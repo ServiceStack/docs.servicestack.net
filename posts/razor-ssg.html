@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="img/logo.svg">
+    <title>Introducing Razor SSG</title>
+    <base href="https://servicestack.github.io/docs.servicestack.net/" />
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="css/app.css">
+    
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "./mjs/app.mjs",
+        "vue": "./lib/mjs/vue.min.mjs",
+        "@servicestack/client": "./lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "./lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<!-- Background backdrop, visually different from main _Layout -->
+<svg class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]" aria-hidden="true">
+  <defs>
+    <pattern id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
+      <path d="M.5 200V.5H200" fill="none"/>
+    </pattern>
+  </defs>
+  <svg x="50%" y="-1" class="overflow-visible fill-gray-50">
+    <path d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z" stroke-width="0"/>
+  </svg>
+  <rect width="100%" height="100%" stroke-width="0" fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)"/>
+</svg>
+<div class="absolute top-0 left-1/2 right-0 -z-10 -ml-24 transform-gpu overflow-hidden blur-3xl lg:ml-24 xl:ml-48">
+  <svg viewBox="0 0 801 1036" aria-hidden="true" class="w-[50.0625rem]">
+    <path fill="url(#70656b7e-db44-4b9b-b7d2-1f06791bed52)" fill-opacity=".3" d="m282.279 843.371 32.285 192.609-313.61-25.32 281.325-167.289-58.145-346.888c94.5 92.652 277.002 213.246 251.009-45.597C442.651 127.331 248.072 10.369 449.268.891c160.956-7.583 301.235 116.434 351.256 179.39L507.001 307.557l270.983 241.04-495.705 294.774Z"/>
+    <defs>
+      <linearGradient id="70656b7e-db44-4b9b-b7d2-1f06791bed52" x1="508.179" x2="-28.677" y1="-116.221" y2="1091.63" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#9089FC"/>
+        <stop offset="1" stop-color="#FF80B5"/>
+      </linearGradient>
+    </defs>
+  </svg>
+</div>
+
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow pr-3">
+    <div class="flex flex-wrap items-center">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="./">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">MyApp</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="whatsnew" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    What's New
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="videos" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Videos
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="creatorkit/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Creator Kit
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="blog" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Blog
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="posts/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Archive
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="speaking" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Speaking
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="uses" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Uses
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="about" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    About
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+  <main role="main" class="pt-14 pb-3">
+    
+
+
+<link rel="stylesheet" href="css/typography.css">
+
+<div class="container px-5 mb-32 mx-auto">
+        <article class="mt-20">
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-12 text-center md:text-left">
+                Introducing Razor SSG
+            </h1>
+            <div class="flex justify-between">
+                <div class="md:mb-12 flex items-center">
+                        <a href="posts/author/lucy-bates"><img class="w-12 h-12 rounded-full mr-4 text-cyan-600" src="img/authors/author1.svg"></a>
+                    <div class="flex flex-col">
+                            <a class="text-xl font-semibold hover:underline" href="posts/author/lucy-bates">Lucy Bates</a>
+                            <ul role="list" class="flex">
+                                    <li>
+                                        <a title="Follow on Twitter" class="mr-1 group flex text-sm font-medium text-zinc-800 transition hover:text-indigo-500 dark:text-zinc-200 dark:hover:text-indigo-500" href="https://twitter.com/lucy">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 flex-none fill-zinc-500 transition group-hover:fill-indigo-500">
+                                                <path d="M20.055 7.983c.011.174.011.347.011.523 0 5.338-3.92 11.494-11.09 11.494v-.003A10.755 10.755 0 0 1 3 18.186c.308.038.618.057.928.058a7.655 7.655 0 0 0 4.841-1.733c-1.668-.032-3.13-1.16-3.642-2.805a3.753 3.753 0 0 0 1.76-.07C5.07 13.256 3.76 11.6 3.76 9.676v-.05a3.77 3.77 0 0 0 1.77.505C3.816 8.945 3.288 6.583 4.322 4.737c1.98 2.524 4.9 4.058 8.034 4.22a4.137 4.137 0 0 1 1.128-3.86A3.807 3.807 0 0 1 19 5.274a7.657 7.657 0 0 0 2.475-.98c-.29.934-.9 1.729-1.713 2.233A7.54 7.54 0 0 0 22 5.89a8.084 8.084 0 0 1-1.945 2.093Z"></path>
+                                            </svg>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a title="Follow on GitHub" class="mr-1 group flex text-sm font-medium text-zinc-800 transition hover:text-indigo-500 dark:text-zinc-200 dark:hover:text-indigo-500" href="https://github.com/lucy">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 flex-none fill-zinc-500 transition group-hover:fill-indigo-500">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.475 2 2 6.588 2 12.253c0 4.537 2.862 8.369 6.838 9.727.5.09.687-.218.687-.487 0-.243-.013-1.05-.013-1.91C7 20.059 6.35 18.957 6.15 18.38c-.113-.295-.6-1.205-1.025-1.448-.35-.192-.85-.667-.013-.68.788-.012 1.35.744 1.538 1.051.9 1.551 2.338 1.116 2.912.846.088-.666.35-1.115.638-1.371-2.225-.256-4.55-1.14-4.55-5.062 0-1.115.387-2.038 1.025-2.756-.1-.256-.45-1.307.1-2.717 0 0 .837-.269 2.75 1.051.8-.23 1.65-.346 2.5-.346.85 0 1.7.115 2.5.346 1.912-1.333 2.75-1.05 2.75-1.05.55 1.409.2 2.46.1 2.716.637.718 1.025 1.628 1.025 2.756 0 3.934-2.337 4.806-4.562 5.062.362.32.675.936.675 1.897 0 1.371-.013 2.473-.013 2.82 0 .268.188.589.688.486a10.039 10.039 0 0 0 4.932-3.74A10.447 10.447 0 0 0 22 12.253C22 6.588 17.525 2 12 2Z"></path>
+                                            </svg>
+                                        </a>
+                                    </li>
+                            </ul>
+                    </div>
+                </div>
+                <div class="mb-4 max-w-sm" data-mail="JoinMailingList" data-props="{ submitLabel:'Join our newsletter' }"></div>
+            </div>
+            <div class="mb-8 md:mb-16 sm:mx-0">
+                <div class="sm:mx-0">
+                    <img src="https://images.unsplash.com/photo-1579767684138-a57e917d30aa?crop=entropy&amp;fit=crop&amp;h=1000&amp;w=2000" alt="Introducing Razor SSG Background" class="shadow-small">
+                </div>
+            </div>
+            <div class="mb-4 max-w-3xl mx-auto flex flex-wrap">
+                    <a href="posts/tagged/razor" class="mr-2 text-xs leading-5 font-semibold bg-slate-400/10 rounded-full py-1 px-3 flex items-center space-x-2 hover:bg-slate-400/20 dark:highlight-white/5">razor</a>
+                    <a href="posts/tagged/markdown" class="mr-2 text-xs leading-5 font-semibold bg-slate-400/10 rounded-full py-1 px-3 flex items-center space-x-2 hover:bg-slate-400/20 dark:highlight-white/5">markdown</a>
+                    <a href="posts/tagged/blog" class="mr-2 text-xs leading-5 font-semibold bg-slate-400/10 rounded-full py-1 px-3 flex items-center space-x-2 hover:bg-slate-400/20 dark:highlight-white/5">blog</a>
+                    <a href="posts/tagged/dev" class="mr-2 text-xs leading-5 font-semibold bg-slate-400/10 rounded-full py-1 px-3 flex items-center space-x-2 hover:bg-slate-400/20 dark:highlight-white/5">dev</a>
+            </div>
+                <div class="max-w-3xl mx-auto">
+                    <div class="mb-6 text-lg text-gray-500">
+                        <time datetime="2023-03-28T00:00:00.0000000">March 28, 2023</time>
+                        <span aria-hidden="true">&middot;</span>
+                        <span>14 min read</span>
+                    </div>
+                </div>
+            <div class="max-w-3xl mx-auto">
+                <div class="prose lg:prose-xl max-w-none mb-32">
+                    <p>Razor SSG is a Razor Pages powered Markdown alternative to <a href="https://jekyllrb.com/">Ruby's Jekyll</a> &amp;
+<a href="https://nextjs.org">Next.js</a> that's ideal for generating static websites &amp; blogs using C#, Razor Pages &amp; Markdown.</p>
+<h3 id="github-codespaces-friendly">GitHub Codespaces Friendly<a class="header-anchor" href="javascript:;" onclick="location.hash='#github-codespaces-friendly'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In addition to having a pure Razor + .NET solution to create fast, CDN-hostable static websites, it also aims to provide a
+great experience from GitHub Codespaces, where you can create, modify, preview &amp; check-in changes before the included GitHub Actions
+auto deploy changes to its GitHub Pages CDN - all from your iPad!</p>
+<p><a href="https://github.com/features/codespaces"><img src="/img/posts/razor-ssg/codespaces.png" alt="" /></a></p>
+<p>To see this in action, we walk through the entire workflow of creating, updating and adding features to a custom Razor SSG website
+from just a browser using Codespaces, that auto publishes changes to your GitHub Repo's <strong>gh-pages</strong> branch where it's hosted for
+free on GitHub Pages CDN:</p>
+<iframe class="youtube" src="https://www.youtube.com/embed/MRQMBrXi5Sc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<h3 id="enhance-with-simple-modern-javascript">Enhance with simple, modern JavaScript<a class="header-anchor" href="javascript:;" onclick="location.hash='#enhance-with-simple-modern-javascript'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For enhanced interactivity, static markdown content can be <a href="/posts/javascript">progressively enhanced</a> with Vue 3 components,
+as done in this example that embed's the
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/wwwroot/mjs/components/GettingStarted.mjs">GettingStarted.mjs</a>
+Vue Component to create new Razor SSG App's below with:</p>
+<pre><code class="language-html">&lt;div data-component=&quot;GettingStarted&quot; data-props=&quot;{template:'razor-ssg'}&quot;&gt;&lt;/div&gt;
+</code></pre>
+<div class="py-8 not-prose text-base flex justify-center" data-component="GettingStarted" data-props="{template:'razor-ssg'}"></div>
+<p>Although with full control over the websites <code>_Layout.cshtml</code>, you're free to use any preferred JS Module or Web Component you prefer.</p>
+<h2 id="razor-pages">Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#razor-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Your website can be built using either Markdown <code>.md</code> or Razor <code>.cshtml</code> pages, although it's generally recommended to
+use Markdown to capture the static content for your website for improved productivity and ease of maintenance.</p>
+<h3 id="content-in-markdown-functionality-in-razor-pages">Content in Markdown, Functionality in Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#content-in-markdown-functionality-in-razor-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The basic premise behind most built-in features is to capture static content in markdown using a combination of
+folder structure &amp; file name conventions in addition to each markdown page's frontmatter &amp; content. This information
+is then used to power each feature using Razor pages for precise layout and functionality.</p>
+<p>The template includes the source code for each website feature, enabling full customization that also serves as good examples
+for how to implement your own custom markdown-powered website features.</p>
+<h3 id="markdown-feature-structure">Markdown Feature Structure<a class="header-anchor" href="javascript:;" onclick="location.hash='#markdown-feature-structure'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>All markdown features are effectively implemented in the same way, starting with a <strong>_folder</strong> for maintaining its static markdown
+content, a <strong>.cs</strong> class to load the markdown and a <strong>.cshtml</strong> Razor Page to render it:</p>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/_{Feature}</code></td>
+<td>Maintains the static markdown for the feature</td>
+</tr>
+<tr>
+<td><code>Markdown.{Feature}.cs</code></td>
+<td>Functionality to read the feature's markdown into logical collections</td>
+</tr>
+<tr>
+<td><code>{Feature}.cshtml</code></td>
+<td>Functionality to Render the feature</td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Configure.Ssg.cs">Configure.Ssg.cs</a></td>
+<td>Initializes and registers the feature with ASP .NET's IOC</td>
+</tr>
+</tbody>
+</table>
+<p>Lets see what this looks like in practice by walking through the &quot;Pages&quot; feature:</p>
+<h2 id="pages-feature">Pages Feature<a class="header-anchor" href="javascript:;" onclick="location.hash='#pages-feature'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The pages feature simply makes all pages in the <strong>_pages</strong> folder, available from <code>/{filename}</code>.</p>
+<p>Where the included pages:</p>
+<h3 id="pages"><a href="https://github.com/NetCoreTemplates/razor-ssg/tree/main/MyApp/_pages">/_pages</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li>privacy.md</li>
+<li>speaking.md</li>
+<li>uses.md</li>
+</ul>
+<p>Are made available from:</p>
+<ul>
+<li><a href="/privacy">/privacy</a></li>
+<li><a href="/speaking">/speaking</a></li>
+<li><a href="/uses">/uses</a></li>
+</ul>
+<h3 id="loading-pages-markdown">Loading Pages Markdown<a class="header-anchor" href="javascript:;" onclick="location.hash='#loading-pages-markdown'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The code that loads the Pages feature markdown content is in <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Markdown.Pages.cs">Markdown.Pages.cs</a>:</p>
+<pre><code class="language-csharp">public class MarkdownPages : MarkdownPagesBase&lt;MarkdownFileInfo&gt;
+{
+    public MarkdownPages(ILogger&lt;MarkdownPages&gt; log, IWebHostEnvironment env) 
+        : base(log,env) {}
+    
+    List&lt;MarkdownFileInfo&gt; Pages { get; set; } = new();
+    public List&lt;MarkdownFileInfo&gt; VisiblePages =&gt; Pages.Where(IsVisible).ToList();
+
+    public MarkdownFileInfo? GetBySlug(string slug) =&gt; 
+        Fresh(VisiblePages.FirstOrDefault(x =&gt; x.Slug == slug));
+
+    public void LoadFrom(string fromDirectory)
+    {
+        Pages.Clear();
+        var fs = AssertVirtualFiles();
+        var files = fs.GetDirectory(fromDirectory).GetAllFiles().ToList();
+        var log = LogManager.GetLogger(GetType());
+        log.InfoFormat(&quot;Found {0} pages&quot;, files.Count);
+
+        var pipeline = CreatePipeline();
+
+        foreach (var file in files)
+        {
+            var doc = Load(file.VirtualPath, pipeline);
+            if (doc == null)
+                continue;
+
+            Pages.Add(doc);
+        }
+    }
+}
+</code></pre>
+<p>Which ultimately just loads Markdown files using the configured <a href="https://github.com/xoofx/markdig">Markdig</a> pipeline in its <code>Pages</code>
+collection which is made available via its <code>VisiblePages</code> property which returns all documents in development whilst hiding
+<strong>Draft</strong> and content published at a <strong>Future Date</strong> from production builds.</p>
+<h3 id="rendering-markdown-pages">Rendering Markdown Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#rendering-markdown-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The pages are then rendered in <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Page.cshtml">Page.cshtml</a> Razor Page
+that's available from <code>/{slug}</code></p>
+<pre><code class="language-csharp">@page &quot;/{slug}&quot;
+@model MyApp.Page
+@inject MarkdownPages Markdown
+
+@implements IRenderStatic&lt;MyApp.Page&gt;
+@functions {
+    public List&lt;Page&gt; GetStaticProps(RenderContext ctx)
+    {
+        var markdown = ctx.Resolve&lt;MarkdownPages&gt;();
+        return markdown.VisiblePages.Map(page =&gt; new Page { Slug = page.Slug! });
+    }
+}
+
+@{
+    var doc = Markdown.GetBySlug(Model.Slug);
+    if (doc.Layout != null) 
+        Layout = doc.Layout == &quot;none&quot;
+            ? null
+            : doc.Layout;
+    ViewData[&quot;Title&quot;] = doc.Title;
+}
+
+&lt;link rel=&quot;stylesheet&quot; href=&quot;css/typography.css&quot;&gt;
+&lt;section class=&quot;flex-col md:flex-row flex justify-center mt-16 mb-16 md:mb-12&quot;&gt;
+    &lt;h1 class=&quot;text-4xl tracking-tight font-extrabold text-gray-900&quot;&gt;
+        @doc.Title
+    &lt;/h1&gt;
+&lt;/section&gt;    
+&lt;div class=&quot;mx-auto&quot;&gt;
+    &lt;div class=&quot;mx-auto prose lg:prose-xl mb-24&quot;&gt;
+        @Html.Raw(doc.Preview)
+    &lt;/div&gt;
+&lt;/div&gt;
+
+@await Html.PartialAsync(&quot;HighlightIncludes&quot;)
+&lt;script&gt;hljs.highlightAll()&lt;/script&gt;
+</code></pre>
+<p>Which uses a custom layout if one is defined in its frontmatter which
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/_pages/speaking.md">speaking.md</a> utilizes in its <strong>layout</strong> frontmatter:</p>
+<pre><code class="language-yaml">---
+title: Speaking
+layout: _LayoutContent
+---
+</code></pre>
+<p>To render the page using <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Shared/_LayoutContent.cshtml">_LayoutContent.cshtml</a>
+visible by the background backdrop in its <a href="/speaking">/speaking</a> page.</p>
+<h2 id="whats-new-feature">What's New Feature<a class="header-anchor" href="javascript:;" onclick="location.hash='#whats-new-feature'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <a href="/whatsnew">/whatsnew</a> page is an example of creating a custom Markdown feature to implement a portfolio or a product releases page
+where a new folder is created per release, containing both release date and release or project name, with all features in that release
+maintained markdown content sorted in alphabetical order:</p>
+<h3 id="whatsnew"><a href="https://github.com/NetCoreTemplates/razor-ssg/tree/main/MyApp/_whatsnew">/_whatsnew</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#whatsnew'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><strong>/2023-03-08_Animaginary</strong>
+<ul>
+<li>feature1.md</li>
+</ul>
+</li>
+<li><strong>/2023-03-18_OpenShuttle</strong>
+<ul>
+<li>feature1.md</li>
+</ul>
+</li>
+<li><strong>/2023-03-28_Planetaria</strong>
+<ul>
+<li>feature1.md</li>
+</ul>
+</li>
+</ul>
+<p>What's New follows the same structure as Pages feature which is loaded in:</p>
+<ul>
+<li><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Markdown.WhatsNew.cs">Markdown.WhatsNew.cs</a></li>
+</ul>
+<p>and rendered in:</p>
+<ul>
+<li><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/WhatsNew.cshtml">WhatsNew.cshtml</a></li>
+</ul>
+<h2 id="blog-feature">Blog Feature<a class="header-anchor" href="javascript:;" onclick="location.hash='#blog-feature'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The blog maintains its markdown posts in a flat folder which each Markdown post containing its publish date and URL slug it
+should be published under:</p>
+<h3 id="posts"><a href="https://github.com/NetCoreTemplates/razor-ssg/tree/main/MyApp/_posts">/_posts</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#posts'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li>...</li>
+<li>2023-01-21_start.md</li>
+<li>2023-03-21_javascript.md</li>
+<li>2023-03-28_razor-ssg.md</li>
+</ul>
+<p>As the Blog has more features it requires a larger <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Markdown.Blog.cs">Markdown.Blog.cs</a>
+to load its Markdown posts that is rendered in several different Razor Pages for each of its Views:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Blog.cshtml">Blog.cshtml</a></td>
+<td>Main Blog layout</td>
+<td><a href="/blog">/blog</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Index.cshtml">Posts/Index.cshtml</a></td>
+<td>Navigable Archive grid of Posts</td>
+<td><a href="/posts">/posts</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Post.cshtml">Posts/Post.cshtml</a></td>
+<td>Individual Blog Post (like this!)</td>
+<td><a href="/posts/razor-ssg">/posts/razor-ssg</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Author.cshtml">Author.cshtml</a></td>
+<td>Display Posts by Author</td>
+<td><a href="/posts/author/lucy-bates">/posts/author/lucy-bates</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Tagged.cshtml">Tagged.cshtml</a></td>
+<td>Display Posts by Tag</td>
+<td><a href="/posts/tagged/markdown">/posts/tagged/markdown</a></td>
+</tr>
+<tr>
+<td><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Year.cshtml">Year.cshtml</a></td>
+<td>Display Posts by Year</td>
+<td><a href="/posts/year/2023">/posts/year/2023</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="general-features">General Features<a class="header-anchor" href="javascript:;" onclick="location.hash='#general-features'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Most unique markdown features are captured in their Markdown's frontmatter metadata, but in general these features
+are broadly available for all features:</p>
+<ul>
+<li><strong>Live Reload</strong> - Latest Markdown content is displayed during <strong>Development</strong></li>
+<li><strong>Custom Layouts</strong> - Render post in custom Razor Layout with <code>layout: _LayoutAlt</code></li>
+<li><strong>Drafts</strong> - Prevent posts being worked on from being published with <code>draft: true</code></li>
+<li><strong>Future Dates</strong> - Posts with a future date wont be published until that date</li>
+</ul>
+<h3 id="initializing-and-loading-markdown-features">Initializing and Loading Markdown Features<a class="header-anchor" href="javascript:;" onclick="location.hash='#initializing-and-loading-markdown-features'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>All markdown features are initialized in the same way in <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Configure.Ssg.cs">Configure.Ssg.cs</a>
+where they're registered in ASP.NET Core's IOC and initialized after the App's plugins are loaded
+by injecting with the App's <a href="https://docs.servicestack.net/virtual-file-system">Virtual Files provider</a>
+before using it to read from the directory where the markdown content for each feature is maintained:</p>
+<pre><code class="language-csharp">public class ConfigureSsg : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices(services =&gt;
+        {
+            services.AddSingleton&lt;RazorPagesEngine&gt;();
+            services.AddSingleton&lt;MarkdownPages&gt;();
+            services.AddSingleton&lt;MarkdownWhatsNew&gt;();
+            services.AddSingleton&lt;MarkdownBlog&gt;();
+        })
+        .ConfigureAppHost(afterPluginsLoaded: appHost =&gt; {
+            var pages = appHost.Resolve&lt;MarkdownPages&gt;();
+            var whatsNew = appHost.Resolve&lt;MarkdownWhatsNew&gt;();
+            var blogPosts = appHost.Resolve&lt;MarkdownBlog&gt;();
+            
+            var features = new IMarkdownPages[] { pages, whatsNew, blogPosts }; 
+            features.Each(x =&gt; x.VirtualFiles = appHost.VirtualFiles);
+
+            // Custom initialization
+            blogPosts.Authors = Authors;
+
+            // Load feature markdown content
+            pages.LoadFrom(&quot;_pages&quot;);
+            whatsNew.LoadFrom(&quot;_whatsnew&quot;);
+            blogPosts.LoadFrom(&quot;_posts&quot;);
+        });
+    });
+    //...
+}
+</code></pre>
+<p>These dependencies are then injected in the feature's Razor Pages to query and render the loaded markdown content.</p>
+<h3 id="custom-frontmatter">Custom Frontmatter<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-frontmatter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can extend the <code>MarkdownFileInfo</code> type used to maintain the markdown content and metadata of each loaded Markdown file
+by adding any additional metadata you want included as C# properties on:</p>
+<pre><code class="language-csharp">// Add additional frontmatter info to include
+public class MarkdownFileInfo : MarkdownFileBase
+{
+}
+</code></pre>
+<p>Any additional properties are automatically populated using ServiceStack's
+<a href="https://docs.servicestack.net/auto-mapping">built-in Automapping</a> which includes rich support for converting string frontmatter
+values into native .NET types.</p>
+<h3 id="updating-to-latest-versions">Updating to latest versions<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-to-latest-versions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can easily update all the JavaScript dependencies used in
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/postinstall.js">postinstall.js</a> by running:</p>
+<div class="not-prose text-base" data-component="ShellCommand" data-props="{ text: 'node postinstall.js' }"></div>
+<p>This will also update the Markdown features <code>*.cs</code> implementations which is delivered as source files instead of an external
+NuGet package to enable full customization, easier debugging whilst supporting easy upgrades.</p>
+<p>If you do customize any of the <code>.cs</code> files, you'll want to exclude them from being updated by removing them from:</p>
+<pre><code class="language-js">const hostFiles = [
+    'Markdown.Blog.cs',
+    'Markdown.Pages.cs',
+    'Markdown.WhatsNew.cs',
+    'MarkdownPagesBase.cs',
+]
+</code></pre>
+<h3 id="markdown-tag-helper">Markdown Tag Helper<a class="header-anchor" href="javascript:;" onclick="location.hash='#markdown-tag-helper'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The included <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/MarkdownTagHelper.cs">MarkdownTagHelper.cs</a> can be used
+in hybrid Razor Pages like <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/About.cshtml">About.cshtml</a>
+to render the <a href="/about">/about</a> page which requires the flexibility of Razor Pages with a static content component which you
+prefer to maintain inline with Markdown.</p>
+<p>The <code>&lt;markdown /&gt;</code> tag helper renders plain HTML, which you can apply <a href="https://tailwindcss.com/docs/typography-plugin">Tailwind's @typography</a>
+styles by including <strong>typography.css</strong> and annotating it with your preferred <code>prose</code> variant, e.g:</p>
+<pre><code class="language-html">&lt;link rel=&quot;stylesheet&quot; href=&quot;css/typography.css&quot;&gt;
+&lt;markdown class=&quot;prose&quot;&gt;
+  Markdown content...
+&lt;/markdown&gt;
+</code></pre>
+<h2 id="static-static-generation-ssg">Static Static Generation (SSG)<a class="header-anchor" href="javascript:;" onclick="location.hash='#static-static-generation-ssg'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>All features up till now describes how this template implements a Markdown powered Razor Pages .NET application, where this template
+differs in its published output, where instead of a .NET App deployed to a VM or App server it generates static <code>*.html</code> files that's
+bundled together with <code>/wwwroot</code> static assets in the <code>/dist</code> folder that can be previewed by launching a HTTP Server from that
+folder with the built-in npm script:</p>
+<div class="not-prose text-base" data-component="ShellCommand" data-props="{ text: 'npm run serve' }"></div>
+<p>That runs <strong>npx http-server</strong> on <code>http://localhost:8080</code> that you can open in a browser to preview the published version of your
+site as it would be when hosted on a CDN.</p>
+<h3 id="static-razor-pages">Static Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#static-razor-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The static generation functionality works by scanning all your Razor Pages and prerendering the pages with prerendering instructions.</p>
+<h3 id="pages-with-static-routes">Pages with Static Routes<a class="header-anchor" href="javascript:;" onclick="location.hash='#pages-with-static-routes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Pages with static routes can be marked to be prerendered by annotating it with the <code>[RenderStatic]</code> attribute as done in
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/About.cshtml">About.cshtml</a>:</p>
+<pre><code class="language-csharp">@page &quot;/about&quot;
+@attribute [RenderStatic]
+</code></pre>
+<p>Which saves the pre-rendered page using the pages route with a .html suffix, e.g: <code>/{@page route}.html</code> whilst pages with static
+routes with a trailing <code>/</code> are saved to <code>/{@page route}/index.html</code>:</p>
+<pre><code class="language-csharp">@page &quot;/posts/&quot;
+@attribute [RenderStatic]
+</code></pre>
+<h4 id="explicit-generated-paths">Explicit generated paths<a class="header-anchor" href="javascript:;" onclick="location.hash='#explicit-generated-paths'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>To keep the generated pages in-sync with using the same routes as your Razor Pages in development it's recommended to use the implied
+rendered paths, but if preferred you can specify which path the page should be rendered to instead with:</p>
+<pre><code class="language-csharp">@page &quot;/posts/&quot;
+@attribute [RenderStatic(&quot;/posts/index.html&quot;)]
+</code></pre>
+<h3 id="pages-with-dynamic-routes">Pages with Dynamic Routes<a class="header-anchor" href="javascript:;" onclick="location.hash='#pages-with-dynamic-routes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Prerendering dynamic pages follows <a href="https://nextjs.org/docs/basic-features/data-fetching/get-static-props">Next.js getStaticProps</a>
+convention which you can implement using <code>IRenderStatic&lt;PageModel&gt;</code> by returning a Page Model for each page that should be generated
+as done in <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Post.cshtml">Posts/Post.cshtml</a> and
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Page.cshtml">Page.cshtml</a>:</p>
+<pre><code class="language-csharp">@page &quot;/{slug}&quot;
+@model MyApp.Page
+
+@implements IRenderStatic&lt;MyApp.Page&gt;
+@functions {
+    public List&lt;Page&gt; GetStaticProps(RenderContext ctx)
+    {
+        var markdown = ctx.Resolve&lt;MarkdownPages&gt;();
+        return markdown.VisiblePages.Map(page =&gt; new Page { Slug = page.Slug! });
+    }
+}
+...
+</code></pre>
+<p>In this case it returns a Page Model for every <strong>Visible</strong> markdown page in
+<a href="https://github.com/NetCoreTemplates/razor-ssg/tree/main/MyApp/_pages">/_pages</a> that ends up rendering the following pages in <code>/dist</code>:</p>
+<ul>
+<li><code>/privacy.html</code></li>
+<li><code>/speaking.html</code></li>
+<li><code>/uses.html</code></li>
+</ul>
+<h3 id="limitations">Limitations<a class="header-anchor" href="javascript:;" onclick="location.hash='#limitations'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The primary limitations for developing statically generated Apps is that a <strong>snapshot</strong> of entire App is generated at deployment,
+which prohibits being able to render different content <strong>per request</strong>, e.g. for Authenticated users which would require executing
+custom JavaScript after the page loads to dynamically alter the page's initial content.</p>
+<p>Otherwise in practice you'll be able develop your Razor Pages utilizing Razor's full feature-set, the primary concessions stem
+from Pages being executed in a static context which prohibits pages from returning dynamic content per request, instead any
+&quot;different views&quot; should be maintained in separate pages.</p>
+<h4 id="no-querystring-params">No QueryString Params<a class="header-anchor" href="javascript:;" onclick="location.hash='#no-querystring-params'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>As the generated pages should adopt the same routes as your Razor Pages you'll need to avoid relying on <strong>?QueryString</strong> params
+and instead capture all required parameters for a page in its <strong>@page route</strong> as done for:</p>
+<p><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Author.cshtml">Posts/Author.cshtml</a></p>
+<pre><code class="language-csharp">@page &quot;/posts/author/{slug}&quot;
+@model AuthorModel
+@inject MarkdownBlog Blog
+
+@implements IRenderStatic&lt;AuthorModel&gt;
+@functions {
+    public List&lt;AuthorModel&gt; GetStaticProps(RenderContext ctx) =&gt; ctx.Resolve&lt;MarkdownBlog&gt;()
+        .AuthorSlugMap.Keys.Map(x =&gt; new AuthorModel { Slug = x });
+}
+...
+</code></pre>
+<p>Which lists all posts by an Author, e.g: <a href="/posts/author/lucy-bates">/posts/author/lucy-bates</a>, likewise required for:</p>
+<p><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Tagged.cshtml">Posts/Tagged.cshtml</a></p>
+<pre><code class="language-csharp">@page &quot;/posts/tagged/{slug}&quot;
+@model TaggedModel
+@inject MarkdownBlog Blog
+
+@implements IRenderStatic&lt;TaggedModel&gt;
+@functions {
+    public List&lt;TaggedModel&gt; GetStaticProps(RenderContext ctx) =&gt; ctx.Resolve&lt;MarkdownBlog&gt;()
+        .TagSlugMap.Keys.Map(x =&gt; new TaggedModel { Slug = x });
+}
+...
+</code></pre>
+<p>Which lists all related posts with a specific tag, e.g: <a href="/posts/tagged/markdown">/posts/tagged/markdown</a>, and for:</p>
+<p><a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Pages/Posts/Year.cshtml">Posts/Year.cshtml</a></p>
+<pre><code class="language-csharp">@page &quot;/posts/year/{year}&quot;
+@model YearModel
+@inject MarkdownBlog Blog
+
+@implements IRenderStatic&lt;YearModel&gt;
+@functions {
+    public List&lt;YearModel&gt; GetStaticProps(RenderContext ctx) =&gt; ctx.Resolve&lt;MarkdownBlog&gt;()
+        .VisiblePosts.Select(x =&gt; x.Date.GetValueOrDefault().Year)
+            .Distinct().Map(x =&gt; new YearModel { Year = x });
+}
+
+...
+</code></pre>
+<p>Which lists all posts published in a specific year, e.g: <a href="/posts/year/2023">/posts/year/2023</a>.</p>
+<p>Conceivably these &quot;different views&quot; could've been implemented by the same page with different <code>?author</code>, <code>?tag</code> and <code>?year</code>
+QueryString params, but are instead extracted into different pages to support its statically generated <code>*.html</code> outputs.</p>
+<h2 id="prerendering-task">Prerendering Task<a class="header-anchor" href="javascript:;" onclick="location.hash='#prerendering-task'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <strong>prerender</strong> <a href="https://docs.servicestack.net/app-tasks">AppTask</a> that pre-renders the entire website is also registered in
+<a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/MyApp/Configure.Ssg.cs">Configure.Ssg.cs</a>:</p>
+<pre><code class="language-csharp">  .ConfigureAppHost(afterAppHostInit: appHost =&gt;
+  {
+      // prerender with: `$ npm run prerender` 
+      AppTasks.Register(&quot;prerender&quot;, args =&gt;
+      {
+          var distDir = appHost.ContentRootDirectory.RealPath.CombineWith(&quot;dist&quot;);
+          if (Directory.Exists(distDir))
+              FileSystemVirtualFiles.DeleteDirectory(distDir);
+          FileSystemVirtualFiles.CopyAll(
+              new DirectoryInfo(appHost.ContentRootDirectory.RealPath.CombineWith(&quot;wwwroot&quot;)),
+              new DirectoryInfo(distDir));
+          var razorFiles = appHost.VirtualFiles.GetAllMatchingFiles(&quot;*.cshtml&quot;);
+          RazorSsg.PrerenderAsync(appHost, razorFiles, distDir).GetAwaiter().GetResult();
+      });
+  });
+  //...
+</code></pre>
+<p>Which we can see:</p>
+<ol>
+<li>Deletes <code>/dist</code> folder</li>
+<li>Copies <code>/wwwroot</code> contents into <code>/dist</code></li>
+<li>Passes all App's Razor <code>*.cshtml</code> files to <code>RazorSsg</code> to do the pre-rendering</li>
+</ol>
+<p>Where it processes all pages with <code>[RenderStatic]</code> and <code>IRenderStatic&lt;PageModel&gt;</code> prerendering instructions to the
+specified <code>/dist</code> folder.</p>
+<h3 id="previewing-prerendered-site">Previewing prerendered site<a class="header-anchor" href="javascript:;" onclick="location.hash='#previewing-prerendered-site'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To preview your SSG website, run the prerendered task with:</p>
+<div class="not-prose text-base" data-component="ShellCommand" data-props="{ text: 'npm run prerender' }"></div>
+<p>Which renders your site to <code>/_dist</code> which you can run a HTTP Server from with:</p>
+<div class="not-prose text-base" data-component="ShellCommand" data-props="{ text: 'npm run serve' }"></div>
+<p>That you can preview with your browser at <code>http://localhost:8080</code>.</p>
+<h3 id="publishing">Publishing<a class="header-anchor" href="javascript:;" onclick="location.hash='#publishing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The included <a href="https://github.com/NetCoreTemplates/razor-ssg/blob/main/.github/workflows/build.yml">build.yml</a> GitHub Action
+takes care of running the prerendered task and deploying it to your Repo's GitHub Pages where it will be available at:</p>
+<pre><code>https://$org_name.github.io/$repo/
+</code></pre>
+<p>You'll need to enable GitHub Pages to be hosted from your <strong>gh-pages</strong> branch in your Repository settings:</p>
+<p><img src="/img/posts/razor-ssg/gh-pages.png" alt="" /></p>
+<p>You can use a <a href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages">Custom domain for GitHub Pages</a>
+by registering a CNAME DNS entry for your preferred Custom Domain, e.g:</p>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Type</th>
+<th>Value</th>
+<th>TTL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>mydomain.org</strong></td>
+<td>CNAME</td>
+<td><strong>org_name</strong>.github.io</td>
+<td>3600</td>
+</tr>
+</tbody>
+</table>
+<p>That you can either <a href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-a-subdomain">configure in your Repo settings</a>
+or if you prefer to maintain it with your code-base, save the domain name to <code>/wwwroot/CNAME</code>, e.g:</p>
+<pre><code>www.mydomain.org
+</code></pre>
+<h3 id="benefits-after-migrating-from-jekyll">Benefits after migrating from Jekyll<a class="header-anchor" href="javascript:;" onclick="location.hash='#benefits-after-migrating-from-jekyll'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Whilst still only at <strong>v1</strong> release, we found it already had a number of advantages over the existing Jekyll static website:</p>
+<ul>
+<li>Faster live reloads</li>
+<li>C#/Razor more type-save &amp; productive than Ruby/Liquid</li>
+<li>Greater flexibility in implementing new features</li>
+<li>Better IDE support (from Rider)</li>
+<li>Ability to reuse our .NET libraries</li>
+<li>Better development experience</li>
+</ul>
+<p>The last point ultimately prompted seeking an alternative solution as previously Jekyll was used from Windows/WSL which
+was awkward to manage from a different filesystem with Jekyll upgrades breaking RubyMine support forcing the use of
+text editors to maintain its code-base and content.</p>
+<h3 id="used-by-the-new-servicestack.net">Used by the new <a href="https://servicestack.net">servicestack.net</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#used-by-the-new-servicestack.net'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Deterred by the growing complexity of current SSG solutions, we decided to create a new solution using C#/Razor
+(our preferred technology for generating server HTML) with a clean implementation that allowed full control
+with an <strong>npm dependency-free</strong> solution letting us adopt our preferred approach to
+<a href="https://vue-mjs.web-templates.io/posts/javascript">Simple, Modern JavaScript</a> without any build-tooling or SPA complexity.</p>
+<p>We're happy with the results of <a href="https://servicestack.net">https://servicestack.net</a> new Razor SSG website:</p>
+<p><a href="https://servicestack.net"><img src="/img/posts/razor-ssg/servicestack.net.png" alt="" /></a></p>
+<p>A clean, crisp code-base utilizing simple JS Module Vue 3 components, the source code of which is publicly maintained at:</p>
+<ul>
+<li><a href="https://github.com/servicestack/servicestack.net">https://github.com/servicestack/servicestack.net</a></li>
+</ul>
+<p>Which serves as a good example at how well this template scales for larger websites.</p>
+<h4 id="markdown-videos-feature">Markdown Videos Feature<a class="header-anchor" href="javascript:;" onclick="location.hash='#markdown-videos-feature'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>It only needed one new Markdown feature to display our growing video library:</p>
+<ul>
+<li><a href="https://github.com/ServiceStack/servicestack.net/tree/main/MyApp/_videos">/_videos</a> - Directory of Markdown Video collections</li>
+<li><a href="https://github.com/ServiceStack/servicestack.net/blob/main/MyApp/Markdown.Videos.cs">Markdown.Videos.cs</a> - Loading Video feature markdown content</li>
+<li><a href="https://github.com/ServiceStack/servicestack.net/blob/main/MyApp/Pages/Shared/VideoGroup.cshtml">Shared/VideoGroup.cshtml</a> - Razor Page for displaying Video Collection</li>
+</ul>
+<p>Which you're free to reuse in your own websites needing a similar feature.</p>
+<h4 id="feedback-feature-requests-welcome">Feedback &amp; Feature Requests Welcome<a class="header-anchor" href="javascript:;" onclick="location.hash='#feedback-feature-requests-welcome'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>In future we'll look at expanding this template with generic Markdown features suitable for websites, blogs &amp; portfolios,
+or maintain a shared community collection if there ends up being community contributions of Razor SSG &amp; Markdown features.</p>
+<p>In the meantime, we welcome any feedback or new feature requests at:</p>
+<h3 id="httpsservicestack.netideas"><a href="https://servicestack.net/ideas">https://servicestack.net/ideas</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#httpsservicestack.netideas'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+
+                </div>
+            </div>
+        </article>
+</div>
+
+<div data-post="PostComments" class="my-48"></div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+<link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets/styles/atom-one-dark.min.css">
+<script src="//unpkg.com/@highlightjs/cdn-assets/highlight.min.js"></script>
+<script>hljs.highlightAll()</script>
+
+  </main>
+</div>
+
+<footer class="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+  <div class="mx-auto max-w-7xl overflow-hidden py-20 px-6 sm:py-24 lg:px-8">
+    <nav class="-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12" aria-label="Footer">
+      <div class="pb-6">
+        <a href="whatsnew" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">What's New</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="blog" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">Blog</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="posts" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">Archive</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="speaking" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">Speaking</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="uses" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">Uses</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="about" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">About</a>
+      </div>
+
+      <div class="pb-6">
+        <a href="privacy" class="text-sm leading-6 text-gray-600 hover:text-gray-900 dark:hover:text-gray-50">Privacy</a>
+      </div>
+    </nav>
+    <div class="mt-10 flex justify-center space-x-10">
+      <a href="#" class="text-gray-400 hover:text-gray-500">
+        <span class="sr-only">Facebook</span>
+        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
+        </svg>
+      </a>
+
+      <a href="#" class="text-gray-400 hover:text-gray-500">
+        <span class="sr-only">Instagram</span>
+        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"/>
+        </svg>
+      </a>
+
+      <a href="#" class="text-gray-400 hover:text-gray-500">
+        <span class="sr-only">Twitter</span>
+        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+        </svg>
+      </a>
+
+      <a href="#" class="text-gray-400 hover:text-gray-500">
+        <span class="sr-only">GitHub</span>
+        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+        </svg>
+      </a>
+
+      <a href="#" class="text-gray-400 hover:text-gray-500">
+        <span class="sr-only">YouTube</span>
+        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clip-rule="evenodd"/>
+        </svg>
+      </a>
+    </div>
+    <p class="mt-10 text-center text-xs leading-5 text-gray-500">
+      <a href="https://github.com/NetCoreTemplates/razor-ssg">powered by razor</a>
+    </p>
+  </div>
+</footer>
+
+<script type="module">
+//TODO: Replace with local and production URLs of CreatorKit .NET App or Remove if not using CreatorKit
+import { mail } from 'https://creatorkit.netcore.io/mjs/components/mail.mjs'
+import { post } from 'https://creatorkit.netcore.io/mjs/components/post.mjs'
+
+mail('[data-mail]', { 
+    mailingLists: ['MonthlyNewsletter'] 
+})
+
+post('[data-post]', {
+    commentLink: { 
+        href: '/community-rules',
+        label: 'read the community rules'
+    } 
+})
+</script>
+
+</body>
+</html>
