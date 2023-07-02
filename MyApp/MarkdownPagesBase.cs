@@ -384,12 +384,13 @@ public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainer
         renderer.Write("<div").WriteAttributes(obj).Write('>');
         MarkdownFileBase? doc = null;
         string? slug = null;
+        string? prefix = null;
         var allIncludes = new List<MarkdownFileInfo>();
+        var markdown = HostContext.Resolve<MarkdownPages>();
         if (include.EndsWith(".md"))
         {
-            var markdown = HostContext.Resolve<MarkdownPages>();
             include = include.TrimStart('/');
-            var prefix = include.LeftPart('/');
+            prefix = include.LeftPart('/');
             slug = include.LeftPart('.');
             allIncludes = markdown.GetVisiblePages(prefix, allDirectories: true);
             doc = allIncludes.FirstOrDefault(x => x.Slug == slug);
@@ -404,13 +405,15 @@ public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainer
             var log = HostContext.Resolve<ILogger<IncludeContainerInlineRenderer>>();
             log.LogError("Could not find: {Include}", include);
             renderer.WriteLine($"Could not find: {include}");
-            renderer.WriteLine($"<!-- slug: {slug}, includes:");
-            foreach (var includeDoc in allIncludes)
-            {
-                renderer.WriteLine($"{includeDoc.Path}: {includeDoc.Slug}");
-            }
-            renderer.WriteLine("-->");
         }
+        
+        renderer.WriteLine($"<!-- prefix: {prefix}, slug: {slug}, pages: {markdown.Pages.Count}, includes:");
+        foreach (var includeDoc in allIncludes)
+        {
+            renderer.WriteLine($"{includeDoc.Path}: {includeDoc.Slug}");
+        }
+        renderer.WriteLine("-->");
+
         renderer.Write("</div>");
     }
 }
