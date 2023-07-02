@@ -217,7 +217,7 @@ experience without any additional build time or tooling complexity.
 
 ## Create Empty ServiceStack Apps
 
-::include /includes/empty-projects.md::
+::include empty-projects.md::
 
 ### Any TypeScript or JavaScript Web, Node.js or React Native App
 

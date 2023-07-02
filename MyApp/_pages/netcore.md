@@ -91,7 +91,7 @@ dotnet tool install --global x
  
 This makes the `x` .NET Core tool globally available which can be run without arguments to view all templates available:
 
-::include /includes/web-new-netcore.md::
+::include web-new-netcore.md::
 
 ### Usage
 

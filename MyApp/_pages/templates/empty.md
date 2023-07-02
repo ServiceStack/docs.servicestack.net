@@ -3,7 +3,7 @@ title: Empty Project Templates
 ---
 ## Create Empty .NET 6 Web Apps
 
-::include /includes/empty-projects.md::
+::include empty-projects.md::
 
 ## Empty ASP .NET Core and .NET Framework Templates
 

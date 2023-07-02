@@ -426,5 +426,5 @@ files.config {AccessKey:$AWS_S3_ACCESS_KEY,SecretKey:$AWS_S3_SECRET_KEY,Region:u
 See the [plugins app.settings](https://sharpscript.net/docs/sharp-apps#registering-servicestack-plugins) for examples of how to load and configure 
 [ServiceStack Plugins](/plugins).
 
-::include /includes/web-trouble.md::
+::include web-trouble.md::
 

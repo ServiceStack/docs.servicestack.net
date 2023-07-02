@@ -386,10 +386,13 @@ public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainer
         string? slug = null;
         string? prefix = null;
         var allIncludes = new List<MarkdownFileInfo>();
-        var markdown = MarkdownPages.Instance;
+        var markdown = HostContext.Resolve<MarkdownPages>();
         if (include.EndsWith(".md"))
         {
-            include = include.TrimStart('/');
+            // default relative path to _includes
+            include = include[0] != '/'
+                ? "_includes/" + include
+                : include.TrimStart('/');
             prefix = include.LeftPart('/');
             slug = include.LeftPart('.');
             allIncludes = markdown.GetVisiblePages(prefix, allDirectories: true);

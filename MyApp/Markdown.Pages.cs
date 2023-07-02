@@ -6,7 +6,6 @@ namespace Ssg;
 
 public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
 {
-    public static MarkdownPages Instance { get; set; }
     public override string Id => "pages";
 
     public virtual string? DefaultMenuIcon { get; set; } =
@@ -33,7 +32,9 @@ public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
         Sidebars.Clear();
         Pages.Clear();
         var fs = AssertVirtualFiles();
-        var files = fs.GetDirectory(fromDirectory).GetAllFiles().ToList();
+        var files = fs.GetDirectory(fromDirectory).GetAllFiles()
+            .OrderBy(x => x.VirtualPath)
+            .ToList();
         var log = LogManager.GetLogger(GetType());
         log.InfoFormat("Found {0} pages", files.Count);
 

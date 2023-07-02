@@ -281,7 +281,7 @@ $ redis-server --service-start –service-name redisService3
 
 ## Redis Admin Desktop App
 
-::include /includes/redis-admin.md::
+::include redis-admin.md::
 
 ## [Redis Vue](https://sharpscript.net/sharp-apps/redis#redis-vue)
 

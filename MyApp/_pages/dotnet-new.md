@@ -47,15 +47,15 @@ Where it will display all repositories in [.NET Core](https://github.com/NetCore
 
 :::{class="not-prose table table-striped"}
 
-::include /includes/web-new-netcore.md::
+::include web-new-netcore.md::
 
 <p>&nbsp;</p>
 
-::include /includes/web-new-corefx.md::
+::include web-new-corefx.md::
 
 <p>&nbsp;</p>
 
-::include /includes/web-new-netfx.md::
+::include web-new-netfx.md::
 
 :::
 
@@ -459,4 +459,4 @@ to browse and create new legacy project templates, e.g:
 APP_SOURCE_TEMPLATES=LegacyTemplates x new
 :::
 
-::include /includes/web-trouble.md::
+::include web-trouble.md::

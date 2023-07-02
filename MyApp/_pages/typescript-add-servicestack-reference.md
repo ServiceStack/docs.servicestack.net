@@ -9,7 +9,7 @@ ServiceStack's **Add ServiceStack Reference** feature allows clients to generate
 
 ## Install
 
-::include /includes/ref-servicestack-client.md::
+::include ref-servicestack-client.md::
 
 ### First class development experience
 
