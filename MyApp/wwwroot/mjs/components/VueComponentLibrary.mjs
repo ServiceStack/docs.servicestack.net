@@ -9,25 +9,25 @@ export default {
         <div class="pt-4 pb-16">
             <div class="mx-auto">
                 <NavList class="mt-8" title="">
-                    <NavListItem title="useMetadata" href="https://docs.servicestack.net/vue/use-metadata" :iconSvg="Icons.Code">
+                    <NavListItem title="useMetadata" href="/vue/use-metadata" :iconSvg="Icons.Code">
                         Reflective utils for inspecting API AppMetadata
                     </NavListItem>
-                    <NavListItem title="useClient" href="https://docs.servicestack.net/vue/use-client" :iconSvg="Icons.Code">
+                    <NavListItem title="useClient" href="/vue/use-client" :iconSvg="Icons.Code">
                         Utilize JSON Api Client features in Components
                     </NavListItem>
-                    <NavListItem title="useAuth" href="https://docs.servicestack.net/vue/use-auth" :iconSvg="Icons.Code">
+                    <NavListItem title="useAuth" href="/vue/use-auth" :iconSvg="Icons.Code">
                         Inspect Authenticated Users Info, Roles &amp; Permissions
                     </NavListItem>
-                    <NavListItem title="useFormatters" href="https://docs.servicestack.net/vue/use-formatters" :iconSvg="Icons.Code">
+                    <NavListItem title="useFormatters" href="/vue/use-formatters" :iconSvg="Icons.Code">
                         Built-in Formats and formatting functions
                     </NavListItem>
-                    <NavListItem title="useFiles" href="https://docs.servicestack.net/vue/use-files" :iconSvg="Icons.Code">
+                    <NavListItem title="useFiles" href="/vue/use-files" :iconSvg="Icons.Code">
                         File utils for resolving SVG icons, extensions and MIME types
                     </NavListItem>
-                    <NavListItem title="useConfig" href="https://docs.servicestack.net/vue/use-config" :iconSvg="Icons.Code">
+                    <NavListItem title="useConfig" href="/vue/use-config" :iconSvg="Icons.Code">
                         Manage global configuration &amp; defaults
                     </NavListItem>
-                    <NavListItem title="useUtils" href="https://docs.servicestack.net/vue/use-utils" :iconSvg="Icons.Code">
+                    <NavListItem title="useUtils" href="/vue/use-utils" :iconSvg="Icons.Code">
                         General functionality and utils
                     </NavListItem>
                 </NavList>

@@ -13,6 +13,12 @@ public class AppHost : AppHostBase, IHostingStartup
 
     public override void Configure(Funq.Container container)
     {
+        SetConfig(new HostConfig {
+            IgnorePathInfoPrefixes = {
+                "/templates",
+            }
+        });
+        Plugins.RemoveAll(x => x is UiFeature);
     }
 }
 

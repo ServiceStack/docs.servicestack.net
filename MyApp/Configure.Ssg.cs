@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ServiceStack.IO;
+using ServiceStack.Logging;
 
 [assembly: HostingStartup(typeof(MyApp.ConfigureSsg))]
 
@@ -14,9 +15,7 @@ public class ConfigureSsg : IHostingStartup
             services.AddSingleton(AppConfig.Instance);
             services.AddSingleton<RazorPagesEngine>();
             services.AddSingleton<MarkdownPages>();
-            services.AddSingleton<MarkdownWhatsNew>();
             services.AddSingleton<MarkdownVideos>();
-            services.AddSingleton<MarkdownBlog>();
             services.AddSingleton<MarkdownMeta>();
         })
         .ConfigureAppHost(
@@ -24,19 +23,14 @@ public class ConfigureSsg : IHostingStartup
             afterPluginsLoaded: appHost =>
             {
                 var pages = appHost.Resolve<MarkdownPages>();
-                var whatsNew = appHost.Resolve<MarkdownWhatsNew>();
                 var videos = appHost.Resolve<MarkdownVideos>();
-                var blogPosts = appHost.Resolve<MarkdownBlog>();
                 var meta = appHost.Resolve<MarkdownMeta>();
 
-                blogPosts.Authors = AppConfig.Instance.Authors;
-                meta.Features = new() { pages, whatsNew, videos, blogPosts };
+                meta.Features = new() { pages, videos };
                 meta.Features.ForEach(x => x.VirtualFiles = appHost.VirtualFiles);
                 
                 pages.LoadFrom("_pages");
-                whatsNew.LoadFrom("_whatsnew");
                 videos.LoadFrom("_videos");
-                blogPosts.LoadFrom("_posts");
             },
             afterAppHostInit: appHost =>
             {
@@ -50,9 +44,15 @@ public class ConfigureSsg : IHostingStartup
                     var distDir = appHost.ContentRootDirectory.RealPath.CombineWith("dist");
                     if (Directory.Exists(distDir))
                         FileSystemVirtualFiles.DeleteDirectory(distDir);
+
                     FileSystemVirtualFiles.CopyAll(
                         new DirectoryInfo(appHost.ContentRootDirectory.RealPath.CombineWith("wwwroot")),
                         new DirectoryInfo(distDir));
+                    
+                    // Render .html redirect files
+                    RazorSsg.PrerenderRedirectsAsync(appHost.ContentRootDirectory.GetFile("redirects.json"), distDir)
+                        .GetAwaiter().GetResult();
+                    
                     var razorFiles = appHost.VirtualFiles.GetAllMatchingFiles("*.cshtml");
                     RazorSsg.PrerenderAsync(appHost, razorFiles, distDir).GetAwaiter().GetResult();
                 });
@@ -64,7 +64,6 @@ public class AppConfig
     public static AppConfig Instance { get; } = new();
     public string LocalBaseUrl { get; set; }
     public string PublicBaseUrl { get; set; }
-    public List<AuthorInfo> Authors { get; set; } = new();
 }
 
 // Add additional frontmatter info to include

@@ -19,8 +19,11 @@ public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
             .Where(x => allDirectories || (x.Slug.CountOccurrencesOf('/') == prefix.CountOccurrencesOf('/') + 1))
             .OrderBy(x => x.Order).ToList();
 
-    public MarkdownFileInfo? GetBySlug(string slug) => 
-        Fresh(Pages.Where(IsVisible).FirstOrDefault(x => x.Slug == slug));
+    public MarkdownFileInfo? GetBySlug(string slug)
+    {
+        slug = slug.Trim('/');
+        return Fresh(Pages.Where(IsVisible).FirstOrDefault(x => x.Slug == slug));
+    }
 
     public Dictionary<string, List<MarkdownMenu>> Sidebars { get; set; } = new();
 
@@ -57,7 +60,6 @@ public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
                 {
                     var virtualPath = file.VirtualPath.Substring(fromDirectory.Length);
                     var folder = virtualPath.Substring(0, virtualPath.Length - "sidebar.json".Length).Trim('/');
-                    Console.WriteLine($"sidebar :: {folder}");
                     var sidebarJson = file.ReadAllText();
                     var sidebar = sidebarJson.FromJson<List<MarkdownMenu>>();
 
@@ -74,6 +76,10 @@ public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
             {
                 log.Error(e, "Couldn't load {0}: {1}", file.VirtualPath, e.Message);
             }
+        }
+        if (Sidebars.Count > 0)
+        {
+            log.Info($"Loaded {Sidebars.Count} sidebars: {Sidebars.Keys.Join(", ")}");
         }
     }
 

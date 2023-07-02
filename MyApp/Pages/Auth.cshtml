@@ -1,0 +1,20 @@
+﻿@page "/auth/{slug?}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("auth", allDirectories:true).Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "Authentication",
+   Slug = Model.Slug,
+   Folder = "auth",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "Authentication",
+       Link = "/auth/",
+   },
+}.Init(this, Markdown))

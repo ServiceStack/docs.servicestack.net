@@ -1,0 +1,658 @@
+---
+title: AutoQuery AutoGen CRUD Services
+---
+
+Long time users of ServiceStack will know it's a staunch proponent of **code-first development** where your C# Types retains the master authority of your App's logic, although there are a number of times where you have to work with existing databases which would require significant effort to create the initial code-first Data Models. Historically we've pointed people to use [OrmLite's T4 Template Support](/ormlite/autogen-t4#t4-template-support) which provides a decent initial stab, however it's limited in its capability and offers a sub par development experience.
+
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NaJ7TW-Q_pU" style="background-image: url('https://img.youtube.com/vi/NaJ7TW-Q_pU/maxresdefault.jpg')"></lite-youtube>
+
+### Code Generation of AutoQuery & CRUD Services
+
+Now with AutoCrud we can add a lot more value in this area as AutoCrud's declarative nature allows us to easily generate AutoQuery & Crud Services by just emitting declarative Request DTOs.
+
+You can then add the generated DTOs to your ServiceModel's to quickly enable AutoQuery Services for your existing databases.
+
+<img src="/img/pages/svg/servicify.svg" width="100%">
+
+To enable this feature you you just need to initialize `GenerateCrudServices` in your `AutoQueryFeature` plugin, e.g:
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 1000,
+    GenerateCrudServices = new GenerateCrudServices {}
+});
+```
+
+If you don't have an existing database, you can quickly test this out with a Northwind SQLite database available from [https://github.com/NetCoreApps/NorthwindAuto](https://github.com/NetCoreApps/NorthwindAuto):
+
+:::sh
+x download NetCoreApps/NorthwindAuto
+:::
+
+As you'll need to use 2 terminal windows, I'd recommend opening the project with **VS Code** which has great multi-terminal support:
+
+:::sh
+code NorthwindAuto
+:::
+
+The important parts of this project is the registering the OrmLite DB Connection, the above configuration and the local **northwind.sqlite** database, i.e:
+
+```csharp
+container.AddSingleton<IDbConnectionFactory>(c =>
+    new OrmLiteConnectionFactory(MapProjectPath("~/northwind.sqlite"), SqliteDialect.Provider));
+
+Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 1000,
+    GenerateCrudServices = new GenerateCrudServices {}
+});
+```
+
+## Export Code-First DTOs
+
+After restarting your App with AutoGen's `GenerateCrudServices` enabled you can export the auto-generated APIs and Data Models into code-first C# classes
+
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="mFyMgg7c3vg" style="background-image: url('https://img.youtube.com/vi/mFyMgg7c3vg/maxresdefault.jpg')"></lite-youtube>
+
+### Generating AutoQuery APIs and Data Models
+
+The development experience is essentially the same as [Add ServiceStack Reference](/add-servicestack-reference) where you'll need to run the .NET Core App in 1 terminal:
+
+:::sh
+dotnet run
+:::
+
+Then use the `x` dotnet tool to download all the AutoQuery & Crud Services for all tables in the configured DB connection:
+
+:::sh
+`x csharp https://localhost:5001 -path /crud/all/csharp`
+:::
+
+::: tip
+If no schema is provided, a default schema is used which depends on the underlying Provider Dialect, eg SQL Server, PostgreSQL etc.
+Multiple schema support requires the AutoQueryFeature to be configured with [multiple schemas](#multiple-schemas-and-rdbms-connections).
+:::
+
+### Updating Generated Services
+
+If your RDBMS schema changes you'd just need to restart your .NET Core App, then you can update all existing `dtos.cs` with:
+
+:::sh
+x csharp
+:::
+
+i.e. the same experience as updating normal DTOs.
+
+You can do the same for all other ServiceStack's supported languages as shown in autodto at the start of this release.
+
+### Switch to code-first dev model
+
+After generating `dtos.cs` AutoGen is no longer needed and can now be removed by removing `GenerateCrudServices`
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 1000,
+    // GenerateCrudServices = new GenerateCrudServices {}
+});
+```
+
+All functionality and features can now be added to annotating & enhancing your code-first C# Typed DTOs.
+
+### AutoGen specific options in AutoGen DTOs
+
+When using AutoGen to [generate Typed AutoQuery DTOs](/autoquery/autogen#generating-autoquery-types-services) for your RDBMS Tables:
+
+:::sh
+`x csharp https://localhost:5001 -path /crud/all/csharp`
+:::
+
+The generated `dtos.cs` includes AutoGen-specific options that can be used to maintain multiple custom RDBMS Tables and AutoQuery APIs, e.g. you could maintain one for each of your different RDBMS schemas:
+
+```csharp
+/* Options:
+//...
+//IncludeCrudOperations: 
+Schema: custom
+//NamedConnection: 
+//IncludeTables: 
+//ExcludeTables: 
+*/
+```
+
+## AutoRegister AutoGen AutoQuery Services
+
+To recap we've now got an integrated scaffolding solution where we can quickly generate code-first AutoQuery Services and integrate them into our App to quickly build an AutoQuery Service layer around our existing database.
+
+But we can raise the productivity level even higher by instead of manually importing the code-generated Services into our project we just tell ServiceStack to do it for us.
+
+This is what the magical `AutoRegister` flag does for us:
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    GenerateCrudServices = new GenerateCrudServices {
+        AutoRegister = true,
+        //....
+    }
+});
+```
+
+### Instantly Servicify Northwind DB with gRPC
+
+To show the exciting potential of this feature we'll demonstrate one valuable use-case of creating a [grpc](/grpc/) project, mixing in AutoQuery configuration to instantly Servicifying the Northwind DB, browsing the generated Services from ServiceStack's [Metadata Page](/metadata-page), explore the gRPC RPC Services `.proto` then create a new Dart App to consume the gRPC Services:
+
+> YouTube: [youtu.be/5NNCaWMviXU](https://youtu.be/5NNCaWMviXU)
+
+[![](/img/pages/release-notes/v5.9/autogen-grpc.png)](https://youtu.be/5NNCaWMviXU)
+
+#### Step-by-step Guide
+
+See the annotated guide below to follow along:
+
+Create a new [grpc](https://github.com/NetCoreTemplates/grpc) .NET Core project and open it in VS Code:
+
+:::sh
+x new grpc NorthwindApi
+code NorthwindApi
+:::
+
+Inside VS Code open a Terminal Window and [mix in](/mix-tool) the required configuration:
+
+:::sh
+cd NorthwindApi
+x mix autocrudgen sqlite northwind.sqlite
+:::
+
+Which will mix in the [autocrudgen](https://gist.github.com/gistlyn/464a80c15cb3af4f41db7810082dc00c) gist to enable AutoQuery and tell it to Auto Generate AutoQuery and CRUD Services for all tables in the registered RDBMS (default schema):
+
+```csharp
+public class ConfigureAutoQuery : IConfigureAppHost
+{
+    public void Configure(IAppHost appHost)
+    {
+        appHost.Plugins.Add(new AutoQueryFeature {
+            MaxLimit = 1000,
+            GenerateCrudServices = new GenerateCrudServices {
+                AutoRegister = true
+            }
+        });
+    }
+}
+```
+
+The [sqlite](https://gist.github.com/gistlyn/768d7b330b8c977f43310b954ceea668) gist registers an 
+[OrmLite.Sqlite](https://github.com/ServiceStack/ServiceStack.OrmLite) RDBMS connection with our App which we want to configure to connect to a **northwind.sqlite** database:
+
+```csharp
+public void Configure(IServiceCollection services)
+{
+    services.AddSingleton<IDbConnectionFactory>(new OrmLiteConnectionFactory(
+        Configuration.GetConnectionString("DefaultConnection") 
+            ?? "northwind.sqlite",
+        SqliteDialect.Provider));
+}
+```
+
+Then we apply the [northwind.sqlite](https://gist.github.com/gistlyn/97d0bcd3ebd582e06c85f8400683e037) gist to add the **northwind.sqlite** database to our new project.
+
+Now that our App's configured we can run it with:
+
+:::sh
+dotnet run
+:::
+
+Where it will start the ServiceStack gRPC App on 3 ports configured in **appsettings.json**:
+
+ - `5001` - Enables access from existing HTTP/1.1 clients and proxies
+ - `5002` - Enables a secure gRPC Channel
+ - `5003` - Enables an insecure gRPC Channel
+
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "Https": {
+        "Url": "https://*:5001",
+        "Protocols": "Http1"
+      },
+      "GrpcSecure": {
+        "Url": "https://*:5051",
+        "Protocols": "Http2"
+      },
+      "GrpcInsecure" : {
+        "Url": "http://*:5054",
+        "Protocols": "Http2"
+      }
+    }
+  }
+}
+```
+
+Once running you can view your Apps metadata page at `https://localhost:5001` to inspect all the Services that were generated.
+
+#### Create Dart gRPC Console App
+
+It's also now accessible via [ServiceStack's gRPC endpoint](/grpc/) which opens your generated Services up to [Google's high-performance gRPC ecosystem](https://grpc.io) which enables typed, high-performance integrations into exciting platforms like [Flutter](https://flutter.dev) which uses the [Dart](https://dart.dev) programming language to create Reactive, high-performance native Android and iOS Apps. 
+
+We can test Dart's gRPC integration and development workflow in a new Dart Console App we can create with:
+
+```bash
+mkdir dart-grpc && cd dart-grpc
+pub global activate stagehand
+stagehand console-full
+```
+
+We'll need to update **pubspec.yaml** with the required gRPC dependencies:
+
+```yaml
+dependencies:
+  fixnum: ^0.10.11
+  async: ^2.2.0
+  protobuf: ^1.0.1
+  grpc: ^2.1.3    
+```
+
+When you save **pubspec.yaml** Dart's VS Code extension will automatically fetch any new dependencies which can also be manually run with:
+
+:::sh
+pub get
+:::
+
+We can then use the [protoc support in the dotnet tools](/grpc#public-grpc-protoc-service-and-ui) to download our `.proto` Services descriptor and generate Dart's gRPC classes with a single command:
+
+:::sh
+`x proto-dart https://localhost:5001 -out lib`
+:::
+
+We're now all set to consume our gRPC Services using the protoc generated gRPC proxy in our `main()` function in **main.dart**:
+
+```dart
+import 'dart:io';
+import 'package:grpc/grpc.dart';
+import 'package:dart_grpc/services.pb.dart';
+import 'package:dart_grpc/services.pbgrpc.dart';
+
+void main(List<String> arguments) async {
+    var client = GrpcServicesClient(ClientChannel('localhost', port:5054,
+      options:ChannelOptions(credentials: ChannelCredentials.insecure())));
+
+    var response = await client.getQueryCategory(QueryCategory());
+    print(response.results);
+    exit(0);
+}
+```
+
+Which can be run with:
+
+:::sh
+dart bin\main.dart
+:::
+
+### Calling gRPC SSL Services
+
+The [Dart gRPC Docs](/grpc/dart#dart-protoc-grpc-ssl-example) shows how we can connect to it via our gRPC SSL endpoint by running the openssl scripts in [grpc/scripts](https://github.com/NetCoreTemplates/grpc/tree/master/scripts) to generate our **dev.crt** and **prod.crt** SSL Certificates that you can configure in your in your **GrpcSecure** endpoint with:
+
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "GrpcSecure": {
+        "Url": "https://*:5051",
+        "Protocols": "Http2",
+        "Certificate": {
+          "Path": "dev.pfx",
+          "Password": "grpc"
+        }
+      }
+    }
+  }
+}
+```
+
+Where you'll then be able to access the secure gRPC SSL endpoints using the generated **dev.crt** certificate in your Dart App:
+
+```dart
+import 'dart:io';
+import 'package:grpc/grpc.dart';
+import 'package:dart_grpc/services.pb.dart';
+import 'package:dart_grpc/services.pbgrpc.dart';
+
+GrpcServicesClient createClient({CallOptions options}) {
+  return GrpcServicesClient(ClientChannel('localhost', port:5051,
+    options:ChannelOptions(credentials: ChannelCredentials.secure(
+        certificates: File('dev.crt').readAsBytesSync(),
+        authority: 'localhost'))), options:options);
+}
+
+void main(List<String> args) async {
+
+    var client = createClient();
+    var response = await client.getQueryCategory(QueryCategory());
+    print(response.results);
+
+    exit(0);
+}
+```
+
+### AutoGen's AutoRegister Implementation
+
+Whilst the `AutoRegister = true` flag on its face may seem magical, it's simply an instruction that tells ServiceStack to register the **new** AutoQuery Services it already knows about and register them as if they were normal code-first Services that we had written ourselves.
+
+More accurately, behind-the-scenes it uses the Metadata Type structure it constructed in generating the Services & Types, i.e. the same Types used to project into its Add ServiceStack Reference's generated C#, TypeScript, (and other languages) which are also the same Types that are manipulated when customizing code-generation, gets used to generate .NET Types in memory on Startup with Reflection.Emit. 
+
+Barring any issues with the projection into IL, externally the end result is indistinguishable to a normal code-first ServiceStack Service manually created by a developer - An important point as to why these solutions compose well with the rest of ServiceStack, just as an AutoQuery Service is a normal ServiceStack Service, these auto generated & auto registered ServiceStack Services are regular Auto Query Services. 
+
+The primary difference is that they only exist in a .NET Assembly in memory created on Startup, not in code so they're not "statically visible" to a C# compiler, IDE, tools, etc. But otherwise they're regular typed ServiceStack Services and can take advantage of the ecosystem around Services including [Add ServiceStack Reference](/add-servicestack-reference) & other Metadata Pages and Services, etc.
+
+### CreateCrudServices Instructions
+
+Peeking deeper behind the `AutoRegister` flag will reveal that it's a helper for adding an empty `CreateCrudServices` instance, i.e. it's equivalent to:
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    GenerateCrudServices = new GenerateCrudServices {
+        CreateServices = {
+            new CreateCrudServices()
+        }
+        //....
+    }
+});
+```
+
+#### Multiple Schemas and RDBMS Connections
+
+This instructs ServiceStack to generate Services for the default option, i.e. all tables in the Database of the default registered Database connection and default schema.
+
+Although should you wish to, you can also generate Services for multiple Databases and RDBMS Schemas within the same App.
+
+With this you could have a single API Gateway Servicifying access to multiple System RDBMS Tables & Schemas, e.g:
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    GenerateCrudServices = new GenerateCrudServices {
+        CreateServices = {
+            new CreateCrudServices(),
+            new CreateCrudServices { Schema = "AltSchema" },
+            new CreateCrudServices { NamedConnection = "Reporting" },
+            new CreateCrudServices { NamedConnection = "Reporting", Schema = "AltSchema" },
+        }
+        //....
+    }
+});
+```
+
+These will generated Service Contracts & DTO Types with the Multitenancy [NamedConnection](/autoquery/rdbms#named-connection) & OrmLite `[Schema]` attribute required for routing AutoQuery Services to use the appropriate RDBMS connection of Schema. 
+ 
+Although there are potential conflicts if there are identical table names in each RDBMS/Schema as it has to go back and rewrite the Metadata References to use a non-ambiguous name, first tries using the NamedConnection, then the schema then a combination when both exists, if it's still ambiguous it gives up and ignores it. If you do run into conflicts, the recommendation is to "eject" the generated `.cs` sources and manually update them to use your preferred unique names.
+
+### Customize Code Generation to include App Conventions
+
+Being able to instantly generate AutoQuery Services for all your RDBMS tables is nice, but it's even nicer if you could easily customize the code-generation!
+
+Together with the flexibility of the new declarative validation support you can compose a surprisingly large amount of your App's logic using the versatility of C# to automate embedding your App's conventions by annotating them on declarative Request DTOs.
+
+The existing code-generation already infers a lot from your RDBMS schema which you can further augment using the available `GenerateCrudServices` filters:
+
+ - `ServiceFilter` - called with every Service Operation
+ - `TypeFilter` - called with every DTO Type
+ - `IncludeService` - a predicate to return whether the **Service** should be included
+ - `IncludeType` - a predicate to return whether the **Type** should be included
+ - `TableSchemasFilter` - an action to modify the `List<TableSchema>` that AutoGen uses to generate data models
+
+For an illustration of this in action, here's a typical scenario of how the Northwind AutoQuery Services could be customized:
+
+ - Controlling which Tables **not to generate Services for** in `ignoreTables`
+ - Which tables not to generate **Write Crud Services** for in `readOnlyTables`
+ - Which tables to **restrict access** to in different roles in `protectTableByRole` 
+ - Example of **additional validation** to existing tables in `tableRequiredFields`
+   - Adds the `[ValidateNotEmpty]` attribute to Services accessing the table and the `[Required]` OrmLite attribute for the Data Model DTO Type.
+
+```csharp
+var ignoreTables = new[] { "IgnoredTable", }; // don't generate AutoCrud APIs for these tables
+var readOnlyTables = new[] { "Region" };
+var protectTableByRole = new Dictionary<string,string[]> {
+    ["Admin"]    = new[] { nameof(CrudEvent), nameof(ValidationRule) },
+    ["Accounts"] = new[] { "Order", "Supplier", "Shipper" },
+    ["Employee"] = new[] { "Customer", "Order", "OrderDetail" },
+    ["Manager"]  = new[] { "Product", "Category", "Employee", "UserAuth", "UserAuthDetails" },
+};
+var tableRequiredFields = new Dictionary<string,string[]> {
+    ["Shipper"] = new[]{ "CompanyName", "Phone" },
+};
+
+Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 100,
+    GenerateCrudServices = new GenerateCrudServices
+    {
+        ServiceFilter = (op,req) => 
+        {
+            // Require all Write Access to Tables to be limited to Authenticated Users
+            if (op.IsCrudWrite())
+            {
+                op.Request.AddAttributeIfNotExists(new ValidateRequestAttribute("IsAuthenticated"), 
+                    x => x.Validator == "IsAuthenticated");
+            }
+
+            // Limit Access to specific Tables
+            foreach (var tableRole in protectTableByRole)
+            {
+                foreach (var table in tableRole.Value)
+                {
+                    if (op.ReferencesAny(table))
+                        op.Request.AddAttribute(new ValidateHasRoleAttribute(tableRole.Key));
+                }
+            }
+
+            // Add [ValidateNotEmpty] attribute on Services operating Tables with Required Fields
+            if (op.DataModel != null && tableRequiredFields.TryGetValue(op.DataModel.Name, out var required))
+            {
+                var props = op.Request.Properties.Where(x => required.Contains(x.Name));
+                props.Each(x => x.AddAttribute(new ValidateNotEmptyAttribute()));
+            }
+        },
+        TypeFilter = (type, req) => 
+        {
+            // Add OrmLite [Required] Attribute on Tables with Required Fields
+            if (tableRequiredFields.TryGetValue(type.Name, out var requiredFields))
+            {
+                var props = type.Properties.Where(x => requiredFields.Contains(x.Name));
+                props.Each(x => x.AddAttribute(new RequiredAttribute()));
+            }
+        },
+        //Don't generate the Services or Types for Ignored Tables
+        IncludeService = op => !ignoreTables.Any(table => op.ReferencesAny(table)) &&
+            !(op.IsCrudWrite() && readOnlyTables.Any(table => op.ReferencesAny(table))),
+
+        IncludeType = type => !ignoreTables.Contains(type.Name),
+    }
+});
+
+Plugins.Add(new ValidationFeature()); // Enable Validation
+```
+
+Additionally, the `TableSchemasFilter` can be used to modify the schema used by AutoGen to generate the types associated with your AutoQuery APIs. 
+This gives you the opportunity to filter or modify the schema after they are pulled from the database.
+For example, we could `Remove` tables based on naming, or alter column definitions to assist with any schema issues.
+
+```csharp
+GenerateCrudServices = new GenerateCrudServices {
+    AutoRegister = true,
+    AddDataContractAttributes = false,
+    TableSchemasFilter = tableSchemas =>
+    {
+        // Don't include tables starting with an underscore
+        tableSchemas.RemoveAll(tableSchema => tableSchema.Name.StartsWith("_"));
+        // Don't include columns of "geometry" type.
+        tableSchema.Columns.ToList().RemoveAll(x => x.DataTypeName == "geometry");
+    }
+}
+```
+
+To assist in code-generation a number of high-level APIs are available to help with identifying Services, e.g:
+
+ - `operation.IsCrud()` - Is read-only AutoQuery or AutoCrud write Service
+ - `operation.IsCrudWrite()` - Is AutoCrud write Service
+ - `operation.IsCrudRead()` - Is AutoQuery read-only Service
+ - `operation.ReferencesAny()` - The DTO Type is referenced anywhere in the Service (e.g. Request/Response DTOs, Inheritance, Generic Args, etc)
+ - `type.InheritsAny()` - The DTO inherits any of the specified type names
+ - `type.ImplementsAny()` - The DTO implements any of the specified interface type names
+
+
+### Mixing generated AutoQuery Services & existing code-first Services
+
+The expected use-case for these new features is that you'd create a new project that points to an existing database to bootstrap your project with code-first AutoQuery Services using the dotnet tool to download the generated types, i.e:
+
+:::sh
+`x csharp https://localhost:5001 -path /crud/all/csharp`
+:::
+
+At which point you'd "eject" from the generated AutoQuery Services (forgetting about this feature), copy the generated types into your **ServiceModel** project and continue on development as code-first Services just as if you'd created the Services manually.
+
+But the `GenerateCrudServices` feature also supports a "hybrid" mode where you can also just generate Services for any **new** AutoQuery Services that don't exist, i.e. for tables for which there are no existing services which you can access their generated Services from:
+
+:::sh
+`x csharp https://localhost:5001 -path /crud/new/csharp`
+:::
+
+The existing `/crud/all/csharp` Service continues to return generated Services for all Tables but will stitch together and use existing types where they exist.
+
+> If your new code first services are missing, remember to make sure your AppHost is scanning the assembly they belong to by using `typeof(MyGeneratedType).Assembly` in your `AppHost` base constructor.
+
+### Trying it out
+
+We now have all the features we need to quickly servicify an existing database that we can easily customize to apply custom App logic to further protect & validate access.
+
+So you can quickly explore these new features locally, you can download the enhanced Northwind example with this customization above in the new [github.com/NetCoreApps/NorthwindCrud](https://github.com/NetCoreApps/NorthwindCrud) project which you can download & run with:
+
+```bash
+x download NetCoreApps/NorthwindCrud
+cd NorthwindCrud
+dotnet run
+```
+
+This example App is also configured with other new features in incoming release including Crud Events in 
+[Startup.cs](https://github.com/NetCoreApps/NorthwindCrud/blob/master/Startup.cs):
+
+```csharp
+// Add support for auto capturing executable audit history for AutoCrud Services
+container.AddSingleton<ICrudEvents>(c => new OrmLiteCrudEvents(c.Resolve<IDbConnectionFactory>()));
+container.Resolve<ICrudEvents>().InitSchema();
+```
+
+As well as support for dynamically generated db rules in 
+[Configure.Validation.cs](https://github.com/NetCoreApps/NorthwindCrud/blob/master/Configure.Validation.cs):
+
+```csharp
+services.AddSingleton<IValidationSource>(c => 
+    new OrmLiteValidationSource(c.Resolve<IDbConnectionFactory>()));
+
+appHost.Resolve<IValidationSource>().InitSchema();
+```
+
+To be able to test the custom code generation the example is pre-populated with 3 users with different roles in 
+[Configure.Auth.cs](https://github.com/NetCoreApps/NorthwindCrud/blob/master/Configure.Auth.cs):
+
+```csharp
+// Register Users that don't exist
+void EnsureUser(string email, string name, string[] roles=null)
+{
+    if (authRepo.GetUserAuthByUserName(email) != null) 
+        return;
+    
+    authRepo.CreateUserAuth(new UserAuth {
+        Email = email,
+        DisplayName = name,
+        Roles = roles?.ToList(),
+    }, password:"p@ss");
+}
+
+EnsureUser("employee@gmail.com", name:"A Employee",   roles:new[]{ "Employee" });
+EnsureUser("accounts@gmail.com", name:"Account Dept", roles:new[]{ "Employee", "Accounts" });
+EnsureUser("manager@gmail.com",  name:"The Manager",  roles:new[]{ "Employee", "Manager" });
+```
+
+Of which you can also find published on NorthwindCrud's home page:
+
+### Open in ServiceStack Studio
+
+![](/img/pages/release-notes/v5.9/northwindcrud-home.png)
+
+### AutoGen Customizations
+
+AutoGen's [Instantly Servicify existing Systems](/servicify) feature works by automatically generating the AutoQuery & Crud APIs and Data Models for all tables in the configured RDBMS's. Further customization of the DataModel Names, the user-defined Route Path they're hosted at & the name of individual AutoQuery APIs for each operation using the `GenerateOperationsFilter`. 
+
+So if you had an existing table name called `applications` the default convention based names would be:
+ - Data Model: `Applications`
+ - APIs: `CreateApplications`, `PatchApplications`, `QueryApplications`, etc
+ - Route: `/applications`, `/applications/{Id}`
+
+You can change each of these default conventions with the new `GenerateOperationsFilter`, e.g:
+
+```csharp
+Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 1000,
+    GenerateCrudServices = new GenerateCrudServices {
+        AutoRegister = true,
+        GenerateOperationsFilter = ctx => {
+            if (ctx.TableName == "applications")
+            {
+                ctx.DataModelName = "Application";
+                ctx.PluralDataModelName = "Apps";
+                ctx.RoutePathBase = "/apps";
+                ctx.OperationNames = new Dictionary<string, string> {
+                    [AutoCrudOperation.Create] = "CreateApp",
+                    [AutoCrudOperation.Patch] = "ModifyApp",
+                };
+            }
+        }
+    }
+});
+```
+
+Would result in:
+ - Data Model: `Application`
+ - APIs: `QueryApps`, `CreateApp`, `ModifyApp`
+ - Route: `/apps`, `/apps/{Id}`
+
+### Retrying Dart gRPC Example
+
+We can see an immediate effect of these customizations in **NorthwindCrud** where most APIs now require Authentication:
+
+![](/img/pages/release-notes/v5.9/northwindcrud-metadata.png)
+
+If we then try to run our Dart `main.dart` example against the customized **NorthwindCrud** APIs by first regenerating gRPC protoc Types:
+
+:::sh
+`x proto-dart https://localhost:5001 -out lib`
+:::
+
+Then try rerunning `main.dart` where it will now fail with an **Unauthorized** exception:
+
+![](/img/pages/release-notes/v5.9/northwindcrud-noauth.png)
+
+To now be able to access most Services we'll need to [Authenticate as registered user](/grpc/dart#dart-grpc-authenticated-request-example).
+
+As NorthwindCrud is [configured to use JWT](https://github.com/NetCoreApps/NorthwindCrud/blob/master/Configure.Auth.cs) we can create an Authenticated gRPC client by adding the populated JWT Token from an Authenticated Request into the **Authorization** gRPC metadata Header:
+
+```dart
+GrpcServicesClient createClient({CallOptions options}) {
+  return GrpcServicesClient(ClientChannel('localhost', port:5054,
+    options:ChannelOptions(credentials: ChannelCredentials.insecure())), 
+    options:options);
+}
+
+void main(List<String> arguments) async {
+    var authResponse = await createClient().postAuthenticate(
+        Authenticate()..provider='credentials'..userName='manager@gmail.com'..password='p@ss');
+
+    var authClient = createClient(options:CallOptions(metadata:{ 
+            'Authorization': 'Bearer ${authResponse.bearerToken}' 
+        }));
+
+    var response = await authClient.getQueryCategory(QueryCategory());
+    print(response.results);
+    exit(0);
+}
+```
+
+Now when we rerun `main.dart` we'll be able to access our Northwind categories again:
+
+![](/img/pages/release-notes/v5.9/northwindcrud-jwtauth.png)

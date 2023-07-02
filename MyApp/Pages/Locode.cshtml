@@ -1,0 +1,20 @@
+﻿@page "/locode/{slug?}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("locode", allDirectories:true).Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "Locode",
+   Slug = Model.Slug,
+   Folder = "locode",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "Locode",
+       Link = "/locode/",
+   },
+}.Init(this, Markdown))

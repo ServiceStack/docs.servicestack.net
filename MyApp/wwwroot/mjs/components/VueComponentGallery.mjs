@@ -20,28 +20,28 @@ export default {
         <div class="pt-4 pb-16">
             <div class="mx-auto">
                 <NavList title="">
-                    <NavListItem title="AutoQueryGrid" href="https://docs.servicestack.net/vue/gallery/autoquerygrid" :iconSvg="Icons.AutoQueryGrid">
+                    <NavListItem title="AutoQueryGrid" href="/vue/autoquerygrid" :iconSvg="Icons.AutoQueryGrid">
                         Instant customizable UIs for calling AutoQuery CRUD APIs
                     </NavListItem>
-                    <NavListItem title="DataGrid" href="https://docs.servicestack.net/vue/gallery/datagrid" :iconSvg="Icons.DataGrid">
+                    <NavListItem title="DataGrid" href="/vue/datagrid" :iconSvg="Icons.DataGrid">
                         DataGrid Component Examples for rendering tabular data
                     </NavListItem>
-                    <NavListItem title="Auto Forms" href="https://docs.servicestack.net/vue/gallery/autoform" :iconSvg="Icons.AutoForms">
+                    <NavListItem title="Auto Forms" href="/vue/autoform" :iconSvg="Icons.AutoForms">
                         Render Auto Form UIs from a Request DTO class
                     </NavListItem>
-                    <NavListItem title="Form Inputs" href="https://docs.servicestack.net/vue/gallery/form-inputs" :iconSvg="Icons.FormInputs">
+                    <NavListItem title="Form Inputs" href="/vue/form-inputs" :iconSvg="Icons.FormInputs">
                         Tailwind UI Input Components
                     </NavListItem>
-                    <NavListItem title="Modals" href="https://docs.servicestack.net/vue/gallery/modals" :iconSvg="Icons.Modals">
+                    <NavListItem title="Modals" href="/vue/modals" :iconSvg="Icons.Modals">
                         Modal Dialogs and Slide Overs
                     </NavListItem>
-                    <NavListItem title="Navigation" href="https://docs.servicestack.net/vue/gallery/navigation" :iconSvg="Icons.Navigation">
+                    <NavListItem title="Navigation" href="/vue/navigation" :iconSvg="Icons.Navigation">
                         Breadcrumbs and Link navigation components
                     </NavListItem>
-                    <NavListItem title="Alerts" href="https://docs.servicestack.net/vue/gallery/alerts" :iconSvg="Icons.Alerts">
+                    <NavListItem title="Alerts" href="/vue/alerts" :iconSvg="Icons.Alerts">
                         Tailwind Alert and Notification components
                     </NavListItem>
-                    <NavListItem title="Formats" href="https://docs.servicestack.net/vue/gallery/formats" :iconSvg="Icons.Formats">
+                    <NavListItem title="Formats" href="/vue/formats" :iconSvg="Icons.Formats">
                         HTML Value Formatters
                     </NavListItem>
                 </NavList>

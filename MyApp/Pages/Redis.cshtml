@@ -1,0 +1,20 @@
+﻿@page "/redis/{**slug}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("redis", allDirectories:true).Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "Redis",
+   Slug = Model.Slug,
+   Folder = "redis",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "Redis",
+       Link = "/redis/",
+   },
+}.Init(this, Markdown))

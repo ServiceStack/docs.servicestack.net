@@ -1,0 +1,20 @@
+﻿@page "/grpc/{slug?}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("grpc", allDirectories:true).Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "gRPC",
+   Slug = Model.Slug,
+   Folder = "grpc",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "gRPC",
+       Link = "/grpc/",
+   },
+}.Init(this, Markdown))

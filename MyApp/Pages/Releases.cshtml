@@ -1,0 +1,22 @@
+﻿@page "/releases/{**slug}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("releases", allDirectories:true).Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "ServiceStack Releases",
+   Slug = Model.Slug,
+   Folder = "releases",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "Releases",
+       Link = "/releases/",
+   },
+   SidebarFilter = sidebar => sidebar[0].Children!.Reverse(),
+   TitleClass = "text-center py-10 text-gray-900 tracking-tight font-extrabold text-4xl sm:text-5xl md:text-6xl",
+}.Init(this, Markdown))
