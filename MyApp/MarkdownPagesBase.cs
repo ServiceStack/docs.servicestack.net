@@ -386,7 +386,7 @@ public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainer
         string? slug = null;
         string? prefix = null;
         var allIncludes = new List<MarkdownFileInfo>();
-        var markdown = HostContext.Resolve<MarkdownPages>();
+        var markdown = MarkdownPages.Instance;
         if (include.EndsWith(".md"))
         {
             include = include.TrimStart('/');

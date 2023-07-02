@@ -25,6 +25,7 @@ public class ConfigureSsg : IHostingStartup
                 var pages = appHost.Resolve<MarkdownPages>();
                 var videos = appHost.Resolve<MarkdownVideos>();
                 var meta = appHost.Resolve<MarkdownMeta>();
+                MarkdownPages.Instance = pages;
 
                 meta.Features = new() { pages, videos };
                 meta.Features.ForEach(x => x.VirtualFiles = appHost.VirtualFiles);

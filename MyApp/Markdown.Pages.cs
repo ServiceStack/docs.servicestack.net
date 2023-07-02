@@ -6,6 +6,7 @@ namespace Ssg;
 
 public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
 {
+    public static MarkdownPages Instance { get; set; }
     public override string Id => "pages";
 
     public virtual string? DefaultMenuIcon { get; set; } =
