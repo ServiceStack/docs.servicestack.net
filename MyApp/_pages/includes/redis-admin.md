@@ -25,7 +25,9 @@ powershell iwr gist.cafe/install.ps1 -useb | iex
 
 After install, open the Redis Admin Desktop from your browser at:
 
+<div class="not-prose">
 <h3 class="text-3xl text-center"><a href="app://redis">app://redis</a></h3>
+</div>
 
 Or from the command-line with:
 
