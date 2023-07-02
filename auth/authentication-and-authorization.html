@@ -1,0 +1,1556 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Authentication and Authorization</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/auth/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Security                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auth/authentication-and-authorization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Authentication &amp; Authorization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/auth-repository" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auth Repository
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ServiceStack Auth in MVC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-aspnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ASP.NET Identity Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identityserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using IdentityServer4 Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/sessions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sessions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/jwt-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JWT AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/api-key-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Key AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/signin-with-apple" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sign in with Apple AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/restricting-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Restricting Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Encrypted Messaging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/anti-forgery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Anti Forgery
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Authentication and Authorization
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>Built into ServiceStack is a simple and extensible Authentication Model that implements standard HTTP Session Authentication where
+<a href="/auth/sessions">Session Cookies</a> are used to send Authenticated Requests which reference Users Custom UserSession POCO's in your App's
+registered <a href="/caching">Caching Provider</a>.</p>
+<p>ServiceStack also includes a number of Auth Providers which &quot;Authenticate per-request&quot; in this case the Authenticated User Session
+is only attached to and lasts during the lifetime of the current <code>IRequest</code>. The implementation details of each Auth Provider are
+transparent to your Application where the same Attributes and APIs are used to retrieve, validate, authenticate and authorize Users.</p>
+<p>ServiceStack's Authentication support is encapsulated in the optional <code>AuthFeature</code> plugin which provides an easy way to declaratively
+register and configure multiple Auth Providers you want to allow in your Application. It's highly configurable with a number of
+additional features like whether to enable built-in Registration for Registering new Users as well as Assign/UnAssign Roles Services
+that Admins can use to assign Roles/Permissions to existing users.</p>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="XKq7TkZAzeg" style="background-image: url('https://img.youtube.com/vi/XKq7TkZAzeg/maxresdefault.jpg')"></lite-youtube></p>
+<h3 id="highly-customizable-and-versatile">Highly customizable and versatile<a class="header-anchor" href="javascript:;" onclick="location.hash='#highly-customizable-and-versatile'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack's Authentication is also highly customizable and versatile from being able to choose from the plethora of Auth Providers
+available or inheriting from them to create your own customized Auth Provider, inheriting <code>AuthUserSession</code> to use your own Custom POCO
+with additional info you want to maintain for your Users, storing User Sessions in any of the available <a href="/caching">Caching Providers</a>,
+adding custom logic by handling any of the <a href="/auth/sessions#session-events">Auth and Session Events</a> raised throughout the Auth lifecycle,
+to specifying which back-end <a href="/auth/auth-repository">Auth Repository</a> you want to persist your Authenticated Users in - supporting most popular RDBMS's and
+popular NoSQL data stores as seen in the high-level overview below:</p>
+<h3 id="high-level-overview">High Level Overview<a class="header-anchor" href="javascript:;" onclick="location.hash='#high-level-overview'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><img src="/img/pages/security/auth-highlevel-overview.svg?sanitize=true" alt="Authentication Overview" /></p>
+<p>The <code>AuthenticateService</code> is the primary Service that manages Authentication which delegates to the specified Auth Provider that
+performs the Authentication, made available via its following endpoints:</p>
+<ul>
+<li><code>/auth/{provider}</code> - Authenticate against a specific Auth Provider</li>
+<li><code>/auth</code> - API to check if a Request is authenticated: returns <strong>200</strong> with basic session info if authenticated or <strong>401</strong> if not.</li>
+<li><code>/auth/logout</code> - Removes the Authenticated Session from the registered cache and clears Session Cookies.</li>
+</ul>
+<h3 id="credentials-auth-providers">Credentials Auth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#credentials-auth-providers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you would like ServiceStack to manage your Apps entire Authentication and persistence of Users you would use one of the available Auth Repositories
+and authenticate against one of the following Auth Providers:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Class Name</th>
+<th>Route</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Credentials</strong></td>
+<td><code>CredentialsAuthProvider</code></td>
+<td><strong>/auth/credentials</strong></td>
+<td>Standard Authentication using Username/Password</td>
+</tr>
+<tr>
+<td><strong>Basic Auth</strong></td>
+<td><code>BasicAuthProvider</code></td>
+<td>HTTP Basic Auth</td>
+<td>Username/Password sent via <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Auth</a></td>
+</tr>
+<tr>
+<td><strong>Digest Auth</strong></td>
+<td><code>DigestAuthProvider</code></td>
+<td>HTTP Digest Auth</td>
+<td>Username/Password hash via <a href="https://en.wikipedia.org/wiki/Digest_access_authentication">HTTP Digest Auth</a></td>
+</tr>
+</tbody>
+</table>
+<p>New Users can be created via the <code>/register</code> Registration Service which be enabled with:</p>
+<pre><code class="language-csharp">Plugins.Add(new RegistrationFeature());
+</code></pre>
+<h3 id="oauth-providers">OAuth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#oauth-providers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The following OAuth Providers are built into ServiceStack and can be used in both ASP.NET Core and .NET Framework Apps:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Class Name</th>
+<th>Route</th>
+<th>Create OAuth App Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Facebook</strong></td>
+<td><code>FacebookAuthProvider</code></td>
+<td><strong>/auth/facebook</strong></td>
+<td><a href="https://developers.facebook.com/apps">developers.facebook.com/apps</a></td>
+</tr>
+<tr>
+<td><strong>Twitter</strong></td>
+<td><code>TwitterAuthProvider</code></td>
+<td><strong>/auth/twitter</strong></td>
+<td><a href="https://dev.twitter.com/apps">dev.twitter.com/apps</a></td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td><code>GoogleAuthProvider</code></td>
+<td><strong>/auth/google</strong></td>
+<td><a href="https://console.developers.google.com/apis/credentials">console.developers.google.com</a></td>
+</tr>
+<tr>
+<td><strong>GitHub</strong></td>
+<td><code>GithubAuthProvider</code></td>
+<td><strong>/auth/github</strong></td>
+<td><a href="https://github.com/settings/applications/new">github.com/settings/applications/new</a></td>
+</tr>
+<tr>
+<td><strong>Microsoft</strong></td>
+<td><code>MicrosoftGraphAuthProvider</code></td>
+<td><strong>/auth/microsoftgraph</strong></td>
+<td><a href="https://apps.dev.microsoft.com">apps.dev.microsoft.com</a></td>
+</tr>
+<tr>
+<td><strong>LinkedIn</strong></td>
+<td><code>LinkedInAuthProvider</code></td>
+<td><strong>/auth/linkedin</strong></td>
+<td><a href="https://www.linkedin.com/secure/developer">www.linkedin.com/secure/developer</a></td>
+</tr>
+<tr>
+<td><strong>Yammer</strong></td>
+<td><code>YammerAuthProvider</code></td>
+<td><strong>/auth/yammer</strong></td>
+<td><a href="http://www.yammer.com/client_applications">www.yammer.com/client_applications</a></td>
+</tr>
+<tr>
+<td><strong>Yandex</strong></td>
+<td><code>YandexAuthProvider</code></td>
+<td><strong>/auth/yandex</strong></td>
+<td><a href="https://oauth.yandex.ru/client/new">oauth.yandex.ru/client/new</a></td>
+</tr>
+<tr>
+<td><strong>VK</strong></td>
+<td><code>VkAuthProvider</code></td>
+<td><strong>/auth/vkcom</strong></td>
+<td><a href="http://vk.com/editapp?act=create">vk.com/editapp?act=create</a></td>
+</tr>
+<tr>
+<td><strong>Odnoklassniki</strong></td>
+<td><code>OdnoklassnikiAuthProvider</code></td>
+<td><strong>/auth/odnoklassniki</strong></td>
+<td><a href="http://www.odnoklassniki.ru/devaccess">www.odnoklassniki.ru/devaccess</a></td>
+</tr>
+</tbody>
+</table>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="aQqF3Sf2fco" style="background-image: url('https://img.youtube.com/vi/aQqF3Sf2fco/maxresdefault.jpg')"></lite-youtube></p>
+<h3 id="session-authentication-overview">Session Authentication Overview<a class="header-anchor" href="javascript:;" onclick="location.hash='#session-authentication-overview'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The diagram below outlines how standard session based Authentication works and how the different providers interact in more detail:</p>
+<p><img src="/img/pages/security/auth-session-auth.svg?sanitize=true" alt="Session Based Authentication" /></p>
+<p>Where the <strong>Auth Provider</strong> are unique for each Auth Provider but otherwise adopt the same Authentication process that results
+in the same end result where an Authenticated <code>AuthUserSession</code> is persisted in the registered <code>ICacheClient</code> against the <code>ss-pid</code> Permanent Cookie
+if the <code>Authenticate</code> request <code>RememberMe=true</code> otherwise against <code>ss-id</code> Temporary Session Cookie if not.</p>
+<p>After a Request is Authenticated its Session Cookies are sent on subsequent requests and validated by ServiceStack's built in <code>[Authenticate]</code> and
+other <code>[Require*]</code> attributes to restrict access to valid users:</p>
+<p><img src="/img/pages/security/auth-session-requests.svg?sanitize=true" alt="Session Requests" /></p>
+<p>Once authenticated the Users Session can be accessed in your <strong>Services</strong> using the Typed and minimal <code>IAuthSession</code> APIs:</p>
+<pre><code class="language-csharp">AuthUserSession session = base.SessionAs&lt;AuthUserSession&gt;();
+IAuthSession session = base.GetSession();
+</code></pre>
+<p>Of if you've registered to use a Custom UserSession POCO in the <code>AuthFeature</code> constructor use that instead of <code>AuthUserSession</code>.</p>
+<p>Typed User Sessions also accessible in all Filters and handlers that have access to the current <code>IRequest</code> with:</p>
+<pre><code class="language-csharp">AuthUserSession session = req.SessionAs&lt;AuthUserSession&gt;();
+IAuthSession session = req.GetSession();
+</code></pre>
+<p>See the <a href="/auth/sessions">Session docs</a> for more info about customizing Sessions and handling different Session and Auth events.</p>
+<h3 id="authentication-per-request-auth-providers">Authentication per Request Auth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#authentication-per-request-auth-providers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>These Auth Providers include authentication with each request so the Authenticated User Session is only populated on the HTTP <code>IRequest</code> and not saved in the registered Cache Client. Unlike traditional Auth Providers above where there is a separate &quot;Authentication&quot; request to establish authentication,
+Auth Providers that implement <code>IAuthWithRequest</code> instead send their Authentication &quot;per-request&quot; where it's only populated on the current <code>IRequest</code>:</p>
+<p><img src="/img/pages/security/auth-auth-with-request-providers.svg?sanitize=true" alt="Auth with Request Auth Providers" /></p>
+<p>Whilst the Authentication Process is different you'd continue to use the same APIs and Attributes to access and validate the Users Session.</p>
+<p>The following Auth Providers below implement <code>IAuthWithRequest</code> and Authenticate per-request:</p>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Class Name</th>
+<th>Auth Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JWT</strong></td>
+<td><code>JwtAuthProvider</code></td>
+<td>Bearer Token</td>
+<td>Stateless Auth Provider using <a href="/auth/jwt-authprovider">JSON Web Tokens</a></td>
+</tr>
+<tr>
+<td><strong>API Keys</strong></td>
+<td><code>ApiKeyAuthProvider</code></td>
+<td>Bearer Token</td>
+<td>Allow 3rd Parties access to <a href="/auth/api-key-authprovider">authenticate without a password</a></td>
+</tr>
+<tr>
+<td><strong>Basic Auth</strong></td>
+<td><code>BasicAuthProvider</code></td>
+<td>Basic Auth</td>
+<td>Authentication using <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Auth</a></td>
+</tr>
+<tr>
+<td><strong>Digest Auth</strong></td>
+<td><code>DigestAuthProvider</code></td>
+<td>Digest Auth</td>
+<td>Authentication using <a href="https://en.wikipedia.org/wiki/Digest_access_authentication">HTTP Digest Auth</a></td>
+</tr>
+</tbody>
+</table>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NTCUT7atoLo" style="background-image: url('https://img.youtube.com/vi/NTCUT7atoLo/maxresdefault.jpg')"></lite-youtube></p>
+<p>Some other special Auth Providers that Authenticate per-request include:</p>
+<ul>
+<li><strong>Windows Auth</strong> in <code>AspNetWindowsAuthProvider</code>  - Authentication using <a href="https://support.microsoft.com/en-us/help/323176/how-to-implement-windows-authentication-and-authorization-in-asp-net">Windows Auth</a> built into ASP.NET.</li>
+<li><strong>Claims Auth</strong> in <code>NetCoreIdentityAuthProvider</code> - Pass through Auth Provider that delegates to ASP.NET Core Identity Auth or Identity Server.</li>
+</ul>
+<h3 id="integrated-asp.net-core-authentication">Integrated ASP.NET Core Authentication<a class="header-anchor" href="javascript:;" onclick="location.hash='#integrated-asp.net-core-authentication'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>NetCoreIdentityAuthProvider</code> is a bi-directional Authentication adapter that enables ServiceStack to use the same Authentication as the
+rest of your ASP.NET Core and MVC Application where it enables the following popular scenarios:</p>
+<ul>
+<li><a href="/auth/identity-servicestack">Using ServiceStack Auth in MVC</a> - Use ServiceStack Auth to power ASP.NET Identity Auth, pre-configured in the <a href="https://github.com/NetCoreTemplates/mvcauth">mvcauth</a> project template.</li>
+<li><a href="/auth/identity-aspnet">Using ASP.NET Identity Auth in ServiceStack</a> - Use ASP.NET Identity Auth to Authenticate ServiceStack Services, pre-configured in the <a href="https://github.com/NetCoreTemplates/mvcidentity">mvcidentity</a> project template.</li>
+<li><a href="/auth/identityserver">Using IdentityServer4 Auth in ServiceStack</a> - Use IdentityServer4 to Authenticate ASP.NET Core and ServiceStack Services,
+pre-configured in the <a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> project template.</li>
+</ul>
+<h3 id="community-auth-providers">Community Auth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#community-auth-providers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><a href="https://github.com/jfoshee/ServiceStack.Authentication.Aad">Azure Active Directory</a> - Allow Custom App to login with Azure Active Directory</li>
+<li><a href="https://github.com/ticky74/ServiceStack.Authentication.Azure">Azure Active Directory via Azure Graph for ServiceStack</a></li>
+<li><a href="https://github.com/MacLeanElectrical/servicestack-authentication-identityserver">ServiceStack.Authentication.IdentityServer</a> - Integration with ASP.NET IdentityServer and provides OpenIDConnect / OAuth 2.0 Single Sign-On Authentication</li>
+</ul>
+<h3 id="basic-configuration">Basic Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#basic-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A minimal configuration needed to get Basic Authentication up and running is the following in <code>AppHost.Config()</code> (derived from the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AuthTests.cs">AuthTests unit test</a>):</p>
+<pre><code class="language-csharp">public override void Configure(Container container)
+{
+    Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(),
+        new IAuthProvider[] { 
+            new BasicAuthProvider(),       //Sign-in with HTTP Basic Auth
+            new CredentialsAuthProvider(), //HTML Form post of UserName/Password credentials
+        }));
+
+    container.Register&lt;ICacheClient&gt;(new MemoryCacheClient());
+
+    var userRepo = new InMemoryAuthRepository();
+    container.Register&lt;IAuthRepository&gt;(userRepo);
+    
+    //The IAuthRepository is used to store the user credentials etc.
+    //Implement this interface to adjust it to your app's data storage
+}
+</code></pre>
+<p><a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.AuthWeb.Tests/">AuthWebTests</a> is a simple project that shows all Auth Providers configured and working in the same app. See the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.AuthWeb.Tests/AppHost.cs">AppHost</a> for an example of the code and the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.AuthWeb.Tests/Web.config">Web.config</a> for an example of the configuration required to enable each Auth Provider.</p>
+<h3 id="oauth-configuration">OAuth Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#oauth-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Once you have the <code>ConsumerKey</code> and <code>ConsumerSecret</code> you need to configure it with your ServiceStack host, via <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.AuthWeb.Tests/Web.config">Web.config</a>, e.g:</p>
+<pre><code class="language-xml">&lt;add key=&quot;oauth.RedirectUrl&quot;            value=&quot;https://yourhostname.com&quot;/&gt;
+&lt;add key=&quot;oauth.CallbackUrl&quot;            value=&quot;https://yourhostname.com/auth/{0}&quot;/&gt;    
+&lt;add key=&quot;oauth.twitter.ConsumerKey&quot;    value=&quot;3H1FHjGbA1N0n0aT5yApA&quot;/&gt;
+&lt;add key=&quot;oauth.twitter.ConsumerSecret&quot; value=&quot;MLrZ0ujK6DwyjlRk2YLp6HwSdoBjtuqwXeHDQLv0Q&quot;/&gt;
+</code></pre>
+<p>For <a href="/web-new">.NET Core</a> or <a href="/templates/corefx">ASP.NET Core Apps</a> you can add the same keys to your <code>appsettings.json</code>, e.g:</p>
+<pre><code class="language-json">{
+    &quot;oauth.RedirectUrl&quot;:            &quot;https://yourhostname.com&quot;,
+    &quot;oauth.CallbackUrl&quot;:            &quot;https://yourhostname.com/auth/{0}&quot;,
+    &quot;oauth.twitter.ConsumerKey&quot;:    &quot;3H1FHjGbA1N0n0aT5yApA&quot;,
+    &quot;oauth.twitter.ConsumerSecret&quot;: &quot;MLrZ0ujK6DwyjlRk2YLp6HwSdoBjtuqwXeHDQLv0Q&quot;,
+}
+</code></pre>
+<p>Each OAuth Config option fallbacks to the configuration without the provider name. If needed you provide OAuth specific configuration
+by including the Auth Provider Name in the configuration, e.g:</p>
+<pre><code class="language-xml">&lt;add key=&quot;oauth.twitter.RedirectUrl&quot;    value=&quot;https://yourhostname.com&quot;/&gt;
+&lt;add key=&quot;oauth.twitter.CallbackUrl&quot;    value=&quot;https://yourhostname.com/auth/twitter&quot;/&gt;    
+</code></pre>
+<p>Configuration can also be specified in code when registering the Auth Provider in the <code>AuthFeature</code> plugin in your AppHost, e.g:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(), new IAuthProvider[] {
+    new TwitterAuthProvider(appSettings) { 
+        RedirectUrl = &quot;http://yourhostname.com/&quot;,
+        CallbackUrl = &quot;http://yourhostname.com/auth/twitter&quot;,
+        ConsumerKey = &quot;3H1FHjGbA1N0n0aT5yApA&quot;,
+        ConsumerSecret = &quot;MLrZ0ujK6DwyjlRk2YLp6HwSdoBjtuqwXeHDQLv0Q&quot;,
+    },
+}));
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>The Callback URL in each Application should match the CallbackUrl for your application which is typically: <a href="http://yourhostname.com/auth/%7BProvider%7D">http://yourhostname.com/auth/{Provider}</a>, e.g. <a href="http://yourhostname.com/auth/twitter">http://yourhostname.com/auth/twitter</a> for Twitter.</p>
+</div>
+<h3 id="allowing-external-redirects">Allowing External Redirects<a class="header-anchor" href="javascript:;" onclick="location.hash='#allowing-external-redirects'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>External Redirects used in the <code>?continue</code> params of <code>/auth</code> requests are disabled by default, they can be re-enabled with:</p>
+<pre><code class="language-csharp">new AuthFeature(...) {
+    ValidateRedirectLinks = AuthFeature.AllowAllRedirects 
+}
+</code></pre>
+<h3 id="auth-repository">Auth Repository<a class="header-anchor" href="javascript:;" onclick="location.hash='#auth-repository'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack supports managing Users in multiple data stores via its <a href="/auth/auth-repository">Auth Repository</a> abstraction and built-in providers.</p>
+<h3 id="session-persistence">Session Persistence<a class="header-anchor" href="javascript:;" onclick="location.hash='#session-persistence'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Once authenticated the <strong>AuthUserSession</strong> model is populated and stored in the Cache using one of ServiceStack's <a href="/caching">supported Caching providers</a>. ServiceStack's Sessions simply uses the
+<a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Caching/ICacheClient.cs">ICacheClient</a>
+API so any new provider added can be used for both Session and Caching, which currently includes:</p>
+<ul>
+<li><strong>Memory</strong>: <code>MemoryCacheClient</code> in <a href="https://nuget.org/packages/ServiceStack">ServiceStack</a></li>
+<li><strong>Redis</strong>: <code>RedisClient</code>, <code>PooledRedisClientManager</code> or <code>BasicRedisClientManager</code> in <a href="https://nuget.org/packages/ServiceStack.Redis">ServiceStack.Redis</a></li>
+<li><strong>OrmLite</strong>: <code>OrmLiteCacheClient</code> in <a href="https://nuget.org/packages/ServiceStack.Server">ServiceStack.Server</a></li>
+<li><strong>AWS DynamoDB</strong>: <code>DynamoDbCacheClient</code> in <a href="https://nuget.org/packages/ServiceStack.Aws">ServiceStack.Aws</a></li>
+<li><strong>Memcached</strong>: <code>MemcachedClientCache</code> in <a href="https://nuget.org/packages/ServiceStack.Caching.Memcached">ServiceStack.Caching.Memcached</a></li>
+<li><strong>Azure</strong>: <code>AzureTableCacheClient</code> in <a href="https://nuget.org/packages/ServiceStack.Azure">ServiceStack.Azure</a></li>
+</ul>
+<p>The Auth Feature also allows you to specify your own custom <code>IUserAuthSession</code> type where you can capture additional metadata with your users session which will also get persisted and hydrated from the cache, e.g:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(() =&gt; new CustomUserSession(), 
+    ...
+));
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>If you're using Custom Sessions and have <code>JsConfig.ExcludeTypeInfo=true</code>, you need to <a href="http://stackoverflow.com/q/18842685/85785">explicitly enable it</a> with <code>JsConfig&lt;TCustomSession&gt;.IncludeTypeInfo=true</code>.</p>
+</div>
+<p>After authentication the client will receive a cookie with a session id, which is used to fetch the correct session from the <code>ICacheClient</code> internally by ServiceStack. Thus, you can access the current session in a service:</p>
+<pre><code class="language-csharp">public class SecuredService : Service
+{
+    public object Get(Secured request)
+    {
+        var session = this.SessionAs&lt;AuthUserSession&gt;();
+        return new SecuredResponse() { Test = &quot;You're&quot; + session.FirstName };
+    }
+}
+</code></pre>
+<p>ServiceStack's Authentication, Caching and Session providers are completely new, clean, dependency-free testable APIs that doesn't rely on and is devoid of ASP.NET's existing membership, caching or session provider models.</p>
+<h3 id="authsecret-admin-session">AuthSecret Admin Session<a class="header-anchor" href="javascript:;" onclick="location.hash='#authsecret-admin-session'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Super User Requests using <a href="/debugging#authsecret">Config.AdminAuthSecret</a> return an Authenticated Admin UserSession
+whose default values can be modified at <code>AuthFeature.AuthSecretSession</code>:</p>
+<ul>
+<li><code>DisplayName</code>: Admin</li>
+<li><code>UserName</code>: authsecret</li>
+<li><code>AuthProvider</code>: authsecret</li>
+<li><code>Roles</code>: Admin</li>
+<li><code>UserAuthId</code>: 0</li>
+</ul>
+<h3 id="embedded-login-page">Embedded Login Page<a class="header-anchor" href="javascript:;" onclick="location.hash='#embedded-login-page'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>AuthFeature</code> adds a fallback <strong>/login.html</strong> page if the <code>HtmlRedirect</code> remains unchanged and no <code>/login.html</code> exists, otherwise
+if using a custom <code>/login</code> page in either <strong>Razor</strong> or <strong>Script Pages</strong> they'll continue to be used instead.</p>
+<p>The default <code>/login.html</code> page provides an auto Login page that supports authentication via Credentials as well as a generating a dynamic
+list of OAuth providers, e.g the <a href="https://github.com/NetCoreApps/NorthwindCrud">NorthwindCrud</a> <code>/login</code> page with Facebook OAuth looks like:</p>
+<p><img src="/img/pages/release-notes/v5.9/auth-login.png" alt="" /></p>
+<p>If you're using an SPA App with client side routing to implement <code>/login</code>, the default login page can be disabled with:</p>
+<pre><code class="language-csharp">new AuthFeature {
+    IncludeDefaultLogin = false
+}
+</code></pre>
+<p>The login page supports same <code>continue</code> or <code>ReturnUrl</code> redirect params as <a href="#logout">Logout API</a>.</p>
+<h2 id="world-validation">World Validation<a class="header-anchor" href="javascript:;" onclick="location.hash='#world-validation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>See the annotated <a href="/world-validation">World Validation Docs</a> for a detailed walks through and showcases the implementation
+of how the most popular <strong>Server HTML rendered</strong> approaches and <strong>Client UI rendered</strong> technologies use the same built-in
+Authentication, Registration and protected Services.</p>
+<h2 id="project-templates">Project Templates<a class="header-anchor" href="javascript:;" onclick="location.hash='#project-templates'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Most of <a href="/templates/dotnet-new">ServiceStack's Project Templates</a> are configured with Auth out-of-the-box or can be easily added to an empty <a href="https://github.com/NetCoreTemplates/web">web</a>
+project template:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x new web ProjectName</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>By <a href="/mix-tool#mix-in-auth-repository">mixing in your desired auth</a> features, e.g. to configure your App to enable auth &amp; maintain in SQL Server run:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix auth auth-db sqlserver</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Checkout the <a href="https://youtu.be/XpHAaCTV7jE">Bookings CRUD YouTube demo</a> for a quick preview of this in action.</p>
+<h2 id="live-demos">Live Demos<a class="header-anchor" href="javascript:;" onclick="location.hash='#live-demos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To illustrate Authentication integration with ServiceStack, see the authentication-enabled
+<a href="https://github.com/NetCoreApps/LiveDemos">Live Demos</a> below:</p>
+<h3 id="net-core">.NET Core<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-core'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><a href="https://github.com/NetCoreApps/AppleSignIn">Apple Sign In</a>
+<ul>
+<li>Apple Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/NetCoreApps/BookingsCrud">Bookings CRUD</a>
+<ul>
+<li>Credentials, Facebook, Google, Microsoft Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/NetCoreApps/TechStacks">New TechStacks</a>
+<ul>
+<li>GitHub, Twitter and JWT Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/NetCoreApps/SimpleAuth.Mvc">SimpleAuth.Mvc</a>
+<ul>
+<li>Twitter, Facebook, GitHub, VK, Yandex and Credentials Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/NetCoreApps/Chat">Chat</a>
+<ul>
+<li>Twitter, Facebook and GitHub Auth</li>
+</ul>
+</li>
+</ul>
+<h3 id="mobile">Mobile<a class="header-anchor" href="javascript:;" onclick="location.hash='#mobile'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><a href="https://github.com/ServiceStackApps/AndroidJavaChat">Android Java Chat</a>
+<ul>
+<li>Facebook, Twitter and Google Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/AndroidXamarinChat">Android Xamarin Chat</a>
+<ul>
+<li>Twitter Auth</li>
+</ul>
+</li>
+</ul>
+<h3 id="net-framework">.NET Framework<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-framework'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><a href="https://github.com/ServiceStackApps/HttpBenchmarks">HttpBenchmarks Application</a>
+<ul>
+<li><a href="https://github.com/ServiceStackApps/HttpBenchmarks#authentication">Step-by-Step Authentication Guide</a></li>
+<li>Twitter, Facebook, Google, LinkedIn and Credentials Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/TechStacks">Angular TechStacks</a>
+<ul>
+<li>Twitter, GitHub and JWT Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStack/Gistlyn">Gistlyn</a>
+<ul>
+<li>GitHub and JWT Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/AwsApps">AWS Auth</a>
+<ul>
+<li>Twitter, Facebook, GitHub, Google, Yahoo, LinkedIn, and Credentials Auth</li>
+</ul>
+</li>
+<li><a href="/servicestack-integration">MVC and WebForms Example</a>
+<ul>
+<li>Twitter, Facebook, GitHub, Google, Yahoo, LinkedIn, VK, Credentials and Windows Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/LiveDemos#chat">Chat</a>
+<ul>
+<li>Twitter, Facebook and GitHub Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/ReactChat">React Chat</a>
+<ul>
+<li>Twitter, Facebook and GitHub Auth</li>
+</ul>
+</li>
+<li><a href="https://github.com/ServiceStackApps/LiveDemos#social-bootstrap-api">SocialBootstrap Api</a>
+<ul>
+<li>Twitter, Facebook, Yahoo and Credentials Auth</li>
+</ul>
+</li>
+</ul>
+<h2 id="custom-authentication-and-authorization">Custom authentication and authorization<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-authentication-and-authorization'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>A good starting place to create your own Auth provider that relies on username/password validation is to subclass <code>CredentialsAuthProvider</code> and override the <code>bool TryAuthenticate(service, username, password)</code> method where you can provide your custom implementation. If you instead wanted to authenticate via HTTP Basic Auth
+you would subclass <code>BasicAuthProvider</code> instead.</p>
+<p>Both the default <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/BasicAuthProvider.cs">BasicAuthProvider</a> and <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/CredentialsAuthProvider.cs">CredentialsAuthProvider</a> (which it extends) can be extended, and their behavior overwritten. An example is below:</p>
+<h4 id="async-custom-authprovider">Async Custom AuthProvider<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-custom-authprovider'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<pre><code class="language-csharp">using ServiceStack;
+using ServiceStack.Auth;
+
+// From v5.10+
+public class CustomCredentialsAuthProvider : CredentialsAuthProvider
+{
+    public override async Task&lt;bool&gt; TryAuthenticateAsync(IServiceBase authService, 
+        string userName, string password, CancellationToken token=default)
+    {
+        //Add here your custom auth logic (database calls etc)
+        //Return true if credentials are valid, otherwise false
+    }
+
+    public override async Task&lt;IHttpResult&gt; OnAuthenticatedAsync(IServiceBase authService, 
+        IAuthSession session, IAuthTokens tokens, Dictionary&lt;string, string&gt; authInfo, 
+        CancellationToken token=default)
+    {
+        //Fill IAuthSession with data you want to retrieve in the app eg:
+        session.FirstName = &quot;some_firstname_from_db&quot;;
+        //...
+
+        //Call base method to Save Session and fire Auth/Session callbacks:
+        return await base.OnAuthenticatedAsync(authService, session, tokens, authInfo, token);
+
+        //Alternatively avoid built-in behavior and explicitly save session with
+        //session.IsAuthenticated = true;
+        //await authService.SaveSessionAsync(session, SessionExpiry, token);
+        //authService.Request.Items[Keywords.DidAuthenticate] = true;
+        //return null;
+    }
+}
+</code></pre>
+<h4 id="sync-custom-authprovider">Sync Custom AuthProvider<a class="header-anchor" href="javascript:;" onclick="location.hash='#sync-custom-authprovider'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<pre><code class="language-csharp">using ServiceStack;
+using ServiceStack.Auth;
+
+public class CustomCredentialsAuthProvider : CredentialsAuthProviderSync
+{
+    public override bool TryAuthenticate(IServiceBase authService, 
+        string userName, string password)
+    {
+        //Add here your custom auth logic (database calls etc)
+        //Return true if credentials are valid, otherwise false
+    }
+
+    public override IHttpResult OnAuthenticated(IServiceBase authService, 
+        IAuthSession session, IAuthTokens tokens, 
+        Dictionary&lt;string, string&gt; authInfo)
+    {
+        //Fill IAuthSession with data you want to retrieve in the app eg:
+        session.FirstName = &quot;some_firstname_from_db&quot;;
+        //...
+
+        //Call base method to Save Session and fire Auth/Session callbacks:
+        return base.OnAuthenticated(authService, session, tokens, authInfo);
+
+        //Alternatively avoid built-in behavior and explicitly save session with
+        //session.IsAuthenticated = true;
+        //authService.SaveSession(session, SessionExpiry);
+        //authService.Request.Items[Keywords.DidAuthenticate] = true;
+        //return null;
+    }
+}
+</code></pre>
+<p>Then you need to register your custom credentials auth provider:</p>
+<pre><code class="language-csharp">//Register all Authentication methods you want to enable for this web app.
+Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(),
+    new IAuthProvider[] {
+        new CustomCredentialsAuthProvider(), //HTML Form post of User/Pass
+    }
+));
+</code></pre>
+<p>By default the AuthFeature plugin automatically registers the following (overridable) Service Routes:</p>
+<pre><code class="language-csharp">new AuthFeature = {
+  ServiceRoutes = new Dictionary&lt;Type, string[]&gt; {
+    { typeof(AuthenticateService),  new[]{ &quot;/auth&quot;, &quot;/auth/{provider}&quot; }‎},
+    { typeof(AssignRolesService),   new[]{ &quot;/assignroles&quot; }‎},
+    { typeof(UnAssignRolesService), new[]{ &quot;/unassignroles&quot; }‎},
+  }
+};
+</code></pre>
+<h3 id="logout">Logout<a class="header-anchor" href="javascript:;" onclick="location.hash='#logout'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can do a GET or POST to <code>/auth/logout</code> to logout the authenticated user or if you're using C# client you can logout with:</p>
+<pre><code class="language-csharp">client.Post(new Authenticate { provider = &quot;logout&quot; });
+</code></pre>
+<h4 id="redirect-url">Redirect URL<a class="header-anchor" href="javascript:;" onclick="location.hash='#redirect-url'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Logging out will remove the Users Session from the Server and Session Cookies from the Client and redirect to the url in
+<code>continue</code>, <code>ReturnUrl</code> or configured <code>AuthFeature.HtmlRedirectReturnParam</code> <strong>QueryString</strong> or <strong>FormData</strong> Request param.
+If no redirect is specified it will fallback to redirect to <code>session.ReferrerUrl</code>, <code>Referer</code> HTTP Header or configured <code>AuthProvider.CallbackUrl</code>.</p>
+<h3 id="authenticating-with.net-service-clients">Authenticating with .NET Service Clients<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-with.net-service-clients'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>On the client you can use the <a href="/csharp-client">C#/.NET Service Clients</a> to easily consume your authenticated Services.</p>
+<p>To authenticate using your <code>CustomCredentialsAuthProvider</code> by POST'ing a <code>Authenticate</code> Request, e.g:</p>
+<pre><code class="language-csharp">var client = new JsonServiceClient(BaseUrl);
+
+var authResponse = client.Post(new Authenticate {
+    provider = CredentialsAuthProvider.Name, //= credentials
+    UserName = &quot;test@gmail.com&quot;,
+    Password = &quot;p@55w0rd&quot;,
+    RememberMe = true,
+});
+</code></pre>
+<p>If authentication was successful the Service Client <code>client</code> instance will be populated with authenticated session cookies which then allows calling Authenticated services, e.g:</p>
+<pre><code class="language-csharp">var response = client.Get(new GetActiveUserId());
+</code></pre>
+<p>If you've also registered the <code>BasicAuthProvider</code> it will enable your Services to accept <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Authentication</a> which is built-in the Service Clients that you can populate on the Service Client with:</p>
+<pre><code class="language-csharp">client.UserName = &quot;test@gmail.com&quot;;
+client.Password = &quot;p@55w0rd&quot;;
+</code></pre>
+<p>Which will also let you access protected Services, e.g:</p>
+<pre><code class="language-csharp">var response = client.Get(new GetActiveUserId());
+</code></pre>
+<p>Although behind-the-scenes it ends up making 2 requests, 1st request sends a normal request which will get rejected with a <code>401 Unauthorized</code> and if the Server indicates it has the <code>BasicAuthProvider</code> enabled it will resend the request with the HTTP Basic Auth credentials.</p>
+<p>You could instead save the latency of the additional auth challenge request by specifying the client should always send the Basic Auth with every request:</p>
+<pre><code class="language-csharp">client.AlwaysSendBasicAuthHeader = true;
+</code></pre>
+<h3 id="authenticating-with-http">Authenticating with HTTP<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-with-http'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To Authenticate with your <code>CustomCredentialsAuthProvider</code> (which inherits from CredentialsAuthProvider) you would POST:</p>
+<p><strong>POST</strong> localhost:60339/auth/credentials?format=json</p>
+<pre><code class="language-json">{
+    &quot;UserName&quot;: &quot;admin&quot;,
+    &quot;Password&quot;: &quot;test&quot;,
+    &quot;RememberMe&quot;: true
+}
+</code></pre>
+<p>When the client now tries to authenticate with the request above and the auth succeeded, the client will retrieve some cookies with a session id which identify the client on each Web Service call.</p>
+<h3 id="authentication-via-oauth-accesstokens">Authentication via OAuth AccessTokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#authentication-via-oauth-accesstokens'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To improve OAuth Sign In integration from native Mobile or Desktop Apps you can also Authenticate via AccessTokens which can dramatically simplify the Development and User Experience by being able to leverage the Native Facebook, Twitter and Google Client SDK's to Sign In users locally then reuse their local <strong>AccessToken</strong> to Authenticate with back-end ServiceStack Servers.</p>
+<p>Example usage of this feature is in the <a href="https://github.com/ServiceStackApps/AndroidJavaChat/#integrated-facebook-twitter-and-google-logins">Integrated Facebook, Twitter and Google Logins</a>
+in Android Java Chat which is also able to <a href="https://github.com/ServiceStackApps/AndroidJavaChat#automatically-sign-in-previously-signed-in-users">Automatically Sign In users with saved AccessTokens</a>.</p>
+<p>This capability is available on the popular OAuth Providers below:</p>
+<ul>
+<li><code>FacebookAuthProvider</code> - Sign in with Facebook</li>
+<li><code>TwitterAuthProvider</code> - Sign in with Twitter</li>
+<li><code>GithubAuthProvider</code> - Sign in with Github</li>
+<li><code>GoogleOAuth2Provider</code> - Sign in with Google</li>
+</ul>
+<p>It can also be enabled in other OAuth2 Providers by implementing <code>VerifyAccessToken</code> to manually
+validate whether the provided AccessToken is valid with the registered OAuth App. The API to validate Access
+Tokens isn't part of the OAuth2 specification and is different (and often missing) for other OAuth2 providers.</p>
+<p>As an example, the <code>GoogleOAuth2Provider</code> uses a <code>VerifyAccessToken</code> implementation that's similar to:</p>
+<pre><code class="language-csharp">new GoogleOAuth2Provider {
+    VerifyAccessToken = accessToken =&gt; {
+        var url = $&quot;https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={accessToken}&quot;;
+        var json = url.GetJsonFromUrl();
+        var obj = JsonObject.Parse(json);
+        return obj[&quot;issued_to&quot;] == ConsumerKey;
+    }
+}
+</code></pre>
+<h4 id="client-authentication-with-accesstoken">Client Authentication with AccessToken<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-authentication-with-accesstoken'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Clients can utilize this feature with the new <code>AccessToken</code> and <code>AccessTokenSecret</code> properties on the existing
+<code>Authenticate</code> Request DTO, sent with the <strong>provider</strong> that the AccessToken is for, e.g:</p>
+<pre><code class="language-csharp">var response = client.Post(new Authenticate {
+    provider = &quot;facebook&quot;,
+    AccessToken = facebookAccessToken,
+    RememberMe = true,
+});
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Most OAuth Providers only require sending an <code>AccessToken</code> with Twitter being the exception which also requires sending an <code>AccessTokenSecret</code></p>
+</div>
+<h3 id="user-sessions-cache">User Sessions Cache<a class="header-anchor" href="javascript:;" onclick="location.hash='#user-sessions-cache'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack uses the <a href="/caching">Cache Provider</a> which was registered in the IoC container:</p>
+<pre><code class="language-csharp">//Register to use an In Memory Cache Provider (default)
+container.Register&lt;ICacheClient&gt;(new MemoryCacheClient());
+
+//Configure an alt. distributed persisted cache, E.g Redis:
+//container.Register&lt;IRedisClientsManager&gt;(c =&gt; 
+//    new RedisManagerPool(&quot;localhost:6379&quot;));
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">Tip</p><p>If you've got multiple servers which run the same ServiceStack service, you can use Redis to share the sessions between these servers</p>
+</div>
+<p>Please look at <a href="https://github.com/ServiceStack/SocialBootstrapApi/tree/master/src/SocialBootstrapApi">SocialBootstrapApi</a> to get a full example.</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Of course you can also implement your own - custom - authentication mechanism. You aren't forced to use the built-in ServiceStack auth mechanism</p>
+</div>
+<h2 id="declarative-validation-attributes">Declarative Validation Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-validation-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The recommended way to protect your APIs is to use the <a href="/declarative-validation">Declarative Validation</a> attributes which as they're decoupled from any implementation can be safely annotated on Request DTOs without adding any implementation dependencies. In addition by annotating Authorization and Validation attributes on Request DTOs captures this information into your APIs reusable DTOs, filtering this information down to clients where they can provide enriched User Experiences.</p>
+<h3 id="authorization-attributes">Authorization Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#authorization-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The available Typed Authorization Attributes include:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[ValidateIsAuthenticated]</code></td>
+<td>Protect access to this API to Authenticated Users only</td>
+</tr>
+<tr>
+<td><code>[ValidateIsAdmin]</code></td>
+<td>Protect access to this API to Admin Users only</td>
+</tr>
+<tr>
+<td><code>[ValidateHasPermission]</code></td>
+<td>Protect access to this API to only Users assigned with ALL Permissions</td>
+</tr>
+<tr>
+<td><code>[ValidateHasRole]</code></td>
+<td>Protect access to this API to only Users assigned with ALL Roles</td>
+</tr>
+</tbody>
+</table>
+<p>Where they can be annotated on <strong>Request DTOs</strong> to protect APIs:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]            // or [ValidateRequest(&quot;IsAuthenticated&quot;)]
+[ValidateIsAdmin]                    // or [ValidateRequest(&quot;IsAdmin&quot;)]
+[ValidateHasRole(role)]              // or [ValidateRequest($&quot;HasRole(`{role}`)&quot;)]
+[ValidateHasPermission(permission)]  // or [ValidateRequest($&quot;HasPermission(`{permission}`)&quot;)
+public class Secured {}
+</code></pre>
+<h2 id="the-authenticate-attribute">The Authenticate attribute<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-authenticate-attribute'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <code>[Authenticate]</code> <a href="/filter-attributes">Request Filter Attribute</a> tells ServiceStack which Services needs authentication by adding it to your Service implementations, e.g:</p>
+<pre><code class="language-csharp">[Authenticate]
+public class SecuredService : Service
+{
+    public object Get(Secured request)
+    {
+        IAuthSession session = this.GetSession();
+        return new SecuredResponse() { Test = &quot;You're&quot; + session.FirstName };
+    }
+
+    public object Put(Secured request)
+    {
+        return new SecuredResponse() { Test = &quot;Valid!&quot; };
+    }
+
+    public object Post(Secured request)
+    {
+        return new SecuredResponse() { Test = &quot;Valid!&quot; };
+    }
+
+    public object Delete(Secured request)
+    {
+        return new SecuredResponse() { Test = &quot;Valid!&quot; };
+    }
+}
+</code></pre>
+<p>If you want, that authentication is only required for GET and PUT requests for example, you have to provide some extra parameters to the <code>Authenticate</code> attribute.</p>
+<pre><code class="language-csharp">[Authenticate(ApplyTo.Get | ApplyTo.Put)] 
+</code></pre>
+<h2 id="requiredrole-and-requiredpermission-attributes">RequiredRole and RequiredPermission attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#requiredrole-and-requiredpermission-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>ServiceStack also includes a built-in role &amp; permission based authorization attributes where you can apply the <code>[Required*]</code> Request Filter Attributes on your Service classes to apply to all Services or limited to a single Service:</p>
+<pre><code class="language-csharp">[Authenticate]
+//All HTTP (GET, POST...) methods need &quot;CanAccess&quot;
+[RequiredRole(&quot;Admin&quot;)]
+[RequiredPermission(&quot;CanAccess&quot;)]
+public class MyServices : Service
+{
+    public object Get(Secured request) {}
+
+    [RequiredPermission(&quot;CanAdd&quot;)]
+    public object Put(Secured request) {}
+    
+    [RequiredPermission(&quot;CanAdd&quot;)]
+    public object Post(Secured request) {}
+    
+    [RequiredPermission(&quot;AdminRights&quot;, &quot;CanDelete&quot;)]
+    public object Delete(Secured request) {}
+}
+</code></pre>
+<p>Now the client needs the permissions:</p>
+<ul>
+<li><strong>CanAccess</strong> to make a GET request</li>
+<li><strong>CanAccess</strong>, <strong>CanAdd</strong> to make a PUT/POST request</li>
+<li><strong>CanAccess</strong>, <strong>AdminRights</strong> and <strong>CanDelete</strong> to make a DELETE request</li>
+</ul>
+<p>If instead you want to allow access to users in <strong>ANY</strong> Role or Permission use:</p>
+<pre><code class="language-csharp">[RequiresAnyRole(&quot;Admin&quot;,&quot;Member&quot;)]
+[RequiresAnyRole(ApplyTo.Put | ApplyTo.Post, &quot;Admin&quot;,&quot;Owner&quot;,&quot;Member&quot;)]
+[RequiresAnyPermission(ApplyTo.Delete, &quot;AdminRights&quot;, &quot;CanDelete&quot;)]
+public class MyServices : Service
+{
+    public object Get(Secured request) {}
+    public object Put(Secured request) {}
+    public object Post(Secured request) {}
+    public object Delete(Secured request) {}
+}
+</code></pre>
+<p>These attributes can also be applied to Request DTOs however as they would add a dependency to <strong>ServiceStack.dll</strong>, it's recommended to</p>
+<h2 id="enabling-authentication-at-different-levels">Enabling Authentication at different levels<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-authentication-at-different-levels'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="using-the-authenticate-attribute">Using the [Authenticate] Attribute<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-authenticate-attribute'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can protect services by adding the <code>[Authenticate]</code> attribute on either the Action:</p>
+<pre><code class="language-csharp">class MyService : Service 
+{
+    [Authenticate] 
+    public object Get(Protected request) { ... }
+}
+</code></pre>
+<p>The Request DTO</p>
+<pre><code class="language-csharp">[Authenticate] 
+class Protected { ... }
+</code></pre>
+<p>Or the service implementation</p>
+<pre><code class="language-csharp">[Authenticate] 
+class MyService : Service 
+{
+    public object Get(Protected request) { ... }
+}
+</code></pre>
+<p>Or by inheriting from a base class</p>
+<pre><code class="language-csharp">[Authenticate] 
+class MyServiceBase : Service { ... }
+
+class MyService : MyServiceBase {
+    public object Get(Protected request) { ... }
+}
+</code></pre>
+<h3 id="using-a-global-request-filter">Using a Global Request Filter<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-a-global-request-filter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Otherwise you can use a <a href="/request-and-response-filters">global Request Filter</a> if you wanted to restrict all requests any other way, e.g something like:</p>
+<pre><code class="language-csharp">GlobalRequestFiltersAsync.Add(async (req, res, requestDto) =&gt;
+{
+    if (ShouldProtectRequest(requestDto)) 
+    {
+        await new AuthenticateAttribute().ExecuteAsync(req, res, requestDto);
+    }
+});
+</code></pre>
+<h2 id="customizing-authproviders">Customizing AuthProviders<a class="header-anchor" href="javascript:;" onclick="location.hash='#customizing-authproviders'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h4 id="customvalidationfilter">CustomValidationFilter<a class="header-anchor" href="javascript:;" onclick="location.hash='#customvalidationfilter'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The <code>CustomValidationFilter</code> on all AuthProviders lets you add post verification logic after a user has signed in with an OAuth provider and their OAuth metadata is retrieved. The filter lets you return a <code>IHttpResult</code> to control what error response is returned, e.g:</p>
+<pre><code class="language-csharp">new FacebookAuthProvider(appSettings) { 
+    CustomValidationFilter = authCtx =&gt; CustomIsValid(authCtx) 
+        ? authCtx.Service.Redirect(authCtx.Session.ReferrerUrl
+            .AddHashParam(&quot;f&quot;,&quot;CustomErrorCode&quot;))
+        : null,
+}
+</code></pre>
+<p>Or could be used to redirect a network or users to a &quot;Not Available in your Area&quot; page with:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(..., 
+    new IAuthProvider[] {
+        new CredentialsAuthProvider {
+            CustomValidationFilter = authCtx =&gt; 
+                authCtx.Request.UserHostAddress.StartsWith(&quot;175.45.17&quot;)
+                    ? HttpResult.Redirect(&quot;http://host.com/are-not-available&quot;)
+                    : null
+        }   
+    }));
+</code></pre>
+<h4 id="username-validation">UserName Validation<a class="header-anchor" href="javascript:;" onclick="location.hash='#username-validation'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The UserName validation for all Auth Repositories are configurable at:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...){
+    ValidUserNameRegEx = new Regex(@&quot;^(?=.{3,20}$)([A-Za-z0-9][._-]?)*$&quot;, RegexOptions.Compiled),
+})
+</code></pre>
+<p>Instead of RegEx you can choose to validate using a Custom Predicate. The example below ensures UserNames don't include specific chars:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...){
+    IsValidUsernameFn = userName =&gt; userName.IndexOfAny(new[] { '@', '.', ' ' }) == -1
+})
+</code></pre>
+<h4 id="accountlocked-validator">AccountLocked Validator<a class="header-anchor" href="javascript:;" onclick="location.hash='#accountlocked-validator'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Use <code>AccountLockedValidator</code> to override logic to determine when an account is locked, e.g. by default an Account is Locked when it has a <code>LockedDate</code> but
+can be changed to allow locking accounts at a future date with:</p>
+<pre><code class="language-csharp">new CredentialsAuthProvider {
+    AccountLockedValidator = (authRepo, userAuth, tokens) =&gt; 
+        userAuth.LockedDate != null &amp;&amp; userAuth.LockedDate &lt;= DateTime.UtcNow;
+}
+</code></pre>
+<p>Alternatively if you're using a Custom Auth Provider you can just override <code>IsAccountLocked()</code> to override this behavior.</p>
+<h4 id="saving-extended-oauth-metadata">Saving Extended OAuth Metadata<a class="header-anchor" href="javascript:;" onclick="location.hash='#saving-extended-oauth-metadata'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The new <code>SaveExtendedUserInfo</code> property (enabled by default) on all OAuth providers let you control whether to save the extended OAuth metadata available (into <code>UserAuthDetails.Items</code>) when logging in via OAuth.</p>
+<h4 id="maxloginattempts">MaxLoginAttempts<a class="header-anchor" href="javascript:;" onclick="location.hash='#maxloginattempts'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The <code>MaxLoginAttempts</code> feature lets you lock a User Account after multiple invalid login attempts, e.g:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...) {
+    MaxLoginAttempts = 5   // Lock user after 5 Invalid attempts
+});
+</code></pre>
+<h3 id="adding-authproviders-with-plugins">Adding AuthProviders with Plugins<a class="header-anchor" href="javascript:;" onclick="location.hash='#adding-authproviders-with-plugins'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Plugins can register AuthProviders by calling <code>RegisterAuthProvider()</code> before the <code>AuthFeature</code> plugin is registered, which can be achieved in Plugins by having them implement <code>IPreInitPlugin</code>:</p>
+<pre><code class="language-csharp">public class MyPlugin : IPreInitPlugin
+{
+    public void BeforePluginsLoaded(IAppHost appHost)
+    {
+        appHost.GetPlugin&lt;AuthFeature&gt;().RegisterAuthProvider(new MyAuthProvider());
+    }
+}
+</code></pre>
+<h3 id="auth-response-filter">Auth Response Filter<a class="header-anchor" href="javascript:;" onclick="location.hash='#auth-response-filter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Auth Providers can customize the <code>AuthenticateResponse</code> returned by implementing <code>IAuthResponseFilter</code> where
+it will get called back with a populated <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/IAuthProvider.cs">AuthFilterContext</a> for successful Authenticate Request DTO requests or <code>AuthResultContext</code> for successful OAuth requests:</p>
+<pre><code class="language-csharp">public interface IAuthResponseFilter
+{
+    // Intercept successful Authenticate Request DTO requests
+    void Execute(AuthFilterContext authContext);
+    
+    // Intercept successful OAuth redirect requests
+    Task ResultFilterAsync(AuthResultContext authContext, CancellationToken token=default);
+}
+
+public class AuthFilterContext
+{
+    public AuthenticateService AuthService    // Instance of AuthenticateService
+    public IAuthProvider AuthProvider         // Selected Auth Provider for Request
+    public IAuthSession Session               // Authenticated Users Session
+    public Authenticate AuthRequest           // Auth Request DTO
+    public AuthenticateResponse AuthResponse  // Auth Response DTO
+    public string ReferrerUrl                 // Optimal Session Referrer URL to use redirects
+    public bool AlreadyAuthenticated          // If User was already authenticated
+    public bool DidAuthenticate               // If User Authenticated in this request
+}
+
+public class AuthResultContext
+{
+    public IHttpResult Result                 // Response returned for this successful Auth Request
+    public IServiceBase Service               // Instance of Service used in this Request
+    public IRequest Request                   // Current HTTP Request Context
+    public IAuthSession Session               // Authenticated Users Session
+}
+</code></pre>
+<p>The filters can be used to modify properties on the <code>AuthenticateResponse</code> DTO or OAuth successful redirect requests.
+To completely replace the <code>AuthenticateResponse</code> returned, you can specify a <code>AuthFeature.AuthResponseDecorator</code>.</p>
+<h3 id="icustomuserauth">ICustomUserAuth<a class="header-anchor" href="javascript:;" onclick="location.hash='#icustomuserauth'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>ICustomUserAuth</code> interface can be implemented on User Auth Repositories that allow replacing the custom
+<code>UserAuth</code> and <code>UserAuthDetails</code> tables by returning the concrete Type that should be used instead:</p>
+<pre><code class="language-csharp">public interface ICustomUserAuth
+{
+    IUserAuth CreateUserAuth();
+    IUserAuthDetails CreateUserAuthDetails();
+}
+</code></pre>
+<p>This allows using the same <code>RegistrationFeature</code> and <code>RegisterService</code> to handle registering new users
+with the substituted <code>IUserAuth</code> and <code>IUserAuthDetails</code> Types.</p>
+<h4 id="loaduserauthfilter">LoadUserAuthFilter<a class="header-anchor" href="javascript:;" onclick="location.hash='#loaduserauthfilter'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The LoadUserAuthFilter on <code>AspNetWindowsAuthProvider</code> lets you retrieve more detailed information about Windows Authenticated users during Windows Auth Authentication by using the .NET's ActiveDirectory services, e.g:</p>
+<pre><code class="language-csharp">//...
+new AspNetWindowsAuthProvider(this) {
+    LoadUserAuthFilter = LoadUserAuthInfo
+}
+//...
+
+public void LoadUserAuthInfo(AuthUserSession userSession, 
+    IAuthTokens tokens, Dictionary&lt;string, string&gt; authInfo)
+{
+    if (userSession == null) return;
+    using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
+    {
+        var user = UserPrincipal.FindByIdentity(pc, userSession.UserAuthName);
+        tokens.DisplayName = user.DisplayName;
+        tokens.Email = user.EmailAddress;
+        tokens.FirstName = user.GivenName;
+        tokens.LastName = user.Surname;
+        tokens.FullName = (String.IsNullOrWhiteSpace(user.MiddleName))
+            ? $&quot;{user.GivenName} {user.Surname}&quot;
+            : $&quot;{user.GivenName} {user.MiddleName} {user.Surname}&quot;;
+        tokens.PhoneNumber = user.VoiceTelephoneNumber;
+    }
+}
+</code></pre>
+<h3 id="customizable-populateuserroles-on-aspnetwindowsauthprovider">Customizable PopulateUserRoles on AspNetWindowsAuthProvider<a class="header-anchor" href="javascript:;" onclick="location.hash='#customizable-populateuserroles-on-aspnetwindowsauthprovider'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>AspNetWindowsAuthProvider</code> uses the public <code>IPrincipal.IsInRole()</code> API to determine if a User is in a particular Windows Auth role, however this can be slow when needing to query a large number of roles in LDAP as it would need to make an LDAP lookup for each role.</p>
+<p>Performance of this can now be improved by specifying a custom <code>PopulateUserRoles</code> implementation that overrides how User Roles are resolved, e.g:</p>
+<pre><code class="language-csharp">new AspNetWindowsAuthProvider (AppSettings) {
+    PopulateUserRoles = (request, user, session) =&gt; {
+        using (WindowsIdentity userId = request?.LogonUserIdentity)
+        {
+            List roles = new List();
+            if (userId?.Groups != null)
+            {
+                foreach (var group in userId.Groups)
+                {
+                    // Remove the domain name from the name of the group, 
+                    // if it has it, and you don't need it. 
+                    var groupName = new SecurityIdentifier(group.Value)
+                        .Translate(typeof(NTAccount)).ToString();
+                    if (groupName.Contains(&quot;\&quot;)) 
+                    groupName = groupName.Split('\')[1]; 
+                    roles.Add(groupName);
+                }
+            }
+            session.Roles = roles;
+        }
+    }
+}
+</code></pre>
+<h3 id="in-process-authenticated-requests">In Process Authenticated Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#in-process-authenticated-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can enable the <code>CredentialsAuthProvider</code> to allow <strong>In Process</strong> requests to Authenticate without a Password with:</p>
+<pre><code class="language-csharp">new CredentialsAuthProvider {
+    SkipPasswordVerificationForInProcessRequests = true,
+}
+</code></pre>
+<p>When enabled this lets <strong>In Process</strong> Service Requests to login as a specified user without needing to provide their password.</p>
+<p>For example this could be used to create an <a href="/auth/restricting-services">Intranet Restricted</a> <strong>Admin-Only</strong> Service that lets you login as another user so you can debug their account without knowing their password with:</p>
+<pre><code class="language-csharp">[RequiredRole(&quot;Admin&quot;)]
+[Restrict(InternalOnly=true)]
+public class ImpersonateUser 
+{
+    public string UserName { get; set; }
+}
+
+public class MyAdminServices : Service
+{
+    public async Task&lt;object&gt; Any(ImpersonateUser request)
+    {
+        using var service = base.ResolveService&lt;AuthenticateService&gt;(); //In Process
+        return await service.PostAsync(new Authenticate {
+            provider = AuthenticateService.CredentialsProvider,
+            UserName = request.UserName,
+        });
+    }
+}
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Your Services can use the new <code>Request.IsInProcessRequest()</code> to identify Services that were executed in-process</p>
+</div>
+<h3 id="custom-user-sessions-using-jwt-tokens">Custom User Sessions using JWT Tokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-user-sessions-using-jwt-tokens'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="/auth/jwt-authprovider">JWT Auth Provider</a> allows for a more flexible approach to impersonating users as they allow
+<a href="/auth/jwt-authprovider#creating-jwt-tokens-manually">Manually creating JWT Tokens</a> to construct a custom User Session with Custom metadata,
+Roles and Permissions.</p>
+<h3 id="iauthmetadataprovider">IAuthMetadataProvider<a class="header-anchor" href="javascript:;" onclick="location.hash='#iauthmetadataprovider'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>An IAuthMetadataProvider provides a way to customize the authInfo in all AuthProviders. It also allows overriding of how extended Auth metadata like profileUrl is returned.</p>
+<pre><code class="language-csharp">public interface IAuthMetadataProvider
+{
+   void AddMetadata(IAuthTokens tokens, Dictionary&lt;string,string&gt; authInfo);
+
+   string GetProfileUrl(IAuthSession authSession, string defaultUrl = null);
+}
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>To override with a custom implementation, register <code>IAuthMetadataProvider</code> in the IOC</p>
+</div>
+<h3 id="generate-new-session-cookies-on-authentication">Generate New Session Cookies on Authentication<a class="header-anchor" href="javascript:;" onclick="location.hash='#generate-new-session-cookies-on-authentication'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The AuthFeature also regenerates new Session Cookies each time users login, this behavior can be disabled with:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...) {
+    GenerateNewSessionCookiesOnAuthentication = false
+});
+</code></pre>
+<h3 id="clientid-and-clientsecret-oauth-config-aliases">ClientId and ClientSecret OAuth Config Aliases<a class="header-anchor" href="javascript:;" onclick="location.hash='#clientid-and-clientsecret-oauth-config-aliases'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>OAuth Providers can use <code>ClientId</code> and <code>ClientSecret</code> aliases instead of <code>ConsumerKey</code> and <code>ConsumerSecret</code>, e.g:</p>
+<pre><code class="language-xml">&lt;appSettings&gt;
+    &lt;add key=&quot;oauth.twitter.ClientId&quot; value=&quot;...&quot; /&gt;
+    &lt;add key=&quot;oauth.twitter.ClientSecret&quot; value=&quot;...&quot; /&gt;
+&lt;/appSettings&gt;
+</code></pre>
+<h3 id="override-authorization-http-header">Override Authorization HTTP Header<a class="header-anchor" href="javascript:;" onclick="location.hash='#override-authorization-http-header'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request Filters can override the Authorization HTTP Header used in Auth Providers with:</p>
+<pre><code class="language-csharp">httpReq.Items[Keywords.Authorization] = $&quot;Bearer {token}&quot;;
+</code></pre>
+<h3 id="get-authenticate-requests-are-disabled-by-default">GET Authenticate Requests are disabled by default<a class="header-anchor" href="javascript:;" onclick="location.hash='#get-authenticate-requests-are-disabled-by-default'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><strong>GET</strong> <code>/auth/{provider}</code> requests are disabled by default to discourage sending confidential information in the URL.</p>
+<p>The current exceptions which still allow <strong>GET</strong> requests include:</p>
+<ul>
+<li><code>/auth</code> - Used to check if a User is Authenticated</li>
+<li><code>/auth/logout</code> - Logging Out</li>
+<li>All OAuth Providers who starts their OAuth flow by navigating to <code>/auth/{provider}</code></li>
+</ul>
+<p>You can allow <strong>GET</strong> Authentication requests with:</p>
+<pre><code class="language-csharp">new AuthFeature {
+    AllowGetAuthenticateRequests = req =&gt; true
+}
+</code></pre>
+<p>Although it's recommended to change your code to use <code>POST</code> instead of <code>GET</code> requests.
+Otherwise you can use the <code>IRequest req</code> parameter to check against a white list of known requests types.</p>
+<p><a name="community"></a></p>
+<h1 id="community-resources">Community Resources<a class="header-anchor" href="javascript:;" onclick="location.hash='#community-resources'" aria-label="Permalink">&ZeroWidthSpace;</a></h1>
+<ul>
+<li><a href="https://steveellwoodnlc.medium.com/simple-web-service-authentication-with-servicestack-7294fe5493a2">Simple Web Service Authentication with ServiceStack</a> by <a href="https://steveellwoodnlc.medium.com">@steveellwood</a></li>
+<li><a href="http://estynedwards.com/blog/2016/01/30/ServiceStack-IdentityServer-Angular/">Using IdentityServer 4 with ServiceStack and Angular</a> by <a href="https://twitter.com/estynedwards">@estynedwards</a></li>
+<li><a href="http://buildclassifieds.com/2016/01/14/facebookauth/">Adding Facebook Authentication using ServiceStack</a> by <a href="https://twitter.com/markholdt">@markholdt</a></li>
+<li><a href="http://blog.falafel.com/Blogs/adam-anderson/2013/10/28/how-to-return-jsv-formatted-collection-types-from-sql-server-to-servicestack.ormlite">How to return JSV formatted collection types from SQL Server in OrmLite</a> by <a href="http://blog.falafel.com/blogs/AdamAnderson">AdamAnderson</a></li>
+<li><a href="http://blog.falafel.com/Blogs/adam-anderson/2013/10/23/how-to-migrate-asp.net-membership-users-to-servicestack">How to migrate ASP.NET Membership users to ServiceStack</a> by <a href="http://blog.falafel.com/blogs/AdamAnderson">AdamAnderson</a></li>
+<li><a href="http://www.binaryforge-software.com/wpblog/?p=242">Authentication in ServiceStack REST Services</a> by <a href="https://twitter.com/binaryforge">@binaryforge</a></li>
+<li><a href="http://dylanbeattie.blogspot.com/2013/08/building-servicestack-based-oauth2.html">Building a ServiceStack OAuth2 resource server using DotNetOpenAuth</a> by <a href="https://twitter.com/dylanbeattie">@dylanbeattie</a></li>
+<li><a href="http://sergeytihon.wordpress.com/2013/06/28/declarative-authorization-in-rest-services-in-sharepoint-with-f-and-servicestack/">Declarative authorization in REST services in SharePoint with F#</a> by <a href="https://twitter.com/sergey_tihon">@sergey_tihon</a></li>
+<li><a href="http://stackoverflow.com/a/16845317/85785">Authenticate ServiceStack services against an Umbraco membership provider</a> by <a href="http://stackoverflow.com/users/1664508/gavin-faux">Gavin Faux</a></li>
+<li><a href="http://davetimmins.com/post/2013/april/oauth-with-arcgisonline-servicestack">Using OAuth with ArcGIS Online and ServiceStack</a> by <a href="https://twitter.com/davetimmins">@davetimmins</a></li>
+<li><a href="http://www.binoot.com/2013/03/30/linkedin-provider-for-servicestack-authentication/">LinkedIn Provider for ServiceStack Authentication</a> by <a href="https://twitter.com/binu_thayamkery">@binu_thayamkery</a></li>
+<li><a href="http://enehana.nohea.com/general/customizing-iauthprovider-for-servicestack-net-step-by-step/">A Step by Step guide to create a Custom IAuthProvider</a> by <a href="https://twitter.com/rngoodness">@rngoodness</a></li>
+<li><a href="http://rossipedia.com/blog/2013/03/simple-api-key-authentication-with-servicestack/">Simple API Key Authentication With ServiceStack</a> by <a href="https://twitter.com/rossipedia">@rossipedia</a></li>
+<li><a href="http://joeriks.com/2013/01/12/cors-basicauth-on-servicestack-with-custom-authentication/">CORS BasicAuth on ServiceStack with custom authentication</a> by <a href="https://twitter.com/joeriks">@joeriks</a></li>
+<li><a href="https://www.jokecamp.com/blog/authenticating-servicestack-rest-api-using-hmac/">Authenticating ServiceStack REST API using HMAC</a> by <a href="https://twitter.com/jokecamp">@jokecamp</a></li>
+<li>ServiceStack Credentials Authentication and EasyHttp: <a href="http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of">Part 1</a>, <a href="http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of-1">Part 2</a>, <a href="http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of-2">Part 3</a> by <a href="https://twitter.com/chrissie1">@chrissie1</a></li>
+</ul>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/auth/" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Security
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/auth/auth-repository" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Auth Repository
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#world-validation'" data-id="world-validation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            World Validation
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#project-templates'" data-id="project-templates" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Project Templates
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#live-demos'" data-id="live-demos" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Live Demos
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="net-core" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#net-core'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            .NET Core
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="mobile" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#mobile'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Mobile
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="net-framework" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#net-framework'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            .NET Framework
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-authentication-and-authorization'" data-id="custom-authentication-and-authorization" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom authentication and authorization
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="logout" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#logout'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Logout
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-with.net-service-clients" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-with.net-service-clients'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating with .NET Service Clients
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-with-http" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-with-http'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating with HTTP
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authentication-via-oauth-accesstokens" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authentication-via-oauth-accesstokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authentication via OAuth AccessTokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="user-sessions-cache" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#user-sessions-cache'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            User Sessions Cache
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#declarative-validation-attributes'" data-id="declarative-validation-attributes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Declarative Validation Attributes
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="authorization-attributes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authorization-attributes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authorization Attributes
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-authenticate-attribute'" data-id="the-authenticate-attribute" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The Authenticate attribute
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#requiredrole-and-requiredpermission-attributes'" data-id="requiredrole-and-requiredpermission-attributes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            RequiredRole and RequiredPermission attributes
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#enabling-authentication-at-different-levels'" data-id="enabling-authentication-at-different-levels" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Enabling Authentication at different levels
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="using-the-authenticate-attribute" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#using-the-authenticate-attribute'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Using the 
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="using-a-global-request-filter" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#using-a-global-request-filter'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Using a Global Request Filter
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#customizing-authproviders'" data-id="customizing-authproviders" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Customizing AuthProviders
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="adding-authproviders-with-plugins" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#adding-authproviders-with-plugins'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Adding AuthProviders with Plugins
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="auth-response-filter" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#auth-response-filter'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Auth Response Filter
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="icustomuserauth" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#icustomuserauth'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ICustomUserAuth
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="customizable-populateuserroles-on-aspnetwindowsauthprovider" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#customizable-populateuserroles-on-aspnetwindowsauthprovider'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Customizable PopulateUserRoles on AspNetWindowsAuthProvider
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="in-process-authenticated-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#in-process-authenticated-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            In Process Authenticated Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="custom-user-sessions-using-jwt-tokens" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#custom-user-sessions-using-jwt-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Custom User Sessions using JWT Tokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="iauthmetadataprovider" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#iauthmetadataprovider'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            IAuthMetadataProvider
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="generate-new-session-cookies-on-authentication" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#generate-new-session-cookies-on-authentication'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Generate New Session Cookies on Authentication
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="clientid-and-clientsecret-oauth-config-aliases" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#clientid-and-clientsecret-oauth-config-aliases'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ClientId and ClientSecret OAuth Config Aliases
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="override-authorization-http-header" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#override-authorization-http-header'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Override Authorization HTTP Header
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="get-authenticate-requests-are-disabled-by-default" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#get-authenticate-requests-are-disabled-by-default'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            GET Authenticate Requests are disabled by default
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

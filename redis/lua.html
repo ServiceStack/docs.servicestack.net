@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>RedisClient LUA APIs</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/redis/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Redis                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-managers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Managers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Usage
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/async" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Async
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/custom-commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Generic Custom Commands
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/pubsub" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis PubSub
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/sentinel" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Sentinel
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/lua" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Redis Lua
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/distributed-locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Distributed Locking
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/troubleshooting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Troubleshooting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Related Docs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/stats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Stats
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/redis-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Admin Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/automatic-retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Automatic Retries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/design-nosql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Designing a NoSql Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/schemaless-migration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data migrations with Redis
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            RedisClient LUA APIs
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>The <code>IRedisClient</code> APIs for <a href="http://redis.io/commands/eval">redis server-side LUA support</a> have been re-factored into the more user-friendly APIs below:</p>
+<h2 id="api">API<a class="header-anchor" href="javascript:;" onclick="location.hash='#api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<pre><code class="language-csharp">public interface IRedisClient 
+{
+    //Eval/Lua operations 
+    T ExecCachedLua&lt;T&gt;(string scriptBody, Func&lt;string, T&gt; scriptSha1);
+
+    RedisText ExecLua(string body, params string[] args);
+    RedisText ExecLua(string luaBody, string[] keys, string[] args);
+    RedisText ExecLuaSha(string sha1, params string[] args);
+    RedisText ExecLuaSha(string sha1, string[] keys, string[] args);
+
+    string ExecLuaAsString(string luaBody, params string[] args);
+    string ExecLuaAsString(string luaBody, string[] keys, string[] args);
+    string ExecLuaShaAsString(string sha1, params string[] args);
+    string ExecLuaShaAsString(string sha1, string[] keys, string[] args);
+    
+    int ExecLuaAsInt(string luaBody, params string[] args);
+    int ExecLuaAsInt(string luaBody, string[] keys, string[] args);
+    int ExecLuaShaAsInt(string sha1, params string[] args);
+    int ExecLuaShaAsInt(string sha1, string[] keys, string[] args);
+
+    List&lt;string&gt; ExecLuaAsList(string luaBody, params string[] args);
+    List&lt;string&gt; ExecLuaAsList(string luaBody, string[] keys, string[] args);
+    List&lt;string&gt; ExecLuaShaAsList(string sha1, params string[] args);
+    List&lt;string&gt; ExecLuaShaAsList(string sha1, string[] keys, string[] args);
+
+    string CalculateSha1(string luaBody);
+    
+    bool HasLuaScript(string sha1Ref);
+    Dictionary&lt;string, bool&gt; WhichLuaScriptsExists(params string[] sha1Refs);
+    void RemoveAllLuaScripts();
+    void KillRunningLuaScript();
+    string LoadLuaScript(string body);
+}
+</code></pre>
+<h2 id="efficient-scan-in-lua">Efficient SCAN in LUA<a class="header-anchor" href="javascript:;" onclick="location.hash='#efficient-scan-in-lua'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The C# API below returns the first 10 results matching the <code>key:*</code> pattern:</p>
+<pre><code class="language-csharp">var keys = Redis.ScanAllKeys(pattern: &quot;key:*&quot;, pageSize: 10)
+    .Take(10).ToList();
+</code></pre>
+<p>However the C# Streaming API above requires an unknown number of Redis Operations (bounded to the number of keys in Redis)
+to complete the request. The number of SCAN calls can be reduced by choosing a higher <code>pageSize</code> to tell Redis to scan more keys
+each time the SCAN operation is called.</p>
+<p>As the number of API calls has the potential to result in a large number of Redis Operations, it can end up yielding an unacceptable
+delay due to the latency of multiple dependent remote network calls. An easy solution is to instead have the multiple SCAN calls
+performed in-process on the Redis Server, eliminating the network latency of multiple SCAN calls, e.g:</p>
+<pre><code class="language-csharp">const string FastScanScript = @&quot;
+local limit = tonumber(ARGV[2])
+local pattern = ARGV[1]
+local cursor = 0
+local len = 0
+local results = {}
+repeat
+    local r = redis.call('scan', cursor, 'MATCH', pattern, 'COUNT', limit)
+    cursor = tonumber(r[1])
+    for k,v in ipairs(r[2]) do
+        table.insert(results, v)
+        len = len + 1
+        if len == limit then break end
+    end
+until cursor == 0 or len == limit
+return results&quot;;
+
+RedisText r = redis.ExecLua(FastScanScript, &quot;key:*&quot;, &quot;10&quot;);
+r.Children.Count.Print() //= 10
+</code></pre>
+<p>The <code>ExecLua</code> API returns this complex LUA table response in the <code>Children</code> collection of the <code>RedisText</code> Response.</p>
+<h3 id="alternative-complex-api-response">Alternative Complex API Response<a class="header-anchor" href="javascript:;" onclick="location.hash='#alternative-complex-api-response'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Another way to return complex data structures in a LUA operation is to serialize the result as JSON</p>
+<pre><code class="language-lua">return cjson.encode(results)
+</code></pre>
+<p>Which you can access as raw JSON by parsing the response as a String with:</p>
+<pre><code class="language-csharp">string json = redis.ExecLuaAsString(FastScanScript, &quot;key:*&quot;, &quot;10&quot;);
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>This is also the approach used in Redis React's <a href="https://github.com/ServiceStackApps/RedisReact/blob/a1b66603d52d2f18b96227fc455ecb5323e424c8/src/RedisReact/RedisReact.ServiceInterface/RedisServices.cs#L60">RedisServices</a>.</p>
+</div>
+<h2 id="execcachedlua">ExecCachedLua<a class="header-anchor" href="javascript:;" onclick="location.hash='#execcachedlua'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>ExecCachedLua is a convenient high-level API that eliminates the bookkeeping required for executing high-performance server LUA
+Scripts which suffers from many of the problems that RDBMS stored procedures have which depends on pre-existing state in the RDBMS
+that needs to be updated with the latest version of the Stored Procedure.</p>
+<p>With Redis LUA you either have the option to send, parse, load then execute the entire LUA script each time it's called or
+alternatively you could pre-load the LUA Script into Redis once on StartUp and then execute it using the Script's SHA1 hash.
+The issue with this is that if the Redis server is accidentally flushed you're left with a broken application relying on a
+pre-existing script that's no longer there. The new <code>ExecCachedLua</code> API provides the best of both worlds where it will always
+execute the compiled SHA1 script, saving bandwidth and CPU but will also re-create the LUA Script if it no longer exists.</p>
+<p>You can instead execute the compiled LUA script above by its SHA1 identifier, which continues to work regardless if it never existed
+or was removed at runtime, e.g:</p>
+<pre><code class="language-csharp">// #1: Loads LUA script and caches SHA1 hash in Redis Client
+r = redis.ExecCachedLua(FastScanScript, sha1 =&gt;
+    redis.ExecLuaSha(sha1, &quot;key:*&quot;, &quot;10&quot;));
+
+// #2: Executes using cached SHA1 hash
+r = redis.ExecCachedLua(FastScanScript, sha1 =&gt;
+    redis.ExecLuaSha(sha1, &quot;key:*&quot;, &quot;10&quot;));
+
+// Deletes all existing compiled LUA scripts 
+redis.ScriptFlush();
+
+// #3: Executes using cached SHA1 hash, gets NOSCRIPT Error, 
+//     re-creates then re-executes the LUA script using its SHA1 hash
+r = redis.ExecCachedLua(FastScanScript, sha1 =&gt;
+    redis.ExecLuaSha(sha1, &quot;key:*&quot;, &quot;10&quot;));
+</code></pre>
+<h2 id="usage-examples">Usage Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Here's how you can implement a <strong>ZPOP</strong> in Lua to remove the items with the lowest rank from a sorted set:</p>
+<pre><code class="language-csharp">var luaBody = @&quot;
+    local val = redis.call('zrange', KEYS[1], 0, ARGV[1]-1)
+    if val then redis.call('zremrangebyrank', KEYS[1], 0, ARGV[1]-1) end
+    return val&quot;;
+
+var i = 0;
+var alphabet = 26.Times(c =&gt; ((char)('A' + c)).ToString());
+alphabet.ForEach(x =&gt; Redis.AddItemToSortedSet(&quot;zalphabet&quot;, x, i++));
+
+//Remove the letters with the lowest rank from the sorted set 'zalphabet'
+var letters = Redis.ExecLuaAsList(luaBody, keys: new[] { &quot;zalphabet&quot; }, args: new[] { &quot;3&quot; });
+letters.PrintDump(); //[A, B, C]
+</code></pre>
+<p>And how to implement <strong>ZREVPOP</strong> to remove items with the highest rank from a sorted set:</p>
+<pre><code class="language-csharp">var luaBody = @&quot;
+    local val = redis.call('zrange', KEYS[1], -ARGV[1], -1)
+    if val then redis.call('zremrangebyrank', KEYS[1], -ARGV[1], -1) end
+    return val&quot;;
+
+var i = 0;
+var alphabet = 26.Times(c =&gt; ((char)('A' + c)).ToString());
+alphabet.ForEach(x =&gt; Redis.AddItemToSortedSet(&quot;zalphabet&quot;, x, i++));
+
+//Remove the letters with the highest rank from the sorted set 'zalphabet'
+List&lt;string&gt; letters = Redis.ExecLuaAsList(luaBody, 
+    keys: new[] { &quot;zalphabet&quot; }, args: new[] { &quot;3&quot; });
+
+letters.PrintDump(); //[X, Y, Z]
+</code></pre>
+<h2 id="other-examples">Other examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#other-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Returning an <code>int</code>:</p>
+<pre><code class="language-csharp">int intVal = Redis.ExecLuaAsInt(&quot;return 123&quot;); //123
+int intVal = Redis.ExecLuaAsInt(&quot;return ARGV[1] + ARGV[2]&quot;, &quot;10&quot;, &quot;20&quot;); //30
+</code></pre>
+<p>Returning an <code>string</code>:</p>
+<pre><code class="language-csharp">//Hello, Redis Lua!
+var strVal = Redis.ExecLuaAsString(@&quot;return 'Hello, ' .. ARGV[1] .. '!'&quot;, &quot;Redis Lua&quot;);
+</code></pre>
+<p>Returning a <code>List</code> of strings:</p>
+<pre><code class="language-csharp">Enum.GetNames(typeof(DayOfWeek)).ToList()
+    .ForEach(x =&gt; Redis.AddItemToList(&quot;DaysOfWeek&quot;, x));
+
+var daysOfWeek = Redis.ExecLuaAsList(&quot;return redis.call('LRANGE', 'DaysOfWeek', 0, -1)&quot;);
+daysOfWeek.PrintDump(); //[Sunday, Monday, Tuesday, ...]
+</code></pre>
+<p>More examples can be found in the <a href="https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisClientEvalTests.cs">Redis Eval Lua tests</a></p>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/redis/sentinel" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Redis Sentinel
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/redis/distributed-locking" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Redis Distributed Locking
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#api'" data-id="api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            API
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#efficient-scan-in-lua'" data-id="efficient-scan-in-lua" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Efficient SCAN in LUA
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="alternative-complex-api-response" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#alternative-complex-api-response'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Alternative Complex API Response
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#execcachedlua'" data-id="execcachedlua" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ExecCachedLua
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#usage-examples'" data-id="usage-examples" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Usage Examples
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#other-examples'" data-id="other-examples" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Other examples
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

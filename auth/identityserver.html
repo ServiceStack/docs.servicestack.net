@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Using IdentityServer4 Auth in ServiceStack</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/auth/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Security                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auth/authentication-and-authorization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Authentication &amp; Authorization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/auth-repository" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auth Repository
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ServiceStack Auth in MVC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-aspnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ASP.NET Identity Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identityserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Using IdentityServer4 Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/sessions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sessions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/jwt-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JWT AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/api-key-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Key AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/signin-with-apple" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sign in with Apple AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/restricting-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Restricting Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Encrypted Messaging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/anti-forgery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Anti Forgery
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Using IdentityServer4 Auth in ServiceStack
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p><a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> .NET 6.0 MVC Website integrated with IdentityServer4 Auth and ServiceStack:</p>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentityserver"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentityserver.png" alt="" /></a></p>
+<p>The <a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> builds upon Identity Server's
+<a href="https://github.com/IdentityServer/IdentityServer4.Samples/tree/master/Quickstarts/5_HybridFlowAuthenticationWithApiAccess">OpenID Connect Hybrid Flow Authentication and API Access Tokens</a>
+Quickstart project to include integration with ServiceStack and additional OAuth providers.</p>
+<p>The home page has also been customized to contain the same functionality as the other 2 templates with some additional features to validate against custom
+OAuth App scopes and <strong>Delegation Auth Pages</strong> showing how to make Authenticated API requests to our remote microservices from within MVC Controllers.</p>
+<p>In contrast to integrating Authentication into our App directly, <a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> configures a central
+<strong>remote IdentityServer instance</strong> with the Auth Features and OAuth providers we want available to our Apps.</p>
+<p>Then when non Authenticated users go to a protected resource they're redirected to the Sign In page on IdentityServer:</p>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentityserver"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentityserver-is4.png" alt="" /></a></p>
+<p>Users can sign in using the same Credentials or external OAuth Providers but are presented with an additional <strong>consent</strong> screen to grant the App permission to access their
+User profile information and access to custom features the App needs:</p>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentityserver"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentityserver-is4-allow.png" alt="" /></a></p>
+<p>Once granted the Auth information is captured in a stateless IdentityServer Token, stored in a cookie and redirected back to the App.</p>
+<h2 id="physical-project-structure">Physical Project Structure<a class="header-anchor" href="javascript:;" onclick="location.hash='#physical-project-structure'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> is pre-configured with <strong>3 Host projects</strong>:</p>
+<ul>
+<li><a href="https://github.com/NetCoreTemplates/mvcidentityserver/tree/master/IdentityServer">/IdentityServer</a> - The Central IdentityServer Auth Server (port <strong>5000</strong>)</li>
+<li><a href="https://github.com/NetCoreTemplates/mvcidentityserver/tree/master/MyApp">/ProjectName</a> - Our Hybrid MVC + ServiceStack App (port <strong>5002</strong>)</li>
+<li><a href="https://github.com/NetCoreTemplates/mvcidentityserver/tree/master/MyApp.Api">/ProjectName.Api</a> - Example Microservice API used by Hybrid App (port <strong>5001</strong>)</li>
+</ul>
+<h2 id="identityserver">IdentityServer<a class="header-anchor" href="javascript:;" onclick="location.hash='#identityserver'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The IdentityServer instance is configured in <a href="https://github.com/NetCoreTemplates/mvcidentityserver/blob/master/IdentityServer/Startup.cs">Startup.cs</a>
+which contains all <strong>external OAuth providers</strong> we want to allow Sign Ins from, the <strong>OpenId Connect Endpoint</strong> which allows Sign Ins from another external
+IdentityServer on <a href="https://demo.identityserver.io/">demo.identityserver.io</a> and all its pre-configured Users, Identity Resources, API Resources and Clients
+defined in <a href="https://github.com/NetCoreTemplates/mvcidentityserver/blob/master/IdentityServer/Config.cs">Config.cs</a>.</p>
+<h2 id="app">App<a class="header-anchor" href="javascript:;" onclick="location.hash='#app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The App's <a href="https://github.com/NetCoreTemplates/mvcidentityserver/blob/master/MyApp/Startup.cs">Startup.cs</a> consists of configuring the OpenId Connect Endpoint
+to our Central <strong>IdentityServer</strong> containing additional customizations to control what <code>Claims</code> the Authenticated <code>ClaimsPrincipal</code> will have:</p>
+<pre><code class="language-csharp">services.AddAuthentication(options =&gt;
+    {
+        options.DefaultScheme = &quot;Cookies&quot;;
+        options.DefaultChallengeScheme = &quot;oidc&quot;;
+    })
+    .AddCookie(&quot;Cookies&quot;)
+    .AddOpenIdConnect(&quot;oidc&quot;, options =&gt;
+    {
+        options.SignInScheme = &quot;Cookies&quot;;
+
+        options.Authority = &quot;https://localhost:5000&quot;;
+        options.RequireHttpsMetadata = false;
+
+        options.ClientId = &quot;mvc&quot;;
+        options.ClientSecret = &quot;secret&quot;;
+        options.ResponseType = &quot;code id_token&quot;;
+
+        options.SaveTokens = true;
+        options.GetClaimsFromUserInfoEndpoint = true;
+
+        options.Scope.Add(&quot;api1&quot;);
+        options.Scope.Add(&quot;offline_access&quot;);
+        
+        options.ClaimActions.MapJsonKey(&quot;website&quot;, &quot;website&quot;);
+        options.ClaimActions.MapJsonKey(&quot;role&quot;, &quot;role&quot;);
+        options.ClaimActions.Add(new AdminRolesClaimAction(&quot;Manager&quot;, &quot;Employee&quot;));
+        
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            NameClaimType = &quot;name&quot;,
+            RoleClaimType = &quot;role&quot;
+        };
+
+        options.Events = new OpenIdConnectEvents {
+            OnRemoteFailure = CustomHandlers.HandleCancelAction,
+            OnTokenResponseReceived = CustomHandlers.CopyAllowedScopesToUserClaims,                        
+        };
+    });
+</code></pre>
+<h2 id="asp.net-core-identity-auth-adapter">ASP.NET Core Identity Auth Adapter<a class="header-anchor" href="javascript:;" onclick="location.hash='#asp.net-core-identity-auth-adapter'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The only customization needed in ServiceStack is to specify the different custom name being used for <code>RoleClaimType</code>:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(() =&gt; new CustomUserSession(), 
+    new IAuthProvider[] {
+        // Adapter to enable ASP.NET Core Identity Auth in ServiceStack
+        new NetCoreIdentityAuthProvider(AppSettings) {
+            RoleClaimType = &quot;role&quot;
+        }, 
+    }));
+</code></pre>
+<p>The <code>MapJsonKey</code> contains a whitelist of properties in Identity Server's Token we want propagated to <code>Claims</code>.
+The <code>AdminRolesClaimAction</code> is a custom <code>ClaimAction</code> we can use to add additional <code>AdminRoles</code> to users with the <code>RoleNames.Admin</code> role:</p>
+<pre><code class="language-csharp">/// &lt;summary&gt;
+/// Use this class to assign additional roles to Admin Users
+/// &lt;/summary&gt;
+public class AdminRolesClaimAction : ClaimAction
+{
+    string[] AdminRoles { get; }
+    public AdminRolesClaimAction(params string[] adminRoles) : base(&quot;role&quot;, null) =&gt; AdminRoles = adminRoles;
+
+    public override void Run(JObject userData, ClaimsIdentity identity, string issuer)
+    {
+        if (!HasAdminRole(userData)) return;
+        foreach (var role in AdminRoles)
+        {
+            identity.AddClaim(new Claim(&quot;role&quot;, role));
+        }
+    }
+
+    private bool HasAdminRole(JObject userData)
+    {
+        var jtoken = userData?[this.ClaimType];
+        if (jtoken is JValue)
+        {
+            if (jtoken?.ToString() == RoleNames.Admin)
+                return true;
+        }
+        else if (jtoken is JArray)
+        {
+            foreach (var obj in jtoken)
+                if (obj?.ToString() == RoleNames.Admin)
+                    return true;
+        }
+        return false;
+    }
+}
+</code></pre>
+<p>The <code>OpenIdConnectEvents</code> lets us intercept the original IdentityServer token so we can extract the custom <strong>OAuth scopes</strong> the User
+has granted the App and add them to <code>scope</code> Claims:</p>
+<pre><code class="language-csharp">public static class CustomHandlers
+{
+    /// &lt;summary&gt;
+    /// Use this handler to copy requested Scopes to User Claims so they can be validated using a Policy  
+    /// &lt;/summary&gt;
+    public static Task CopyAllowedScopesToUserClaims(TokenResponseReceivedContext context)
+    {
+        var scopes = context.ProtocolMessage.Scope?.Split(' ');
+        if (scopes != null &amp;&amp; context.Principal.Identity is ClaimsIdentity identity)
+        {
+            foreach (var scope in scopes)
+            {
+                identity.AddClaim(new Claim(&quot;scope&quot;, scope));
+            }
+        }
+        return Task.CompletedTask;
+    }
+
+    public static Task HandleCancelAction(RemoteFailureContext context)
+    {
+        context.Response.Redirect(&quot;/&quot;);
+        context.HandleResponse();
+        return Task.CompletedTask;
+    }
+}
+</code></pre>
+<p>Now that our populated claims contains the granted OAuth scopes we can validate against it in ServiceStack Services using the new <code>[RequiredClaim]</code> attribute:</p>
+<pre><code class="language-csharp">[RequiredClaim(&quot;scope&quot;, &quot;profile&quot;)]
+public object Any(RequiresScope request)
+{
+    return new RequiresScopeResponse { Result = $&quot;Hello, {request.Name}!&quot; };
+}
+</code></pre>
+<p>In MVC we need create a custom Auth Policy:</p>
+<pre><code class="language-csharp">services.AddAuthorization(options =&gt; {
+    options.AddPolicy(&quot;ProfileScope&quot;, policy =&gt;
+        policy.RequireClaim(&quot;scope&quot;, &quot;profile&quot;));
+});
+</code></pre>
+<p>That can then be used in our MVC Controllers using the <code>[Authorize]</code> attribute, referencing our custom policy:</p>
+<pre><code class="language-csharp">[Authorize(Policy = &quot;ProfileScope&quot;)]
+public async Task&lt;IActionResult&gt; RequiresScope()
+{
+    var accessToken = await HttpContext.GetTokenAsync(&quot;access_token&quot;);
+
+    return View();
+}
+</code></pre>
+<h3 id="delegated-auth-pages">Delegated Auth Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#delegated-auth-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentityserver">mvcidentityserver</a> also contains examples showing how to make
+Authenticated API Requests to a remote Web API Service using <code>HttpClient</code>:</p>
+<pre><code class="language-csharp">public async Task&lt;IActionResult&gt; CallWebApi()
+{
+    var accessToken = await HttpContext.GetTokenAsync(&quot;access_token&quot;);
+
+    var client = new HttpClient();
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(&quot;Bearer&quot;, accessToken);
+    var content = await client.GetStringAsync(&quot;https://localhost:5001/webapi-identity&quot;);
+
+    ViewBag.Json = JArray.Parse(content).ToString();
+    return View(&quot;json&quot;);
+}
+</code></pre>
+<p>The same <code>HttpClient</code> request to call an Authenticated ServiceStack Service:</p>
+<pre><code class="language-csharp">public async Task&lt;IActionResult&gt; CallServiceStack()
+{
+    var accessToken = await HttpContext.GetTokenAsync(&quot;access_token&quot;);
+
+    var client = new HttpClient();
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(&quot;Bearer&quot;, accessToken);
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MimeTypes.Json)); 
+    var json = await client.GetStringAsync(&quot;https://localhost:5001/servicestack-identity&quot;);
+
+    ViewBag.Json = json.IndentJson();
+    return View(&quot;json&quot;);
+}
+</code></pre>
+<p>We need the additional <code>Accept</code> JSON HTTP header to tell ServiceStack which of the registered Content Types
+we want to receive the response in.</p>
+<p>Alternatively we can make Authenticated Requests using the more typed and terse <a href="/csharp-client">C#/.NET Service Client</a>:</p>
+<pre><code class="language-csharp">public async Task&lt;IActionResult&gt; CallServiceClient()
+{
+    var accessToken = await HttpContext.GetTokenAsync(&quot;access_token&quot;);
+
+    var client = new JsonServiceClient(&quot;https://localhost:5001/&quot;) {
+        BearerToken = accessToken
+    };
+    var response = await client.GetAsync(new GetIdentity());
+
+    ViewBag.Json = response.ToJson().IndentJson();
+    return View(&quot;json&quot;);
+}
+</code></pre>
+<h2 id="api">API<a class="header-anchor" href="javascript:;" onclick="location.hash='#api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The API's <a href="https://github.com/NetCoreTemplates/mvcidentityserver/blob/master/MyApp.Api/Startup.cs">Startup.cs</a> is configured to accept
+Bearer Tokens issued by our central <strong>IdentityServer</strong>:</p>
+<pre><code class="language-csharp">services.AddAuthentication(&quot;Bearer&quot;)
+    .AddJwtBearer(&quot;Bearer&quot;, options =&gt; {
+        options.Authority = &quot;https://localhost:5000&quot;;
+        options.RequireHttpsMetadata = false;
+
+        options.Audience = &quot;api1&quot;;
+    });
+</code></pre>
+<p>Nothing special is needed for ServiceStack here other than registering the Identity Auth Provider adapter:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(), 
+    new IAuthProvider[] {
+        new NetCoreIdentityAuthProvider(AppSettings), 
+    }));
+</code></pre>
+<p>The <code>GetIdentity</code> ServiceStack Service then returns the populated <code>AuthUserSession</code> and all claims contained in the Bearer Token:</p>
+<pre><code class="language-csharp">[Route(&quot;/servicestack-identity&quot;)]
+public class GetIdentity : IReturn&lt;GetIdentityResponse&gt; { }
+
+public class GetIdentityResponse
+{
+    public List&lt;Property&gt; Claims { get; set; }
+    public AuthUserSession Session { get; set; }
+}
+
+[Authenticate]
+public class IdentityService : Service
+{
+    public object Any(GetIdentity request)
+    {
+        return new GetIdentityResponse {
+            Claims = Request.GetClaims().Map(x =&gt; new Property { Name = x.Type, Value = x.Value }),
+            Session = SessionAs&lt;AuthUserSession&gt;(),
+        };
+    }
+}
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/auth/identity-aspnet" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Using ASP.NET Identity Auth
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/auth/sessions" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Sessions
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#physical-project-structure'" data-id="physical-project-structure" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Physical Project Structure
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#identityserver'" data-id="identityserver" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            IdentityServer
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#app'" data-id="app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            App
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#asp.net-core-identity-auth-adapter'" data-id="asp.net-core-identity-auth-adapter" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ASP.NET Core Identity Auth Adapter
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="delegated-auth-pages" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#delegated-auth-pages'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Delegated Auth Pages
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#api'" data-id="api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            API
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

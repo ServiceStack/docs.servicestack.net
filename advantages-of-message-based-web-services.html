@@ -1,0 +1,1756 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Advantages of message-based WebServices</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Overview
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/why-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Why ServiceStack
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/architecture-overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Architecture Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/servicify" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Servicify existing Systems
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/explore-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Explore ServiceStack
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Releases
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/releases/v6_9" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Latest Release Notes
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/release-notes-history" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Release Notes History
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/myget" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Pre-release MyGet Packages
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Getting Started
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/create-your-first-webservice" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Create your first WebService
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/your-first-webservice-explained" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Your first WebService explained
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/api-design" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Service API Design
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/service-return-types" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Service Return Types
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/design-rest-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Design RESTful Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/design-message-based-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Design Message-based APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/modular-startup" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Modular Startup
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/dotnet-tool" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        dotnet tool - Win/Mac/Linux Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/dotnet-new" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        x new - Project Template
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/netcore-windows-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        app tool - .NET Windows Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/mix-tool" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        mix tool - Mix n&#x27; Match .NET Apps
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/post-command" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Post Command - Inspect HTTP APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Background Concepts
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/what-is-a-message-based-web-service" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        What is a Message-based Web Service
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/advantages-of-message-based-web-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Advantages of message-based Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/why-remote-services-use-dtos" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Why Remote Services should use DTOs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/service-complexity-and-dto-roles" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Complexity, Services and Role of DTOs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/api-first-development" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API First Development
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    UIs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auto-html-api" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auto HTML API
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/api-explorer" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Explorer
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/locode/" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Locode
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin UI
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-users" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin Manage Users UI
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-redis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin Redis
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-database" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-validation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin DB Validation UI
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin Logging &amp; Profiling UI
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/admin-ui-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Admin UI Features
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Reference
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/host-configuration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AppHost
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ioc" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        IOC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/routing" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Routing
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/order-of-operations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Order of Operations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/customize-http-responses" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Customize HTTP Responses
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/customize-json-responses" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Customize JSON Responses
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/appsettings" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Configuration &amp; AppSettings
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/metadata-page" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Metadata Pages
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/svg" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SVG Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/endpoints" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        REST, SOAP &amp; default endpoints
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/soap-support" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SOAP support
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Error Handling
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/error-handling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/validation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Validation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/world-validation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        World Validation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/declarative-validation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Declarative Validation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/debugging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Debugging
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Service Gateway
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/service-gateway" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/service-discovery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Service Discovery
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Clients
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/clients-overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/csharp-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        C#/.NET Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/typescript-add-servicestack-reference#typescript-serviceclient" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        TypeScript Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/javascript-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JavaScript Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/java-add-servicestack-reference#jsonserviceclient-api" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Java Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/swift-add-servicestack-reference#swift-client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Swift Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/dart-add-servicestack-reference#example-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dart Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/silverlight-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Silverlight Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/messaging#mq-client-architecture" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MQ Clients
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Add ServiceStack Reference
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/csharp-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        C# Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/typescript-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        TypeScript Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/javascript-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JavaScript Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/python-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Python Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/swift-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Swift Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/java-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Java Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/kotlin-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Kotlin Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/dart-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dart Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/fsharp-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        F# Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/vbnet-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        VB.NET Add Reference
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/commonjs-add-servicestack-reference" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ES3 Common.js Add Reference
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Server Events
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/server-events" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/csharp-server-events-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        C# Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/typescript-server-events-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        TypeScript Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/java-server-events-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Java Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/javascript-server-events-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JavaScript Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/server-events-grpc" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        gRPC Clients
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis-server-events" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Server Events
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    MQ Messaging
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/background-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Background MQ
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/rabbit-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Rabbit MQ
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis MQ
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/amazon-sqs-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Amazon SQS MQ
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/azure-service-bus-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Azure Service Bus MQ
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Jupyter Notebooks
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/jupyter-notebooks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jupyter-notebooks-python" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Python Jupyter Notebooks
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jupyter-notebooks-csharp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        C# Jupyter Notebooks
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jupyter-notebooks-fsharp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        F# Jupyter Notebooks
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jupyter-notebooks-reporting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Jupyter Reporting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    GitHub Action Templates
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/github-action-templates" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ssh-github-action-deployment" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        GitHub GHR &amp; SSH Docker Compose
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/do-github-action-mix-deployment" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        GitHub GHR &amp; Digital Ocean
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/mix-github-actions-aws-ecs" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AWS ECR &amp; ECS with NGINX
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Encrypted Messaging
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/logging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Logging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/request-and-response-filters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Request &amp; Response filters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/filter-attributes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Filter attributes
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/access-http-specific-features-in-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Access HTTP features in services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/serialization-deserialization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Serialization &amp; Deserialization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auto-mapping" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auto-Mapping
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auto-batched-requests" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auto Batched Requests
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/virtual-file-system" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Virtual File System
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/multitenancy" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multitenancy
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/physical-project-structure" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Physical Project Structure
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/modularizing-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Modularizing Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/built-in-profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Built-in profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/hot-reloading" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Hot Reloading
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/html-css-and-javascript-minification" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        HTML, CSS and JS Minifiers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/navigation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Unified Navigation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/app-tasks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        App Tasks
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/mvc-integration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MVC Integration
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/servicestack-integration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack Integration
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/servicestack-side-by-side-with-another-web-framework" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Run side-by-side with another fx
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/versioning" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Versioning
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/config-api" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Config API
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/concurrency-model" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Concurrency Model
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/form-hijacking-prevention" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Form Hijacking Prevention
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/create-webservice-from-scratch" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Create a WebService from scratch
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Formats
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/formats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/json-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JSON Format
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jsv-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JSV Format
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/csv-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        CSV Format
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/messagepack-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MessagePack Format
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/protobuf-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ProtoBuf Format
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/html5reportformat" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        HTML5 Report Format
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    .NET Core
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/netcore" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/netcore-redis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        .NET Core Redis
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/netcore-localhost-cert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Configure localhost dev cert
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/deploy-netcore-to-amazon-linux-2-ami" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Deploy to Amazon Linux 2 AMI
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/deploy-netcore-docker-aws-ecs" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Deploy .NET Core Apps to AWS ECS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/netcore-deploy-rsync" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Deploy .NET Core Apps using rsync
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Utils
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/text" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Text Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/http-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        HTTP Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/dump-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dump Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/reflection-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Reflection Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/js-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JS Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/adhoc-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Adhoc Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/simple-ioc" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Simple IOC
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Caching
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/caching" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/http-caching" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        HTTP Caching
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/cacheresponse-attribute" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        CacheResponse Attribute
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/cache-aware-clients" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Cache Aware Clients
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/compression" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Compression
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Plugins
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/plugins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/openapi" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Open API
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/corsfeature" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        CORS Feature
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/proxy-feature" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Proxy Feature
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/request-logger" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Request logger
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/lisp-tcp-repl-server" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Lisp TCP REPL Server
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/postman" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Postman
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/sitemaps" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sitemaps
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/cancellable-requests" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Cancellable Requests
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/webhooks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Webhooks
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    View Engines
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/netcore-razor" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack Razor
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/razor-ui-controls" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Razor UI Controls
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/razor-notes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Razor Notes
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/view-and-template-selection" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        View and Template Selection
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/compiled-razor-views" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Compiled Razor Views
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/razor-views-vs-content-pages" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Razor Views vs Content Pages
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    JavaScript Web Apps
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/vue-components" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Vue Components
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/servicestack-client-umd" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Embedded UMD @servicestack/client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ss-utils-js" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ss-utils.js JavaScript Client Library
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Hosts
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/iis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        IIS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/self-hosting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Self-hosting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Tests
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/testing" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Testing
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/howto-write-unit-integration-tests" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        HowTo write unit &amp; integration tests
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Blazor
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/templates/blazor-tailwind" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Blazor WASM Tailwind
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/templates/blazor-server" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Blazor Server Tailwind
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/templates/blazor-bootstrap" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Blazor WASM Bootstrap
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/templates/blazor-components" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Blazor Components
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/blazor-diffusion" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Blazor Diffusion
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/locode/files-blazor" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        File Blazor Demo
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Java
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/java" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Java ServiceStack Resources
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/java-add-servicestack-reference#servicestack-idea-android-studio-plugin" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Android Studio &amp; IntelliJ
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Other Languages
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/swift" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Swift
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/fsharp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        F#
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/vbnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        VB.NET
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Deployment
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/deploy-multiple-sites-to-aws" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Deploy Multiple Sites to single AWS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/simple-deployments-to-aws" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Simple Deployments with WebDeploy
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/advanced-deployment-octopus-deploy" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Deployments with OctopusDeploy
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Amazon Web Services
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/aws" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/aws-pocodynamo" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PocoDynamo
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/aws-getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started with AWS
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Azure
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/azure" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Stripe
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/stripe" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Install 3rd Party Products
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/install-redis-windows" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis on Windows
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/install-rabbitmq-windows" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        RabbitMQ on Windows
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ssl-redis-azure" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis SSL on Azure
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Performance
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/real-world-performance" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Real world performance
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Future
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/roadmap" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Roadmap
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Advantages of message-based WebServices
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <h3 id="this-is-in-response-to-a-recent-question-from-mailing-group">This is in response to a recent question from <a href="https://groups.google.com/forum/?fromgroups#!topic/servicestack/qkV5fzdnzt8">mailing group</a>:<a class="header-anchor" href="javascript:;" onclick="location.hash='#this-is-in-response-to-a-recent-question-from-mailing-group'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<blockquote>
+<p>It seems like ServiceStack is designed for use primarily in a greenfield
+SOA implementation where the technology environment is quite homogeneous,
+and more or less the same people have ownership of the servers and all the clients.<br />
+Is that correct?</p>
+</blockquote>
+<p>ServiceStack's message-based design is optimal for the design of <strong>any remote service</strong>. We believe .NET has never gotten web services right, which was the inspiration for starting ServiceStack. If .NET was lucky enough to have had someone like Martin Fowler (or just someone following his decade-old guidance) at the helm of the Microsoft Patterns &amp; Practices and VS.NET tools teams from the start we would've likely been able to avoid the multiple replacement web service frameworks from Microsoft that .NET web service developers have endured over the years - and still haven't got right. This is unfortunate considering remote services are the most important APIs developers can create as they ultimately offer the highest-level of software re-use possible whilst remaining programmatically composable.</p>
+<h2 id="best-practices-for-remote-services">Best-practices for remote services<a class="header-anchor" href="javascript:;" onclick="location.hash='#best-practices-for-remote-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Inspiration should've ideally been taken from Martin Fowler or from companies that have <a href="http://en.wikipedia.org/wiki/Service-oriented_architecture">SOA</a> ingrained in their DNA who have successfully run long-term evolving SOA solutions that have enabled rich and complex platforms.
+Amazon is a shining example of this, where even Steve Yegge admits <a href="https://gigaom.com/2011/10/12/419-the-biggest-thing-amazon-got-right-the-platform/">it's the only thing they do better than Google</a>. Where their relentless dedication to exposing SOA services over all their systems have enabled their industry leading EC2 and <a href="http://aws.amazon.com/">aws.amazon.com</a> cloud services.</p>
+<h2 id="the-service-api-of-amazons-web-services">The Service API of Amazon's Web Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-service-api-of-amazons-web-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>If you look at an <a href="http://docs.amazonwebservices.com/AWSEC2/latest/APIReference/ApiReference-query-AttachVolume.html">example of Amazons EC2 Web Service APIs</a> you'll see a strong similarity with ServiceStack's approach where they accept a Request message and return a response message for all their services, e.g:</p>
+<h3 id="example-request">Example Request<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-request'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code>https://ec2.amazonaws.com/?Action=AttachVolume
+&amp;VolumeId=vol-4d826724
+&amp;InstanceId=i-6058a509
+&amp;Device=/dev/sdh
+&amp;AUTHPARAMS
+</code></pre>
+<h3 id="example-response">Example Response<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-response'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-xml">&lt;AttachVolumeResponse xmlns=&quot;http://ec2.amazonaws.com/doc/2012-06-01/&quot;&gt;
+    &lt;requestId&gt;59dbff89-35bd-4eac-99ed-be587EXAMPLE&lt;/requestId&gt;
+    &lt;volumeId&gt;vol-4d826724&lt;/volumeId&gt;
+    &lt;instanceId&gt;i-6058a509&lt;/instanceId&gt;
+    &lt;device&gt;/dev/sdh&lt;/device&gt;
+    &lt;status&gt;attaching&lt;/status&gt;
+    &lt;attachTime&gt;2008-05-07T11:51:50.000Z&lt;/attachTime&gt;
+&lt;/AttachVolumeResponse&gt;
+</code></pre>
+<p>From this we can attest Amazon maintains a Request <a href="http://en.wikipedia.org/wiki/Data_Transfer_Object">DTO</a> named <code>AttachVolume</code> and a Response DTO named <code>AttachVolumeResponse</code>. This is the same design ServiceStack encourages and with some minor customisations the Request can be easily made to be more REST-ful with:</p>
+<pre><code>POST https://ec2.amazonaws.com/volumes/vol-4d826724/attach 
+FormData: InstanceId=i-6058a509&amp;Device=/dev/sdh&amp;AUTHPARAMS
+</code></pre>
+<p>In-terms of accessibility and interoperability, ServiceStack 1-ups Amazon here since the same Request DTO can be populated with any combination of a <a href="/architecture-overview">Custom Route, QueryString, FormData or a POST'ed XML, JSON, JSV, SOAP 1.1/1.2 or ProtoBuf Request DTO payload</a>. Although this is really inconsequential since both Amazon and ServiceStack also provide <strong>typed service clients</strong> so you're never required to manually construct the request by hand.</p>
+<h2 id="messaging-at-google">Messaging at Google<a class="header-anchor" href="javascript:;" onclick="location.hash='#messaging-at-google'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Although Amazon holds the SOA edge, Google, like Amazon also benefits from message-based design for nearly all their internal communications using their own Data Interchange Format - <a href="http://code.google.com/p/protobuf/">Protocol Buffers</a>, which like JSON is both fast, compact and tolerant:</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Protocol Buffers are a way of encoding structured data in an efficient yet extensible format. Google uses Protocol Buffers for almost all of its internal RPC protocols and file formats</p>
+</div>
+<p>A simple DSL is used to define their Protocol Buffer message DTOs:</p>
+<pre><code class="language-js">message Person {
+    required int32 id = 1;
+    required string name = 2;
+    optional string email = 3;
+}
+</code></pre>
+<p>From this they use their <code>protoc</code> command-line utility to generate native types in C++, Java and Python, which like Amazon and ServiceStack, enables them to benefit from using an end-to-end, typed API.</p>
+<blockquote>
+<p>Add a reference to <a href="http://nuget.org/packages/ServiceStack.ProtoBuf">ServiceStack.ProtoBuf</a>  to enable <a href="http://stackoverflow.com/users/23354/marc-gravell">@marcgravell's</a> excellent implementation of Protocol Buffers: <a href="https://github.com/mgravell/protobuf-net">protobuf-net</a>.</p>
+</blockquote>
+<h2 id="a-productivity-win">A Productivity Win<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-productivity-win'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>We've been building SOA systems like this with ServiceStack for years: the productivity boost you get from using typed, end-to-end, resilient, message-based API is unmatched. An example of this was having developed over 100+ Web Services for the <a href="http://redisadminui.servicestack.net/redis/metadata">Redis WebServices</a> project in just 1 weekend. Others that have tried ServiceStack also agree its ease-of-development and <strong>&quot;pit of success&quot;</strong> design it promotes ultimately yields a productivity win - this positive sentiment is captured in <a href="https://twitter.com/ServiceStack/likes">@ServiceStack's favorites</a> and throughout the <a href="https://groups.google.com/forum/?fromgroups#!forum/servicestack">mailing group</a>.</p>
+<h3 id="the-anatomy-of-a-servicestack-service">The anatomy of a ServiceStack service<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-anatomy-of-a-servicestack-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For normal services, ServiceStack is an invisible library i.e. it lets you implement your service in pure, untainted C# accepting any user-defined Request and lets you return any Response DTO without any regard to endpoints and formats. Any dependencies your services need can be declared as public properties and are automatically auto-wired on each request. A complete example of this is the self-contained <a href="https://github.com/ServiceStack/ServiceStack.Examples/blob/master/src/Backbone.Todos/Global.asax.cs">Backbone TODO backend persisted using Redis</a>.</p>
+<h3 id="in-contrast-with-soap"><a href="http://www.infoq.com/articles/interview-servicestack">In contrast with SOAP</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#in-contrast-with-soap'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>By contrast we've witnessed .NET devs struggling to implement much fewer SOAP web services within the same timeframe, especially when they're fighting un-expected and unknown WCF interoperability issues. Not only is SOAP more verbose and slower, its less tolerant and version-able, it was never a good choice for the open web and is now effectively deprecated.</p>
+<h2 id="the-many-webservice-frameworks-of-microsoft">The many webservice frameworks of Microsoft<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-many-webservice-frameworks-of-microsoft'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Unfortunately despite Microsoft having hosted Martin Fowler's respected <a href="http://msdn.microsoft.com/en-us/library/ff649585.aspx">Data Transfer Object</a> and <a href="http://msdn.microsoft.com/en-us/library/ff650101.aspx">Service Gateway</a> patterns on MSDN for years - none of their web frameworks have encouraged their use. Instead in .NET we've been forced to code against the multiple generation of replacement web service frameworks they've churned out over the years like .asmx, CSF, WCF, WCF/REST, WSE, WCF DataServices, RIA, MVC (escaping earlier cruft) and now WebApi. Each of these frameworks share the same mistake of mapping to C# methods, which we believe is a terrible idea for network  services since it promotes chatty and brittle remote interfaces, that fail to facilitate the easy creation of SOA-like Apis.</p>
+<p>Throughout all these generations of frameworks ServiceStack's underlying core message-based design has remained
+a constant powerful primitive that drives much of its simplicity. At a minimum ServiceStack Services just need
+to implement the empty marker interface:</p>
+<pre><code class="language-csharp">public interface IService { }
+</code></pre>
+<p>Which lets you handle any HTTP Verb, as well as a 'Catch All' <strong>Any</strong> fall-back to handle any un-specified HTTP verbs, e.g:</p>
+<pre><code class="language-csharp">public class MyService : IService 
+{
+    public Response Get(Request request)  =&gt; ...;
+    public Response Post(Request request) =&gt; ...;
+
+    //Fallback for Anything else e.g DELETE, PUT, PATCH, OPTIONS, etc.
+    public Response Any(Request request)  =&gt; ...;
+}
+</code></pre>
+<p>It simply accepts any user-defined Request DTO and returns any Response DTO - that you're given complete freedom to create. If ever more customization/headers is needed you can return the decorated response inside a <code>HttpResult</code> or <code>HttpError</code> to maintain full control over the HTTP output.</p>
+<h3 id="message-apis-minimizes-round-trips-creates-fewer-more-re-usable-and-extensible-services">Message APIs minimizes round-trips, creates fewer, more re-usable and extensible services<a class="header-anchor" href="javascript:;" onclick="location.hash='#message-apis-minimizes-round-trips-creates-fewer-more-re-usable-and-extensible-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Messages APIs are naturally batchful and promote the development of coarse-grained service interfaces. This encourages fewer, more re-usable services that are better positioned for extensibility - this is a key benefit, since well-defined (i.e. non RPC/client-specific) back-end services tend to out live the UIs and clients that consume them.</p>
+<p>This is illustrated in this example between the <a href="https://gist.github.com/1386381">different style of services that WCF and ServiceStack encourages</a>. Another example showcasing the differences is in many of jQuery's APIs that take in an array of key/value pairs, like <a href="http://api.jquery.com/jQuery.ajax/">$.ajax()</a>. Imagine if every configuration permutation was a different or overloaded method? This gets unwieldy, very quickly. A coarse-grained interface enables richer functionality in a single call, whilst sharing the same well-tested code-path.</p>
+<h3 id="code-first-pocos">Code-first POCO's<a class="header-anchor" href="javascript:;" onclick="location.hash='#code-first-pocos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Since it promotes clean, re-usable code, ServiceStack has always encouraged the use of code-first <a href="http://en.wikipedia.org/wiki/Plain_Old_CLR_Object">POCO</a>'s for just about everything. i.e. the same POCO can be used:</p>
+<ul>
+<li>In Request and Response DTO's (on client and server)</li>
+<li>In <a href="https://github.com/ServiceStack/ServiceStack.Text">JSON, JSV and CSV Text Serializers</a></li>
+<li>As the data model in <a href="https://github.com/ServiceStack/ServiceStack.OrmLite">OrmLite</a>, <a href="http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.Db4oProvider">db4o</a> and <a href="http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.NHibernateProvider%253Fstate%253Dclosed">NHibernate</a></li>
+<li>As the entities stored in <a href="https://github.com/ServiceStack/ServiceStack.Redis">Redis</a></li>
+<li>As blobs stored in <a href="/caching">Caches</a> and <a href="/auth/sessions">Sessions</a></li>
+<li>Dropped and executed in <a href="/redis-mq">MQ's services</a></li>
+<li>Dehydrating <a href="http://www.servicestack.net/mvc-powerpack/">complex configurations</a> into</li>
+</ul>
+<p>Leveraging different technologies whose functionality is built around POCO's offer un-precedented levels of re-use, reduces friction, promotes consistent, more usable and easier to rationale code-bases.</p>
+<h2 id="the-case-against-mapping-to-method-signatures">The case against mapping to method signatures<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-case-against-mapping-to-method-signatures'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The programmer convenience and familiarity of using method signatures for Service APIs is just not worth what you give up:</p>
+<p>It encourages developers to treat web services as just another method call even though they're millions of times slower, the different properties between service endpoints and C# methods highlight more of the short comings of this approach where in order to be able to evolve your services without friction, services should be both forward and backwards compatible - not fail-fast. When you evolve and refactor a C# method you have the opportunity to refactor all the call sites to meet the new method signature - whereas in a disconnected (and already deployed) client/server solution you don't, you need to support both old and new clients requests and the only way to do this cleanly whilst still maintaining the same code-path is to pass messages between them.</p>
+<p>But the main disadvantage of method signature service APIs is that they mandate the use of code-gen in order to provide a typed client API. Using messages allows you to re-use generic service clients for all your service communications. This is how, even up to this day ServiceStack remains the only .NET framework to maintain a terse, (both sync and async), typed, end-to-end client libraries without any code-gen, e.g:</p>
+<pre><code class="language-cs">Todo createdTodo = client.Post(new Todo { Content = &quot;New Todo&quot;, Order = 1 });
+</code></pre>
+<h3 id="code-gening-service-clients-is-evil">Code-gen'ing service clients is evil<a class="header-anchor" href="javascript:;" onclick="location.hash='#code-gening-service-clients-is-evil'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Although a subject of another post we consider code-gen an arthritis that imposes undue friction to a project, it adds un-necessary build steps, increases compile times, forces lock-step deployment of client/server endpoints (usually requiring downtime), inhibits DRY/code re-use amongst code-gen types, has your domain logic binded to external moving types (that are outside of your control), are less resilient since code-gen types parse the entire payload - so unwanted breakages can occur on changes to un-used parts of the request or response.</p>
+<p>The only way to maintain a succinct API that maps to method signatures without code-gen is to use dynamic. We're a fan of dynamic languages for most (fuzzy) development tasks like creating/binding UIs, html generation, scripting, etc. But we don't think they're optimal for creating evolving service APIs with - which stand to benefit most from statically typed annotations, compiler warnings and the refactoring support that statically typed languages can provide.</p>
+<h3 id="twitter-benefitting-from-typed-services">Twitter benefitting from Typed Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#twitter-benefitting-from-typed-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>After having rewrote their Ruby APIs in Scala, Twitter also comes to the same conclusion:
+<a href="http://www.infoq.com/articles/twitter-java-use">http://www.infoq.com/articles/twitter-java-use</a></p>
+<blockquote>
+<p>I would say about half of the productivity gain is purely because of accumulated technical debt in the search Rails stack. And the other half is that, as search has moved into a Service Oriented Architecture and exposes various APIs, static typing becomes a big convenience in enforcing coherency across all the systems. You can guarantee that your dataflow is more or less going to work, and focus on the functional aspects. Whereas for something like building a web page you don't want to recompile all the time, you don't really want to worry about whether in some edge condition you are going to get a type you didn't expect. But as we move into a light-weight Service Oriented Architecture model, static typing becomes a genuine productivity boon. And Scala gives you the same thing.</p>
+</blockquote>
+<h2 id="advantages-of-message-based-designs">Advantages of Message-based designs<a class="header-anchor" href="javascript:;" onclick="location.hash='#advantages-of-message-based-designs'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>So in contrast to method signatures, message-based designs offer many advantages:</p>
+<ul>
+<li>They're easy to version and evolve since you're freely able to add/remove functionality and properties without error</li>
+<li>They're easy to route, chain and decorate through to different handlers and pipelines</li>
+<li>They're easy to serialize and proxy through to remote services</li>
+<li>They're easy to record, defer and replay - evident by ServiceStack's <a href="/redis-mq">IMessaging API</a> which can automatically drop one-way services into MQ's and have them executed inside an MQ Host, you get this functionality for free since the MQ host can re-use the same web service implementation. It works the other way too where you can supply a Url in the ReplyTo property to have the MQ response POST'ed to a ServiceStack HTTP Service.</li>
+<li>They're easy to log, evident by ServiceStack's trivially simple but useful <a href="/request-logger">IRequestLogger service</a></li>
+<li>They're easy to map and translate to and from domain models using convention and auto mappers</li>
+<li>Ideal for concurrency as immutable messages are thread-safe and can be easily multi-plexed with their handlers over multiple threads.</li>
+</ul>
+<p>All these properties make messages a better choice for distributed systems, where all this functionality can be achieved with generic solutions since it's much easier to pass around and serialize messages than method signature invocations.</p>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="Vae0ALalIP0" style="background-image: url('https://img.youtube.com/vi/Vae0ALalIP0/maxresdefault.jpg')"></lite-youtube></p>
+<h3 id="message-designs-are-well-known">Message designs are well known<a class="header-anchor" href="javascript:;" onclick="location.hash='#message-designs-are-well-known'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Although none of these qualities are new, message-based designs have been very well known for decades and are used in many of the most highly respected real-time distributed technologies: including Erlang processes, Java's JMS, Scala's Actors, Go's go-routines, Dart's isolates, F#'s Mailboxes as well as in industrial strength Message Queues which (amongst many other benefits) provide deferred, durable and reliable execution - which are a strong force in most other platforms.</p>
+<h3 id="messaging-practically-non-existant-in.net">Messaging practically non-existant in .NET<a class="header-anchor" href="javascript:;" onclick="location.hash='#messaging-practically-non-existant-in.net'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>They're just weak in .NET since Microsoft has an un-naturally strong influence over .NET developer mindshare and have been able to steer mainstream .NET into using SOAP Web Services at the expense of MQ's and message-based solutions. Our guess for this was because they've only had a poor, outdated MQ option in MSMQ and that the 1) right-click 'Add Service Reference' and 2) call a remote service like a c# method, demos very well.</p>
+<p>This could change with the advent of <a href="https://azure.microsoft.com/en-us/services/service-bus/">Azure Service Bus</a> if Microsoft devotes some attention into pointing mainstream .NET devs towards a messaging approach. Although with the imminent release of WebApi and Microsoft's full marketing force, army of employees and full-time developer advocates behind it, they will likely be once again successful into moving most of mainstream .NET onto yet another replacement web-service framework for all their remote communication needs - when often message-based / SOA designs provide a better fit.</p>
+<p>For those interested in discovering advantages of MQ's and message-based designs and their abilities in enabling loosely coupled distributed systems, we recommend the excellent book from Martin Fowler's signature series - <a href="http://www.eaipatterns.com/">Enterprise Integration Patterns</a>.</p>
+<h2 id="so-is-servicestack-only-suitable-for-homogeneous-environments-that-control-client-server">So is ServiceStack only suitable for homogeneous environments that control client / server?<a class="header-anchor" href="javascript:;" onclick="location.hash='#so-is-servicestack-only-suitable-for-homogeneous-environments-that-control-client-server'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>This is fairly inaccurate considering ServiceStack's mission is close to the exact opposite: i.e. to encapsulate and empower your services logic and host them in the most accessible and re-usable ways possible on the most popular endpoints and formats. This is, after all what the core objectives of a service should be, i.e. to expose high-level functionality in the most accessible way and consume them in least-effort possible.</p>
+<h3 id="excellent-built-in-support-of-http-on-most-open-and-popular-formats">Excellent built-in support of HTTP on most open and popular formats<a class="header-anchor" href="javascript:;" onclick="location.hash='#excellent-built-in-support-of-http-on-most-open-and-popular-formats'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Not only do all ServiceStack services accept a Request DTO populated with any combination of Custom Routes, QueryString and HTML FormData. You can also POST the serialized Request DTO in any of the in-built formats: i.e. XML, JSON, JSV, SOAP 1.1/1.2, ProtoBuf (when enabled) or your own <a href="https://northwind.netcore.io/vcard-format.htm">custom format</a>. All services immediately support JSONP and its trivial to <a href="http://stackoverflow.com/questions/8211930/servicestack-rest-api-and-cors">enable CORS on all services</a>. Should you wish, you're also able to have all HTTP Verbs execute the same service.</p>
+<p>Support is included for registering raw custom IHttpHandler's, <a href="/request-and-response-filters">Request / Response Filters</a> and HttpResult/HttpError results - giving you a multitude of options to maintain full control over the entire HTTP Output - should you need to meet any extraneous external requirements.</p>
+<h3 id="text-serializers-are-fast-resilient-and-idiomatic">Text serializers are fast, resilient and idiomatic<a class="header-anchor" href="javascript:;" onclick="location.hash='#text-serializers-are-fast-resilient-and-idiomatic'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack's JSON &amp; JSV serializers are <strong>case-insensitive</strong> (i.e. supports both camelCase and PascalCase properties) and the 1-line below (already included in most Example templates) emits idiomatic camelCase JSON output:</p>
+<pre><code class="language-cs">JsConfig.Init(Config { TextCase = TextCase.CamelCase });
+</code></pre>
+<p>They're both <a href="./redis/schemaless-migration.md">very resilient and can withstand extreme versioning without error</a> making it easy to consume <a href="https://github.com/ServiceStack/ServiceStack.Text/tree/master/tests/ServiceStack.Text.Tests/UseCases">3rd party APIs</a></p>
+<h3 id="your-services-can-be-consumed-by-more-than-just-http">Your services can be consumed by more than just HTTP<a class="header-anchor" href="javascript:;" onclick="location.hash='#your-services-can-be-consumed-by-more-than-just-http'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Your services implementation can even be re-used inside any <a href="/redis-mq">IMessageService hosts</a>, which at this time includes support for
+<a href="/messaging">Background MQ, Rabbit MQ, Redis MQ, AWS SQS and Azure Service Bus MQ Servers</a> and for Maximum Performance
+Services can also be consumed from <a href="/grpc/">high-performance HTTP/2 gRPC endpoints</a> and its universe of <a href="https://grpc.servicestack.net/">protoc Generated Clients</a>. All these features actually make ServiceStack one of the most versatile and flexible web service frameworks in existence - enabling your services accessible in a myriad of different use-cases.</p>
+<h3 id="most-examples-dont-actually-have.net-clients">Most examples don't actually have .NET clients<a class="header-anchor" href="javascript:;" onclick="location.hash='#most-examples-dont-actually-have.net-clients'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This is also a peculiar assumption in light of the fact that most <a href="https://github.com/ServiceStack/ServiceStack.Examples/">ServiceStack Examples</a> (as seen on <a href="http://servicestack.net">http://servicestack.net</a>) are actually Single Page Apps being consumed with Ajax clients (i.e. no .NET clients in sight).</p>
+<p>The <a href="http://www.servicestack.net/Backbone.Todos/">Backbone TODOs example</a> shows how trivial it was to retrofit Backbone's REST service with a ServiceStack backend and the <a href="https://github.com/ServiceStack/SocialBootstrapApi">SocialBootstrapApi</a> example show-cases an internet-ready Single Page Backbone App with Facebook, Twitter, HTML Form credentials, Basic Auth &amp; Digest Auth, all enabled. It also makes use of ServiceStack's <a href="https://github.com/ServiceStack/Bundler">cross-platform node.js bundler</a> for statically compiling, minifying and concatenating your websites .coffee, .js, .less, .sass and .css assets - and since it works headless and without .NET, is able to be used for non .NET projects as well.</p>
+<h3 id="net-clients-can-benefit-from-a-typed-api">.NET clients can benefit from a typed API<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-clients-can-benefit-from-a-typed-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>.NET clients do benefit from being able to re-use the same types you've defined your web services with, which in addition to <a href="http://www.servicestack.net/ServiceStack.Hello/#predefinedroutes">pre-defined auto routes</a> and generic service clients, is what enables the typed, end-to-end client gateways.</p>
+<h3 id="just-as-consumable-as-any-other-web-service">Just as consumable as any other web service<a class="header-anchor" href="javascript:;" onclick="location.hash='#just-as-consumable-as-any-other-web-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>But even without this, ServiceStack services are just as consumable as any other web service framework since they're just pure DTOs serialized into the preferred Content-Type, with no additional bytes or wrappers added to the response. Different client examples in contrast:</p>
+<p>The earlier typed API example of creating a new TODO in C#:</p>
+<pre><code class="language-csharp">var client = new JsonServiceClient(baseUrl);
+Todo createdTodo = client.Post(new Todo { Content = &quot;New Todo&quot;, Order = 1 });
+</code></pre>
+<p>Is like this in <a href="/typescript-add-servicestack-reference">TypeScript</a>:</p>
+<pre><code class="language-ts">var client = new JsonServiceClient(baseUrl);
+var request = Todo();
+request.Content = &quot;New Todo&quot;;
+request.Order = 1;
+client.post(request)
+    .then((createdTodo) =&gt; ...)
+</code></pre>
+<p>and this in Dart (using the <a href="https://github.com/mythz/DartJsonClient">Dart JSON Client</a>):</p>
+<pre><code class="language-dart">var client = new JsonClient(baseUrl);
+client.todos({'content':'New Todo', 'order':1})
+        .then((createdTodo) =&gt; ...);
+</code></pre>
+<p>Or in jQuery:</p>
+<pre><code class="language-js">$.post(baseUrl + '/todos', {content:'New Todo', order:1}, 
+       function(createdTodo) { ... }, 'json');
+</code></pre>
+<p>And you still have the option to consume all services in other Content-Types. Some languages may prefer to deal with XML - which can easily be accessed by adding the appropriate <code>Accept</code> and <code>Content-Type</code> headers.</p>
+<h2 id="whats-the-best-way-to-expose-our-services-to-clients-today">What's the best way to expose our services to clients today?<a class="header-anchor" href="javascript:;" onclick="location.hash='#whats-the-best-way-to-expose-our-services-to-clients-today'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="what-was-soaps-original-vision">What was SOAP's original vision?<a class="header-anchor" href="javascript:;" onclick="location.hash='#what-was-soaps-original-vision'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Back in the W3C glory days, existed think-tanks who imagined a beautiful world were you could easily discover and connect to services through the magical properties of UDDI and WSDLs. However this pipe-dream never came to pass, the closest .NET got was the 'Add Service Reference' dialog ingrained in VS.NET - which we refer to internally as the technical-debt-creating-anti-pattern dialog :)</p>
+<h3 id="so-how-should-we-expose-our-services-now">So how should we expose our services now?<a class="header-anchor" href="javascript:;" onclick="location.hash='#so-how-should-we-expose-our-services-now'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The natural choice would be to just document your services' uniform HTTP Interface using XML or JSON REST APIs. This is a popular choice for many companies today, some good examples include <a href="http://api.stackoverflow.com/1.0/usage">StackOverflow</a> and <a href="http://developer.github.com/v3/">GitHub</a>. This approach easily supports dynamic clients who are able to trivially consume JSON responses.</p>
+<h3 id="native-language-client-libraries">Native language client libraries<a class="header-anchor" href="javascript:;" onclick="location.hash='#native-language-client-libraries'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A more productive option for clients however would be to provide a native client library for each of the popular languages you wish to support. This is generally the approach of companies who really, really want to help you use their services - they tend to call their clients <strong>SDK's</strong> which abstract away the underlying connection transport behind optimal native language bindings. This is especially evident from companies whose business relies on the popular use of their APIs, like <a href="http://aws.amazon.com/sdkfornet/">Amazon</a>, <a href="https://developers.facebook.com/docs/sdks/">Facebook</a> and <a href="https://github.com/WindowsAzure">Windows Azure</a>. This is an especially good idea if you want to support static languages (i.e. C# and Java) where having typed client libraries saves end-users from reverse engineering the types and API calls. It also saves them having to look up documentation since a lot of it can be inferred from the type info. ServiceStack's and Amazons convention of having <code>ServiceName</code> and <code>ServiceNameResponse</code> for each service also saves users from continually checking documentation to work out what the response of each service will be.</p>
+<h3 id="packaging-client-libraries">Packaging client libraries<a class="header-anchor" href="javascript:;" onclick="location.hash='#packaging-client-libraries'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In terms of packaging your client libraries, sticking a link to a zip file on your Websites APIs documentation page would be the easiest approach. It would be better if the zip file was a link to a master archive of a Github repository as you'll be able to accept bug fixes and usability tips from the community. Finally we believe the best way to make your client libraries available would be to host them in the target languages native package manager - letting end-users issue 1-command to automatically add it to their project, and another to easily update it when your service has changed.</p>
+<h3 id="nuget-is-the-new-add-service-reference">NuGet is the new Add Service Reference<a class="header-anchor" href="javascript:;" onclick="location.hash='#nuget-is-the-new-add-service-reference'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For .NET this means adding it to NuGet. If you use ServiceStack your package would just need to contain your types with a reference to <a href="http://nuget.org/packages/ServiceStack.Client">ServiceStack.Client</a> - which contains all ServiceStack's generic JSON, XML, JSV and SOAP 1.1/1.2 service clients. Add a reference to <a href="http://nuget.org/packages/ServiceStack.ProtoBuf">ServiceStack.ProtoBuf</a> if you want to support Protocol Buffers as well. One of the benefits of using ServiceStack is that all your types are already created since it's what you used to define your web services with!</p>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/what-is-a-message-based-web-service" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                What is a Message-based Web Service
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/why-remote-services-use-dtos" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Why Remote Services should use DTOs
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#best-practices-for-remote-services'" data-id="best-practices-for-remote-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Best-practices for remote services
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-service-api-of-amazons-web-services'" data-id="the-service-api-of-amazons-web-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The Service API of Amazon&#x27;s Web Services
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="example-request" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#example-request'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Example Request
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="example-response" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#example-response'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Example Response
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#messaging-at-google'" data-id="messaging-at-google" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Messaging at Google
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#a-productivity-win'" data-id="a-productivity-win" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            A Productivity Win
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="the-anatomy-of-a-servicestack-service" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-anatomy-of-a-servicestack-service'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The anatomy of a ServiceStack service
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-many-webservice-frameworks-of-microsoft'" data-id="the-many-webservice-frameworks-of-microsoft" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The many webservice frameworks of Microsoft
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="message-apis-minimizes-round-trips-creates-fewer-more-re-usable-and-extensible-services" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#message-apis-minimizes-round-trips-creates-fewer-more-re-usable-and-extensible-services'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Message APIs minimizes round-trips, creates fewer, more re-usable and extensible services
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="code-first-pocos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#code-first-pocos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Code-first POCO&#x27;s
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-case-against-mapping-to-method-signatures'" data-id="the-case-against-mapping-to-method-signatures" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The case against mapping to method signatures
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="code-gening-service-clients-is-evil" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#code-gening-service-clients-is-evil'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Code-gen&#x27;ing service clients is evil
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="twitter-benefitting-from-typed-services" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#twitter-benefitting-from-typed-services'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Twitter benefitting from Typed Services
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#advantages-of-message-based-designs'" data-id="advantages-of-message-based-designs" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Advantages of Message-based designs
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="message-designs-are-well-known" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#message-designs-are-well-known'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Message designs are well known
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="messaging-practically-non-existant-in.net" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#messaging-practically-non-existant-in.net'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Messaging practically non-existant in .NET
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#so-is-servicestack-only-suitable-for-homogeneous-environments-that-control-client-server'" data-id="so-is-servicestack-only-suitable-for-homogeneous-environments-that-control-client-server" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            So is ServiceStack only suitable for homogeneous environments that control client / server?
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="excellent-built-in-support-of-http-on-most-open-and-popular-formats" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#excellent-built-in-support-of-http-on-most-open-and-popular-formats'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Excellent built-in support of HTTP on most open and popular formats
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="text-serializers-are-fast-resilient-and-idiomatic" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#text-serializers-are-fast-resilient-and-idiomatic'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Text serializers are fast, resilient and idiomatic
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="your-services-can-be-consumed-by-more-than-just-http" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#your-services-can-be-consumed-by-more-than-just-http'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Your services can be consumed by more than just HTTP
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="most-examples-dont-actually-have.net-clients" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#most-examples-dont-actually-have.net-clients'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Most examples don&#x27;t actually have .NET clients
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="net-clients-can-benefit-from-a-typed-api" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#net-clients-can-benefit-from-a-typed-api'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            .NET clients can benefit from a typed API
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="just-as-consumable-as-any-other-web-service" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#just-as-consumable-as-any-other-web-service'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Just as consumable as any other web service
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#whats-the-best-way-to-expose-our-services-to-clients-today'" data-id="whats-the-best-way-to-expose-our-services-to-clients-today" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            What&#x27;s the best way to expose our services to clients today?
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="what-was-soaps-original-vision" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#what-was-soaps-original-vision'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            What was SOAP&#x27;s original vision?
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="so-how-should-we-expose-our-services-now" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#so-how-should-we-expose-our-services-now'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            So how should we expose our services now?
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="native-language-client-libraries" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#native-language-client-libraries'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Native language client libraries
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="packaging-client-libraries" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#packaging-client-libraries'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Packaging client libraries
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="nuget-is-the-new-add-service-reference" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#nuget-is-the-new-add-service-reference'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            NuGet is the new Add Service Reference
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

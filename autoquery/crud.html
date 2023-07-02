@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>AutoQuery CRUD</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/autoquery/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+AutoQuery                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/autoquery/rdbms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery RDBMS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/data" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/memory" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Memory
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/service" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Service
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/dynamodb" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data DynamoDB
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        AutoQuery CRUD
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/audit-log" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Audit Log
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/autogen" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/bookings-crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery CRUD Bookings Demo
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/why-not-odata" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Why Not OData
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            AutoQuery CRUD
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>AutoQuery Services includes support for implementing much of a CRUD Services logic declaratively, including support for multi-tenancy,
+optimistic concurrency, declarative validation, Auto Mapping external of Request/Respond DTOs to data model properties,
+auto populating then using full #Script Expressions that can be used for example to populate timestamps,
+authenticating user information, generating new UUIDs, etc.</p>
+<p>Just like AutoQuery, CRUD Services are ServiceStack Services where you can continue using the same functionality to
+specify optimal user-defined routes for HTTP APIs, same Request/Response and Attribute filters to apply custom logic and
+continue enjoying the entire ecosystem around ServiceStack Services including being able to invoke them via
+<a href="/grpc/">gRPC</a>, <a href="/messaging">MQ endpoints</a> and its rich client ecosystem for enabling end-to-end Typed APIs with
+<a href="/add-servicestack-reference">Add ServiceStack Reference</a>.</p>
+<p>AutoQuery Services are fast &amp; emit clean optimal &quot;pure serialized POCO&quot; wire-format, they're built on OrmLite's high-performance
+APIs where all AutoQuery APIs are <code>async</code> by default but also also offers native sync APIs if needing to enlist any of
+AutoQuery's functionality in custom sync methods (that are unable to be converted into viral async APIs).</p>
+<p>Importantly AutoQuery Services are &quot;future-proofed&quot; and can be overridden with a custom implementation that can either choose to augment
+the existing AutoQuery functionality and enhance it with custom behavior (e.g. if not possible to implement declaratively) or if needed its
+entire implementation can be replaced without breaking its design contract &amp; existing client integrations, should it be necessary to
+reimplement later if the Service needs to be constructed to use alternative data sources.</p>
+<h2 id="rapidly-develop-data-driven-systems">Rapidly develop data-driven systems<a class="header-anchor" href="javascript:;" onclick="location.hash='#rapidly-develop-data-driven-systems'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>As AutoQuery lets you declaratively develop Services by just defining their API Contract with POCO DTOs you're able to develop entire
+data-driven systems in a fraction of the time that it would take to implement them manually. In addition AutoQuery Services are semantically
+richer as all capabilities are declaratively defined around typed data models which makes it possible to build higher-level generic features
+like ServiceStack's Studio <a href="/studio-autoquery">Instant UI for AutoQuery Services</a>.</p>
+<p>With AutoQuery you can now build entire Apps declaratively to develop high-performance capable Services accessible via ServiceStack's
+industry leading <a href="/why-servicestack#features-overview">myriad of Service endpoints</a> and rich metadata services, all without needing to write any implementation!</p>
+<p>For a sample of the productivity enabled checkout the <a href="https://github.com/NetCoreApps/BookingsCrud">Bookings CRUD</a> demo to create a multi-user ASP.NET Core Booking System from scratch within minutes with full Audit History, fine-grained permissions, declarative validation, run adhoc queries &amp; export to Excel by just defining code-first high-performance AutoQuery CRUD Typed APIs</p>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="rSFiikDjGos" style="background-image: url('https://img.youtube.com/vi/rSFiikDjGos/maxresdefault.jpg')"></lite-youtube></p>
+<h2 id="creating-autoquery-crud-services">Creating AutoQuery CRUD Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-autoquery-crud-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Just like <a href="/autoquery/rdbms">AutoQuery</a>, you just need to provide the typed Request DTOs definition for your DB Table APIs and
+AutoQuery automatically provides the implementation for the Service.</p>
+<p>To enlist Auto CRUD behavior your Request DTOs need to implement one of the following interfaces which dictates the behavior of the Service:</p>
+<ul>
+<li><code>ICreateDb&lt;Table&gt;</code> - Create new Table Entry</li>
+<li><code>IUpdateDb&lt;Table&gt;</code> - Update existing Table Entry</li>
+<li><code>IPatchDb&lt;Table&gt;</code>  - Partially update existing Table Entry</li>
+<li><code>IDeleteDb&lt;Table&gt;</code> - Delete existing Table Entry</li>
+</ul>
+<p>All Request DTOs also require either an <code>IReturn&lt;T&gt;</code> or <code>IReturnVoid</code> marker interface to specify the return type of the Service.</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Can use built-in <code>IReturn&lt;EmptyResponse&gt;</code> for an &quot;empty&quot; response where as <code>IReturnVoid</code> returns &quot;no&quot; response.</p>
+</div>
+<p>Let's go through a simple example, starting with a simple POCO OrmLite data model we want to add to our RDBMS:</p>
+<pre><code class="language-csharp">public class Rockstar
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? Age { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateDied { get; set; }
+    public LivingStatus LivingStatus { get; set; }
+}
+</code></pre>
+<p>We can create a Service that <strong>inserts</strong> a new <code>Rockstar</code> by defining all the properties we want to allow API consumers to provide when creating a new Rockstar:</p>
+<pre><code class="language-csharp">public class CreateRockstar : ICreateDb&lt;Rockstar&gt;, IReturn&lt;CreateRockstarResponse&gt; 
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? Age { get; set; }
+    public DateTime DateOfBirth { get; set; }
+}
+
+public class CreateRockstarResponse
+{
+    public int Id { get; set; } // Id is auto populated with RDBMS generated Id
+    public ResponseStatus ResponseStatus { get; set; }
+}
+</code></pre>
+<p>When ServiceStack starts it generates the implementation for this Service, which can now insert Rockstars using your populated Request DTO:</p>
+<pre><code class="language-csharp">var client = new JsonServiceClient(baseUrl);
+
+client.Post(new CreateRockstar {
+    FirstName = &quot;Kurt&quot;,
+    LastName = &quot;Cobain&quot;,
+    Age = 27,
+    DateOfBirth = new DateTime(20,2,1967),
+});
+</code></pre>
+<p>Similarly you can define <strong>Update</strong> and <strong>Delete</strong> Services the same way, e.g:</p>
+<pre><code class="language-csharp">public class UpdateRockstar : Rockstar,
+    IUpdateDb&lt;Rockstar&gt;, IReturn&lt;UpdateRockstarResponse&gt; {}
+
+public class UpdateRockstarResponse
+{
+    public int Id { get; set; } // Id is auto populated with RDBMS generated Id
+    public Rockstar Result { get; set; } // selects &amp; returns latest DB Rockstar
+    public ResponseStatus ResponseStatus { get; set; }
+}
+</code></pre>
+<p>By convention if your Response DTO contains any of these properties it will be automatically populated:</p>
+<ul>
+<li><code>T Id</code> - The Primary Key</li>
+<li><code>T Result</code> - The POCO you want to return (can be a subset of DB model)</li>
+<li><code>int Count</code> - Return the number of rows affected (typically 1, but Deletes can be &gt;1)</li>
+</ul>
+<p>Delete Services need only a Primary Key, e.g:</p>
+<pre><code class="language-csharp">public class DeleteRockstar : IDeleteDb&lt;Rockstar&gt;, IReturnVoid 
+{
+    public int Id { get; set; }
+}
+</code></pre>
+<p>and to Query the Rockstar table you have the <a href="/autoquery/rdbms">full featureset of AutoQuery</a> for a complete set of CRUD Services without needing to provide any implementations.</p>
+<h2 id="custom-autoquery-crud-implementation">Custom AutoQuery CRUD Implementation<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoquery-crud-implementation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Just as you can create <a href="/autoquery/rdbms.html#custom-autoquery-implementations">Custom AutoQuery Implementations</a> to override the default AutoQuery behavior
+you can also override AutoQuery CRUD implementations by creating implementations with AutoQuery CRUD Request DTOs and calling the relevate <code>IAutoQueryDb</code> method, e.g:</p>
+<pre><code class="language-csharp">public class MyCrudServices : Service
+{
+    public IAutoQueryDb AutoQuery { get; set; }
+
+    public object Post(CreateRockstar request) =&gt; AutoQuery.Create(request, base.Request);
+    public object Put(UpdateRockstar request) =&gt; AutoQuery.Update(request, base.Request);
+    public object Delete(DeleteRockstar request) =&gt; AutoQuery.Delete(request, base.Request);
+}
+
+// Async
+public class MyCrudServices : Service
+{
+    public IAutoQueryDb AutoQuery { get; set; }
+
+    public Task&lt;object&gt; Post(CreateRockstar request) =&gt; AutoQuery.CreateAsync(request, base.Request);
+    public Task&lt;object&gt; Put(UpdateRockstar request) =&gt; AutoQuery.UpdateAsync(request, base.Request);
+    public Task&lt;object&gt; Delete(DeleteRockstar request) =&gt; AutoQuery.DeleteAsync(request, base.Request);
+}
+</code></pre>
+<h3 id="custom-implementations-using-ormlite-typed-apis">Custom implementations using OrmLite Typed APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-implementations-using-ormlite-typed-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>It's not strictly necessary to use <code>IAutoQueryDb</code> APIs to implement custom AutoQuery implementations as you could instead use OrmLite to implement similar CRUD behavior, e.g:</p>
+<pre><code class="language-csharp">public class MyCrudServices : Service
+{
+    public object Post(CreateRockstar request) 
+    {
+        var id = (int) Db.Insert(request.ConvertTo&lt;Rockstar&gt;(), selectIdentity:true);
+        return new CreateRockstarResponse {
+            Id = id
+        };
+    }
+
+    public object Put(UpdateRockstar request)
+    {
+        Db.UpdateNonDefaults(request.ConvertTo&lt;Rockstar&gt;(), x =&gt; x.Id == request.Id);
+        return new UpdateRockstarResponse {
+            Id = id,
+            Result = Db.SingleById&lt;Rockstar&gt;(id),
+        };
+    }
+    
+    public void Delete(DeleteRockstar request)
+    {
+        Db.DeleteById&lt;Rockstar&gt;(request.Id);
+    }
+}
+</code></pre>
+<p>Async version:</p>
+<pre><code class="language-csharp">public class MyCrudServices : Service
+{
+    public async Task&lt;object&gt; Post(CreateRockstar request) 
+    {
+        var id = (int) await Db.InsertAsync(request.ConvertTo&lt;Rockstar&gt;(), selectIdentity:true);
+        return new CreateRockstarResponse {
+            Id = id
+        };
+    }
+
+    public object Put(UpdateRockstar request)
+    {
+        await Db.UpdateNonDefaultsAsync(request.ConvertTo&lt;Rockstar&gt;(), x =&gt; x.Id == request.Id);
+        return new UpdateRockstarResponse {
+            Id = id,
+            Result = await Db.SingleByIdAsync&lt;Rockstar&gt;(id),
+        };
+    }
+    
+    public Task Delete(DeleteRockstar request)
+    {
+        await Db.DeleteByIdAsync&lt;Rockstar&gt;(request.Id);
+    }
+}
+</code></pre>
+<p>The above are equivalents of typical AutoQuery CRUD APIs using OrmLite directly, however if the AutoQuery APIs includes <a href="/ormlite/reference-support">POCO references</a>, you'll need to OrmLite's <code>Save()</code> API to save the reference complex types as well, e.g:</p>
+<pre><code class="language-csharp">public class MyCrudServices : Service
+{
+    public object Post(CreateRockstar request) 
+    {
+        var row = request.ConvertTo&lt;Rockstar&gt;();
+        Db.Save(row, references: true);
+        return new CreateRockstarResponse {
+            Id = row.Id
+        };
+    }
+}
+</code></pre>
+<h2 id="autoquery-crud-attributes">AutoQuery CRUD Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>AutoQuery CRUD extends existing <a href="/autoquery/rdbms">querying functionality in AutoQuery</a> with additional features covering common functionality in CRUD operations:</p>
+<ul>
+<li><code>[AutoApply]</code> - Apply built-in composite generic behavior</li>
+<li><code>[AutoPopulate]</code> - Populate data models with generic user &amp; system info</li>
+<li><code>[AutoFilter]</code> - Apply pre-configured filters to query operations</li>
+<li><code>[AutoMap]</code> - Map System Input properties to Data Model fields</li>
+<li><code>[AutoDefault]</code> - Specify to fallback default values when not provided</li>
+<li><code>[AutoIgnore]</code> - Ignore mapping Request DTO property to Data Model</li>
+</ul>
+<p>Each of these are covered in more detail in the docs and examples below.</p>
+<h3 id="advanced-crud-example">Advanced CRUD Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#advanced-crud-example'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Lets now explore a more advanced example that implements Audit information as well as layered support for multi-tenancy to see how you can easily compose features.</p>
+<p>So lets say you have an interface that all tables you want to contain Audit information implements:</p>
+<pre><code class="language-csharp">public interface IAudit 
+{
+    DateTime CreatedDate { get; set; }
+    string CreatedBy { get; set; }
+    string CreatedInfo { get; set; }
+    DateTime ModifiedDate { get; set; }
+    string ModifiedBy { get; set; }
+    string ModifiedInfo { get; set; }
+    DateTime? SoftDeletedDate { get; set; }
+    string SoftDeletedBy { get; set; }
+    string SoftDeletedInfo { get; set; }
+}
+</code></pre>
+<p>It's not required, but it's also useful to have a concrete base table which could be annotated like:</p>
+<pre><code class="language-csharp">public abstract class AuditBase : IAudit
+{
+    public DateTime CreatedDate { get; set; }
+    [Required]
+    public string CreatedBy { get; set; }
+    [Required]
+    public string CreatedInfo { get; set; }
+
+    public DateTime ModifiedDate { get; set; }
+    [Required]
+    public string ModifiedBy { get; set; }
+    [Required]
+    public string ModifiedInfo { get; set; }
+
+    [Index] //Check if Deleted
+    public DateTime? SoftDeletedDate { get; set; }
+    public string SoftDeletedBy { get; set; }
+    public string SoftDeletedInfo { get; set; }
+}
+</code></pre>
+<p>We can then create a base Request DTO that all Audit Create Services will implement:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[AutoPopulate(nameof(IAudit.CreatedDate),  Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(IAudit.CreatedBy),    Eval = &quot;userAuthName&quot;)] //or userAuthId
+[AutoPopulate(nameof(IAudit.CreatedInfo),  Eval = &quot;`${userSession.DisplayName} (${userSession.City})`&quot;)]
+[AutoPopulate(nameof(IAudit.ModifiedDate), Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(IAudit.ModifiedBy),   Eval = &quot;userAuthName&quot;)] //or userAuthId
+[AutoPopulate(nameof(IAudit.ModifiedInfo), Eval = &quot;`${userSession.DisplayName} (${userSession.City})`&quot;)]
+public abstract class CreateAuditBase&lt;Table,TResponse&gt; : ICreateDb&lt;Table&gt;, IReturn&lt;TResponse&gt; {}
+</code></pre>
+<p>These all call <a href="https://sharpscript.net/docs/methods">#Script Methods</a> which you can <a href="https://sharpscript.net/docs/script-pages#extend">add/extend yourself</a>.</p>
+<p>The <code>*Info</code> examples is a superfluous example showing that you can basically evaluate any <code>#Script</code> expression. Typically you'd only save User Id or Username</p>
+<h3 id="autopopulate">AutoPopulate<a class="header-anchor" href="javascript:;" onclick="location.hash='#autopopulate'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>[AutoPopulate]</code> attribute tells AutoCrud that you want the DB Table to automatically populate these properties, which can be populated using any of its
+properties below:</p>
+<ul>
+<li><strong>Value</strong> - A constant value that can be used in C# Attributes, e.g <code>Value=&quot;Foo&quot;</code></li>
+<li><strong>Expression</strong> - A Lightweight <a href="https://sharpscript.net/">#Script</a> Expression that results in a constant value that's only evaluated once and cached globally, e.g. <code>Expression = &quot;date(2001,1,1)&quot;</code>, useful for values that can't be defined in C# Attributes like <code>DateTime</code>, can be any <a href="https://sharpscript.net/docs/default-scripts">#Script Method</a>.</li>
+<li><strong>Eval</strong> - A <a href="https://sharpscript.net/">#Script</a> Expression that's cached per request. E.g. <code>Eval=&quot;utcNow&quot;</code> calls the <code>utcNow</code> Script method which returns <code>DateTime.UtcNow</code> which is cached for that request so all other <code>utcNow</code> expressions will return the same exact value.</li>
+<li><strong>NoCache</strong> - Don't cache the expression, evaluate it each time.</li>
+</ul>
+<p>AutoCrud makes extensive usage of <code>#Script</code> expressions for much of its declarative functionality which always executes their cached ASTs so expressions are only parsed once and still fast to evaluate even when results are not cached.</p>
+<p>Lets now layer on additional generic functionality by inheriting and extending the base class with additional functionality, e.g. if we want our table to support <a href="/multitenancy">Multitenancy</a> we could extend it with:</p>
+<pre><code class="language-csharp">[AutoPopulate(nameof(IAuditTenant.TenantId), Eval = &quot;Request.Items.TenantId&quot;)]
+public abstract class CreateAuditTenantBase&lt;Table,TResponse&gt; 
+    : CreateAuditBase&lt;Table,TResponse&gt; {}
+</code></pre>
+<p>Where <code>TenantId</code> is added in a Global Request Filter (e.g. after inspecting the authenticated UserSession to determine the tenant they belong to), e.g:</p>
+<pre><code class="language-csharp">const string TenantId = nameof(TenantId);
+
+void SetTenant(IRequest req, IResponse res, object dto)
+{
+    var userSession = req.SessionAs&lt;AuthUserSession&gt;();
+    if (userSession.IsAuthenticated)
+    {
+        req.SetItem(TenantId, userSession.City switch {
+            &quot;London&quot; =&gt; 10,
+            &quot;Perth&quot;  =&gt; 11,
+            //...
+            _        =&gt; 100,
+        });
+    }
+}
+    
+GlobalRequestFilters.Add(SetTenant);        // HTTP Requests
+GlobalMessageRequestFilters.Add(SetTenant); // MQ Requests
+</code></pre>
+<p>Now we easily implement custom &quot;Audited&quot; and &quot;Multi Tenant&quot; CRUD Services by inheriting these base Services.</p>
+<p>Here's an example of our custom Table that implements our <code>AuditBase</code> class with a <code>TenantId</code> to capture the Tenant the record should be saved to:</p>
+<pre><code class="language-csharp">public class RockstarAuditTenant : AuditBase
+{
+    [Index]
+    public int TenantId { get; set; }
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? Age { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateDied { get; set; }
+    public LivingStatus LivingStatus { get; set; }
+}
+</code></pre>
+<p>Our service can now implement our base Audit &amp; Multitenant enabled service:</p>
+<pre><code class="language-csharp">public class CreateRockstarAuditTenant 
+    : CreateAuditTenantBase&lt;RockstarAuditTenant, CreateRockstarResponse&gt;
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? Age { get; set; }
+    public DateTime DateOfBirth { get; set; }
+}
+</code></pre>
+<p>And all the decorated properties will be automatically populated when creating the Rockstar with <code>CreateRockstarAuditTenant</code>, e.g:</p>
+<pre><code class="language-csharp">client.Post(new CreateRockstarAuditTenant {
+    FirstName = &quot;Kurt&quot;,
+    LastName = &quot;Cobain&quot;,
+    Age = 27,
+    DateOfBirth = new DateTime(20,2,1967),
+});
+</code></pre>
+<p>We can create the same base classes for Updates:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[AutoPopulate(nameof(IAudit.ModifiedDate), Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(IAudit.ModifiedBy),   Eval = &quot;userAuthName&quot;)] //or userAuthId
+[AutoPopulate(nameof(IAudit.ModifiedInfo), Eval = &quot;`${userSession.DisplayName} (${userSession.City})`&quot;)]
+public abstract class UpdateAuditBase&lt;Table,TResponse&gt; 
+    : IUpdateDb&lt;Table&gt;, IReturn&lt;TResponse&gt; {}
+
+[AutoFilter(nameof(IAuditTenant.TenantId), Eval=&quot;Request.Items.TenantId&quot;)]
+public abstract class UpdateAuditTenantBase&lt;Table,TResponse&gt; 
+    : UpdateAuditBase&lt;Table,TResponse&gt; {}
+
+public class UpdateRockstarAuditTenant 
+    : UpdateAuditTenantBase&lt;RockstarAuditTenant, RockstarWithIdResponse&gt;
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public LivingStatus? LivingStatus { get; set; }
+}
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>the <code>[AutoPopulate]</code> properties only appear on the Data Model, not the external Request DTO since we don't want external API consumers to populate them.</p>
+</div>
+<p>For Apps that prefer to never delete rows and instead mark records as deleted so an audit trail is retained, we can implement &quot;Soft Deletes&quot; using an UPDATE to populate the <code>SoftDelete*</code> fields behind-the-scenes:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[AutoPopulate(nameof(IAudit.SoftDeletedDate), Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(IAudit.SoftDeletedBy),   Eval = &quot;userAuthName&quot;)] //or userAuthId
+[AutoPopulate(nameof(IAudit.SoftDeletedInfo), Eval = &quot;`${userSession.DisplayName} (${userSession.City})`&quot;)]
+public abstract class SoftDeleteAuditBase&lt;Table,TResponse&gt; 
+    : IUpdateDb&lt;Table&gt;, IReturn&lt;TResponse&gt; {}
+
+[AutoFilter(QueryTerm.Ensure, nameof(IAuditTenant.TenantId),  Eval = &quot;Request.Items.TenantId&quot;)]
+public abstract class SoftDeleteAuditTenantBase&lt;Table,TResponse&gt; 
+    : SoftDeleteAuditBase&lt;Table,TResponse&gt; {}
+
+public class SoftDeleteAuditTenant 
+    : SoftDeleteAuditTenantBase&lt;RockstarAuditTenant, RockstarWithIdResponse&gt;
+{
+    public int Id { get; set; }
+}
+</code></pre>
+<p>To implement a &quot;Real&quot; permanently destructive DELETE you would instead implement <code>IDeleteDb&lt;T&gt;</code>:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[AutoFilter(QueryTerm.Ensure, nameof(IAuditTenant.TenantId),  Eval = &quot;Request.Items.TenantId&quot;)]
+public class RealDeleteAuditTenant 
+    : IDeleteDb&lt;RockstarAuditTenant&gt;, IReturn&lt;RockstarWithIdResponse&gt;
+{
+    public int Id { get; set; }
+    public int? Age { get; set; }
+}
+</code></pre>
+<h3 id="multi-rdbms-services">Multi RDBMS Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#multi-rdbms-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As they're just regular ServiceStack Services everything you’re used to that works with normal services also works with new Auto Crud Services, to
+recap you can annotate the <strong>DB Model</strong> with the <code>[NamedConnection]</code> attribute to specify which
+<a href="/multitenancy#changedb-apphost-registration">registered named connection</a> AutoQuery should use:</p>
+<pre><code class="language-csharp">[NamedConnection(&quot;Reporting&quot;)]
+public class NamedRockstar : Rockstar { } //DB Model
+</code></pre>
+<p>Where all AutoQuery Services for that data model will query the <strong>Reporting</strong> database instead:</p>
+<pre><code class="language-csharp">public class CreateNamedRockstar : RockstarBase, 
+    ICreateDb&lt;NamedRockstar&gt;, IReturn&lt;RockstarWithIdAndResultResponse&gt;
+{
+    public int Id { get; set; }
+}
+
+public class UpdateNamedRockstar : RockstarBase, 
+    IUpdateDb&lt;NamedRockstar&gt;, IReturn&lt;RockstarWithIdAndResultResponse&gt;
+{
+    public int Id { get; set; }
+}
+</code></pre>
+<h4 id="custom-autoquery-crud-services">Custom AutoQuery CRUD Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoquery-crud-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Alternatively the <code>[ConnectionInfo]</code> can be <a href="/multitenancy#connectioninfo-attribute">used on Service implementations</a>, but as AutoQuery doesn't
+have them you'd need to provide custom implementations that can delegate to their respective Auto Crud API, e.g:</p>
+<pre><code class="language-csharp">[ConnectionInfo(NamedConnection = MyDatabases.Reporting)]
+public class MyReportingServices : Service
+{
+    public IAutoQueryDb AutoQuery { get; set; }
+
+    public Task&lt;object&gt; Any(CreateConnectionInfoRockstar request) =&gt; 
+        AutoQuery.CreateAsync(request, Request);
+
+    public Task&lt;object&gt; Any(UpdateConnectionInfoRockstar request) =&gt; 
+        AutoQuery.UpdateAsync(request, Request);
+}
+</code></pre>
+<h3 id="autofilter">AutoFilter<a class="header-anchor" href="javascript:;" onclick="location.hash='#autofilter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you're creating Soft Delete &amp; Multi tenant services you'll want to ensure that every query only returns records in their tenant and doesn't return deleted items, which we can implement using an <code>[AutoFilter]</code>, e.g:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[AutoFilter(QueryTerm.Ensure, nameof(IAudit.SoftDeletedDate), Template = SqlTemplate.IsNull)]
+[AutoFilter(QueryTerm.Ensure, nameof(IAuditTenant.TenantId),  Eval = &quot;Request.Items.TenantId&quot;)]
+public abstract class QueryDbTenant&lt;From, Into&gt; : QueryDb&lt;From, Into&gt; {}
+</code></pre>
+<p>The <code>[AutoFilter]</code> lets you add pre-configured filters to the query, <code>QueryTerm.Ensure</code> utilizes OrmLite's new <code>Ensure()</code> APIs which forces always applying this filter, even if the query contains other <code>OR</code> conditions.</p>
+<p>This base class will then let you create concrete queries that doesn't return soft deleted rows and only returns rows from the same tenant as the authenticated user, e.g:</p>
+<pre><code class="language-csharp">public class QueryRockstarAudit : QueryDbTenant&lt;RockstarAuditTenant, Rockstar&gt;
+{
+    public int? Id { get; set; }
+}
+</code></pre>
+<p>To coincide with AutoCRUD there's also support for <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.Validate.cs">declarative validation</a> which thanks to <a href="https://sharpscript.net/">#Script</a> lets you define your Fluent Validation Rules by annotating your Request DTO properties. As it's essentially a different way to define Fluent Validation Rules, it still <a href="/validation#validation-feature">needs Validation enabled</a> to run:</p>
+<pre><code class="language-csharp">Plugins.Add(new ValidationFeature());
+</code></pre>
+<h3 id="automap-and-autodefault-attributes">AutoMap and AutoDefault Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#automap-and-autodefault-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>[AutoDefault]</code> attribute allows you to specify default values that the Data Model should be populated with using the same <code>#Script</code> expression support
+available in <code>[AutoPopulate]</code> to populate constant values, cached constant expressions or results of full evaluated expressions.</p>
+<p>The <code>[AutoMap]</code> attributes enables the flexibility of being able to maintain different external property names from their internal data models, but still
+be able to declaratively map them.</p>
+<p>Here's an example <code>ICreateDb&lt;T&gt;</code> AutoCrud Service that makes use of both these attributes to achieve its desired behavior:</p>
+<pre><code class="language-csharp">public class CreateRockstarAutoMapDefault : ICreateDb&lt;Rockstar&gt;, IReturn&lt;RockstarWithIdResponse&gt;
+{
+    [AutoMap(nameof(Rockstar.FirstName))]
+    public string MapFirstName { get; set; }
+
+    [AutoMap(nameof(Rockstar.LastName))]
+    public string MapLastName { get; set; }
+    
+    [AutoMap(nameof(Rockstar.Age))]
+    [AutoDefault(Value = 21)]
+    public int? MapAge { get; set; }
+    
+    [AutoMap(nameof(Rockstar.DateOfBirth))]
+    [AutoDefault(Expression = &quot;date(2001,1,1)&quot;)]
+    public DateTime MapDateOfBirth { get; set; }
+
+    [AutoMap(nameof(Rockstar.DateDied))]
+    [AutoDefault(Eval = &quot;utcNow&quot;)]
+    public DateTime? MapDateDied { get; set; }
+    
+    [AutoMap(nameof(Rockstar.LivingStatus))]
+    [AutoDefault(Value = LivingStatus.Dead)]
+    public LivingStatus? MapLivingStatus { get; set; }
+}
+</code></pre>
+<h3 id="autoignore-attributes">AutoIgnore Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoignore-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To send additional properties with your AutoQuery CRUD Request DTO which doesn't match the data model you can ignore the validation check
+by annotating properties with the <code>[AutoIgnore]</code> Attribute, e.g:</p>
+<pre><code class="language-csharp">public class CustomRockstarService : ICreateDb&lt;Rockstar&gt;, IReturn&lt;RockstarWithIdResponse&gt;
+{
+    public int Id { get; set; }
+    public int? Age { get; set; }
+    [AutoIgnore]
+    public CustomInfo CustomInfo { get;set; }
+}
+</code></pre>
+<p>Or you can ignore validation for all properties with the same name by registering it to <code>AutoQuery.IgnoreCrudProperties</code>, e.g:</p>
+<pre><code class="language-csharp">AutoQuery.IgnoreCrudProperties.Add(nameof(CustomInfo));
+</code></pre>
+<h3 id="apply-generic-crud-behaviors">Apply Generic CRUD Behaviors<a class="header-anchor" href="javascript:;" onclick="location.hash='#apply-generic-crud-behaviors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The AutoQuery Attributes are used to construct a metadata model of each operation used to enlist the desired functionality that each Service should have.
+This metadata model can also be programmatically constructed allowing you to codify conventions by grouping annotated attributes under a single <code>[AutoApply]</code>
+attribute resulting in the same behavior had the AutoQuery Request been annotated with the attributes directly, e.g:</p>
+<pre><code class="language-csharp">[AutoApply(Behavior.AuditQuery)]
+public class QueryBookings { ... } // Equivalent to:
+
+[AutoFilter(QueryTerm.Ensure, nameof(AuditBase.DeletedDate), Template = SqlTemplate.IsNull)]
+public class QueryBookings { ... }
+
+
+[AutoApply(Behavior.AuditCreate)]
+public class CreateBooking { ... } // Equivalent to:
+
+[AutoPopulate(nameof(AuditBase.CreatedDate),  Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(AuditBase.CreatedBy),    Eval = &quot;userAuthName&quot;)]
+[AutoPopulate(nameof(AuditBase.ModifiedDate), Eval = &quot;utcNow&quot;)]
+[AutoPopulate(nameof(AuditBase.ModifiedBy),   Eval = &quot;userAuthName&quot;)]
+public class CreateBooking { ... }
+</code></pre>
+<p>The <code>[AutoApply]</code> attribute is itself an inert marker for capturing what generic behavior you want applied to AutoQuery Services.
+All built-in behavior is declared on the <code>Behavior</code> static class:</p>
+<pre><code class="language-csharp">public static class Behavior
+{
+    // Auto Filter SoftDeleted Results
+    public const string AuditQuery = nameof(AuditQuery);
+    
+    // Auto Populate CreatedDate, CreatedBy, ModifiedDate &amp; ModifiedBy fields
+    public const string AuditCreate = nameof(AuditCreate);
+    
+    // Auto Populate ModifiedDate &amp; ModifiedBy fields
+    public const string AuditModify = nameof(AuditModify);
+    
+    // Auto Populate DeletedDate &amp; DeletedBy fields
+    public const string AuditDelete = nameof(AuditDelete);
+    
+    // Auto Populate DeletedDate &amp; DeletedBy fields and changes IDeleteDb operation to Update
+    public const string AuditSoftDelete = nameof(AuditSoftDelete);
+}
+</code></pre>
+<h4 id="auditautocrudmetadatafilter">AuditAutoCrudMetadataFilter<a class="header-anchor" href="javascript:;" onclick="location.hash='#auditautocrudmetadatafilter'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>This functionality is implemented by extending the metadata for AutoQuery CRUD Services with additional attributes in <code>AutoQueryFeature.AutoCrudMetadataFilters</code> delegate filters where they result in the same behavior as if the Request DTOs were annotated with attributes directly. E.g. Here's the built-in filter for implementing the above behaviors:</p>
+<pre><code class="language-csharp">public static void AuditAutoCrudMetadataFilter(AutoCrudMetadata meta)
+{
+    foreach (var applyAttr in meta.AutoApplyAttrs)
+    {
+        switch (applyAttr.Name)
+        {
+            case Behavior.AuditQuery:
+                meta.Add(new AutoFilterAttribute(
+                    QueryTerm.Ensure, nameof(AuditBase.DeletedDate), SqlTemplate.IsNull));
+                break;
+            case Behavior.AuditCreate:
+            case Behavior.AuditModify:
+                if (applyAttr.Name == Behavior.AuditCreate)
+                {
+                    meta.Add(new AutoPopulateAttribute(nameof(AuditBase.CreatedDate)) {
+                        Eval = &quot;utcNow&quot;
+                    });
+                    meta.Add(new AutoPopulateAttribute(nameof(AuditBase.CreatedBy)) {
+                        Eval = &quot;userAuthName&quot;
+                    });
+                }
+                meta.Add(new AutoPopulateAttribute(nameof(AuditBase.ModifiedDate)) {
+                    Eval = &quot;utcNow&quot;
+                });
+                meta.Add(new AutoPopulateAttribute(nameof(AuditBase.ModifiedBy)) {
+                    Eval = &quot;userAuthName&quot;
+                });
+                break;
+            case Behavior.AuditDelete:
+            case Behavior.AuditSoftDelete:
+                if (applyAttr.Name == Behavior.AuditSoftDelete)
+                    meta.SoftDelete = true;
+
+                meta.Add(new AutoPopulateAttribute(nameof(AuditBase.DeletedDate)) {
+                    Eval = &quot;utcNow&quot;
+                });
+                meta.Add(new AutoPopulateAttribute(nameof(AuditBase.DeletedBy)) {
+                    Eval = &quot;userAuthName&quot;
+                });
+                break;
+        }
+    }
+}
+</code></pre>
+<p>You can use this same functionality to describe your own custom generic functionality, e.g. Lets say you wanted to instead populate your base class with Audit Info containing different named properties with <strong>local</strong> <code>DateTime</code> and UserAuth <code>Id</code>. You can define your own Behavior name for this functionality:</p>
+<pre><code class="language-csharp">[AutoApply(&quot;MyUpdate&quot;)]
+public class UpdateBooking { ... }
+</code></pre>
+<p>and implement it with a custom <code>AutoCrudMetadataFilters</code> that populates the Audit <code>[AutoPopulate]</code> attributes on all Request DTOs marked with your Behavior name, e.g:</p>
+<pre><code class="language-csharp">void MyAuditFilter(AutoCrudMetadata meta)
+{
+    if (meta.HasAutoApply(&quot;MyUpdate&quot;))
+    {
+        meta.Add(new AutoPopulateAttribute(nameof(MyBase.MyModifiedDate)) {
+            Eval = &quot;now&quot;
+        });
+        meta.Add(new AutoPopulateAttribute(nameof(MyBase.MyModifiedBy)) {
+            Eval = &quot;userAuthId&quot;
+        });
+    }
+}
+
+Plugins.Add(new AutoQueryFeature {
+    AutoCrudMetadataFilters = { MyAuditFilter },
+});
+</code></pre>
+<h3 id="autoquery-crud-events">AutoQuery CRUD Events<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-events'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>AutoQuery includes <code>OnBefore*</code> and <code>OnAfter*</code> (sync &amp; async) events for <code>Create</code>, <code>Update</code>, <code>Patch</code> &amp; <code>Delete</code> that can be used to execute custom logic before or after each AutoQuery CRUD operation. E.g. if your system implements their own Audit history via RDBMS triggers, you can use the <code>OnBefore</code> <strong>Delete</strong> event to update the record with deleted info before the AutoQuery CRUD operation deletes it:</p>
+<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+    OnBeforeDeleteAsync = async ctx =&gt; {
+        if (ctx.Dto is DeleteBooking deleteBooking)
+        {
+            var session = await ctx.Request.GetSessionAsync();
+            await ctx.Db.UpdateOnlyAsync(() =&gt; new Booking {
+                DeletedBy = session.UserAuthName,
+                DeletedDate = DateTime.UtcNow,
+            }, where: x =&gt; x.Id == deleteBooking.Id);
+        }                
+    },
+});
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>AutoQuery generates <strong>async</strong> Services by default which will invoke the <code>*Async</code> events, but if you implement a <a href="/autoquery/crud#custom-autoquery-crud-services">sync Custom AutoQuery CRUD Service</a> it executes the <strong>sync</strong> events instead so you'd need to implement the <code>OnBeforeDelete</code> custom hook instead.</p>
+</div>
+<h3 id="custom-complex-mapping">Custom Complex Mapping<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-complex-mapping'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Another opportunity to apply more complex custom mapping logic before resorting to creating an actual Service implementation is to make use of
+ServiceStack's built-in <a href="/auto-mapping#intercept-automapping-conversions">Auto Mapping Populator API</a> to intercept an AutoMapping conversion
+between 2 types and apply custom logic after <code>ConvertTo&lt;T&gt;</code> or <code>PopulateWith&lt;T&gt;</code> APIs, e.g:</p>
+<pre><code class="language-csharp">AutoMapping.RegisterPopulator((Dictionary&lt;string,object&gt; target, CreateRockstar source) =&gt; 
+{
+    if (!IsAlive(source))
+    {
+        target[nameof(source.LivingStatus)] = LivingStatus.Dead;
+    }
+});
+</code></pre>
+<h3 id="auto-guids">Auto Guid's<a class="header-anchor" href="javascript:;" onclick="location.hash='#auto-guids'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In addition to supporting <code>[AutoIncrement]</code> to insert records with Auto Incrementing Ids, you can use <code>[AutoId]</code> to insert entities with
+<a href="/ormlite/reference-support#auto-populated-guid-ids">RDBMS generated UUIDs</a> where they're supported otherwise
+OrmLite populates them with <code>Guid.NewGuid()</code>.</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>usage of inheritance isn't required &amp; has the same behavior as using explicit properties</p>
+</div>
+<pre><code class="language-csharp">public abstract class RockstarBase
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int? Age { get; set; }
+    public DateTime DateOfBirth { get; set; }
+}
+
+public class Rockstar : RockstarBase
+{
+    [AutoId]
+    public Guid Id { get; set; }
+}
+
+public class CreateRockstarWithAutoGuid : RockstarBase, ICreateDb&lt;Rockstar&gt;, IReturn&lt;RockstarWithIdResponse&gt;
+{
+}
+</code></pre>
+<p>Or if you prefer for Id's to always be populated with <code>Guid.NewGuid()</code>, remove <code>[AutoId]</code> and populate it with <code>[AutoPopulate]</code> instead:</p>
+<pre><code class="language-csharp">[AutoPopulate(nameof(Rockstar.Id),  Eval = &quot;nguid&quot;)]
+public class CreateRockstarWithAutoGuid : RockstarBase, ICreateDb&lt;Rockstar&gt;, IReturn&lt;RockstarWithIdResponse&gt;
+{
+}
+</code></pre>
+<h3 id="optimistic-concurrency">Optimistic Concurrency<a class="header-anchor" href="javascript:;" onclick="location.hash='#optimistic-concurrency'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>We can declaratively add support for <a href="/ormlite/optimistic-concurrency">OrmLite's Optimistic Concurrency</a> by
+including <code>ulong RowVersion</code> property on Auto Crud Request/Response DTOs and Data Models, e.g:</p>
+<pre><code class="language-csharp">// Data Model
+public class RockstarVersion : RockstarBase
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+
+    public ulong RowVersion { get; set; }
+}
+
+public class CreateRockstarVersion : RockstarBase, ICreateDb&lt;RockstarVersion&gt;,
+    IReturn&lt;RockstarWithIdAndRowVersionResponse&gt; { }
+
+public class UpdateRockstarVersion : RockstarBase, IPatchDb&lt;RockstarVersion&gt;,
+    IReturn&lt;RockstarWithIdAndRowVersionResponse&gt;
+{
+    public int Id { get; set; }
+    public ulong RowVersion { get; set; }
+}
+
+// Response DTO
+public class RockstarWithIdAndRowVersionResponse
+{
+    public int Id { get; set; }
+    public ulong RowVersion { get; set; }
+    public ResponseStatus ResponseStatus { get; set; }
+}
+</code></pre>
+<p>AutoQuery will populate the <code>RowVersion</code> in Response DTOs which will need to be provided whenever making changes to that entity where it will fail to update the entity if no <code>RowVersion</code> was provided or has since been modified:</p>
+<pre><code class="language-csharp">var createResponse = client.Post(new CreateRockstarVersion {
+    FirstName = &quot;Original&quot;,
+    LastName = &quot;Version&quot;,
+    Age = 20,
+    DateOfBirth = new DateTime(2001,7,1),
+    LivingStatus = LivingStatus.Dead,
+});
+
+// throws OptimisticConcurrencyException: No RowVersion provided
+client.Patch(new UpdateRockstarVersion {
+    Id = createResponse.Id, 
+    LastName = &quot;UpdatedVersion&quot;,
+});
+
+// succeeds if &quot;Original Version&quot; wasn't modified otherwise throws OptimisticConcurrencyException 
+var response = client.Patch(new UpdateRockstarVersion {
+    Id = createResponse.Id, 
+    LastName = &quot;UpdatedVersion&quot;,
+    RowVersion = createResponse.RowVersion,
+});
+</code></pre>
+<h3 id="mq-autoquery-crud-requests">MQ AutoQuery CRUD Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-autoquery-crud-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As AutoQuery CRUD Services are just ServiceStack Services they can partake in its ecosystem of features like being able to
+<a href="/messaging">invoke Services via MQ</a>, although there's some extra consideration needed to account for the differences between HTTP and MQ Requests.
+First whatever filters you've added to populate the <code>IRequest.Items</code> like tenant Id you'll also need to register in <code>GlobalMessageRequestFilters</code>
+so they're executed for MQ Requests as well:</p>
+<pre><code class="language-csharp">GlobalRequestFilters.Add(SetTenant);        // HTTP Requests
+GlobalMessageRequestFilters.Add(SetTenant); // MQ Requests
+</code></pre>
+<p>Secondly Auth Information is typically sent in the HTTP Request Headers, but they need to be included in the Request DTO to send Authenticated
+MQ Requests, which can either implement <code>IHasSessionId</code> for normal <a href="/auth/authentication-and-authorization#session-authentication-overview">Session Auth Providers</a>, e.g:</p>
+<pre><code class="language-csharp">public class CreateRockstarAuditTenant 
+  : CreateAuditTenantBase&lt;RockstarAuditTenant, RockstarWithIdAndResultResponse&gt;, IHasSessionId
+{
+    public string SessionId { get; set; } //Authenticate MQ Requests
+    //...
+}
+</code></pre>
+<p>Alternatively they can implement <code>IHasBearerToken</code> for <a href="/auth/authentication-and-authorization#authentication-per-request-auth-providers">stateless Bearer Token</a>
+Auth providers like JWT or API Keys.</p>
+<p>If you're publishing an MQ Request inside a HTTP Service you can use the <code>PopulateRequestDtoIfAuthenticated</code> extension method which populates the Request
+DTO from the Authenticated HTTP Request, e.g:</p>
+<pre><code class="language-csharp">public class AutoCrudMqServices : Service
+{        
+    public void Any(CreateRockstarAuditTenantMq request)
+    {
+        var mqRequest = request.ConvertTo&lt;CreateRockstarAuditTenant&gt;();
+        Request.PopulateRequestDtoIfAuthenticated(mqRequest);
+        PublishMessage(mqRequest);
+    }
+}
+</code></pre>
+<p>In this case if using <a href="/background-mq">Background MQ</a>, it will execute the <code>CreateRockstarAuditTenant</code> request in a background thread, populating the MQ Request Context with the session identified by the <code>IRequest.GetSessionId()</code>.</p>
+<h4 id="publishing-requests-to-oneway-endpoint">Publishing Requests to OneWay Endpoint<a class="header-anchor" href="javascript:;" onclick="location.hash='#publishing-requests-to-oneway-endpoint'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>You can also send MQ requests directly by <a href="/messaging#oneway-http-requests-are-published-to-mq-then-executed">publishing to the OneWay HTTP endpoint</a>, which if your AppHost is registered with an MQ Server, it will publish the message to the MQ and auto populate Request DTOs that implements <code>IHasSessionId</code> or <code>IHasBearerToken</code>, either if implicitly sent from an Authenticated client:</p>
+<pre><code class="language-csharp">var authResponse = authClient.Post(new Authenticate {
+    provider = &quot;credentials&quot;,
+    UserName = &quot;admin@email.com&quot;,
+    Password = &quot;p@55wOrd&quot;,
+    RememberMe = true,
+});
+
+authClient.SendOneWay(new CreateRockstarAuditTenant {
+    FirstName = nameof(CreateRockstarAuditTenant),
+    LastName = &quot;SessionId&quot;,
+    Age = 20,
+    DateOfBirth = new DateTime(2002,2,2),
+});
+</code></pre>
+<p>Or from an anonymous client with the explicit <code>BearerToken</code> or <code>SessionId</code> properties populated, e.g:</p>
+<pre><code class="language-csharp">client.SendOneWay(new CreateRockstarAuditMqToken {
+    BearerToken = JwtUserToken,
+    FirstName = nameof(CreateRockstarAuditMqToken),
+    LastName = &quot;JWT&quot;,
+    Age = 20,
+    DateOfBirth = new DateTime(2002,2,2),
+});
+</code></pre>
+<p>To save populating the <code>BearerToken</code> in each request, you can set it once on the Service Client which will automatically populate it on Request DTOs:</p>
+<pre><code class="language-csharp">client.BearerToken = jwtUserToken;
+</code></pre>
+<h2 id="autoquery-crud-features">AutoQuery CRUD Features<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-features'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Building upon AutoQuery is a number of other features that increase the capabilities of AutoQuery Services &amp; provide instant utility, including:</p>
+<ul>
+<li><a href="/declarative-validation">Declarative Validation</a></li>
+<li><a href="/autoquery/audit-log">Executable Audit Log</a></li>
+<li><a href="/autoquery/autogen">Instantly Servicify with AutoGen</a></li>
+</ul>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/autoquery/dynamodb" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                AutoQuery Data DynamoDB
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/autoquery/audit-log" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                AutoQuery Audit Log
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#rapidly-develop-data-driven-systems'" data-id="rapidly-develop-data-driven-systems" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Rapidly develop data-driven systems
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#creating-autoquery-crud-services'" data-id="creating-autoquery-crud-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Creating AutoQuery CRUD Services
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-autoquery-crud-implementation'" data-id="custom-autoquery-crud-implementation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom AutoQuery CRUD Implementation
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="custom-implementations-using-ormlite-typed-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#custom-implementations-using-ormlite-typed-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Custom implementations using OrmLite Typed APIs
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#autoquery-crud-attributes'" data-id="autoquery-crud-attributes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            AutoQuery CRUD Attributes
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="advanced-crud-example" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#advanced-crud-example'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Advanced CRUD Example
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autopopulate" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autopopulate'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoPopulate
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="multi-rdbms-services" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#multi-rdbms-services'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Multi RDBMS Services
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autofilter" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autofilter'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoFilter
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="automap-and-autodefault-attributes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#automap-and-autodefault-attributes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoMap and AutoDefault Attributes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autoignore-attributes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoignore-attributes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoIgnore Attributes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="apply-generic-crud-behaviors" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#apply-generic-crud-behaviors'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Apply Generic CRUD Behaviors
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autoquery-crud-events" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-crud-events'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery CRUD Events
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="custom-complex-mapping" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#custom-complex-mapping'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Custom Complex Mapping
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="auto-guids" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#auto-guids'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Auto Guid&#x27;s
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="optimistic-concurrency" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#optimistic-concurrency'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Optimistic Concurrency
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="mq-autoquery-crud-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#mq-autoquery-crud-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            MQ AutoQuery CRUD Requests
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#autoquery-crud-features'" data-id="autoquery-crud-features" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            AutoQuery CRUD Features
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

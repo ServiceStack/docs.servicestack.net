@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>AutoQuery DynamoDB Data Source</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/autoquery/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+AutoQuery                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/autoquery/rdbms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery RDBMS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/data" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/memory" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Memory
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/service" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Service
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/dynamodb" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        AutoQuery Data DynamoDB
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery CRUD
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/audit-log" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Audit Log
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/autogen" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/bookings-crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery CRUD Bookings Demo
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/why-not-odata" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Why Not OData
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            AutoQuery DynamoDB Data Source
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>AutoQuery Data's <code>DynamoDbSource</code> provides the most productive development experience for effortlessly creating rich, queryable and optimized Services for <a href="https://aws.amazon.com/dynamodb/">DynamoDB data stores</a>.</p>
+<p><a href="/aws-pocodynamo"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/dynamodb-banner.png" alt="" /></a></p>
+<p>DynamoDB is the near perfect solution if you're on AWS and in need of a managed NoSQL data storage solution
+that can achieve near-infinite scale whilst maintaining constant single-digit millisecond performance.
+The primary issue with DynamoDB however is working with it's unstructured schema and API's which is reflected
+in the official .NET DynamoDB client providing a flexible but low-level and cumbersome development experience
+to work with directly. Most of these shortcomings are resolved with our POCO-friendly
+<a href="/aws-pocodynamo">PocoDynamo</a> client which provides an intuitive and idiomatic
+Typed .NET API that lets you reuse your DTO's and OrmLite POCO Data Models for persistence in DynamoDB.</p>
+<p>Querying in DynamoDB is even more cumbersome, unlike an RDBMS which can process ad hoc queries on non-indexed
+fields with decent performance, every query in DynamoDB needs to be performed on an index defined ahead-of-time.
+Any queries not on an index needs to be sent as a Filter Expression and even more limiting is that queries
+can only be executed against rows containing the same hash id. If you need to query data spanning across
+multiple hash ids you either need to create a separate
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html">Global Index</a>
+or perform a full
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#QueryAndScan.Scan">SCAN operation</a>
+which is even slower than full table scans on an RDBMS as they need to be performed on all underlying sharded
+nodes which can quickly eat up your reserved provisioned throughput allotted to your DynamoDB table.</p>
+<h2 id="optimal-dynamodb-queries">Optimal DynamoDB Queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#optimal-dynamodb-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>With AutoQuery's <code>DynamoDbSource</code> a lot of these nuances are transparently handled where it will automatically
+create the most optimal DynamoDB Query based on the fields populated on the incoming AutoQuery Request DTO.
+E.g. it will perform a
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#QueryAndScan.Query">DynamoDB Query</a>
+when the <strong>Hash</strong> field is populated otherwise transparently falls back into a
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#QueryAndScan.Scan">Scan Operation</a>.
+Any conditions that query an Index field are added to the
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#QueryAndScan.Query">Key Condition</a>,
+starting first with the <strong>Range Key</strong> (if specified), otherwise uses any populated <strong>Local Indexes</strong> it can
+find before any of the remaining conditions are added to the
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#FilteringResults">Filter Expression</a>.</p>
+<p>Transparently adopting the most optimal queries dramatically reduces development time as it lets you quickly
+create, change and delete DynamoDB Services without regard for Indexes where it will often fallback to
+<strong>SCAN</strong> operations (performance of which is unnoticeable during development). Then once you're project is
+ready to deploy to production, go back and analyze all remaining queries your System relies on at the end
+then re-create tables with the appropriate indexes so that all App queries are efficiently querying an index.</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>When needed you can specify <code>.DynamoDbSource&lt;T&gt;(allowScans:false)</code> to disable anyone from executing SCAN
+requests when deployed to production</p>
+</div>
+<h2 id="download">Download<a class="header-anchor" href="javascript:;" onclick="location.hash='#download'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To Get Started Install <a href="https://github.com/ServiceStack/ServiceStack.Aws">ServiceStack's AWS Support package</a> from NuGet:</p>
+<div class="not-prose nuget-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-700">
+                    <div class="pl-4 py-1 pb-1.5 align-middle text-lg text-white"><p><code>&lt;PackageReference Include=&quot;ServiceStack.Aws&quot; Version=&quot;6.*&quot; /&gt;</code></p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-sky-500 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h2 id="simple-autoquery-data-example">Simple AutoQuery Data Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-autoquery-data-example'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To illustrate how to use AutoQuery with DynamoDB we'll walk through a simple example of querying Rockstars Albums.
+For this example we'll specify
+<a href="/autoquery#explicit-conventions">explicit conventions</a>
+so we can use ServiceStack's
+<a href="/csharp-client">typed .NET Service Clients</a>
+to show which fields we're going to query and also lets us call the Service with a convenient typed API:</p>
+<pre><code class="language-csharp">[Route(&quot;/rockstar-albums&quot;)]
+public class QueryRockstarAlbums : QueryData&lt;RockstarAlbum&gt;
+{
+    public int? Id { get; set; }         // Primary Key | Range Key
+    public int? RockstarId { get; set; } // Foreign key | Hash Key
+    public string Name { get; set; }
+    public string Genre { get; set; }
+    public int[] IdBetween { get; set; }
+}
+</code></pre>
+<p>Here we see that creating DynamoDB Queries is no different to any other AutoQuery Data Service, where the
+same definition is used irrespective if the data source was populated from a <code>MemorySource</code>, <code>ServiceSource</code>
+or <code>DynamoDbSource</code> and the only thing that would need to change to have it query an RDBMS instead is the
+<code>QueryDb&lt;T&gt;</code> base class.</p>
+<p>The text in comments highlight that when the <code>RockstarAlbum</code> POCO is stored in an RDBMS
+<a href="https://github.com/ServiceStack/ServiceStack.OrmLite">OrmLite</a>
+creates the table with the <code>Id</code> as the Primary Key and <code>RockstarId</code> as a Foreign Key to the <code>Rockstar</code> table.
+This is different in DynamoDB where
+<a href="/aws-pocodynamo">PocoDynamo</a> behavior is to keep related records together so
+they can be efficiently queried and will instead Create the <code>RockstarAlbum</code> DynamoDB Table with the
+<code>RockstarId</code> as the Hash Key and its unique <code>Id</code> as the Range Key.</p>
+<h3 id="register-dynamodbsource">Register DynamoDbSource<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-dynamodbsource'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To use DynamoDB AutoQuery's you need to first configure
+<a href="/aws-pocodynamo#download">PocoDynamo</a>
+which is just a matter of passing an an initialized <code>AmazonDynamoDBClient</code> and telling PocoDynamo which
+DynamoDB tables you intend to use:</p>
+<pre><code class="language-csharp">container.Register(c =&gt; new PocoDynamo(new AmazonDynamoDBClient(...))
+    .RegisterTable&lt;Rockstar&gt;()
+    .RegisterTable&lt;RockstarAlbum&gt;()
+);
+</code></pre>
+<p>Then before using PocoDynamo, call <code>InitSchema()</code> to tell it to automatically go through and create all
+DynamoDB Tables that were registered but don't yet exist in DynamoDB:</p>
+<pre><code class="language-csharp">var dynamo = container.Resolve&lt;IPocoDynamo&gt;();
+dynamo.InitSchema();
+</code></pre>
+<p>So the first time <code>InitSchema()</code> is run it will create both <code>Rockstar</code> and <code>RockstarAlbum</code> tables but will
+no longer create any tables on any subsequent runs. After <code>InitSchema()</code> has completed we're assured that
+both <code>Rockstar</code> and <code>RockstarAlbum</code> tables exist so we can start using PocoDynamo's typed APIs to populate
+them with Data:</p>
+<pre><code class="language-csharp">dynamo.PutItems(new Rockstar[] { ... });
+dynamo.PutItems(new RockstarAlbum[] { ... });
+</code></pre>
+<blockquote>
+<p>Behind the scenes PocoDynamo efficiently creates the minimum number of
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html">BatchWriteItem</a>
+requests as necessary to store all Rockstar and RockstarAlbum's.</p>
+</blockquote>
+<p>Now that we have data we can query we can register the AutoQuery Data plugin along with the <code>Rockstar</code>
+and <code>RockstarAlbum</code> DynamoDB Tables we want to be able to query:</p>
+<pre><code class="language-csharp">Plugins.Add(new AutoQueryDataFeature { MaxLimit = 100 }
+    .AddDataSource(ctx =&gt; ctx.DynamoDbSource&lt;Rockstar&gt;())
+    .AddDataSource(ctx =&gt; ctx.DynamoDbSource&lt;RockstarAlbum&gt;())
+);
+</code></pre>
+<h3 id="rockstaralbum-poco-table-definition">RockstarAlbum POCO Table Definition<a class="header-anchor" href="javascript:;" onclick="location.hash='#rockstaralbum-poco-table-definition'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Where <code>RockstarAlbum</code> is just a simple POCO and can be used as-is throughout all of ServiceStack's libraries
+inc. OrmLite, Redis, Caching Providers, Serializers, etc:</p>
+<pre><code class="language-csharp">public class RockstarAlbum
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+
+    [References(typeof(Rockstar))]
+    public int RockstarId { get; set; }
+
+    [Index]
+    public string Genre { get; set; }
+
+    public string Name { get; set; }
+}
+</code></pre>
+<p>PocoDynamo uses the same generic metadata attributes in <strong>ServiceStack.Interfaces</strong> as OrmLite.</p>
+<p>When this POCO is created in OrmLite it creates:</p>
+<ul>
+<li>A <code>RockstarAlbum</code> table with an <code>Id</code> auto incrementing <strong>Primary Key</strong></li>
+<li>The <code>RockstarId</code> as the <strong>Foreign Key</strong> for the <code>Rockstar</code> table</li>
+<li>Adds an <strong>Index</strong> on the <code>Genre</code> column.</li>
+</ul>
+<p>Whereas in DynamoDB, PocoDynamo creates:</p>
+<ul>
+<li>The <code>RockstarAlbum</code> table with the <code>Id</code> as an auto incrementing <strong>Range Key</strong></li>
+<li>The <code>RockstarId</code> as the <strong>Hash Key</strong></li>
+<li>Creates a <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html">Local Secondary Index</a> for the Genre attribute.</li>
+</ul>
+<h2 id="typed-autoquery-dynamodb-queries">Typed AutoQuery DynamoDB Queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#typed-autoquery-dynamodb-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Since the properties we want to query are explicitly typed we can make use of ServiceStack's nice typed
+Service Client API's to call this Service and fetch Kurt Cobains <strong>Grunge</strong> Albums out of the first 5 recorded:</p>
+<pre><code class="language-csharp">var response = client.Get(new QueryRockstarAlbums { //QUERY 
+    RockstarId = kurtCobainId, //Key Condition
+    IdBetween = new[]{ 1, 5 }, //Key Condition
+    Genre = &quot;Grunge&quot;,          //Filter Condition
+});
+
+response.PrintDump(); // Pretty print results to Console
+</code></pre>
+<p>As illustrated in the comments, DynamoDB AutoQuery performs the most efficient DynamoDB Query required in
+order to satisfy this request where it will create a
+<a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/QueryAndScan.html#QueryAndScan.Query">Query Request</a>
+with the <code>RockstarId</code> and <code>IdBetween</code> conditions added to the <strong>Key Condition</strong> and the remaining <code>Genre</code>
+added as a <strong>Filter Expression</strong>.</p>
+<p>If we instead wanted to fetch all of Kurt Cobains <strong>Grunge</strong> Albums where there was no longer a condition on
+the Album <code>Id</code> <strong>Range Key</strong>, i.e:</p>
+<pre><code class="language-csharp">var response = client.Get(new QueryRockstarAlbums { //QUERY
+    RockstarId = kurtCobainId, //Key Condition
+    Genre = &quot;Grunge&quot;,          //Key Condition
+});
+</code></pre>
+<p>It would instead create a <strong>Query Request</strong> configured to use the Genre <strong>Local Secondary Index</strong> and have
+added both <code>RockstarId</code> Hash Key and index <code>Genre</code> to the <strong>Key Condition</strong>.</p>
+<p>But if you instead wanted to view all Grunge Albums, i.e:</p>
+<pre><code class="language-csharp">var response = client.Get(new QueryRockstarAlbums { //SCAN
+    Genre = &quot;Grunge&quot;            //Filter Condition
+});
+</code></pre>
+<p>As no Hash Key was specified it would instead create a <strong>SCAN Request</strong> where as there's no index, it adds
+all conditions to the <strong>Filter Expression</strong>.</p>
+<h2 id="autoquery-dynamodb-global-index-queries">AutoQuery DynamoDB Global Index Queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-dynamodb-global-index-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For times when you need to perform an efficient <strong>Query Request</strong> across multiple hash keys you will need to
+create a <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html">Global Secondary Index</a>.
+Luckily this is easy to do in PocoDynamo where you can define Global Indexes with a simple POCO class definition:</p>
+<pre><code class="language-csharp">public class RockstarAlbumGenreIndex : IGlobalIndex&lt;RockstarAlbum&gt;
+{
+    [HashKey]
+    public string Genre { get; set; }
+
+    [RangeKey]
+    public int Id { get; set; }
+
+    public string Name { get; set; }    // projected property
+    public int RockstarId { get; set; } // projected property
+}
+</code></pre>
+<p>Global Indexes can be thought of as &quot;automatically synced tables&quot; specified with a different Hash Key.
+Just like DynamoDB tables you can specify the <strong>Hash Key</strong> you want to globally query and create the Index
+on as well as a separate <strong>Range Key</strong> you want to be able to perform efficient <strong>Key Condition</strong> queries on.
+You'll also want to specify any properties you want returned when querying the Global Index so they'll be
+automatically projected and stored with the Global Index, ensuring fast access.</p>
+<p>Then to have PocoDynamo create the Global Index it should be referenced on the table the Global Index is on:</p>
+<pre><code class="language-csharp">[References(typeof(RockstarAlbumGenreIndex))]
+public class RockstarAlbum { ... }
+</code></pre>
+<p>When referenced, <code>InitSchema()</code> will create the <code>RockstarAlbumGenreIndex</code> Global Secondary Index when it
+creates the <code>RockstarAlbum</code> DynamoDB Table.</p>
+<p>With the Global Index created we can now query it just like we would any other DynamoDB AutoQuery but instead
+of querying a table, we query the Index instead:</p>
+<pre><code class="language-csharp">public class QueryRockstarAlbumsGenreIndex : QueryData&lt;RockstarAlbumGenreIndex&gt;
+{
+    public string Genre { get; set; }     // Hash Key
+    public int[] IdBetween { get; set; }  // Range Key
+    public string Name { get; set; }
+}
+</code></pre>
+<p>Once defined you can query it just like any other AutoQuery Service where you're now able to perform
+efficient queries by <strong>Genre</strong> across all Rockstar Album's:</p>
+<pre><code class="language-csharp">var response = client.Get(new QueryRockstarAlbumsGenreIndex //QUERY
+{
+    Genre = &quot;Grunge&quot;,              //Key Condition
+    IdBetween = new[] { 1, 1000 }, //Key Condition
+});
+</code></pre>
+<h2 id="custom-poco-result-mappings">Custom POCO Result Mappings<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-poco-result-mappings'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>A noticeable difference from querying a Global Index instead of the Table directly is that results are
+returned in a different <code>RockstarAlbumGenreIndex</code> POCO. Luckily we can use AutoQuery's
+<a href="/autoquery#returning-custom-results">Custom Results Feature</a>
+to map the properties back into the original table <code>RockstarAlbum</code> with:</p>
+<pre><code class="language-csharp">public class QueryRockstarAlbumsGenreIndex : QueryData&lt;RockstarAlbumGenreIndex,RockstarAlbum&gt; 
+{ 
+    public string Genre { get; set; }
+    public int[] IdBetween { get; set; }
+    public string Name { get; set; }
+}
+</code></pre>
+<p>Now when we query the Index we get our results populated in <code>RockstarAlbum</code> DTO's instead:</p>
+<pre><code class="language-csharp">QueryResponse&lt;RockstarAlbum&gt; response = client.Get(new QueryRockstarAlbumsGenreIndex
+{
+    Genre = &quot;Grunge&quot;,              //Key Condition
+    IdBetween = new[] { 1, 1000 }, //Key Condition
+});
+</code></pre>
+<h2 id="caching-autoquery-services">Caching AutoQuery Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#caching-autoquery-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>One of the many benefits of AutoQuery Services being just regular ServiceStack Services is that we get
+access to ServiceStack's rich ecosystem of enhanced functionality around existing Services. An example added
+in this release is ServiceStack's new HTTP Caching feature which lets you easily cache a Service with
+the new <code>[CacheResponse]</code> attribute, letting you declaratively specify how long you want to cache identical
+requests for on the <strong>Server</strong> as well as a <code>MaxAge</code> option for instructing the <strong>Client</strong> how long they should
+consider their local cache is valid for and any custom <code>Cache-Control</code> behavior you want them to have, e.g:</p>
+<pre><code class="language-csharp">[Route(&quot;/rockstar-albums&quot;)]
+[CacheResponse(Duration = 60, MaxAge = 30, CacheControl = CacheControl.MustRevalidate)]
+public class QueryRockstarAlbums : QueryData&lt;RockstarAlbum&gt;
+{
+    public int? Id { get; set; }         
+    public int? RockstarId { get; set; }
+    public string Genre { get; set; }
+    public int[] IdBetween { get; set; }
+}
+</code></pre>
+<p>So with just the above single Request DTO we've declaratively created a fully-queryable DynamoDB AutoQuery
+Service that transparently executes the most ideal DynamoDB queries for each request, has it's optimal
+representation efficiently cached on both Server and clients, whose Typed DTO can be reused as-is on the
+client to call Services with an end-to-end Typed API using any
+<a href="/csharp-client">.NET Service Client</a>,
+that's also available to external developers in a clean typed API, natively in their preferred language of
+choice, accessible with just a right-click menu integrated inside VS.NET, Xcode, Android Studio, IntelliJ
+and Eclipse - serving both PCL Xamarin.iOS/Android as well as native iOS and Android developers by just<br />
+<a href="/add-servicestack-reference">Adding a ServiceStack Reference</a>
+to the base URL of a remote ServiceStack Instance - all without needing to write any implementation!</p>
+<h2 id="more-info">More Info<a class="header-anchor" href="javascript:;" onclick="location.hash='#more-info'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For more examples exploring different AutoQuery Data features checkout the
+<a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryDataTests.cs">AutoQuery Data Tests</a>
+and <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryDataTests.Dynamo.cs">AutoQuery DynamoDB Tests</a>
+that can be compared on a feature-by-feature basis against the existing
+<a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryTests.cs">AutoQuery Tests</a>
+they were originally based on.</p>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/autoquery/service" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                AutoQuery Data Service
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/autoquery/crud" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                AutoQuery CRUD
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#optimal-dynamodb-queries'" data-id="optimal-dynamodb-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Optimal DynamoDB Queries
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#download'" data-id="download" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Download
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-autoquery-data-example'" data-id="simple-autoquery-data-example" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple AutoQuery Data Example
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="register-dynamodbsource" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#register-dynamodbsource'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Register DynamoDbSource
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="rockstaralbum-poco-table-definition" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#rockstaralbum-poco-table-definition'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            RockstarAlbum POCO Table Definition
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#typed-autoquery-dynamodb-queries'" data-id="typed-autoquery-dynamodb-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Typed AutoQuery DynamoDB Queries
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#autoquery-dynamodb-global-index-queries'" data-id="autoquery-dynamodb-global-index-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            AutoQuery DynamoDB Global Index Queries
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-poco-result-mappings'" data-id="custom-poco-result-mappings" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom POCO Result Mappings
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#caching-autoquery-services'" data-id="caching-autoquery-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Caching AutoQuery Services
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#more-info'" data-id="more-info" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            More Info
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Using ASP.NET Identity Auth in ServiceStack</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/auth/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Security                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auth/authentication-and-authorization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Authentication &amp; Authorization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/auth-repository" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auth Repository
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ServiceStack Auth in MVC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-aspnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Using ASP.NET Identity Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identityserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using IdentityServer4 Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/sessions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sessions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/jwt-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JWT AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/api-key-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Key AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/signin-with-apple" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sign in with Apple AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/restricting-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Restricting Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Encrypted Messaging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/anti-forgery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Anti Forgery
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Using ASP.NET Identity Auth in ServiceStack
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p><a href="https://github.com/NetCoreTemplates/mvcidentity">mvcidentity</a> is a .NET 6.0 MVC Website integrated with ServiceStack using ASP.NET Identity Auth:</p>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentity"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentity.png" alt="" /></a></p>
+<p>Create new <code>mvcidentity</code> project with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x new mvcidentity ProjectName</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p><a href="https://github.com/NetCoreTemplates/mvcidentity">mvcidentity</a> is essentially the same App with the same functionality as <a href="https://github.com/NetCoreTemplates/mvcauth">mvcauth</a>
+but rewritten to use ASP.NET Identity Auth instead of ServiceStack Auth, including the registration options which are handled implemented
+using MVC Controllers instead of ServiceStack's built-in Services:</p>
+<p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentity-login.png" alt="" /></p>
+<p><code>mvcidentity</code> defaults to using EF and SQL Server which we expect to be the most popular configuration:</p>
+<pre><code class="language-csharp">services.AddDbContext&lt;ApplicationDbContext&gt;(options =&gt;
+    options.UseSqlServer(Configuration.GetConnectionString(&quot;DefaultConnection&quot;)));
+
+services.AddIdentity&lt;ApplicationUser, IdentityRole&gt;(options =&gt; {
+        options.User.AllowedUserNameCharacters = null;
+    })
+    .AddEntityFrameworkStores&lt;ApplicationDbContext&gt;()
+    .AddDefaultTokenProviders();
+</code></pre>
+<p>The rest of <a href="https://github.com/NetCoreTemplates/mvcidentity/blob/master/MyApp/Startup.cs">Startup.cs</a> contains the
+standard setup for configuring ASP.NET Identity Auth with the same Twitter, Facebook, Google and Microsoft OAuth Providers.</p>
+<p>A custom <a href="https://github.com/NetCoreTemplates/mvcidentity/blob/master/MyApp/Models/ApplicationUser.cs">ApplicationUser</a>
+EF DataModel is used to better prepare for real world usage to show how to propagate custom User metadata<br />
+down into Authenticated UserSessions. <code>mvcidentity</code> starts with an extended <code>ApplicationUser</code> that captures basic info about
+the user and capture external references to any 3rd Party OAuth providers that Users have signed in with:</p>
+<pre><code class="language-csharp">public class ApplicationUser : IdentityUser
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string DisplayName { get; set; }
+
+    public string TwitterUserId { get; set; }
+    public string TwitterScreenName { get; set; }
+
+    public string FacebookUserId { get; set; }
+
+    public string GoogleUserId { get; set; }
+
+    public string GoogleProfilePageUrl { get; set; }
+
+    public string MicrosoftUserId { get; set; }
+    
+    public string ProfileUrl { get; set; }
+}
+</code></pre>
+<h2 id="mapping-customizations">Mapping Customizations<a class="header-anchor" href="javascript:;" onclick="location.hash='#mapping-customizations'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>By default the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/NetCoreIdentityAuthProvider.cs">NetCoreIdentityAuthProvider.cs</a>
+uses the <code>MapClaimsToSession</code> dictionary to map well known <code>ClaimTypes</code> Properties to their natural <code>AuthUserSession</code> property:</p>
+<pre><code class="language-csharp">public Dictionary&lt;string, string&gt; MapClaimsToSession { get; set; } = new Dictionary&lt;string, string&gt; {
+    [ClaimTypes.Email] = nameof(AuthUserSession.Email),
+    [ClaimTypes.Name] = nameof(AuthUserSession.UserAuthName),
+    [ClaimTypes.GivenName] = nameof(AuthUserSession.FirstName),
+    [ClaimTypes.Surname] = nameof(AuthUserSession.LastName),
+    [ClaimTypes.StreetAddress] = nameof(AuthUserSession.Address),
+    [ClaimTypes.Locality] = nameof(AuthUserSession.City),
+    [ClaimTypes.StateOrProvince] = nameof(AuthUserSession.State),
+    [ClaimTypes.PostalCode] = nameof(AuthUserSession.PostalCode),
+    [ClaimTypes.Country] = nameof(AuthUserSession.Country),
+    [ClaimTypes.OtherPhone] = nameof(AuthUserSession.PhoneNumber),
+    [ClaimTypes.DateOfBirth] = nameof(AuthUserSession.BirthDateRaw),
+    [ClaimTypes.Gender] = nameof(AuthUserSession.Gender),
+    [ClaimTypes.Dns] = nameof(AuthUserSession.Dns),
+    [ClaimTypes.Rsa] = nameof(AuthUserSession.Rsa),
+    [ClaimTypes.Sid] = nameof(AuthUserSession.Sid),
+    [ClaimTypes.Hash] = nameof(AuthUserSession.Hash),
+    [ClaimTypes.HomePhone] = nameof(AuthUserSession.HomePhone),
+    [ClaimTypes.MobilePhone] = nameof(AuthUserSession.MobilePhone),
+    [ClaimTypes.Webpage] = nameof(AuthUserSession.Webpage),
+};
+</code></pre>
+<p>Which you can also extend or modify to handle any additional straightforward <strong>1:1 mappings</strong>.</p>
+<h2 id="custom-mappings">Custom Mappings<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-mappings'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Alternatively you can use <code>PopulateSessionFilter</code> to apply additional logic when creating a <code>UserSession</code> from a <code>ClaimsPrincipal</code>
+which is what's needed to copy over <strong>EF Identity Roles</strong> when using EF Identity Auth with ServiceStack.</p>
+<p>As <code>mvcidentity</code> doesn't have a dependency on OrmLite you could choose to populate roles using EF's APIs directly:</p>
+<pre><code class="language-csharp">new NetCoreIdentityAuthProvider(AppSettings) 
+{
+    PopulateSessionFilter = (session, principal, req) =&gt; 
+    {
+        var userManager = req.TryResolve&lt;UserManager&lt;ApplicationUser&gt;&gt;();
+        var user = userManager.FindByIdAsync(session.Id).Result;
+        var roles = userManager.GetRolesAsync(user).Result;        
+    }
+},
+</code></pre>
+<p>Whilst this works it uses &quot;sync over async&quot; which is
+<a href="https://github.com/davidfowl/AspNetCoreDiagnosticScenarios/blob/master/AsyncGuidance.md">discouraged and problematic in many use-cases</a>,
+less efficient than just sync and UserManager's limited API available forces multiple DB calls and more data over the wire than just the role names needed.</p>
+<h2 id="built-in-identity-db-apis">Built-in Identity DB APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-identity-db-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Instead we recommend instead using the more optimal <code>IDbConnection.GetIdentityUserRolesById()</code> API which returns just the role names in
+a single indexed DB query.</p>
+<p>If you're not using OrmLite you can utilize EF's configured <strong>DB Connection</strong> by adding this extension method to your host project:</p>
+<pre><code class="language-csharp">public static class AppExtensions
+{
+    public static T DbExec&lt;T&gt;(this IServiceProvider services, Func&lt;IDbConnection, T&gt; fn) =&gt; services
+        .DbContextExec&lt;ApplicationDbContext,T&gt;(x =&gt; { 
+            x.Database.OpenConnection(); return x.Database.GetDbConnection(); }, fn);
+}
+</code></pre>
+<h2 id="asp.net-core-identity-auth-adapter">ASP.NET Core Identity Auth Adapter<a class="header-anchor" href="javascript:;" onclick="location.hash='#asp.net-core-identity-auth-adapter'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Where you'll able to use it to perform adhoc DB queries, in this case calling <code>GetIdentityUserRolesById()</code> to populate the Users roles:</p>
+<pre><code class="language-csharp">new NetCoreIdentityAuthProvider(AppSettings) 
+{
+    PopulateSessionFilter = (session, principal, req) =&gt; {
+        session.Roles = ApplicationServices.DbExec(db =&gt; db.GetIdentityUserRolesById(session.Id));
+    }
+}
+</code></pre>
+<p>This gets called whenever <strong>ServiceStack receives an Authenticated Request</strong> which you can intercept and customize how <code>ClaimsPrincipal</code>
+are mapped to ServiceStack User Sessions.</p>
+<p>To improve performance and save the DB hit, we recommend caching the User Roles into an In Memory Cache:</p>
+<pre><code class="language-csharp">new NetCoreIdentityAuthProvider(AppSettings) 
+{
+    PopulateSessionFilter = (session, principal, req) =&gt; {
+        session.Roles = req.GetMemoryCacheClient().GetOrCreate(
+            IdUtils.CreateUrn(nameof(session.Roles), session.Id),
+            TimeSpan.FromMinutes(5),
+            () =&gt; ApplicationServices.DbExec(db =&gt; db.GetIdentityUserRolesById(session.Id)));
+    }
+},
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Alternatively use <code>req.GetCacheClient()</code> if you want to use your registered <code>ICacheClient</code> provider instead</p>
+</div>
+<h2 id="propagating-extended-user-info">Propagating Extended User Info<a class="header-anchor" href="javascript:;" onclick="location.hash='#propagating-extended-user-info'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In addition to populating the Users Roles we also want to populate our custom User metadata on our <code>ApplicationUser</code> EF model,
+for this we can use the new <code>GetIdentityUserById&lt;T&gt;</code> API which we'll also want to cache.</p>
+<p>This brings us to the end result in <a href="https://github.com/NetCoreTemplates/mvcidentity">mvcidentity</a> project template:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(() =&gt; new CustomUserSession(), 
+    new IAuthProvider[] {
+        new NetCoreIdentityAuthProvider(AppSettings) // Adapter to enable ASP.NET Identity Auth in ServiceStack
+        {
+            AdminRoles = { &quot;Manager&quot; }, // Automatically Assign additional roles to Admin Users
+            PopulateSessionFilter = (session, principal, req) =&gt; {
+                //Example of populating ServiceStack Session Roles + Custom Info from EF Identity DB
+                var user = req.GetMemoryCacheClient().GetOrCreate(
+                    IdUtils.CreateUrn(nameof(ApplicationUser), session.Id),
+                    TimeSpan.FromMinutes(5), //return cached results before refreshing cache from db /5mins
+                    () =&gt; ApplicationServices.DbExec(db=&gt;db.GetIdentityUserById&lt;ApplicationUser&gt;(session.Id)));
+
+                session.Email = session.Email ?? user.Email;
+                session.FirstName = session.FirstName ?? user.FirstName;
+                session.LastName = session.LastName ?? user.LastName;
+                session.DisplayName = session.DisplayName ?? user.DisplayName;
+                session.ProfileUrl = user.ProfileUrl ?? AuthMetadataProvider.DefaultNoProfileImgUrl;
+
+                session.Roles = req.GetMemoryCacheClient().GetOrCreate(
+                    IdUtils.CreateUrn(nameof(session.Roles), session.Id),
+                    TimeSpan.FromMinutes(5), //return cached results before refreshing cache from db /5mins
+                    () =&gt; ApplicationServices.DbExec(db =&gt; db.GetIdentityUserRolesById(session.Id)));
+            }
+        }, 
+    }));
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/auth/identity-servicestack" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Using ServiceStack Auth in MVC
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/auth/identityserver" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Using IdentityServer4 Auth
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#mapping-customizations'" data-id="mapping-customizations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Mapping Customizations
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-mappings'" data-id="custom-mappings" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom Mappings
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#built-in-identity-db-apis'" data-id="built-in-identity-db-apis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Built-in Identity DB APIs
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#asp.net-core-identity-auth-adapter'" data-id="asp.net-core-identity-auth-adapter" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ASP.NET Core Identity Auth Adapter
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#propagating-extended-user-info'" data-id="propagating-extended-user-info" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Propagating Extended User Info
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

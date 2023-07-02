@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>OrmLite walk through example</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/ormlite/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+OrmLite                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/installation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Installation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/async-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Async APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/db-migrations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        DB Migrations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/litestream" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Litestream
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    OrmLite APIs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/apis/select" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Select APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/update" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Update APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Delete APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/schema" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schema APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Advanced Topics
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/reference-support" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Reference Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/typed-joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Typed Join Expressions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dynamic-result-sets" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dynamic Result Sets
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/type-converters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Type Converters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        OrmLite Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ensure-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Ensure APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/introspection" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Logging &amp; Introspection
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/complex-type-serializers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Complex Type Serializers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/filters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert &amp; Update Filters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/custom-sql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Custom SQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customized-sql-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Customizations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dictionary-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dictionary APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    RDBMS specific features
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/sql-server-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Server Features
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/postgres-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PostgreSQL Features
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Background Info
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/optimistic-concurrency" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Optimistic Concurrency
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/untyped-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Untyped APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/autogen-t4" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen &amp; T4 templates
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/stored-procedures" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Stored Procedures
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multi-database-connections" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multi database connections
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/shippers-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        OrmLite Shippers example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customer-orders-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Customer Orders example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/aws-rds-databases" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AWS &amp; RDS Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/limitations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Limitations
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            OrmLite walk through example
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>In its simplest usage, OrmLite can persist any POCO type without any attributes required:</p>
+<pre><code class="language-csharp">public class SimpleExample
+{
+	public int Id { get; set; }
+	public string Name { get; set; }
+}
+
+//Set once before use (i.e. in a static constructor).
+OrmLiteConfig.DialectProvider = SqliteDialect.Provider;
+
+using (IDbConnection db = &quot;/path/to/db.sqlite&quot;.OpenDbConnection())
+{
+	db.CreateTable&lt;SimpleExample&gt;(true);
+	db.Insert(new SimpleExample { Id=1, Name=&quot;Hello, World!&quot;});
+	var rows = db.Select&lt;SimpleExample&gt;();
+
+	Assert.That(rows, Has.Count(1));
+	Assert.That(rows[0].Id, Is.EqualTo(1));
+}
+</code></pre>
+<p>To get a better idea of the features of OrmLite lets walk through a complete example using sample tables from the Northwind database.
+_ (Full source code for this example is <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/tests/ServiceStack.OrmLite.Tests/ShippersExample.cs">available here</a>.) _</p>
+<p>So with no other configuration using only the classes below:</p>
+<pre><code class="language-csharp">[Alias(&quot;Shippers&quot;)]
+public class Shipper
+	: IHasId&lt;int&gt;
+{
+	[AutoIncrement]
+	[Alias(&quot;ShipperID&quot;)]
+	public int Id { get; set; }
+
+	[Required]
+	[Index(Unique = true)]
+	[StringLength(40)]
+	public string CompanyName { get; set; }
+
+	[StringLength(24)]
+	public string Phone { get; set; }
+
+	[References(typeof(ShipperType))]
+	public int ShipperTypeId { get; set; }
+}
+
+[Alias(&quot;ShipperTypes&quot;)]
+public class ShipperType
+	: IHasId&lt;int&gt;
+{
+	[AutoIncrement]
+	[Alias(&quot;ShipperTypeID&quot;)]
+	public int Id { get; set; }
+
+	[Required]
+	[Index(Unique = true)]
+	[StringLength(40)]
+	public string Name { get; set; }
+}
+
+public class SubsetOfShipper
+{
+	public int ShipperId { get; set; }
+	public string CompanyName { get; set; }
+}
+
+public class ShipperTypeCount
+{
+	public int ShipperTypeId { get; set; }
+	public int Total { get; set; }
+}
+</code></pre>
+<h2 id="creating-tables">Creating tables<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-tables'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Creating tables is a simple 1-liner:</p>
+<pre><code class="language-csharp">using (IDbConnection db = &quot;:memory:&quot;.OpenDbConnection())
+{
+    db.CreateTable&lt;ShipperType&gt;();
+    db.CreateTable&lt;Shipper&gt;();
+}
+
+/* In debug mode the line above prints:
+DEBUG: CREATE TABLE &quot;ShipperTypes&quot; 
+(
+  &quot;ShipperTypeID&quot; INTEGER PRIMARY KEY AUTOINCREMENT, 
+  &quot;Name&quot; VARCHAR(40) NOT NULL 
+);
+DEBUG: CREATE UNIQUE INDEX uidx_shippertypes_name ON &quot;ShipperTypes&quot; (&quot;Name&quot; ASC);
+DEBUG: CREATE TABLE &quot;Shippers&quot; 
+(
+  &quot;ShipperID&quot; INTEGER PRIMARY KEY AUTOINCREMENT, 
+  &quot;CompanyName&quot; VARCHAR(40) NOT NULL, 
+  &quot;Phone&quot; VARCHAR(24) NULL, 
+  &quot;ShipperTypeId&quot; INTEGER NOT NULL, 
+
+  CONSTRAINT &quot;FK_Shippers_ShipperTypes&quot; FOREIGN KEY (&quot;ShipperTypeId&quot;) REFERENCES &quot;ShipperTypes&quot; (&quot;ShipperID&quot;) 
+);
+DEBUG: CREATE UNIQUE INDEX uidx_shippers_companyname ON &quot;Shippers&quot; (&quot;CompanyName&quot; ASC);
+*/
+</code></pre>
+<h2 id="transaction-support">Transaction Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#transaction-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>As we have direct access to IDbCommand and friends - playing with transactions is easy:</p>
+<pre><code class="language-csharp">var trainsType = new ShipperType { Name = &quot;Trains&quot; };
+var planesType = new ShipperType { Name = &quot;Planes&quot; };
+
+//Playing with transactions
+using (IDbTransaction dbTrans = db.OpenTransaction())
+{
+    db.Save(trainsType);
+    db.Save(planesType);
+
+    dbTrans.Commit();
+}
+
+using (IDbTransaction dbTrans = db.OpenTransaction(IsolationLevel.ReadCommitted))
+{
+    db.Insert(new ShipperType { Name = &quot;Automobiles&quot; });
+    Assert.That(db.Select&lt;ShipperType&gt;(), Has.Count.EqualTo(3));
+}
+Assert.That(db.Select&lt;ShipperType&gt;(), Has.Count(2));
+</code></pre>
+<h2 id="crud-operations">CRUD Operations<a class="header-anchor" href="javascript:;" onclick="location.hash='#crud-operations'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>No ORM is complete without the standard crud operations:</p>
+<pre><code class="language-csharp">	//Performing standard Insert's and Selects
+  db.Insert(new Shipper { CompanyName = &quot;Trains R Us&quot;, Phone = &quot;555-TRAINS&quot;, ShipperTypeId = trainsType.Id });
+  db.Insert(new Shipper { CompanyName = &quot;Planes R Us&quot;, Phone = &quot;555-PLANES&quot;, ShipperTypeId = planesType.Id });
+  db.Insert(new Shipper { CompanyName = &quot;We do everything!&quot;, Phone = &quot;555-UNICORNS&quot;, ShipperTypeId = planesType.Id });
+
+  var trainsAreUs = db.Single&lt;Shipper&gt;(&quot;ShipperTypeId = @Id&quot;, new { trainsType.Id });
+  Assert.That(trainsAreUs.CompanyName, Is.EqualTo(&quot;Trains R Us&quot;));
+  Assert.That(db.Select&lt;Shipper&gt;(&quot;CompanyName = @company OR Phone = @phone&quot;, 
+        new { company = &quot;Trains R Us&quot;, phone = &quot;555-UNICORNS&quot; }), Has.Count.EqualTo(2));
+  Assert.That(db.Select&lt;Shipper&gt;(&quot;ShipperTypeId = @Id&quot;, new { planesType.Id }), Has.Count.EqualTo(2));
+
+  //Lets update a record
+  trainsAreUs.Phone = &quot;666-TRAINS&quot;;
+  db.Update(trainsAreUs);
+          Assert.That(db.SingleById&lt;Shipper&gt;(trainsAreUs.Id).Phone, Is.EqualTo(&quot;666-TRAINS&quot;));
+  
+  //Then make it dissappear
+  db.Delete(trainsAreUs);
+          Assert.That(db.SingleById&lt;Shipper&gt;(trainsAreUs.Id), Is.Null);
+
+  //And bring it back again
+  db.Insert(trainsAreUs);
+</code></pre>
+<h2 id="performing-custom-queries">Performing custom queries<a class="header-anchor" href="javascript:;" onclick="location.hash='#performing-custom-queries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>And with access to raw sql when you need it - the database is your oyster :)</p>
+<pre><code class="language-csharp">var partialColumns = db.Select&lt;SubsetOfShipper&gt;(typeof(Shipper), 
+    &quot;ShipperTypeId = @Id&quot;, new { planesType.Id });
+Assert.That(partialColumns, Has.Count.EqualTo(2));
+
+//Select into another POCO class that matches sql
+var rows = db.Select&lt;ShipperTypeCount&gt;(
+    &quot;SELECT ShipperTypeId, COUNT(*) AS Total FROM Shippers GROUP BY ShipperTypeId ORDER BY COUNT(*)&quot;);
+
+Assert.That(rows, Has.Count.EqualTo(2));
+Assert.That(rows[0].ShipperTypeId, Is.EqualTo(trainsType.Id));
+Assert.That(rows[0].Total, Is.EqualTo(1));
+Assert.That(rows[1].ShipperTypeId, Is.EqualTo(planesType.Id));
+Assert.That(rows[1].Total, Is.EqualTo(2));
+
+
+//And finally lets quickly clean up the mess we've made:
+db.DeleteAll&lt;Shipper&gt;();
+db.DeleteAll&lt;ShipperType&gt;();
+
+Assert.That(db.Select&lt;Shipper&gt;(), Has.Count.EqualTo(0));
+Assert.That(db.Select&lt;ShipperType&gt;(), Has.Count.EqualTo(0));
+</code></pre>
+<h2 id="soft-deletes">Soft Deletes<a class="header-anchor" href="javascript:;" onclick="location.hash='#soft-deletes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Select Filters let you specify a custom <code>SelectFilter</code> that lets you modify queries that use <code>SqlExpression&lt;T&gt;</code> before they're executed. This could be used to make working with &quot;Soft Deletes&quot; Tables easier where it can be made to apply a custom <code>x.IsDeleted != true</code> condition on every <code>SqlExpression</code>.</p>
+<p>By either using a <code>SelectFilter</code> on concrete POCO Table Types, e.g:</p>
+<pre><code class="language-csharp">SqlExpression&lt;Table1&gt;.SelectFilter = q =&gt; q.Where(x =&gt; x.IsDeleted != true);
+SqlExpression&lt;Table2&gt;.SelectFilter = q =&gt; q.Where(x =&gt; x.IsDeleted != true);
+</code></pre>
+<p>Or alternatively using generic delegate that applies to all SqlExpressions, but you'll only have access to a
+<code>IUntypedSqlExpression</code> which offers a limited API surface area but will still let you execute a custom filter
+for all <code>SqlExpression&lt;T&gt;</code> that could be used to add a condition for all tables implementing a custom
+<code>ISoftDelete</code> interface with:</p>
+<pre><code class="language-csharp">OrmLiteConfig.SqlExpressionSelectFilter = q =&gt;
+{
+    if (q.ModelDef.ModelType.HasInterface(typeof(ISoftDelete)))
+    {
+        q.Where&lt;ISoftDelete&gt;(x =&gt; x.IsDeleted != true);
+    }
+};
+</code></pre>
+<p>Both solutions above will transparently add the <code>x.IsDeleted != true</code> to all <code>SqlExpression&lt;T&gt;</code> based queries
+so it only returns results which aren't <code>IsDeleted</code> from any of queries below:</p>
+<pre><code class="language-csharp">var results = db.Select(db.From&lt;Table&gt;());
+var result = db.Single(db.From&lt;Table&gt;().Where(x =&gt; x.Name == &quot;foo&quot;));
+var result = db.Single(x =&gt; x.Name == &quot;foo&quot;);
+</code></pre>
+<h2 id="check-constraints">Check Constraints<a class="header-anchor" href="javascript:;" onclick="location.hash='#check-constraints'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite includes support for <a href="https://en.wikipedia.org/wiki/Check_constraint">SQL Check Constraints</a> which will create your Table schema with the <code>[CheckConstraint]</code> specified, e.g:</p>
+<pre><code class="language-csharp">public class Table
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+
+    [Required]
+    [CheckConstraint(&quot;Age &gt; 1&quot;)]
+    public int Age { get; set; }
+
+    [CheckConstraint(&quot;Name IS NOT NULL&quot;)]
+    public string Name { get; set; }
+}
+</code></pre>
+<h3 id="bitwise-operators">Bitwise operators<a class="header-anchor" href="javascript:;" onclick="location.hash='#bitwise-operators'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The Typed SqlExpression bitwise operations support depends on the RDBMS used.</p>
+<p>E.g. all RDBMS's support Bitwise <code>And</code> and <code>Or</code> operators:</p>
+<pre><code class="language-csharp">db.Select&lt;Table&gt;(x =&gt; (x.Flags | 2) == 3);
+db.Select&lt;Table&gt;(x =&gt; (x.Flags &amp; 2) == 2);
+</code></pre>
+<p>All RDBMS Except for SQL Server support bit shift operators:</p>
+<pre><code class="language-csharp">db.Select&lt;Table&gt;(x =&gt; (x.Flags &lt;&lt; 1) == 4);
+db.Select&lt;Table&gt;(x =&gt; (x.Flags &gt;&gt; 1) == 1);
+</code></pre>
+<p>Whilst only SQL Server and MySQL Support Exclusive Or:</p>
+<pre><code class="language-csharp">db.Select&lt;Table&gt;(x =&gt; (x.Flags ^ 2) == 3);
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/ormlite/multi-database-connections" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Multi database connections
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/ormlite/customer-orders-example" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Customer Orders example
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#creating-tables'" data-id="creating-tables" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Creating tables
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#transaction-support'" data-id="transaction-support" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Transaction Support
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#crud-operations'" data-id="crud-operations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            CRUD Operations
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#performing-custom-queries'" data-id="performing-custom-queries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Performing custom queries
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#soft-deletes'" data-id="soft-deletes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Soft Deletes
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#check-constraints'" data-id="check-constraints" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Check Constraints
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="bitwise-operators" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#bitwise-operators'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Bitwise operators
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

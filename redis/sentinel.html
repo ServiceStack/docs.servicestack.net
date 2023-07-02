@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Redis Sentinel</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/redis/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Redis                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-managers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Managers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Usage
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/async" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Async
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/custom-commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Generic Custom Commands
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/pubsub" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis PubSub
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/sentinel" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Redis Sentinel
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/lua" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Lua
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/distributed-locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Distributed Locking
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/troubleshooting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Troubleshooting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Related Docs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/stats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Stats
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/redis-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Admin Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/automatic-retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Automatic Retries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/design-nosql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Designing a NoSql Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/schemaless-migration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data migrations with Redis
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Redis Sentinel
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p><a href="http://redis.io/topics/sentinel">Redis Sentinel</a> is the official recommendation for running a highly
+available Redis configuration by running a number of additional redis sentinel processes to actively monitor
+existing redis master and slave instances ensuring they're each working as expected. If by consensus it's
+determined that the master is no longer available it will automatically failover and promote one of the
+replicated slaves as the new master. The sentinels also maintain an authoritative list of available
+redis instances providing clients a centeral repositorty to discover available instances they can connect to.</p>
+<p>Support for Redis Sentinel is available with the <code>RedisSentinel</code> class which listens to the available
+Sentinels to source its list of available master, slave and other sentinel redis instances which it uses
+to configure and maintain the Redis Client Managers, initiating any failovers as they're reported.</p>
+<h2 id="usage">Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To use the new Sentinel support, instead of populating the Redis Client Managers with the connection string
+of the master and slave instances you would create a single <code>RedisSentinel</code> instance configured with
+the connection string of the running Redis Sentinels:</p>
+<pre><code class="language-csharp">var sentinelHosts = new[]{ &quot;sentinel1&quot;, &quot;sentinel2:6390&quot;, &quot;sentinel3&quot; };
+var sentinel = new RedisSentinel(sentinelHosts, masterName: &quot;mymaster&quot;);
+</code></pre>
+<p>This shows a typical example of configuring a <code>RedisSentinel</code> which references 3 sentinel hosts (i.e.
+the minimum number for a highly available setup which can survive any node failing).
+It's also configured to look at the <code>mymaster</code> configuration set (the default master group).</p>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Redis Sentinels can monitor more than 1 master / slave group, each with a different master group name.</p>
+</div>
+<p>The default port for sentinels is <strong>26379</strong> (when unspecified) and as RedisSentinel can auto-discover
+other sentinels, the minimum configuration required is just:</p>
+<pre><code class="language-csharp">var sentinel = new RedisSentinel(&quot;sentinel1&quot;);
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>Scanning and auto discovering of other Sentinels can be disabled with <code>ScanForOtherSentinels=false</code></p>
+</div>
+<h2 id="start-monitoring-sentinels">Start monitoring Sentinels<a class="header-anchor" href="javascript:;" onclick="location.hash='#start-monitoring-sentinels'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured
+client manager with:</p>
+<pre><code class="language-csharp">IRedisClientsManager redisManager = sentinel.Start();
+</code></pre>
+<p>Which as before, can be registered in your preferred IOC as a <strong>singleton</strong> instance:</p>
+<pre><code class="language-csharp">container.Register&lt;IRedisClientsManager&gt;(c =&gt; sentinel.Start());
+</code></pre>
+<h2 id="advanced-sentinel-configuration">Advanced Sentinel Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#advanced-sentinel-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>RedisSentinel by default manages a configured <code>PooledRedisClientManager</code> instance which resolves both master
+Redis clients for read/write <code>GetClient()</code> and slaves for readonly <code>GetReadOnlyClient()</code> API's.</p>
+<p>This can be changed to use the newer <code>RedisManagerPool</code> with:</p>
+<pre><code class="language-csharp">sentinel.RedisManagerFactory = (master,slaves) =&gt; new RedisManagerPool(master);
+</code></pre>
+<h2 id="custom-redis-connection-string">Custom Redis Connection String<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-redis-connection-string'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The host the RedisSentinel is configured with only applies to that Sentinel Host, you can still use the flexibility of
+<a href="https://github.com/ServiceStack/ServiceStack.Redis#redis-connection-strings">Redis Connection Strings</a>
+to configure the individual Redis Clients by specifying a custom <code>HostFilter</code>:</p>
+<pre><code class="language-csharp">sentinel.HostFilter = host =&gt; &quot;{0}?db=1&amp;RetryTimeout=5000&quot;.Fmt(host);
+</code></pre>
+<p>This will return clients configured to use Database 1 and a Retry Timeout of 5 seconds (used in new
+Auto Retry feature).</p>
+<h2 id="other-redissentinel-configuration">Other RedisSentinel Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#other-redissentinel-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Whilst the above covers the popular Sentinel configuration that would typically be used, nearly every aspect
+of <code>RedisSentinel</code> behavior is customizable with the configuration below:</p>
+<table>
+    <tr>
+        <td><b>OnSentinelMessageReceived</b></td><td>Fired when the Sentinel worker receives a message from the Sentinel Subscription</td>
+    </tr>
+    <tr>
+        <td><b>OnFailover</b></td><td>Fired when Sentinel fails over the Redis Client Manager to a new master</td>
+    </tr>
+    <tr>
+        <td><b>OnWorkerError</b></td><td>Fired when the Redis Sentinel Worker connection fails</td>
+    </tr>
+    <tr>
+        <td><b>IpAddressMap</b></td><td>Map internal redis host IP's returned by Sentinels to its external IP</td>
+    </tr>
+    <tr>
+        <td><b>ScanForOtherSentinels</b></td><td>Whether to routinely scan for other sentinel hosts (default true)</td>
+    </tr>
+    <tr>
+        <td><b>RefreshSentinelHostsAfter</b></td><td>What interval to scan for other sentinel hosts (default 10 mins)</td>
+    </tr>
+    <tr>
+        <td><b>WaitBetweenFailedHosts</b></td><td>How long to wait after failing before connecting to next redis instance (default 250ms)</td>
+    </tr>
+    <tr>
+        <td><b>MaxWaitBetweenFailedHosts</b></td><td>How long to retry connecting to hosts before throwing (default 60s)</td>
+    </tr>
+    <tr>
+        <td><b>WaitBeforeForcingMasterFailover</b></td><td>How long after consecutive failed attempts to force failover (default 60s)</td>
+    </tr>
+    <tr>
+        <td><b>ResetWhenSubjectivelyDown</b></td><td>Reset clients when Sentinel reports redis is subjectively down (default true)</td>
+    </tr>
+    <tr>
+        <td><b>ResetWhenObjectivelyDown</b></td><td>Reset clients when Sentinel reports redis is objectively down (default true)</td>
+    </tr>
+    <tr>
+        <td><b>SentinelWorkerConnectTimeoutMs</b></td><td>The Max Connection time for Sentinel Worker (default 100ms)</td>
+    </tr>
+    <tr>
+        <td><b>SentinelWorkerSendTimeoutMs</b></td><td>Max TCP Socket Send time for Sentinel Worker (default 100ms)</td>
+    </tr>
+    <tr>
+        <td><b>SentinelWorkerReceiveTimeoutMs</b></td><td>Max TCP Socket Receive time for Sentinel Worker (default 100ms)</td>
+    </tr>
+</table>
+<h2 id="configure-redis-sentinel-servers"><a href="https://github.com/ServiceStack/redis-config">Configure Redis Sentinel Servers</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#configure-redis-sentinel-servers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><a href="https://github.com/ServiceStack/redis-config"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/instant-sentinel-setup.png" alt="Instant Redis Setup" /></a></p>
+<p>The
+<a href="https://github.com/ServiceStack/redis-config">redis config project</a> simplifies setting up and running a highly-available multi-node Redis Sentinel configuration including
+start/stop scripts for instantly setting up the minimal
+<a href="https://github.com/ServiceStack/redis-config/blob/master/README.md#3x-sentinels-monitoring-1x-master-and-2x-slaves">highly available Redis Sentinel configuration</a>
+on a single (or multiple) Windows, OSX or Linux servers. This single-server/multi-process configuration
+is ideal for setting up a working sentinel configuration on a single dev workstation or remote server.</p>
+<p>The redis-config repository also includes the
+<a href="https://github.com/ServiceStack/redis-windows#running-microsofts-native-port-of-redis">MS OpenTech Windows redis binaries</a>
+and doesn't require any software installation.</p>
+<h2 id="windows-usage">Windows Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#windows-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To run the included Sentinel configuration, clone the redis-config repo on the server you want to run it on:</p>
+<pre><code>git clone https://github.com/ServiceStack/redis-config.git
+</code></pre>
+<p>Then Start 1x Master, 2x Slaves and 3x Sentinel redis-servers with:</p>
+<pre><code>cd redis-config\sentinel3\windows
+start-all.cmd
+</code></pre>
+<p>Shutdown started instances:</p>
+<pre><code>stop-all.cmd
+</code></pre>
+<p>If you're running the redis processes locally on your dev workstation the minimal configuration to connect
+to the running instances is just:</p>
+<pre><code class="language-csharp">var sentinel = new RedisSentinel(&quot;127.0.0.1:26380&quot;);
+container.Register(c =&gt; sentinel.Start());
+</code></pre>
+<h2 id="localhost-vs-network-ips">Localhost vs Network IP's<a class="header-anchor" href="javascript:;" onclick="location.hash='#localhost-vs-network-ips'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The sentinel configuration assumes all redis instances are running locally on <strong>127.0.0.1</strong>.
+If you're instead running it on a remote server that you want all developers in your network to be
+able to access, you'll need to either change the IP Address in the <code>*.conf</code> files to use the servers
+Network IP. Otherwise you can leave the defaults and use the <code>RedisSentinel</code> IP Address Map feature
+to transparently map localhost IP's to the Network IP that each pc on your network can connect to.</p>
+<p>E.g. if this is running on a remote server with a <strong>10.0.0.9</strong> Network IP, it can be configured with:</p>
+<pre><code class="language-csharp">var sentinel = new RedisSentinel(&quot;10.0.0.9:26380&quot;) {
+    IpAddressMap = {
+        {&quot;127.0.0.1&quot;, &quot;10.0.0.9&quot;},
+    }
+};
+container.Register(c =&gt; sentinel.Start());
+</code></pre>
+<h2 id="google-cloud-click-to-deploy-redis">Google Cloud - <a href="https://github.com/ServiceStack/redis-config/blob/master/README.md#google-cloud---click-to-deploy-redis">Click to Deploy Redis</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#google-cloud-click-to-deploy-redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The easiest Cloud Service we've found that can instantly set up a multi node-Redis Sentinel Configuration
+is using Google Cloud's
+<a href="https://cloud.google.com/solutions/redis/click-to-deploy">click to deploy Redis feature</a>
+available from the Google Cloud Console under <strong>Deploy &amp; Manage</strong>:</p>
+<p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/sentinel3-gcloud-01.png" alt="" /></p>
+<p>Clicking <strong>Deploy</strong> button will let you configure the type, size and location where you want to deploy the
+Redis VM's. See the
+<a href="https://github.com/ServiceStack/redis-config/blob/master/README.md#google-cloud---click-to-deploy-redis">full Click to Deploy Redis guide</a>
+for a walk-through on setting up and inspecting a highly-available redis configuration on Google Cloud.</p>
+<h2 id="change-to-use-redismanagerpool">Change to use RedisManagerPool<a class="header-anchor" href="javascript:;" onclick="location.hash='#change-to-use-redismanagerpool'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>By default, RedisSentinel uses a <code>PooledRedisClientManager</code>, this can be changed to use the
+newer <code>RedisManagerPool</code> with:</p>
+<pre><code class="language-csharp">sentinel.RedisManagerFactory = (master,replicas) =&gt; new RedisManagerPool(master);
+</code></pre>
+<h2 id="start-monitoring-sentinels-1">Start monitoring Sentinels<a class="header-anchor" href="javascript:;" onclick="location.hash='#start-monitoring-sentinels-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured
+client manager with:</p>
+<pre><code class="language-csharp">IRedisClientsManager redisManager = sentinel.Start();
+</code></pre>
+<p>Which as before, can be registered in your preferred IOC as a <strong>singleton</strong> instance:</p>
+<pre><code class="language-csharp">container.Register&lt;IRedisClientsManager&gt;(c =&gt; sentinel.Start());
+</code></pre>
+<h2 id="configure-redis-sentinel-servers-1"><a href="https://github.com/ServiceStack/redis-config">Configure Redis Sentinel Servers</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#configure-redis-sentinel-servers-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><a href="https://github.com/ServiceStack/redis-config"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/redis/instant-sentinel-setup.png" alt="Instant Redis Setup" /></a></p>
+<p>See the
+<a href="https://github.com/ServiceStack/redis-config">redis config project</a> for a quick way to setup up
+the minimal
+<a href="https://github.com/ServiceStack/redis-config/blob/master/README.md#3x-sentinels-monitoring-1x-master-and-2x-slaves">highly available Redis Sentinel configuration</a>
+including start/stop scripts for instantly running multiple redis instances on a single (or multiple)
+Windows, OSX or Linux servers.</p>
+<h2 id="redis-stats">Redis Stats<a class="header-anchor" href="javascript:;" onclick="location.hash='#redis-stats'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>You can use the <code>RedisStats</code> class for visibility and introspection into your running instances.
+The <a href="/redis/stats">Redis Stats</a> lists the stats available.</p>
+<h2 id="automatic-retries">Automatic Retries<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatic-retries'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The built-in <a href="/redis/automatic-retries">Automatic Retries</a> support improves the resilience of client connections,
+<code>RedisClient</code> will transparently retry failed Redis operations due to Socket and I/O Exceptions in an exponential
+backoff starting from <strong>10ms</strong> up until the <code>RetryTimeout</code> of <strong>10000ms</strong>. These defaults can be tweaked with:</p>
+<pre><code class="language-csharp">RedisConfig.DefaultRetryTimeout = 10000;
+RedisConfig.BackOffMultiplier = 10;
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/redis/pubsub" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Redis PubSub
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/redis/lua" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Redis Lua
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#usage'" data-id="usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Usage
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#start-monitoring-sentinels'" data-id="start-monitoring-sentinels" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Start monitoring Sentinels
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#advanced-sentinel-configuration'" data-id="advanced-sentinel-configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Advanced Sentinel Configuration
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-redis-connection-string'" data-id="custom-redis-connection-string" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom Redis Connection String
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#other-redissentinel-configuration'" data-id="other-redissentinel-configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Other RedisSentinel Configuration
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#windows-usage'" data-id="windows-usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Windows Usage
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#localhost-vs-network-ips'" data-id="localhost-vs-network-ips" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Localhost vs Network IP&#x27;s
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#google-cloud-click-to-deploy-redis'" data-id="google-cloud-click-to-deploy-redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Google Cloud - 
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#change-to-use-redismanagerpool'" data-id="change-to-use-redismanagerpool" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Change to use RedisManagerPool
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#start-monitoring-sentinels-1'" data-id="start-monitoring-sentinels-1" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Start monitoring Sentinels
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#redis-stats'" data-id="redis-stats" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Redis Stats
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#automatic-retries'" data-id="automatic-retries" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Automatic Retries
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

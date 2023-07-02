@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Data migrations with Redis</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/redis/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Redis                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-managers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Managers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Usage
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/async" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Async
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/custom-commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Generic Custom Commands
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/pubsub" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis PubSub
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/sentinel" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Sentinel
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/lua" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Lua
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/distributed-locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Distributed Locking
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/troubleshooting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Troubleshooting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Related Docs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/stats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Stats
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/redis-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Admin Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/automatic-retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Automatic Retries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/design-nosql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Designing a NoSql Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/schemaless-migration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Data migrations with Redis
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Data migrations with Redis
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>This page runs through a typical example to show how painless typical data migrations can be when using Redis and other NoSQL schema-less data stores.</p>
+<h4 id="all-redis-blog-application-pages">All Redis Blog application pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#all-redis-blog-application-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li><a href="./design-nosql.md">Designing a NoSQL Database using Redis</a></li>
+<li>Painless data migrations using Redis and other schema-less NoSQL datastores</li>
+</ul>
+<h2 id="painless-data-migrations-with-schema-less-nosql-datastores-and-redis">Painless data migrations with schema-less NoSQL datastores and Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#painless-data-migrations-with-schema-less-nosql-datastores-and-redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Developing <em>new</em> greenfield database systems utilizing a RDBMS back-end is mostly a trouble-free experience. Before the system is live, you're able to easily modify a schema by nuking the entire application database, and re-creating it with automated DDL scripts that will create and populate it with test data that fits your new schema.</p>
+<p>The real troubles in your IT life happens after your first deployment and your system goes live. At that point you no longer have the option to nuke the database and re-create it from scratch. If you're lucky, you have a script in place that can automatically infer the required DDL statements to migrate from your old schema to your new one. However any significant changes to your schema are likely to involve late nights, downtime, and a non-trivial amount of effort to ensure a successful migration to the new db schema.</p>
+<p>This process is much less painful with schema-less data stores. In fact in most cases when you're just adding and removing fields it doesn't exist at all. By not having your datastore understand intrinsic details of your schema, it means it's no longer an infrastructure-level issue and can easily be handled by application logic if needed.</p>
+<p>Being maintenance-free, schema-less and non-intrusive are fundamental design qualities baked into Redis and its operations. For example querying a list of recent BlogPosts returns the same result for an <em>empty list</em> as it would in an <em>empty Redis database</em> - 0 results. As values in Redis are binary-safe strings you're able to store anything you want in them and most importantly by extension this means that all Redis operations can support all of your application types without needing an 'intermediate language' like DDL to provide a rigid schema of what to expect. Without any prior initialization your code can talk directly to a Redis datastore naturally as if it was an in-memory collection.</p>
+<p>To illustrate what can be achieved in practice, I will run through two different strategies of handling schema changes.</p>
+<ul>
+<li>The do-nothing approach - where adding, removing fields and non-destructive change of field types are automatically handled.</li>
+<li>Using a custom translation - using application level logic to customize the translation between the old and new types.</li>
+</ul>
+<p>The full runnable source code for this example are <a href="https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BestPractice/BlogPostMigrations.cs">available here</a>.</p>
+<h2 id="example-code">Example Code<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To demonstrate a typical migration scenario, I'm using the <code>BlogPost</code> type defined on the previous page to project it to a fundamentally different <code>New.BlogPost</code> type. The full definition of the old and new types are shown below:</p>
+<h3 id="the-old-schema">The old schema<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-old-schema'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">public class BlogPost
+{
+    public BlogPost()
+    {
+        this.Categories = new List&lt;string&gt;();
+        this.Tags = new List&lt;string&gt;();
+        this.Comments = new List&lt;BlogPostComment&gt;();
+    }
+
+    public int Id { get; set; }
+    public int BlogId { get; set; }
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public List&lt;string&gt; Categories { get; set; }
+    public List&lt;string&gt; Tags { get; set; }
+    public List&lt;BlogPostComment&gt; Comments { get; set; }
+}
+
+public class BlogPostComment
+{
+    public string Content { get; set; }
+    public DateTime CreatedDate { get; set; }
+}
+</code></pre>
+<h3 id="the-new-schema">The new schema<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-new-schema'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The 'new version' contains most changes you are likely to encounter in normal app development:</p>
+<ul>
+<li>Added, removed and renamed fields</li>
+<li>Non-destructive change of <code>int</code> into <code>long</code> and <code>double</code> fields</li>
+<li>Changed Tag collection type from a <code>List</code> to a <code>HashSet</code></li>
+<li>Changed a strongly-typed <code>BlogPostComment</code> type into a loosely-typed string <code>Dictionary</code></li>
+<li>Introduced a new <code>enum</code> type</li>
+<li>Added a nullable calculated field</li>
+</ul>
+<h3 id="new-schema-types">New schema types<a class="header-anchor" href="javascript:;" onclick="location.hash='#new-schema-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">public class BlogPost
+{
+    public BlogPost()
+    {
+        this.Labels = new List&lt;string&gt;();
+        this.Tags = new HashSet&lt;string&gt;();
+        this.Comments = new List&lt;Dictionary&lt;string, string&gt;&gt;();
+    }
+
+    //Changed int types to both a long and a double type
+    public long Id { get; set; }
+    public double BlogId { get; set; }
+
+    //Added new field
+    public BlogPostType PostType { get; set; }
+
+    public string Title { get; set; }
+    public string Content { get; set; }
+
+    //Renamed from 'Categories' to 'Labels'
+    public List&lt;string&gt; Labels { get; set; }
+
+    //Changed from List to a HashSet
+    public HashSet&lt;string&gt; Tags { get; set; }
+
+    //Changed from List of strongly-typed 'BlogPostComment' to loosely-typed string map
+    public List&lt;Dictionary&lt;string, string&gt;&gt; Comments { get; set; }
+
+    //Added pointless calculated field
+    public int? NoOfComments { get; set; }
+}
+
+public enum BlogPostType
+{
+    None,
+    Article,
+    Summary,
+}
+</code></pre>
+<h3 id="the-do-nothing-approach-using-the-old-data-with-the-new-types">1. The do-nothing approach - using the old data with the new types<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-do-nothing-approach-using-the-old-data-with-the-new-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Although hard to believe, with no extra effort you can just pretend <em>no change was actually done</em> and freely access new types looking at old data.
+This is possible when there is non-destructive changes (i.e. no loss of information) with new field types.
+The example below uses the repository from the previous example to populate Redis with test data from the old types. Just as if nothing happened you can read the old data using the new type:</p>
+<pre><code class="language-csharp">var repository = new BlogRepository(redisClient);
+
+//Populate the datastore with the old schema from the 'BlogPostBestPractice'
+BlogPostBestPractice.InsertTestData(repository);
+
+//Create a typed-client based on the new schema
+using (var redisBlogPosts = redisClient.GetTypedClient&lt;New.BlogPost&gt;())
+{
+    //Automatically retrieve blog posts
+    IList&lt;New.BlogPost&gt; allBlogPosts = redisBlogPosts.GetAll();
+
+    //Print out the data in the list of 'New.BlogPost' populated from old 'BlogPost' type
+    Console.WriteLine(allBlogPosts.Dump());
+    /*Output:
+    [
+        {
+            Id: 3,
+            BlogId: 2,
+            PostType: None,
+            Title: Redis,
+            Labels: [],
+            Tags: 
+            [
+                Redis,
+                NoSQL,
+                Scalability,
+                Performance
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 2010-04-28T21:42:03.9484725Z
+                }
+            ]
+        },
+        {
+            Id: 4,
+            BlogId: 2,
+            PostType: None,
+            Title: Couch Db,
+            Labels: [],
+            Tags: 
+            [
+                CouchDb,
+                NoSQL,
+                JSON
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 2010-04-28T21:42:03.9484725Z
+                }
+            ]
+        },
+        {
+            Id: 1,
+            BlogId: 1,
+            PostType: None,
+            Title: RavenDB,
+            Labels: [],
+            Tags: 
+            [
+                Raven,
+                NoSQL,
+                JSON,
+                .NET
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 2010-04-28T21:42:03.9004697Z
+                },
+                {
+                    Content: Second Comment!,
+                    CreatedDate: 2010-04-28T21:42:03.9004697Z
+                }
+            ]
+        },
+        {
+            Id: 2,
+            BlogId: 1,
+            PostType: None,
+            Title: Cassandra,
+            Labels: [],
+            Tags: 
+            [
+                Cassandra,
+                NoSQL,
+                Scalability,
+                Hashing
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 2010-04-28T21:42:03.9004697Z
+                }
+            ]
+        }
+    ]
+
+     */
+}
+</code></pre>
+<h3 id="using-a-custom-translation-to-migrate-data-using-application-logic">2. Using a custom translation to migrate data using application logic<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-a-custom-translation-to-migrate-data-using-application-logic'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Some drawbacks with the above 'do-nothing' approach is that you will lose the data of 'renamed fields'.
+There will also be times when you want the newly migrated data to have specific values that are different from the .NET built-in defaults.
+When you want more control over the migration of your old data, adding a custom translation is a trivial exercise when you can do it natively in code:</p>
+<pre><code class="language-csharp">var repository = new BlogRepository(redisClient);
+
+//Populate the datastore with the old schema from the 'BlogPostBestPractice'
+BlogPostBestPractice.InsertTestData(repository);
+
+//Create a typed-client based on the new schema
+using (var redisBlogPosts = redisClient.GetTypedClient&lt;BlogPost&gt;())
+using (var redisNewBlogPosts = redisClient.GetTypedClient&lt;New.BlogPost&gt;())
+{
+    //Automatically retrieve blog posts
+    IList&lt;BlogPost&gt; oldBlogPosts = redisBlogPosts.GetAll();
+
+    //Write a custom translation layer to migrate to the new schema
+    var migratedBlogPosts = oldBlogPosts.ConvertAll(old =&gt; new New.BlogPost
+    {
+        Id = old.Id,
+        BlogId = old.BlogId,
+        Title = old.Title,
+        Content = old.Content,
+        Labels = old.Categories, //populate with data from renamed field
+        PostType = New.BlogPostType.Article, //select non-default enum value
+        Tags = old.Tags,
+        Comments = old.Comments.ConvertAll(x =&gt; new Dictionary&lt;string, string&gt; 
+            { { &quot;Content&quot;, x.Content }, { &quot;CreatedDate&quot;, x.CreatedDate.ToString() }, }),
+        NoOfComments = old.Comments.Count, //populate using logic from old data
+    });
+
+    //Persist the new migrated blogposts 
+    redisNewBlogPosts.StoreAll(migratedBlogPosts);
+
+    //Read out the newly stored blogposts
+    var refreshedNewBlogPosts = redisNewBlogPosts.GetAll();
+    //Note: data renamed fields are successfully migrated to the new schema
+    Console.WriteLine(refreshedNewBlogPosts.Dump());
+    /*
+    [
+        {
+            Id: 3,
+            BlogId: 2,
+            PostType: Article,
+            Title: Redis,
+            Labels: 
+            [
+                NoSQL,
+                Cache
+            ],
+            Tags: 
+            [
+                Redis,
+                NoSQL,
+                Scalability,
+                Performance
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 28/04/2010 22:58:35
+                }
+            ],
+            NoOfComments: 1
+        },
+        {
+            Id: 4,
+            BlogId: 2,
+            PostType: Article,
+            Title: Couch Db,
+            Labels: 
+            [
+                NoSQL,
+                DocumentDB
+            ],
+            Tags: 
+            [
+                CouchDb,
+                NoSQL,
+                JSON
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 28/04/2010 22:58:35
+                }
+            ],
+            NoOfComments: 1
+        },
+        {
+            Id: 1,
+            BlogId: 1,
+            PostType: Article,
+            Title: RavenDB,
+            Labels: 
+            [
+                NoSQL,
+                DocumentDB
+            ],
+            Tags: 
+            [
+                Raven,
+                NoSQL,
+                JSON,
+                .NET
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 28/04/2010 22:58:35
+                },
+                {
+                    Content: Second Comment!,
+                    CreatedDate: 28/04/2010 22:58:35
+                }
+            ],
+            NoOfComments: 2
+        },
+        {
+            Id: 2,
+            BlogId: 1,
+            PostType: Article,
+            Title: Cassandra,
+            Labels: 
+            [
+                NoSQL,
+                Cluster
+            ],
+            Tags: 
+            [
+                Cassandra,
+                NoSQL,
+                Scalability,
+                Hashing
+            ],
+            Comments: 
+            [
+                {
+                    Content: First Comment!,
+                    CreatedDate: 28/04/2010 22:58:35
+                }
+            ],
+            NoOfComments: 1
+        }
+    ]
+
+     */
+}
+</code></pre>
+<p>The end result is a datastore filled with new data populated in exactly the way you want it - ready to serve features of your new application.
+In contrast, attempting the above in a typical RDBMS solution without any downtime is effectively a feat of magic that is rewardable by 999 <a href="http://stackoverflow.com">Stack Overflow</a> points and a personal condolence from its grand chancellor <a href="http://twitter.com/jonskeet">@JonSkeet</a> :)</p>
+<p>I hope this clearly illustrates differences between the two technologies. In practice you'll be amazed by the productivity gains made possible when you don't have to model your application to fit around an ORM and an RDBMS and can save objects like it was memory.</p>
+<p>It's always a good idea to expose yourself to new technologies so if you haven't already done so, I invite you to get started developing with Redis today to see the benefits for yourself. To get started all you need is an instance of
+<a href="http://code.google.com/p/servicestack/wiki/RedisWindowsDownload">the redis-server</a> (no configuration required, just unzip and run) and the dependency-free
+<a href="https://github.com/ServiceStack/ServiceStack.Redis">ServiceStack's C# Redis Client</a> and you're ready to go!</p>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/redis/design-nosql" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Designing a NoSql Database
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#painless-data-migrations-with-schema-less-nosql-datastores-and-redis'" data-id="painless-data-migrations-with-schema-less-nosql-datastores-and-redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Painless data migrations with schema-less NoSQL datastores and Redis
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#example-code'" data-id="example-code" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Example Code
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="the-old-schema" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-old-schema'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The old schema
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="the-new-schema" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-new-schema'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The new schema
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="new-schema-types" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#new-schema-types'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            New schema types
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="the-do-nothing-approach-using-the-old-data-with-the-new-types" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-do-nothing-approach-using-the-old-data-with-the-new-types'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            1. The do-nothing approach - using the old data with the new types
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="using-a-custom-translation-to-migrate-data-using-application-logic" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#using-a-custom-translation-to-migrate-data-using-application-logic'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            2. Using a custom translation to migrate data using application logic
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

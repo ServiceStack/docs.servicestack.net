@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>API Key Auth Provider</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/auth/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Security                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auth/authentication-and-authorization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Authentication &amp; Authorization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/auth-repository" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auth Repository
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ServiceStack Auth in MVC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-aspnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ASP.NET Identity Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identityserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using IdentityServer4 Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/sessions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sessions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/jwt-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JWT AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/api-key-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        API Key AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/signin-with-apple" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sign in with Apple AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/restricting-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Restricting Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Encrypted Messaging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/anti-forgery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Anti Forgery
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            API Key Auth Provider
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>The API Key Auth Provider provides an alternative method for allowing external 3rd Parties access to
+your protected Services without needing to specify a password. API Keys is the preferred approach for
+many well-known public API providers used in system-to-system scenarios for several reasons:</p>
+<ul>
+<li><strong>Simple</strong> - It integrates easily with existing HTTP Auth functionality</li>
+<li><strong>Independent from Password</strong> - Limits exposure to the much more sensitive master user passwords that
+should ideally never be stored in plain-text. Resetting User's Password or password reset strategies
+wont invalidate existing systems configured to use API Keys</li>
+<li><strong>Entropy</strong> - API Keys are typically much more secure than most normal User Passwords. The configurable
+default has <strong>24 bytes</strong> of entropy (Guids have 16 bytes) generated from a secure random number generator
+that encodes to <strong>32 chars</strong> using URL-safe Base64 (Same as Stripe)</li>
+<li><strong>Performance</strong> - Thanks to their much greater entropy and independence from user-chosen passwords,
+API Keys are validated as fast as possible using a datastore Index. This is contrast to validating hashed
+user passwords which as a goal require usage of slower and more computationally expensive algorithms to
+try make brute force attacks infeasible</li>
+</ul>
+<p>Like most ServiceStack providers the new API Key Auth Provider is simple to use, integrates seamlessly with
+ServiceStack existing Auth model and includes Typed end-to-end client/server support.</p>
+<p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NTCUT7atoLo" style="background-image: url('https://img.youtube.com/vi/NTCUT7atoLo/maxresdefault.jpg')"></lite-youtube></p>
+<p>For familiarity and utility we've modeled our implementation around Stripe's API Key functionality whilst
+sharing many of the benefits of ServiceStack's Auth Providers:</p>
+<h2 id="simple-and-integrated">Simple and Integrated<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-and-integrated'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To register <code>ApiKeyAuthProvider</code> add it to the <code>AuthFeature</code> list of Auth Providers:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...,
+    new IAuthProvider[] {
+        new ApiKeyAuthProvider(AppSettings),
+        new CredentialsAuthProvider(AppSettings),
+        //...
+    }
+));
+</code></pre>
+<p>Or for Apps utilizing encapsulated <a href="/modular-startup">Modular Startup</a> configuration blocks:</p>
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureAuth))]
+
+public class ConfigureAuth : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt; {
+            appHost.Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(),
+                new IAuthProvider[] {
+                    new ApiKeyAuthProvider(appHost.AppSettings),
+                    new CredentialsAuthProvider(appHost.AppSettings),
+                    //...
+                }));
+        });
+}
+</code></pre>
+<p>The <code>ApiKeyAuthProvider</code> works similarly to the other ServiceStack <code>IAuthWithRequest</code> providers where a
+successful API Key initializes the current <code>IRequest</code> with the user's Authenticated Session. It also adds the
+<a href="https://github.com/ServiceStack/ServiceStack/blob/c4a8f9741e496793d949c09cecb84e84fca86686/src/ServiceStack/Auth/ApiKeyAuthProvider.cs#L31">ApiKey</a> POCO Model to the request which can be accessed with:</p>
+<pre><code class="language-csharp">ApiKey apiKey = req.GetApiKey();
+</code></pre>
+<p>The <code>ApiKey</code> can be later inspected throughout the <a href="/order-of-operations">request pipeline</a> to determine which API Key, Type and Environment was used.</p>
+<h2 id="interoperable">Interoperable<a class="header-anchor" href="javascript:;" onclick="location.hash='#interoperable'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Using existing HTTP Functionality makes it simple and interoperable to use with any HTTP Client even command-line clients like curl where API Keys can be specified in the <strong>Username</strong> of HTTP Basic Auth:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>curl <a href="https://api.stripe.com/v1/charges">https://api.stripe.com/v1/charges</a> -u yDOr26HsxyhpuRB3qbG07qfCmDhqutnA:</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Or as a HTTP Bearer Token in the <strong>Authorization</strong> HTTP Request Header:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>curl <a href="https://api.stripe.com/v1/charges">https://api.stripe.com/v1/charges</a> -H &quot;Authorization: Bearer yDOr26HsxyhpuRB3qbG07qfCmDhqutnA&quot;</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Both of these methods are built into most HTTP Clients. Here are a few different ways which you can send them using ServiceStack's <a href="/csharp-client">.NET Service Clients</a>:</p>
+<pre><code class="language-csharp">var client = new JsonServiceClient(baseUrl) {
+    Credentials = new NetworkCredential(apiKey, &quot;&quot;)
+};
+
+var client = new JsonHttpClient(baseUrl) {
+    BearerToken = apiKey
+};
+</code></pre>
+<p>Or using the <a href="/http-utils">HTTP Utils</a> extension methods:</p>
+<pre><code class="language-csharp">var response = baseUrl.CombineWith(&quot;/secured&quot;).GetStringFromUrl(
+    requestFilter: req =&gt; req.AddBasicAuth(apiKey, &quot;&quot;));
+    
+var response = await &quot;https://example.org/secured&quot;.GetJsonFromUrlAsync(
+    requestFilter: req =&gt; req.AddBearerToken(apiKey));
+</code></pre>
+<h2 id="sending-api-key-in-request-dtos">Sending API Key in Request DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-api-key-in-request-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Similar to the <code>IHasSessionId</code> interface Request DTOs can also implement <code>IHasBearerToken</code> to send Bearer Tokens, e.g:</p>
+<pre><code class="language-csharp">public class Secure : IHasBearerToken
+{
+    public string BearerToken { get; set; }
+    public string Name { get; set; }
+}
+
+var response = client.Get(new Secure { BearerToken = apiKey, Name = &quot;World&quot; });
+</code></pre>
+<p>Alternatively you can set the <code>BearerToken</code> property on the Service Client once where it will automatically populate all Request DTOs
+that implement <code>IHasBearerToken</code>, e.g:</p>
+<pre><code class="language-csharp">client.BearerToken = jwtToken;
+
+var response = client.Get(new Secure { Name = &quot;World&quot; });
+</code></pre>
+<h2 id="supported-auth-repositories">Supported Auth Repositories<a class="header-anchor" href="javascript:;" onclick="location.hash='#supported-auth-repositories'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The necessary functionality to support API Keys has been implemented in the following supported Auth Repositories:</p>
+<ul>
+<li><code>OrmLiteAuthRepository</code> - Supporting <a href="/ormlite/#ormlite-rdbms-providers">most major RDBMS</a></li>
+<li><code>RedisAuthRepository</code> - Uses Redis back-end data store</li>
+<li><code>DynamoDbAuthRepository</code> - Uses AWS DynamoDB data store</li>
+<li><code>MongoDbAuthRepository</code> - Uses MongoDB data store</li>
+<li><code>InMemoryAuthRepository</code> - Uses InMemory Auth Repository</li>
+</ul>
+<p>And requires no additional configuration as it just utilizes the existing registered <code>IAuthRepository</code>.</p>
+<h2 id="multiple-api-key-types-and-environments">Multiple API Key Types and Environments<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-api-key-types-and-environments'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>You can specify any number of different Key Types for use in multiple environments for each user. Keys are
+generated upon User Registration where it generates both a <strong>live</strong> and <strong>test</strong> key for the <strong>secret</strong>
+Key Type by default. To also create both a &quot;secret&quot; and &quot;publishable&quot; API Key, configure it with:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...,
+    new IAuthProvider[] {
+        new ApiKeyAuthProvider(AppSettings) {
+            KeyTypes = new[] { &quot;secret&quot;, &quot;publishable&quot; },
+        }
+    }
+));
+</code></pre>
+<p>If preferred, any of the API Key Provider options can instead be specified in
+<a href="/appsettings">App Settings</a> following the <code>apikey.{PropertyName}</code> format, e.g:</p>
+<pre><code class="language-xml">&lt;add key=&quot;apikey.KeyTypes&quot; value=&quot;secret,publishable&quot; /&gt;
+</code></pre>
+<h2 id="cached-api-key-sessions">Cached API Key Sessions<a class="header-anchor" href="javascript:;" onclick="location.hash='#cached-api-key-sessions'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>You can reduce the number of I/O Requests and improve the performance of API Key Auth Provider Requests by
+specifying a <code>SessionCacheDuration</code> to temporarily store the Authenticated UserSession against the API Key
+which will reduce subsequent API Key requests down to 1 DB call to fetch and validate the API Key + 1 Cache Hit
+to restore the User's Session which if you're using the default in-memory Cache will mean it only requires 1 I/O
+call for the DB request.</p>
+<p>This can be enabled with:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(...,
+    new IAuthProvider[] {
+        new ApiKeyAuthProvider(AppSettings) {
+            SessionCacheDuration = TimeSpan.FromMinutes(10),
+        }
+    }));
+</code></pre>
+<h2 id="multitenancy">Multitenancy<a class="header-anchor" href="javascript:;" onclick="location.hash='#multitenancy'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Thanks to the ServiceStack's trivial support for enabling
+<a href="/multitenancy">Multitenancy</a>, the minimal configuration required to register and API Key Auth Provider that persists to a <strong>LiveDb</strong> SQL Server database and also allows Services called with an Test API Key to query the alternative <strong>TestDb</strong> database instead, is just:</p>
+<pre><code class="language-csharp">class AppHost : AppSelfHostBase
+{
+    public AppHost() : base(&quot;API Key Multitenancy Example&quot;, typeof(AppHost).Assembly) { }
+
+    public override void Configure(Container container)
+    {
+        //Create and register an OrmLite DB Factory configured to use Live DB by default 
+        var dbFactory = new OrmLiteConnectionFactory(
+            AppSettings.GetString(&quot;LiveDb&quot;), SqlServerDialect.Provider);
+
+        container.Register&lt;IDbConnectionFactory&gt;(dbFactory);
+
+        // Register a &quot;TestDb&quot; Named Connection 
+        dbFactory.RegisterConnection(&quot;TestDb&quot;, 
+            AppSettings.GetString(&quot;TestDb&quot;), SqlServerDialect.Provider);
+
+        //Tell ServiceStack you want to persist User Auth Info in SQL Server
+        container.Register&lt;IAuthRepository&gt;(c =&gt; new OrmLiteAuthRepository(dbFactory));
+        
+        //Register the AuthFeature with the API Key Auth Provider 
+        Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(),
+            new IAuthProvider[] {
+                new ApiKeyAuthProvider(AppSettings)
+            });
+    }
+    
+    public override IDbConnection GetDbConnection(IRequest req = null)
+    {
+        //If an API Test Key was used return DB connection to TestDb instead: 
+        return req.GetApiKey()?.Environment == &quot;test&quot;
+            ? TryResolve&lt;IDbConnectionFactory&gt;().OpenDbConnection(&quot;TestDb&quot;)
+            : base.GetDbConnection(req);
+    }
+}
+</code></pre>
+<p>Now whenever a Test API Key was used to call an Authenticated Service, all <code>base.Db</code> Queries or AutoQuery Services will query <strong>TestDb</strong> instead.</p>
+<h2 id="api-key-defaults">API Key Defaults<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-key-defaults'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The API Key Auth Provider has several options to customize its behavior with all but delegate Filters being able to be specified in AppSettings as well:</p>
+<pre><code class="language-csharp">new ApiKeyAuthProvider 
+{
+    // Whether to only permit access via API Key from a secure connection. (default true)
+    public bool RequireSecureConnection { get; set; }
+
+    // Generate different keys for different environments. (default live,test)
+    public string[] Environments { get; set; }
+
+    // Different types of Keys each user can have. (default secret)
+    public string[] KeyTypes { get; set; }
+
+    // How much entropy should the generated keys have. (default 24)
+    public int KeySizeBytes { get; set; }
+
+    /// Whether to automatically expire keys. (default no expiry)
+    public TimeSpan? ExpireKeysAfter { get; set; }
+
+    // Automatically create ApiKey Table for Auth Repositories which need it. (true)
+    public bool InitSchema { get; set; }
+
+    // Change how API Key is generated
+    public CreateApiKeyDelegate GenerateApiKey { get; set; }
+
+    // Run custom filter after API Key is created
+    public Action&lt;ApiKey&gt; CreateApiKeyFilter { get; set; }
+
+    // Cache the User Session so it can be reused between subsequent API Key Requests
+    public TimeSpan? SessionCacheDuration { get; set; }
+
+    // Whether to allow API Keys in 'apikey' QueryString or FormData (e.g. `?apikey={APIKEY}`) 
+    public bool AllowInHttpParams { get; set; }
+}
+</code></pre>
+<h2 id="imanageapikeys-api">IManageApiKeys API<a class="header-anchor" href="javascript:;" onclick="location.hash='#imanageapikeys-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Should you need to, you can access API Keys from the Auth Repository directly through the following interface:</p>
+<pre><code class="language-csharp">public interface IManageApiKeys
+{
+    void InitApiKeySchema();
+
+    bool ApiKeyExists(string apiKey);
+
+    ApiKey GetApiKey(string apiKey);
+
+    List&lt;ApiKey&gt; GetUserApiKeys(string userId);
+
+    void StoreAll(IEnumerable&lt;ApiKey&gt; apiKeys);
+}
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>This interface also defines what's required in order to implement API Keys support on a Custom AuthRepository</p>
+</div>
+<p>For Auth Repositories which implement it, you can access the interface by resolving <code>IAuthRepository</code> from the IOC and casting it to the above interface, e.g:</p>
+<pre><code class="language-csharp">var apiRepo = (IManageApiKeys)HostContext.TryResolve&lt;IAuthRepository&gt;();
+var apiKeys = apiRepo.GetUserApiKeys(session.UserAuthId);
+</code></pre>
+<h2 id="built-in-api-key-services">Built-in API Key Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-api-key-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To give end-users access to their keys the API Key Auth Provider enables 2 Services: the <code>GetApiKeys</code> Service to return all valid User API Keys for the specified environment:</p>
+<pre><code class="language-csharp">//GET /apikeys/live
+var response = client.Get(new GetApiKeys { Environment = &quot;live&quot; }); 
+response.Results.PrintDump(); //User's &quot;live&quot; API Keys 
+</code></pre>
+<p>And the <code>RegenerateApiKeys</code> Service to invalidate all current API Keys and generate new ones for the specified environment:</p>
+<pre><code class="language-csharp">//POST /apikeys/regenerate/live
+var response = client.Post(new RegenerateApiKeys { Environment = &quot;live&quot; }); 
+response.Results.PrintDump(); //User's new &quot;live&quot; API Keys 
+</code></pre>
+<p>You can modify which built-in Services you want registered, or modify the custom routes to where you want them to be available by modifying the <code>ServiceRoutes</code> collection. E.g. you can prevent it from registering any Services by setting <code>ServiceRoutes</code> to an empty collection:</p>
+<pre><code class="language-csharp">new ApiKeyAuthProvider { ServiceRoutes = new Dictionary&lt;Type, string[]&gt;() }
+</code></pre>
+<h2 id="generating-api-keys-for-existing-users">Generating API Keys for Existing Users<a class="header-anchor" href="javascript:;" onclick="location.hash='#generating-api-keys-for-existing-users'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Whilst the API Key Auth Provider will automatically generate API Keys for new users, if you also want to add API Keys for existing users you'll need to use the <code>ApiKeyAuthProvider</code> to generate new keys for all users that don't have keys.</p>
+<p>Here's a script you can use when using an <code>OrmLiteAuthRepository</code> to generate API Keys for all users with missing API Keys on startup:</p>
+<pre><code class="language-csharp">public class ConfigureAuth : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt;
+        {
+            appHost.Plugins.Add(new AuthFeature(() =&gt; new AuthUserSession(),
+                new IAuthProvider[] {
+                    new ApiKeyAuthProvider(appHost.AppSettings)
+                }));
+        }, afterAppHostInit: appHost =&gt; {
+            var authProvider = (ApiKeyAuthProvider)
+                AuthenticateService.GetAuthProvider(ApiKeyAuthProvider.Name);
+            
+            using var db = appHost.TryResolve&lt;IDbConnectionFactory&gt;().Open();
+            var userWithKeysIds = db.Column&lt;string&gt;(db.From&lt;ApiKey&gt;()
+                .SelectDistinct(x =&gt; x.UserAuthId)).Map(int.Parse);
+
+            var userIdsMissingKeys = db.Column&lt;string&gt;(db.From&lt;UserAuth&gt;() // Use custom UserAuth if configured
+                .Where(x =&gt; userWithKeysIds.Count == 0 || !userWithKeysIds.Contains(x.Id))
+                .Select(x =&gt; x.Id));
+
+            var authRepo = (IManageApiKeys)appHost.TryResolve&lt;IAuthRepository&gt;();
+            foreach (var userId in userIdsMissingKeys)
+            {
+                var apiKeys = authProvider.GenerateNewApiKeys(userId);
+                authRepo.StoreAll(apiKeys);
+            }
+        });
+}
+</code></pre>
+<div class="info custom-block">
+                <p class="custom-block-title">INFO</p><p>If using another Auth Repository backend this script will need to be modified to fetch the userIds for all users missing API Keys</p>
+</div>
+<h2 id="net-framework-example">.NET Framework Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-framework-example'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Older platforms can register Startup initialization logic using the <code>HostContext.ConfigureAppHost()</code> singleton:</p>
+<pre><code class="language-csharp">HostContext.ConfigureAppHost(afterAppHostInit:appHost =&gt; ...);
+</code></pre>
+<p>Or adding to <code>AfterInitCallbacks</code> in their <code>AppHost.Configure()</code>, e.g:</p>
+<pre><code class="language-csharp">public override void Configure(Container container)
+{
+    AfterInitCallbacks.Add(appHost =&gt; ...);
+}
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/auth/jwt-authprovider" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                JWT AuthProvider
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/auth/signin-with-apple" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Sign in with Apple AuthProvider
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#simple-and-integrated'" data-id="simple-and-integrated" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Simple and Integrated
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#interoperable'" data-id="interoperable" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Interoperable
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#sending-api-key-in-request-dtos'" data-id="sending-api-key-in-request-dtos" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Sending API Key in Request DTOs
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#supported-auth-repositories'" data-id="supported-auth-repositories" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Supported Auth Repositories
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#multiple-api-key-types-and-environments'" data-id="multiple-api-key-types-and-environments" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multiple API Key Types and Environments
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#cached-api-key-sessions'" data-id="cached-api-key-sessions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Cached API Key Sessions
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#multitenancy'" data-id="multitenancy" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multitenancy
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#api-key-defaults'" data-id="api-key-defaults" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            API Key Defaults
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#imanageapikeys-api'" data-id="imanageapikeys-api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            IManageApiKeys API
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#built-in-api-key-services'" data-id="built-in-api-key-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Built-in API Key Services
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#generating-api-keys-for-existing-users'" data-id="generating-api-keys-for-existing-users" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Generating API Keys for Existing Users
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#net-framework-example'" data-id="net-framework-example" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            .NET Framework Example
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

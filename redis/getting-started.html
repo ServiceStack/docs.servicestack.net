@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Getting Started with Redis in .NET</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/redis/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Redis                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-managers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Managers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Usage
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/async" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Async
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/custom-commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Generic Custom Commands
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/pubsub" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis PubSub
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/sentinel" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Sentinel
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/lua" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Lua
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/distributed-locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Distributed Locking
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/troubleshooting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Troubleshooting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Related Docs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/stats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Stats
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/redis-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Admin Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/automatic-retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Automatic Retries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/design-nosql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Designing a NoSql Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/schemaless-migration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data migrations with Redis
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Getting Started with Redis in .NET
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="py-8 max-w-7xl mx-auto">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="jBdOvTvjyqY" style="background-image: url('https://img.youtube.com/vi/jBdOvTvjyqY/maxresdefault.jpg')"></lite-youtube>
+</div>
+<h1 id="introduction-to-redis-as-a-technology">Introduction to Redis as a Technology<a class="header-anchor" href="javascript:;" onclick="location.hash='#introduction-to-redis-as-a-technology'" aria-label="Permalink">&ZeroWidthSpace;</a></h1>
+<p>Redis, standing for REmote DIctionary Server, is an open-source, in-memory data structure store. It's widely used as a database, cache, and message broker. With its unique set of features and unparalleled speed, it's a crucial tool for a modern developer's toolkit.</p>
+<h2 id="key-features-of-redis">Key Features of Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#key-features-of-redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Redis supports various kinds of data structures like <a href="https://redis.io/docs/data-types/strings">strings</a>, <a href="https://redis.io/docs/data-types/hashes">hashes</a>, <a href="https://redis.io/docs/data-types/lists">lists</a>, <a href="https://redis.io/docs/data-types/sets">sets</a>, <a href="https://redis.io/docs/data-types/sorted-sets">sorted sets with range queries</a>, <a href="https://redis.io/docs/data-types/bitmaps">bitmaps</a>, <a href="https://redis.io/docs/data-types/hyperloglogs">hyperloglogs</a>, and geospatial indexes with <a href="https://redis.io/docs/data-types/geospatial">radius queries</a>. This wide array of data types and its ability to perform <a href="https://redis.io/docs/manual/transactions/">atomic operations</a> make Redis extremely versatile for solving a myriad of problems.</p>
+<p><img src="../img/pages/redis/getting-started/key-features.png" alt="" /></p>
+<h2 id="high-performance-and-speed">High Performance and Speed<a class="header-anchor" href="javascript:;" onclick="location.hash='#high-performance-and-speed'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>This support for a wide array of fundamental computational storage data structures is what sets Redis apart, and enables <a href="https://redis.io/topics/benchmarks">blazing speed</a> when applied correctly. As an in-memory data store, reading and writing data happens exceedingly fast. This makes Redis an excellent choice for applications that require real-time data processing.</p>
+<p><img src="../img/pages/redis/getting-started/performance.png" alt="" /></p>
+<h2 id="durability-and-persistence">Durability and Persistence<a class="header-anchor" href="javascript:;" onclick="location.hash='#durability-and-persistence'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Even though Redis is an in-memory data store, it provides mechanisms to achieve data <a href="https://redis.io/topics/persistence">persistence</a>. You have the flexibility to choose from options like <a href="https://redis.io/docs/management/persistence/#snapshotting">snapshotting</a> and append-only files (AOF), depending on your application's needs.</p>
+<h2 id="scalability-and-high-availability">Scalability and High Availability<a class="header-anchor" href="javascript:;" onclick="location.hash='#scalability-and-high-availability'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Redis has robust features like <a href="https://redis.io/topics/replication">replication</a>, <a href="https://redis.io/commands/eval">Lua scripting</a>, <a href="https://redis.io/docs/manual/transactions">transactions</a>, and different levels of <a href="https://redis.io/topics/persistence">on-disk persistence</a>. With the help of <a href="https://redis.io/topics/sentinel">Redis Sentinel</a>, it provides high availability via automatic partitioning across multiple Redis nodes. It is also widely supported on major cloud providers as a managed service, like on <a href="https://aws.amazon.com/elasticache/redis/">AWS under the ElastiCache product</a>.</p>
+<p><img src="../img/pages/redis/getting-started/durability.png" alt="" /></p>
+<h2 id="extensible-and-versatile">Extensible and Versatile<a class="header-anchor" href="javascript:;" onclick="location.hash='#extensible-and-versatile'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>You can extend Redis functionality using Redis modules. It's also a good fit for job &amp; queue management, caching, real-time analytics, and many other use-cases.</p>
+<p>Before we dive into using the ServiceStack.Redis .NET client, we will need a locally running Redis server. The easiest way to get this working is by using the <a href="https://hub.docker.com/_/redis">official Redis Docker image</a>, and using <a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a> to run it.</p>
+<h2 id="setting-up-a-local-redis-server-with-docker">Setting Up a Local Redis Server with Docker<a class="header-anchor" href="javascript:;" onclick="location.hash='#setting-up-a-local-redis-server-with-docker'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To follow along with this tutorial, you will need a running instance of Redis. One of the easiest ways to get this set up is through Docker, which allows you to run a Redis server within a container on your machine.</p>
+<p>If you do not have Docker installed, you can download it from the <a href="https://www.docker.com/products/docker-desktop">official Docker website</a>.</p>
+<p>Once you have Docker installed and running, you can set up a Redis instance with the following command:</p>
+<pre><code class="language-bash">docker run --name local-redis -p 6379:6379 -d redis
+</code></pre>
+<p>This command tells Docker to run a container with the name &quot;local-redis&quot;, using the official Redis image from Docker Hub. The <code>-p</code> flag maps the default Redis port (6379) from the container to your local machine, and the <code>-d</code> flag tells Docker to run the container in the background.</p>
+<p>To confirm that your Redis server is running correctly, you can use the following command:</p>
+<pre><code class="language-bash">docker ps
+</code></pre>
+<p>This command lists all running Docker containers. If everything is set up correctly, you should see your &quot;local-redis&quot; container in the list.</p>
+<p>Now, your local Redis server is running and ready to be connected on <code>localhost:6379</code>.</p>
+<p>For more detailed information about Docker commands, you can refer to the <a href="https://docs.docker.com/engine/reference/commandline/cli/">official Docker documentation</a>.</p>
+<h2 id="using-the-redis-cli-from-docker">Using the redis-cli from Docker<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-redis-cli-from-docker'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Another way to validate your local Redis Docker container is running and access it is by using the Redis-CLI.
+If you don't have the Redis-CLI, we can actually use it from the same <code>redis</code> Docker image using the following command.</p>
+<pre><code class="language-bash">docker run -it redis /bin/bash -c &quot;redis-cli -h host.docker.internal&quot;
+</code></pre>
+<blockquote>
+<p><code>host.docker.internal</code> is a way of accessing the Docker host containers, however it may only work on Windows &amp; macOS.</p>
+</blockquote>
+<h2 id="installing-and-setting-up-servicestack.redis-in-your-project">Installing and Setting Up ServiceStack.Redis in Your Project<a class="header-anchor" href="javascript:;" onclick="location.hash='#installing-and-setting-up-servicestack.redis-in-your-project'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Now that we have our local Redis server set up and running, let's move on to adding ServiceStack.Redis to your .NET project. Here we will demonstrate this process in a .NET Console application for simplicity.</p>
+<p>To start with, make sure you have the <a href="https://dotnet.microsoft.com/download">.NET SDK</a> installed on your system. Once you have the SDK, you can create a new Console application with the following command:</p>
+<pre><code class="language-bash">dotnet new console -n RedisConsoleApp
+</code></pre>
+<p>After creating your Console application, navigate to the project directory:</p>
+<pre><code class="language-bash">cd RedisConsoleApp
+</code></pre>
+<p>Then, add the ServiceStack.Redis NuGet package:</p>
+<pre><code class="language-bash">dotnet add package ServiceStack.Redis
+</code></pre>
+<p>Now you have successfully added the ServiceStack.Redis library to your project. In your <code>Program.cs</code>, you can import the library using:</p>
+<pre><code class="language-csharp">using ServiceStack.Redis;
+</code></pre>
+<p>You are now set to start using Redis in your .NET console application.</p>
+<h3 id="using-the-servicestack-x-tool">Using the ServiceStack <code>x</code> tool<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-servicestack-x-tool'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For developers working on larger projects or who want a quicker setup, ServiceStack provides a .NET tool called <code>x</code>. You can install this tool using the following command:</p>
+<pre><code class="language-bash">dotnet tool install --global x
+</code></pre>
+<p>This tool allows you to create new projects and add (mix in) functionality quickly and easily. To create a new web project, you can use the following command:</p>
+<pre><code class="language-bash">x new web ProjectName
+</code></pre>
+<p>To add Redis support to your project, navigate to your project directory and then use the <code>mix</code> command:</p>
+<pre><code class="language-bash">cd ProjectName
+x mix redis
+</code></pre>
+<p>This automatically adds the ServiceStack.Redis library to your project and sets up a basic Redis configuration.</p>
+<p>For further information on using the <code>x</code> tool, refer to the <a href="/dotnet-tool">ServiceStack <code>x</code> tool documentation</a>.</p>
+<h2 id="connecting-and-using-redis-client-managers">Connecting and Using Redis Client Managers<a class="header-anchor" href="javascript:;" onclick="location.hash='#connecting-and-using-redis-client-managers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In the previous section, we installed and set up the ServiceStack.Redis library in our .NET Console application. Now, let's learn how to use the Redis Client Managers provided by this library to interact with Redis.</p>
+<p>ServiceStack.Redis provides a few different client managers, but for this tutorial, we will use <code>RedisManagerPool</code>. This client manager is a simple and efficient pool of Redis clients that is suitable for most use cases.</p>
+<h3 id="connecting-to-redis">Connecting to Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#connecting-to-redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To start, you will first need to establish a connection to your Redis server. You can do this by passing your Redis server's connection string to the <code>RedisManagerPool</code> constructor:</p>
+<pre><code class="language-csharp">var manager = new RedisManagerPool(&quot;localhost:6379&quot;);
+</code></pre>
+<p>Now that you have a manager, you can get a Redis client instance from it:</p>
+<pre><code class="language-csharp">using (var redis = manager.GetClient())
+{
+    // You can now use `redis` to interact with your Redis server.
+}
+</code></pre>
+<h3 id="using-the-client-with.net-core-dependency-injection">Using the Client with .NET Core Dependency Injection<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-client-with.net-core-dependency-injection'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you are building a web application with .NET Core, you might want to make use of .NET Core's built-in dependency injection (DI) to manage your Redis clients. Here is how you can register your <code>RedisManagerPool</code> with the DI container:</p>
+<pre><code class="language-csharp">public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton&lt;IRedisClientsManager&gt;(new RedisManagerPool(&quot;localhost:6379&quot;));
+
+    // Add other services...
+}
+</code></pre>
+<p>Now, the DI container will manage the lifecycle of the <code>RedisManagerPool</code>, and you can inject <a href="https://reference.servicestack.net/api/ServiceStack.Redis/IRedisClientsManager/"><code>IRedisClientsManager</code></a> into your services:</p>
+<pre><code class="language-csharp">public class MyService : Service
+{
+    public IRedisClientsManager RedisClientsManager { get; set; }
+
+    public void Any(Request request)
+    {
+        using (var redis = RedisClientsManager.GetClient())
+        {
+            // Use `redis` to interact with your Redis server.
+        }
+    }
+}
+</code></pre>
+<p>If you are using ServiceStack, you can simply use the <code>base.Redis</code> property from the <code>Service</code> base class to resolve a Redis client:</p>
+<pre><code class="language-csharp">public class MyService : Service
+{
+    public void Any(Request request)
+    {
+        var redis = base.Redis;
+        // Use `redis` to interact with your Redis server.
+    }
+}
+</code></pre>
+<h2 id="leveraging-the-simplicity-of-icacheclient">Leveraging the Simplicity of ICacheClient<a class="header-anchor" href="javascript:;" onclick="location.hash='#leveraging-the-simplicity-of-icacheclient'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>ServiceStack's <code>ICacheClient</code> is an abstraction over caching operations, which allows you to interact with various cache implementations in a standard way. Once <code>IRedisClientsManager</code> is registered in the IoC container, ServiceStack switches the implementation of <code>ICacheClient</code> to use Redis as its backend.</p>
+<p>In ServiceStack services, you can easily access the cache via the <code>base.Cache</code> property of the <code>Service</code> base class. Here is an example of how you can use the <code>Get</code> and <code>Set</code> methods to work with Redis cache:</p>
+<pre><code class="language-csharp">public class MyService : Service
+{
+    public object Any(Request request)
+    {
+        var cacheKey = &quot;unique-cache-key&quot;;
+        var existingValue = base.Cache.Get&lt;string&gt;(cacheKey);
+
+        if (existingValue == null)
+        {
+            existingValue = &quot;This is a value from some expensive operation&quot;;
+            base.Cache.Set(cacheKey, existingValue);
+        }
+
+        return new { Value = existingValue };
+    }
+}
+</code></pre>
+<p>This example checks if a value is available in the cache. If the value is not present, it performs an expensive operation to get the value (in this case, we're just setting a string), then stores the value in the cache for subsequent requests.</p>
+<p>The <code>ICacheClient</code> interface also supports asynchronous operations. If you want to use the async versions of these methods, you can use the <code>base.CacheAsync</code> property of the <code>Service</code> base class:</p>
+<pre><code class="language-csharp">public class MyService : Service
+{
+    public async Task&lt;object&gt; Any(Request request)
+    {
+        var cacheKey = &quot;unique-cache-key&quot;;
+        var existingValue = await base.CacheAsync.Get&lt;string&gt;(cacheKey);
+
+        if (existingValue == null)
+        {
+            existingValue = &quot;This is a value from some expensive operation&quot;;
+            await base.CacheAsync.Set(cacheKey, existingValue);
+        }
+
+        return new { Value = existingValue };
+    }
+}
+</code></pre>
+<p>By using <code>ICacheClient</code>, you can make your application agnostic of the underlying cache implementation, which promotes loose coupling and makes your application easier to test and maintain. You can learn more about the <code>ICacheClient</code> interface and its usage in the <a href="/caching">Caching providers documentation</a>.</p>
+<h2 id="using-the-redisclient-directly">Using the RedisClient Directly<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-redisclient-directly'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>While using <code>ICacheClient</code> provides a high-level abstraction for caching operations, there might be situations where you would need direct access to the underlying Redis client for more granular control or to perform operations not covered by the <code>ICacheClient</code> interface.</p>
+<p>You can use <code>IRedisClient</code> to interact directly with Redis using the commands provided by the Redis server. First, let's get an instance of <code>IRedisClient</code>:</p>
+<pre><code class="language-csharp">using var redis = clientsManager.GetClient();
+</code></pre>
+<p>In this context, <code>clientsManager</code> is an instance of <code>IRedisClientsManager</code>, which is already registered in our .NET Core application's dependency injection container.</p>
+<p>With an instance of <code>IRedisClient</code>, we can perform similar <code>Get</code> and <code>Set</code> operations as we did with <code>ICacheClient</code>:</p>
+<pre><code class="language-csharp">var key = &quot;unique-key&quot;;
+var existingValue = redis.Get&lt;string&gt;(key);
+
+if (existingValue == null)
+{
+    existingValue = &quot;This is a value from some expensive operation&quot;;
+    redis.Set(key, existingValue);
+}
+</code></pre>
+<p>These operations directly correspond to the GET and SET commands in raw Redis:</p>
+<pre><code class="language-bash">GET unique-key
+SET unique-key &quot;This is a value from some expensive operation&quot;
+</code></pre>
+<p>In addition to <code>Get</code> and <code>Set</code>, <code>IRedisClient</code> also exposes other Redis commands. For instance, you can use the <code>Increment</code> method to atomically increment the value of a key:</p>
+<pre><code class="language-csharp">var counterKey = &quot;counter&quot;;
+redis.Increment(counterKey, 1);
+</code></pre>
+<p>The <code>Increment</code> method corresponds to the INCR command in raw Redis:</p>
+<pre><code class="language-bash">INCR counter
+</code></pre>
+<p>By using <code>IRedisClient</code> directly, you have access to the entire set of Redis commands and data structures, which makes it a powerful tool for more advanced use cases. To learn more about the <code>IRedisClient</code> interface and its usage, refer to the <a href="https://reference.servicestack.net/api/ServiceStack.Redis/IRedisClient/">ServiceStack reference documentation site</a>.</p>
+<h2 id="async-usability-of-servicestack.redis">Async Usability of ServiceStack.Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-usability-of-servicestack.redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>One of the great strengths of the ServiceStack.Redis library is its comprehensive support for asynchronous operations via the <code>async</code>/<code>await</code> paradigm in .NET. This allows developers to perform non-blocking I/O operations with Redis, freeing up system resources and improving the efficiency and scalability of your application.</p>
+<p>To make use of asynchronous operations, you'll want to get an instance of <code>IRedisClientAsync</code>:</p>
+<pre><code class="language-csharp">using var redisAsync = await clientsManager.GetClientAsync();
+</code></pre>
+<p>In this context, <code>clientsManager</code> is an instance of <code>IRedisClientsManager</code>, which is already registered in our .NET Core application's dependency injection container.</p>
+<p>Once you have an instance of <code>IRedisClientAsync</code>, you can perform async versions of the usual Redis operations. For instance:</p>
+<pre><code class="language-csharp">var key = &quot;unique-key&quot;;
+var existingValue = await redisAsync.GetAsync&lt;string&gt;(key);
+
+if (existingValue == null)
+{
+    existingValue = &quot;This is a value from some expensive operation&quot;;
+    await redisAsync.SetAsync(key, existingValue);
+}
+</code></pre>
+<p>These operations are non-blocking and make use of the Task-based Asynchronous Pattern (TAP) in .NET. This means you can perform other work while waiting for the Redis operations to complete, improving the responsiveness of your application. This is particularly beneficial in web applications, where efficient handling of requests is critical for performance.</p>
+<p>ServiceStack.Redis async support makes interacting with Redis from .NET applications familiar and straightforward, aligning with the asynchronous programming model in .NET. As such, you can leverage all the benefits of async/await while interacting with Redis in a manner consistent with the rest of your .NET codebase.</p>
+<h2 id="storing-complex-objects-strongly-typed-client-api">Storing Complex Objects: Strongly Typed Client API<a class="header-anchor" href="javascript:;" onclick="location.hash='#storing-complex-objects-strongly-typed-client-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>One of the many powerful features of ServiceStack.Redis library is its support for storing complex objects using the Strongly Typed Client API. This feature provides a more natural and convenient way to work with custom Plain Old CLR Objects (POCOs) and data structures in Redis.</p>
+<p>To use the Strongly Typed Client API, we start by obtaining an instance of the <code>IRedisTypedClient&lt;T&gt;</code>, which can be done using the <code>As&lt;T&gt;</code> method from an <code>IRedisClient</code> instance. Let's assume that we have a <code>Person</code> class defined as follows:</p>
+<pre><code class="language-csharp">public class Person
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+</code></pre>
+<p>To store an instance of the <code>Person</code> class in Redis, we can do the following:</p>
+<pre><code class="language-csharp">using (var redis = clientsManager.GetClient())
+{
+    var redisPeople = redis.As&lt;Person&gt;();
+
+    var person = new Person
+    {
+        Id = &quot;1&quot;,
+        Name = &quot;John Doe&quot;,
+        Age = 30
+    };
+
+    redisPeople.Store(person);
+}
+</code></pre>
+<p>In this example, the <code>redisPeople</code> variable is an instance of <code>IRedisTypedClient&lt;Person&gt;</code>. We can use this instance to call the <code>Store</code> method and save our <code>Person</code> instance to Redis. The ServiceStack.Redis library automatically handles the serialization and deserialization of our POCO.</p>
+<p>Retrieving our <code>Person</code> instance is just as straightforward:</p>
+<pre><code class="language-csharp">using (var redis = clientsManager.GetClient())
+{
+    var redisPeople = redis.As&lt;Person&gt;();
+    var person = redisPeople.GetById(&quot;1&quot;);
+    Console.WriteLine($&quot;Name: {person.Name}, Age: {person.Age}&quot;);
+}
+</code></pre>
+<p>Here we used the <code>GetById</code> method from our <code>redisPeople</code> instance to retrieve the person with the <code>Id</code> &quot;1&quot; from Redis.</p>
+<p>This way of working with complex objects in Redis using ServiceStack.Redis makes it seamless to integrate Redis into your .NET applications, as it aligns with .NET's object-oriented approach.</p>
+<p>In the previous examples, we used the <code>Store</code> method of <code>IRedisTypedClient&lt;T&gt;</code> to store an instance of <code>Person</code> into Redis, and the <code>GetById</code> method to retrieve it. One important thing to note is that these methods automatically handle the generation of the key for Redis.</p>
+<p>The key is generated based on the namespace and the class name of the object being stored, followed by the value of the primary key. This means that when you use <code>Store</code>, ServiceStack.Redis takes care of creating a key like <code>urn:Person:1</code> for a <code>Person</code> instance with an <code>Id</code> of &quot;1&quot;. This pattern also applies when retrieving data with <code>GetById</code>; ServiceStack.Redis knows to look for a key following this pattern.</p>
+<p>This feature is particularly useful when used in combination with ServiceStack's OrmLite, a convention-based, configuration-free lightweight ORM. With OrmLite, you can use the same POCO classes for both your database and Redis operations. The automatic key generation from ServiceStack.Redis aligns with OrmLite's conventions, providing a consistent and intuitive pattern for data storage and retrieval across both systems. This alleviates the need to manually manage keys, allowing developers to focus on working with their data in a more natural, object-oriented manner.</p>
+<p>For more information about ServiceStack's OrmLite, check the <a href="/ormlite/">ServiceStack.OrmLite documentation</a>.</p>
+<h2 id="working-with-redis-data-structures">Working with Redis Data Structures<a class="header-anchor" href="javascript:;" onclick="location.hash='#working-with-redis-data-structures'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In Redis, one of the powerful features is its support for different types of data structures. While key-value storage is fundamental, Redis goes beyond this and provides the ability to manipulate lists, sets, sorted sets, and hashes as well.</p>
+<p>ServiceStack.Redis library provides an intuitive interface to work with these data structures in a way that feels familiar to .NET developers. This is achieved through properties exposed on the <code>IRedisClient</code> interface, each corresponding to one of Redis's data structures.</p>
+<p>Here are examples of how to interact with Lists, Sets, and SortedSets using ServiceStack.Redis:</p>
+<h3 id="lists">Lists<a class="header-anchor" href="javascript:;" onclick="location.hash='#lists'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A Redis list is a simple list of strings, sorted by insertion order. You can work with lists in ServiceStack.Redis through the <code>Lists</code> property.</p>
+<pre><code class="language-csharp">var redis = redisManager.GetClient();
+
+// Add new elements to a Redis list
+redis.Lists[&quot;urn:mylist&quot;].Add(&quot;item1&quot;);
+redis.Lists[&quot;urn:mylist&quot;].Add(&quot;item2&quot;);
+
+// Fetch all elements in the list
+var myList = redis.Lists[&quot;urn:mylist&quot;].GetAll();
+</code></pre>
+<h3 id="sets">Sets<a class="header-anchor" href="javascript:;" onclick="location.hash='#sets'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A Redis set is an unordered collection of unique strings. In ServiceStack.Redis, you can work with sets through the <code>Sets</code> property.</p>
+<pre><code class="language-csharp">var redis = redisManager.GetClient();
+
+// Add new elements to a Redis set
+redis.Sets[&quot;urn:myset&quot;].Add(&quot;item1&quot;);
+redis.Sets[&quot;urn:myset&quot;].Add(&quot;item2&quot;);
+
+// Check if an item exists in the set
+bool exists = redis.Sets[&quot;urn:myset&quot;].Contains(&quot;item1&quot;);
+</code></pre>
+<h3 id="sorted-sets">Sorted Sets<a class="header-anchor" href="javascript:;" onclick="location.hash='#sorted-sets'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A Redis sorted set is similar to a regular set, but each value is associated with a score, which is used to sort the set. It's through the <code>SortedSets</code> property that ServiceStack.Redis allows interaction with sorted sets.</p>
+<pre><code class="language-csharp">var redis = redisManager.GetClient();
+
+// Works with TypedClients as well.
+var typedClient = redis.As&lt;MyClass&gt;();
+
+// Add new elements to a Redis sorted set
+typedClient.SortedSets[&quot;urn:mysortedset&quot;].Add(new MyClass(), 1);
+typedClient.SortedSets[&quot;urn:mysortedset&quot;].Add(new MyClass(), 2);
+
+// Fetch all elements in the sorted set
+var mySortedSet = typedClient.SortedSets[&quot;urn:mysortedset&quot;].GetAll();
+</code></pre>
+<p>As you can see, ServiceStack.Redis makes it easy to work with Redis data structures in a manner that's familiar to .NET developers. With these powerful features at your disposal, you can implement complex data storage and retrieval operations with ease. For a deeper dive into these data structures and their usage, please refer to the <a href="https://redis.io/docs/data-types/tutorial/">Redis data types documentation</a>.</p>
+<h2 id="conclusion-the-power-of-redis-and-servicestack.redis">Conclusion: The Power of Redis and ServiceStack.Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#conclusion-the-power-of-redis-and-servicestack.redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Throughout this tutorial, we've explored the basics of Redis as a technology and have seen how the ServiceStack.Redis library can make interacting with Redis from a .NET environment feel natural and intuitive. However, what we've covered just scratches the surface of what can be achieved with this powerful combination.</p>
+<p>With Redis, we have at our disposal a high-performance, feature-rich in-memory database that supports various data structures. Combined with the real-time data replication, persistence options, and high availability features, Redis is a versatile tool that can suit a wide array of application needs.</p>
+<p>On the other hand, ServiceStack.Redis bridges the gap between the .NET ecosystem and Redis. Its ability to leverage .NET's async/await syntax, work with complex POCO objects, manage connections efficiently, and provide an idiomatic interface to Redis's data structures, truly makes it a powerful tool for any .NET developer looking to utilize Redis.</p>
+<p>If you have suggestions, corrections, or ideas to improve this content, please do share them. Your insights will help us refine this tutorial and better serve readers like you. You can reach out to us via Discord, GitHub Discussions or our Customer Forums.</p>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/redis/" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Redis
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/redis/client-managers" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Redis Client Managers
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#key-features-of-redis'" data-id="key-features-of-redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Key Features of Redis
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#high-performance-and-speed'" data-id="high-performance-and-speed" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            High Performance and Speed
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#durability-and-persistence'" data-id="durability-and-persistence" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Durability and Persistence
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#scalability-and-high-availability'" data-id="scalability-and-high-availability" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Scalability and High Availability
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#extensible-and-versatile'" data-id="extensible-and-versatile" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Extensible and Versatile
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#setting-up-a-local-redis-server-with-docker'" data-id="setting-up-a-local-redis-server-with-docker" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Setting Up a Local Redis Server with Docker
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#using-the-redis-cli-from-docker'" data-id="using-the-redis-cli-from-docker" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Using the redis-cli from Docker
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#installing-and-setting-up-servicestack.redis-in-your-project'" data-id="installing-and-setting-up-servicestack.redis-in-your-project" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Installing and Setting Up ServiceStack.Redis in Your Project
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="using-the-servicestack-x-tool" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#using-the-servicestack-x-tool'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Using the ServiceStack 
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#connecting-and-using-redis-client-managers'" data-id="connecting-and-using-redis-client-managers" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Connecting and Using Redis Client Managers
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="connecting-to-redis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#connecting-to-redis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Connecting to Redis
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="using-the-client-with.net-core-dependency-injection" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#using-the-client-with.net-core-dependency-injection'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Using the Client with .NET Core Dependency Injection
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#leveraging-the-simplicity-of-icacheclient'" data-id="leveraging-the-simplicity-of-icacheclient" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Leveraging the Simplicity of ICacheClient
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#using-the-redisclient-directly'" data-id="using-the-redisclient-directly" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Using the RedisClient Directly
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#async-usability-of-servicestack.redis'" data-id="async-usability-of-servicestack.redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Async Usability of ServiceStack.Redis
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#storing-complex-objects-strongly-typed-client-api'" data-id="storing-complex-objects-strongly-typed-client-api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Storing Complex Objects: Strongly Typed Client API
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#working-with-redis-data-structures'" data-id="working-with-redis-data-structures" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Working with Redis Data Structures
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="lists" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#lists'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Lists
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sets" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sets'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sets
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sorted-sets" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sorted-sets'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sorted Sets
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#conclusion-the-power-of-redis-and-servicestack.redis'" data-id="conclusion-the-power-of-redis-and-servicestack.redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Conclusion: The Power of Redis and ServiceStack.Redis
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

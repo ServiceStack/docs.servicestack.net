@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Design a Blog with Redis</title>
+    <script>
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+<header class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+    <div class="flex flex-wrap items-center max-w-[100rem] mx-auto">
+        <div class="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
+            <div class="cursor-pointer">
+                <a class="navbar-brand flex items-center" href="/">
+                    <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                    <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+                </a>
+            </div>
+        </div>
+        <div class="flex flex-grow flex-shrink flex-nowrap justify-end items-center">
+            <nav class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap items-center justify-end w-full m-0 pb-2 sm:pb-0">
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/templates/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Project Templates
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/vue/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Vue
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/autoquery/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    AutoQuery
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/locode/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Locode
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/auth/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Security
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/grpc/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    gRPC
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/ormlite/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    OrmLite
+                                </a>
+                            </li>
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/redis/" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400 text-blue-700 dark:text-blue-300">
+                                    Redis
+                                </a>
+                            </li>
+                    <li class="relative flex flex-wrap just-fu-start m-0">
+                        <div data-component="DarkModeToggle" class="ml-2 w-10"></div>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>
+<script type="module">
+import { mountAll } from "app.mjs"
+mountAll()
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-14 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
+                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+                                <a href="/redis/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Redis                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-managers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Managers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/client-usage" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client Usage
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/async" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Async
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Advanced
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/custom-commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Generic Custom Commands
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/pubsub" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis PubSub
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/sentinel" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Sentinel
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/lua" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Lua
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/distributed-locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Distributed Locking
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/troubleshooting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Troubleshooting
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Redis - Related Docs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/redis/client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Client
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/typed-transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Typed Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/stats" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Stats
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/profiling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Profiling
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/redis-desktop" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Redis Admin Desktop
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/automatic-retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Automatic Retries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/design-nosql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Designing a NoSql Database
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/redis/schemaless-migration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data migrations with Redis
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg" style="width:var(--content-width)">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Design a Blog with Redis
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <p>This page illustrates a good solution on how to design a simple Blog application with <a href="http://redis.io">Redis</a> using advanced features of
+<a href="https://github.com/ServiceStack/ServiceStack.Redis">ServiceStack's C# Redis Client</a> to provide fast, simple and elegant solutions to real world scenarios.</p>
+<h4 id="all-redis-blog-application-pages">All Redis Blog application pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#all-redis-blog-application-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>Designing a NoSQL Database using Redis</li>
+<li><a href="./schemaless-migration.md">Painless data migrations using Redis and other schema-less NoSQL datastores</a></li>
+</ul>
+<h2 id="designing-a-nosql-database-using-redis">Designing a NoSQL Database using Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#designing-a-nosql-database-using-redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Oren Eini from the popular .NET blog <a href="http://ayende.com/Blog/">http://ayende.com/Blog/</a>, is putting together a
+<a href="http://ayende.com/Blog/archive/2010/04/20/that-no-sql-thing-the-relational-modeling-anti-pattern-in.aspx">series of blog posts</a> explaining how to go about designing a
+simple blog application using a NoSQL database. Although he's using his RavenDB as a reference implementation, this example applies equally well to Redis and other
+NoSQL variants. Some solutions will vary based on the advanced features of each NoSQL solution but the 'core data models' should remain the same.</p>
+<p>I will try to add my own thoughts on and where possible show how you can use the advanced features in Redis the C# Client to provide simple, fast and effective solutions.
+The entire source code for this example is available in its simplest form at:
+<a href="https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BlogPostExample.cs">BlogPostExample.cs</a>.
+I will be re-factoring this solution in what I consider a 'best practices approach' for large applications where I will shove all Redis access behind a repository
+(so the client doesn't know it's even being used) which I will be maintaining at:
+<a href="https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BestPractice/BlogPostBestPractice.cs">BlogPostBestPractice.cs</a></p>
+<h2 id="modeling-entities-in-a-nosql-database">Modeling Entities in a NoSQL Database<a class="header-anchor" href="javascript:;" onclick="location.hash='#modeling-entities-in-a-nosql-database'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>If you've spent a lot of time building solutions with an RDBMS back-end it can be hard to know which part of your schema is due to the problem domain and which part is the result of an implementation constraint trying to map your ideal domain model onto a relational tabular structure.</p>
+<p>My approach before designing any system is to map out the ideal domain model we need to build in order before I reach for an IDE or a db gui schema creator. Unfortunately creating POCO types is just so damn quick in VS.NET/C#/R# that I've ditched the pencil and paper a long time ago and jump right into using C# automatic properties like a kind of light-weight DSL ripping out entities quicker than I can draw crows feet :)</p>
+<p>If you are like me and prefer to design your domain models from POCO types rather than creating RDBMS tables than you're in good shape in implementing a NoSQL solution as the time when you usually morph your pristine domain models into a tabular structure peppering it with Primary and Foreign keys can now saved and put towards a longer lunch break as most of the times you can skip this step entirely.</p>
+<p>The schema-less nature of NoSQL databases means you can pretty much store your domain models as-is. You will still need to identify your distinct entities from your Key Value Objects. A good guide I use to help with this is whether the Model only makes sense in the context its parent and whether it is 'co-owned' or referenced by another entity. This is where we start pulling the domain model apart, basically you just replace the collection of strongly-typed entities to a collection of entity ids. Effectively you can think of this like foreign-keys but at a much higher level as you only pull it apart of the domain model when you want to manage the entities independently of each other, not as dictated by your schema.</p>
+<p>Taking the User model in it's most simplest form. A User has many blogs, now as you may want to view a list of blogs outside the context of a User (e.g. view a list of newly created blogs, most popular blogs for a category, etc). It becomes a good candidate to being promoted a first class entity.</p>
+<pre><code class="language-csharp">//Before
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List&lt;Blog&gt; Blogs { get; set; }
+}
+
+//After
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List&lt;int&gt; BlogIds { get; set; }
+}
+</code></pre>
+<p>With only a running redis-server instance running and the C# client, the full source to persist and retrieve a list of users is only:</p>
+<pre><code class="language-csharp">var redis = new RedisClient();
+var redisUsers = redis.As&lt;User&gt;();
+redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = &quot;ayende&quot; });
+redisUsers.Store(new User { Id = redisUsers.GetNextSequence(), Name = &quot;mythz&quot; });
+
+var allUsers = redisUsers.GetAll();
+
+//Recursively print the values of the POCO
+allUsers.PrintDump();
+/*Output
+[
+    {
+        Id: 1,
+        Name: ayende,
+        BlogIds: []
+    },
+    {
+        Id: 2,
+        Name: mythz,
+        BlogIds: []
+    }
+]
+    */
+</code></pre>
+<p><em>Note: <a href="http://www.servicestack.net/mythz_blog/?p=202">You can also use the generic T.Dump() Extension method yourself</a>.</em></p>
+<p>Ayende has outlined a few scenarios that the Blog application should support.</p>
+<ul>
+<li>Main page: show list of blogs</li>
+<li>Main page: show list of recent posts</li>
+<li>Main page: show list of recent comments</li>
+<li>Main page: show tag cloud for posts</li>
+<li>Main page: show categories</li>
+<li>Post page: show post and all comments</li>
+<li>Post page: add comment to post</li>
+<li>Tag page: show all posts for tag</li>
+<li>Categories page: show all posts for category</li>
+</ul>
+<p>The full source code for the Redis solution for each of these scenarios is <a href="https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BlogPostExample.cs">available here</a>. Although I will go through each solution in a little more detail below.</p>
+<h3 id="main-page-show-list-of-blogs">Main page: show list of blogs<a class="header-anchor" href="javascript:;" onclick="location.hash='#main-page-show-list-of-blogs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Before we can show a list of blogs, we need to add some first.
+Here I make effective use of the Redis client's unique sequence that is maintained for each type.</p>
+<p>In identifying my entities I have a general preference for 'automated ids' which are either
+sequential integer ids or Guids - if the entities are going to be distributed across multiple data stores.</p>
+<p>Apart from that persisting an object is just a straight forward process of serializing the object graph into a text-serialization format.
+By default, the Redis Client uses <a href="https://github.com/ServiceStack/ServiceStack.Text">Service Stack's JsonSerializer</a> as it's the fastest and JSON Serializer for .NET.</p>
+<pre><code class="language-csharp">//Retrieve strongly-typed Redis clients that let's you natively persist POCO's
+var redisUsers = redis.As&lt;User&gt;();
+var redisBlogs = redis.As&lt;Blog&gt;();
+//Create the user, getting a unique User Id from the User sequence.
+var mythz = new User { Id = redisUsers.GetNextSequence(), Name = &quot;Demis Bellot&quot; };
+
+//create some blogs using unique Ids from the Blog sequence. Also adding references
+var mythzBlogs = new List&lt;Blog&gt;
+{
+    new Blog
+    {
+        Id = redisBlogs.GetNextSequence(),
+        UserId = mythz.Id,
+        UserName = mythz.Name,
+        Tags = new List&lt;string&gt; { &quot;Architecture&quot;, &quot;.NET&quot;, &quot;Redis&quot; },
+    },
+    new Blog
+    {
+        Id = redisBlogs.GetNextSequence(),
+        UserId = mythz.Id,
+        UserName = mythz.Name,
+        Tags = new List&lt;string&gt; { &quot;Music&quot;, &quot;Twitter&quot;, &quot;Life&quot; },
+    },
+};
+//Add the blog references
+mythzBlogs.ForEach(x =&gt; mythz.BlogIds.Add(x.Id));
+
+//Store the user and their blogs
+redisUsers.Store(mythz);
+redisBlogs.StoreAll(mythzBlogs);
+
+//retrieve all blogs
+var blogs = redisBlogs.GetAll();
+
+blogs.PrintDump();
+/*Output
+[
+    {
+        Id: 1,
+        UserId: 1,
+        UserName: Demis Bellot,
+        Tags: 
+        [
+            Architecture,
+            .NET,
+            Redis
+        ],
+        BlogPostIds: []
+    },
+    {
+        Id: 2,
+        UserId: 1,
+        UserName: Demis Bellot,
+        Tags: 
+        [
+            Music,
+            Twitter,
+            Life
+        ],
+        BlogPostIds: []
+    }
+]
+*/
+</code></pre>
+<h3 id="main-page-show-list-of-recent-comments">Main page: show list of recent comments<a class="header-anchor" href="javascript:;" onclick="location.hash='#main-page-show-list-of-recent-comments'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For this scenario we can take advantage of Redis's LTRIM'ing operation to maintain custom rolling lists.
+The richness of <a href="http://redis.io/commands/rpush">Redis list operations</a> also allow us to prepend or append at either end of the list which we take advantage of in this example.</p>
+<pre><code class="language-csharp">//Get strongly-typed clients
+var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var redisComments = redis.As&lt;BlogPostComment&gt;();
+//To keep this example let's pretend this is a new list of blog posts
+var newIncomingBlogPosts = redisBlogPosts.GetAll();
+
+//Let's get back an IList&lt;BlogPost&gt; wrapper around a Redis server-side List.
+var recentPosts = redisBlogPosts.Lists[&quot;urn:BlogPost:RecentPosts&quot;];
+var recentComments = redisComments.Lists[&quot;urn:BlogPostComment:RecentComments&quot;];
+
+foreach (var newBlogPost in newIncomingBlogPosts)
+{
+    //Prepend the new blog posts to the start of the 'RecentPosts' list
+    recentPosts.Prepend(newBlogPost);
+
+    //Prepend all the new blog post comments to the start of the 'RecentComments' list
+    newBlogPost.Comments.ForEach(recentComments.Prepend);
+}
+
+//Make this a Rolling list by only keep the latest 3 posts and comments
+recentPosts.Trim(0, 2);
+recentComments.Trim(0, 2);
+
+//Print out the last 3 posts:
+recentPosts.GetAll().PrintDump();
+/* Output: 
+[
+    {
+        Id: 2,
+        BlogId: 2,
+        Title: Redis,
+        Categories: 
+        [
+            NoSQL,
+            Cache
+        ],
+        Tags: 
+        [
+            Redis,
+            NoSQL,
+            Scalability,
+            Performance
+        ],
+        Comments: 
+        [
+            {
+                Content: First Comment!,
+                CreatedDate: 2010-04-20T22:14:02.755878Z
+            }
+        ]
+    },
+    {
+        Id: 1,
+        BlogId: 1,
+        Title: RavenDB,
+        Categories: 
+        [
+            NoSQL,
+            DocumentDB
+        ],
+        Tags: 
+        [
+            Raven,
+            NoSQL,
+            JSON,
+            .NET
+        ],
+        Comments: 
+        [
+            {
+                Content: First Comment!,
+                CreatedDate: 2010-04-20T22:14:02.755878Z
+            },
+            {
+                Content: Second Comment!,
+                CreatedDate: 2010-04-20T22:14:02.755878Z
+            }
+        ]
+    },
+    {
+        Id: 4,
+        BlogId: 2,
+        Title: Couch Db,
+        Categories: 
+        [
+            NoSQL,
+            DocumentDB
+        ],
+        Tags: 
+        [
+            CouchDb,
+            NoSQL,
+            JSON
+        ],
+        Comments: 
+        [
+            {
+                Content: First Comment!,
+                CreatedDate: 2010-04-20T22:14:02.755878Z
+            }
+        ]
+    }
+]
+*/
+
+recentComments.GetAll().PrintDump();
+/* Output:
+[
+    {
+        Content: First Comment!,
+        CreatedDate: 2010-04-20T20:32:42.2970956Z
+    },
+    {
+        Content: First Comment!,
+        CreatedDate: 2010-04-20T20:32:42.2970956Z
+    },
+    {
+        Content: First Comment!,
+        CreatedDate: 2010-04-20T20:32:42.2970956Z
+    }
+]
+*/
+</code></pre>
+<h3 id="main-page-show-tag-cloud-for-posts">Main page: show tag cloud for posts<a class="header-anchor" href="javascript:;" onclick="location.hash='#main-page-show-tag-cloud-for-posts'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Redis Sorted Sets provide the perfect data structure to maintain a Tag cloud of all tags.
+It's very fast, elegant structure which provides custom-specific operations to maintain and sort the data.</p>
+<pre><code class="language-csharp">//Get strongly-typed clients
+var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var newIncomingBlogPosts = redisBlogPosts.GetAll();
+
+foreach (var newBlogPost in newIncomingBlogPosts)
+{
+    //For every tag in each new blog post, increment the number of times each Tag has occurred 
+    newBlogPost.Tags.ForEach(x =&gt;
+        redis.IncrementItemInSortedSet(&quot;urn:TagCloud&quot;, x, 1));
+}
+
+//Show top 5 most popular tags with their scores
+var tagCloud = redis.GetRangeWithScoresFromSortedSetDesc(&quot;urn:TagCloud&quot;, 0, 4);
+tagCloud.PrintDump();
+/* Output:
+[
+    [
+        NoSQL,
+            4
+    ],
+    [
+        Scalability,
+            2
+    ],
+    [
+        JSON,
+            2
+    ],
+    [
+        Redis,
+            1
+    ],
+    [
+        Raven,
+            1
+    ],
+]
+*/
+</code></pre>
+<h3 id="main-page-show-categories">Main page: show categories<a class="header-anchor" href="javascript:;" onclick="location.hash='#main-page-show-categories'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To keep a unique list of categories the right structure to use is a Set.
+This allows you to freely add a value multiple times and there will never be any
+duplicates as only one of each value is stored.</p>
+<pre><code class="language-csharp">var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var blogPosts = redisBlogPosts.GetAll();
+
+foreach (var blogPost in blogPosts)
+{
+    blogPost.Categories.ForEach(x =&gt;
+            redis.AddToSet(&quot;urn:Categories&quot;, x));
+}
+
+var uniqueCategories = redis.GetAllFromSet(&quot;urn:Categories&quot;);
+uniqueCategories.PrintDump();
+/* Output:
+[
+    DocumentDB,
+    NoSQL,
+    Cluster,
+    Cache
+]
+*/
+</code></pre>
+<h3 id="post-page-show-post-and-all-comments">Post page: show post and all comments<a class="header-anchor" href="javascript:;" onclick="location.hash='#post-page-show-post-and-all-comments'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>There is nothing special to do here since comments are Key Value Objects they are
+stored and retrieved with the post, so retrieving the post retrieves it's comments as well.</p>
+<pre><code class="language-csharp">var postId = 1;
+var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var selectedBlogPost = redisBlogPosts.GetById(postId.ToString());
+
+selectedBlogPost.PrintDump();
+/* Output:
+{
+    Id: 1,
+    BlogId: 1,
+    Title: RavenDB,
+    Categories: 
+    [
+        NoSQL,
+        DocumentDB
+    ],
+    Tags: 
+    [
+        Raven,
+        NoSQL,
+        JSON,
+        .NET
+    ],
+    Comments: 
+    [
+        {
+            Content: First Comment!,
+            CreatedDate: 2010-04-20T21:26:31.9918236Z
+        },
+        {
+            Content: Second Comment!,
+            CreatedDate: 2010-04-20T21:26:31.9918236Z
+        }
+    ]
+}
+*/
+</code></pre>
+<h3 id="post-page-add-comment-to-post">Post page: add comment to post<a class="header-anchor" href="javascript:;" onclick="location.hash='#post-page-add-comment-to-post'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Modifying an entity are one of the strengths of a schema-less data store.
+Adding a comment is as simple as</p>
+<ul>
+<li>retrieving it's parent post</li>
+<li>modifying the POCO entity in memory by adding a comment to the existing list</li>
+<li>then saving the entity.</li>
+</ul>
+<pre><code class="language-csharp">var postId = 1;
+var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var blogPost = redisBlogPosts.GetById(postId.ToString());
+blogPost.Comments.Add(
+    new BlogPostComment { Content = &quot;Third Post!&quot;, CreatedDate = DateTime.UtcNow });
+redisBlogPosts.Store(blogPost);
+
+var refreshBlogPost = redisBlogPosts.GetById(postId.ToString());
+refreshBlogPost.PrintDump();
+/* Output:
+{
+    Id: 1,
+    BlogId: 1,
+    Title: RavenDB,
+    Categories: 
+    [
+        NoSQL,
+        DocumentDB
+    ],
+    Tags: 
+    [
+        Raven,
+        NoSQL,
+        JSON,
+        .NET
+    ],
+    Comments: 
+    [
+        {
+            Content: First Comment!,
+            CreatedDate: 2010-04-20T21:32:39.9688707Z
+        },
+        {
+            Content: Second Comment!,
+            CreatedDate: 2010-04-20T21:32:39.9688707Z
+        },
+        {
+            Content: Third Post!,
+            CreatedDate: 2010-04-20T21:32:40.2688879Z
+        }
+    ]
+}
+*/
+</code></pre>
+<h3 id="tag-page-show-all-posts-for-tag">Tag page: show all posts for tag<a class="header-anchor" href="javascript:;" onclick="location.hash='#tag-page-show-all-posts-for-tag'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Basically in order to view all the posts for a particular category we'll need to provide
+a reverse-index by adding all matching post ids into a 'Category &gt; Post Id' Set.</p>
+<p>From there it's just a matter of performing a batch request fetching all the Posts with the supplied Ids:</p>
+<pre><code class="language-csharp">var redisBlogPosts = redis.As&lt;BlogPost&gt;();
+var newIncomingBlogPosts = redisBlogPosts.GetAll();
+
+foreach (var newBlogPost in newIncomingBlogPosts)
+{
+    //For each post add it's Id into each of it's 'Cateogry &gt; Posts' index
+    newBlogPost.Categories.ForEach(x =&gt;
+            redis.AddToSet(&quot;urn:Category:&quot; + x, newBlogPost.Id.ToString()));
+}
+
+//Retrieve all the post ids for the category you want to view
+var documentDbPostIds = redis.GetAllFromSet(&quot;urn:Category:DocumentDB&quot;);
+
+//Make a batch call to retrieve all the posts containing the matching ids 
+//(i.e. the DocumentDB Category posts)
+var documentDbPosts = redisBlogPosts.GetByIds(documentDbPostIds);
+
+documentDbPosts.PrintDump();
+/* Output:
+[
+    {
+        Id: 4,
+        BlogId: 2,
+        Title: Couch Db,
+        Categories: 
+        [
+            NoSQL,
+            DocumentDB
+        ],
+        Tags: 
+        [
+            CouchDb,
+            NoSQL,
+            JSON
+        ],
+        Comments: 
+        [
+            {
+                Content: First Comment!,
+                CreatedDate: 2010-04-20T21:38:24.6305842Z
+            }
+        ]
+    },
+    {
+        Id: 1,
+        BlogId: 1,
+        Title: RavenDB,
+        Categories: 
+        [
+            NoSQL,
+            DocumentDB
+        ],
+        Tags: 
+        [
+            Raven,
+            NoSQL,
+            JSON,
+            .NET
+        ],
+        Comments: 
+        [
+            {
+                Content: First Comment!,
+                CreatedDate: 2010-04-20T21:38:24.6295842Z
+            },
+            {
+                Content: Second Comment!,
+                CreatedDate: 2010-04-20T21:38:24.6295842Z
+            }
+        ]
+    }
+]
+*/
+</code></pre>
+
+
+                <div class="not-prose"></div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/redis/automatic-retries" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Automatic Retries
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/redis/schemaless-migration" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Data migrations with Redis
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#designing-a-nosql-database-using-redis'" data-id="designing-a-nosql-database-using-redis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Designing a NoSQL Database using Redis
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#modeling-entities-in-a-nosql-database'" data-id="modeling-entities-in-a-nosql-database" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Modeling Entities in a NoSQL Database
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="main-page-show-list-of-blogs" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#main-page-show-list-of-blogs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Main page: show list of blogs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="main-page-show-list-of-recent-comments" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#main-page-show-list-of-recent-comments'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Main page: show list of recent comments
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="main-page-show-tag-cloud-for-posts" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#main-page-show-tag-cloud-for-posts'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Main page: show tag cloud for posts
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="main-page-show-categories" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#main-page-show-categories'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Main page: show categories
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="post-page-show-post-and-all-comments" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#post-page-show-post-and-all-comments'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Post page: show post and all comments
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="post-page-add-comment-to-post" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#post-page-add-comment-to-post'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Post page: add comment to post
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="tag-page-show-all-posts-for-tag" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#tag-page-show-all-posts-for-tag'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Tag page: show all posts for tag
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+mount('#doc', App)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/js/custom.js"></script>
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<script type="module">
+import { $$, $1, on, leftPart, map } from "@servicestack/client"
+//change #hash on scroll
+const headings = $$('h2[id],h3[id]')
+
+function select(id) {
+    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
+    map($1(`.docmap [data-id='${id}']`), el => {
+        el.classList.add('active')
+        map(el.closest('.group'), el => el.classList.add('active'))
+    })
+}
+
+on(document, {
+    scroll(e) {
+        headings.forEach(ha => {
+            const rect = ha.getBoundingClientRect()
+            if (rect.top > 0 && rect.top < 150) {
+                const location = leftPart(window.location.toString(), '#')
+                history.replaceState(null, null, location + '#' + ha.id)
+                select(ha.id)
+            }
+        })
+    }
+})
+if (location.hash) {
+    select(location.hash.substring(1))
+}
+
+//scroll menu item into view
+function isInView(el) {
+  const box = el.getBoundingClientRect();
+  return box.top < window.innerHeight && box.bottom >= 0;
+}
+
+const active = $1('.sidebar .active')
+if (active && !isInView(active)) {
+    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
+}
+</script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
