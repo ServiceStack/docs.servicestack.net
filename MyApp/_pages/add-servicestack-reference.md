@@ -336,7 +336,7 @@ that are able to take advantage of the integrated and transparent JWT and Refres
 
 ### Refresh Token Cookies supported in all Service Clients
 
-::include includes/jwt-service-clients.md::
+::include /includes/jwt-service-clients.md::
 
 ### Integrate with Visual Studio
 
@@ -562,4 +562,4 @@ The Add ServiceStack Reference dialog just takes the URL provided and requests t
 | /types/vbnet        | VB .NET  |
 | /types/metadata     | Metadata |
 
-::include includes/add-servicestack-reference-footer.md::
+::include /includes/add-servicestack-reference-footer.md::

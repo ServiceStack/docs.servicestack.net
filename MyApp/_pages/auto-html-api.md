@@ -18,7 +18,7 @@ The Auto HTML Page provides instant utility for API consumers in consuming your 
 
 Lets take a quick tour through each of these features:
 
-### PREVIEW
+## PREVIEW
 
 Calling our APIs in a browser will greet us with the Preview page which uses the [HtmlFormat](/vue/gallery/formats#htmlformat) to display the API response in a
 beautiful Tailwind style with links to different [Content-Type Formats](/formats) and direct links to view it in [API Explorer](/api-explorer) and [Locode](/locode/) for [AutoQuery](/autoquery/rdbms) APIs:
@@ -29,7 +29,7 @@ beautiful Tailwind style with links to different [Content-Type Formats](/formats
     </div>
 </a>
 
-### JSON
+## JSON
 
 Developers who wish to view the actual JSON API Response can click on the **JSON** tab to view the JSON in pretty-formatted syntax-highlighted form with a 1-click button to copy:
 
@@ -39,7 +39,7 @@ Developers who wish to view the actual JSON API Response can click on the **JSON
     </div>
 </a>
 
-### FORM
+## FORM
 
 You don't need to build UIs before non-developers can access your APIs with the **FORM** tab which uses the new [AutoForm](/vue/gallery/autoform) component
 to render an optimal UI to call an API that you can further customize from your C# Request DTOs:
@@ -50,7 +50,7 @@ to render an optimal UI to call an API that you can further customize from your 
     </div>
 </a>
 
-### CODE
+## CODE
 
 The **CODE** tab gives you an appealing API docs page you can immediately share with any 3rd Party Developers that want to consume your APIs, with simple
 step-by-step instructions for how to call your APIs from their preferred programming language:
@@ -65,16 +65,16 @@ A nice benefit of ServiceStack's API Design is that consuming APIs are fundament
 dependency containing a generic ServiceClient which can be used to call any ServiceStack API using the typed DTOs copied directly from the API docs page
 to enable an end-to-end typed API without any external tooling or build steps.
 
-### API Fallback HTML Page
+## API Fallback HTML Page
 
 The Auto HTML API is the fallback HTML page returned for APIs when calling user-defined routes from a browser (i.e. **Accept: text/html**):
 
-#### [https://northwind.netcore.io/customers/ALFKI](https://northwind.netcore.io/customers/ALFKI)
+### [https://northwind.netcore.io/customers/ALFKI](https://northwind.netcore.io/customers/ALFKI)
 
 When calling the [/api pre-defined route](/routing#json-api-pre-defined-route) with the `.html` extension:
 
-#### [https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI](https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI)
+### [https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI](https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI)
 
 When calling the [/api pre-defined route](/routing#json-api-pre-defined-route) with `?format=html`:
 
-#### [https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html](https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html)
+### [https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html](https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html)

@@ -33,11 +33,15 @@ e.g. the pre-defined url to call a JSON 'Hello' Service is:
 
 Over the last decade [JSON](https://www.json.org/json-en.html) has stood out and become more popular than all others combined, where it's the lingua franca for calling APIs in Web Apps and what our [Add ServiceStack Reference](/add-servicestack-reference) ecosystem of languages relies on. Due to its overwhelming dominance for usage in APIs we've decided to elevate its status and give it a pre-defined route of its very own at:
 
+<div class="not-prose">
 <h3 class="text-4xl text-center text-indigo-800 pb-3">/api/{Request}</h3>
+</div>
 
 This simple convention makes it easy to remember the route new APIs are immediately available on & pairs nicely with [API Explorer's](/api-explorer):
 
+<div class="not-prose">
 <h3 class="text-4xl text-center text-indigo-800 pb-3">/ui/{Request}</h3>
+</div>
 
 ### Benefits in Jamstack Apps
 

@@ -1111,10 +1111,10 @@ When using the default `FileSystemVirtualFiles` VFS provider this would require 
 
 ## Refresh Token Cookies supported in all Service Clients
 
-::include includes/jwt-service-clients.md::
+::include /includes/jwt-service-clients.md::
 
 ## JWT Configuration
-
+~~~~
 The JWT Auth Provider provides the following options to customize its behavior: 
 
 ```csharp
