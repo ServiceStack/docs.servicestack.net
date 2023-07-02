@@ -1,0 +1,28 @@
+
+
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="header-anchor" href="javascript:;" onclick="location.hash='#troubleshooting'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="x-command-not-found">x: command not found<a class="header-anchor" href="javascript:;" onclick="location.hash='#x-command-not-found'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If after installing any of the <code>dotnet</code> tools it fails with <code>bash: x: command not found</code> you'll need to add <strong>dotnet tools</strong> to your <code>PATH</code>
+which you can do in Linux Bash with:</p>
+<pre><code class="language-bash">$ echo &quot;export PATH=\$HOME/.dotnet/tools:\$PATH&quot; &gt;&gt; ~/.bashrc
+$ . ~/.bashrc
+</code></pre>
+<h3 id="ssl-connection-errors">SSL Connection Errors<a class="header-anchor" href="javascript:;" onclick="location.hash='#ssl-connection-errors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To resolve SSL Connection errors you can try <a href="https://github.com/dotnet/corefx/issues/33179#issuecomment-435118249">commenting out ssl_conf = ssl_sect</a>, e.g:</p>
+<pre><code class="language-bash">$ sudo vi /etc/ssl/openssl.cnf
+</code></pre>
+<p>Comment out line in <code>vi</code> using a <code>#</code> prefix, write changes and quit:</p>
+<pre><code>:%s/^ssl_conf/#&amp;/
+:wq
+</code></pre>
+<p>If that doesn't resolve the issue you can try <a href="https://github.com/dotnet/corefx/issues/30147#issuecomment-410526404">updating the local ca-certificates</a>:</p>
+<pre><code class="language-bash">$ sudo update-ca-certificates --fresh
+</code></pre>
+<p>Or try <a href="https://github.com/dotnet/core/issues/1941#issuecomment-421387136">updating the SSL_CERT Environment variables</a> before running the tool again:</p>
+<pre><code class="language-bash">export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+export SSL_CERT_DIR=/dev/null
+</code></pre>
+<p>Finally you can try running the <code>x</code> tool with the <code>--ignore-ssl-errors</code> switch, e.g:</p>
+<pre><code class="language-bash">$ x new vue-lite VueLite --ignore-ssl-errors
+</code></pre>
