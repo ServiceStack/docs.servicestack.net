@@ -14,10 +14,10 @@ public class MarkdownPages : MarkdownPagesBase<MarkdownFileInfo>
     public MarkdownPages(ILogger<MarkdownPages> log, IWebHostEnvironment env) : base(log,env) {}
     List<MarkdownFileInfo> Pages { get; set; } = new();
     public List<MarkdownFileInfo> GetVisiblePages(string? prefix=null, bool allDirectories=false) => prefix == null 
-        ? Pages.Where(x => IsVisible(x) && !x.Slug!.Contains('/')).OrderBy(x => x.Order).ToList()
+        ? Pages.Where(x => IsVisible(x) && !x.Slug!.Contains('/')).OrderBy(x => x.Order).ThenBy(x => x.Path).ToList()
         : Pages.Where(x => IsVisible(x) && x.Slug!.StartsWith(prefix.WithTrailingSlash()))
             .Where(x => allDirectories || (x.Slug.CountOccurrencesOf('/') == prefix.CountOccurrencesOf('/') + 1))
-            .OrderBy(x => x.Order).ToList();
+            .OrderBy(x => x.Order).ThenBy(x => x.Path).ToList();
 
     public MarkdownFileInfo? GetBySlug(string slug)
     {
