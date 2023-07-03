@@ -69,7 +69,7 @@ public class ConfigureSsg : IHostingStartup
             var pos = txt.IndexOf("url = ", StringComparison.Ordinal);
             if (pos >= 0)
             {
-                var url = txt[(pos + "url = ".Length)..].LastLeftPart(".git");
+                var url = txt[(pos + "url = ".Length)..].LastLeftPart(".git").LastLeftPart('\n').Trim();
                 var gitBaseUrl = url.CombineWith($"blob/main/{srcDir.Name}");
                 return gitBaseUrl;
             }
