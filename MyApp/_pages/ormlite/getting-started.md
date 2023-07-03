@@ -111,14 +111,32 @@ OrmLite is a lightweight, convention-based Object-Relational Mapper (ORM) offere
 
 ### Setup and Installation
 
-To begin using OrmLite, you'll need to install it in your project. For a basic Console application, you'll want to add the OrmLite NuGet package for the database you're planning to use. This tutorial will use SQLite as an example. So, within your Package Manager Console, input `Install-Package ServiceStack.OrmLite.Sqlite`.
+To begin using OrmLite, you'll need to install it in your project. For a basic Console application, you'll want to add the OrmLite NuGet package for the database you're planning to use. This tutorial will use SQLite as an example. So, within your Package Manager Console, input `Install-Package ServiceStack.OrmLite.Sqlite` or use `dotnet .
 
 ```bash
-dotnet add ServiceStack.OrmLite.SqlServer   // SQLServer 2012+
-dotnet add ServiceStack.OrmLite.Sqlite      // Sqlite
-dotnet add ServiceStack.OrmLite.PostgreSQL  // PostgreSQL 
-dotnet add ServiceStack.OrmLite.MySql       // MySql
+dotnet add package ServiceStack.OrmLite.SqlServer   // SQLServer 2012+
+dotnet add package ServiceStack.OrmLite.Sqlite      // Sqlite
+dotnet add package ServiceStack.OrmLite.PostgreSQL  // PostgreSQL 
+dotnet add package ServiceStack.OrmLite.MySql       // MySql
 ```
+
+Or you can add the following to your `csproj` file.
+
+::: nuget
+`<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="6.*" />`
+:::
+
+::: nuget
+`<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="6.*" />`
+:::
+
+::: nuget
+`<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />`
+:::
+
+::: nuget
+`<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
+:::
 
 The next step is creating a connection to your database. Here's how you do it for SQLite:
 
