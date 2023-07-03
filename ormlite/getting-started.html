@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-07-03T05:53:31.3600345Z'>
+    <meta name='date' content='2023-07-03T07:34:31.6190894Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Getting started with OrmLite</title>
@@ -392,10 +392,341 @@ public class Reports { ... }
 public class QueryReports : QueryDb&lt;Reports&gt; {}
 </code></pre>
 <p>More examples available in <a href="/multitenancy">Multitenancy</a> docs.</p>
-<h2 id="ormlite-interactive-tour">OrmLite Interactive Tour<a class="header-anchor" href="javascript:;" onclick="location.hash='#ormlite-interactive-tour'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>A quick way to learn about OrmLite is to take the <a href="https://gist.cafe/87164fa870ac7503b43333d1d275456c?docs=8a70f8bf2755f0a755afeca6b2a5238e">OrmLite Interactive Tour</a> which lets you try out and explore different OrmLite features immediately from the comfort of your own
-browser without needing to install anything:</p>
-<p><a href="https://gist.cafe/87164fa870ac7503b43333d1d275456c?docs=8a70f8bf2755f0a755afeca6b2a5238e"><img src="/img/pages/gistcafe/ormlite-tour-screenshot.png" alt="" /></a></p>
+<h2 id="detailed-walkthrough">Detailed Walkthrough<a class="header-anchor" href="javascript:;" onclick="location.hash='#detailed-walkthrough'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite is a lightweight, convention-based Object-Relational Mapper (ORM) offered within the ServiceStack suite of libraries. This tutorial aims to guide you through the basic functionality of OrmLite, covering its usage both as a standalone library and as an integrated part of a ServiceStack service. You will learn how to set up OrmLite, create data models, perform standard CRUD operations, and utilize the library's unique query functionalities. This tutorial provides a comprehensive starting point for developers looking to understand and effectively use OrmLite in their .NET projects.</p>
+<h3 id="setup-and-installation">Setup and Installation<a class="header-anchor" href="javascript:;" onclick="location.hash='#setup-and-installation'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To begin using OrmLite, you'll need to install it in your project. For a basic Console application, you'll want to add the OrmLite NuGet package for the database you're planning to use. This tutorial will use SQLite as an example. So, within your Package Manager Console, input <code>Install-Package ServiceStack.OrmLite.Sqlite</code>.</p>
+<pre><code class="language-bash">dotnet add ServiceStack.OrmLite.SqlServer   // SQLServer 2012+
+dotnet add ServiceStack.OrmLite.Sqlite      // Sqlite
+dotnet add ServiceStack.OrmLite.PostgreSQL  // PostgreSQL 
+dotnet add ServiceStack.OrmLite.MySql       // MySql
+</code></pre>
+<p>The next step is creating a connection to your database. Here's how you do it for SQLite:</p>
+<pre><code class="language-csharp">var dbFactory = new OrmLiteConnectionFactory(&quot;:memory:&quot;, SqliteDialect.Provider);
+</code></pre>
+<p>This snippet establishes an in-memory SQLite database connection. In a real-world application, you'd replace <code>&quot;:memory:&quot;</code> with your SQLite database's connection string.</p>
+<p>OrmLite supports multiple database types, including MS SQL Server, MySQL, and PostgreSQL. To use these, simply install the corresponding NuGet package and replace <code>SqliteDialect.Provider</code> with the appropriate provider (i.e., <code>SqlServerDialect.Provider</code>, <code>MySqlDialect.Provider</code>, or <code>PostgreSqlDialect.Provider</code>).</p>
+<p>If you're planning on using OrmLite within a ServiceStack project, you can streamline the setup process with the ServiceStack .NET tool <code>x</code> and the command <code>x mix &lt;database technology&gt;</code>. For SQLite, use <code>x mix sqlite</code>.</p>
+<pre><code class="language-bash"># Create new project
+x new web MyApp
+# Navigate into new project
+cd MyApp
+# Mix in OrmLite SQLite support
+x mix sqlite
+</code></pre>
+<p>After setup, you're now ready to establish a database connection and execute queries from your project.</p>
+<h2 id="basic-usage-standalone">Basic Usage (Standalone)<a class="header-anchor" href="javascript:;" onclick="location.hash='#basic-usage-standalone'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite is designed for simplicity and efficiency, enabling you to perform CRUD operations directly from your .NET classes. Here's an example of how you can utilize OrmLite in a standalone context.</p>
+<p><img src="/img/pages/ormlite/getting-started/basic-usage.PNG" alt="basic-usage.PNG" /></p>
+<h3 id="creating-a-connection">Creating a Connection<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-a-connection'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Creating a connection with your database is as simple as calling <code>OpenDbConnection</code> on your <code>IDbConnectionFactory</code> instance.</p>
+<pre><code class="language-csharp">using var db = dbFactory.OpenDbConnection();
+</code></pre>
+<p>This line establishes a connection to your database and ensures it is correctly disposed of once you're finished.</p>
+<h2 id="creating-a-model">Creating a Model<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-a-model'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite maps C# classes to database tables. Here's an example model class <code>Order</code>:</p>
+<pre><code class="language-csharp">public class Order
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string Customer { get; set; }
+    public DateTime OrderDate { get; set; }
+}
+</code></pre>
+<p>In this class, the <code>Id</code> property is annotated with <code>[AutoIncrement]</code>, telling OrmLite to auto-increment this field for new records.</p>
+<p><img src="/img/pages/ormlite/getting-started/table-mapping.PNG" alt="table-mapping.PNG" /></p>
+<h3 id="creating-a-table">Creating a Table<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-a-table'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Once your model is defined, you can use it to create a new table:</p>
+<pre><code class="language-csharp">db.CreateTableIfNotExists&lt;Order&gt;();
+</code></pre>
+<p>This method creates a new <code>Order</code> table if it doesn't already exist in your database.</p>
+<h3 id="inserting-data">Inserting Data<a class="header-anchor" href="javascript:;" onclick="location.hash='#inserting-data'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To insert data, use the <code>Insert</code> method:</p>
+<pre><code class="language-csharp">var order = new Order
+{
+    Customer = &quot;John Doe&quot;,
+    OrderDate = DateTime.UtcNow
+};
+
+db.Insert(order);
+</code></pre>
+<p>The <code>Insert</code> method adds a new record to the <code>Order</code> table. If you want to retrieve the auto-incremented Id after the insert, use <code>Insert</code> and <code>selectIdentity</code> together:</p>
+<pre><code class="language-csharp">var orderId = db.Insert(order, selectIdentity: true);
+</code></pre>
+<h3 id="updating-data">Updating Data<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-data'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Updating records is just as easy. Make sure your instance includes the primary key value:</p>
+<pre><code class="language-csharp">order.Customer = &quot;Jane Doe&quot;;
+db.Update(order);
+</code></pre>
+<p>This updates the <code>Order</code> record that has the same <code>Id</code> as <code>order</code>.</p>
+<h3 id="deleting-data">Deleting Data<a class="header-anchor" href="javascript:;" onclick="location.hash='#deleting-data'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Finally, deleting a record is a simple call to <code>Delete</code>:</p>
+<pre><code class="language-csharp">db.Delete(order);
+</code></pre>
+<p>This deletes the <code>Order</code> record with the same <code>Id</code> as <code>order</code>. To delete a records based on a condition, use <code>Delete&lt;T&gt;(predicate)</code>:</p>
+<pre><code class="language-csharp">db.Delete&lt;Order&gt;(x =&gt; x.Customer == &quot;Jane Doe&quot;);
+</code></pre>
+<h2 id="usage-from-a-servicestack-service">Usage from a ServiceStack Service<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage-from-a-servicestack-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Utilizing OrmLite from a ServiceStack service is straightforward, due to ServiceStack's built-in integration with OrmLite. ServiceStack services can access a <code>Db</code> property from the base <code>Service</code> class, which provides access to an OrmLite database connection.</p>
+<h3 id="registering-the-database-connection-factory">Registering the Database Connection Factory<a class="header-anchor" href="javascript:;" onclick="location.hash='#registering-the-database-connection-factory'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Before you can use the <code>Db</code> property, you need to register an <code>IDbConnectionFactory</code> instance with ServiceStack's IoC container. This is usually done in your <code>ConfigureDb.cs</code> file:</p>
+<pre><code class="language-csharp">public class ConfigureDb : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            services.AddSingleton&lt;IDbConnectionFactory&gt;(new OrmLiteConnectionFactory(
+                context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;)
+                ?? &quot;:memory:&quot;,
+                SqliteDialect.Provider));
+        });
+}
+</code></pre>
+<p>In this code, an <code>OrmLiteConnectionFactory</code> is created and registered as a singleton service. This factory will create database connections when needed, using the provided connection string and dialect provider.</p>
+<h3 id="creating-a-servicestack-service">Creating a ServiceStack Service<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-a-servicestack-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Here's an example of a ServiceStack service that performs basic CRUD operations on an <code>Order</code>:</p>
+<pre><code class="language-csharp">public class OrderService : Service
+{
+    public object Any(GetOrder request)
+    {
+        return Db.SingleById&lt;Order&gt;(request.Id);
+    }
+
+    public object Any(CreateOrder request)
+    {
+        var order = new Order
+        {
+            Customer = request.Customer,
+            OrderDate = DateTime.UtcNow
+        };
+
+        var orderId = Db.Insert(order, selectIdentity: true);
+        return new CreateOrderResponse { Id = orderId };
+    }
+
+    public void Any(UpdateOrder request)
+    {
+        var order = Db.SingleById&lt;Order&gt;(request.Id);
+        order.Customer = request.Customer;
+        Db.Update(order);
+    }
+
+    public void Any(DeleteOrder request)
+    {
+        Db.DeleteById&lt;Order&gt;(request.Id);
+    }
+}
+</code></pre>
+<p>In this service, we're utilizing the <code>Db</code> property, which gives us a handle to the database connection. We can then use this handle to perform CRUD operations in the same way we did in a standalone context.</p>
+<p>The service methods match HTTP verbs based on their prefix: <code>Any</code> methods can respond to any HTTP verb, <code>Get</code> methods respond to GET requests, <code>Post</code> methods respond to POST requests, and so on.</p>
+<h2 id="code-first-models">Code-First Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#code-first-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite uses a code-first approach to data modeling, which means you define your data model using C# classes, and OrmLite will take care of creating the corresponding database schema. This includes creating tables, defining columns and their types, and setting up relationships between tables.</p>
+<p>In OrmLite, you can add various attributes to your class and property definitions that control how they're treated by OrmLite when generating schema or performing database operations. Here's an example <code>Order</code> class with some of these attributes:</p>
+<pre><code class="language-csharp">[Alias(&quot;Orders&quot;)]
+public class Order
+{
+    [AutoIncrement]
+    [PrimaryKey]
+    public int Id { get; set; }
+    
+    [Required]
+    [Index(Unique = true)]
+    public string OrderNumber { get; set; }
+
+    [Reference]
+    public List&lt;OrderLine&gt; OrderLines { get; set; }
+}
+</code></pre>
+<p>In this class definition:</p>
+<ul>
+<li>The <code>[Alias]</code> attribute changes the name of the generated table to <code>Orders</code>, can be used on properties as well for columns.</li>
+<li>The <code>[AutoIncrement]</code> attribute specifies that the <code>Id</code> column should automatically increment its value.</li>
+<li>The <code>[PrimaryKey]</code> attribute designates <code>Id</code> as the primary key for the <code>Order</code> table.</li>
+<li>The <code>[Required]</code> attribute indicates that the <code>OrderNumber</code> property must have a value before an order can be inserted or updated in the database.</li>
+<li>The <code>[Index]</code> attribute creates an index on the <code>OrderNumber</code> column and the <code>Unique = true</code> property ensures that the <code>OrderNumber</code> value is unique across all orders.</li>
+<li>The <code>[Reference]</code> attribute enables us to use features like <code>LoadSelect&lt;T&gt;</code> to pull data from related tables.</li>
+</ul>
+<p>The corresponding <code>OrderLine</code> class may look something like this:</p>
+<pre><code class="language-csharp">public class OrderLine
+{
+    [AutoIncrement]
+    [PrimaryKey]
+    public int Id { get; set; }
+
+    [ForeignKey(typeof(Order))]
+    public int OrderId { get; set; }
+
+    public string Product { get; set; }
+
+    public int Quantity { get; set; }
+}
+</code></pre>
+<p>In this <code>OrderLine</code> class definition:</p>
+<ul>
+<li>The <code>[ForeignKey]</code> attribute defines a foreign key relationship from <code>OrderLine</code> to <code>Order</code>. The <code>OrderId</code> property in <code>OrderLine</code> corresponds to the <code>Id</code> property in <code>Order</code>.</li>
+</ul>
+<h2 id="different-ways-to-query">Different ways to Query<a class="header-anchor" href="javascript:;" onclick="location.hash='#different-ways-to-query'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite offers several ways to query your database, catering to different levels of complexity and customization needs. Here, we will explore three methods: lambda expressions, the <code>From&lt;T&gt;</code> method, and plain SQL queries.</p>
+<p>Let's use our <code>Order</code> and <code>OrderLine</code> models and assume we already have some data in our database.</p>
+<h3 id="lambda-expressions">Lambda Expressions<a class="header-anchor" href="javascript:;" onclick="location.hash='#lambda-expressions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Lambda expressions are the simplest way to query your database using OrmLite. You can use them directly within OrmLite's <code>Select&lt;T&gt;</code> method:</p>
+<pre><code class="language-csharp">var orders = db.Select&lt;Order&gt;(x =&gt; x.OrderNumber == &quot;1234&quot;);
+</code></pre>
+<p>This line will fetch all orders where <code>OrderNumber</code> equals &quot;1234&quot;.</p>
+<h3 id="fromt-method"><code>From&lt;T&gt;</code> Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#fromt-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>From&lt;T&gt;</code> method provides more flexibility than simple lambda expressions. It enables you to build more complex queries involving multiple tables and conditions:</p>
+<pre><code class="language-csharp">var q = db.From&lt;Order&gt;()
+          .Join&lt;Order, OrderLine&gt;()
+          .Where&lt;Order&gt;(x =&gt; x.OrderNumber == &quot;1234&quot;);
+var orders = db.Select&lt;Order&gt;(q);
+</code></pre>
+<p>This query fetches all orders, and joins their corresponding <code>OrderLine</code> entries, where <code>OrderNumber</code> equals &quot;1234&quot;.</p>
+<h3 id="plain-sql">Plain SQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#plain-sql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>While OrmLite's query API is robust and handles a wide variety of query scenarios, there are times when you might need to drop down to raw SQL for the utmost control:</p>
+<pre><code class="language-csharp">var orders = db.Select&lt;Order&gt;(&quot;SELECT * FROM Orders WHERE OrderNumber = @orderNumber&quot;, new { orderNumber = &quot;1234&quot; });
+</code></pre>
+<p>This is a basic query but demonstrates that you can write and execute raw SQL queries in OrmLite, and map back to your model classes.</p>
+<h2 id="inserting-data-1">Inserting data<a class="header-anchor" href="javascript:;" onclick="location.hash='#inserting-data-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Inserting data into your database using OrmLite is as straightforward as querying. Let's dive into some examples using our <code>Order</code> and <code>OrderLine</code> models.</p>
+<h3 id="basic-insert">Basic Insert<a class="header-anchor" href="javascript:;" onclick="location.hash='#basic-insert'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The simplest way to insert a new record into your database is by using the <code>Insert</code> method. You just need to create an instance of your model and pass it to the <code>Insert</code> method:</p>
+<pre><code class="language-csharp">var newOrder = new Order
+{
+    OrderNumber = &quot;5678&quot;,
+    OrderDate = DateTime.UtcNow
+};
+
+db.Insert(newOrder);
+</code></pre>
+<h3 id="inserting-with-selectidentity">Inserting with SelectIdentity<a class="header-anchor" href="javascript:;" onclick="location.hash='#inserting-with-selectidentity'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If your model has an <code>[AutoIncrement]</code> attribute on its primary key, you can retrieve the generated id during the insertion:</p>
+<pre><code class="language-csharp">var newOrder = new Order
+{
+    OrderNumber = &quot;5678&quot;,
+    OrderDate = DateTime.UtcNow
+};
+
+var newId = db.Insert(newOrder, selectIdentity: true);
+</code></pre>
+<h3 id="inserting-multiple-records">Inserting Multiple Records<a class="header-anchor" href="javascript:;" onclick="location.hash='#inserting-multiple-records'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>OrmLite also allows you to insert multiple records at once when passing a <code>List&lt;T&gt;</code> to <code>InsertAll</code>:</p>
+<pre><code class="language-csharp">var orderLines = new List&lt;OrderLine&gt;
+{
+    new OrderLine { OrderId = newId, ProductName = &quot;Product 1&quot;, Quantity = 2 },
+    new OrderLine { OrderId = newId, ProductName = &quot;Product 2&quot;, Quantity = 3 }
+};
+
+db.InsertAll(orderLines);
+</code></pre>
+<h2 id="updating-data-1">Updating data<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-data-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Let's use our <code>Order</code> and <code>OrderLine</code> models for demonstration of updating.</p>
+<h3 id="basic-update">Basic Update<a class="header-anchor" href="javascript:;" onclick="location.hash='#basic-update'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The most straightforward way to update a record in your database is by using the <code>Update</code> method. You need to create an instance of your model with the desired changes and pass it to the <code>Update</code> method:</p>
+<pre><code class="language-csharp">var orderToUpdate = db.Single&lt;Order&gt;(x =&gt; x.OrderNumber == &quot;5678&quot;);
+orderToUpdate.OrderDate = DateTime.UtcNow;
+
+db.Update(orderToUpdate);
+</code></pre>
+<p>In this example, the <code>Update</code> method uses the <code>Id</code> property (which is treated as the primary key by default) to identify the record to update.</p>
+<h3 id="conditional-update">Conditional Update<a class="header-anchor" href="javascript:;" onclick="location.hash='#conditional-update'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In case you need to update multiple records based on a condition, you can use the <code>UpdateOnly</code> method. This method is powerful as it allows you to specify which properties to update and the condition for the records to be updated:</p>
+<pre><code class="language-csharp">db.UpdateOnly(() =&gt; new Order { OrderDate = DateTime.UtcNow },
+    where: x =&gt; x.OrderNumber == &quot;5678&quot;);
+</code></pre>
+<p>In this example, only the <code>OrderDate</code> property is updated for all <code>Order</code> records that have <code>&quot;5678&quot;</code> as their <code>OrderNumber</code>.</p>
+<h3 id="updating-related-records">Updating Related Records<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-related-records'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Let's say you want to update the <code>ProductName</code> for a specific <code>OrderLine</code> associated with an <code>Order</code>. Here's how you can do it:</p>
+<pre><code class="language-csharp">var orderLineToUpdate = db.Single&lt;OrderLine&gt;(x =&gt; x.OrderId == 1 &amp;&amp; x.ProductName == &quot;Product 1&quot;);
+orderLineToUpdate.ProductName = &quot;Updated Product Name&quot;;
+
+db.Update(orderLineToUpdate);
+</code></pre>
+<h2 id="deleting-data-1">Deleting data<a class="header-anchor" href="javascript:;" onclick="location.hash='#deleting-data-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Once again, we'll use our <code>Order</code> and <code>OrderLine</code> models for demonstration of Delete.</p>
+<h3 id="basic-deletion">Basic Deletion<a class="header-anchor" href="javascript:;" onclick="location.hash='#basic-deletion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The simplest way to delete a record is by using the <code>Delete</code> method. You just need to pass an instance of your model with the <code>Id</code> of the record you want to delete:</p>
+<pre><code class="language-csharp">var orderToDelete = db.Single&lt;Order&gt;(x =&gt; x.OrderNumber == &quot;5678&quot;);
+db.Delete(orderToDelete);
+</code></pre>
+<p>In this example, the <code>Delete</code> method uses the <code>Id</code> property (which is treated as the primary key by default) to identify the record to delete.</p>
+<h3 id="conditional-deletion">Conditional Deletion<a class="header-anchor" href="javascript:;" onclick="location.hash='#conditional-deletion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you need to delete multiple records based on a condition, you can also use the <code>Delete</code> method, but with a predicate:</p>
+<pre><code class="language-csharp">db.Delete&lt;Order&gt;(x =&gt; x.OrderNumber == &quot;5678&quot;);
+</code></pre>
+<p>In this example, all <code>Order</code> records that have <code>&quot;5678&quot;</code> as their <code>OrderNumber</code> will be deleted.</p>
+<h2 id="using-loadselect-and-related-model-code-attributes">Using LoadSelect and Related Model Code Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-loadselect-and-related-model-code-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In real-world applications, it's quite common to deal with relationships between tables, like one-to-many relationships. OrmLite provides a set of <code>Load</code> prefixed methods to make loading related data with relationships easier. These methods return the primary entity and populate its related entities.</p>
+<p>For instance, to load an <code>Order</code> with its related <code>OrderLine</code>s, you can use the <code>LoadSelect</code> method:</p>
+<pre><code class="language-csharp">var orderWithLines = db.LoadSelect&lt;Order&gt;(x =&gt; x.Id == 1);
+</code></pre>
+<p>In this case, <code>LoadSelect</code> returns an <code>Order</code> object that also contains all the <code>OrderLine</code>s related to it. The relationship between <code>Order</code> and <code>OrderLine</code> is defined by the <code>ForeignKey</code> attribute:</p>
+<pre><code class="language-csharp">public class OrderLine
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+
+    [ForeignKey(typeof(Order))]
+    public int OrderId { get; set; }
+
+    public string ProductName { get; set; }
+    public decimal Price { get; set; }
+}
+</code></pre>
+<p>And the <code>Order</code> class has a <code>List&lt;OrderLine&gt;</code> applied with a <code>[Reference]</code> attribute:</p>
+<pre><code class="language-csharp">public class Order
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string OrderNumber { get; set; }
+
+    [Reference]
+    public List&lt;OrderLine&gt; OrderLines { get; set; }
+}
+</code></pre>
+<p>The <code>ForeignKey</code> attribute in the <code>OrderLine</code> class establishes that the <code>OrderId</code> property is a foreign key that relates to the <code>Order</code> table. The <code>[Reference]</code> attribute is used by <code>LoadSelect</code> to populate the related data on the <code>Order</code> class.</p>
+<h2 id="high-level-features-when-integrated-with-servicestack">High-Level Features When Integrated with ServiceStack<a class="header-anchor" href="javascript:;" onclick="location.hash='#high-level-features-when-integrated-with-servicestack'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>While ServiceStack.OrmLite works effectively as a standalone micro ORM, it offers even more when integrated within the ServiceStack ecosystem. In this context, OrmLite can be leveraged to facilitate high-level features of ServiceStack such as AutoQuery, Locode, and code-first model generation.</p>
+<h3 id="autoquery-and-code-first-models">AutoQuery and Code First Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-and-code-first-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In a typical ServiceStack application, OrmLite is commonly used to create code-first models that form the basis for database operations. One key advantage of this is the seamless integration with AutoQuery, a ServiceStack feature that enables automated generation of optimized, queryable services for defined models.</p>
+<p><img src="/img/pages/ormlite/getting-started/code-first.PNG" alt="code-first.PNG" /></p>
+<p>Here's an example of defining a model and an AutoQuery request DTO:</p>
+<pre><code class="language-csharp">public class Order
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    
+    public string Customer { get; set; }
+}
+
+[Route(&quot;/orders&quot;)]
+public class QueryOrders : QueryDb&lt;Order&gt;
+{
+}
+</code></pre>
+<h3 id="autoquery-and-database-first-approach">AutoQuery and Database First Approach<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-and-database-first-approach'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack also supports a database-first approach, especially useful when working with an existing database. In this scenario, you can leverage AutoQuery's <code>GeneratedServices</code> feature. It allows you to create ready-to-use services based on your database schema.</p>
+<pre><code class="language-csharp">appHost.Plugins.Add(new AutoQueryFeature {
+    MaxLimit = 1000,
+    GenerateCrudServices = new GenerateCrudServices
+    {
+        AutoRegister = true
+    }
+}
+</code></pre>
+<h3 id="locode">Locode<a class="header-anchor" href="javascript:;" onclick="location.hash='#locode'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Locode is a built-in ServiceStack UI that provides an easy way to visualize, interact with your database and manage your data. When using OrmLite with AutoQuery, Locode can generate interfaces for your tables, enabling you to browse and manage your data.</p>
+<p><img src="/img/pages/ormlite/getting-started/database-first-workflow.PNG" alt="database-first-workflow.PNG" /></p>
+<h3 id="code-generation-with-servicestack-x-tool">Code Generation with ServiceStack 'x' Tool<a class="header-anchor" href="javascript:;" onclick="location.hash='#code-generation-with-servicestack-x-tool'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you start with a database-first approach using <code>GeneratedServices</code>, ServiceStack provides a smooth transition to a code-first approach when you're ready. Using the <code>x</code> dotnet tool, you can generate all POCO model classes, as well as AutoQuery CRUD Request DTOs, all from an existing database schema. The command for this is:</p>
+<pre><code class="language-bash">x csharp https://localhost:5001 -path /crud/all/csharp
+</code></pre>
+<p><img src="/img/pages/ormlite/getting-started/database-first.PNG" alt="database-first.PNG" /></p>
+<p>This will create a C# file that contain classes representing each table in your database, as well as the CRUD Request DTOs. From there, you can start to manipulate these models in a code-first manner while still leveraging all the powerful features of ServiceStack and OrmLite.</p>
+<h2 id="conclusion">Conclusion<a class="header-anchor" href="javascript:;" onclick="location.hash='#conclusion'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>We've journeyed through an introduction to ServiceStack.OrmLite, discussing its setup, basic usage, and how it can be used within a ServiceStack service. We've explored the power of code-first models, various ways of querying, inserting, updating, and deleting data using OrmLite, and how to leverage LoadSelect to handle related model data.</p>
+<p>We also touched on some high-level features provided by OrmLite when integrated with ServiceStack, including AutoQuery, Locode, and transitioning from a database-first to a code-first approach using the 'x' dotnet tool.</p>
+<p>The aim of this tutorial was to give you an understanding of the core concepts and capabilities of OrmLite and to demonstrate its potential as a reliable and efficient Micro ORM for your .NET projects. Whether used in a standalone context or as part of a wider ServiceStack application, OrmLite provides a lightweight, intuitive, and feature-rich data access solution.</p>
+<h2 id="feedback-welcome">Feedback welcome<a class="header-anchor" href="javascript:;" onclick="location.hash='#feedback-welcome'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Think we are missing something in OrmLite to make it better? Let us know in <a href="https://servicestack.net/ideas">servicestack.net/ideas</a>!</p>
 
 
                 <div class="not-prose"></div>
@@ -458,8 +789,218 @@ browser without needing to install anything:</p>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#ormlite-interactive-tour'" data-id="ormlite-interactive-tour" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            OrmLite Interactive Tour
+                                        <span v-hash="'#detailed-walkthrough'" data-id="detailed-walkthrough" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Detailed Walkthrough
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="setup-and-installation" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#setup-and-installation'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Setup and Installation
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#basic-usage-standalone'" data-id="basic-usage-standalone" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Basic Usage (Standalone)
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="creating-a-connection" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#creating-a-connection'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Creating a Connection
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#creating-a-model'" data-id="creating-a-model" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Creating a Model
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="creating-a-table" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#creating-a-table'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Creating a Table
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="inserting-data" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#inserting-data'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Inserting Data
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="updating-data" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#updating-data'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Updating Data
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="deleting-data" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#deleting-data'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Deleting Data
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#usage-from-a-servicestack-service'" data-id="usage-from-a-servicestack-service" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Usage from a ServiceStack Service
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="registering-the-database-connection-factory" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#registering-the-database-connection-factory'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Registering the Database Connection Factory
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="creating-a-servicestack-service" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#creating-a-servicestack-service'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Creating a ServiceStack Service
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#code-first-models'" data-id="code-first-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Code-First Models
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#different-ways-to-query'" data-id="different-ways-to-query" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Different ways to Query
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="lambda-expressions" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#lambda-expressions'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Lambda Expressions
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="plain-sql" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#plain-sql'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Plain SQL
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#inserting-data-1'" data-id="inserting-data-1" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Inserting data
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="basic-insert" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#basic-insert'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Basic Insert
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="inserting-with-selectidentity" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#inserting-with-selectidentity'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Inserting with SelectIdentity
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="inserting-multiple-records" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#inserting-multiple-records'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Inserting Multiple Records
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#updating-data-1'" data-id="updating-data-1" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Updating data
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="basic-update" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#basic-update'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Basic Update
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="conditional-update" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#conditional-update'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Conditional Update
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="updating-related-records" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#updating-related-records'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Updating Related Records
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#deleting-data-1'" data-id="deleting-data-1" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Deleting data
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="basic-deletion" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#basic-deletion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Basic Deletion
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="conditional-deletion" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#conditional-deletion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Conditional Deletion
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#using-loadselect-and-related-model-code-attributes'" data-id="using-loadselect-and-related-model-code-attributes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Using LoadSelect and Related Model Code Attributes
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#high-level-features-when-integrated-with-servicestack'" data-id="high-level-features-when-integrated-with-servicestack" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            High-Level Features When Integrated with ServiceStack
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="autoquery-and-code-first-models" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-and-code-first-models'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery and Code First Models
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autoquery-and-database-first-approach" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-and-database-first-approach'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery and Database First Approach
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="locode" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#locode'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Locode
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="code-generation-with-servicestack-x-tool" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#code-generation-with-servicestack-x-tool'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Code Generation with ServiceStack &#x27;x&#x27; Tool
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#conclusion'" data-id="conclusion" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Conclusion
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#feedback-welcome'" data-id="feedback-welcome" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Feedback welcome
                                         </span>
                                     </li>
                             </ul>
