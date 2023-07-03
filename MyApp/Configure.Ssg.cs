@@ -31,6 +31,7 @@ public class ConfigureSsg : IHostingStartup
                 
                 pages.LoadFrom("_pages");
                 videos.LoadFrom("_videos");
+                AppConfig.Instance.GitPagesBaseUrl ??= ResolveGitBlobBaseUrl(appHost.ContentRootDirectory);
             },
             afterAppHostInit: appHost =>
             {
@@ -57,6 +58,24 @@ public class ConfigureSsg : IHostingStartup
                     RazorSsg.PrerenderAsync(appHost, razorFiles, distDir).GetAwaiter().GetResult();
                 });
             });
+
+    private string? ResolveGitBlobBaseUrl(IVirtualDirectory contentDir)
+    {
+        var srcDir = new DirectoryInfo(contentDir.RealPath);
+        var gitConfig = new FileInfo(Path.Combine(srcDir.Parent!.FullName, ".git", "config"));
+        if (gitConfig.Exists)
+        {
+            var txt = gitConfig.ReadAllText();
+            var pos = txt.IndexOf("url = ", StringComparison.Ordinal);
+            if (pos >= 0)
+            {
+                var url = txt[(pos + "url = ".Length)..].LastLeftPart(".git");
+                var gitBaseUrl = url.CombineWith($"blob/main/{srcDir.Name}");
+                return gitBaseUrl;
+            }
+        }
+        return null;
+    }
 }
 
 public class AppConfig
@@ -64,6 +83,7 @@ public class AppConfig
     public static AppConfig Instance { get; } = new();
     public string LocalBaseUrl { get; set; }
     public string PublicBaseUrl { get; set; }
+    public string? GitPagesBaseUrl { get; set; }
 }
 
 // Add additional frontmatter info to include

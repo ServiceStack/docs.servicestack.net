@@ -15,6 +15,7 @@ public class DocsPage : PageModel
     public bool HideTitle { get; set; }
     public bool HideNavigation { get; set; }
     public bool HideDocumentMap { get; set; }
+    public bool HideEditOnGitHub { get; set; }
     public Action<List<MarkdownMenu>>? SidebarFilter { get; set; }
 
     public DocsPage Init(Microsoft.AspNetCore.Mvc.RazorPages.Page page, MarkdownPages markdown)
