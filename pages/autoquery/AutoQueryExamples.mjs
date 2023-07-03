@@ -2,7 +2,7 @@ export default {
     template:`<div>
         <div class="mt-16 mx-auto max-w-7xl px-4 sm:mt-24 sm:px-6">
             <div class="text-center">
-                <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
                     <span class="block">
                         AutoQuery Examples
                     </span>
@@ -12,10 +12,10 @@ export default {
         
         <div class="mt-16 mx-auto max-w-md px-4 text-center sm:px-6 sm:max-w-3xl lg:px-8 lg:max-w-7xl">
             <div>
-                <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-4xl">
                     Database-first Example Locode App
                 </p>
-                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
+                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500 dark:text-gray-400">
                     To demonstrate a database-first development workflow we've enabled 
                     <a class="text-indigo-600" href="/autoquery-autogen">AutoGen</a> on the <b>Northwind</b> 
                     sample database to generate 
@@ -44,10 +44,10 @@ export default {
                     </a>
                   </div>
                   <div class="mt-6 sm:max-w-xl">
-                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-5xl">
                       Northwind Auto Locode
                     </h1>
-                    <p class="mt-6 text-xl text-gray-500">
+                    <p class="mt-6 text-xl text-gray-500 dark:text-gray-400">
                       Northwind Auto is a customized database-first Northwind App using
                       <a class="text-indigo-600" href="/autoquery-autogen">AutoGen</a> to generate
                       <a class="text-indigo-600" href="/autoquery-rdbms">AutoQuery</a> &amp;
@@ -57,7 +57,7 @@ export default {
                     </p>
                   </div>
                   <div class="mt-6">
-                    <p class="text-2xl font-medium text-gray-900 mb-3">
+                    <p class="text-2xl font-medium text-gray-900 dark:text-gray-50 mb-3">
                       Explore Features
                     </p>
                     <div class="flex items-center mb-2">
@@ -70,7 +70,7 @@ export default {
                     </div>
                     <div class="mt-6 flex">
                       <div class="rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
-                        <a href="https://github.com/NetCoreApps/NorthwindAuto/archive/refs/heads/master.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
+                        <a href="https://github.com/NetCoreApps/NorthwindAuto/archive/refs/heads/master.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 dark:text-gray-50 bg-white hover:bg-gray-50">
                           Download Northwind.zip
                         </a>
                       </div>
@@ -98,10 +98,10 @@ export default {
         
         <div class="mx-auto max-w-md px-4 text-center sm:px-6 sm:max-w-3xl lg:px-8 lg:max-w-7xl">
             <div>
-                <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-4xl">
                     Code-first Example Locode App
                 </p>
-                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
+                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500 dark:text-gray-400">
                     For greater customizability we've exported AutoGen APIs of the <b>Chinook</b> sample database into typed AutoQuery APIs &amp; Data Models to unlock more flexible code-first declarative &amp; programmatic dev models that includes Custom UI components to showcase potential enhancements in Locode Apps 
                 </p>
             </div>
@@ -126,10 +126,10 @@ export default {
                     </a>
                   </div>
                   <div class="mt-6 sm:max-w-xl">
-                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-5xl">
                       Chinook Locode
                     </h1>
-                    <p class="mt-6 text-xl text-gray-500">
+                    <p class="mt-6 text-xl text-gray-500 dark:text-gray-400">
                       Chinook is a customized <a class="text-rose-500" href="/locode/code-first">Code-First</a> App using
                       <a class="text-rose-500" href="/autoquery-autogen">AutoGen</a> to
                       <a class="text-rose-500" href="/autoquery-autogen#export-code-first-dtos">export</a>
@@ -141,7 +141,7 @@ export default {
                     </p>
                   </div>
                   <div class="mt-6">
-                    <p class="text-2xl font-medium text-gray-900 mb-3">
+                    <p class="text-2xl font-medium text-gray-900 dark:text-gray-50 mb-3">
                       Explore Features
                     </p>
                     <div class="flex items-center mb-2">
@@ -154,7 +154,7 @@ export default {
                     </div>
                     <div class="mt-6 flex">
                       <div class="rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
-                        <a href="https://github.com/NetCoreApps/Chinook/archive/refs/heads/main.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
+                        <a href="https://github.com/NetCoreApps/Chinook/archive/refs/heads/main.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 dark:text-gray-50 bg-white hover:bg-gray-50">
                           Download Chinook.zip
                         </a>
                       </div>
@@ -182,10 +182,10 @@ export default {
         
         <div class="mx-auto max-w-md px-4 text-center sm:px-6 sm:max-w-3xl lg:px-8 lg:max-w-7xl">
             <div>
-                <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-4xl">
                     Reuse typed APIs in Optimized UIs
                 </p>
-                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500"> 
+                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500 dark:text-gray-400"> 
                     AutoQuery's declarative dev model lets you focus on your new App's business requirements where its data model, API capabilities, input validation &amp; multi-user Auth restrictions can be defined simply using annotated C# POCOs.<br> This provides immense value at the start of the development cycle where functional prototypes can be quickly iterated to gather business requirements <br><br> Once requirements have been solidified, the typed AutoQuery APIs can easily be reused to develop custom UIs to optimize important workflows. <br><br><a class="text-indigo-600" href="https://github.com/NetCoreApps/TalentBlazor">Talent Blazor</a> is a new App showcasing an example of this where its entire back-office functionality can be managed through Locode whilst an optimized <b>Blazor WASM</b> App is created to optimize its unique workflow requirements which also benefits from the superior productive dev model of its Typed APIs 
                 </p>
             </div>
@@ -209,10 +209,10 @@ export default {
                     </a>
                   </div>
                   <div class="mt-6 sm:max-w-xl">
-                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+                    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-5xl">
                       Talent Blazor Locode
                     </h1>
-                    <p class="mt-6 text-xl text-gray-500">
+                    <p class="mt-6 text-xl text-gray-500 dark:text-gray-400">
                       Talent Blazor is a Blazor WASM App built around a HR's unique workflow for processing Job Applications
                       from initial Application, through to Phone Screening and Interviews by multiple employees, capturing
                       relevant feedback at each application event, with successful Applicants awarded the Job
@@ -222,7 +222,7 @@ export default {
                     </p>
                   </div>
                   <div class="mt-6">
-                    <p class="text-2xl font-medium text-gray-900 mb-3">
+                    <p class="text-2xl font-medium text-gray-900 dark:text-gray-50 mb-3">
                       Explore Features
                     </p>
                     <div class="flex items-center mb-2">
@@ -243,7 +243,7 @@ export default {
                     </div>
                     <div class="mt-6 flex">
                       <div class="rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
-                        <a href="https://github.com/NetCoreApps/TalentBlazor/archive/refs/heads/main.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
+                        <a href="https://github.com/NetCoreApps/TalentBlazor/archive/refs/heads/main.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 dark:text-gray-50 bg-white hover:bg-gray-50">
                           Download TalentBlazor.zip
                         </a>
                       </div>
@@ -271,10 +271,10 @@ export default {
         
         <div class="mx-auto max-w-md px-4 text-center sm:px-6 sm:max-w-3xl lg:px-8 lg:max-w-7xl">
             <div>
-                <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">
+                <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-4xl">
                     Use AutoQuery for most of your App's APIs
                 </p>
-                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500"> 
+                <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500 dark:text-gray-400"> 
                   AutoQuery enables a highly productive platform capable of rapidly developing a majority of App's CRUD functionality 
                   to enable a hybrid development model which can benefit from using customized
                   <a href="https://blazor-gallery.jamstacks.net/grid">AutoQueryGrid components</a>
@@ -294,10 +294,10 @@ export default {
                         </div>
                         <div class="mt-20">
                             <div class="mt-6 sm:max-w-xl">
-                                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+                                <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-50 tracking-tight sm:text-5xl">
                                     Blazor Diffusion
                                 </h1>
-                                <p class="mt-6 text-xl text-gray-500">
+                                <p class="mt-6 text-xl text-gray-500 dark:text-gray-400">
                                     We’ve created 
                                     <a href="https://blazordiffusion.com">blazordiffusion.com</a>
                                     to best illustrate this potential
@@ -310,7 +310,7 @@ export default {
                                 </p>
                             </div>
                             <div class="mt-6">
-                                <p class="text-2xl font-medium text-gray-900 mb-3">
+                                <p class="text-2xl font-medium text-gray-900 dark:text-gray-50 mb-3">
                                     Explore Features
                                 </p>
                                 <div class="flex items-center mb-2">
@@ -350,7 +350,7 @@ export default {
                                     <div class="rounded-md shadow">
                                         <a href="https://github.com/NetCoreApps/BlazorDiffusion/archive/refs/heads/main.zip"
                                             target="_blank"
-                                            class="flex hover:no-underline px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
+                                            class="flex hover:no-underline px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 dark:text-gray-50 bg-white hover:bg-gray-50">
                                             Download BlazorDiffusion.zip
                                         </a>
                                     </div>
@@ -391,8 +391,8 @@ export default {
             </div>
         </div>
         
-        <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">More AutoQuery Source Code Examples</h3>
-        <ul class="ul-circle list-disc mx-auto ml-5 mt-5 text-xl text-gray-500">
+        <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50 dark:text-gray-50">More AutoQuery Source Code Examples</h3>
+        <ul class="ul-circle list-disc mx-auto ml-5 mt-5 text-xl text-gray-500 dark:text-gray-400">
             <li class="mt-2"><a class="text-blue-600" href="https://github.com/NetCoreApps/BookingsCrud">NetCoreApps/BookingsCrud</a></li>
             <li class="mt-2"><a class="text-blue-600" href="https://github.com/NetCoreApps/TechStacks">NetCoreApps/TechStacks</a></li>
             <li class="mt-2"><a class="text-blue-600" href="https://github.com/NetCoreApps/StackApis/tree/master/src/StackApis.ServiceModel">NetCoreApps/StackApis</a></li>
