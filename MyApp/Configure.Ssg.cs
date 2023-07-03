@@ -66,6 +66,8 @@ public class ConfigureSsg : IHostingStartup
         if (gitConfig.Exists)
         {
             var txt = gitConfig.ReadAllText();
+            Console.WriteLine("gitConfig:");
+            Console.WriteLine(txt);
             var pos = txt.IndexOf("url = ", StringComparison.Ordinal);
             if (pos >= 0)
             {
