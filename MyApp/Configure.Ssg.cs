@@ -66,12 +66,10 @@ public class ConfigureSsg : IHostingStartup
         if (gitConfig.Exists)
         {
             var txt = gitConfig.ReadAllText();
-            Console.WriteLine("gitConfig:");
-            Console.WriteLine(txt);
             var pos = txt.IndexOf("url = ", StringComparison.Ordinal);
             if (pos >= 0)
             {
-                var url = txt[(pos + "url = ".Length)..].LastLeftPart(".git").LastLeftPart('\n').Trim();
+                var url = txt[(pos + "url = ".Length)..].LeftPart(".git").LeftPart('\n').Trim();
                 var gitBaseUrl = url.CombineWith($"blob/main/{srcDir.Name}");
                 return gitBaseUrl;
             }
