@@ -269,6 +269,89 @@ for your Environment that anyone can write to their current directory with **the
 `x gist <gist-id>`
 :::
 
+### Patch JSON files
+
+The `x` dotnet tool also includes a number of utilities for patching JSON files, e.g. you can use `x patch` to patch a JSON file with a [JSON Patch](https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0).
+
+The `json.patch` file supports the following JSON Patch operations:
+
+| Operation | Notes                                                                              |
+|-----------|------------------------------------------------------------------------------------|
+| add       | Add a property or array element. For existing property: set value.                 |
+| remove    | Remove a property or array element.                                                |
+| replace   | Same as remove followed by add at same location.                                   |
+| move      | Same as remove from source followed by add to destination using value from source. |
+| copy      | Same as add to destination using value from source.                                |
+| test      | Return success status code if value at path = provided value.                      |
+
+For example, we could have the following `original.json` file:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "smtp": {}
+}
+```
+
+We need to fill this `smtp` object with settings such as username, password, host, port, and more. To automate filling these values, we can use the ServiceStack `x` tool to apply a `json.patch`. The `json.patch` file to accomplish this would look something like:
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/smtp",
+    "value": {
+      "UserName": "AWS_ACCESS_KEY_ID",
+      "Password": "AWS_SECRET_ACCESS_KEY",
+      "Host": "email-smtp.us-east-1.amazonaws.com",
+      "Port": 587,
+      "From": "email address",
+      "FromName": "From Name",
+      "Bcc": "bcc email address"
+    }
+  }
+]
+```
+
+Once this patch is applied, our `appsettings.json` transforms into:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "smtp": {
+    "UserName": "AWS_ACCESS_KEY_ID",
+    "Password": "AWS_SECRET_ACCESS_KEY",
+    "Host": "email-smtp.us-east-1.amazonaws.com",
+    "Port": 587,
+    "From": "email address",
+    "FromName": "From Name",
+    "Bcc": "bcc email address"
+  }
+}
+```
+
+You can apply this patch using the `x` tool's `patch` command:
+
+```bash
+x patch appsettings.json.patch
+```
+
+This expects both the `appsettings.json.patch` and `appsettings.json` files to be local. Optionally, you can specify both files if their names differ.
+
+```bash
+x patch changes.json.patch appsettings.json
+```
+
 ### Lisp REPL
 
 Lisp's dynamism and extensibility makes it particularly well suited for explanatory programming whose access via a REPL is available 
