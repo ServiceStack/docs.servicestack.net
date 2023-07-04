@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-07-04T03:28:15.7771586Z'>
+    <meta name='date' content='2023-07-04T07:17:04.3063822Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack&#x27;s .NET Core Utility Belt</title>
@@ -1650,6 +1650,96 @@ for your Environment that anyone can write to their current directory with <stro
                     </div>
                 </div>
             </div>
+<h3 id="patch-json-files">Patch JSON files<a class="header-anchor" href="javascript:;" onclick="location.hash='#patch-json-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>x</code> dotnet tool also includes a number of utilities for patching JSON files, e.g. you can use <code>x patch</code> to patch a JSON file with a <a href="https://learn.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-7.0">JSON Patch</a>.</p>
+<p>The <code>json.patch</code> file supports the following JSON Patch operations:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>add</td>
+<td>Add a property or array element. For existing property: set value.</td>
+</tr>
+<tr>
+<td>remove</td>
+<td>Remove a property or array element.</td>
+</tr>
+<tr>
+<td>replace</td>
+<td>Same as remove followed by add at same location.</td>
+</tr>
+<tr>
+<td>move</td>
+<td>Same as remove from source followed by add to destination using value from source.</td>
+</tr>
+<tr>
+<td>copy</td>
+<td>Same as add to destination using value from source.</td>
+</tr>
+<tr>
+<td>test</td>
+<td>Return success status code if value at path = provided value.</td>
+</tr>
+</tbody>
+</table>
+<p>For example, we could have the following <code>original.json</code> file:</p>
+<pre><code class="language-json">{
+  &quot;Logging&quot;: {
+    &quot;LogLevel&quot;: {
+      &quot;Default&quot;: &quot;Information&quot;,
+      &quot;Microsoft.AspNetCore&quot;: &quot;Warning&quot;
+    }
+  },
+  &quot;smtp&quot;: {}
+}
+</code></pre>
+<p>We need to fill this <code>smtp</code> object with settings such as username, password, host, port, and more. To automate filling these values, we can use the ServiceStack <code>x</code> tool to apply a <code>json.patch</code>. The <code>json.patch</code> file to accomplish this would look something like:</p>
+<pre><code class="language-json">[
+  {
+    &quot;op&quot;: &quot;add&quot;,
+    &quot;path&quot;: &quot;/smtp&quot;,
+    &quot;value&quot;: {
+      &quot;UserName&quot;: &quot;AWS_ACCESS_KEY_ID&quot;,
+      &quot;Password&quot;: &quot;AWS_SECRET_ACCESS_KEY&quot;,
+      &quot;Host&quot;: &quot;email-smtp.us-east-1.amazonaws.com&quot;,
+      &quot;Port&quot;: 587,
+      &quot;From&quot;: &quot;email address&quot;,
+      &quot;FromName&quot;: &quot;From Name&quot;,
+      &quot;Bcc&quot;: &quot;bcc email address&quot;
+    }
+  }
+]
+</code></pre>
+<p>Once this patch is applied, our <code>appsettings.json</code> transforms into:</p>
+<pre><code class="language-json">{
+  &quot;Logging&quot;: {
+    &quot;LogLevel&quot;: {
+      &quot;Default&quot;: &quot;Information&quot;,
+      &quot;Microsoft.AspNetCore&quot;: &quot;Warning&quot;
+    }
+  },
+  &quot;smtp&quot;: {
+    &quot;UserName&quot;: &quot;AWS_ACCESS_KEY_ID&quot;,
+    &quot;Password&quot;: &quot;AWS_SECRET_ACCESS_KEY&quot;,
+    &quot;Host&quot;: &quot;email-smtp.us-east-1.amazonaws.com&quot;,
+    &quot;Port&quot;: 587,
+    &quot;From&quot;: &quot;email address&quot;,
+    &quot;FromName&quot;: &quot;From Name&quot;,
+    &quot;Bcc&quot;: &quot;bcc email address&quot;
+  }
+}
+</code></pre>
+<p>You can apply this patch using the <code>x</code> tool's <code>patch</code> command:</p>
+<pre><code class="language-bash">x patch appsettings.json.patch
+</code></pre>
+<p>This expects both the <code>appsettings.json.patch</code> and <code>appsettings.json</code> files to be local. Optionally, you can specify both files if their names differ.</p>
+<pre><code class="language-bash">x patch changes.json.patch appsettings.json
+</code></pre>
 <h3 id="lisp-repl">Lisp REPL<a class="header-anchor" href="javascript:;" onclick="location.hash='#lisp-repl'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Lisp's dynamism and extensibility makes it particularly well suited for explanatory programming whose access via a REPL is available
 <code>x</code>, <code>web</code> and <code>app</code> dotnet tools.</p>
@@ -1914,6 +2004,12 @@ export SSL_CERT_DIR=/dev/null
                                                         <span v-hash="'#mix-features-into-existing-asp.net-core-apps'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Mix Features into existing ASP.NET Core Apps
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="patch-json-files" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#patch-json-files'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Patch JSON files
                                                         </span>
                                                     </li>
                                                     <li data-id="lisp-repl" class="text-gray-500 hover:text-gray-900">
