@@ -3,7 +3,7 @@ import { ref, nextTick, onMounted } from 'vue'
 const TypesenseDialog = {
     template:`<div class="search-dialog hidden flex bg-black bg-opacity-25 items-center" :class="{ open }" 
        @click="$emit('hide')">
-    <div class="dialog absolute" style="max-height:70vh;" @click.stop="">
+    <div class="dialog absolute w-full flex flex-col bg-white dark:bg-gray-800" style="max-height:70vh;" @click.stop="">
       <div class="p-2 flex flex-col" style="max-height: 70vh;">
         <div class="flex">
           <label class="pt-4 mt-0.5 pl-2" for="docsearch-input">
@@ -19,7 +19,7 @@ const TypesenseDialog = {
           <div v-for="g in results.groups" :key="g.group" class="group-result mb-2">
             <h3 class="m-0 text-lg text-gray-600" v-html="g.group"></h3>
             <div v-for="result in g.items" :key="result.id" :aria-selected="result.id == selectedIndex"
-                 class="group-item rounded-lg bg-gray-50 mb-1 p-2 flex" @mouseover="onHover(result.id)" @click="go(result.url)">              
+                 class="group-item rounded-lg bg-gray-50 dark:bg-gray-900 mb-1 p-2 flex" @mouseover="onHover(result.id)" @click="go(result.url)">              
               <div class="min-w-min mr-2 flex items-center">
                 <svg v-if="result.type=='doc'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                 <svg v-else-if="result.type=='content'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -199,8 +199,8 @@ export default {
     },
     template:`<div>
         <TypesenseDialog :open="openSearch" @hide="hideSearch" />
-        <button class="flex rounded-full p-0 bg-gray-100 border-2 border-solid border-gray-100 text-gray-400 cursor-pointer
-                       hover:border-green-400 hover:bg-white hover:text-gray-600" @click="showSearch">
+        <button class="flex rounded-full p-0 bg-gray-100 dark:bg-gray-800 border-2 border-solid border-gray-100 dark:border-gray-700 text-gray-400 cursor-pointer
+                       hover:border-green-400 dark:hover:border-green-400 hover:bg-white hover:text-gray-600" @click="showSearch">
           <svg class="w-7 h-7 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
