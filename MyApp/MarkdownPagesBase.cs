@@ -1,14 +1,12 @@
 ﻿// run node postinstall.js to update to latest version
-
-using System.Text.RegularExpressions;
 using Markdig;
-using Markdig.Extensions.CustomContainers;
 using Markdig.Parsers;
 using Markdig.Parsers.Inlines;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Markdig.Extensions.CustomContainers;
 using ServiceStack.IO;
 using ServiceStack.Text;
 
