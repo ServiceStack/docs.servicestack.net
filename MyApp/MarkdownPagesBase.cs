@@ -173,7 +173,7 @@ public abstract class MarkdownPagesBase<T> : IMarkdownPages where T : MarkdownFi
 
         doc.Path = file.VirtualPath;
         doc.FileName = file.Name;
-        doc.Slug = doc.FileName.WithoutExtension().CreateSlug();
+        doc.Slug = doc.FileName.WithoutExtension().GenerateSlug();
         doc.Content = content;
         doc.WordCount = WordCount(content);
         doc.LineCount = LineCount(content);
@@ -584,37 +584,6 @@ public class HeadingsMapExtension : IMarkdownExtension
 
 public static class MarkdigExtensions
 {
-    private static readonly Regex InvalidCharsRegex = new(@"[^a-z0-9\s-_]", RegexOptions.Compiled);
-    private static readonly Regex SpacesRegex = new(@"\s", RegexOptions.Compiled);
-    private static readonly Regex CollapseHyphensRegex = new("-+", RegexOptions.Compiled);
-    private static readonly Regex RemoveNonAsciiRegex = new(@"[^\u0000-\u007F]+", RegexOptions.Compiled);
-    public static string CreateSlug(this string phrase, int maxLength = 100)
-    {
-        if (string.IsNullOrEmpty(phrase))
-            return string.Empty;
-
-        var str = phrase.ToLower()
-            .Replace("#", "sharp")  // c#, f# => csharp, fsharp
-            .Replace("++", "pp");   // c++ => cpp
-
-        str = RemoveNonAsciiRegex.Replace(str, "");
-        str = InvalidCharsRegex.Replace(str, "-");
-        str = str.Substring(0, Math.Min(str.Length, maxLength)).Trim();
-        str = SpacesRegex.Replace(str, "-");
-        str = CollapseHyphensRegex.Replace(str, "-");
-
-        if (string.IsNullOrEmpty(str))
-            return str;
-
-        if (str[0] == '-')
-            str = str.Substring(1);
-        if (str.Length > 0 && str[str.Length - 1] == '-')
-            str = str.Substring(0, str.Length - 1);
-
-        return str;
-    }
-    
-    
     /// <summary>
     /// Uses the auto-identifier extension.
     /// </summary>
