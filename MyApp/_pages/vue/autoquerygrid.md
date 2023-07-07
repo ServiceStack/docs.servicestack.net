@@ -159,7 +159,9 @@ Which columns are displayed and how they're formatted are further customizable w
         <span class="hidden lg:inline">Room </span>No
     </template>
 
-    <template #cost="{ cost }" v-html="currency(cost)"></template>
+    <template #cost="{ cost }">
+        <span v-html="currency(cost)"></span>
+    </template>
     
     <template #bookingStartDate-header>
         Start<span class="hidden lg:inline"> Date</span>
@@ -175,6 +177,8 @@ Which columns are displayed and how they're formatted are further customizable w
     <template #createdBy="{ createdBy }" v-html="createdBy"></template>
 </AutoQueryGrid>
 ```
+
+<responsive class="not-prose mb-4"></responsive>
 
 <h2 class="pt-8 mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-100">
   Custom Functionality
