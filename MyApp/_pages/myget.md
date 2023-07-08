@@ -75,7 +75,7 @@ Within VS .NET you can clear them from **Tools** > **Options** > **Nuget Package
 Alternatively on Windows you can delete the Cached NuGet packages manually with:
 
 :::sh
-$ del %LOCALAPPDATA%\NuGet\Cache\*.nupkg /q
+del %LOCALAPPDATA%\NuGet\Cache\*.nupkg /q
 :::
 
 ### Full Package Clean
