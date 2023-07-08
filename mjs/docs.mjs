@@ -37,7 +37,7 @@ if (active && !isInView(active)) {
     (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
 }
 
-/* used in :::sh and :::nuget CopyContainerRenderer */
+/* used in :::copy and :::sh CopyContainerRenderer */
 globalThis.copy = function(e) {
     e.classList.add('copying')
     let $el = document.createElement("textarea")
