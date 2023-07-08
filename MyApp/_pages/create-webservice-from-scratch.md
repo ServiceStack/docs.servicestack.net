@@ -13,7 +13,7 @@ For this tutorial, an empty ASP.NET Web Application (non MVC) is assumed.
 
 To install ServiceStack into your application, you have two options to get the binaries:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack" Version="5.12.0" />`
 :::
 

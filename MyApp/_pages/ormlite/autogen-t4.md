@@ -12,6 +12,6 @@ The recommended way to auto generate Tables and APIs for your existing RDBMS tab
 
 [OrmLite's T4 Template](https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/T4) are useful in database-first development or when wanting to use OrmLite with an existing RDBMS by automatically generating POCO's and strong-typed wrappers for executing stored procedures.
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.T4" Version="6.*" />`
 :::

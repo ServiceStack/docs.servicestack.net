@@ -126,19 +126,19 @@ dotnet add package ServiceStack.OrmLite.MySql       // MySql
 
 Or you can add the following to your `csproj` file.
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 

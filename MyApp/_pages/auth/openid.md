@@ -14,7 +14,7 @@ Contained in the [ServiceStack.Authentication.OpenId](http://nuget.org/packages/
 
 ## Install via NuGet
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Authentication.OpenId" Version="5.*" />`
 :::
 

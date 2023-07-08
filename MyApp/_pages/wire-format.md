@@ -17,7 +17,7 @@ code-first POCO DTOs.
 
 Wire is easily installed with the [ServiceStack.Wire](https://nuget.org/packages/ServiceStack.Wire) NuGet package:
 
-::: nuget 
+:::copy 
 `<PackageReference Include="ServiceStack.Wire" Version="6.*" />`
 :::
 

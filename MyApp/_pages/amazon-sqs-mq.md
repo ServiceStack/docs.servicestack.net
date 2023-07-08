@@ -5,7 +5,7 @@ title: Amazon SQS MQ
 
 Support for registering Amazon Simple Queue Service (SQS) as an [MQ Server](/messaging) is available in [ServiceStack.Aws](https://www.nuget.org/packages/ServiceStack.Aws) NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
 :::
 

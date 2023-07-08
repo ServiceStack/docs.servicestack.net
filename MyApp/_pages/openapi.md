@@ -8,7 +8,7 @@ title: Open API
 [Open API](https://www.openapis.org/) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services. ServiceStack implements the 
 [OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) back-end and embeds the Swagger UI front-end in a separate plugin which is available under [OpenAPI NuGet package](http://nuget.org/packages/ServiceStack.Api.OpenApi/):
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Api.OpenApi" Version="6.*" />`
 :::
 

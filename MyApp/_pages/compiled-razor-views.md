@@ -9,7 +9,7 @@ The primary benefits of compiled views is improved performance by eliminating co
 
 To enable compiled razor views you need to add the [ServiceStack.Razor.BuildTask](https://www.nuget.org/packages/ServiceStack.Razor.BuildTask) NuGet Package to the project containing your Razor `*.cshtml` pages, i.e:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Razor.BuildTask" Version="5.*" />`
 :::
 

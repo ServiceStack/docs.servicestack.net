@@ -12,7 +12,7 @@ by [Scott Mackay](https://github.com/wwwlicious) leverages the hardened distribu
 highly available features in [consul.io](https://www.consul.io/) to provide automatic registration and 
 de-registration of ServiceStack Services on AppHost **StartUp** and **Dispose** that's available from:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Discovery.Consul" Version="6.*" />`
 :::
 
@@ -55,7 +55,7 @@ The [RedisServiceDiscoveryFeature](https://github.com/rsafier/ServiceStack.Disco
 [Richard Safier](https://github.com/rsafier) has similar goals to provide transparent service discovery 
 but only requires access to Redis-backed datastore, but is otherwise just as easy to install:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Discovery.Redis" Version="6.*" />`
 :::
 

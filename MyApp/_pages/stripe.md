@@ -20,7 +20,7 @@ We welcome PR's with support of missing APIs which typically only requires addin
 
 Install from NuGet with:
 
-:::nuget
+:::copy
 `<PackageReference Include="ServiceStack.Stripe" Version="6.*" />`
 :::
 
@@ -28,7 +28,7 @@ Install from NuGet with:
 
 To use this library in [ASP.NET Core Apps running on the .NET Framework](/templates/corefx), install the **.NET Standard 2.0** only NuGet package instead:
 
-:::nuget
+:::copy
 `<PackageReference Include="ServiceStack.Stripe.Core" Version="6.*" />`
 :::
 

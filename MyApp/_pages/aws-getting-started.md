@@ -66,7 +66,7 @@ Now that you're PostgreSQL instance is running, connecting with OrmLite will req
 </appSettings>
 ```
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />`
 :::
 
@@ -186,7 +186,7 @@ Now that you're Aurora instance is running, connecting with OrmLite will require
 </appSettings>
 ```
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 
@@ -306,7 +306,7 @@ Now that you're MySQL instance is running, connecting with OrmLite will require 
 </appSettings>
 ```
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 
@@ -430,7 +430,7 @@ Now that you're MariaDB instance is running, connecting with OrmLite will requir
 </appSettings>
 ```
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 
@@ -555,7 +555,7 @@ If you are connecting to a new instance without a database, you'll need to creat
 </appSettings>
 ```
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.SqlServer" Version="6.*" />`
 :::
 
@@ -664,7 +664,7 @@ Now you're your Redis nodes are ready, your AppHost can be configured to use the
 
 First, you'll need to install `ServiceStack.Redis` NuGet package if your application doesn't already use it.
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Redis" Version="6.*" />`
 :::
 
@@ -793,7 +793,7 @@ Now you're your Memcached cluster is ready, your AppHost can be configured to us
 
 First, you'll need to install `ServiceStack.Caching.Memcached`:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Caching.Memcached" Version="6.*" />`
 :::
 

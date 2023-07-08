@@ -34,7 +34,7 @@ The above configuration will use Redis ServerEvents if there's a `RedisHost` **a
 
 RedisServerEvents is in the [ServiceStack.Server](http://www.nuget.org/packages/ServiceStack.Server) NuGet Package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Redis" Version="6.*" />`
 :::
 

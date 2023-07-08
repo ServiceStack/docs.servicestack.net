@@ -5,7 +5,7 @@ title: Azure Service Bus MQ
 
 Support for registering Azure Service Bus as an [MQ Server](/messaging) in ServiceStack is available in [ServiceStack.Azure](https://www.nuget.org/packages/ServiceStack.Azure) NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Azure" Version="6.*" />`
 :::
 

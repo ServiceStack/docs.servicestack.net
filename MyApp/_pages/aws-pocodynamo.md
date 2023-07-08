@@ -138,7 +138,7 @@ configurations, related items, conventions, aliases, dep-free data annotation at
 
 PocoDynamo is contained in ServiceStack's AWS NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
 :::
  

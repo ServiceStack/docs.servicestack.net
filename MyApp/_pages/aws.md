@@ -50,7 +50,7 @@ It's now more productive than ever to develop and host ServiceStack solutions en
 All of ServiceStack's support for AWS is encapsulated within the single **ServiceStack.Aws** NuGet package which 
 references the latest modular AWSSDK **v3.1x** dependencies **.NET 4.5+** projects can install from NuGet with:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
 :::
 
@@ -536,7 +536,7 @@ configurations, related items, conventions, aliases, dep-free data annotation at
 
 PocoDynamo is contained in ServiceStack's AWS NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
 :::
    

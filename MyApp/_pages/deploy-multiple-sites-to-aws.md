@@ -92,7 +92,7 @@ Another requirement is that the application you want to package will require a n
 
 You can add it to your application with the following NuGet command in Visual Studio:
 
-::: nuget
+:::copy
 `<PackageReference Include="OctoPack" Version="3.*" />`
 :::
 

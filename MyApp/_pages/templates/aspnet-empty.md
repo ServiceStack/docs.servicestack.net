@@ -108,11 +108,11 @@ You can then easily [Convert this empty template into a functional ServiceStack 
 
 1) Installing ServiceStack and any other dependency you want to use, e.g:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Redis" Version="6.*" />`
 :::
    

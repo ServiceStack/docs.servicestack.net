@@ -54,7 +54,7 @@ mqService.RegisterHandler<EmailMessage>(ExecuteMessage);
 
 A redis-based message queue client/server that can be hosted in any .NET or ASP.NET application. All Redis MQ Hosts lives in the [ServiceStack.Server](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Server/Messaging/Redis) project and brings the many benefits of using a Message Queue. 
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Server" Version="6.*" />`
 :::
 
@@ -132,7 +132,7 @@ Probably will help to understand the background concepts behind Redis so you can
 
 The `RedisMqServer` is in [ServiceStack.Server](https://www.nuget.org/packages/ServiceStack.Server) project and can be installed with:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Server" Version="6.*" />`
 :::
 

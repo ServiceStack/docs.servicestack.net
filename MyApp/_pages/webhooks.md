@@ -11,7 +11,7 @@ The [WebHookFeature](https://github.com/jezzsantos/servicestack.webhooks) plugin
 by [Jezz Santos](https://github.com/jezzsantos) makes it very easy to expose webhook notifications from your ServiceStack services, 
 and helps you manage your user's subscriptions to those webhooks.:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Webhooks" Version="6.*" />`
 :::
 
