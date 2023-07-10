@@ -298,7 +298,7 @@ public class AutoLinkHeadingRenderer : HtmlObjectRenderer<HeadingBlock>
         {
             renderer.Write("<a class=\"header-anchor\" href=\"javascript:;\" onclick=\"location.hash='#");
             renderer.Write(attrs.Id);
-            renderer.Write("'\" aria-label=\"Permalink\">&ZeroWidthSpace;</a>");
+            renderer.Write("'\" aria-label=\"Permalink\"> </a>");
         }
 
         if (renderer.EnableHtmlForBlock)
