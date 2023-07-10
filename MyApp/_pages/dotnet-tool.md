@@ -22,14 +22,6 @@ To access available features, install with:
 dotnet tool install --global x 
 :::
 
-### Apple M1
-
-Install on Apple's new M1 Pro and M1 Max ARM chips with:
-
-:::sh
-dotnet tool install -g -a x64 x
-:::
-
 ### Update
 
 Or if you had a previous version installed, update with:
