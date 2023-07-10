@@ -57,7 +57,7 @@ const TypesenseDialog = {
                     // typesense API reference: https://typesense.org/docs/0.21.0/api/documents.html#search
                     fetch('https://search.docs.servicestack.net/collections/typesense_docs/documents/search?q='
                         + encodeURIComponent(query.value)
-                        + '&query_by=content,hierarchy.lvl0,hierarchy.lvl1,hierarchy.lvl2,hierarchy.lvl3&group_by=hierarchy.lvl0', {
+                        + '&query_by=hierarchy.lvl0,hierarchy.lvl1,content,hierarchy.lvl2,hierarchy.lvl3&group_by=hierarchy.lvl0', {
                         headers: {
                             // Search only API key for Typesense.
                             'x-typesense-api-key': 'N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo'
