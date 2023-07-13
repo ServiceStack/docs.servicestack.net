@@ -21,12 +21,6 @@ export default {
       <h4 class="py-6 text-center text-xl">Run .NET Project (New Terminal)</h4>
       <ShellCommand class="mb-2">dotnet watch</ShellCommand>
 
-      <div class="mt-8 text-center">
-        <div class="flex justify-center gap-x-2">
-          <PrimaryButton color="purple" href="./posts/rider">rider</PrimaryButton>
-          <PrimaryButton color="purple" href="./posts/vs">visualstudio</PrimaryButton>
-        </div>
-      </div>        
     </div>`,
     props: { template:String },
     setup(props) {
