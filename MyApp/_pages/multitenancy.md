@@ -3,7 +3,11 @@ slug: multitenancy
 title: Multitenancy
 ---
 
-ServiceStack provides a number of ways of changing the database connection used at runtime based on an incoming Request. You can use a [Request Filter](/request-and-response-filters#global-request-filters), use the `[ConnectionInfo]` [Request Filter Attribute](/filter-attributes#request-filter-attributes), use the `[NamedConnection]` attribute on [Auto Query](/autoquery/) Services, access named connections in Custom Service implementations or override `GetDbConnection(IRequest)` in your AppHost.
+ServiceStack provides a number of ways of changing the database connection used at runtime based on an incoming Request. 
+You can use a [Request Filter](/request-and-response-filters#global-request-filters), use the `[ConnectionInfo]` 
+[Request Filter Attribute](/filter-attributes#request-filter-attributes), use the `[NamedConnection]` attribute on 
+[Auto Query](/autoquery/) Services, access named connections in Custom Service implementations or override 
+`GetDbConnection(IRequest)` in your AppHost.
 
 ### Change Database Connection at Runtime
 
@@ -199,32 +203,16 @@ from a central overridable location in your `AppHost`. This lets you control whi
 dependency gets used based on the incoming Request for each Service by overriding any of the `AppHost` methods below: 
 
 ```csharp
-public virtual IDbConnection Db
-{
-    get { return db ?? (db = HostContext.AppHost.GetDbConnection(Request)); }
-}
+public IDbConnection Db => db ??= HostContext.AppHost.GetDbConnection(Request);
 
-public virtual ICacheClient Cache
-{
-    get { return cache ?? (cache = HostContext.AppHost.GetCacheClient(Request)); }
-}
+public IRedisClient Redis => redis ??= HostContext.AppHost.GetRedisClient(Request);
 
-public virtual MemoryCacheClient LocalCache
-{
-    get { return localCache ?? 
-              (localCache = HostContext.AppHost.GetMemoryCacheClient(Request)); }
-}
+public ICacheClient Cache => cache ??= HostContext.AppHost.GetCacheClient(Request);
 
-public virtual IRedisClient Redis
-{
-    get { return redis ?? (redis = HostContext.AppHost.GetRedisClient(Request)); }
-}
+public MemoryCacheClient LocalCache => localCache ??= HostContext.AppHost.GetMemoryCacheClient(Request);
 
-public virtual IMessageProducer MessageProducer
-{
-    get { return messageProducer ?? 
-              (messageProducer = HostContext.AppHost.GetMessageProducer(Request)); }
-}
+public IMessageProducer MessageProducer => messageProducer ??= 
+    HostContext.AppHost.GetMessageProducer(Request);
 ```
 
 E.g. to change the DB Connection your Service uses you can override `GetDbConnection(IRequest)` in your `AppHost`.

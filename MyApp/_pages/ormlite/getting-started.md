@@ -85,7 +85,8 @@ Named connections can be opened by its name:
 using var db = dbFactory.Open("Reporting");
 ```
 
-If using ServiceStack the `[NamedConnection]` attribute can be used to configure Services `base.Db` connection with the named connection RDBMS, e.g:
+If using ServiceStack the `[NamedConnection]` attribute can be used to configure Services `base.Db` connection with the 
+named connection RDBMS, e.g:
 
 ```csharp
 [NamedConnection("Reporting")]
@@ -104,6 +105,20 @@ Or if using [AutoQuery](/autoquery/) it can be used to associate Data Models wit
 public class Reports { ... }
 
 public class QueryReports : QueryDb<Reports> {}
+```
+
+Otherwise for other Services the `[ConnectionInfo]` attribute can be used to change the `base.Db` to use the registered
+named connection for all APIs in a Service class, e.g:
+
+```csharp
+[ConnectionInfo(NamedConnection = "Reporting")]
+public class ReportingServices : Service
+{
+    public object Any(Sales request)
+    {
+        return new SalesResponse { Results = Db.Select<Sales>() };
+    }
+}
 ```
 
 More examples available in [Multitenancy](/multitenancy) docs.
