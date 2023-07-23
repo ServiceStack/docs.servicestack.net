@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-07-19T10:29:23.1710968Z'>
+    <meta name='date' content='2023-07-23T02:28:02.1642468Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Multitenancy</title>
@@ -1316,7 +1316,11 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>ServiceStack provides a number of ways of changing the database connection used at runtime based on an incoming Request. You can use a <a href="/request-and-response-filters#global-request-filters">Request Filter</a>, use the <code>[ConnectionInfo]</code> <a href="/filter-attributes#request-filter-attributes">Request Filter Attribute</a>, use the <code>[NamedConnection]</code> attribute on <a href="/autoquery/">Auto Query</a> Services, access named connections in Custom Service implementations or override <code>GetDbConnection(IRequest)</code> in your AppHost.</p>
+                <div class="content"><p>ServiceStack provides a number of ways of changing the database connection used at runtime based on an incoming Request.
+You can use a <a href="/request-and-response-filters#global-request-filters">Request Filter</a>, use the <code>[ConnectionInfo]</code>
+<a href="/filter-attributes#request-filter-attributes">Request Filter Attribute</a>, use the <code>[NamedConnection]</code> attribute on
+<a href="/autoquery/">Auto Query</a> Services, access named connections in Custom Service implementations or override
+<code>GetDbConnection(IRequest)</code> in your AppHost.</p>
 <h3 id="change-database-connection-at-runtime">Change Database Connection at Runtime<a class="header-anchor" href="javascript:;" onclick="location.hash='#change-database-connection-at-runtime'" aria-label="Permalink"> </a></h3>
 <p>The default implementation of <code>IAppHost.GetDbConnection(IRequest)</code> includes an easy way to change the DB Connection that can be done by populating the
 <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Common/ConnectionInfo.cs">ConnectionInfo</a>
@@ -1461,32 +1465,16 @@ public class ViewSales : IReturn&lt;ViewSalesResponse&gt; { }
 <p>All built-in dependencies available from <code>Service</code> base class, AutoQuery, Razor View pages, etc are resolved
 from a central overridable location in your <code>AppHost</code>. This lets you control which pre-configured
 dependency gets used based on the incoming Request for each Service by overriding any of the <code>AppHost</code> methods below:</p>
-<pre><code class="language-csharp">public virtual IDbConnection Db
-{
-    get { return db ?? (db = HostContext.AppHost.GetDbConnection(Request)); }
-}
+<pre><code class="language-csharp">public IDbConnection Db =&gt; db ??= HostContext.AppHost.GetDbConnection(Request);
 
-public virtual ICacheClient Cache
-{
-    get { return cache ?? (cache = HostContext.AppHost.GetCacheClient(Request)); }
-}
+public IRedisClient Redis =&gt; redis ??= HostContext.AppHost.GetRedisClient(Request);
 
-public virtual MemoryCacheClient LocalCache
-{
-    get { return localCache ?? 
-              (localCache = HostContext.AppHost.GetMemoryCacheClient(Request)); }
-}
+public ICacheClient Cache =&gt; cache ??= HostContext.AppHost.GetCacheClient(Request);
 
-public virtual IRedisClient Redis
-{
-    get { return redis ?? (redis = HostContext.AppHost.GetRedisClient(Request)); }
-}
+public MemoryCacheClient LocalCache =&gt; localCache ??= HostContext.AppHost.GetMemoryCacheClient(Request);
 
-public virtual IMessageProducer MessageProducer
-{
-    get { return messageProducer ?? 
-              (messageProducer = HostContext.AppHost.GetMessageProducer(Request)); }
-}
+public IMessageProducer MessageProducer =&gt; messageProducer ??= 
+    HostContext.AppHost.GetMessageProducer(Request);
 </code></pre>
 <p>E.g. to change the DB Connection your Service uses you can override <code>GetDbConnection(IRequest)</code> in your <code>AppHost</code>.</p>
 <h2 id="multitenancy-rdbms-authprovider">Multitenancy RDBMS AuthProvider<a class="header-anchor" href="javascript:;" onclick="location.hash='#multitenancy-rdbms-authprovider'" aria-label="Permalink"> </a></h2>

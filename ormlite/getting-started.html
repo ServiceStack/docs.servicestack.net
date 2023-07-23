@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-07-19T10:29:23.5897098Z'>
+    <meta name='date' content='2023-07-23T02:28:02.5362587Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Getting started with OrmLite</title>
@@ -432,7 +432,8 @@ dbFactory.RegisterConnection(&quot;Reporting&quot;, pgConnString, PostgreSqlDial
 <p>Named connections can be opened by its name:</p>
 <pre><code class="language-csharp">using var db = dbFactory.Open(&quot;Reporting&quot;);
 </code></pre>
-<p>If using ServiceStack the <code>[NamedConnection]</code> attribute can be used to configure Services <code>base.Db</code> connection with the named connection RDBMS, e.g:</p>
+<p>If using ServiceStack the <code>[NamedConnection]</code> attribute can be used to configure Services <code>base.Db</code> connection with the
+named connection RDBMS, e.g:</p>
 <pre><code class="language-csharp">[NamedConnection(&quot;Reporting&quot;)]
 public class QueryReports {}
 
@@ -446,6 +447,17 @@ public class ReportServices : Service
 public class Reports { ... }
 
 public class QueryReports : QueryDb&lt;Reports&gt; {}
+</code></pre>
+<p>Otherwise for other Services the <code>[ConnectionInfo]</code> attribute can be used to change the <code>base.Db</code> to use the registered
+named connection for all APIs in a Service class, e.g:</p>
+<pre><code class="language-csharp">[ConnectionInfo(NamedConnection = &quot;Reporting&quot;)]
+public class ReportingServices : Service
+{
+    public object Any(Sales request)
+    {
+        return new SalesResponse { Results = Db.Select&lt;Sales&gt;() };
+    }
+}
 </code></pre>
 <p>More examples available in <a href="/multitenancy">Multitenancy</a> docs.</p>
 <h2 id="detailed-walkthrough">Detailed Walkthrough<a class="header-anchor" href="javascript:;" onclick="location.hash='#detailed-walkthrough'" aria-label="Permalink"> </a></h2>
