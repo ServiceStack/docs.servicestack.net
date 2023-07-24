@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-07-24T02:10:27.2407036Z'>
+    <meta name='date' content='2023-07-24T02:10:27.2161734Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>OrmLite Type Converters</title>
+    <title>Install PostgreSQL, MySql and SQL Server with Docker</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -203,7 +203,7 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/ormlite/install-postgres-mysql-sqlserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/ormlite/install-postgres-mysql-sqlserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Install Postgres, MySql &amp; MSSQL
                                     </a>
                                 </li>
@@ -263,7 +263,7 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/ormlite/type-converters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/ormlite/type-converters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Type Converters
                                     </a>
                                 </li>
@@ -381,200 +381,145 @@ OrmLite                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            OrmLite Type Converters
+                            Install PostgreSQL, MySql and SQL Server with Docker
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>OrmLite has become a lot more customizable and extensible thanks to the internal redesign decoupling all
-custom logic for handling different Field Types into individual Type Converters.</p>
-<p>This use of individual decoupled Type Converters makes it possible to enhance or entirely replace how .NET Types are handled and can also be extended to support new Types it has no knowledge about, a feature taken advantage of by the <a href="/ormlite/sql-server-features#sql-server-types">SQL Server Types</a> support.</p>
-<p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/ormlite-converters.png" alt="OrmLite Converters" /></p>
-<h2 id="encapsulated-reusable-customizable-and-debuggable">Encapsulated, reusable, customizable and debuggable<a class="header-anchor" href="javascript:;" onclick="location.hash='#encapsulated-reusable-customizable-and-debuggable'" aria-label="Permalink"> </a></h2>
-<p>Converters allow for great re-use as common functionality to support each type is maintained in the common
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite/Converters">ServiceStack.OrmLite/Converters</a>
-whilst any RDBMS-specific functionality can inherit the common converters and provide any specialization
-required to support that type. E.g. SQL Server specific converters are maintained in
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite.SqlServer/Converters">ServiceStack.OrmLite.SqlServer/Converters</a>
-with each converter inheriting shared functionality and only adding custom logic required to support that
-Type in Sql Server.</p>
-<h2 id="creating-converters">Creating Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-converters'" aria-label="Permalink"> </a></h2>
-<p>Converters also provide good encapsulation as everything relating to handling the field type is contained within
-a single class definition. A Converter is any class implementing
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/IOrmLiteConverter.cs">IOrmLiteConverter</a>
-although, it's instead recommended inheriting from the <code>OrmLiteConverter</code> abstract class which allows
-only the minimum APIs needing to be overridden, namely the <code>ColumnDefinition</code>
-used when creating the Table definition and the ADO.NET <code>DbType</code> it should use in parameterized queries.
-An example of this is in
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/Converters/GuidConverter.cs">GuidConverter</a>:</p>
-<pre><code class="language-csharp">public class GuidConverter : OrmLiteConverter
-{
-    public override string ColumnDefinition =&gt; &quot;GUID&quot;;
-
-    public override DbType DbType =&gt; DbType.Guid;
-}
-</code></pre>
-<p>For this to work in SQL Server the <code>ColumnDefinition</code> should instead be <strong>UniqueIdentifier</strong> which is also
-what it needs to be cast to, to be able to query Guid's within an SQL Statement.
-Therefore, Guids require a custom
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerGuidConverter.cs">SqlServerGuidConverter</a>
-to support Guids in SQL Server which looks like:</p>
-<pre><code class="language-csharp">public class SqlServerGuidConverter : GuidConverter
-{
-    public override string ColumnDefinition =&gt; &quot;UniqueIdentifier&quot;;
-
-    public override string ToQuotedString(Type fieldType, object value) =&gt; $&quot;CAST('{(Guid)value}' AS UNIQUEIDENTIFIER)&quot;;
-}
-</code></pre>
-<h2 id="registering-converters">Registering Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#registering-converters'" aria-label="Permalink"> </a></h2>
-<p>To get OrmLite to use this new Custom Converter for SQL Server, the <code>SqlServerOrmLiteDialectProvider</code> just
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/41226795fc12f1b65d6af70c177a5ff57fa70334/src/ServiceStack.OrmLite.SqlServer/SqlServerOrmLiteDialectProvider.cs#L41">registers it in its constructor</a>:</p>
-<pre><code class="language-csharp">base.RegisterConverter&lt;Guid&gt;(new SqlServerGuidConverter());
-</code></pre>
-<p>i.e. overriding the pre-registered <code>GuidConverter</code> to enable its extended functionality in SQL Server.</p>
-<p>You'll also use the same <code>RegisterConverter&lt;T&gt;()</code> API to register your own Custom Guid Coverter on the RDBMS
-provider you want it to apply to, e.g for SQL Server:</p>
-<pre><code class="language-csharp">SqlServerDialect.Provider.RegisterConverter&lt;Guid&gt;(new MyCustomGuidConverter());
-</code></pre>
-<h2 id="resolving-converters">Resolving Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-converters'" aria-label="Permalink"> </a></h2>
-<p>If needed, it can be later retrieved with:</p>
-<pre><code class="language-csharp">IOrmLiteConverter converter = SqlServerDialect.Provider.GetConverter&lt;Guid&gt;();
-var myGuidConverter = (MyCustomGuidConverter)converter;
-</code></pre>
-<h2 id="debugging-converters">Debugging Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#debugging-converters'" aria-label="Permalink"> </a></h2>
-<p>Custom Converters also makes it easier to debug Type issues where if you want to see what value gets retrieved
-from the database, you can override and add a breakpoint on the base method letting you inspect the value
-returned from the ADO.NET Data Reader:</p>
-<pre><code class="language-csharp">public class MyCustomGuidConverter : SqlServerGuidConverter
-{
-    public override object FromDbValue(Type fieldType, object value)
-    {
-        return base.FromDbValue(fieldType, value); //add breakpoint
-    }
-}
-</code></pre>
-<h2 id="enhancing-an-existing-converter">Enhancing an existing Converter<a class="header-anchor" href="javascript:;" onclick="location.hash='#enhancing-an-existing-converter'" aria-label="Permalink"> </a></h2>
-<p>An example of when you'd want to do this is if you wanted to use the <code>Guid</code> property in your POCO's on
-legacy tables which stored Guids in <code>VARCHAR</code> columns, in which case you can also add support for converting
-the returned strings back into Guid's with:</p>
-<pre><code class="language-csharp">public class MyCustomGuidConverter : SqlServerGuidConverter
-{
-    public override object FromDbValue(Type fieldType, object value)
-    {
-        var strValue = value as string; 
-        return strValue != null
-            ? new Guid(strValue);
-            : base.FromDbValue(fieldType, value); 
-    }
-}
-</code></pre>
-<h2 id="sql-server-time-converter">SQL Server TIME Converter<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-server-time-converter'" aria-label="Permalink"> </a></h2>
-<p>Another popular Use Case now enabled with Converters is being able to override built-in functionality based on preference. E.g. by default TimeSpans are stored in the database as Ticks in a <code>BIGINT</code> column since it's the most reliable way to retain the same TimeSpan value uniformly across all RDBMS's.</p>
-<p>E.g. SQL Server's <strong>TIME</strong> data type can't store Times greater than 24 hours or with less precision than <strong>3ms</strong>.
-But if using a <strong>TIME</strong> column was preferred it can now be enabled by registering to use the new
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerTimeConverter.cs">SqlServerTimeConverter</a>
-instead:</p>
-<pre><code class="language-csharp">SqlServerDialect.Provider.RegisterConverter&lt;TimeSpan&gt;(
-    new SqlServerTimeConverter { 
-       Precision = 7 
-    });
-</code></pre>
-<h2 id="customizable-field-definitions">Customizable Field Definitions<a class="header-anchor" href="javascript:;" onclick="location.hash='#customizable-field-definitions'" aria-label="Permalink"> </a></h2>
-<p>Another benefit is they allow for easy customization as seen with <code>Precision</code> property which will now
-create tables using the <code>TIME(7)</code> Column definition for TimeSpan properties.</p>
-<h2 id="compact-guid-converters">Compact Guid Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#compact-guid-converters'" aria-label="Permalink"> </a></h2>
-<p>For RDBMS's that don't have a native <code>Guid</code> type like Oracle or Firebird, you had an option to choose whether
-you wanted to save them as text for better readability (default) or in a more efficient compact binary format.
-Previously this preference was maintained in a boolean flag along with multiple Guid implementations hard-coded
-at different entry points within each DialectProvider. This complexity has now been removed, now to store guids
-in a compact binary format you'll instead register the preferred Converter implementation, e.g:</p>
-<pre><code class="language-csharp">FirebirdDialect.Provider.RegisterConverter&lt;Guid&gt;(
-    new FirebirdCompactGuidConverter());
-</code></pre>
-<h2 id="string-converters">String Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#string-converters'" aria-label="Permalink"> </a></h2>
-<p>To customize the behavior of how strings are stored you can change them directly on the <code>StringConverter</code>, e.g:</p>
-<pre><code class="language-csharp">StringConverter converter = OrmLiteConfig.DialectProvider.GetStringConverter();
-converter.UseUnicode = true;
-converter.StringLength = 100;
-</code></pre>
-<p>Which will change the default column definitions for strings to use <code>NVARCHAR(100)</code> for RDBMS's that support
-Unicode or <code>VARCHAR(100)</code> for those that don't.</p>
-<p>The <code>GetStringConverter()</code> API is just an extension method wrapping the generic <code>GetConverter()</code> API to return
-a concrete type:</p>
-<pre><code class="language-csharp">public static StringConverter GetStringConverter(this IOrmLiteDialectProvider d)
-{
-    return (StringConverter)d.GetConverter(typeof(string));
-}
-</code></pre>
-<h2 id="datetime-converters">DateTime Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#datetime-converters'" aria-label="Permalink"> </a></h2>
-<h3 id="specify-the-datekind-in-datetimes">Specify the DateKind in DateTimes<a class="header-anchor" href="javascript:;" onclick="location.hash='#specify-the-datekind-in-datetimes'" aria-label="Permalink"> </a></h3>
-<p>It's now much simpler and requires less effort to implement new features that maintain the same behavior
-across all supported RDBMS thanks to better cohesion, re-use and reduced internal state. One new feature
-we've added as a result is the new <code>DateStyle</code> customization on <code>DateTimeConverter</code> which lets you change how
-Dates are persisted and populated, e.g:</p>
-<pre><code class="language-csharp">DateTimeConverter dates = OrmLiteConfig.DialectProvider.GetDateTimeConverter();
-dates.DateStyle = DateTimeKind.Local;
-</code></pre>
-<p>Will save <code>DateTime</code> in the database and populate them back on data models as LocalTime.
-This is also available for Utc:</p>
-<pre><code class="language-csharp">dates.DateStyle = DateTimeKind.Utc;
-</code></pre>
-<p>Default is <code>Unspecified</code> which doesn't do any conversions and just uses the DateTime returned by the ADO.NET provider.
-Examples of the behavior of the different DateStyle's is available in
-<a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/tests/ServiceStack.OrmLite.Tests/DateTimeTests.cs">DateTimeTests</a>.</p>
-<h2 id="noda-time">Noda Time<a class="header-anchor" href="javascript:;" onclick="location.hash='#noda-time'" aria-label="Permalink"> </a></h2>
-<p>SQL Server Converter for <a href="http://nodatime.org/">NodaTime</a> <code>Instant</code> Type in <code>DATETIMEOFFSET</code> with TimeZone:</p>
-<pre><code class="language-csharp">public class SqlServerInstantConverter : OrmLiteConverter
-{
-    public override string ColumnDefinition =&gt; &quot;DATETIMEOFFSET&quot;;
-
-    public override DbType DbType =&gt; DbType.DateTimeOffset;
-
-    public override object ToDbValue(Type fieldType, object value)
-    {
-        var instantValue = (Instant)value;
-        return instantValue.ToDateTimeOffset();
-    }
-
-    public override object FromDbValue(Type fieldType, object value)
-    {
-        return Instant.FromDateTimeOffset((DateTimeOffset)value);
-    }
-}
-
-SqlServerDialect.Provider.RegisterConverter&lt;Instant&gt;(new SqlServerInstantConverter());
-</code></pre>
-<p>In <code>DATETIME2</code> in UTC:</p>
-<pre><code class="language-csharp">public class SqlServerInstantDateTimeConverter : OrmLiteConverter
-{
-    public override string ColumnDefinition =&gt; &quot;DATETIME2&quot;;
-
-    public override DbType DbType =&gt; DbType.DateTime;
-
-    public override object ToDbValue(Type fieldType, object value)
-    {
-        var instantValue = (Instant) value;
-        return instantValue.ToDateTimeUtc();
-    }
-
-    public override object FromDbValue(Type fieldType, object value)
-    {
-        var dateTime = DateTime.SpecifyKind((DateTime)value, DateTimeKind.Utc);
-        return Instant.FromDateTimeUtc(dateTime);
-    }
-}
-
-SqlServerDialect.Provider.RegisterConverter&lt;Instant&gt;(new SqlServerInstantDateTimeConverter());
-</code></pre>
-<h2 id="sql-server-types">SQL Server Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-server-types'" aria-label="Permalink"> </a></h2>
-<p>See <a href="sql-server-features.md#sql-server-types">SQL Server Types</a> for how to enable support for SQL Server-specific <code>SqlGeography</code>, <code>SqlGeometry</code> and <code>SqlHierarchyId</code> Types.</p>
+                <div class="content"><p>Installing developer tools has become frictionless in today's world of ubiquitous Docker adoption. First thing you'll
+need to install is <a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> which will let you run each RDBMS
+in a containerized Docker App.</p>
+<p>After Docker is running, installing and running PostgreSQL and MySql can be done with a single command:</p>
+<h2 id="install-and-run-postgresql">Install and run PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#install-and-run-postgresql'" aria-label="Permalink"> </a></h2>
+<div class="not-prose copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-700">
+                    <div class="pl-4 py-1 pb-1.5 align-middle text-lg text-white"><p>docker run --name postgres -e POSTGRES_PASSWORD=p@55wOrd -p 127.0.0.1:5432:5432 -d postgres</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-sky-500 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h2 id="install-and-run-mysql">Install and run MySql<a class="header-anchor" href="javascript:;" onclick="location.hash='#install-and-run-mysql'" aria-label="Permalink"> </a></h2>
+<div class="not-prose copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-700">
+                    <div class="pl-4 py-1 pb-1.5 align-middle text-lg text-white"><p>docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=p@55wOrd -d mysql:latest</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-sky-500 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<blockquote>
+<p>Feel free to update commands to use your preferred strong password instead</p>
+</blockquote>
+<h2 id="install-and-run-sql-server">Install and run SQL Server<a class="header-anchor" href="javascript:;" onclick="location.hash='#install-and-run-sql-server'" aria-label="Permalink"> </a></h2>
+<p>SQL Server requires more resources than the popular RDBMS's and as it doesn't have a native ARM Docker Image requires
+a bit more configuration.</p>
+<p>First you'll want to ensure you have at least <strong>4GB RAM</strong> available to containers from
+the <strong>Resources</strong> Tab in Docker Settings you can open with <code>⌘,</code></p>
+<p><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/docker-resources.png" alt="" /></p>
+<h2 id="apple-silicon">Apple Silicon<a class="header-anchor" href="javascript:;" onclick="location.hash='#apple-silicon'" aria-label="Permalink"> </a></h2>
+<p>Our MacBook Air's <strong>24GB RAM</strong> configuration defaulted to <strong>7.9 GB</strong>, but if you have a lower configuration you'll want
+to ensure <strong>4GB</strong> is available to SQL Server.</p>
+<p>If you're running on Apple Silicon you'll want to ensure <strong>Use Virtualization Framework</strong> and <strong>VirtioFS</strong> is checked
+in the <strong>General</strong> tab which will allow SQL Server <strong>AMD64</strong> Image will run on Apple's new
+<a href="https://developer.apple.com/documentation/virtualization">Virtualization framework</a>:</p>
+<p><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/docker-general.png" alt="" /></p>
+<p>After which you'll be able to install and run SQL Server with:</p>
+<div class="not-prose copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-700">
+                    <div class="pl-4 py-1 pb-1.5 align-middle text-lg text-white"><p>docker run --platform=linux/amd64 --name mssql -e ACCEPT_EULA=1 -e MSSQL_SA_PASSWORD=p@55wOrd -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-sky-500 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>You'll be able to check if all Docker containers are now running by clicking on the <strong>Containers</strong> tab in Docker Desktop:</p>
+<p><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/docker-containers.png" alt="" /></p>
+<h2 id="lazydocker">lazydocker<a class="header-anchor" href="javascript:;" onclick="location.hash='#lazydocker'" aria-label="Permalink"> </a></h2>
+<p>Another great alternative to Docker Desktop for managing Docker Containers is <a href="https://github.com/jesseduffield/lazydocker">lazydocker</a>
+which can be installed with:</p>
+<h3 id="macos">macOS<a class="header-anchor" href="javascript:;" onclick="location.hash='#macos'" aria-label="Permalink"> </a></h3>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>brew install lazydocker</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="chocolatey-windows">Chocolatey (Windows)<a class="header-anchor" href="javascript:;" onclick="location.hash='#chocolatey-windows'" aria-label="Permalink"> </a></h3>
+<p>Using <a href="https://chocolatey.org">Chocolatey</a> is an easy way to install on Windows:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>choco install lazydocker</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>As lazydocker a Terminal UI it can be run everywhere where there's a Terminal, in local and remote terminals as well as
+Rider and VS Code's built-in Terminal UIs where you can quickly perform Docker tasks without breaking your development
+workflow:</p>
+<p><a href="https://github.com/jesseduffield/lazydocker"><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/lazydocker.png" alt="" /></a></p>
+<h2 id="datagrip">DataGrip<a class="header-anchor" href="javascript:;" onclick="location.hash='#datagrip'" aria-label="Permalink"> </a></h2>
+<p>Now we can see they're all running, lets connect to them. You could use the command line tools specific to each database
+but my preference is to use <a href="https://www.jetbrains.com/datagrip/">JetBrains DataGrip</a> which lets you connect and manage
+any RDBMS from a single Desktop App, including many of the most popular NoSQL data stores.</p>
+<h2 id="connect-to-all-database-connections">Connect to all Database connections<a class="header-anchor" href="javascript:;" onclick="location.hash='#connect-to-all-database-connections'" aria-label="Permalink"> </a></h2>
+<p>In <strong>Database Explorer</strong>, click on the <code>+</code> New Icon to add a new Data Source to <strong>Microsoft SQL Server</strong>, <strong>MySql</strong>
+and <strong>PostgreSQL</strong> using the passwords used to run the Docker commands (e.g.<code>p@55wOrd</code>) and the default user names
+for each RDBMS:</p>
+<ul>
+<li>SQL Server: <code>sa</code></li>
+<li>MySQL: <code>root</code></li>
+<li>PostgreSQL: <code>postgres</code></li>
+</ul>
+<p>After connecting to all databases you should end up with active connections to all empty databases:</p>
+<p><a href="https://www.jetbrains.com/datagrip/"><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/datagrip-databases.png" alt="" /></a></p>
+<p>Which you can open a <strong>New &gt; Query Console</strong> or <code>⇧⌘L</code> to start executing generic queries against like <code>SELECT @@VERSION</code>
+in SQL Server to display the version of SQL Server that's running:</p>
+<p><a href="https://www.jetbrains.com/datagrip/"><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/datagrip-mssql-version.png" alt="" /></a></p>
+<h2 id="creating-new-databases-with-datagrip">Creating new Databases with DataGrip<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-new-databases-with-datagrip'" aria-label="Permalink"> </a></h2>
+<p>To do anything interesting you'll need databases, which you can create with <code>New &gt; Database</code> for SQL Server and
+PostgreSQL or <code>New &gt; Schema</code> in MySQL:</p>
+<p><a href="https://www.jetbrains.com/datagrip/"><img src="https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/datagrip-test.png" alt="" /></a></p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/type-converters.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/install-postgres-mysql-sqlserver.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -582,18 +527,18 @@ SqlServerDialect.Provider.RegisterConverter&lt;Instant&gt;(new SqlServerInstantD
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/ormlite/dynamic-result-sets" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/ormlite/litestream" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Dynamic Result Sets
+                                                Litestream
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/ormlite/ormlite-utils" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                OrmLite Utils
+                                            <a href="/ormlite/multi-database-app" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Multiple App Databases
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -612,76 +557,57 @@ SqlServerDialect.Provider.RegisterConverter&lt;Instant&gt;(new SqlServerInstantD
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#encapsulated-reusable-customizable-and-debuggable'" data-id="encapsulated-reusable-customizable-and-debuggable" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Encapsulated, reusable, customizable and debuggable
+                                        <span v-hash="'#install-and-run-postgresql'" data-id="install-and-run-postgresql" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Install and run PostgreSQL
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#creating-converters'" data-id="creating-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Creating Converters
+                                        <span v-hash="'#install-and-run-mysql'" data-id="install-and-run-mysql" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Install and run MySql
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#registering-converters'" data-id="registering-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Registering Converters
+                                        <span v-hash="'#install-and-run-sql-server'" data-id="install-and-run-sql-server" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Install and run SQL Server
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#resolving-converters'" data-id="resolving-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Resolving Converters
+                                        <span v-hash="'#apple-silicon'" data-id="apple-silicon" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Apple Silicon
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#debugging-converters'" data-id="debugging-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Debugging Converters
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#enhancing-an-existing-converter'" data-id="enhancing-an-existing-converter" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Enhancing an existing Converter
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#sql-server-time-converter'" data-id="sql-server-time-converter" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            SQL Server TIME Converter
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#customizable-field-definitions'" data-id="customizable-field-definitions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Customizable Field Definitions
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#compact-guid-converters'" data-id="compact-guid-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Compact Guid Converters
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#string-converters'" data-id="string-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            String Converters
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#datetime-converters'" data-id="datetime-converters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            DateTime Converters
+                                        <span v-hash="'#lazydocker'" data-id="lazydocker" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            lazydocker
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="specify-the-datekind-in-datetimes" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#specify-the-datekind-in-datetimes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="macos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#macos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Specify the DateKind in DateTimes
+                                                            macOS
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="chocolatey-windows" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#chocolatey-windows'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Chocolatey (Windows)
                                                         </span>
                                                     </li>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#noda-time'" data-id="noda-time" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Noda Time
+                                        <span v-hash="'#datagrip'" data-id="datagrip" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            DataGrip
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#sql-server-types'" data-id="sql-server-types" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            SQL Server Types
+                                        <span v-hash="'#connect-to-all-database-connections'" data-id="connect-to-all-database-connections" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Connect to all Database connections
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#creating-new-databases-with-datagrip'" data-id="creating-new-databases-with-datagrip" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Creating new Databases with DataGrip
                                         </span>
                                     </li>
                             </ul>
