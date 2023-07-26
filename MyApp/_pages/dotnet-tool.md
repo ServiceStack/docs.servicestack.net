@@ -42,7 +42,7 @@ Then run `x` without any arguments to view Usage:
 x
 :::
 
-```
+```txt
 Usage:
 
   x new                     List available Project Templates
