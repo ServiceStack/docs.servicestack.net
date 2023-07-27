@@ -10,6 +10,12 @@ Please see the [Pre Release NuGet Packages docs](/pre-release) for configuring a
 
 ---
 
+:::{.text-center .text-2xl .text-red-600 .font-medium}
+Old MyGet Docs
+:::
+
+---
+
 ## ServiceStack pre-release MyGet Feed
 
 Our interim pre-release NuGet packages in between major releases on NuGet are published to [MyGet](https://www.myget.org/).
