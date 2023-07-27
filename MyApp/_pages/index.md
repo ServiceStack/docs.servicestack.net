@@ -23,7 +23,7 @@ title: ServiceStack Documentation
 - [Free for Individuals & OSS](https://servicestack.net/free) - ServiceStack is FREE for Individuals & OSS
 - [ServiceStack Downloads](https://servicestack.net/download) - Official downloads are available on NuGet
 - [License Registration](/register) - ServiceStack License Key Registration Options
-- [Pre-release MyGet Packages](/myget) - The latest downloads in-between each release are available on MyGet
+- [Pre-release NuGet Packages](/pre-release) - Latest pre-release NuGet Packages in-between each release
 
 ## Contributing
 

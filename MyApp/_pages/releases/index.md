@@ -16,7 +16,7 @@ To distinguish updates from normal releases we’ll use the `{PATCH}` version to
 
     {MAJOR}.{MINOR}.{PATCH}
 
-The `{MAJOR}` is reserved for Major releases like v5 containing structural changes that may require changes to environment and/or project configurations like v5. A new `{MINOR}` version will be used for normal "Major" releases which will have a `{PATCH}` version of **0**. An **even** `{PATCH}` version number indicates an "Update" release published to **NuGet** whilst an **odd** version number indicates a "pre-release" version that's only [available on MyGet](/myget), e.g:
+The `{MAJOR}` is reserved for Major releases like v5 containing structural changes that may require changes to environment and/or project configurations like v5. A new `{MINOR}` version will be used for normal "Major" releases which will have a `{PATCH}` version of **0**. An **even** `{PATCH}` version number indicates an "Update" release published to **NuGet** whilst an **odd** version number indicates a "pre-release" version that's only [available on Pre Release NuGet packages feed](/pre-release), e.g:
 
   - **v5.0.0** - Current Major Release with structural changes
     - v5.0.2 - Enhancement of Major v5.0.0 Release

@@ -1,18 +1,10 @@
 ---
-title: MyGet
+title: Pre Release NuGet Packages
 ---
 
-## Pre-release packages Moved to Feedz
+## ServiceStack Pre-Release NuGet Packages
 
-After several unacceptably long outages we've decided to publish our Pre Release NuGet packages to [Feedz.io](https://feedz.io)
-
-Please see the [Pre Release NuGet Packages docs](/pre-release) for configuring access to our Pre Release NuGet packages on [Feedz.io](https://feedz.io).
-
----
-
-## ServiceStack pre-release MyGet Feed
-
-Our interim pre-release NuGet packages in between major releases on NuGet are published to [MyGet](https://www.myget.org/).
+Our interim pre-release NuGet packages in between major releases on NuGet are published to [Feedz.io](https://feedz.io/).
 
 ::: tip
 If preferred, the pre-release packages are also available in our [GitHub Packages Registry](/gh-nuget)
@@ -23,27 +15,24 @@ If preferred, the pre-release packages are also available in our [GitHub Package
 If you have the [dotnet x tool](/dotnet-tool) installed, you can configure your projects by downloading `NuGet.Config` in the same folder as your **.sln**
 
 :::sh
-x mix myget
+x mix feedz
 :::
 
 ### Add using VS .NET
 
-Instructions to add ServiceStack's MyGet feed to VS .NET are:
+Instructions to add ServiceStack's Pre-Release packages feed to VS .NET are:
 
   1. Go to **Tools** > **Options** > **Nuget Package Manager** > **Package Sources**
-  2. Add the Source `https://www.myget.org/F/servicestack` with the name of your choice, 
-  e.g. _ServiceStack MyGet feed_
+  2. Add the Source `https://f.feedz.io/servicestack/pre-release/nuget/index.json` with the name of your choice, 
+  e.g. `ServiceStack Pre-Release`
 
-![NuGet Package Sources](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/myget/package-sources.png)
-
-After registering the MyGet feed it will show up under NuGet package sources when opening the NuGet 
-package manager dialog:
+After registering the feed it will show up under NuGet package sources when opening the NuGet package manager dialog:
 
 ![NuGet Package Manager](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/myget/package-manager-ui.png)
 
-Which will allow you to search and install pre-release packages from the selected MyGet feed.
+Which will allow you to search and install pre-release packages from the selected Pre Release packages feed.
 
-### Adding MyGet feed without VS .NET
+### Adding Pre-Release NuGet feed without VS .NET
 
 If you're not using or don't have VS .NET installed, you can add the MyGet feed to your NuGet.config at `%AppData%\NuGet\NuGet.config`:
 
@@ -51,15 +40,15 @@ If you're not using or don't have VS .NET installed, you can add the MyGet feed 
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="ServiceStack MyGet feed" value="https://www.myget.org/F/servicestack" />
+    <add key="ServiceStack Pre-Release" value="https://f.feedz.io/servicestack/pre-release/nuget/index.json" />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
   </packageSources>
 </configuration>
 ```
 
-## Redownloading MyGet packages
+## Redownloading Pre Release packages
 
-If you've already packages with the **same version number** from MyGet previously installed, you will 
+If you've already packages with the **same version number** from Feedz previously installed, you will 
 need to manually delete the NuGet `/packages` folder for NuGet to pull down the latest packages.
 
 ### Clear NuGet Package Cache
@@ -125,12 +114,16 @@ The `{MINOR}` version is used for major ServiceStack official releases which wil
 
 The `{PATCH}` version is used to distinguish updates from normal releases where a `{PATCH}` above **0** indicates an Enhancement Release.
 
-Whilst we want to minimize the effort for Customers to upgrade we also want to make any fixes or enhancements to the previous release available sooner as there are often fixes reported and resolved immediately after each release and made available in our **pre-release packages on MyGet** that most Customers wont get until the next major Release on NuGet. 
+Whilst we want to minimize the effort for Customers to upgrade we also want to make any fixes or enhancements to the 
+previous release available sooner as there are often fixes reported and resolved immediately after each release and made 
+available in our **pre-release NuGet packages feed** that most Customers wont get until the next major Release on NuGet. 
 
-To deliver updates sooner we dedicate time immediately after each release to resolving issues and adding enhancements to existing features so we can publish update releases before starting work on new major features. Update releases will be primarily additive and minimally disruptive so they're safe to upgrade.
+To deliver updates sooner we dedicate time immediately after each release to resolving issues and adding enhancements 
+to existing features so we can publish update releases before starting work on new major features. 
+Update releases will be primarily additive and minimally disruptive so they're safe to upgrade.
 
 - An **even** `{PATCH}` version number indicates an "Update" release published to **NuGet**.
-- An **odd** version number indicates a "pre-release" version that's only **available on MyGet**
+- An **odd** version number indicates a "pre-release" version that's only **available on Feedz.io** or [GitHub Packages](/gh-nuget)
 
 Versioning scheme example:
 
