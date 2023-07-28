@@ -8,6 +8,10 @@ a high affinity with SQL, exposing intuitive APIs that generate predictable SQL 
 it obvious what SQL is getting executed at what time, whilst mitigating unexpected behavior,
 implicit N+1 queries and leaky data access prevalent in Heavy Object Relational Mappers (ORMs).
 
+<div class="py-8 max-w-7xl mx-auto">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
+</div>
+
 OrmLite was designed with a focus on the core objectives:
 
 * Provide a set of light-weight C# extension methods around .NET's impl-agnostic `System.Data.*` interfaces
