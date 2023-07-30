@@ -5,19 +5,19 @@ slug: release-notes-history
 
 ## 2023
 
-- [v6.9](/releases/v6_9)
-- [v6.8](/releases/v6_8)
-- [v6.7](/releases/v6_7)
-- [v6.6](/releases/v6_6)
+- [v6.9](/releases/v6_09)
+- [v6.8](/releases/v6_08)
+- [v6.7](/releases/v6_07)
+- [v6.6](/releases/v6_06)
 
 ## 2022
 
-- [v6.5](/releases/v6_5)
-- [v6.4](/releases/v6_4)
-- [v6.3](/releases/v6_3)
-- [v6.2](/releases/v6_2)
-- [v6.1](/releases/v6_1)
-- [v6](/releases/v6)
+- [v6.5](/releases/v6_05)
+- [v6.4](/releases/v6_04)
+- [v6.3](/releases/v6_03)
+- [v6.2](/releases/v6_02)
+- [v6.1](/releases/v6_01)
+- [v6](/releases/v6_00)
 
 ## 2021
 

@@ -4,7 +4,7 @@ title: Studio - AutoQuery UI
 ---
 
 ::: warning Deprecated
-**[ServiceStack Studio has been replaced](/releases/v6_2.html#retiring-studio)** by **[Locode](/locode/)**.
+**[ServiceStack Studio has been replaced](/releases/v6_02.html#retiring-studio)** by **[Locode](/locode/)**.
 Last supported versions: **ServiceStack v6.1** with **app v6.0.4**.
 :::
 
