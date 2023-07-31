@@ -656,7 +656,6 @@ To host lots of our demo applications, we are doing exactly this, meaning we hav
     <div class="inline-flex justify-center w-full">
       <img src="/img/posts/docker-compose/cloud-cost-comparison.PNG" alt="">
     </div>
-<div class="text-gray-500 text-center">Previous test result price comparison without AWS using Provisioned IOPS.</div>
 </div>
 
 ## Conclusion
