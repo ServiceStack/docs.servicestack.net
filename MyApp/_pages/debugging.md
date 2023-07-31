@@ -23,7 +23,7 @@ In addition to using MSBuild generated packages all projects also utilize CI NuG
 as now the **master** repo of all GitHub projects can be built from a clean checkout at anytime.
 
 The pre-release packages are still published using the **same version number** so if you get a build error from having a cached stale package
-you'll need to [clear your local packages cache](/myget#redownloading-myget-packages) to download the latest build packages from the CI NuGet packages feed.
+you'll need to [clear your local packages cache](/pre-release#redownloading-myget-packages) to download the latest build packages from the CI NuGet packages feed.
 
 ### Linking to Source projects
 

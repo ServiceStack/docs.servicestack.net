@@ -13,7 +13,7 @@ run and explore all ServiceStack.Text features from the comfort of your browser 
 
 ## Install ServiceStack.Text
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Text" Version="6.*" />`
 :::
 
@@ -110,7 +110,7 @@ JS.eval("{a: 3.itemsOf(arg.reverse().padRight(8, '_')) }", scope)
 
 ServiceStack's JS Utils is available in the [ServiceStack.Common](https://www.nuget.org/packages/ServiceStack.Common) NuGet package:
 
-:::nuget
+:::copy
 `<PackageReference Include="ServiceStack.Common" Version="6.*" />`
 :::
 

@@ -30,6 +30,9 @@
 }
 
 <style>
+.active {
+    color: #0ea5e9 !important;
+}
 </style>
 <link rel="stylesheet" href="/css/highlight.css">
 <link rel="stylesheet" href="/css/typography.css">
@@ -43,9 +46,13 @@
 }
 <div class="w-full max-w-[100rem] mx-auto">
     <div class="flex flex-wrap">
-        <div class="hidden xl:block z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
-            <div class="fixed h-screen overflow-y-auto scrolling-touch overflow-hidden">
-                <nav class="sidebar bg-white dark:bg-black lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-base sm:px-3 xl:px-5 lg:text-sm" aria-label="Sidebar">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
                     @foreach (var menu in sidebar)
                     {
                         if (menu.Text != null)
@@ -84,8 +91,7 @@
                             @foreach (var menuItem in menu.Children.Safe())
                             {
                                 <li class="relative">
-                                    <a href="@("/".CombineWith(menuItem.Link))" class="@Html.ClassNames("block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full", 
-                                            Html.MatchesPath("/".CombineWith(menuItem.Link)) ? "active font-semibold text-sky-500 before:bg-sky-500" : "text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300")">
+                                    <a href="@("/".CombineWith(menuItem.Link))" class="@Html.ClassNames("block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full", Html.MatchesPath("/".CombineWith(menuItem.Link)) ? "active font-semibold text-sky-500 before:bg-sky-500" : "text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300")">
                                         @menuItem.Text
                                     </a>
                                 </li>
@@ -109,7 +115,7 @@
 
                 <div class="not-prose">@Model.Header?.Invoke(null)</div>
 
-                @Html.Raw(Markdown.SanitizeVueTemplate(doc.Preview))
+                <div class="content">@Html.Raw(Markdown.SanitizeVueTemplate(doc.Preview))</div>
 
                 <div class="not-prose">@Model.Footer?.Invoke(null)</div>
                 
@@ -268,6 +274,7 @@ if (document.querySelector('.hide-title')) {
 </script>
 
 <script type="module">
+import { ref } from "vue"
 import { mount } from "app.mjs"
 
 @if (docMjs != null)
@@ -290,56 +297,18 @@ else
     </text>
 }
 
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
 mount('#doc', App)
+mount('#sidebar', Sidebar)
 </script>
 
 <script src="/lib/js/highlight.js"></script>
 <script>hljs.highlightAll()</script>
 <script src="/lib/js/lite-yt-embed.js"></script>
-<script src="/js/custom.js"></script>
-
-<style>
-.active {
-    color: #0ea5e9 !important;
-}
-</style>
-<script type="module">
-import { $$, $1, on, leftPart, map } from "@@servicestack/client"
-//change #hash on scroll
-const headings = $$('h2[id],h3[id]')
-
-function select(id) {
-    $$(`.docmap .active`).forEach(el => el.classList.remove('active'))
-    map($1(`.docmap [data-id='${id}']`), el => {
-        el.classList.add('active')
-        map(el.closest('.group'), el => el.classList.add('active'))
-    })
-}
-
-on(document, {
-    scroll(e) {
-        headings.forEach(ha => {
-            const rect = ha.getBoundingClientRect()
-            if (rect.top > 0 && rect.top < 150) {
-                const location = leftPart(window.location.toString(), '#')
-                history.replaceState(null, null, location + '#' + ha.id)
-                select(ha.id)
-            }
-        })
-    }
-})
-if (location.hash) {
-    select(location.hash.substring(1))
-}
-
-//scroll menu item into view
-function isInView(el) {
-  const box = el.getBoundingClientRect();
-  return box.top < window.innerHeight && box.bottom >= 0;
-}
-
-const active = $1('.sidebar .active')
-if (active && !isInView(active)) {
-    (active.parentElement.previousElementSibling || active.parentElement.parentElement || active).scrollIntoView()
-}
-</script>
+<script src="/mjs/docs.mjs" type="module"></script>

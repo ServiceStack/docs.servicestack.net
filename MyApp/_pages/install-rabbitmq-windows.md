@@ -49,7 +49,7 @@ the state of the Rabbit MQ server instance:
 
 To use Rabbit MQ from .NET get Rabbit MQ's [.NET client bindings from NuGet](https://www.nuget.org/packages/RabbitMQ.Client):
 
-::: nuget
+:::copy
 `<PackageReference Include="RabbitMQ.Client" Version="6.*" />`
 :::
 

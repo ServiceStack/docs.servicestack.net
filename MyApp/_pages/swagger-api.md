@@ -10,7 +10,7 @@ title: Swagger API
 [Swagger](http://swagger.io/) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services. ServiceStack implements the 
 [Swagger 1.2 Spec](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md) back-end and embeds the Swagger UI front-end in a separate plugin which is available under [Swagger NuGet package](http://nuget.org/packages/ServiceStack.Api.Swagger/):
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Api.Swagger" Version="6.*" />`
 :::
 

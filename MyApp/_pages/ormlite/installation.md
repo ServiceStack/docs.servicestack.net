@@ -8,7 +8,7 @@ OrmLite packages are available on NuGet and can be installed using your IDE or b
 
 Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />`
 :::
 
@@ -16,13 +16,13 @@ Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET
 
 Uses **[Microsoft.Data.SqlClient](https://devblogs.microsoft.com/dotnet/introducing-the-new-microsoftdatasqlclient/)** ADO .NET provider. Supports **.NET 6+** and **.NET Standard 2.0** (.NET 5 and lower)
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer.Data" Version="6.*" />`
 :::
 
 Uses **System.Data.SqlClient**. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="6.*" />`
 :::
 
@@ -30,13 +30,13 @@ Uses **System.Data.SqlClient**. Supports **.NET 6+**, .NET Framework **v4.7.2+**
 
 Uses **Mysql.Data**. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 
 Uses [MySqlConnector](https://mysqlconnector.net). Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySqlConnector" Version="6.*" />`
 :::
 
@@ -45,20 +45,20 @@ Uses [MySqlConnector](https://mysqlconnector.net). Supports **.NET 6+**, .NET Fr
 Uses **[System.Data.SQLite](https://system.data.sqlite.org)**. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="6.*" />`
 :::
 
 
 Uses **[Microsoft.Data.Sqlite](https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/)**. Supports **.NET 6+** and **.NET Standard 2.0** (.NET 5 and lower), Apple M1 ARM
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite.Data" Version="6.*" />`
 :::
 
  Uses [SQLitePCLRaw.bundle_cil](https://ericsink.com/entries/sqlite_llama_preview.html) for a managed implementation free of native binaries. **Still in Preview** but passes 100% test suite.
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite.Cil" Version="6.*" />`
 :::
 
@@ -67,19 +67,19 @@ Uses **[Microsoft.Data.Sqlite](https://docs.microsoft.com/en-us/dotnet/standard/
 
 The `.Core` packages contains only **.NET 6** and **.NET Standard 2.0** versions which can be used in [ASP.NET Core Apps on .NET Framework](/templates/corefx):
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer.Core" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.PostgreSQL.Core" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql.Core" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite.Core" Version="6.*" />`
 :::
 
@@ -87,11 +87,11 @@ The `.Core` packages contains only **.NET 6** and **.NET Standard 2.0** versions
 
 Unofficial providers contributed and supported by ServiceStack Community users:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Oracle" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Firebird" Version="6.*" />`
 :::
 

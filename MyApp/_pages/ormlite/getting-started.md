@@ -2,6 +2,10 @@
 title: Getting started with OrmLite
 ---
 
+<div class="py-8 max-w-7xl mx-auto">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
+</div>
+
 After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to. Most NuGet OrmLite packages only contain a single provider listed below:
 
 ```csharp
@@ -81,7 +85,8 @@ Named connections can be opened by its name:
 using var db = dbFactory.Open("Reporting");
 ```
 
-If using ServiceStack the `[NamedConnection]` attribute can be used to configure Services `base.Db` connection with the named connection RDBMS, e.g:
+If using ServiceStack the `[NamedConnection]` attribute can be used to configure Services `base.Db` connection with the 
+named connection RDBMS, e.g:
 
 ```csharp
 [NamedConnection("Reporting")]
@@ -100,6 +105,20 @@ Or if using [AutoQuery](/autoquery/) it can be used to associate Data Models wit
 public class Reports { ... }
 
 public class QueryReports : QueryDb<Reports> {}
+```
+
+Otherwise for other Services the `[ConnectionInfo]` attribute can be used to change the `base.Db` to use the registered
+named connection for all APIs in a Service class, e.g:
+
+```csharp
+[ConnectionInfo(NamedConnection = "Reporting")]
+public class ReportingServices : Service
+{
+    public object Any(Sales request)
+    {
+        return new SalesResponse { Results = Db.Select<Sales>() };
+    }
+}
 ```
 
 More examples available in [Multitenancy](/multitenancy) docs.
@@ -122,19 +141,19 @@ dotnet add package ServiceStack.OrmLite.MySql       // MySql
 
 Or you can add the following to your `csproj` file.
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />`
 :::
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />`
 :::
 

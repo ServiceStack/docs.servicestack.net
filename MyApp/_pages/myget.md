@@ -2,6 +2,20 @@
 title: MyGet
 ---
 
+## Pre-release packages Moved to Feedz
+
+After several unacceptably long outages we've decided to publish our Pre Release NuGet packages to [Feedz.io](https://feedz.io)
+
+Please see the [Pre Release NuGet Packages docs](/pre-release) for configuring access to our Pre Release NuGet packages on [Feedz.io](https://feedz.io).
+
+---
+
+:::{.text-center .text-2xl .text-red-600 .font-medium}
+Old MyGet Docs
+:::
+
+---
+
 ## ServiceStack pre-release MyGet Feed
 
 Our interim pre-release NuGet packages in between major releases on NuGet are published to [MyGet](https://www.myget.org/).
@@ -75,7 +89,7 @@ Within VS .NET you can clear them from **Tools** > **Options** > **Nuget Package
 Alternatively on Windows you can delete the Cached NuGet packages manually with:
 
 :::sh
-$ del %LOCALAPPDATA%\NuGet\Cache\*.nupkg /q
+del %LOCALAPPDATA%\NuGet\Cache\*.nupkg /q
 :::
 
 ### Full Package Clean

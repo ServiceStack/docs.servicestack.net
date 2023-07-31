@@ -7,7 +7,7 @@ title: Azure Resources
 
 ServiceStack.Azure package provides support to Azure ServiceBus and Azure Blob Storage. All features are incapsulated in single ServiceStack.Azure package. To install package run from NuGet
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Azure" Version="6.*" />`
 :::
 

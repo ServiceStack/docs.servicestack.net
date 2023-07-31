@@ -16,7 +16,7 @@ Automation, Integration testing, etc.
 You can find .NET Core Razor features documented in [razor.netcore.io](http://razor.netcore.io) which 
 is maintained in our MVC NuGet package that can be installed with: 
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Mvc" Version="6.*" />`
 :::
 

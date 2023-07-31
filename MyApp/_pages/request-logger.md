@@ -50,7 +50,7 @@ The [iayos.ServiceStack.RollbarPlugin](https://github.com/daleholborow/iayos.Ser
 
 To use `RollbarLoggerPlugin` install the [iayos.ServiceStack.RollbarPlugin](https://www.nuget.org/packages/iayos.ServiceStack.RollbarPlugin) NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="iayos.ServiceStack.RollbarPlugin" Version="0.0.1" />`
 :::
 
@@ -74,7 +74,7 @@ The HTTP Request logs can also be configured to persist to a distributed [Redis]
 
 To use `RedisRequestLogger` first install the **ServiceStack.Server** NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Server" Version="6.*" />`
 :::
 

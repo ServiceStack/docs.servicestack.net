@@ -48,7 +48,7 @@ We've simplified the build system which now has consistent naming, behavior and 
 
 ServiceStack now supports Google and LinkedIn OAuth2 providers thanks to [@RobertTheGrey](https://twitter.com/RobertTheGrey) which you can add to your project with:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Authentication.OAuth2" Version="5.*" />`
 :::
 
@@ -153,7 +153,7 @@ Most of the metadata ServiceStack knows about your services are accessible from 
 
 Whilst OrmLite is foremost a code-first POCO ORM, when you have to work with an existing database, the OrmLite T4 templates by [@gkathire](https://github.com/gkathire) makes it easy to get started quickly by creating code-generated POCO's for all your DB tables as well as strong-typed wrappers for existing stored procedures. These OrmLite T4 Content templates are now available to any project via NuGet:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.OrmLite.T4" Version="5.*" />`
 :::
 
@@ -781,7 +781,7 @@ By far the biggest feature in this release is ServiceStack's much improved HTML 
 
 ServiceStack's Razor support comes conveniently packaged inside a [NuGet package](https://nuget.org/packages/ServiceStack.Razor) that you can immediately get going with after creating any empty ASP.NET or Console Application (.NET 4.0+) and running:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Razor" Version="5.*" />`
 :::
 

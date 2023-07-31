@@ -4,7 +4,7 @@ title: Studio - Validation Rules
 ---
 
 ::: warning Deprecated
-**[ServiceStack Studio has been replaced](/releases/v6_2.html#retiring-studio)** by **[Admin UI](/admin-ui)**.
+**[ServiceStack Studio has been replaced](/releases/v6_02.html#retiring-studio)** by **[Admin UI](/admin-ui)**.
 Last supported versions: **ServiceStack v6.1** with **app v6.0.4**.
 :::
 

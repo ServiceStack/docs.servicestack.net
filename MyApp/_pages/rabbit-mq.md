@@ -21,7 +21,7 @@ enabling a number of messaging features including publishing and receiving messa
 
 ServiceStack's Rabbit MQ bindings is available on NuGet at:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.RabbitMq" Version="6.*" />`
 :::
 

@@ -6,9 +6,9 @@ title: Installation
 
 **@servicestack/vue** can be added to existing Vue SPA Apps by installing via npm:
 
-```bash
-$ npm install @servicestack/vue
-```
+:::sh
+npm install @servicestack/vue
+:::
 
 Where it will also install its **vue** and **@servicestack/client** dependencies.
 

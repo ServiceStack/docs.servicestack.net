@@ -11,7 +11,7 @@ These docs only apply to ASP .NET Framework MVC projects, for [.NET Core](/netco
 
 You can easily add ServiceStack to any ASP.NET MVC project by getting it from NuGet with:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Mvc" Version="6.*" />`
 :::
 

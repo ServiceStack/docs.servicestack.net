@@ -13,7 +13,7 @@ MsgPack is a great addition to your ServiceStack's web services as it has [simil
 
 Message Pack is easily installed with the [ServiceStack.MsgPack](https://nuget.org/packages/ServiceStack.MsgPack) NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.MsgPack" Version="6.*" />`
 :::
 

@@ -23,7 +23,7 @@ In this example of integrating Azure Blob Storage, we initialize the `AzureBlobV
 
 To use the `AzureBlobVirtualFiles` you will need the `ServiceStack.Azure` NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Azure" Version="6.*" />`
 :::
 

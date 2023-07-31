@@ -11,7 +11,7 @@ A more flexible approach to read any arbitrary JavaScript or JSON data structure
 
 The `#Script` JSON and JS Utils are available from the [ServiceStack.Common](https://www.nuget.org/packages/ServiceStack.Common) NuGet package:
 
-::: nuget
+:::copy
 `<PackageReference Include="ServiceStack.Common" Version="6.*" />`
 :::
 

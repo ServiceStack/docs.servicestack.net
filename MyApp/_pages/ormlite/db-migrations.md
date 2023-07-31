@@ -416,9 +416,9 @@ dotnet run --AppTasks=migrate
 
 The format to revert a migration is:
 
-```bash
-$ dotnet run --AppTasks=migrate.revert:<name>
-```
+:::sh
+dotnet run --AppTasks=migrate.revert:<name>
+:::
 
 Where **name** is either the class name of the Migration you want to revert to (inclusive) or you can use **last** to revert the last migration:
 

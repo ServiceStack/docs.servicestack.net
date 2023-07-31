@@ -1,6 +1,10 @@
+using Markdig.Extensions.CustomContainers;
+using Markdig.Renderers;
+using Markdig.Renderers.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ServiceStack.IO;
 using ServiceStack.Logging;
+using ServiceStack.Text;
 
 [assembly: HostingStartup(typeof(MyApp.ConfigureSsg))]
 
@@ -22,6 +26,21 @@ public class ConfigureSsg : IHostingStartup
             appHost => appHost.Plugins.Add(new CleanUrlsFeature()),
             afterPluginsLoaded: appHost =>
             {
+                MarkdigConfig.Set(new MarkdigConfig
+                {
+                    ConfigurePipeline = pipeline =>
+                    {
+                        // Extend Markdig Pipeline
+                    },
+                    ConfigureContainers = config =>
+                    {
+                        config.AddBuiltInContainers();
+                        // Add Custom Block or Inline containers
+                        config.AddBlockContainer("YouTube", new YouTubeContainer());
+                        config.AddInlineContainer("YouTube", new YouTubeInlineContainer());
+                    }
+                });
+
                 var pages = appHost.Resolve<MarkdownPages>();
                 var videos = appHost.Resolve<MarkdownVideos>();
                 var meta = appHost.Resolve<MarkdownMeta>();
@@ -103,4 +122,53 @@ public static class HtmlHelpers
 
     public static string ContentUrl(this IHtmlHelper html, string? relativePath) => ToAbsoluteContentUrl(relativePath); 
     public static string ApiUrl(this IHtmlHelper html, string? relativePath) => ToAbsoluteApiUrl(relativePath);
+}
+
+// Example of implementing a custom Block Container
+public class YouTubeContainer : HtmlObjectRenderer<CustomContainer>
+{
+    protected override void Write(HtmlRenderer renderer, CustomContainer obj)
+    {
+        if (obj.Arguments == null)
+        {
+            renderer.WriteLine($"Missing YouTube Id, Usage :::{obj.Info} <id>");
+            return;
+        }
+        
+        renderer.EnsureLine();
+
+        var youtubeId = obj.Arguments!;
+        var attrs = obj.TryGetAttributes()!;
+        attrs.Classes ??= new();
+        attrs.Classes.Add("not-prose text-center");
+        
+        renderer.Write("<div").WriteAttributes(obj).Write('>');
+        renderer.WriteLine("<div class=\"text-3xl font-extrabold tracking-tight\">");
+        renderer.WriteChildren(obj);
+        renderer.WriteLine("</div>");
+        renderer.WriteLine(@$"<div class=""mt-3 flex justify-center"">
+            <lite-youtube class=""w-full mx-4 my-4"" width=""560"" height=""315"" videoid=""{youtubeId}"" 
+                style=""background-image:url('https://img.youtube.com/vi/{youtubeId}/maxresdefault.jpg')""></lite-youtube>
+            </div>
+        </div>");
+    }
+}
+
+public class YouTubeInlineContainer : HtmlObjectRenderer<CustomContainerInline>
+{
+    protected override void Write(HtmlRenderer renderer, CustomContainerInline obj)
+    {
+        var youtubeId = obj.FirstChild is Markdig.Syntax.Inlines.LiteralInline literalInline
+            ? literalInline.Content.AsSpan().RightPart(' ').ToString()
+            : null;
+        if (string.IsNullOrEmpty(youtubeId))
+        {
+            renderer.WriteLine($"Missing YouTube Id, Usage ::YouTube <id>::");
+            return;
+        }
+        renderer.WriteLine(@$"<div class=""mt-3 flex justify-center"">
+            <lite-youtube class=""w-full mx-4 my-4"" width=""560"" height=""315"" videoid=""{youtubeId}"" 
+                style=""background-image:url('https://img.youtube.com/vi/{youtubeId}/maxresdefault.jpg')""></lite-youtube>
+        </div>");
+    }
 }

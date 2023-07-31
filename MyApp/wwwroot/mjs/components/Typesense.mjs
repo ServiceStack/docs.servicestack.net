@@ -57,7 +57,7 @@ const TypesenseDialog = {
                     // typesense API reference: https://typesense.org/docs/0.21.0/api/documents.html#search
                     fetch('https://search.docs.servicestack.net/collections/typesense_docs/documents/search?q='
                         + encodeURIComponent(query.value)
-                        + '&query_by=content,hierarchy.lvl0,hierarchy.lvl1,hierarchy.lvl2,hierarchy.lvl3&group_by=hierarchy.lvl0', {
+                        + '&query_by=hierarchy.lvl0,hierarchy.lvl1,content,hierarchy.lvl2,hierarchy.lvl3&group_by=hierarchy.lvl0', {
                         headers: {
                             // Search only API key for Typesense.
                             'x-typesense-api-key': 'N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo'
@@ -204,7 +204,7 @@ export default {
           <svg class="w-7 h-7 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          <span class="hidden lg:inline text-lg mr-1">Search</span>
+          <span class="hidden xl:inline text-lg mr-1">Search</span>
           <span style="opacity:1;" class="hidden md:block text-gray-400 text-sm leading-5 py-0 px-1.5 my-0.5 mr-1.5 border border-gray-300 border-solid rounded-md">
             <span class="sr-only">Press </span><kbd class="font-sans">/</kbd><span class="sr-only"> to search</span>
           </span>
