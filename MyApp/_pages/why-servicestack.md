@@ -20,8 +20,9 @@ for the creation of loosely-coupled
 [Modularized Service](/modularizing-services) Architectures.
 ServiceStack Services are consumable via an array of built-in fast data formats (inc. 
 [JSON](https://github.com/ServiceStack/ServiceStack.Text), 
-XML, 
-[CSV](/csv-format), 
+XML,
+[CSV](/csv-format),
+[JSONL](/jsonl-format),
 [JSV](/jsv-format), 
 [ProtoBuf](/protobuf-format) and 
 [MsgPack](/messagepack-format)) 

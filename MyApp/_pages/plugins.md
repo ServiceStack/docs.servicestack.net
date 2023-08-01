@@ -159,7 +159,7 @@ Plugins.RemoveAll(x => x is SvgFeature);
 
 ### CSV Format
 
-Registers the CSV Serializers to enable ServiceStack's [CSV Format](/csv-format). 
+Registers the CSV Serializers to enable ServiceStack's [CSV Format](/csv-format).
 
 ```csharp
 var feature = Plugins.FirstOrDefault(x => x is CsvFormat); 
@@ -168,6 +168,19 @@ Plugins.RemoveAll(x => x is CsvFormat);
 
 ::: info
 By default the CSV Format tries serialize the Response object directly into CSV which is only ideal if your responses return `List<Poco>`. If however you mark your Response DTO with the **[Csv(CsvBehavior.FirstEnumerable)]** attribute the CSV Format instead will only serialize the first `IEnumerable<T>` it finds on your Response DTO e.g. if you had a `List<Poco> Results` property it will only serialize this list in the tabular CSV Format which is typically the behaviour you want.
+:::
+
+### JSON Lines Format
+
+Registers the `JsonlSerializer` to enable ServiceStack's [JSON Lines Format](/jsonl-format).
+
+```csharp
+var feature = Plugins.FirstOrDefault(x => x is JsonlFormat); 
+Plugins.RemoveAll(x => x is JsonlFormat); 
+```
+
+::: info
+The JSON Lines format follows CSV Format's behavior for serializing `IEnumerable` POCOs.
 :::
 
 ### Html Format

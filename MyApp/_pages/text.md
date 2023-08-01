@@ -6,7 +6,7 @@ Deep inside all of ServiceStack's premium libraries lies a high-performance core
 
 ServiceStack.Text is an **independent, dependency-free** serialization library containing ServiceStack's core high-performance utils and text processing functionality, including:
 
-- [JSON](/json-format), [JSV](/jsv-format) and [CSV](/csv-format) Text Serializers
+- [JSON](/json-format), [CSV](/csv-format), [JSON Lines](/jsonl-format) and [JSV](/jsv-format) Text Serializers
 - [AutoMapping Utils](/auto-mapping)
 - [JavaScript Utils](/js-utils)
 - [HTTP Utils](/http-utils)

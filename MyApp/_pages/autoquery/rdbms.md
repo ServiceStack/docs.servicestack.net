@@ -875,7 +875,7 @@ var top250 = client.GetLazy(new QueryMovies {
 
 Another benefit we get from AutoQuery Services being regular ServiceStack services is taking advantage of [ServiceStack's built-in formats](/formats). 
 
-### CsvFormat
+### CSV Format
 
 The [CSV Format](/csv-format) especially shines here given queries return a single tabular resultset making it perfect for CSV. In many ways CSV is one of the most interoperable Data Formats given most data import and manipulation programs including Databases and Spreadsheets have native support for CSV allowing for deep and seamless integration.
 
@@ -891,6 +891,15 @@ Typed Results to exclude default values columns when returning limited [custom f
 
  - Camel Humps Notation: `?jsconfig=edv`
  - Full configuration: `?jsconfig=ExcludeDefaultValues`
+
+### JSONL Format
+
+whilst the [JSON Lines Format](/jsonl-format) is useful for returning results in a streamable JSON format:
+
+```
+/rockstars.jsonl
+/movies.jsonl?ratings=G,PG-13
+```
 
 ## Named Connection
 

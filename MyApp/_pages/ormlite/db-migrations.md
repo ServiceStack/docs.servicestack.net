@@ -628,6 +628,33 @@ class Migration1000 : MigrationBase
 Whilst schema changes are run on different RDBMS's, all migration state is maintained in the **primary database's** `Migration` table
 :::
 
+### Multiple Named Connections
+
+DB Migrations also support running and reverting Migrations on multiple named connections, e.g:
+
+```csharp
+[NamedConnection("mssql")]
+[NamedConnection("mysql")]
+[NamedConnection("postgres")]
+public class Migration1001 : MigrationBase
+{
+    //...
+}
+```
+
+This feature is likely more useful for maintaining the same schema across multiple database shards, which is a
+[popular scaling technique](https://aws.amazon.com/what-is/database-sharding/) to increase system capacity and improve response times:
+
+```csharp
+[NamedConnection("shard1")]
+[NamedConnection("shard2")]
+[NamedConnection("shard3")]
+public class Migration1001 : MigrationBase
+{
+    //...
+}
+```
+
 ## Reviewing Migrations
 
 The output of each Migration is logged to the Console (or configured Logger), logging useful information on Migrations found and run as well as the executed SQL run in each migration. This information is also captured in the **Migration** table on the database they were run on, where they can be easily viewed in your App's [Database Admin UI](/admin-ui-database), e.g:

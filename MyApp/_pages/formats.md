@@ -8,6 +8,7 @@ ServiceStack supports the following formats:
 - [JSON](https://github.com/ServiceStack/ServiceStack.Text)
 - [XML](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.datacontractserializer)
 - [CSV](/csv-format)
+- [JSONL](/jsonl-format)
 - [JSV](/jsv-format) (hybrid CSV-style escaping + JSON format that is optimized for both size and speed)
 - [SOAP 1.1/1.2](/soap-support) (requires ASP.NET Framework)
 - [Message Pack](/messagepack-format)

@@ -1,5 +1,4 @@
 ---
-slug: csv-format
 title: CSV Format
 ---
 
