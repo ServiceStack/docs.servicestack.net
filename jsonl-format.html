@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-08-01T10:39:06.3408389Z'>
+    <meta name='date' content='2023-08-01T10:39:06.7086587Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Bundling &amp; Minification</title>
+    <title>JSON Lines Data Format</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -872,7 +872,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/jsonl-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/jsonl-format" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         JSON Lines Format
                                     </a>
                                 </li>
@@ -1315,30 +1315,117 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Bundling &amp; Minification
+                            JSON Lines Data Format
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>For info info on bundling built into ServiceStack, see <a href="/html-css-and-javascript-minification">HTML, CSS and JavaScript Minification</a> and
-<a href="/templates/lite#integrated-bundling">Integrated Bundling</a>.</p>
-<p>See the top-level <a href="https://github.com/ServiceStack/Bundler">ServiceStack Bundler</a> project for documentation on bundling and minification with ServiceStack's node.js powered bundler.</p>
-<h1 id="community-resources">Community Resources<a class="header-anchor" href="javascript:;" onclick="location.hash='#community-resources'" aria-label="Permalink"> </a></h1>
+                <div class="content"><div class="not-prose my-8 flex justify-center">
+   <a class="block max-w-2xl" href="https://jsonlines.org">
+      <div class="block flex justify-center">
+         <img class="py-8" src="/img/pages/release-notes/v6.10/jsonl.png">
+      </div>
+   </a>
+</div>
+<p><a href="https://jsonlines.org">JSON Lines</a> is an efficient JSON data format parseable by streaming parsers and text processing tools
+like Unix shell pipelines, whose streamable properties is making it a popular data format for maintaining large datasets
+like the large AI datasets maintained on <a href="https://huggingface.co">https://huggingface.co</a> which is now accessible on <a href="/auto-html-api">Auto HTML API</a> pages:</p>
+<div class="not-prose my-8 flex justify-center">
+   <a class="block max-w-2xl" href="https://blazor-gallery.servicestack.net/albums">
+      <div class="block flex justify-center shadow hover:shadow-lg rounded overflow-hidden">
+         <img class="py-8" src="/img/pages/release-notes/v6.10/jsonl-format.png">
+      </div>
+   </a>
+</div>
+<p>Which lists the <code>.jsonl</code> format like other data formats where it's accessible from <code>.jsonl</code> extension for <code>?format=jsonl</code> query string, e.g:</p>
 <ul>
-<li><a href="http://antonkallenberg.com/2012/07/26/using-servicestack-bundler/">using ServiceStack Bundler</a> by <a href="https://twitter.com/antonkallenberg">@antonkallenberg</a></li>
+<li><a href="https://blazor-gallery.servicestack.net/albums.jsonl">https://blazor-gallery.servicestack.net/albums.jsonl</a></li>
+<li><a href="https://blazor-gallery.servicestack.net/api/QueryAlbums?format=jsonl">https://blazor-gallery.servicestack.net/api/QueryAlbums?format=jsonl</a></li>
 </ul>
+<h3 id="csv-enumerable-behavior">CSV Enumerable Behavior<a class="header-anchor" href="javascript:;" onclick="location.hash='#csv-enumerable-behavior'" aria-label="Permalink"> </a></h3>
+<p>The JSON Lines data format behaves the same way as the CSV format where if your Request DTO is annotated with either
+<code>[DataContract]</code> or the more explicit <code>[Csv(CsvBehavior.FirstEnumerable)]</code> it will automatically serialize the
+<strong>first IEnumerable property</strong>, where all <a href="/autoquery/">AutoQuery APIs</a> and the Request DTO's below will return their
+<code>IEnumerable</code> datasets in the streamable JSON Lines format:</p>
+<pre><code class="language-csharp">public class QueryPocos : QueryDb&lt;Poco&gt; {}
+
+[Route(&quot;/pocos&quot;)]
+public class Pocos : List&lt;Poco&gt;, IReturn&lt;Pocos&gt;
+{
+    public Pocos() {}
+    public Pocos(IEnumerable&lt;Poco&gt; collection) : base(collection) {}
+}
+
+[Route(&quot;/pocos&quot;)]
+[DataContract]
+public class Pocos : IReturn&lt;Pocos&gt;
+{
+    [DataMember]
+    public List&lt;Poco&gt; Items { get; set; }
+}
+
+[Route(&quot;/pocos&quot;)]
+[Csv(CsvBehavior.FirstEnumerable)]
+public class Pocos : IReturn&lt;Pocos&gt;
+{
+    public List&lt;Poco&gt; Items { get; set; }
+}
+</code></pre>
+<h3 id="async-streaming-parsing-example">Async Streaming Parsing Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-streaming-parsing-example'" aria-label="Permalink"> </a></h3>
+<p>The <a href="/http-utils">HTTP Utils</a> extension methods makes it trivial to implement async streaming parsing where you can process
+each row one at a time to avoid large allocations:</p>
+<pre><code class="language-csharp">const string BaseUrl = &quot;https://blazor-gallery.servicestack.net&quot;;
+var url = BaseUrl.CombineWith(&quot;albums.jsonl&quot;);
+await using var stream = await url.GetStreamFromUrlAsync();
+await foreach (var line in stream.ReadLinesAsync())
+{
+    var row = line.FromJson&lt;Album&gt;();
+    //...
+}
+</code></pre>
+<h3 id="jsonlserializer">JsonlSerializer<a class="header-anchor" href="javascript:;" onclick="location.hash='#jsonlserializer'" aria-label="Permalink"> </a></h3>
+<p>Alternatively if streaming the results isn't important it can be deserialized like any other format using the <code>JsonlSerializer</code> directly:</p>
+<pre><code class="language-csharp">var jsonl = await url.GetStringFromUrlAsync();
+var albums = JsonlSerializer.DeserializeFromString&lt;List&lt;Album&gt;&gt;(jsonl);
+</code></pre>
+<p>Which can also serialize to a <code>string</code>, <code>Stream</code> or <code>TextWriter</code>:</p>
+<pre><code class="language-csharp">var jsonl = JsonlSerializer.SerializeToString(albums);
+JsonlSerializer.SerializeToStream(albums, stream);
+JsonlSerializer.SerializeToWriter(albums, textWriter);
+</code></pre>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/bundling-and-minification.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/jsonl-format.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
 
                     <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/jsv-format" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                JSV Format
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/messagepack-format" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                MessagePack Format
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
                     </div>
             </div>
                 
