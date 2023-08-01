@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-08-01T08:35:16.0060399Z'>
+    <meta name='date' content='2023-08-01T08:35:15.9710059Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Limitations</title>
+    <title>Bulk Inserts</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -248,7 +248,7 @@ OrmLite                                    </span>
                                 </h2>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
-                                    <a href="/ormlite/bulk-inserts" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/ormlite/bulk-inserts" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Bulk Inserts
                                     </a>
                                 </li>
@@ -378,7 +378,7 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/ormlite/limitations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/ormlite/limitations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Limitations
                                     </a>
                                 </li>
@@ -391,48 +391,169 @@ OrmLite                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Limitations
+                            Bulk Inserts
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><h2 id="single-primary-key">Single Primary Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#single-primary-key'" aria-label="Permalink"> </a></h2>
-<p>For simplicity, and to be able to have the same POCO class persisted in db4o, memcached, redis or on the filesystem (i.e. providers included in ServiceStack), each model must have a single primary key, by convention OrmLite expects it
-to be <code>Id</code> although you use <code>[Alias(&quot;DbFieldName&quot;)]</code> attribute it map it to a column with a different name or use
-the <code>[PrimaryKey]</code> attribute to tell OrmLite to use a different property for the primary key.</p>
-<p>If an <code>Id</code> property or <code>[PrimaryKey]</code> attribute isn't specified, a Primary Key is assigned to <code>[AutoIncrement]</code> and <code>[AutoId]</code> properties, otherwise it's assumed the first property is the tables Primary Key.</p>
-<p>You can still <code>SELECT</code> from these tables, you will just be unable to make use of APIs that rely on it, e.g.
-<code>Update</code> or <code>Delete</code> where the filter is implied (i.e. not specified), all the APIs that end with <code>ById</code>, etc.</p>
-<h2 id="optimize-like-searches">Optimize LIKE Searches<a class="header-anchor" href="javascript:;" onclick="location.hash='#optimize-like-searches'" aria-label="Permalink"> </a></h2>
-<p>One of the primary goals of OrmLite is to expose and RDBMS agnostic Typed API Surface which will allow you
-to easily switch databases, or access multiple databases at the same time with the same behavior.</p>
-<p>One instance where this can have an impact is needing to use <code>UPPER()</code> in <strong>LIKE</strong> searches to enable
-case-insensitive <strong>LIKE</strong> queries across all RDBMS. The drawback of this is that LIKE Queries are not able
-to use any existing RDBMS indexes. We can disable this feature and return to the default RDBMS behavior with:</p>
-<pre><code class="language-csharp">OrmLiteConfig.StripUpperInLike = true;
+                <div class="content"><p>Bulk Insert implementations are available for each <a href="/ormlite/installation">supported RDBMS</a> enabling the most efficient
+ways for inserting large amounts of data from code, which is encapsulated behind OrmLite's <code>BulkInsert</code> API:</p>
+<pre><code class="language-csharp">db.BulkInsert(rows);
 </code></pre>
-<p>Allowing all <strong>LIKE</strong> Searches in OrmLite or AutoQuery to use any available RDBMS Index.</p>
-<h2 id="oracle-provider-notes">Oracle Provider Notes<a class="header-anchor" href="javascript:;" onclick="location.hash='#oracle-provider-notes'" aria-label="Permalink"> </a></h2>
-<p>By default, the Oracle provider stores Guids in the database as character strings and when generating SQL it quotes only table and column names that are reserved words in Oracle. That requires that you use the same quoting if you code your own SQL. Both of these options can be overridden, but overriding them will cause problems: the provider can store Guids as raw(16) but it cannot read them.</p>
-<p>The Oracle provider uses Oracle sequences to implement AutoIncrement columns and it queries the sequence to get a new value in a separate database call. You can override the automatically generated sequence name with a</p>
-<pre><code>[Sequence(&quot;name&quot;)]
+<h2 id="bulk-insert-implementations">Bulk Insert Implementations<a class="header-anchor" href="javascript:;" onclick="location.hash='#bulk-insert-implementations'" aria-label="Permalink"> </a></h2>
+<p>Which uses the optimal implementation available for each RDBMS:</p>
+<ul>
+<li><strong>PostgreSQL</strong> - Uses PostgreSQL's <a href="https://www.postgresql.org/docs/current/sql-copy.html">COPY</a>
+command via Npgsql's <a href="https://www.npgsql.org/doc/copy.html">Binary Copy</a> import</li>
+<li><strong>MySql</strong> - Uses <a href="https://dev.mysql.com/doc/connector-net/en/connector-net-programming-bulk-loader.html">MySqlBulkLoader</a>
+feature where data is written to a temporary <strong>CSV</strong> file that's imported directly by <code>MySqlBulkLoader</code></li>
+<li><strong>MySqlConnector</strong> - Uses <a href="https://mysqlconnector.net/api/mysqlconnector/mysqlbulkloadertype/">MySqlConnector's MySqlBulkLoader</a>
+implementation which makes use of its <code>SourceStream</code> feature to avoid writing to a temporary file</li>
+<li><strong>SQL Server</strong> - Uses SQL Server's <code>SqlBulkCopy</code> feature which imports data written to an in-memory <code>DataTable</code></li>
+<li><strong>SQLite</strong> - SQLite doesn't have a specific import feature, instead Bulk Inserts are performed using batches of <a href="https://www.tutorialscampus.com/sql/insert-multiple-rows.htm">Multiple Rows Inserts</a>
+to reduce I/O calls down to a configurable batch size</li>
+<li><strong>Firebird</strong> - Is also implemented using <strong>Multiple Rows Inserts</strong> within an <a href="https://firebirdsql.org/refdocs/langrefupd20-execblock.html">EXECUTE BLOCK</a>
+configurable up to Firebird's maximum of <strong>256</strong> statements</li>
+</ul>
+<h2 id="sql-multiple-row-inserts">SQL Multiple Row Inserts<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-multiple-row-inserts'" aria-label="Permalink"> </a></h2>
+<p>All RDBMS's also support SQL's Multiple Insert Rows feature which is an efficient and compact alternative to inserting
+multiple rows within a single INSERT statement:</p>
+<pre><code class="language-sql">INSERT INTO Contact (Id, FirstName, LastName, Age) VALUES 
+(1, 'John', 'Doe', 27),
+(2, 'Jane', 'Doe', 42);
 </code></pre>
-<p>attribute on a field. The Sequence attribute implies <code>[AutoIncrement]</code>, but you can use both on the same field.</p>
-<p>Since Oracle has a very restrictive 30 character limit on names, it is strongly suggested that you use short entity class and field names or aliases, remembering that indexes and foreign keys get compound names. If you use long names, the provider will squash them to make them compliant with the restriction. The algorithm used is to remove all vowels (&quot;aeiouy&quot;) and if still too long then every fourth letter starting with the third one and finally if still too long to truncate the name. You must apply the same squashing algorithm if you are coding your own SQL.</p>
-<p>The previous version of ServiceStack.OrmLite.Oracle used System.Data.OracleClient to talk to the database. Microsoft has deprecated that client, but it does still mostly work if you construct the Oracle provider like this:</p>
-<pre><code>OracleOrmLiteDialectProvider.Instance = new OracleOrmLiteDialectProvider(
-compactGuid: false,
-quoteNames: false,
-clientProvider: OracleOrmLiteDialectProvider.MicrosoftProvider); 
+<p>Normally OrmLite APIs uses parameterized statements however for Bulk Inserts it uses inline rasterized values in order
+to construct and send large SQL INSERT statements that avoids RDBMS's max parameter limitations, which if preferred can
+be configured to be used instead of its default RDBMS-specific implementation:</p>
+<pre><code class="language-csharp">db.BulkInsert(rows, new BulkInsertConfig {
+    Mode = BulkInsertMode.Sql
+});
 </code></pre>
-<p>DateTimeOffset fields and, in locales that use a comma to separate the fractional part of a floating point number, some aspects of using floating point numbers, do not work with System.Data.OracleClient.</p>
+<h2 id="batch-size">Batch Size<a class="header-anchor" href="javascript:;" onclick="location.hash='#batch-size'" aria-label="Permalink"> </a></h2>
+<p><strong>Multiple Row Inserts</strong> are sent in batches of <strong>1000</strong> (Maximum for SQL Server), Firebird uses a maximum of <strong>256</strong>
+whilst other RDBMS's can be configured to use larger batch sizes:</p>
+<pre><code class="language-csharp">db.BulkInsert(rows, new BulkInsertConfig {
+    BatchSize = 1000
+});
+</code></pre>
+<h2 id="bulk-insert-benchmarks">Bulk Insert Benchmarks<a class="header-anchor" href="javascript:;" onclick="location.hash='#bulk-insert-benchmarks'" aria-label="Permalink"> </a></h2>
+<p>To test the performance of Bulk Inserts we've ran a number of benchmarks across macOS, Linux and Windows in our
+<a href="https://servicestack.net/posts/bulk-insert-performance">Bulk Insert Performance</a> blog post.</p>
+<p>The Relative performances of Apple M2 macOS Benchmarks provide some indication of the performance benefits of Bulk Inserts
+you can expect, confirming that they offer much better performance when needing to insert a significant number of rows,
+we're it's up to <strong>138x</strong> more efficient than inserting just <strong>1,000 rows</strong>.</p>
+<div class="table table-striped text-base"><p>Relative performance for Inserting <strong>1,000</strong> records:</p>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th style="text-align: right;">Bulk Inserts</th>
+<th style="text-align: right;">Multiple Rows Inserts</th>
+<th style="text-align: right;">Single Row Inserts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">1.32x</td>
+<td style="text-align: right;">57.04x</td>
+</tr>
+<tr>
+<td>MySqlConnector</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">1.04x</td>
+<td style="text-align: right;">137.78x</td>
+</tr>
+<tr>
+<td>MySql</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">1.16x</td>
+<td style="text-align: right;">131.47x</td>
+</tr>
+<tr>
+<td>SqlServer</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">6.61x</td>
+<td style="text-align: right;">74.19x</td>
+</tr>
+</tbody>
+</table>
+<p>Relative performance for Inserting <strong>10,000</strong> records:</p>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th style="text-align: right;">Bulk Inserts</th>
+<th style="text-align: right;">Multiple Rows Inserts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">3.37x</td>
+</tr>
+<tr>
+<td>MySqlConnector</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">1.24x</td>
+</tr>
+<tr>
+<td>MySql</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">1.52x</td>
+</tr>
+<tr>
+<td>SqlServer</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">9.36x</td>
+</tr>
+</tbody>
+</table>
+<p>Relative performance for Inserting <strong>100,000</strong> records:</p>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th style="text-align: right;">Bulk Inserts</th>
+<th style="text-align: right;">Multiple Rows Inserts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">3.68x</td>
+</tr>
+<tr>
+<td>MySqlConnector</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">2.04x</td>
+</tr>
+<tr>
+<td>MySql</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">2.31x</td>
+</tr>
+<tr>
+<td>SqlServer</td>
+<td style="text-align: right;">1x</td>
+<td style="text-align: right;">10.14x</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It also shows that batched Multiple Row Inserts Bulk Insert mode is another good option for inserting large number of
+rows that's within <strong>3.4x</strong> performance range of optimal Bulk Insert implementations, for all but SQL Server which
+is an order of magnitude slower than using <code>SqlBulkCopy</code>.</p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/limitations.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/bulk-inserts.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -440,16 +561,23 @@ clientProvider: OracleOrmLiteDialectProvider.MicrosoftProvider);
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/ormlite/aws-rds-databases" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/ormlite/apis/schema" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                AWS &amp; RDS Support
+                                                Schema APIs
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/ormlite/reference-support" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Reference Support
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
                                     </div>
                                 </nav>
                     </div>
@@ -463,18 +591,23 @@ clientProvider: OracleOrmLiteDialectProvider.MicrosoftProvider);
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#single-primary-key'" data-id="single-primary-key" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Single Primary Key
+                                        <span v-hash="'#bulk-insert-implementations'" data-id="bulk-insert-implementations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Bulk Insert Implementations
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#optimize-like-searches'" data-id="optimize-like-searches" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Optimize LIKE Searches
+                                        <span v-hash="'#sql-multiple-row-inserts'" data-id="sql-multiple-row-inserts" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            SQL Multiple Row Inserts
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#oracle-provider-notes'" data-id="oracle-provider-notes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Oracle Provider Notes
+                                        <span v-hash="'#batch-size'" data-id="batch-size" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Batch Size
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#bulk-insert-benchmarks'" data-id="bulk-insert-benchmarks" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Bulk Insert Benchmarks
                                         </span>
                                     </li>
                             </ul>
