@@ -2,6 +2,10 @@
 title: Bulk Inserts
 ---
 
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="3gO_OEWIyPo" style="background-image: url('https://img.youtube.com/vi/3gO_OEWIyPo/maxresdefault.jpg')"></lite-youtube>
+</div>
+
 Bulk Insert implementations are available for each [supported RDBMS](/ormlite/installation) enabling the most efficient
 ways for inserting large amounts of data from code, which is encapsulated behind OrmLite's `BulkInsert` API:
 
