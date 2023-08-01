@@ -16,13 +16,6 @@ const ChartJs = {
                 legend: {
                     position: "top"
                 },
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
             }
             new Chart(chart.value, {
                 type: props.type || "bar",
