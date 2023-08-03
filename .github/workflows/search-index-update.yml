@@ -87,6 +87,15 @@ jobs:
           echo "TYPESENSE_API_KEY=${{ env.typesense_api_key }}" >> .env
           cp search-server/typesense-server/docker-compose.yml ./
           
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v3
+        if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
+        with:
+          file: ./typesense-data/Dockerfile
+          context: ./typesense-data/
+          push: true
+          tags: ghcr.io/${{ env.image_repository_name }}:${{ env.TAG_NAME }}
+          
       # Copy only the docker-compose.yml to remote server home folder
       - name: copy compose file via scp
         uses: appleboy/scp-action@v0.1.3
