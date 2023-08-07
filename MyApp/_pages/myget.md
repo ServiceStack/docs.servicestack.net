@@ -4,7 +4,7 @@ title: MyGet
 
 ## Pre-release packages Moved to Feedz
 
-After several unacceptably long outages we've decided to publish our Pre Release NuGet packages to [Feedz.io](https://feedz.io)
+After experiencing several outages with MyGet we've decided to publish our Pre Release NuGet packages to [Feedz.io](https://feedz.io)
 
 Please see the [Pre Release NuGet Packages docs](/pre-release) for configuring access to our Pre Release NuGet packages on [Feedz.io](https://feedz.io).
 
