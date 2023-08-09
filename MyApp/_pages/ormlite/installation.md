@@ -14,7 +14,7 @@ Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET
 
 ## SQL Server
 
-Uses **[Microsoft.Data.SqlClient](https://devblogs.microsoft.com/dotnet/introducing-the-new-microsoftdatasqlclient/)** ADO .NET provider. Supports **.NET 6+** and **.NET Standard 2.0** (.NET 5 and lower)
+Uses **[Microsoft.Data.SqlClient](https://devblogs.microsoft.com/dotnet/introducing-the-new-microsoftdatasqlclient/)** ADO .NET provider. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (supports Apple Silicon/ARM)
 
 :::copy
 `<PackageReference Include="ServiceStack.OrmLite.SqlServer.Data" Version="6.*" />`
@@ -42,6 +42,12 @@ Uses [MySqlConnector](https://mysqlconnector.net). Supports **.NET 6+**, .NET Fr
 
 ## SQLite
 
+Uses **[Microsoft.Data.Sqlite](https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/)**. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (supports Apple Silicon/ARM)
+
+:::copy
+`<PackageReference Include="ServiceStack.OrmLite.Sqlite.Data" Version="6.*" />`
+:::
+
 Uses **[System.Data.SQLite](https://system.data.sqlite.org)**. Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
 
 
@@ -49,12 +55,6 @@ Uses **[System.Data.SQLite](https://system.data.sqlite.org)**. Supports **.NET 6
 `<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="6.*" />`
 :::
 
-
-Uses **[Microsoft.Data.Sqlite](https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/)**. Supports **.NET 6+** and **.NET Standard 2.0** (.NET 5 and lower), Apple M1 ARM
-
-:::copy
-`<PackageReference Include="ServiceStack.OrmLite.Sqlite.Data" Version="6.*" />`
-:::
 
  Uses [SQLitePCLRaw.bundle_cil](https://ericsink.com/entries/sqlite_llama_preview.html) for a managed implementation free of native binaries. **Still in Preview** but passes 100% test suite.
 
