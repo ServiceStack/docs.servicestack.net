@@ -193,16 +193,19 @@ var idGetter = fi.CreateGetter();
  
 The `Create*` APIs above creates the compiled delegates which need to be cached to avoid the compilation penalty on subsequent usages. The `TypeProperties<T>` and `TypeFields<T>` classes offers fast cached access to these setters/getters which compiles all the **public** properties or fields on a per Type basis. 
  
+### Runtime Type example
+
 Some examples of using these classes:
  
 ```csharp
-var runtimeType = typeof(MyType);
+var runtimeType = dto.GetType(); //or: typeof(MyType)
+
 var instance = runtimeType.CreateInstance();
 
 var typeProps = TypeProperties.Get(runtimeType); //Equivalent to:
 //  typeProps = TypeProperties<MyType>.Instance;
  
-var idAccessor = typeProps.GetAccessor("Id");
+var propAccessor = typeProps.GetAccessor("Id");
 propAccessor.PublicSetter(instance, 1);
 var idValue = propAccessor.PublicGetter(instance);
 ```
