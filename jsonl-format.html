@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-08-16T10:57:25.7275110Z'>
+    <meta name='date' content='2023-08-17T14:56:15.9213323Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>JSON Lines Data Format</title>
@@ -1324,9 +1324,12 @@ mount('#header', Header)
                 <div class="content"><div class="not-prose my-8 flex justify-center">
    <a class="block max-w-2xl" href="https://jsonlines.org">
       <div class="block flex justify-center">
-         <img class="py-8" src="/img/pages/release-notes/v6.10/jsonl.png">
+         <img class="py-8 h-80" src="/img/pages/release-notes/v6.10/jsonl.png">
       </div>
    </a>
+</div>
+<div class="py-8 max-w-7xl mx-auto">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="m0tAfjvJaZg" style="background-image: url('https://img.youtube.com/vi/m0tAfjvJaZg/maxresdefault.jpg')"></lite-youtube>
 </div>
 <p><a href="https://jsonlines.org">JSON Lines</a> is an efficient JSON data format parseable by streaming parsers and text processing tools
 like Unix shell pipelines, whose streamable properties is making it a popular data format for maintaining large datasets
@@ -1338,11 +1341,15 @@ like the large AI datasets maintained on <a href="https://huggingface.co">https:
       </div>
    </a>
 </div>
+<p>It's added by default, which can be removed with:</p>
+<pre><code class="language-csharp">Plugins.RemoveAll(x =&gt; x is JsonlFormat);
+</code></pre>
 <p>Which lists the <code>.jsonl</code> format like other data formats where it's accessible from <code>.jsonl</code> extension for <code>?format=jsonl</code> query string, e.g:</p>
 <ul>
 <li><a href="https://blazor-gallery.servicestack.net/albums.jsonl">https://blazor-gallery.servicestack.net/albums.jsonl</a></li>
 <li><a href="https://blazor-gallery.servicestack.net/api/QueryAlbums?format=jsonl">https://blazor-gallery.servicestack.net/api/QueryAlbums?format=jsonl</a></li>
 </ul>
+<p>In addition to the standard <code>Accept: text/jsonl</code> HTTP Header.</p>
 <h3 id="csv-enumerable-behavior">CSV Enumerable Behavior<a class="header-anchor" href="javascript:;" onclick="location.hash='#csv-enumerable-behavior'" aria-label="Permalink"> </a></h3>
 <p>The JSON Lines data format behaves the same way as the CSV format where if your Request DTO is annotated with either
 <code>[DataContract]</code> or the more explicit <code>[Csv(CsvBehavior.FirstEnumerable)]</code> it will automatically serialize the
@@ -1372,6 +1379,30 @@ public class Pocos : IReturn&lt;Pocos&gt;
     public List&lt;Poco&gt; Items { get; set; }
 }
 </code></pre>
+<p>JSON Lines format is similar to the <a href="/csv-format">CSV format</a> where each line in the file represents a separate JSON object.
+This makes it easy to process large datasets incrementally, without having to load the entire file into memory.</p>
+<pre><code class="language-json">{&quot;id&quot;: 1, &quot;name&quot;: &quot;John Doe&quot;}
+{&quot;id&quot;: 2, &quot;name&quot;: &quot;Jane Doe&quot;}
+{&quot;id&quot;: 3, &quot;name&quot;: &quot;John Smith&quot;}
+</code></pre>
+<p>These streamable properties in combination of the ubiquitous JSON format has led to its popularity where it can be processed by
+streaming parsers and text processing tools like Unix shell pipelines, making it an ideal format for handling large datasets efficiently,
+or quickly putting together a data pipeline for quick large scale experimentation.</p>
+<p>For example, you can pull out the <code>title</code> property from a JSON Lines file using the following command line using just <code>curl</code> and <code>jq</code>:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>curl <a href="https://blazor-gallery.servicestack.net/albums.jsonl">https://blazor-gallery.servicestack.net/albums.jsonl</a> -s | jq '.title'</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 <h3 id="async-streaming-parsing-example">Async Streaming Parsing Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-streaming-parsing-example'" aria-label="Permalink"> </a></h3>
 <p>The <a href="/http-utils">HTTP Utils</a> extension methods makes it trivial to implement async streaming parsing where you can process
 each row one at a time to avoid large allocations:</p>
@@ -1394,6 +1425,71 @@ var albums = JsonlSerializer.DeserializeFromString&lt;List&lt;Album&gt;&gt;(json
 JsonlSerializer.SerializeToStream(albums, stream);
 JsonlSerializer.SerializeToWriter(albums, textWriter);
 </code></pre>
+<h2 id="indexing-ai-generated-art-albums-with-jsonl">Indexing AI-Generated Art Albums with JSONL<a class="header-anchor" href="javascript:;" onclick="location.hash='#indexing-ai-generated-art-albums-with-jsonl'" aria-label="Permalink"> </a></h2>
+<p>In this example, we will walk you through a practical demonstration of using JSON Lines to index AI-generated art albums. We will fetch data
+from the Blazor Diffusion API, which provides &quot;Creatives&quot; generated based on user-provided text prompts. Our goal is to index the text and
+image URLs of these Creatives into a Typesense search server.</p>
+<p>Here is the code snippet with a practical implementation of interacting with <code>creatives.jsonl</code> endpoint:</p>
+<pre><code class="language-csharp">const string ApiUrl = &quot;https://localhost:5001/creatives.jsonl&quot;;
+
+var provider = TypesenseUtils.InitProvider();
+var typesenseClient = provider.GetRequiredService&lt;ITypesenseClient&gt;();
+await typesenseClient.InitCollection();
+var sw = new Stopwatch();
+sw.Start();
+
+var lastIndexedCreative = 0;
+
+while (true)
+{
+    await using var stream = await ApiUrl.AddQueryParams(new() {
+            [&quot;IdGreaterThan&quot;] = lastIndexedCreative,
+            [&quot;OrderBy&quot;] = &quot;Id&quot;,
+        })
+        .GetStreamFromUrlAsync();
+    await foreach (var line in stream.ReadLinesAsync())
+    {
+        var creative = line.FromJson&lt;Creative&gt;();
+        lastIndexedCreative = creative.Id;
+        // processing
+        if (creative.Artifacts.Count == 0)
+            return;
+        var imageId = creative.PrimaryArtifactId 
+            ?? creative.CuratedArtifactId 
+            ?? creative.Artifacts.First().Id;
+        var artifact = creative.Artifacts.First(x =&gt; x.Id == imageId);
+        var indexedCreative = new IndexedCreative
+        {
+            Text = creative.Prompt,
+            Url = $&quot;https://cdn.diffusion.works{artifact.FilePath}&quot;
+        };
+        // Process and index the creative data
+        await typesenseClient.CreateDocument(&quot;Creatives&quot;, indexedCreative);
+    } 
+    
+    // sleep if no new data ..
+}
+</code></pre>
+<p>Here we have the service client initialization with the <code>TypesenseUtils.InitProvider()</code>. Then, inside an infinite loop, we fetch data using <code>GetStreamFromUrlAsync()</code> and stream it line by line using the <code>ReadLinesAsync()</code> method. After processing each line, we index the creative item into typesense.</p>
+<h2 id="indexing-creative-data-into-typesense">Indexing Creative Data into Typesense<a class="header-anchor" href="javascript:;" onclick="location.hash='#indexing-creative-data-into-typesense'" aria-label="Permalink"> </a></h2>
+<p>With Typesense, implementation of full-text search for our data can be achieved efficiently. Once we have fetched the Creative data from Blazor Diffusion's API, we can proceed to index it into Typesense for easy searching and analysis of the indexed documents. To index the Creative data, we're using <a href="https://github.com/DAXGRID/typesense-dotnet">a C# client library built by the community</a>.</p>
+<p>Processed data are saved into IndexedCreative instances and are added into the Typesense server. Under the hood, the C# client library interacts with Typesense's API and handles all HTTP requests and responses for us.</p>
+<h3 id="memory-foot-print">Memory Foot Print<a class="header-anchor" href="javascript:;" onclick="location.hash='#memory-foot-print'" aria-label="Permalink"> </a></h3>
+<p>Our application logs the memory usage over time, and we see it’s constant relative to the size of our process. Streamed JSONL parsing and async indexing allows us processing infinite datasets size without hitting the memory bounds.</p>
+<h2 id="skipping-already-indexed-data-example">Skipping Already Indexed Data Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#skipping-already-indexed-data-example'" aria-label="Permalink"> </a></h2>
+<p>For increased efficiency, instead of re-indexing all the data each time our program runs, we will only fetch and index data that hasn't been indexed already. We use <code>lastIndexedCreative</code> integer variable to keep track of the last creative indexed. On subsequent runs of our program, we fetch only new data by modifying the API URL to fetch Creative objects starting from the ID greater than <code>lastIndexedCreative</code>.</p>
+<p>This is done by appending the <code>IdGreaterThan</code> query parameter to our AutoQuery endpoint.</p>
+<pre><code class="language-csharp">await using var stream = await ApiUrl.AddQueryParams(new() {
+        [&quot;IdGreaterThan&quot;] = lastIndexedCreative,
+        [&quot;OrderBy&quot;] = &quot;Id&quot;,
+    }).GetStreamFromUrlAsync();
+</code></pre>
+<h2 id="visualizing-indexed-documents-with-typesense-dashboard">Visualizing Indexed Documents with Typesense Dashboard<a class="header-anchor" href="javascript:;" onclick="location.hash='#visualizing-indexed-documents-with-typesense-dashboard'" aria-label="Permalink"> </a></h2>
+<p>Another great community feature is the <a href="https://github.com/bfritscher/typesense-dashboard">Typesense dashboard project</a>, providing a user-friendly interface to manage and browse collections in a Typesense search server. The dashboard, which can be accessed via the browser or as a downloadable desktop app, provides real-time statistics and overview over the indexed collections.</p>
+<p>The indexed creative data can now be explored and analyzed using the dashboard's intuitive interface. You can apply filters, perform searches, and manipulate the stored data through the user interface.</p>
+<h2 id="conclusion">Conclusion<a class="header-anchor" href="javascript:;" onclick="location.hash='#conclusion'" aria-label="Permalink"> </a></h2>
+<p>The JSON lines format is a versatile and efficient standard for working with large datasets. Its streamable properties make it particularly useful for handling big data and its ease of use makes it an ideal choice for developers working in any client language.</p>
+<p>Streaming data directly to and from HTTP APIs — a major power of the JSON lines format — can dramatically improve the performance of data-intensive applications. Furthermore, ServiceStack's new JSON Lines support makes it straight forward serve and consume these streams.</p>
 </div>
 
                 <div class="not-prose"></div>
@@ -1429,6 +1525,50 @@ JsonlSerializer.SerializeToWriter(albums, textWriter);
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#indexing-ai-generated-art-albums-with-jsonl'" data-id="indexing-ai-generated-art-albums-with-jsonl" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Indexing AI-Generated Art Albums with JSONL
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#indexing-creative-data-into-typesense'" data-id="indexing-creative-data-into-typesense" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Indexing Creative Data into Typesense
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="memory-foot-print" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#memory-foot-print'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Memory Foot Print
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#skipping-already-indexed-data-example'" data-id="skipping-already-indexed-data-example" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Skipping Already Indexed Data Example
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#visualizing-indexed-documents-with-typesense-dashboard'" data-id="visualizing-indexed-documents-with-typesense-dashboard" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Visualizing Indexed Documents with Typesense Dashboard
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#conclusion'" data-id="conclusion" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Conclusion
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    
