@@ -198,9 +198,7 @@ The `Create*` APIs above creates the compiled delegates which need to be cached 
 Some examples of using these classes:
  
 ```csharp
-var runtimeType = dto.GetType(); //or: typeof(MyType)
-
-var instance = runtimeType.CreateInstance();
+var runtimeType = instance.GetType(); //typeof(MyType)
 
 var typeProps = TypeProperties.Get(runtimeType); //Equivalent to:
 //  typeProps = TypeProperties<MyType>.Instance;
