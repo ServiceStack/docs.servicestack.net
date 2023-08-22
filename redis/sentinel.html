@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-08-17T16:44:22.6646219Z'>
+    <meta name='date' content='2023-08-22T07:54:07.6194189Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Redis Sentinel</title>
@@ -326,6 +326,19 @@ other sentinels, the minimum configuration required is just:</p>
 <div class="info custom-block">
                 <p class="custom-block-title">INFO</p><p>Scanning and auto discovering of other Sentinels can be disabled with <code>ScanForOtherSentinels=false</code></p>
 </div>
+<h3 id="advanced-configuration">Advanced Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#advanced-configuration'" aria-label="Permalink"> </a></h3>
+<p>More advanced configuration of the internal RedisManager used by <code>RedisSentinel</code> can be done by overriding
+the <code>RedisManagerFactory</code> where you can specify the RedisManager it should use along with fine-grained configuration
+such as configuring individual <strong>master</strong> and <strong>replica</strong> pool sizes, e.g:</p>
+<pre><code class="language-csharp">var sentinel = new RedisSentinel(sentinelHost, masterName)
+{
+    RedisManagerFactory = (masters, replicas) =&gt; new PooledRedisClientManager(masters, replicas,
+        new RedisClientManagerConfig {
+            MaxWritePoolSize = 100,
+            MaxReadPoolSize = 200,
+        })
+};
+</code></pre>
 <h2 id="start-monitoring-sentinels">Start monitoring Sentinels<a class="header-anchor" href="javascript:;" onclick="location.hash='#start-monitoring-sentinels'" aria-label="Permalink"> </a></h2>
 <p>Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured
 client manager with:</p>
@@ -523,6 +536,14 @@ RedisConfig.BackOffMultiplier = 10;
                                         <span v-hash="'#usage'" data-id="usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Usage
                                         </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="advanced-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#advanced-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Advanced Configuration
+                                                        </span>
+                                                    </li>
+                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#start-monitoring-sentinels'" data-id="start-monitoring-sentinels" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
