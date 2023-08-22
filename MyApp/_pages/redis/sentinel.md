@@ -44,6 +44,23 @@ var sentinel = new RedisSentinel("sentinel1");
 Scanning and auto discovering of other Sentinels can be disabled with `ScanForOtherSentinels=false`
 :::
 
+### Advanced Configuration
+
+More advanced configuration of the internal RedisManager used by `RedisSentinel` can be done by overriding
+the `RedisManagerFactory` where you can specify the RedisManager it should use along with fine-grained configuration
+such as configuring individual **master** and **replica** pool sizes, e.g:
+
+```csharp
+var sentinel = new RedisSentinel(sentinelHost, masterName)
+{
+    RedisManagerFactory = (masters, replicas) => new PooledRedisClientManager(masters, replicas,
+        new RedisClientManagerConfig {
+            MaxWritePoolSize = 100,
+            MaxReadPoolSize = 200,
+        })
+};
+```
+
 ## Start monitoring Sentinels
 
 Once configured, you can start monitoring the Redis Sentinel servers and access the pre-configured
