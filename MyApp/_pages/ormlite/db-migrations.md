@@ -408,6 +408,8 @@ Here we can see we need to configure our `Migrator` with the `IDbConnectionFacto
 
 This will now let us run your app in **"Task Mode"** where it will execute the specified task before promptly exiting with a **0** success exit code if successful or the index of the task that failed, e.g. **1** if the first Task failed. 
 
+### dotnet Migration Tasks
+
 We can then execute our App Task by running our App with the `AppTasks` command-line argument of the Task we want to run, so we can run all pending migrations with:
 
 :::sh
@@ -432,14 +434,17 @@ or **all** to revert all migrations:
 dotnet run --AppTasks=migrate.revert:all
 :::
 
+### npm Migration Scripts
+
 To make this easier to remember and use, these tasks are also added as npm scripts:
 
-```csharp
+```json
 {
   "scripts": {
     "migrate": "dotnet run --AppTasks=migrate",
     "revert:last": "dotnet run --AppTasks=migrate.revert:last",
-    "revert:all": "dotnet run --AppTasks=migrate.revert:all"
+    "revert:all": "dotnet run --AppTasks=migrate.revert:all",
+    "rerun:last": "npm run revert:last && npm run migrate"
   }
 }
 ```
@@ -450,6 +455,7 @@ Which can be run with:
 $ npm run migrate
 $ npm run revert:last
 $ npm run revert:all
+$ npm run rerun:last
 ```
 
 Which Rider provides a nice UX for running directly from the IDE where it will print all executed SQL output in a dedicated Console:
