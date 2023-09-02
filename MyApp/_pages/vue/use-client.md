@@ -275,6 +275,62 @@ The AutoForm components are powered by your [App Metadata](/vue/use-metadata) wh
 highly customized UIs from [declarative C# attributes](/locode/declarative) whose customizations are
 reused across all ServiceStack Auto UIs.
 
+## Stale-While-Revalidate APIs
+
+A popular performance enhancing technique you can use to improve perceived performance between pages are to use State-While-Revalidate (SWR) APIs
+which can deliver just as good UX as complex SPAs with stateless full page reloads of pre-rendered HTML pages if we use SWR to fetch all 
+the API data needed to render the page on first load:
+
+[![](/img/pages/release-notes/v6.9/diffusion-swr.gif)](https://diffusion.works)
+
+This is easily achieved in reactive Vue.js UIs by invoking API requests with the new `swr()` client API where if 
+the same API request had been run before it will execute the callback immediately with its "stale" cached results
+in `localStorage` first, before invoking the callback again after receiving the API response with the latest data:
+
+```ts
+import { useClient } from "@servicestack/vue"
+const client = useClient()
+
+const results = ref([])
+const topAlbums = ref([])
+//...
+
+onMounted(async () => {
+    await Promise.all([
+        client.swr(request.value, api => {
+            results.value = api.response?.results || []
+            //...
+        }),
+        client.swr(new AnonData(), async api => {
+            topAlbums.value = api.response?.topAlbums || []
+            //...
+        }),
+    ])
+})
+```
+
+This results in UIs being immediately rendered on load and if the API response has changed, the updated reactive collections will re-render 
+the UI with the updated data.
+
+### swrEffect
+
+The built-in `swrEffect()` API uses Vue's `watchEffect` to detect property changes to trigger invoking the API request and returning API responses 
+in an idiomatic `ApiResult<T>` with a similarly pleasant declarative API without the unnecessary boilerplate:
+
+```ts
+const client = useClient()
+//...
+
+const api = client.swrEffect(() => new Hello({ name: props.name }))
+```
+
+It also includes a built-in [debounce feature](https://www.freecodecamp.org/news/javascript-debounce-example/) where you can collapse multiple event triggers within a specified duration (like input events when a user is typing), e.g. we can initiate an API request when a user has paused briefly after 50ms with:
+
+```ts
+const api = client.swrEffect(() => new Hello({ name: props.name }), { delayMs:50 })
+```
+
+
 ## TypeScript Definition
 
 TypeScript definition of the API surface area and type information for correct usage of `useClient()`
