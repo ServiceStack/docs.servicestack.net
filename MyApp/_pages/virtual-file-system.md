@@ -17,6 +17,7 @@ ServiceStack has the following Virtual Files Sources available:
  - `FileSystemMapping` - Hard-disk or Network files made available under an custom file mapping alias
  - `GistVirtualFiles` - Files stored in a GitHub Gist
  - `S3VirtualFiles` - Files stored on Amazon's S3 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws#s3virtualfiles)
+ - `R2VirtualFiles` - Files stored on CloudFlare's R2 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws#s3virtualfiles)
  - `AzureBlobVirtualFiles` - Files stored on Azure's Managed Blob Storage in [ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure)
  - `MultiVirtualFiles` - Any combination of any of the above Virtual File Sources under a cascading configuration
 
