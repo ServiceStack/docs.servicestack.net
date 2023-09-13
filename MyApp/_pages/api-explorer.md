@@ -695,8 +695,7 @@ Values for `InputInfo` are merged with the `[Input]` attribute that can be used 
 This allows you to keep the default layout while still controlling `Input` options directly on your Request DTO class.
 
 ```csharp
-public class CreateCustomers
-        : IReturn<IdResponse>, IPost, ICreateDb<Customers>
+public class CreateCustomers : IReturn<IdResponse>, IPost, ICreateDb<Customers>
 {
     [Input(Placeholder = "me@email.com", Type = "email", Label = "Personal Email Address")]
     public string Email { get; set; }
