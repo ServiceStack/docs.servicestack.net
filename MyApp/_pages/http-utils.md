@@ -106,6 +106,16 @@ Alternatively you can configure it to use your own client factory with:
 HttpUtils.CreateClient = () => UseMyHttpClient()
 ```
 
+Or to utilize a custom Proxy with:
+
+```csharp
+HttpUtils.HttpClientHandlerFactory = () => new() {
+    UseDefaultCredentials = true,
+    AutomaticDecompression = DecompressionMethods.Brotli | DecompressionMethods.Deflate | DecompressionMethods.GZip,
+    Proxy = new WebProxy(proxyUrl)
+};
+```
+
 The following Core APIs also have extension methods on `HttpClient` which existing HttpClient instances can make use of:
 
  - `SendStringToUrl()`
