@@ -114,6 +114,8 @@ appHost.AddToAppMetadata(meta =>
 
 Once signed in, API Explorer expands to include all the protected APIs the signed in user has access to, identifiable with the padlock icon.
 
+### Disable API Explorer
+
 ::: info
 API Explorer is powered by the rich API metadata provided by the `MetadataFeature` and can be customized through the `UiFeature` plugin. 
 Removing either plugin disables API Explorer.
