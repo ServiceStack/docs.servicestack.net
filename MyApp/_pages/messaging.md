@@ -46,6 +46,8 @@ Results matching tag [mq]:
 
 If you'd instead prefer to develop stand-alone MQ Servers (i.e. without HTTP access) then it can be beneficial to run the MQ Server in an ASP.NET Core Worker Service by starting from a pre-configured project template:
 
+<worker-templates></worker-templates>
+
 || .NET Core C# Worker Service Templates |
 |-|-|
 | [worker-rabbitmq](https://github.com/NetCoreTemplates/worker-rabbitmq)        | .NET 6.0 Rabbit MQ Worker Service |
