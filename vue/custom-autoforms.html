@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-10-03T19:18:34.8223818Z'>
+    <meta name='date' content='2023-10-03T19:18:34.7990463Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>App Metadata</title>
+    <title>Custom Auto Forms</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -198,7 +198,7 @@ Vue                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/vue/custom-autoforms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/vue/custom-autoforms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Custom Auto Forms
                                     </a>
                                 </li>
@@ -263,7 +263,7 @@ Vue                                    </span>
                                 </h2>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
-                                    <a href="/vue/use-metadata" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/vue/use-metadata" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         useMetadata
                                     </a>
                                 </li>
@@ -306,253 +306,198 @@ Vue                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            App Metadata
+                            Custom Auto Forms
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>The rich server metadata about your APIs that's used to generate your App's DTOs in
-<a href="/add-servicestack-reference">Multiple Programming Languages</a>, power ServiceStack's
-<a href="/locode/declarative">built-in Auto UIs</a> also power the Metadata driven components in the <strong>@servicestack/vue</strong> component library
-where it can be loaded in your <code>_Layout.cshtml</code> using an optimal configuration like:</p>
-<pre><code class="language-html">var dev = HostContext.AppHost.IsDevelopmentEnvironment();
-@if (dev) {
-    &lt;script&gt;window.Server = @await Html.ApiAsJsonAsync(new MetadataApp())&lt;/script&gt;
+                <div class="content"><h2 id="custom-autoform-uis">Custom AutoForm UIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoform-uis'" aria-label="Permalink"> </a></h2>
+<p><a href="https://servicestack.net/posts/building-typechat-coffeeshop-modelling">CoffeeShop's Admin UI</a> is a good example of the rapid development model
+of AutoQuery and Vue's <a href="/vue/autoquerygrid">AutoQueryGrid</a> and
+<a href="/vue/autoform">Auto Form</a> Components was nearly able to develop the entire CRUD management UI using just AutoQuery's Typed DTOs.</p>
+<p>The one Form that it wasn't able to generate the entire UI for is its <strong>Many-to-Many</strong> <code>CategoryOption</code> relationship
+which requires a custom AutoForm component to be able to specify which Options a category of CoffeeShop Products can have.</p>
+<h3 id="implementing-many-to-many-categoryoption-admin-ui">Implementing Many to Many CategoryOption Admin UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#implementing-many-to-many-categoryoption-admin-ui'" aria-label="Permalink"> </a></h3>
+<p>The easier way to implement this functionality would be to have the UI call an API each time an <code>Option</code> was added or removed
+to a <code>Category</code>. The problem with this approach is that it doesn't match the existing behavior where if a User <strong>cancels</strong>
+a form they'd expect for none of their changes to be applied.</p>
+<p>To implement the desired functionality we'll instead create a custom <code>UpdateCategory</code> implementation that also
+handles any changes to <code>CategoryOption</code> using new <code>AddOptionIds</code> and <code>RemoveOptionIds</code> properties that we'll want
+rendered as <strong>hidden</strong> inputs in our HTML Form with:</p>
+<pre><code class="language-csharp">public class UpdateCategory : IPatchDb&lt;Category&gt;, IReturn&lt;Category&gt;
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    [Input(Type = &quot;tag&quot;), FieldCss(Field = &quot;col-span-12&quot;)]
+    public List&lt;string&gt;? Sizes { get; set; }
+    [Input(Type = &quot;tag&quot;), FieldCss(Field = &quot;col-span-12&quot;)]
+    public List&lt;string&gt;? Temperatures { get; set; }
+    public string? DefaultSize { get; set; }
+    public string? DefaultTemperature { get; set; }
+    [Input(Type = &quot;file&quot;), UploadTo(&quot;products&quot;)]
+    public string? ImageUrl { get; set; }
+
+    [Input(Type = &quot;hidden&quot;)]
+    public List&lt;int&gt;? AddOptionIds { get; set; }
+ 
+    [Input(Type = &quot;hidden&quot;)]
+    public List&lt;int&gt;? RemoveOptionIds { get; set; }
 }
+</code></pre>
+<h2 id="custom-autoquery-implementation">Custom AutoQuery Implementation<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoquery-implementation'" aria-label="Permalink"> </a></h2>
+<p>The <a href="/autoquery/rdbms#custom-autoquery-implementations">Custom AutoQuery Implementation</a>
+in <a href="https://github.com/NetCoreApps/TypeChatExamples/blob/main/TypeChatExamples.ServiceInterface/CoffeeShopServices.cs">CoffeeShopServices.cs</a>
+contains the custom implementation which continues to utilize AutoQuery's <strong>Partial Update</strong> functionality if there's any changes to update,
+as well as removing or adding any Options the user makes to the <code>Category</code>:</p>
+<pre><code class="language-csharp">public class CoffeeShopServices : Service
+{
+    public IAutoQueryDb AutoQuery { get; set; }
+    
+    public async Task&lt;object&gt; Any(UpdateCategory request)
+    {
+        // Perform all RDBMS Updates within the same Transaction
+        using var trans = Db.OpenTransaction();
 
-&lt;script type=&quot;module&quot;&gt;
-import { useMetadata } from &quot;@@servicestack/vue&quot;
+        Category? response = null;
+        var ignore = new[]{nameof(request.Id),nameof(request.AddOptionIds),nameof(request.RemoveOptionIds)};
+        // Only call AutoQuery Update if there's something to update
+        if (request.ToObjectDictionary().HasNonDefaultValues(ignoreKeys:ignore))
+        {
+            response = (Category) await AutoQuery.PartialUpdateAsync&lt;Category&gt;(request, Request, Db);
+        }
+        if (request.RemoveOptionIds?.Count &gt; 0)
+        {
+            await Db.DeleteAsync&lt;CategoryOption&gt;(x =&gt; 
+                x.CategoryId == request.Id &amp;&amp; request.RemoveOptionIds.Contains(x.OptionId));
+        }
+        if (request.AddOptionIds?.Count &gt; 0)
+        {
+            await Db.InsertAllAsync(request.AddOptionIds.Map(id =&gt; 
+                new CategoryOption { CategoryId = request.Id, OptionId = id }));
+        }
+        trans.Commit();
 
-const { loadMetadata } = useMetadata()
-loadMetadata({
-    olderThan: window.Server ? null : location.search.includes('clear=metadata') ? 0 : 60 * 60 * 1000 //1hr 
-})
-&lt;/script&gt;
-</code></pre>
-<p>Where during development it always embeds the AppMetadata in each page but as this metadata can become quite large for systems with a lot of APIs, the above optimization clears and reloads the AppMetadata after <strong>1 hr</strong> or if the page was explicitly loaded with <code>?clear=metadata</code>,
-otherwise it will use a local copy cached in <code>localStorage</code> at <code>/metadata/app.json</code>, which Apps needing more
-fine-grained cache invalidation strategies can manage themselves.</p>
-<p>Once loaded the AppMetadata features can be access with the helper functions in <a href="/vue/use-metadata">useMetadata</a>.</p>
-<pre><code class="language-js">import { useMetadata } from &quot;@servicestack/vue&quot;
-
-const { 
-    loadMetadata,      // Load {AppMetadata} if needed 
-    setMetadata,       // Explicitly set AppMetadata and save to localStorage
-    clearMetadata,     // Delete AppMetadata and remove from localStorage
-    metadataApi,       // Reactive accessor to Ref&lt;MetadataTypes&gt;
-    typeOf,            // Resolve {MetadataType} for DTO name
-    typeOfRef,         // Resolve {MetadataType} by {MetadataTypeName}
-    apiOf,             // Resolve Request DTO {MetadataOperationType} by name
-    property,          // Resolve {MetadataPropertyType} by Type and Property name
-    enumOptions,       // Resolve Enum entries for Enum Type by name
-    propertyOptions,   // Resolve allowable entries for property by {MetadataPropertyType}
-    createFormLayout,  // Create Form Layout's {InputInfo[]} from {MetadataType}
-    typeProperties,    // Return all properties (inc. inherited) for {MetadataType}
-    supportsProp,      // Check if a supported HTML Input exists for {MetadataPropertyType}
-    Crud,              // Query metadata information about AutoQuery CRUD Types
-    getPrimaryKey,     // Resolve PrimaryKey {MetadataPropertyType} for {MetadataType}
-    getId,             // Resolve Primary Key value from {MetadataType} and row instance
-    createDto,         // Create a Request DTO instance for Request DTO name
-    toFormValues,      // Convert Request DTO values to supported HTML Input values
-    formValues,        // Convert HTML Input values to supported DTO values
-} = useMetadata()
-</code></pre>
-<p>For example you can use this to view all C# property names and Type info for the <code>Contact</code> C# DTO with:</p>
-<pre><code class="language-html">&lt;HtmlFormat :value=&quot;typeOf('Contact').properties.map(({ name, type, namespace }) =&gt; ({ name, type, namespace }))&quot; /&gt;
-</code></pre>
-<div class="not-prose">
-<html-format :value="typeOf('Contact').properties.map(({ name, type, namespace }) => ({ name, type, namespace }))"></html-format>
-</div>
-<h2 id="enum-values-and-property-options">Enum Values and Property Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#enum-values-and-property-options'" aria-label="Permalink"> </a></h2>
-<p>More usefully this can avoid code maintenance and duplication efforts from maintaining enum values on both server and client forms.</p>
-<p>An example of this is in the <a href="https://github.com/NetCoreTemplates/razor-tailwind/blob/main/MyApp/wwwroot/Pages/Contacts.mjs">Contacts.mjs</a>
-component which uses the server metadata to populate the <strong>Title</strong> and <strong>Favorite Genre</strong> select options from the <code>Title</code> and <code>FilmGenre</code> enums:</p>
-<pre><code class="language-html">&lt;div class=&quot;grid grid-cols-6 gap-6&quot;&gt;
-  &lt;div class=&quot;col-span-6 sm:col-span-3&quot;&gt;
-    &lt;SelectInput id=&quot;title&quot; v-model=&quot;request.title&quot; :options=&quot;enumOptions('Title')&quot; /&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;col-span-6 sm:col-span-3&quot;&gt;
-    &lt;TextInput id=&quot;name&quot; v-model=&quot;request.name&quot; required placeholder=&quot;Contact Name&quot; /&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;col-span-6 sm:col-span-3&quot;&gt;
-    &lt;SelectInput id=&quot;color&quot; v-model=&quot;request.color&quot; :options=&quot;colorOptions&quot; /&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;col-span-6 sm:col-span-3&quot;&gt;
-    &lt;SelectInput id=&quot;favoriteGenre&quot; v-model=&quot;request.favoriteGenre&quot; :options=&quot;enumOptions('FilmGenre')&quot; /&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;col-span-6 sm:col-span-3&quot;&gt;
-    &lt;TextInput type=&quot;number&quot; id=&quot;age&quot; v-model=&quot;request.age&quot; /&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-</code></pre>
-<p>Whilst the <code>colorOptions</code> gets its values from the available options on the <code>CreateContact.Color</code> property:</p>
-<pre><code class="language-js">const Edit = {
-    //...
-    setup(props) {
-        const { property, propertyOptions, enumOptions } = useMetadata()
-        const colorOptions = propertyOptions(property('CreateContact','Color'))
-        return { enumOptions, colorOptions }
-        //..
+        response ??= request.ConvertTo&lt;Category&gt;();
+        return response;
     }
 }
 </code></pre>
-<p>Which instead of an enum, references the C# Dictionary in:</p>
-<pre><code class="language-csharp">public class CreateContact : IPost, IReturn&lt;CreateContactResponse&gt;
-{
-    [Input(Type=&quot;select&quot;, EvalAllowableEntries = &quot;AppData.Colors&quot;)]
-    public string? Color { get; set; }
+<h2 id="custom-autoform-component">Custom AutoForm Component<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoform-component'" aria-label="Permalink"> </a></h2>
+<p>It now needs to implement a Custom UI that Adds/Removes Options from a Category which is done in a custom <code>CategoryOptions</code>
+Vue Component that displays all the Category Options with a button to remove existing ones and a Select Input to
+add non existing options.</p>
+<p>The purpose of the component is to populate the <code>addOptionIds</code> field with Option Ids that should be added and <code>removeOptionIds</code>
+with Ids to be removed, which updates the Request DTO of the parent Form Model with the <code>update:modelValue</code> event:</p>
+<pre><code class="language-js">const CategoryOptions = {
+    template:`
+         &lt;div&gt;
+            &lt;ul v-for=&quot;optionType in currentOptionTypes&quot;&gt;
+                &lt;li class=&quot;py-1 flex justify-between&quot;&gt;
+                    &lt;span&gt;
+                        {‎{optionType}‎}
+                    &lt;/span&gt;
+                    &lt;span&gt;
+                        &lt;svg class=&quot;w-6 h-6 text-red-600 hover:text-red-800 cursor-pointer&quot; @click=&quot;removeOption(optionType)&quot; xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'&gt;
+                            &lt;title&gt;Remove Option&lt;/title&gt;
+                            &lt;path fill='currentColor' d='M512 64a448 448 0 1 1 0 896a448 448 0 0 1 0-896zM288 512a38.4 38.4 0 0 0 38.4 38.4h371.2a38.4 38.4 0 0 0 0-76.8H326.4A38.4 38.4 0 0 0 288 512z'/&gt;
+                        &lt;/svg&gt;
+                    &lt;/span&gt;
+                &lt;/li&gt; 
+            &lt;/ul&gt;
+            &lt;div class=&quot;flex justify-between items-center&quot;&gt;
+                &lt;select-input class=&quot;flex-grow&quot; @change=&quot;addOption&quot; :values=&quot;['',...options.filter(x =&gt; !currentOptionTypes.includes(x.type)).map(x =&gt; x.type)]&quot;&gt;&lt;/select-input&gt;
+                &lt;svg class=&quot;ml-2 w-6 h-6 text-green-600&quot; xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'&gt;
+                    &lt;title&gt;Add Option&lt;/title&gt;
+                    &lt;path fill='currentColor' d='M11 17h2v-4h4v-2h-4V7h-2v4H7v2h4v4Zm1 5q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z'/&gt;
+                &lt;/svg&gt;            
+            &lt;/div&gt;
+         &lt;/div&gt;
+    `,
+    props:['type','id','modelValue'],
+    emits:['update:modelValue'],
+    setup(props, { emit }) {
+        const client = useClient()
+        const options = ref([])
+        const model = props.modelValue
+
+        model.addOptionIds ??= []
+        model.removeOptionIds ??= []
+        const origOptionIds = model.categoryOptions?.map(x =&gt; x.optionId) || []
+
+        const currentOptionIds = computed(() =&gt; [...origOptionIds, ...model.addOptionIds]
+            .filter(x =&gt; !model.removeOptionIds.includes(x)))
+        const currentOptionTypes = computed(() =&gt;
+            currentOptionIds.value.map(id =&gt; options.value.find(x =&gt; x.id === id)?.type).filter(x =&gt; !!x))
+
+        function addOption(e) {
+            const optionType = e.target.value
+            if (!optionType) return
+            const option = options.value.find(x =&gt; x.type === optionType)
+            if (model.removeOptionIds.includes(option.id))
+                model.removeOptionIds = model.removeOptionIds.filter(id =&gt; id !== option.id)
+            else if (!model.addOptionIds.includes(option.id))
+                model.addOptionIds.push(option.id)
+            emit('update:modelValue', model)
+        }
+        function removeOption(optionType) {
+            const option = options.value.find(x =&gt; x.type === optionType)
+            if (model.addOptionIds.includes(option.id))
+                model.addOptionIds = model.addOptionIds.filter(id =&gt; id !== option.id)
+            else if (!model.removeOptionIds.includes(option.id))
+                model.removeOptionIds.push(option.id)
+        }
+
+        onMounted(async () =&gt; {
+            const api = await client.api(new QueryOptions({ orderBy:'id' }))
+            options.value = api.response.results || []
+            emit('update:modelValue', model)
+        })
+
+        return { options, addOption, removeOption, currentOptionTypes }
+    }
+}
+</code></pre>
+<p>Which is then attached to the AutoQueryGrid Form Components using its <code>&lt;template #formfooter&gt;</code> to include it in the
+bottom of the Create and Edit Form Components:</p>
+<pre><code class="language-js">const sections = {
+    Categories: {
+        type: 'Category',
+        component: {
+            components: { CategoryOptions },
+            template:`
+            &lt;AutoQueryGrid :type=&quot;type&quot; selectedColumns=&quot;imageUrl,id,name,defaultSize,products&quot;
+                    :headerTitles=&quot;{ imageUrl: ' ' }&quot; :canFilter=&quot;x =&gt; x != 'ImageUrl'&quot;&gt;
+                &lt;template #imageUrl=&quot;{ imageUrl }&quot;&gt;
+                    &lt;Icon :src=&quot;imageUrl&quot; class=&quot;w-8 h-8 rounded-full&quot; /&gt;
+                &lt;/template&gt;
+                &lt;template #id=&quot;{ id }&quot;&gt;{‎{id}‎}&lt;/template&gt;
+                &lt;template #name=&quot;{ name }&quot;&gt;{‎{name}‎}&lt;/template&gt;
+                &lt;template #description=&quot;{ description }&quot;&gt;{‎{description}‎}&lt;/template&gt;
+                &lt;template #defaultSize=&quot;{ defaultSize }&quot;&gt;{‎{defaultSize}‎}&lt;/template&gt;
+                &lt;template #products=&quot;{ products }&quot;&gt;{‎{ products.map(x =&gt; x.name).join(', ') }‎}&lt;/template&gt;
+                &lt;template #formfooter=&quot;{ form, type, apis, model, id, updateModel }&quot;&gt;
+                    &lt;div class=&quot;w-1/2 mt-4 px-4 sm:px-6&quot;&gt;
+                        &lt;h3 class=&quot;text-lg font-semibold&quot;&gt;Options&lt;/h3&gt;
+                        &lt;CategoryOptions v-if=&quot;form === 'edit'&quot; :key=&quot;id&quot; :type=&quot;type&quot; :id=&quot;id&quot; v-model=&quot;model&quot; @update:modelValue=&quot;updateModel(model)&quot; /&gt;
+                    &lt;/div&gt;
+                &lt;/template&gt;                
+            &lt;/AutoQueryGrid&gt;`,
+        },
+    },
     //...
 }
 </code></pre>
-<p>To return a C# Dictionary of custom colors defined in:</p>
-<pre><code class="language-csharp">public class ConfigureUi : IHostingStartup
-{
-    public void Configure(IWebHostBuilder builder) =&gt; builder
-        .ConfigureAppHost(appHost =&gt; {
-            //Enable referencing AppData.* in #Script expressions
-            appHost.ScriptContext.Args[nameof(AppData)] = AppData.Instance;
-        });
-}
-
-public class AppData
-{
-    public static readonly AppData Instance = new();
-    public Dictionary&lt;string, string&gt; Colors { get; } = new() {
-        [&quot;#F0FDF4&quot;] = &quot;Green&quot;,
-        [&quot;#EFF6FF&quot;] = &quot;Blue&quot;,
-        [&quot;#FEF2F2&quot;] = &quot;Red&quot;,
-        [&quot;#ECFEFF&quot;] = &quot;Cyan&quot;,
-        [&quot;#FDF4FF&quot;] = &quot;Fuchsia&quot;,
-    };
-}
-</code></pre>
-<h2 id="autoform-components">AutoForm Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoform-components'" aria-label="Permalink"> </a></h2>
-<p>See <a href="/vue/autoform">Auto Form Components</a> docs for examples of easy to use, high productivity <code>AppMetadata</code> powered components.</p>
-<h2 id="typescript-definition">TypeScript Definition<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-definition'" aria-label="Permalink"> </a></h2>
-<p>TypeScript definition of the API surface area and type information for correct usage of <code>useMetadata()</code></p>
-<pre><code class="language-ts">import type { 
-    AppMetadata, MetadataType, MetadataPropertyType, MetadataOperationType, InputInfo, KeyValuePair 
-} from &quot;./types&quot;
-
-
-/** Load {AppMetadata} if needed 
- * @param olderThan   - Reload metadata if age exceeds ms
- * @param resolvePath - Override `/metadata/app.json` path use to fetch metadata
- * @param resolve     - Use a custom fetch to resolve AppMetadata
-*/
-function loadMetadata(args: {
-    olderThan?: number;
-    resolvePath?: string;
-    resolve?: () =&gt; Promise&lt;Response&gt;;
-}): Promise&lt;AppMetadata&gt;;
-
-/** Check if AppMetadata is valid */
-function isValid(metadata: AppMetadata | null | undefined): boolean | undefined;
-
-/** Delete AppMetadata and remove from localStorage */
-function setMetadata(metadata: AppMetadata | null | undefined): boolean;
-
-/** Delete AppMetadata and remove from localStorage */
-function clearMetadata(): void;
-
-
-/** Query metadata information about AutoQuery CRUD Types */
-const Crud: {
-    Create: string;
-    Update: string;
-    Patch: string;
-    Delete: string;
-    AnyRead: string[];
-    AnyWrite: string[];
-    isQuery: (op: MetadataOperationType) =&gt; any;
-    isCrud: (op: MetadataOperationType) =&gt; boolean | undefined;
-    isCreate: (op: MetadataOperationType) =&gt; boolean | undefined;
-    isUpdate: (op: MetadataOperationType) =&gt; boolean | undefined;
-    isPatch: (op: MetadataOperationType) =&gt; boolean | undefined;
-    isDelete: (op: MetadataOperationType) =&gt; boolean | undefined;
-    model: (type?: MetadataType | null) =&gt; string | null | undefined;
-};
-
-/** Resolve HTML Input type to use for {MetadataPropertyType}  */
-function propInputType(prop: MetadataPropertyType): string;
-
-/** Resolve HTML Input type to use for C# Type name */
-function inputType(type: string): string;
-
-/** Check if C# Type name is numeric */
-function isNumericType(type?: string | null): boolean;
-
-/** Check if C# Type is an Array or List */
-function isArrayType(type: string): boolean;
-
-/** Check if a supported HTML Input exists for {MetadataPropertyType} */
-function supportsProp(prop?: MetadataPropertyType): boolean;
-
-/** Create a Request DTO instance for Request DTO name */
-function createDto(name: string, obj?: any): any;
-
-/** Convert Request DTO values to supported HTML Input values */
-function toFormValues(dto: any, metaType?: MetadataType | null): any;
-
-/** Convert HTML Input values to supported DTO values */
-function formValues(form: HTMLFormElement, props?: MetadataPropertyType[]): {
-    [k: string]: any;
-};
-
-/**
- * Resolve {MetadataType} for DTO name
- * @param name        - Find MetadataType by name
- * @param [namespace] - Find MetadataType by name and namespace 
- */
-function typeOf(name?: string | null, namespace?: string | null): MetadataType | null;
-
-/** Resolve Request DTO {MetadataOperationType} by name */
-function apiOf(name: string): MetadataOperationType | null;
-
-/** Resolve {MetadataType} by {MetadataTypeName} */
-function typeOfRef(ref?: {
-    name: string;
-    namespace?: string;
-}): MetadataType | null;
-
-function property(typeName: string, name: string): MetadataPropertyType | null;
-
-/** Resolve Enum entries for Enum Type by name */
-function enumOptions(name: string): { [name: string]: string; } | null;
-
-function enumOptionsByType(type?: MetadataType | null): { [name: string]: string; } | null;
-
-/** Resolve Enum entries for Enum Type by MetadataType */
-function propertyOptions(prop: MetadataPropertyType): { [name: string]: string; } | null;
-
-/** Convert string dictionary to [{ key:string, value:string }] */
-function asKvps(options?: { [k: string]: string; } | null): KeyValuePair&lt;string, string&gt;[] | undefined;
-
-/** Create InputInfo from MetadataPropertyType and custom InputInfo */
-function createInput(prop: MetadataPropertyType, input?: InputInfo): InputInfo;
-
-/** Create Form Layout's {InputInfo[]} from {MetadataType} */
-function createFormLayout(metaType?: MetadataType | null): InputInfo[];
-
-/** Return all properties (inc. inherited) for {MetadataType} */
-function typeProperties(type?: MetadataType | null): MetadataPropertyType[];
-
-/** Check if MetadataOperationType implements interface by name */
-function hasInterface(op: MetadataOperationType, cls: string): boolean;
-
-/** Resolve PrimaryKey {MetadataPropertyType} for {MetadataType} */
-function getPrimaryKey(type?: MetadataType | null): MetadataPropertyType | null;
-
-/** Resolve Primary Key value from {MetadataType} and row instance  */
-function getId(type: MetadataType, row: any): any;
-</code></pre>
+<p>With those finishing touches CoffeeShop's back-end Admin UI is now complete which now allows shop owners to manage their entire database:</p>
+<div class="shadow rounded-sm"><p><a href="/img/pages/autoquery/portal-update-category.png"><img src="/img/pages/autoquery/portal-update-category.png" alt="" /></a></p>
+</div>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/vue/use-metadata.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/vue/custom-autoforms.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -560,18 +505,18 @@ function getId(type: MetadataType, row: any): any;
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/vue/formats" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/vue/autoform" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Formats
+                                                Auto Forms
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/vue/use-client" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                useClient
+                                            <a href="/vue/form-inputs" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Form Inputs
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -590,18 +535,26 @@ function getId(type: MetadataType, row: any): any;
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#enum-values-and-property-options'" data-id="enum-values-and-property-options" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Enum Values and Property Options
+                                        <span v-hash="'#custom-autoform-uis'" data-id="custom-autoform-uis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom AutoForm UIs
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="implementing-many-to-many-categoryoption-admin-ui" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#implementing-many-to-many-categoryoption-admin-ui'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Implementing Many to Many CategoryOption Admin UI
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#custom-autoquery-implementation'" data-id="custom-autoquery-implementation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom AutoQuery Implementation
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#autoform-components'" data-id="autoform-components" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            AutoForm Components
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#typescript-definition'" data-id="typescript-definition" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            TypeScript Definition
+                                        <span v-hash="'#custom-autoform-component'" data-id="custom-autoform-component" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Custom AutoForm Component
                                         </span>
                                     </li>
                             </ul>
@@ -626,7 +579,14 @@ import { ref } from "vue"
 import { mount } from "app.mjs"
 
 
-        import App from "/pages/vue/use-metadata.mjs" 
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
     
 const Sidebar = {
     setup() {
