@@ -13,12 +13,13 @@ ServiceStack has the following Virtual Files Sources available:
 
  - `FileSystemVirtualFiles` - Hard-disk or Network Files and Directories from a specified root directory
  - `MemoryVirtualFiles` - Virtual Files and Folders that can be programmatically populated In Memory
- - `ResourceVirtualFiles` - Embedded Resource Files in .dlls
  - `FileSystemMapping` - Hard-disk or Network files made available under an custom file mapping alias
+ - `S3VirtualFiles` - Files stored on Amazon's S3 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws/src/ServiceStack.Aws)
+ - `AzureBlobVirtualFiles` - Files stored on Azure's Managed Blob Storage in [ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Azure/src/ServiceStack.Azure)
+ - `GoogleCloudVirtualFiles` - Files stored on GoogleCloud Storage in [ServiceStack.GoogleCloud](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack.GoogleCloud)
+ - `R2VirtualFiles` - Files stored on CloudFlare's R2 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws/src/ServiceStack.Aws)
+ - `ResourceVirtualFiles` - Embedded Resource Files in .dlls
  - `GistVirtualFiles` - Files stored in a GitHub Gist
- - `S3VirtualFiles` - Files stored on Amazon's S3 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws#s3virtualfiles)
- - `R2VirtualFiles` - Files stored on CloudFlare's R2 Managed File Storage in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws#s3virtualfiles)
- - `AzureBlobVirtualFiles` - Files stored on Azure's Managed Blob Storage in [ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure)
  - `MultiVirtualFiles` - Any combination of any of the above Virtual File Sources under a cascading configuration
 
 ## Embedded Resources
