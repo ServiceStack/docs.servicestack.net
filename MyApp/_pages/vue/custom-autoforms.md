@@ -12,6 +12,13 @@ of AutoQuery and Vue's [AutoQueryGrid](/vue/autoquerygrid) and
 The one Form that it wasn't able to generate the entire UI for is its **Many-to-Many** `CategoryOption` relationship
 which requires a custom AutoForm component to be able to specify which Options a category of CoffeeShop Products can have.
 
+<div class="not-prose">
+    <div class="mb-16 flex justify-center">
+        <iframe style="width:896px;height:504px;" src="https://www.youtube.com/embed/MjNqPAXLH5w?si=HDFs2FnYhtuZSDWL&amp;start=404" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+</div>
+
+
 ### Implementing Many to Many CategoryOption Admin UI
 
 The easier way to implement this functionality would be to have the UI call an API each time an `Option` was added or removed
