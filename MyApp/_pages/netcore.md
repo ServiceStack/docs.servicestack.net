@@ -655,7 +655,6 @@ Use the `PathBase` property on AppHost for hosting a ServiceStack .NET Core App 
 ```csharp
 app.UseServiceStack(new AppHost {
     PathBase = "/api",
-    AppSettings = new NetCoreAppSettings(Configuration)
 });
 ```
 
