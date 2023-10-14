@@ -87,7 +87,7 @@ Using [dataclasses](https://docs.python.org/3/library/dataclasses.html) enables 
 from .dtos import *
 from servicestack import JsonServiceClient
 
-client = JsonServiceClient("http://test.servicestack.net")
+client = JsonServiceClient("https://test.servicestack.net")
 
 response: HelloResponse = client.get(Hello(name="World"))
 ```

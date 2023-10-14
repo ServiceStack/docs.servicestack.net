@@ -293,7 +293,7 @@ dto.Result //Hello, World
 ### Accessing raw service responses
 
 ServiceStack isn't limited to just returning POCO's as you can effectively [return anything you want](/service-return-types) even images 
-[/helloimage/ServiceStack?Width=600&height=300&Foreground=Yellow](http://test.servicestack.net/image-draw/ServiceStack?Width=600&height=300&Foreground=Yellow). These native responses can also be mark on your Request DTO `IReturn<T>` interface marker to give you a terse end-to-end API for fetching raw responses, e.g:
+[/helloimage/ServiceStack?Width=600&height=300&Foreground=Yellow](https://test.servicestack.net/image-draw/ServiceStack?Width=600&height=300&Foreground=Yellow). These native responses can also be mark on your Request DTO `IReturn<T>` interface marker to give you a terse end-to-end API for fetching raw responses, e.g:
 
 ```csharp
 [Route("/headers/{Text}")]

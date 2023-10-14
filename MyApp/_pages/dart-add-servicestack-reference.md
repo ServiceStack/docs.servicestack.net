@@ -327,7 +327,7 @@ Our App will be making API calls to 2 different ServiceStack instances which we'
 ```bash
 cd lib
 x dart https://techstacks.io
-x dart http://test.servicestack.net test
+x dart https://test.servicestack.net test
 ```
 
 Which will save the DTOs for each endpoint in different files:
@@ -360,7 +360,7 @@ import 'package:servicestack/client.dart';
 import 'test.dtos.dart';
 import 'dtos.dart';
 
-const TestBaseUrl = "http://test.servicestack.net";
+const TestBaseUrl = "https://test.servicestack.net";
 const TechStacksBaseUrl = "https://techstacks.io";
 
 var testClient = JsonServiceClient(TestBaseUrl);
@@ -652,7 +652,7 @@ import '../dtos/dtos.dart';
 class HelloWorldComponent {
   var result = "";
   var imageSrc = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="; // 1x1 pixel
-  static const TestBaseUrl = "http://test.servicestack.net";
+  static const TestBaseUrl = "https://test.servicestack.net";
   static const TechStacksBaseUrl = "https://techstacks.io";
   var testClient = JsonWebClient(TestBaseUrl);
   var techstacksClient = JsonWebClient(TechStacksBaseUrl);

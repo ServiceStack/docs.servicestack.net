@@ -493,7 +493,7 @@ To illustrate exception handling we'll connect to ServiceStack's Test Services a
 Handling a Single C# Exception:
 
 ```swift
-var client = JsonServiceClient(baseUrl: "http://test.servicestack.net")
+var client = JsonServiceClient(baseUrl: "https://test.servicestack.net")
 
 var request = ThrowType()
 request.type = "NotFound"
@@ -513,7 +513,7 @@ do {
 Handling a Validation Exception with multiple field validation errors:
 
 ```swift
-let client = JsonServiceClient(baseUrl: "http://test.servicestack.net")
+let client = JsonServiceClient(baseUrl: "https://test.servicestack.net")
 
 let request = ThrowValidation()
 request.email = "invalidemail"
@@ -860,7 +860,7 @@ step-by-step guide below showing how to create a simple
 
 With Swift support our goal was to ensure a high-fidelity, idiomatic translation within the constraints of Swift language and built-in libraries, where the .NET Server DTO's are translated into clean Swift POSO's (Plain Old Swift Objects :) having their .NET built-in types mapped to their equivalent Swift data type. 
 
-To see what this ended up looking like, we'll peel back behind the covers and look at a couple of the [Generated Swift Test Models](http://test.servicestack.net/types/swift) to see how they're translated in Swift:
+To see what this ended up looking like, we'll peel back behind the covers and look at a couple of the [Generated Swift Test Models](https://test.servicestack.net/types/swift) to see how they're translated in Swift:
 
 ```swift
 public class AllTypes

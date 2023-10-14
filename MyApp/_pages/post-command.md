@@ -447,13 +447,13 @@ x send https://covid-vac-watch.netcore.io GetLocations -json > results.json
 [jq](https://stedolan.github.io/jq/) is a popular command-line tool for querying JSON outputs that's useful for inspecting the JSON response of one command to chain using it in others. A useful usecase is for parse an `AuthenticateResponse` to capture the JWT `bearerToken` property with `jq -r .bearerToken`:
 
 ```bash
-TOKEN=$(x send http://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}" -json | jq -r .bearerToken)
+TOKEN=$(x send https://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}" -json | jq -r .bearerToken)
 ```
 
 Then using it to make stateless Authenticated requests, e.g:
 
 :::sh
-x send -token $TOKEN http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -token $TOKEN https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:
@@ -578,7 +578,7 @@ As ServiceStack APIs supports [nested complex types in query strings](/routing#p
 #### Example GET Request
 
 ```bash
-x GET http://test.servicestack.net StoreLogs "{Loggers:[{Id:786,Devices:[{Id:5955,Type:'Panel',TimeStamp:1,Channels:[{Name:'Temperature',Value:'58'},{Name:'Status',Value:'On'}]}]}]}" -raw
+x GET https://test.servicestack.net StoreLogs "{Loggers:[{Id:786,Devices:[{Id:5955,Type:'Panel',TimeStamp:1,Channels:[{Name:'Temperature',Value:'58'},{Name:'Status',Value:'On'}]}]}]}" -raw
 ```
 
 Where they're sent on the query string:
@@ -609,7 +609,7 @@ Content-Type: application/json; charset=utf-8
 As well as HTTP Requests with Request bodies where only the method used needs to change whilst the Request JS Object literal stays exactly the same, e.g:
 
 ```bash
-x POST http://test.servicestack.net StoreLogs "{Loggers:[{Id:786,Devices:[{Id:5955,Type:'Panel',TimeStamp:1,Channels:[{Name:'Temperature',Value:'58'},{Name:'Status',Value:'On'}]}]}]}" -raw
+x POST https://test.servicestack.net StoreLogs "{Loggers:[{Id:786,Devices:[{Id:5955,Type:'Panel',TimeStamp:1,Channels:[{Name:'Temperature',Value:'58'},{Name:'Status',Value:'On'}]}]}]}" -raw
 ```
 
 Where instead of being sent on the query string it's posted inside a JSON Request body, irrespective of how its sent a ServiceStack API supporting any HTTP Method by being implemented with the `Any()` method name will result in an identical response:
@@ -644,7 +644,7 @@ Content-Type: application/json; charset=utf-8
 For requests that get significantly large it may be more convenient to maintain the request body in a separate file that you can pipe into the command instead, e.g:
 
 :::sh
-x send http://test.servicestack.net StoreLogs -raw < StoreLogs.json
+x send https://test.servicestack.net StoreLogs -raw < StoreLogs.json
 :::
 
 Output:
@@ -676,7 +676,7 @@ Content-Type: application/json; charset=utf-8
 Remove the `-raw` option to display the response in a more human-friendly readable format:
 
 :::sh
-x send http://test.servicestack.net StoreLogs < StoreLogs.json
+x send https://test.servicestack.net StoreLogs < StoreLogs.json
 :::
 
 Output:
@@ -712,13 +712,13 @@ Options:
 Since Username/Password Credentials Auth is a normal ServiceStack API we can invoke it like normal, e.g:
 
 :::sh
-x send http://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}"
+x send https://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}"
 :::
 
 However to hide your credentials from command history logs you'll likely want to maintain your credentials in a separate file, e.g:
 
 :::sh
-x send http://test.servicestack.net Authenticate < auth.json
+x send https://test.servicestack.net Authenticate < auth.json
 :::
 
 Which if successful will return a populated human-friendly `AuthenticateResponse`:
@@ -741,13 +741,13 @@ Admin
 Likely the easiest and most versatile authentication option would be to use a separate cookies file where it will load and save cookies after each request allowing each request to be made within the context of the same authenticated session as done in browsers, e.g:
 
 :::sh
-x send -cookies cookies.xml http://test.servicestack.net Authenticate < auth.json
+x send -cookies cookies.xml https://test.servicestack.net Authenticate < auth.json
 :::
 
 We can test that it's working by first trying to call an Authentication protected Service without any Authentication options, e.g:
 
 :::sh
-x send http://test.servicestack.net HelloSecure "{name:'World'}"
+x send https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:
@@ -759,7 +759,7 @@ The remote server returned an error: (401) Not Authenticated.
 Then re-trying the request, providing the **cookies.xml** that was populated after the success Authentication:
 
 :::sh
-x send -cookies cookies.xml http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -cookies cookies.xml https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:
@@ -779,14 +779,14 @@ When the `JwtAuthProvider` is configured a successful Authentication Response wi
 
 ```bash
 set TOKEN=...
-x send -token %TOKEN% http://test.servicestack.net HelloSecure {name:'World'}
+x send -token %TOKEN% https://test.servicestack.net HelloSecure {name:'World'}
 ```
 
 **Linux / macOS:**
 
 ```bash
 TOKEN=...
-x send -token $TOKEN http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -token $TOKEN https://test.servicestack.net HelloSecure "{name:'World'}"
 ```
 
 Output:
@@ -800,13 +800,13 @@ result:  Hello, World!
 A dependency-free solution for capturing the `bearerToken` is to utilize the [#Script](https://sharpscript.net) eval expression support in `x` to make an API Request and parsing the JSON response and parsing it with #Script methods, e.g:
 
 ```bash
-TOKEN=$(x -e "'http://test.servicestack.net/auth' |> urlTextContents({method:'POST',accept:'application/json',data:'provider=credentials&username=admin&password=test'}) |> parseJson |> get('bearerToken')")
+TOKEN=$(x -e "'https://test.servicestack.net/auth' |> urlTextContents({method:'POST',accept:'application/json',data:'provider=credentials&username=admin&password=test'}) |> parseJson |> get('bearerToken')")
 ```
 
 Then using it to make stateless Authenticated requests, e.g:
 
 :::sh
-x send -token $TOKEN http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -token $TOKEN https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 ### Capturing bearerToken with jq
@@ -814,7 +814,7 @@ x send -token $TOKEN http://test.servicestack.net HelloSecure "{name:'World'}"
 [jq](https://stedolan.github.io/jq/) is a versatile command for extracting info from JSON outputs which can extract the raw string "bearerToken" property value of an `AuthenticateResponse` with `jq -r .bearerToken`, e.g:
 
 ```bash
-TOKEN=$(x send http://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}" -json | jq -r .bearerToken)
+TOKEN=$(x send https://test.servicestack.net Authenticate "{provider:'credentials',username:'admin',password:'test'}" -json | jq -r .bearerToken)
 ```
 
 ### Inspect JWTs
@@ -860,13 +860,13 @@ jti:                 9
 When the `BasicAuthProvider` is configured we can authenticate with HTTP Basic Auth using the `-basic` command line option which supports both clear text:
 
 :::sh
-x send -basic admin:test http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -basic admin:test https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:
 
 :::sh
-x send -basic admin:test http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -basic admin:test https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 As well as Base64 encoded credentials which we can convert using the `x base64` tool, e.g:
@@ -882,7 +882,7 @@ YWRtaW46dGVzdA==
 ```
 
 :::sh
-x send -basic YWRtaW46dGVzdA== http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -basic YWRtaW46dGVzdA== https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:
@@ -895,7 +895,7 @@ Although a Base64 encoded password does not offer much protection for your passw
 
 ```bash
 set /P basic=<credentials.txt
-x send -basic %basic% http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -basic %basic% https://test.servicestack.net HelloSecure "{name:'World'}"
 ```
 
 Output:
@@ -915,7 +915,7 @@ SetConfig(new HostConfig { AdminAuthSecret = "secretz" });
 It can be used to authenticated with using the `-authsecret` option:
 
 :::sh
-x send -authsecret secretz http://test.servicestack.net HelloSecure "{name:'World'}"
+x send -authsecret secretz https://test.servicestack.net HelloSecure "{name:'World'}"
 :::
 
 Output:

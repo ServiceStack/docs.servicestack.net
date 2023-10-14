@@ -660,7 +660,7 @@ the constraints of Kotlin language and its built-in libraries, where .NET Server
 clean, conventional Kotlin classes where .NET built-in Value Types mapped to their equivalent JVM data Type.
 
 To see what this ends up looking up we'll go through some of the 
-[Generated Test Services](http://test.servicestack.net/types/kotlin) to see how they're translated in Kotlin.
+[Generated Test Services](https://test.servicestack.net/types/kotlin) to see how they're translated in Kotlin.
 
 ### .NET Attributes translated into Java Annotations
 By inspecting the `HelloAllTypes` Request DTO we can see that C# Metadata Attributes e.g. `[Route("/all-types")]` 
@@ -688,7 +688,7 @@ open class HelloAllTypes : IReturn<HelloAllTypesResponse>
 ### DTO Property Behavior
 
 To comply with Gson JSON Serialization rules, the public DTO properties are emitted in the same JSON naming 
-convention as the remote ServiceStack server which for the [test.servicestack.net](http://test.servicestack.net) 
+convention as the remote ServiceStack server which for the [test.servicestack.net](https://test.servicestack.net) 
 Web Services, follows its **camelCase** naming convention that is configured in its AppHost with: 
 
 ```csharp
