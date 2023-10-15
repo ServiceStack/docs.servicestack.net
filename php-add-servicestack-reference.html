@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-10-15T08:58:10.0239604Z'>
+    <meta name='date' content='2023-10-15T08:58:09.8301076Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Silverlight Client</title>
+    <title>PHP Add ServiceStack Reference</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -512,7 +512,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/silverlight-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/silverlight-client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Silverlight Client
                                     </a>
                                 </li>
@@ -1320,328 +1320,863 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Silverlight Client
+                            PHP Add ServiceStack Reference
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>The <strong>recommended</strong> way to get Silverlight builds of ServiceStack client libraries is from <a href="https://nuget.org/packages/ServiceStack.Client.Silverlight">NuGet</a>:</p>
-<p><a href="https://nuget.org/packages/ServiceStack.Client"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/nuget-servicestack.client.silverlight.png" alt="ServiceStack Silverlight Client on NuGet" /></a></p>
-<p>These binaries are custom builds of the full ServiceStack Service Clients providing JSON, JSV and XML ServiceClients.</p>
-<h4 id="requires-pcl-support-in-v4.x-servicestack.client-nuget-package">Requires PCL support in v4.x <a href="https://nuget.org/packages/ServiceStack.Client">ServiceStack.Client</a> NuGet package.<a class="header-anchor" href="javascript:;" onclick="location.hash='#requires-pcl-support-in-v4.x-servicestack.client-nuget-package'" aria-label="Permalink"> </a></h4>
-<div class="info custom-block">
-                <p class="custom-block-title">INFO</p><p>Due to restrictions in Silverlight only the Async operations are supported.</p>
-</div>
-<h2 id="hellomobile"><a href="https://github.com/ServiceStackApps/HelloMobile">HelloMobile</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#hellomobile'" aria-label="Permalink"> </a></h2>
-<p>See the <a href="https://github.com/ServiceStackApps/HelloMobile">HelloMobile</a> project for more info on ServiceStack's Silverlight and PCL client support including showing re-use of shared libraries between each of the different mobile platforms.</p>
-<hr />
-<h3 id="building-silverlight-json-service-client-from-scratch">Building Silverlight JSON Service Client from Scratch<a class="header-anchor" href="javascript:;" onclick="location.hash='#building-silverlight-json-service-client-from-scratch'" aria-label="Permalink"> </a></h3>
-<p>Although it is recommended to use the published binaries above, for illustrative purposes, this section below walks through creating a Silverlight client from scratch. This example below shows how to create a JSON ServiceClient.</p>
-<p><em>Note: The code below has been tested in Silverlight 5.  It should work fine in other versions of Silverlight as well.</em></p>
-<h2 id="please-be-aware-of-the-following-considerations">Please be aware of the following considerations:<a class="header-anchor" href="javascript:;" onclick="location.hash='#please-be-aware-of-the-following-considerations'" aria-label="Permalink"> </a></h2>
-<h3 id="uses-httpwebrequest-with-clienthttp-handling">Uses HttpWebRequest with ClientHttp handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#uses-httpwebrequest-with-clienthttp-handling'" aria-label="Permalink"> </a></h3>
-<p>The <a href="http://www.silverlight.net/learn/data-networking/network-services-%28soap,-rest-and-more%29/rest-services-%28silverlight-quickstart%29">Silverlight REST Services Quickstart</a> describes the different mechanisms of how http calls can be made from Silverlight.  There is the easier-but-heavier WebClient implementation, and the lighter-but-harder HttpWebRequest implementation.  The code below uses the HttpWebRequest implementation, primarily because you cannot manipulate cookies with the WebClient version, but also because it provides better hooks for serializing and deserializing the JSON we want to send to our ServiceStack service.</p>
-<p>It also uses the ClientHttp handling instead of BrowserHttp handling. <a href="http://msdn.microsoft.com/en-us/library/dd920295%28VS.95%29.aspx">See the differences here.</a></p>
-<p>You may need to put a clientaccesspolicy.xml file in the root of your host.  It depends on the domains of the host and client, and the trust level of the particular Silverlight client application (differs between out-of-browser and between Silverlight versions).  <a href="http://msdn.microsoft.com/en-us/library/cc645032%28v=VS.95%29.aspx">See MSDN documentation for more info.</a></p>
-<h3 id="is-cookie-aware">Is Cookie-Aware<a class="header-anchor" href="javascript:;" onclick="location.hash='#is-cookie-aware'" aria-label="Permalink"> </a></h3>
-<p>In the code below, you will see how cookies can be enabled or disabled.  Because we are using ClientHttp handling, when cookies are enabled, we have to create a custom CookieContainer.</p>
-<p>In order to share these cookies with the browser, we are populating from HtmlPage.Document.Cookies before the request, and then setting the cookies back to the browser after getting a response.  This technique allows things like ServiceStack's built-in authentication to work, even if you authenticate in the browser before launching your Silverlight app.</p>
-<p>If you don't want to share cookies with the browser, you can set EnableCookies = false, or you can modify the code to persist the CookieContainer in some other way.</p>
-<h3 id="talks-only-json">Talks only JSON<a class="header-anchor" href="javascript:;" onclick="location.hash='#talks-only-json'" aria-label="Permalink"> </a></h3>
-<p>The request and response streams are assumed to be JSON, and the Accept and Content-Type headers are set accordingly.  If you want to implement xml or jsv, you will have to adjust the headers and the content appropriately.</p>
-<h5 id="using-the-datacontractjsonserializer">Using the DataContractJsonSerializer</h5>
-<p>The only JSON serializer that comes with Silverlight is the <a href="http://msdn.microsoft.com/en-us/library/system.runtime.serialization.json.datacontractjsonserializer%28v=vs.95%29.aspx">DataContractJsonSerializer</a>.  While not as performant as ServiceStack's serializers, performance on the client usually tends not to be as important as on the server (due to load).</p>
-<p>Note that if you decide to apply a [DataContract] attribute to your DTO that you must specifically mark all members that you want to serialize with [DataMember].  If you leave them off, all public members will be serialized.</p>
-<p>The code below uses this serializer by default.  If you use it, be aware that there is a bug in the DataContractJsonSerializer related to handling of dates that are not of type DateTimeKind.Local.  <a href="http://connect.microsoft.com/VisualStudio/feedback/details/723368">Read more here</a></p>
-<h5 id="using-the-servicestack-jsonserializer">Using the ServiceStack JsonSerializer</h5>
-<p>The Silverlight build of ServiceStack.Text (the one that comes with the ServiceStack.Client.Silverlight) is easy to implement.  There is code in the below sample that is commented out, showing how to do this.  Simply uncomment the code and remove the DCJS implementation, then reference ServiceStack.Text and you now have a faster serializer (one without the date bug).</p>
-<h2 id="example-usage">Example Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-usage'" aria-label="Permalink"> </a></h2>
-<h3 id="setting-up-your-dtos">Setting up your DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#setting-up-your-dtos'" aria-label="Permalink"> </a></h3>
-<p>The regular ServiceStack example DTOs should work:</p>
-<pre><code class="language-csharp">public class Hello
+                <div class="content"><p><img src="/img/pages/servicestack-reference/php-reference.png" alt="ServiceStack and PHP Banner" /></p>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types from directly within PhpStorm using <a href="https://plugins.jetbrains.com/plugin/7749-servicestack/">ServiceStack IntelliJ Plugin</a> - providing a simple way to give clients typed access to your ServiceStack Services.</p>
+<p><a href="https://youtu.be/WjbhfH45i5k"><img src="/img/pages/servicestack-reference/python-add-servicestack-reference-youtube-splash.png" alt="" /></a></p>
+<blockquote>
+<p>YouTube: <a href="https://youtu.be/WjbhfH45i5k">youtu.be/WjbhfH45i5k</a></p>
+</blockquote>
+<h3 id="first-class-development-experience">First class development experience<a class="header-anchor" href="javascript:;" onclick="location.hash='#first-class-development-experience'" aria-label="Permalink"> </a></h3>
+<p><a href="https://www.php.net">PHP</a> is one of the worlds most popular programming languages thanks to its ease of use,
+platform independence, large standard library, flexibility and fast development experience which sees it excels as
+a popular language for web development and for development of popular CMS products like WordPress, Drupal and Joomla
+thanks to its flexibility, embeddability and ease of customization.</p>
+<p>To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports PHP as a
+1st class Add ServiceStack Reference supported language which gives PHP developers an end-to-end typed API for consuming
+ServiceStack APIs, complete with IDE integration in <a href="https://www.jetbrains.com/phpstorm/">PhpStorm</a> as well as
+<a href="/dotnet-tool#addupdate-servicestack-references">built-in support in x dotnet tool</a>
+to generate Typed and annotated PHP DTOs for a remote ServiceStack instance from a single command-line.</p>
+<h3 id="ideal-idiomatic-typed-message-based-api">Ideal idiomatic Typed Message-based API<a class="header-anchor" href="javascript:;" onclick="location.hash='#ideal-idiomatic-typed-message-based-api'" aria-label="Permalink"> </a></h3>
+<p>To maximize the utility of PHP DTOs and enable richer tooling support and greater development experience, PHP DTOs are generated as
+Typed <a href="https://www.php.net/manual/en/class.jsonserializable.php">JsonSerializable</a> classes with
+<a href="https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.constructor.promotion">promoted constructors</a>
+and annotated with <a href="https://phpstan.org/writing-php-code/phpdoc-types">PHPDoc Types</a> - that's invaluable when scaling
+large PHP code-bases and greatly improves discoverability of a remote API. DTOs are also enriched with interface markers
+and Annotations which enables its optimal end-to-end typed API:</p>
+<p>The PHP DTOs and <code>JsonServiceClient</code> library follow
+<a href="https://infinum.com/handbook/wordpress/coding-standards/php-coding-standards/naming">PHP naming conventions</a>
+so they'll naturally fit into existing PHP code bases. Here's a sample of <a href="https://techstacks.io">techstacks.io</a>
+generated PHP DTOs containing string and int Enums, an example AutoQuery and a standard Request &amp; Response DTO showcasing
+the rich typing annotations and naming conventions used:</p>
+<pre><code class="language-php">enum TechnologyTier : string
 {
-    public string Name { get; set; }
+    case ProgrammingLanguage = 'ProgrammingLanguage';
+    case Client = 'Client';
+    case Http = 'Http';
+    case Server = 'Server';
+    case Data = 'Data';
+    case SoftwareInfrastructure = 'SoftwareInfrastructure';
+    case OperatingSystem = 'OperatingSystem';
+    case HardwareInfrastructure = 'HardwareInfrastructure';
+    case ThirdPartyServices = 'ThirdPartyServices';
 }
 
-public class HelloResponse
+enum Frequency : int
 {
-    public string Result { get; set; }
+    case Daily = 1;
+    case Weekly = 7;
+    case Monthly = 30;
+    case Quarterly = 90;
 }
-</code></pre>
-<p>Your DTO projects will need to be accessible from both Silverlight and your other .Net projects.  There are two ways to accomplish this:</p>
-<h5 id="shared-projects">Shared Projects</h5>
-<p>You can use a set of shared project for porting your DTOs to Silverlight.  One should be a regular .Net Class Library (perhaps named MySilverlightApp.DTOs), and another should be a Silverlight Class Library (perhaps named MySilverlightApp.DTOs.Silverlight).  You can use the project linking technique <a href="http://10rem.net/blog/2009/07/13/sharing-entities-between-wcf-and-silverlight">documented here</a>.</p>
-<p>You may also want to use the Visual Studio Project Linker add-in, which is <a href="http://visualstudiogallery.msdn.microsoft.com/5e730577-d11c-4f2e-8e2b-cbb87f76c044">available here</a> and <a href="http://msdn.microsoft.com/en-us/library/ff921108.aspx">documented here</a>.</p>
-<h5 id="portable-class-libraries">Portable Class Libraries</h5>
-<p>You can put your DTOs in a single project that is set up as a <a href="http://msdn.microsoft.com/en-us/library/gg597391.aspx">Portable Class Library</a>.  This is a much easier solution, but you will not be able to take on any dependencies.</p>
-<p>This means that you cannot use the [Route] attribute on your DTOs with this approach.  Instead, use one of the other ways to register services, such as <code>Routes.Add()</code> in your AppHost.Config.</p>
-<h3 id="the-serviceclient-implementation">The ServiceClient Implementation<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-serviceclient-implementation'" aria-label="Permalink"> </a></h3>
-<p>Here is the actual code that implements the ServiceClient.  If you've followed all of the above instructions, you should be able to use it easily in your application.  Simply change the namespace as you desire.</p>
-<pre><code class="language-csharp">using System;
-using System.Net;
-using System.Net.Browser;
-using System.Runtime.Serialization.Json;
-using System.Windows;
-using System.Windows.Browser;
-//using ServiceStack.Text;  // uncomment if using SS serializer instead of DCJS.
 
-namespace MySilverlightApp
+// @Route(&quot;/technology/search&quot;)
+#[Returns('QueryResponse')]
+/**
+ * @template QueryDb of Technology
+ * @template QueryDb1 of TechnologyView
+ */
+class FindTechnologies extends QueryDb implements IReturn, IGet, JsonSerializable
 {
-    public class ServiceClient&lt;TRequest, TResponse&gt;
-        where TRequest : class
-        where TResponse : class
-    {
-        private readonly string _baseUri;
-
-        public bool EnableCookies { get; set; }
-
-        public ServiceClient(string baseUri = &quot;/api&quot;)
-        {
-            // make sure the base uri is set appropriately
-            if (!baseUri.StartsWith(&quot;http&quot;, StringComparison.InvariantCultureIgnoreCase))
-            {
-                var source = Application.Current.Host.Source;
-                
-                string rootUri = string.Empty;
-                if (source.AbsoluteUri.Contains(&quot;ClientBin&quot;))
-                {
-                    int idx = source.AbsoluteUri.IndexOf(&quot;ClientBin&quot;);
-
-                    rootUri = source.AbsoluteUri.Substring(0, idx);
-                }
-                else
-                    rootUri = source.AbsoluteUri.Substring(0, source.AbsoluteUri.Length - source.AbsolutePath.Length);
-                if (!baseUri.StartsWith(&quot;/&quot;))
-                    baseUri = &quot;/&quot; + baseUri;
-                baseUri = rootUri + baseUri;
-            }
-            this._baseUri = baseUri;
-
-            // cookies are on by default
-            this.EnableCookies = true;
-        }
-
-        public void Send(string uri, string method, TRequest data = null)
-        {
-            // set up the web request
-            var webRequest = (HttpWebRequest)WebRequestCreator.ClientHttp.Create(new Uri(_baseUri + uri));
-            webRequest.Method = method;
-
-            // if cookies are enabled, pass them in from the browser
-            if (this.EnableCookies)
-            {
-                webRequest.CookieContainer = new CookieContainer();
-                webRequest.CookieContainer.SetCookies(new Uri(_baseUri), HtmlPage.Document.Cookies);
-            }
-
-            // set the accept header so our response is in json
-            webRequest.Accept = &quot;application/json&quot;;
-
-            // if we have data to stream, start streaming.  Otherwise we can get the response now.
-            if (data != null)
-                webRequest.BeginGetRequestStream(RequestCallback, new DataContainer(webRequest, data));
-            else
-                webRequest.BeginGetResponse(this.ResponseCallback, webRequest);
-        }
-
-        private void RequestCallback(IAsyncResult asyncResult)
-        {
-            try
-            {
-                // Get the web request stream
-                var container = (DataContainer)asyncResult.AsyncState;
-                var webRequest = container.WebRequest;
-                var stream = webRequest.EndGetRequestStream(asyncResult);
-
-                // set the content type to json
-                webRequest.ContentType = &quot;application/json&quot;;
-
-                // serialize the object to json and write it to the stream
-                var serializer = new DataContractJsonSerializer(typeof(TRequest));
-                serializer.WriteObject(stream, container.Data);
-                stream.Flush();
-                stream.Close();
-
-                // If you want to use ServiceStack's serializer, replace the previous code block with this one.
-                //using (var writer = new StreamWriter(stream))
-                //{
-                //    var serializer = new JsonSerializer&lt;TRequest&gt;();
-                //    serializer.SerializeToWriter(container.Data, writer);
-                //}
-
-
-                // now we can get the response
-                webRequest.BeginGetResponse(ResponseCallback, webRequest);
-            }
-            catch (Exception ex)
-            {
-                // Raise our own event for the error on the UI thread
-                var args = new ServiceClientEventArgs&lt;TResponse&gt;(ex);
-                Deployment.Current.Dispatcher.BeginInvoke(() =&gt; this.OnCompleted(args));
-            }
-
-        }
-
-        private void ResponseCallback(IAsyncResult asyncResult)
-        {
-            try
-            {
-                // Get the web response
-                var webRequest = (HttpWebRequest)asyncResult.AsyncState;
-                var webResponse = webRequest.EndGetResponse(asyncResult);
-
-                // Get the web response stream
-                var stream = webResponse.GetResponseStream();
-
-                // Deserialize the json data in the response stream
-                var serializer = new DataContractJsonSerializer(typeof(TResponse));
-                var response = (TResponse)serializer.ReadObject(stream);
-
-                // If you want to use ServiceStack's serializer, replace the previous code block with this one.
-                //TResponse response;
-                //using (var reader = new StreamReader(stream))
-                //{
-                //    var serializer = new JsonSerializer&lt;TResponse&gt;();
-                //    response = serializer.DeserializeFromReader(reader);
-                //}
-
-
-                // Switch to the UI thread
-                var args = new ServiceClientEventArgs&lt;TResponse&gt;(response);
-                Deployment.Current.Dispatcher.BeginInvoke(
-                    () =&gt;
-                    {
-                        // if cookies are enabled, pass them back to the browser
-                        if (this.EnableCookies &amp;&amp; webRequest.CookieContainer != null)
-                        {
-                            var cookieHeader = webRequest.CookieContainer.GetCookieHeader(new Uri(_baseUri));
-                            HtmlPage.Document.Cookies = cookieHeader;
-                        }
-
-                        //Raise our own event for the response
-                        this.OnCompleted(args);
-                    });
-            }
-            catch (Exception ex)
-            {
-                // Raise our own event for the error on the UI thread
-                var args = new ServiceClientEventArgs&lt;TResponse&gt;(ex);
-                Deployment.Current.Dispatcher.BeginInvoke(() =&gt; this.OnCompleted(args));
-            }
-        }
-
-        public void Get(string uri)
-        {
-            this.Send(uri, &quot;GET&quot;);
-        }
-
-        public void Post(string uri, TRequest data = null)
-        {
-            this.Send(uri, &quot;POST&quot;, data);
-        }
-
-        public void Put(string uri, TRequest data = null)
-        {
-            this.Send(uri, &quot;PUT&quot;, data);
-        }
-
-        public void Patch(string uri, TRequest data = null)
-        {
-            this.Send(uri, &quot;PATCH&quot;, data);
-        }
-
-        public void Delete(string uri, TRequest data = null)
-        {
-            this.Send(uri, &quot;DELETE&quot;, data);
-        }
-
-        public event EventHandler&lt;ServiceClientEventArgs&lt;TResponse&gt;&gt; Completed;
-
-        protected void OnCompleted(ServiceClientEventArgs&lt;TResponse&gt; e)
-        {
-            var handler = this.Completed;
-            if (handler != null)
-                handler(this, e);
-        }
-
-        private class DataContainer
-        {
-            public DataContainer(HttpWebRequest webRequest, TRequest data)
-            {
-                this.WebRequest = webRequest;
-                this.Data = data;
-            }
-
-            public HttpWebRequest WebRequest { get; private set; }
-            public TRequest Data { get; private set; }
-        }
+    public function __construct(
+        /** @var array&lt;int&gt;|null */
+        public ?array $ids=null,
+        /** @var string|null */
+        public ?string $name=null,
+        /** @var string|null */
+        public ?string $vendorName=null,
+        /** @var string|null */
+        public ?string $nameContains=null,
+        /** @var string|null */
+        public ?string $vendorNameContains=null,
+        /** @var string|null */
+        public ?string $descriptionContains=null
+    ) {
     }
 
-    public class ServiceClientEventArgs&lt;TResponse&gt; : EventArgs
-        where TResponse : class
+    /** @throws Exception */
+    public function fromMap($o): void {
+        parent::fromMap($o);
+        if (isset($o['ids'])) $this-&gt;ids = JsonConverters::fromArray('int', $o['ids']);
+        if (isset($o['name'])) $this-&gt;name = $o['name'];
+        if (isset($o['vendorName'])) $this-&gt;vendorName = $o['vendorName'];
+        if (isset($o['nameContains'])) $this-&gt;nameContains = $o['nameContains'];
+        if (isset($o['vendorNameContains'])) $this-&gt;vendorNameContains = $o['vendorNameContains'];
+        if (isset($o['descriptionContains'])) $this-&gt;descriptionContains = $o['descriptionContains'];
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
     {
-        private readonly TResponse _response;
-        private readonly Exception _error;
+        $o = parent::jsonSerialize();
+        if (isset($this-&gt;ids)) $o['ids'] = JsonConverters::toArray('int', $this-&gt;ids);
+        if (isset($this-&gt;name)) $o['name'] = $this-&gt;name;
+        if (isset($this-&gt;vendorName)) $o['vendorName'] = $this-&gt;vendorName;
+        if (isset($this-&gt;nameContains)) $o['nameContains'] = $this-&gt;nameContains;
+        if (isset($this-&gt;vendorNameContains)) $o['vendorNameContains'] = $this-&gt;vendorNameContains;
+        if (isset($this-&gt;descriptionContains)) $o['descriptionContains'] = $this-&gt;descriptionContains;
+        return empty($o) ? new class(){} : $o;
+    }
+    public function getTypeName(): string { return 'FindTechnologies'; }
+    public function getMethod(): string { return 'GET'; }
+    public function createResponse(): mixed { return QueryResponse::create(genericArgs:['TechnologyView']); }
+}
 
-        public ServiceClientEventArgs(TResponse response)
-        {
-            this._response = response;
-        }
+// @Route(&quot;/orgs/{Id}&quot;, &quot;DELETE&quot;)
+class DeleteOrganization implements IReturnVoid, IDelete, JsonSerializable
+{
+    public function __construct(
+        /** @var int */
+        public int $id=0
+    ) {
+    }
 
-        public ServiceClientEventArgs(Exception error)
-        {
-            this._error = error;
-        }
+    /** @throws Exception */
+    public function fromMap($o): void {
+        if (isset($o['id'])) $this-&gt;id = $o['id'];
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
+    {
+        $o = [];
+        if (isset($this-&gt;id)) $o['id'] = $this-&gt;id;
+        return empty($o) ? new class(){} : $o;
+    }
+    public function getTypeName(): string { return 'DeleteOrganization'; }
+    public function getMethod(): string { return 'DELETE'; }
+    public function createResponse(): void {}
+}
+</code></pre>
+<p>The smart PHP <code>JsonServiceClient</code> available in the <a href="https://packagist.org/packages/servicestack/client">servicestack/client</a>
+packagist package enables the same productive, typed API development experience available in our other 1st-class supported
+client platforms.</p>
+<p>Using promoted constructors enables DTOs to be populated using a single constructor expression utilizing named parameters
+which together with the generic <code>JsonServiceClient</code> enables end-to-end typed API Requests in a single LOC:</p>
+<pre><code class="language-php">use Servicestack\JsonServiceClient;
+use dtos\Hello;
 
-        public TResponse Response
-        {
-            get { return this._response; }
-        }
+$client = new JsonServiceClient(&quot;https://test.servicestack.net&quot;);
 
-        public Exception Error
-        {
-            get { return this._error; }
-        }
+/** @var HelloResponse $response */
+$response = client-&gt;get(new Hello(name:&quot;World&quot;));
+</code></pre>
+<blockquote>
+<p>The <code>HelloResponse</code> optional type hint doesn't change runtime behavior but enables static analysis tools and IDEs like PyCharm to provide rich intelli-sense and development time feedback.</p>
+</blockquote>
+<h2 id="installation">Installation<a class="header-anchor" href="javascript:;" onclick="location.hash='#installation'" aria-label="Permalink"> </a></h2>
+<p>Ensure you have <a href="https://www.php.net/manual/en/install.php">PHP</a> and <a href="https://getcomposer.org/doc/00-intro.md">Composer</a> installed.</p>
+<p>The only requirements for PHP apps to perform typed API Requests are the generated PHP DTOs and the generic <code>JsonServiceClient</code>
+which can be installed in Composer projects with:</p>
+<pre><code class="language-bash">$ composer require servicestack/client
+</code></pre>
+<p>Or by adding the package to your <code>composer.json</code> then installing the dependencies:</p>
+<pre><code class="language-json">{
+  &quot;require&quot;: {
+    &quot;servicestack/client&quot;: &quot;^1.0&quot;
+  }
+}
+</code></pre>
+<h3 id="phpstorm-servicestack-plugin">PhpStorm ServiceStack Plugin<a class="header-anchor" href="javascript:;" onclick="location.hash='#phpstorm-servicestack-plugin'" aria-label="Permalink"> </a></h3>
+<p>PHP developers of <a href="https://www.jetbrains.com/phpstorm/">PhpStorm</a> can get a simplified development experience for consuming
+ServiceStack Services by installing the <a href="https://plugins.jetbrains.com/plugin/7749-servicestack">ServiceStack Plugin</a> from the JetBrains Marketplace:</p>
+<p><a href="https://plugins.jetbrains.com/plugin/7749-servicestack"><img src="/img/pages/servicestack-reference/pycharm-servicestack-plugin.png" alt="" /></a></p>
+<p>Where you'll be able to right-click on a directory and click on <strong>ServiceStack Reference</strong> on the context menu:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-add-servicestack-reference.png" alt="" /></p>
+<p>To launch the <strong>Add PHP ServiceStack Reference</strong> dialog where you can enter the remote URL of the ServiceStack endpoint you wish to call to generate the Typed PHP DTOs for all APIs which by default will saved to <code>dtos.php</code>:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-add-servicestack-reference-dialog.png" alt="" /></p>
+<p>Then just import the DTOs and <code>JsonServiceClient</code> to be able to consume any of the remote ServiceStack APIs:</p>
+<pre><code class="language-php">&lt;?php
+
+require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer autoload
+require_once 'dtos.php';
+
+use dtos\FindTechnologies;
+use Servicestack\JsonServiceClient;
+
+$client = JsonServiceClient::create(&quot;https://techstacks.io&quot;);
+
+$response = $client-&gt;send(new FindTechnologies(
+    ids: [1,2,4,6],
+    vendorName: &quot;Google&quot;));
+
+print_r($response);
+</code></pre>
+<p>If any of the the remote APIs change their DTOs can be updated by right-clicking on <code>dtos.php</code> and clicking <strong>Update ServiceStack Reference</strong>:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-update-servicestack-reference.png" alt="" /></p>
+<h3 id="simple-command-line-utility-for-php">Simple command-line utility for PHP<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-command-line-utility-for-php'" aria-label="Permalink"> </a></h3>
+<p>Developers using other PHP IDEs and Text Editors like VS Code can utilize the cross-platform <a href="/dotnet-tool"><code>x</code> command line utility</a> for generating PHP DTOs from the command-line.</p>
+<p>To install first install the <a href="https://dotnet.microsoft.com/download">latest .NET SDK</a> for your OS then install the <a href="/dotnet-tool"><code>x</code> dotnet tool</a> with:</p>
+<pre><code class="language-bash">$ dotnet tool install --global x 
+</code></pre>
+<h3 id="adding-a-servicestack-reference">Adding a ServiceStack Reference<a class="header-anchor" href="javascript:;" onclick="location.hash='#adding-a-servicestack-reference'" aria-label="Permalink"> </a></h3>
+<p>To Add a PHP ServiceStack Reference just call <code>x php</code> with the URL of a remote ServiceStack instance:</p>
+<pre><code class="language-bash">$ x php https://techstacks.io
+</code></pre>
+<p>Result:</p>
+<pre><code>Saved to: dtos.php
+</code></pre>
+<p>Calling <code>x php</code> with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:</p>
+<pre><code>$ x php https://techstacks.io Tech
+</code></pre>
+<p>Result:</p>
+<pre><code>Saved to: Tech.dtos.php
+</code></pre>
+<h3 id="updating-a-servicestack-reference">Updating a ServiceStack Reference<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-a-servicestack-reference'" aria-label="Permalink"> </a></h3>
+<p>To Update an existing ServiceStack Reference, call <code>x php</code> with the Filename:</p>
+<pre><code>$ x php dtos.php
+</code></pre>
+<p>Result:</p>
+<pre><code>Updated: dtos.php
+</code></pre>
+<p>Which will update the File with the latest PHP Server DTOs from <a href="https://techstacks.io">techstacks.io</a>.
+You can also customize how DTOs are generated by uncommenting the <a href="/#dto-customization-options">PHP DTO Customization Options</a> and updating them again.</p>
+<h3 id="updating-all-php-dtos">Updating all PHP DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#updating-all-php-dtos'" aria-label="Permalink"> </a></h3>
+<p>Calling <code>x php</code> without any arguments will update all PHP DTOs in the current directory:</p>
+<pre><code class="language-bash">$ x php
+</code></pre>
+<p>Result:</p>
+<pre><code>Updated: Tech.dtos.php
+Updated: dtos.php
+</code></pre>
+<h3 id="smart-generic-jsonserviceclient">Smart Generic JsonServiceClient<a class="header-anchor" href="javascript:;" onclick="location.hash='#smart-generic-jsonserviceclient'" aria-label="Permalink"> </a></h3>
+<p>The generic <code>JsonServiceClient</code> is a 1st class client with the same rich feature-set of the smart ServiceClients in other
+<a href="/add-servicestack-reference#supported-languages">1st class supported languages</a> sporting a terse,
+typed flexible API with support for additional untyped params, custom URLs and HTTP Methods, dynamic response types including
+consuming API responses in raw text and binary data formats. Clients can be decorated to support generic functionality
+using instance and static Request, Response and Exception Filters.</p>
+<p>It includes built-in support for a number of <a href="/authentication-and-authorization">ServiceStack Auth options</a>
+including <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Auth</a> and stateless Bearer Token Auth Providers like
+<a href="/api-key-authprovider">API Key</a> and <a href="/jwt-authprovider">JWT Auth</a> as well as
+<a href="/sessions">stateful Sessions</a> used by the popular <strong>credentials</strong> Auth Provider and an
+<code>onAuthenticationRequired</code> callback for enabling custom authentication methods.</p>
+<p>The built-in auth options include auto-retry support for transparently authenticating and retrying authentication required
+requests as well as <a href="/jwt-authprovider#refresh-token-cookies-supported-in-all-service-clients">Refresh Token Cookie</a>
+support where it will transparently fetch new JWT Bearer Tokens automatically behind-the-scenes for friction-less stateless JWT support.</p>
+<p>A snapshot of these above features is captured in the high-level public API below:</p>
+<pre><code class="language-php">class JsonServiceClient
+{
+    public static ?RequestFilter $globalRequestFilter;
+    public ?RequestFilter $requestFilter;
+    public static ?ResponseFilter $globalResponseFilter;
+    public ?ResponseFilter $responseFilter;
+    public static ?ExceptionFilter $globalExceptionFilter;
+    public ?ExceptionFilter $exceptionFilter;
+    public ?Callback $onAuthenticationRequired;
+
+    public string $baseUrl;
+    public string $replyBaseUrl;
+    public string $oneWayBaseUrl;
+    public ?string $userName;
+    public ?string $password;
+    public ?string $bearerToken;
+    public ?string $refreshToken;
+    public ?string $refreshTokenUri;
+    public bool $useTokenCookie;
+    public array $headers = [];
+    public array $cookies = [];
+
+    public function __construct(string $baseUrl);
+
+    public function setCredentials(?string $userName = null, ?string $password = null) : void;
+    public function getTokenCookie();
+    public function getRefreshTokenCookie();
+
+    public function get(IReturn|IReturnVoid|string $request, ?array $args = null): mixed;
+    public function post(IReturn|IReturnVoid|string $request, mixed $body = null, ?array $args = null): mixed;
+    public function put(IReturn|IReturnVoid|string $request, mixed $body = null, ?array $args = null): mixed;
+    public function patch(IReturn|IReturnVoid|string $request, mixed $body = null, ?array $args = null): mixed;
+    public function delete(IReturn|IReturnVoid|string $request, ?array $args = null): mixed;
+    public function options(IReturn|IReturnVoid|string $request, ?array $args = null): mixed;
+    public function head(IReturn|IReturnVoid|string $request, ?array $args = null): mixed;
+    public function send(IReturn|IReturnVoid|null $request, ?string $method = null, mixed $body = null, 
+        ?array $args = null): mixed;
+
+    public function getUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
+    public function postUrl(string $path, mixed $responseAs = null, mixed $body = null, ?array $args = null): mixed;
+    public function putUrl(string $path, mixed $responseAs = null, mixed $body = null, ?array $args = null): mixed;
+    public function patchUrl(string $path, mixed $responseAs = null, mixed $body = null, ?array $args = null): mixed;
+    public function deleteUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
+    public function optionsUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
+    public function headUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
+    public function sendUrl(string $path, ?string $method = null, mixed $responseAs = null, mixed $body = null, 
+        mixed $args = null): mixed
+
+    public function sendAll(array $requestDtos): mixed;       # Auto Batch Reply Requests
+    public function sendAllOneWay(array $requestDtos): void;  # Auto Batch Oneway Requests
+</code></pre>
+<h3 id="change-default-server-configuration">Change Default Server Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#change-default-server-configuration'" aria-label="Permalink"> </a></h3>
+<p>The above defaults are also overridable on the ServiceStack Server by modifying the default config on the <code>NativeTypesFeature</code> Plugin, e.g:</p>
+<pre><code class="language-csharp">var nativeTypes = this.GetPlugin&lt;NativeTypesFeature&gt;();
+nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
+...
+</code></pre>
+<p>PHP specific functionality can be added by <code>PhpGenerator</code></p>
+<pre><code class="language-csharp">PhpGenerator.ServiceStackImports.Add(&quot;MyNamespace\\Type&quot;);
+</code></pre>
+<h3 id="customize-dto-type-generation">Customize DTO Type generation<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-dto-type-generation'" aria-label="Permalink"> </a></h3>
+<p>Additional PHP specific customization can be statically configured like <code>PreTypeFilter</code>, <code>InnerTypeFilter</code> &amp; <code>PostTypeFilter</code>
+(available in all languages) can be used to inject custom code in the generated DTOs output.</p>
+<p>Use the <code>PreTypeFilter</code> to generate source code before and after a Type definition, e.g. this will append a custom <code>MyAnnotation</code>
+annotation on non enum &amp; interface types:</p>
+<pre><code class="language-csharp">PhpGenerator.PreTypeFilter = (sb, type) =&gt; {
+    if (!type.IsEnum.GetValueOrDefault() &amp;&amp; !type.IsInterface.GetValueOrDefault())
+    {
+        sb.AppendLine(&quot;#[MyAnnotation]&quot;);
+    }
+};
+</code></pre>
+<p>The <code>InnerTypeFilter</code> gets invoked just after the Type Definition which can be used to generate common members for all Types and interfaces, e.g:</p>
+<pre><code class="language-csharp">PhpGenerator.InnerTypeFilter = (sb, type) =&gt; {
+    sb.AppendLine(&quot;public ?int $id;&quot;);
+    sb.AppendLine(&quot;public function getId(): int { return $this-&gt;id ?? ($this-&gt;id=rand()); }&quot;);
+};
+</code></pre>
+<p>There's also <code>PrePropertyFilter</code> &amp; <code>PostPropertyFilter</code> for generating source before and after properties, e.g:</p>
+<pre><code class="language-csharp">PhpGenerator.PrePropertyFilter = (sb , prop, type) =&gt; {
+    if (prop.Name == &quot;Id&quot;)
+    {
+        sb.AppendLine(&quot;#[IsInt]&quot;);
+    }
+};
+</code></pre>
+<h3 id="emit-custom-code">Emit custom code<a class="header-anchor" href="javascript:;" onclick="location.hash='#emit-custom-code'" aria-label="Permalink"> </a></h3>
+<p>To enable greater flexibility when generating complex Typed DTOs, you can use <code>[Emit{Language}]</code> attributes to generate code before each type or property.</p>
+<p>These attributes can be used to generate different attributes or annotations to enable client validation for different validation libraries in different languages, e.g:</p>
+<pre><code class="language-csharp">[EmitCode(Lang.Php, &quot;// App User&quot;)]
+[EmitPhp(&quot;#[Validate]&quot;)]
+public class User : IReturn&lt;User&gt;
+{
+    [EmitPhp(&quot;#[IsNotEmpty]&quot;, &quot;#[IsEmail]&quot;)]
+    [EmitCode(Lang.Swift | Lang.Dart, new[]{ &quot;@isNotEmpty()&quot;, &quot;@isEmail()&quot; })]
+    public string Email { get; set; }
+}
+</code></pre>
+<p>Which will generate <code>[EmitPhp]</code> code in PHP DTOs:</p>
+<pre><code class="language-php">// App User
+#[Validate]
+class User implements JsonSerializable 
+{
+    public function __construct(
+        #[IsNotEmpty]
+        #[IsEmail]
+        /** @var string|null */
+        public ?string email=null
+    ) {
+    }
+    //...
+}
+</code></pre>
+<p>Whilst the generic <code>[EmitCode]</code> attribute lets you emit the same code in multiple languages with the same syntax.</p>
+<h3 id="php-reference-example">PHP Reference Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#php-reference-example'" aria-label="Permalink"> </a></h3>
+<p>Lets walk through a simple example to see how we can use ServiceStack's PHP DTO annotations in our PHP <code>JsonServiceClient</code>.</p>
+<p>Firstly we'll need to add a PHP Reference to the remote ServiceStack Service by <strong>right-clicking</strong> on a project folder and clicking on <code>ServiceStack Reference...</code> (as seen in the above screenshot).</p>
+<p>This will import the remote Services dtos into your local project which looks similar to:</p>
+<pre><code class="language-php">&lt;?php namespace dtos;
+/* Options:
+Date: 2023-10-14 08:05:09
+Version: 6.111
+Tip: To override a DTO option, remove &quot;//&quot; prefix before updating
+BaseUrl: https://techstacks.io
+
+//GlobalNamespace: dtos
+//MakePropertiesOptional: False
+//AddServiceStackTypes: True
+//AddResponseStatus: False
+//AddImplicitVersion: 
+//AddDescriptionAsComments: True
+//IncludeTypes: 
+//ExcludeTypes: 
+//DefaultImports: 
+*/
+
+// @Route(&quot;/technology/{Slug}&quot;)
+#[Returns('GetTechnologyResponse')]
+class GetTechnology implements IReturn, IRegisterStats, IGet, JsonSerializable
+{
+    public function __construct(
+        /** @var string|null */
+        public ?string $slug=null
+    ) {
+    }
+
+    /** @throws Exception */
+    public function fromMap($o): void {
+        if (isset($o['slug'])) $this-&gt;slug = $o['slug'];
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
+    {
+        $o = [];
+        if (isset($this-&gt;slug)) $o['slug'] = $this-&gt;slug;
+        return empty($o) ? new class(){} : $o;
+    }
+    public function getTypeName(): string { return 'GetTechnology'; }
+    public function getMethod(): string { return 'GET'; }
+    public function createResponse(): mixed { return new GetTechnologyResponse(); }
+}
+
+class GetTechnologyResponse implements JsonSerializable
+{
+    public function __construct(
+        /** @var DateTime */
+        public DateTime $created=new DateTime(),
+        /** @var Technology|null */
+        public ?Technology $technology=null,
+        /** @var array&lt;TechnologyStack&gt;|null */
+        public ?array $technologyStacks=null,
+        /** @var ResponseStatus|null */
+        public ?ResponseStatus $responseStatus=null
+    ) {
+    }
+
+    /** @throws Exception */
+    public function fromMap($o): void {
+        if (isset($o['created'])) $this-&gt;created = JsonConverters::from('DateTime', $o['created']);
+        if (isset($o['technology'])) $this-&gt;technology = JsonConverters::from('Technology', $o['technology']);
+        if (isset($o['technologyStacks'])) $this-&gt;technologyStacks = JsonConverters::fromArray('TechnologyStack', $o['technologyStacks']);
+        if (isset($o['responseStatus'])) $this-&gt;responseStatus = JsonConverters::from('ResponseStatus', $o['responseStatus']);
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
+    {
+        $o = [];
+        if (isset($this-&gt;created)) $o['created'] = JsonConverters::to('DateTime', $this-&gt;created);
+        if (isset($this-&gt;technology)) $o['technology'] = JsonConverters::to('Technology', $this-&gt;technology);
+        if (isset($this-&gt;technologyStacks)) $o['technologyStacks'] = JsonConverters::toArray('TechnologyStack', $this-&gt;technologyStacks);
+        if (isset($this-&gt;responseStatus)) $o['responseStatus'] = JsonConverters::to('ResponseStatus', $this-&gt;responseStatus);
+        return empty($o) ? new class(){} : $o;
     }
 }
 </code></pre>
-<h1 id="community-resources">Community Resources<a class="header-anchor" href="javascript:;" onclick="location.hash='#community-resources'" aria-label="Permalink"> </a></h1>
-<ul>
-<li><a href="http://skov-boisen.dk/?p=214">Silverlight, GZip and ServiceStack</a> by <a href="https://twitter.com/ssboisen">@ssboisen</a></li>
-</ul>
+<p>By default the generated PHP DTOs use the default <code>dtos</code> namespace which you can reference as individual classes:</p>
+<pre><code class="language-php">use dtos\GetTechnology;
+use dtos\GetTechnologyResponse;
+</code></pre>
+<p>Or combined within a single line with:</p>
+<pre><code class="language-php">use dtos\{GetTechnology,GetTechnologyResponse};
+
+$request = new GetTechnology();
+</code></pre>
+<h3 id="making-typed-api-requests">Making Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-typed-api-requests'" aria-label="Permalink"> </a></h3>
+<p>Making API Requests in PHP is the same as all other <a href="/clients-overview">ServiceStack's Service Clients</a>
+by sending a populated Request DTO using a <code>JsonServiceClient</code> which returns typed Response DTO.</p>
+<p>So the only things we need to make any API Request is the <code>JsonServiceClient</code> from the <code>servicestack/client</code> package and any
+DTO's we're using from generated PHP ServiceStack Reference, e.g:</p>
+<pre><code class="language-php">&lt;?php
+
+require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer autoload
+require_once 'dtos.php';
+
+use dtos\GetTechnology;
+use dtos\GetTechnologyResponse;
+use Servicestack\JsonServiceClient;
+
+$client = JsonServiceClient::create(&quot;https://techstacks.io&quot;);
+
+/** @var GetTechnologyResponse $response */
+$response = $client-&gt;get(new GetTechnology(slug:&quot;ServiceStack&quot;));
+
+$tech = $response-&gt;technology; // typed to Technology
+
+echo &quot;$tech-&gt;name by $tech-&gt;vendorName from $tech-&gt;productUrl\n&quot;;
+echo &quot;$tech-&gt;name TechStacks:\n&quot;;
+print_r($response-&gt;technologyStacks);
+</code></pre>
+<h3 id="phpdoc-typed-annotations">PHPDoc Typed Annotations<a class="header-anchor" href="javascript:;" onclick="location.hash='#phpdoc-typed-annotations'" aria-label="Permalink"> </a></h3>
+<p>Whilst PHP is a dynamic language with limited support for static typing and generics included in the PHP language itself,
+you can get many of the static type and intelli-sense benefits of a typed language by using
+<a href="https://phpstan.org/writing-php-code/phpdoc-types">PHPDoc type hints</a> to annotate the APIs Typed Responses which lights
+up static analysis and intelli-sense benefits in smart IDEs like PhpStorm:</p>
+<pre><code class="language-php">/** @var GetTechnologyResponse $response */
+$response = $client-&gt;get(new GetTechnology(slug:&quot;ServiceStack&quot;));
+echo $response-&gt;technology-&gt;name . PHP_EOL; //intelli-sense
+
+/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;get(new FindTechnologies(ids:[2,4,8]));
+
+/** @var TechnologyView[] $results */
+$results = $response-&gt;results;
+echo $results[0]-&gt;name . PHP_EOL; //intelli-sense
+</code></pre>
+<h3 id="constructors-initializer">Constructors Initializer<a class="header-anchor" href="javascript:;" onclick="location.hash='#constructors-initializer'" aria-label="Permalink"> </a></h3>
+<p>All PHP Reference DTOs also implements promoted constructors making them much nicer to populate using a
+constructor expression with named params syntax we're used to in C#, so instead of:</p>
+<pre><code class="language-php">$request = new Authenticate();
+$request-&gt;provider = &quot;credentials&quot;;
+$request-&gt;userName = $userName;
+$request-&gt;password = $password;
+$request-&gt;rememberMe = true;
+$response = $client-&gt;post($request);
+</code></pre>
+<p>You can populate DTOs with a single constructor expression without any loss of PHP's Typing benefits:</p>
+<pre><code class="language-php">$response = $client-&gt;post(new Authenticate(
+    provider: &quot;credentials&quot;,
+    userName: &quot;test&quot;,
+    password: &quot;test&quot;,
+    rememberMe: true));
+</code></pre>
+<h3 id="sending-additional-arguments-with-typed-api-requests">Sending additional arguments with Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-additional-arguments-with-typed-api-requests'" aria-label="Permalink"> </a></h3>
+<p>Many AutoQuery Services utilize <a href="/autoquery-rdbms#implicit-conventions">implicit conventions</a>
+to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments
+with the typed Request DTO, e.g:</p>
+<pre><code class="language-php">/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;get(new FindTechnologies(), args:[&quot;vendorName&quot; =&gt; &quot;ServiceStack&quot;]);
+</code></pre>
+<h3 id="making-api-requests-with-urls">Making API Requests with URLs<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-api-requests-with-urls'" aria-label="Permalink"> </a></h3>
+<p>In addition to making Typed API Requests you can also call Services using relative or absolute urls, e.g:</p>
+<pre><code class="language-php">$client-&gt;getUrl(&quot;/technology/ServiceStack&quot;, responseAs:new GetTechnologyResponse());
+
+$client-&gt;getUrl(&quot;https://techstacks.io/technology/ServiceStack&quot;, 
+    responseAs:new GetTechnologyResponse());
+
+// https://techstacks.io/technology?Slug=ServiceStack
+$args = [&quot;slug&quot; =&gt; &quot;ServiceStack&quot;]
+client.getUrl(&quot;/technology&quot;, args:$args, responseAs:new GetTechnologyResponse()); 
+</code></pre>
+<p>as well as POST Request DTOs to custom urls:</p>
+<pre><code class="language-php">$client-&gt;postUrl(&quot;/custom-path&quot;, $request, args:[&quot;slug&quot; =&gt; &quot;ServiceStack&quot;]);
+
+$client-&gt;postUrl(&quot;http://example.org/custom-path&quot;, $request);
+</code></pre>
+<h3 id="raw-data-responses">Raw Data Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-data-responses'" aria-label="Permalink"> </a></h3>
+<p>The <code>JsonServiceClient</code> also supports Raw Data responses like <code>string</code> and <code>byte[]</code> which also get a Typed API once
+declared on Request DTOs using the <code>IReturn&lt;T&gt;</code> marker:</p>
+<pre><code class="language-csharp">public class ReturnString : IReturn&lt;string&gt; {}
+public class ReturnBytes : IReturn&lt;byte[]&gt; {}
+</code></pre>
+<p>Which can then be accessed as normal, with their Response typed to a PHP <code>string</code> or <code>ByteArray</code> for raw <code>byte[]</code> responses:</p>
+<pre><code class="language-php">/** @var string $str */ 
+$str = client.get(new ReturnString());
+
+/** @var ByteArray $data */ 
+$data = client-&gt;get(new ReturnBytes());
+</code></pre>
+<h3 id="authenticating-using-basic-auth">Authenticating using Basic Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-basic-auth'" aria-label="Permalink"> </a></h3>
+<p>Basic Auth support is implemented in <code>JsonServiceClient</code> and follows the same API made available in the C# Service Clients where the <code>userName/password</code> properties can be set individually, e.g:</p>
+<pre><code class="language-php">$client = new JsonServiceClient($baseUrl);
+$client-&gt;username = user;
+$client-&gt;password = pass;
+
+$response = client-&gt;get(new SecureRequest());
+</code></pre>
+<p>Or use <code>$client-&gt;setCredentials()</code> to have them set both together.</p>
+<h3 id="authenticating-using-credentials">Authenticating using Credentials<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-credentials'" aria-label="Permalink"> </a></h3>
+<p>Alternatively you can authenticate using userName/password credentials by
+<a href="#add-php-reference">adding a PHP Reference</a>
+to your remote ServiceStack Instance and sending a populated <code>Authenticate</code> Request DTO, e.g:</p>
+<pre><code class="language-php">$request = new Authenticate();
+$request-&gt;provider = &quot;credentials&quot;;
+$request-&gt;userName = $userName;
+$request-&gt;password = $password;
+$request-&gt;remember_me = true;
+
+$response = client-&gt;post(request);
+</code></pre>
+<p>This will populate the <code>JsonServiceClient</code> with <a href="/sessions#cookie-session-ids">Session Cookies</a>
+which will transparently be sent on subsequent requests to make authenticated requests.</p>
+<h3 id="authenticating-using-jwt">Authenticating using JWT<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-jwt'" aria-label="Permalink"> </a></h3>
+<p>Use the <code>bearerToken</code> property to Authenticate with a <a href="/jwt-authprovider">ServiceStack JWT Provider</a>
+using a JWT Token:</p>
+<pre><code class="language-php">$client-&gt;bearerToken = $jwt;
+</code></pre>
+<p>Alternatively you can use just a <a href="/jwt-authprovider#refresh-tokens">Refresh Token</a> instead:</p>
+<pre><code class="language-php">$client-&gt;refreshYoken = $refreshToken;
+</code></pre>
+<p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.</p>
+<h3 id="authenticating-using-an-api-key">Authenticating using an API Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-an-api-key'" aria-label="Permalink"> </a></h3>
+<p>Use the <code>bearerToken</code> property to Authenticate with an <a href="/api-key-authprovider">API Key</a>:</p>
+<pre><code class="language-php">$client-&gt;bearerToken = $apiKey;
+</code></pre>
+<h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink"> </a></h3>
+<p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the
+configured Bearer Token or API Key used had expired or was invalidated, you can use <code>onAuthenticationRequired</code>
+callback to re-configure the client before automatically retrying the original request, e.g:</p>
+<pre><code class="language-php">$client = new JsonServiceClient(BASE_URL);
+$authClient = new JsonServiceClient(AUTH_URL);
+
+$client-&gt;onAuthenticationRequired = new class($client, $authClient) implements Callback {
+    public function __construct(public JsonServiceClient $client, public JsonServiceClient $authClient) {}
+    public function call(): void {
+        $this-&gt;authClient-&gt;setCredentials(&quot;test&quot;, &quot;test&quot;);
+        $this-&gt;client-&gt;bearerToken = $this-&gt;authClient-&gt;get(new Authenticate())-&gt;getRefreshTokenCookie();
+    }
+};
+
+// Automatically retries requests returning 401 Responses with new bearerToken
+$response = client-&gt;get(new Secured());
+</code></pre>
+<h3 id="automatically-refresh-access-tokens">Automatically refresh Access Tokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-refresh-access-tokens'" aria-label="Permalink"> </a></h3>
+<p>With the <a href="/jwt-authprovider#refresh-tokens">Refresh Token support in JWT</a>
+you can use the <code>refresh_token</code> property to instruct the Service Client to automatically fetch new JWT Tokens behind
+the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:</p>
+<pre><code class="language-php">// Authenticate to get new Refresh Token
+$authClient = new JsonServiceClient(AUTH_URL);
+$authClient.userName = $userName;
+$authClient.password = $password;
+$authResponse = $authClient-&gt;get(new Authenticate());
+
+// Configure client with RefreshToken
+$client-&gt;refreshToken = $authResponse-&gt;refreshToken;
+
+// Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
+$response = client-&gt;get(new Secured());
+</code></pre>
+<p>Use the <code>refreshTokenUri</code> property when refresh tokens need to be sent to a different ServiceStack Server, e.g:</p>
+<pre><code class="language-php">$client-&gt;refreshToken = $refreshToken;
+$client-&gt;refreshTokenUri = AUTH_URL . &quot;/access-token&quot;;
+</code></pre>
+<h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink"> </a></h2>
+<p>In most cases you'll just use the generated PHP DTO's as-is, however you can further customize how the DTO's are generated
+by overriding the default options.</p>
+<p>The header in the generated DTO's show the different options PHP native types support with their defaults.
+Default values are shown with the comment prefix of <code>//</code>. To override a value, remove the <code>//</code> and specify the value to
+the right of the <code>:</code>. Any uncommented value will be sent to the server to override any server defaults.</p>
+<p>The DTO comments allows for customizations for how DTOs are generated. The default options that were used to generate the
+DTO's are repeated in the header comments of the generated DTOs, options that are preceded by a PHP comment <code>//</code> are defaults
+from the server, any uncommented value will be sent to the server to override any server defaults.</p>
+<pre><code class="language-php">&lt;?php namespace dtos;
+/* Options:
+Date: 2023-10-14 08:05:09
+Version: 6.111
+Tip: To override a DTO option, remove &quot;//&quot; prefix before updating
+BaseUrl: https://techstacks.io
+
+//GlobalNamespace: dtos
+//MakePropertiesOptional: False
+//AddServiceStackTypes: True
+//AddResponseStatus: False
+//AddImplicitVersion: 
+//AddDescriptionAsComments: True
+//IncludeTypes: 
+//ExcludeTypes: 
+//DefaultImports: 
+*/
+</code></pre>
+<p>We'll go through and cover each of the above options to see how they affect the generated DTO's:</p>
+<h3 id="change-default-server-configuration-1">Change Default Server Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#change-default-server-configuration-1'" aria-label="Permalink"> </a></h3>
+<p>The above defaults are also overridable on the ServiceStack Server by modifying the default config on the
+<code>NativeTypesFeature</code> Plugin, e.g:</p>
+<pre><code class="language-csharp">//Server example in C#
+var nativeTypes = this.GetPlugin&lt;NativeTypesFeature&gt;();
+nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
+...
+</code></pre>
+<p>We'll go through and cover each of the above options to see how they affect the generated DTO's:</p>
+<h3 id="globalnamespace">GlobalNamespace<a class="header-anchor" href="javascript:;" onclick="location.hash='#globalnamespace'" aria-label="Permalink"> </a></h3>
+<p>This lets you specify which namespace you want the DTOs to be generated in:</p>
+<pre><code class="language-php">&lt;?php namespace dtos;
+</code></pre>
+<h3 id="addresponsestatus">AddResponseStatus<a class="header-anchor" href="javascript:;" onclick="location.hash='#addresponsestatus'" aria-label="Permalink"> </a></h3>
+<p>Automatically add a <code>$responseStatus</code> property on all Response DTOs, regardless if it wasn't already defined:</p>
+<pre><code class="language-php">class GetTechnologyResponse implements JsonSerializable
+{
+    ...
+    /** @var ResponseStatus|null */
+    public ?ResponseStatus $responseStatus=null
+}
+</code></pre>
+<h3 id="addimplicitversion">AddImplicitVersion<a class="header-anchor" href="javascript:;" onclick="location.hash='#addimplicitversion'" aria-label="Permalink"> </a></h3>
+<p>Lets you specify the Version number to be automatically populated in all Request DTOs sent from the client:</p>
+<pre><code class="language-php">class GetTechnology implements IReturn, IRegisterStats, IGet, JsonSerializable
+{
+    public int $version = 1;
+    ...
+}
+</code></pre>
+<p>This lets you know what Version of the Service Contract that existing clients are using making it easy to
+implement ServiceStack's <a href="http://stackoverflow.com/a/12413091/85785">recommended versioning strategy</a>.</p>
+<h3 id="includetypes">IncludeTypes<a class="header-anchor" href="javascript:;" onclick="location.hash='#includetypes'" aria-label="Permalink"> </a></h3>
+<p>Is used as a Whitelist to specify only the types you would like to have code-generated:</p>
+<pre><code>/* Options:
+IncludeTypes: GetTechnology,GetTechnologyResponse
+</code></pre>
+<p>Will only generate <code>GetTechnology</code> and <code>GetTechnologyResponse</code> DTOs:</p>
+<pre><code class="language-php">class GetTechnology implements IReturn, IRegisterStats, IGet, JsonSerializable
+
+// ...
+class GetTechnologyResponse implements JsonSerializable
+// ...
+</code></pre>
+<h4 id="include-generic-types">Include Generic Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#include-generic-types'" aria-label="Permalink"> </a></h4>
+<p>Use .NET's Type Name to include Generic Types, i.e. the Type name separated by the backtick followed by the number of
+generic arguments, e.g:</p>
+<pre><code>IncludeTypes: IReturn`1,MyPair`2
+</code></pre>
+<h4 id="include-request-dto-and-its-dependent-types">Include Request DTO and its dependent types<a class="header-anchor" href="javascript:;" onclick="location.hash='#include-request-dto-and-its-dependent-types'" aria-label="Permalink"> </a></h4>
+<p>You can include a Request DTO and all its dependent types with a <code>.*</code> suffix on the Request DTO, e.g:</p>
+<pre><code>/* Options:
+IncludeTypes: GetTechnology.*
+</code></pre>
+<p>Which will include the <code>GetTechnology</code> Request DTO, the <code>GetTechnologyResponse</code> Response DTO and all Types that they both reference.</p>
+<h4 id="include-all-types-within-a-c-namespace">Include All Types within a C# namespace<a class="header-anchor" href="javascript:;" onclick="location.hash='#include-all-types-within-a-c-namespace'" aria-label="Permalink"> </a></h4>
+<p>If your DTOs are grouped into different namespaces they can be all included using the <code>/*</code> suffix, e.g:</p>
+<pre><code>/* Options:
+IncludeTypes: MyApp.ServiceModel.Admin/*
+</code></pre>
+<p>This will include all DTOs within the <code>MyApp.ServiceModel.Admin</code> C# namespace.</p>
+<h4 id="include-all-services-in-a-tag-group">Include All Services in a Tag Group<a class="header-anchor" href="javascript:;" onclick="location.hash='#include-all-services-in-a-tag-group'" aria-label="Permalink"> </a></h4>
+<p>Services <a href="/api-design#group-services-by-tag">grouped by Tag</a> can be used in the <code>IncludeTypes</code>
+where tags can be specified using braces in the format <code>{tag}</code> or <code>{tag1,tag2,tag3}</code>, e.g:</p>
+<pre><code>/* Options:
+IncludeTypes: {web,mobile}
+</code></pre>
+<p>Or individually:</p>
+<pre><code>/* Options:
+IncludeTypes: {web},{mobile}
+</code></pre>
+<h3 id="excludetypes">ExcludeTypes<a class="header-anchor" href="javascript:;" onclick="location.hash='#excludetypes'" aria-label="Permalink"> </a></h3>
+<p>Is used as a Blacklist to specify which types you would like excluded from being generated:</p>
+<pre><code>/* Options:
+ExcludeTypes: GetTechnology,GetTechnologyResponse
+</code></pre>
+<p>Will exclude <code>GetTechnology</code> and <code>GetTechnologyResponse</code> DTOs from being generated.</p>
+<h3 id="defaultimports">DefaultImports<a class="header-anchor" href="javascript:;" onclick="location.hash='#defaultimports'" aria-label="Permalink"> </a></h3>
+<p>Use <code>DefaultImports</code> for specifying additional imports in your generated PHP DTOs.</p>
+<pre><code class="language-php">/* Options:
+...
+DefaultImports: MyType
+*/
+</code></pre>
+<p>Which will include the type in the generated DTOs:</p>
+<pre><code class="language-php">use MyType;
+</code></pre>
+<h2 id="customize-serialization">Customize Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-serialization'" aria-label="Permalink"> </a></h2>
+<p>The <code>servicestack/client</code> client lib allows for flexible serialization customization where you can change how different
+.NET Types are serialized and deserialized into native PHP types.</p>
+<p>To illustrate this we'll walk through how serialization of properties containing binary data to Base64 is implemented.</p>
+<p>First we specify the PHP DTO generator to emit <code>ByteArray</code> type hint for the popular .NET binary data types:</p>
+<pre><code class="language-csharp">PhpGenerator.TypeAliases[typeof(byte[]).Name] = &quot;ByteArray&quot;;
+PhpGenerator.TypeAliases[typeof(Stream).Name] = &quot;ByteArray&quot;;
+</code></pre>
+<p>In the PHP app we can then specify the serializers and deserializers to use for deserializing properties with the <code>ByteArray</code>
+data type which converts binary data to/from Base64:</p>
+<pre><code class="language-php">use JsonSerializable;
+
+class ByteArray implements JsonSerializable
+{
+    public ?string $data;
+
+    public function __construct(?string $data=null)
+    {
+        $this-&gt;data = isset($data) ? base64_decode($data) : null;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return base64_encode($this-&gt;data);
+    }
+}
+</code></pre>
+<h2 id="inspect-utils">Inspect Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#inspect-utils'" aria-label="Permalink"> </a></h2>
+<p>To help clients with inspecting API Responses the <code>servicestack/client</code> library also includes a number of helpful utils
+to quickly visualizing API outputs.</p>
+<p>For a basic indented object graph you can use <code>Inspect::dump</code> to capture and <code>Inspect::printDump</code> to print the output
+of any API Response, e.g:</p>
+<pre><code class="language-php">$orgName = &quot;php&quot;;
+
+$opts = [
+    &quot;http&quot; =&gt; [
+        &quot;header&quot; =&gt; &quot;User-Agent: gist.cafe\r\n&quot;
+    ]
+];
+$context = stream_context_create($opts);
+$json = file_get_contents(&quot;https://api.github.com/orgs/{$orgName}/repos&quot;, false, $context);
+$orgRepos = array_map(function($x) {
+    $x = get_object_vars($x);
+    return [
+        &quot;name&quot;        =&gt; $x[&quot;name&quot;],
+        &quot;description&quot; =&gt; $x[&quot;description&quot;],
+        &quot;url&quot;         =&gt; $x[&quot;url&quot;],
+        &quot;lang&quot;        =&gt; $x[&quot;language&quot;],
+        &quot;watchers&quot;    =&gt; $x[&quot;watchers&quot;],
+        &quot;forks&quot;       =&gt; $x[&quot;forks&quot;],
+    ];
+}, json_decode($json));
+usort($orgRepos, function($a,$b) { return $b[&quot;watchers&quot;] - $a[&quot;watchers&quot;]; });
+
+echo  &quot;Top 3 {$orgName} GitHub Repos:\n&quot;;
+Inspect::printDump(array_slice($orgRepos, 0, 3));
+
+echo  &quot;\nTop 10 {$orgName} GitHub Repos:\n&quot;;
+Inspect::printDumpTable(array_map(function($x) {
+    return [
+        &quot;name&quot;        =&gt; $x[&quot;name&quot;],
+        &quot;lang&quot;        =&gt; $x[&quot;lang&quot;],
+        &quot;watchers&quot;    =&gt; $x[&quot;watchers&quot;],
+        &quot;forks&quot;       =&gt; $x[&quot;forks&quot;],
+    ];
+}, array_slice($orgRepos, 0, 10)));
+</code></pre>
+<p>Output:</p>
+<pre><code>Top 3 php GitHub Repos:
+[
+    {
+        name: php-src,
+        description: The PHP Interpreter,
+        url: https://api.github.com/repos/php/php-src,
+        lang: C,
+        watchers: 36122,
+        forks: 7653
+    },
+    {
+        name: web-php,
+        description: The www.php.net site,
+        url: https://api.github.com/repos/php/web-php,
+        lang: PHP,
+        watchers: 785,
+        forks: 532
+    },
+    {
+        name: php-gtk-src,
+        description: The PHP GTK Bindings,
+        url: https://api.github.com/repos/php/php-gtk-src,
+        lang: C++,
+        watchers: 201,
+        forks: 59
+    }
+]
+</code></pre>
+<p>For tabular result-sets you can use <code>Inspect::table</code> to capture and <code>Inspect::printTable</code> to print API result-sets in a
+human-friendly markdown table, e.g:</p>
+<pre><code class="language-php">echo &quot;\nTop 10 $orgName Repos:\n&quot;
+Inspect::printTable(array_slice($orgRepos, 0, 10));
+</code></pre>
+<p>Output:</p>
+<pre><code>Top 10 php GitHub Repos:
++------------------------------------------------+
+|      name      |    lang    | watchers | forks |
+|------------------------------------------------|
+| php-src        | C          |    36122 |  7653 |
+| web-php        | PHP        |      785 |   532 |
+| php-gtk-src    | C++        |      201 |    59 |
+| web-qa         | PHP        |       68 |    39 |
+| phd            | PHP        |       68 |    44 |
+| web-bugs       | PHP        |       58 |    68 |
+| presentations  | HTML       |       45 |    27 |
+| web-doc-editor | JavaScript |       43 |    37 |
+| systems        | C          |       41 |    27 |
+| web-wiki       | PHP        |       35 |    29 |
++------------------------------------------------+
+</code></pre>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/silverlight-client.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/php-add-servicestack-reference.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
 
                     <div class="not-prose my-20">
-                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
-                                    <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/dart-add-servicestack-reference#example-usage" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                <!-- Heroicon name: mini/arrow-long-left -->
-                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
-                                                </svg>
-                                                Dart Client
-                                            </a>
-                                    </div>
-                                    <div class="hidden md:-mt-px md:flex"></div>
-                                    <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/messaging#mq-client-architecture" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                MQ Clients
-                                                <!-- Heroicon name: mini/arrow-long-right -->
-                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
-                                                </svg>
-                                            </a>
-                                    </div>
-                                </nav>
                     </div>
             </div>
                 
@@ -1653,48 +2188,202 @@ namespace MySilverlightApp
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#please-be-aware-of-the-following-considerations'" data-id="please-be-aware-of-the-following-considerations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Please be aware of the following considerations:
+                                        <span v-hash="'#installation'" data-id="installation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Installation
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="uses-httpwebrequest-with-clienthttp-handling" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#uses-httpwebrequest-with-clienthttp-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="phpstorm-servicestack-plugin" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#phpstorm-servicestack-plugin'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Uses HttpWebRequest with ClientHttp handling
+                                                            PhpStorm ServiceStack Plugin
                                                         </span>
                                                     </li>
-                                                    <li data-id="is-cookie-aware" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#is-cookie-aware'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="simple-command-line-utility-for-php" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#simple-command-line-utility-for-php'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Is Cookie-Aware
+                                                            Simple command-line utility for PHP
                                                         </span>
                                                     </li>
-                                                    <li data-id="talks-only-json" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#talks-only-json'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="adding-a-servicestack-reference" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#adding-a-servicestack-reference'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Talks only JSON
+                                                            Adding a ServiceStack Reference
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="updating-a-servicestack-reference" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#updating-a-servicestack-reference'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Updating a ServiceStack Reference
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="updating-all-php-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#updating-all-php-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Updating all PHP DTOs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="smart-generic-jsonserviceclient" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#smart-generic-jsonserviceclient'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Smart Generic JsonServiceClient
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="change-default-server-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#change-default-server-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Change Default Server Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="customize-dto-type-generation" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#customize-dto-type-generation'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Customize DTO Type generation
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="emit-custom-code" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#emit-custom-code'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Emit custom code
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="php-reference-example" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#php-reference-example'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            PHP Reference Example
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="making-typed-api-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#making-typed-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Making Typed API Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="phpdoc-typed-annotations" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#phpdoc-typed-annotations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            PHPDoc Typed Annotations
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="constructors-initializer" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#constructors-initializer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Constructors Initializer
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sending-additional-arguments-with-typed-api-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sending-additional-arguments-with-typed-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sending additional arguments with Typed API Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="making-api-requests-with-urls" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#making-api-requests-with-urls'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Making API Requests with URLs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="raw-data-responses" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#raw-data-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Raw Data Responses
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-using-basic-auth" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-using-basic-auth'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating using Basic Auth
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-using-credentials" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-using-credentials'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating using Credentials
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-using-jwt" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-using-jwt'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating using JWT
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authenticating-using-an-api-key" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authenticating-using-an-api-key'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authenticating using an API Key
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Transparently handle 401 Unauthorized Responses
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="automatically-refresh-access-tokens" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#automatically-refresh-access-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Automatically refresh Access Tokens
                                                         </span>
                                                     </li>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#example-usage'" data-id="example-usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Example Usage
+                                        <span v-hash="'#dto-customization-options'" data-id="dto-customization-options" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            DTO Customization Options
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="setting-up-your-dtos" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#setting-up-your-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="change-default-server-configuration-1" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#change-default-server-configuration-1'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Setting up your DTOs
+                                                            Change Default Server Configuration
                                                         </span>
                                                     </li>
-                                                    <li data-id="the-serviceclient-implementation" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#the-serviceclient-implementation'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="globalnamespace" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#globalnamespace'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            The ServiceClient Implementation
+                                                            GlobalNamespace
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="addresponsestatus" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#addresponsestatus'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AddResponseStatus
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="addimplicitversion" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#addimplicitversion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AddImplicitVersion
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="includetypes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#includetypes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            IncludeTypes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="excludetypes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#excludetypes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ExcludeTypes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="defaultimports" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#defaultimports'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            DefaultImports
                                                         </span>
                                                     </li>
                                             </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#customize-serialization'" data-id="customize-serialization" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Customize Serialization
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#inspect-utils'" data-id="inspect-utils" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Inspect Utils
+                                        </span>
                                     </li>
                             </ul>
                         </div>
