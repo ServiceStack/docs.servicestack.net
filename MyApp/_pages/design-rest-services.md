@@ -102,7 +102,7 @@ public class GetEventReviews : IReturn<GetEventReviewsResponse>
 
 public class GetEventReviewsResponse
 {
-    public List<Event> Results { get; set; }
+    public List<EventReview> Results { get; set; }
 }
 
 [Route("/events/{EventId}/reviews/{Id}", "GET")]
