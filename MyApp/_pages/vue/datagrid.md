@@ -94,7 +94,7 @@ collapse column names at small screen sizes:
         <span class="text-gray-900" v-html="id"></span>
     </template>
     
-    <template #name="{ name }" v-html="name"></template>
+    <template #name="{ name }">{{name}}</template>
     
     <template #roomNumber-header>
         <span class="hidden lg:inline">Room </span>No
