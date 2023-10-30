@@ -462,6 +462,19 @@ Which Rider provides a nice UX for running directly from the IDE where it will p
 
 ![](/img/pages/ormlite/migration-scripts.png)
 
+### Use with Entity Framework Migrations
+
+For convenience if you're using both Entity Framework and OrmLite within the same project you can change `npm run migrate` to run both
+Entity Framework and OrmLite Migrations with a single command:
+
+```json
+{
+  "scripts": {
+    "migrate": "dotnet ef database update && dotnet run --AppTasks=migrate"
+  }
+}
+```
+
 ### ASP .NET Core Projects
 
 General (i.e. non-ServiceStack) ASP.NET Core Apps can instead configure AppTasks before `app.Run()` in their **Program.cs**:
