@@ -3,12 +3,18 @@ slug: built-in-profiling
 title: Built-in Mini Profiler
 ---
 
+## Try the built-in Admin Logging & Profiling UI
+
+For a better integrated alternative to Mini Profiler checkout the built-in Admin [Logging & Profiling UI](/admin-ui-profiling).
+
+---
+
+## MVC Mini Profiler
+
 ServiceStack's [HTML5 JSON Report Format](/html5reportformat) also includes the [Mvc Mini Profiler](https://github.com/MiniProfiler/dotnet) - by [@jarrod_dixon](https://twitter.com/jarrod_dixon) and [@samsaffron](https://twitter.com/samsaffron).
 It's the same profiler used to profile and help speed up sites like [Stack Overflow](http://www.stackoverflow.com) and more recently the much faster [NuGet v2.0](http://nuget.org) website.
 
 The MVC Mini Profiler plugin is only available for classic ASP.NET Framework Web Apps, for .NET Core Apps you can use the official [MiniProfiler.AspNetCore.Mvc](https://www.nuget.org/packages/MiniProfiler.AspNetCore.Mvc) NuGet package, please see this community post for details:
-
- - [Servicestack + Miniprofiler + .NET Core + Angular](http://inayearorso.io/2018/04/18/servicestack-miniprofiler-dotnetcore-angular2/)
 
 ### Using the MVC Mini Profiler
 
