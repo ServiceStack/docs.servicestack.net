@@ -6,10 +6,9 @@ title: PHP Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PhpStorm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.
 
-
-[![](/img/pages/servicestack-reference/python-add-servicestack-reference-youtube-splash.png)](https://youtu.be/WjbhfH45i5k)
-
-> YouTube: [youtu.be/WjbhfH45i5k](https://youtu.be/WjbhfH45i5k)
+<div class="flex justify-center">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
+</div>
 
 ### First class development experience
 
