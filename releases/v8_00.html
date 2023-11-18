@@ -1,0 +1,1935 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2023-11-18T15:27:45.3148513Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>ServiceStack v8</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+                        <a href="/locode/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            Locode
+                        </a>
+                        <a href="/grpc/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            gRPC
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+                    <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Locode
+                    </a>
+                    <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        gRPC
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-16 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/releases/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Releases                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/releases/v8_00" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        ServiceStack v8
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_11" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.11
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_10" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.10
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_09" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.9
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_08" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.8
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_07" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.7
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_06" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.6
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_05" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.5
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_04" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.4
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_03" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.3
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_02" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.2
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_01" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6.1
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v6_00" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v6
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_13" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.13.2
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_12" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.12
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_11" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.11
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_10" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.10
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_09" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.9
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_08" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.8
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_07" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.7
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_06" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.6
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_05" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.5
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_04" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.4
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_02" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.2
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_01_0" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5.1
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v5_00_0" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v5
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_8" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.8
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_6" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.6
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_4" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.4
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_2" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.2
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_14" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.14
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_12" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.12
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_10" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.10
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_5_0" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.5.0
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_62" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.62
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_60" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.60
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_58" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.58
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_56" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.56
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_54" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.54
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_52" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.52
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_50" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.50
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_48" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.48
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_46" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.46
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_44" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.44
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_42" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.42
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_40" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.40
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_38" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.38
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_36" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.36
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_35" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.35
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_34" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.34
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_33" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.33
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_32" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.32
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_31" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.31
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_30" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.30
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_24" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.24
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_23" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.23
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_22" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.22
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_21" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.21
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_19" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.19
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_18" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.18
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_15" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.15
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_12" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.12
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_11" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.11
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_10" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.10
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_09" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.09
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_08" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.08
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_06" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4.0.06
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/v4_0_00" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack v4
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/releases/2016-summary" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        ServiceStack 2016 Release Notes Summary
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-center py-10 text-gray-900 tracking-tight font-extrabold text-4xl sm:text-5xl md:text-6xl">
+                            ServiceStack v8
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><img class="mt-8" style="" src="/img/pages/release-notes/v8/net8.webp">
+<h2 id="net-8">.NET 8<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-8'" aria-label="Permalink"> </a></h2>
+<p>We're excited to welcome the next major release of ServiceStack v8, designed to take advantage of many advancements
+for in .NET's latest long-term release: <a href="https://devblogs.microsoft.com/dotnet/announcing-dotnet-8/">.NET 8</a> - reflected in ServiceStack's v8 major version which identifies
+that latest LTS release of .NET that it targets.</p>
+<h3 id="all-nuget-packages-include-net8.0-builds">All NuGet Packages include net8.0 builds<a class="header-anchor" href="javascript:;" onclick="location.hash='#all-nuget-packages-include-net8.0-builds'" aria-label="Permalink"> </a></h3>
+<p>All of ServiceStack's active NuGet packages now include <code>.net8.0</code> target framework builds and their
+dependencies on Microsoft's packages been upgraded to use the latest <code>8.0.0</code> that were released with .NET 8.</p>
+<h3 id="all.net-project-templates-upgraded-to.net-8">All .NET Project Templates upgraded to .NET 8<a class="header-anchor" href="javascript:;" onclick="location.hash='#all.net-project-templates-upgraded-to.net-8'" aria-label="Permalink"> </a></h3>
+<p>In addition all of ServiceStack's <a href="https://github.com/NetCoreTemplates/">.NET project templates</a> have been upgraded to
+use ServiceStack v8 and .NET 8 target framework, in addition the built-in CI/CD deployment GitHub Actions have been
+upgraded to use the <a href="https://devblogs.microsoft.com/dotnet/securing-containers-with-rootless/">secure rootless Linux Docker containers</a>
+that's now built into .NET 8 which allow you to effortlessly deploy your containerized .NET 8 Apps with Docker and
+GitHub Registry via SSH to any Linux Server.</p>
+<div class="not-prose mt-16 flex flex-col items-center">
+   <div class="flex">
+      <svg class="w-28 h-28" xmlns="http://www.w3.org/2000/svg" width="256" height="185" viewBox="0 0 256 185"><path fill="#2396ED" d="M250.716 70.497c-5.765-4-18.976-5.5-29.304-3.5c-1.2-10-6.725-18.749-16.333-26.499l-5.524-4l-3.844 5.75c-4.803 7.5-7.205 18-6.485 28c.24 3.499 1.441 9.749 5.044 15.249c-3.362 2-10.328 4.5-19.455 4.5H1.155l-.48 2c-1.682 9.999-1.682 41.248 18.014 65.247c14.892 18.249 36.99 27.499 66.053 27.499c62.93 0 109.528-30.25 131.386-84.997c8.647.25 27.142 0 36.51-18.75c.24-.5.72-1.5 2.401-5.249l.961-2l-5.284-3.25ZM139.986 0h-26.42v24.999h26.42V0Zm0 29.999h-26.42v24.999h26.42v-25Zm-31.225 0h-26.42v24.999h26.42v-25Zm-31.225 0H51.115v24.999h26.421v-25ZM46.311 59.998H19.89v24.999h26.42v-25Zm31.225 0H51.115v24.999h26.421v-25Zm31.225 0h-26.42v24.999h26.42v-25Zm31.226 0h-26.422v24.999h26.422v-25Zm31.225 0H144.79v24.999h26.422v-25Z"/></svg>
+   </div>
+</div>
+<div class="not-prose mt-4 px-4 sm:px-6">
+<div class="text-center"><h3 id="razor-ssg" class="text-4xl sm:text-5xl md:text-6xl tracking-tight font-extrabold text-gray-900">
+    .NET 8 Docker Containers
+</h3></div>
+<p class="mx-auto mt-5 max-w-3xl text-xl text-gray-500">
+    Learn about the latest streamlined containerization support built into .NET 8
+</p>
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="y57c-9jeIww" style="background-image: url('https://img.youtube.com/vi/y57c-9jeIww/maxresdefault.jpg')"></lite-youtube>
+</div>
+</div>
+<h3 id="net-8-docker-containerization">.NET 8 Docker Containerization<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-8-docker-containerization'" aria-label="Permalink"> </a></h3>
+<p>.NET 8 simplifies Docker integration using functionality built into the .NET SDK tooling where it's able to use <code>dotnet publish</code>
+to publish your .NET 8 App to a container image without a Dockerfile, adhering to the latest Least privilege and hardened security
+best practices of running App's as non-root by default.</p>
+<p>This <strong>publish to container</strong> feature also supports creating Docker images for different architectures like ARM64 which
+sees <a href="https://devblogs.microsoft.com/dotnet/this-arm64-performance-in-dotnet-8/">significant improvements in .NET 8</a>
+making deploying your .NET Apps to ARM64 an <a href="https://servicestack.net/posts/cloud-value-between-architectures">even better value proposition</a>.</p>
+<h2 id="new.net-8-blazor-template">New .NET 8 Blazor Template<a class="header-anchor" href="javascript:;" onclick="location.hash='#new.net-8-blazor-template'" aria-label="Permalink"> </a></h2>
+<p>Perhaps the feature we're most excited about are the advancements made to Blazor in .NET 8 which we believe is a game changing
+release for .NET Web Development as it's now become suitable for building any kind of Web App in .NET.</p>
+<p>The best way to find out what's new in .NET 8 Blazor is to watch the excellent
+<a href="https://www.youtube.com/watch?v=QD2-DwuOfKM">Full stack web UI with Blazor in .NET 8</a> presentation by Daniel Roth and Steve Sanderson,
+which covers how Blazor has become a Full Stack UI Web Technology for developing any kind of .NET Web App.</p>
+<div class="flex justify-center">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="YwZdtLEtROA" style="background-image: url('https://img.youtube.com/vi/YwZdtLEtROA/maxresdefault.jpg')"></lite-youtube>
+</div>
+<p>ServiceStack's new <a href="https://blazor.web-templates.io">Blazor</a> project template takes advantage of .NET 8 Blazor's new features
+that redefines modern Web Development in C# which we explore in this video overview, covering how the template adopts Blazor's
+familiar <strong>ASP.NET Core Identity</strong> and <strong>Entity Framework</strong> for its authentication, utilizes the modern
+<a href="https://tailwindcss.com">Tailwind CSS</a> framework for beautiful responsive design and adopts .NET's best-practice
+<a href="https://learn.microsoft.com/en-us/dotnet/core/docker/publish-as-container">Docker Containerization</a> support for its built-in
+<a href="https://blazor.web-templates.io/deploy">GitHub Action Deployments</a> - enabling a simple ready-made CI solution for deployment to any
+Linux Host via SSH and Docker compose.</p>
+<p>We’ll also discuss the project's structure, usage of <strong>ASP.NET Core Identity</strong> for Authorization and utilizing
+<strong>ServiceStack Blazor Components</strong> for data handling, all integrated to maximize developer efficiency in building Web Applications.</p>
+<div class="not-prose mt-16 flex flex-col items-center">
+   <div class="flex">
+      <svg class="w-28 h-28 text-purple-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"></path></svg>
+   </div>
+</div>
+<div class="not-prose mt-4 px-4 sm:px-6">
+<div class="text-center"><h3 id="razor-ssg" class="text-4xl sm:text-5xl md:text-6xl tracking-tight font-extrabold text-gray-900">
+    Blazor Tailwind Template
+</h3></div>
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="hqyozHSL0Nk" style="background-image: url('https://img.youtube.com/vi/hqyozHSL0Nk/maxresdefault.jpg')"></lite-youtube>
+</div>
+</div>
+<div class="not-prose relative bg-white dark:bg-black py-4">
+    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Create a new Blazor Tailwind App</p>
+        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
+            Create a new Blazor Tailwind project with your preferred project name:
+        </p>
+    </div>
+    <blazor-template repo="NetCoreTemplates/blazor" name="Blazor"></blazor-template>
+</div>
+<h2 id="asp.net-core-identity-integration">ASP.NET Core Identity Integration<a class="header-anchor" href="javascript:;" onclick="location.hash='#asp.net-core-identity-integration'" aria-label="Permalink"> </a></h2>
+<p>In terms of security, the template integrates ASP.NET Core Identity, offering a structured approach to authentication,
+including support for email confirmation, two-factor authentication and GDPR compliance features.</p>
+<p>Integrating ASP.NET Core Identity doesn't complicate securing ServiceStack services which can still be secured with
+<a href="/auth/authentication-and-authorization#declarative-validation-attributes">Declarative Validation Attributes</a>
+for role-based access control, e.g. using <code>[ValidateHasRole(&quot;Employee&quot;)]</code> directly on Request DTOs, bringing any
+existing knowledge and experience with ServiceStack Authentication to securing UIs and APIs with Identity Auth.</p>
+<p>The template includes a pre-baked solution for sending general and Identity Auth Emails with your configured SMTP Server
+in managed background workers with <a href="/background-mq">Background MQ</a> and an enhanced version of the default
+ASP.NET Core Blazor Identity UI, with all pages upgraded to use a beautiful Tailwind CSS theme as well as integration with
+<a href="https://davidshimjs.github.io/qrcodejs/">qrcode.js</a>
+for providing a visual QR Code barcode which mobile phone users can easily scan to setup 2FA Authentication.</p>
+<h2 id="responsive-and-interactive-uis-with-tailwind-css">Responsive and Interactive UIs with Tailwind CSS<a class="header-anchor" href="javascript:;" onclick="location.hash='#responsive-and-interactive-uis-with-tailwind-css'" aria-label="Permalink"> </a></h2>
+<p>With responsive UI out-of-the-box, thanks to Tailwind CSS, Developers can style their Blazor Apps with the modern
+popular utility-first CSS framework for creating beautiful, maintainable <strong>Responsive UIs</strong> with <strong>DarkMode</strong> support</p>
+<p>It also takes full advantage of Blazor’s static rendering for its Website layout for optimal performance and SEO,
+so only Pages and Components that require interactivity need to opt-in for Blazor Server Interactive rendering modes.</p>
+<h2 id="servicestack.blazor-tailwind-components">ServiceStack.Blazor Tailwind Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.blazor-tailwind-components'" aria-label="Permalink"> </a></h2>
+<p>The <a href="https://blazor-gallery.jamstacks.net">ServiceStack.Blazor Components</a>, updated for .NET 8 enables you to rapidly
+develop beautiful Blazor Apps integrated with Rich high-productivity UI Tailwind Components like
+<a href="https://blazor-gallery.servicestack.net/gallery/autoquerygrid">AutoQueryGrid</a> and
+<a href="https://blazor-gallery.servicestack.net/gallery/autoform">AutoForms</a> which interface with
+<a href="/autoquery/">AutoQuery services</a> to provide a full CRUD data management UI with minimal effort.</p>
+<h2 id="other-template-features">Other Template Features<a class="header-anchor" href="javascript:;" onclick="location.hash='#other-template-features'" aria-label="Permalink"> </a></h2>
+<p>Other features that enhances the default ASP.NET Blazor App templates with several modern, high-productivity features, include:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/ef/">Entity Framework</a> &amp; <a href="/ormlite/">OrmLite</a> - Choose the best ORM for each App feature, with a unified solution that sees <a href="/ormlite/db-migrations">OrmLite's DB Migrations</a> run both EF and OrmLite migrations, inc. Seed Data with a single command at Development or Deployment</li>
+<li><a href="https://www.sqlite.org">SQLite Database</a> - Set up as the default database, it allows developers to start immediately without configuring a separate database server</li>
+<li><a href="/autoquery/">AutoQuery</a> - Rapidly developing data-driven APIs, UIs and CRUD Apps</li>
+<li><a href="https://www.youtube.com/watch?v=tt0ytzVVjEY">Auto Admin Pages</a> - Quickly develop your back-office CRUD Admin UIs to manage your App's Database tables at <a href="https://blazor.web-templates.io/admin">/admin</a></li>
+<li><a href="/razor-press/syntax">Markdown</a> - Maintain SEO-friendly documentation and content-rich pages like this one with just Markdown, beautifully styled with <a href="https://tailwindcss.com/docs/typography-plugin">@tailwindcss/typography</a></li>
+<li><a href="https://servicestack.net/auto-ui">Built-in UIs</a> - Use ServiceStack's Auto UIs to <a href="/api-explorer">Explore your APIs</a> at <a href="https://blazor.web-templates.io/ui/">/ui</a>
+or Query your <a href="/admin-ui-database">App's Database Tables</a> at <a href="https://blazor.web-templates.io/admin-ui/database">/admin-ui/database</a></li>
+<li><a href="https://youtu.be/66DgLHExC9E">Universal API Components</a> - Effortlessly create reusable, maximally performant universal Blazor API Components that works in Blazor Server and Web Assembly Interactivity modes</li>
+<li><a href="/physical-project-structure">Organized Project Structure</a> - Divided into AppHost, Service Interface, Service Model, and Tests projects to promote separation of concerns and maintainability.</li>
+</ul>
+<h3 id="talent-blazor-demo-upgraded">Talent Blazor Demo Upgraded<a class="header-anchor" href="javascript:;" onclick="location.hash='#talent-blazor-demo-upgraded'" aria-label="Permalink"> </a></h3>
+<p>As a demonstration of the new .NET 8 Blazor Template in action, we've upgraded the
+<a href="https://github.com/NetCoreApps/TalentBlazor">Talent Blazor</a> Demo which makes use of the above features:</p>
+<div class="not-prose bg-white pb-8 pb-12">
+  <div class="pt-8 overflow-hidden sm:pt-12 lg:relative lg:py-48">
+    <div class="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl lg:grid lg:grid-cols-2 lg:gap-24">
+      <div>
+        <div>
+          <img class="h-11 w-auto" src="/img/pages/locode/talent/logo.svg" alt="Northwind Logo">
+        </div>
+        <div class="mt-20">
+          <div>
+            <a href="https://talent.locode.dev/locode" class="inline-flex space-x-4">
+              <span class="rounded bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-600 tracking-wide uppercase"> What's new </span>
+              <span class="inline-flex items-center text-sm font-medium text-purple-600 space-x-1">
+              <span>Open Talent Blazor in Locode</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+              </span>
+            </a>
+          </div>
+          <div class="mt-6 sm:max-w-xl">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+              Talent Blazor Locode
+            </h1>
+            <p class="mt-6 text-xl text-gray-500">
+              Talent Blazor is a Blazor .NET 8 App built around a HR's unique workflow for processing Job Applications
+              from initial Application, through to Phone Screening and Interviews by multiple employees, capturing
+              relevant feedback at each application event, with successful Applicants awarded the Job
+              <br>
+              <br>
+              It's co-developed &amp; deployed with a customized Locode App that manages all other CRUD Database Access
+            </p>
+          </div>
+          <div class="mt-6">
+            <p class="text-2xl font-medium text-gray-900 mb-3">
+              Explore Features
+            </p>
+            <div class="flex items-center mb-2">
+              <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M4 5c0-1.007.875-1.755 1.904-2.223C6.978 2.289 8.427 2 10 2s3.022.289 4.096.777C15.125 3.245 16 3.993 16 5v4.758a4.485 4.485 0 0 0-1-.502V6.698a4.92 4.92 0 0 1-.904.525C13.022 7.711 11.573 8 10 8s-3.022-.289-4.096-.777A4.92 4.92 0 0 1 5 6.698V15c0 .374.356.875 1.318 1.313c.916.416 2.218.687 3.682.687c.22 0 .437-.006.65-.018c.447.367.966.65 1.534.822c-.68.127-1.417.196-2.184.196c-1.573 0-3.022-.289-4.096-.777C4.875 16.755 4 16.007 4 15V5zm1 0c0 .374.356.875 1.318 1.313C7.234 6.729 8.536 7 10 7s2.766-.27 3.682-.687C14.644 5.875 15 5.373 15 5c0-.374-.356-.875-1.318-1.313C12.766 3.271 11.464 3 10 3s-2.766.27-3.682.687C5.356 4.125 5 4.627 5 5zm8.5 12c.786 0 1.512-.26 2.096-.697l2.55 2.55a.5.5 0 1 0 .708-.707l-2.55-2.55A3.5 3.5 0 1 0 13.5 17zm0-1a2.5 2.5 0 1 1 0-5a2.5 2.5 0 0 1 0 5z" fill="currentColor"></path></g></svg>
+              <a class="text-xl text-purple-600" href="https://talent.locode.dev/locode">Manage database with Locode</a>
+            </div>
+            <div class="flex items-center mb-2">
+              <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 32"><g fill="currentColor"><path d="M27.464 2.314a.501.501 0 0 0-.698-.257L14.86 8.339a.499.499 0 0 0-.233.621l.245.641l-6.873 3.769a.5.5 0 0 0-.222.63l.228.549l-7.299 3.488a.5.5 0 0 0-.246.643l1.498 3.61a.5.5 0 0 0 .629.28l7.625-2.701l.228.549a.5.5 0 0 0 .601.289l7.276-2.097l.218.569a.497.497 0 0 0 .612.299l13-4a.498.498 0 0 0 .317-.663l-5-12.501zM2.7 21.469l-1.134-2.734l6.823-3.261l1.439 3.47L2.7 21.469zm8.491-1.846l-.238-.574l-1.843-4.445l-.238-.573l6.336-3.475l2.374 6.134l.375.981l-6.766 1.952zm8.109-1.238l-.203-.531c-.003-.011-.001-.024-.006-.035l-.618-1.597l-2.754-7.206l11.023-5.815l4.592 11.48L19.3 18.385z"></path><path d="M28.964.314a.5.5 0 0 0-.929.371l6 15a.502.502 0 0 0 .651.279a.501.501 0 0 0 .279-.65l-6.001-15z"></path><path d="M18 21h-3c-1.14 0-2 .86-2 2v1.315l-5.879 6.859a.5.5 0 1 0 .758.651L13.73 25H16v6.5a.5.5 0 0 0 1 0V25h2.27l5.85 6.825a.497.497 0 0 0 .705.054a.5.5 0 0 0 .054-.705L20 24.315v-1.24C20 21.912 19.122 21 18 21zm1 3h-5v-1c0-.589.411-1 1-1h3c.57 0 1 .462 1 1.075V24z"></path></g></svg>
+              <a class="text-xl text-purple-600" href="https://talent.locode.dev/ui">Explore APIs in API Explorer</a>
+            </div>
+            <div class="flex items-center text-xl mb-2">
+              <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M16 22.027v-2.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7a5.44 5.44 0 0 0-1.5-3.75a5.07 5.07 0 0 0-.09-3.77s-1.18-.35-3.91 1.48a13.38 13.38 0 0 0-7 0c-2.73-1.83-3.91-1.48-3.91-1.48A5.07 5.07 0 0 0 5 5.797a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7a3.37 3.37 0 0 0-.94 2.58v2.87"/><path d="M9 20.027c-3 .973-5.5 0-7-3"/></g></svg>
+              Browse
+              <a class="px-1 text-purple-600" href="https://github.com/NetCoreApps/TalentBlazor">Source Code</a>
+            </div>
+            <div class="mt-6 flex">
+              <div class="rounded-md shadow lg:mt-0 lg:ml-10 lg:flex-shrink-0">
+                <a href="https://github.com/NetCoreApps/TalentBlazor/archive/refs/heads/main.zip" class="flex hover:no-underline items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50">
+                  Download TalentBlazor.zip
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sm:mx-auto sm:max-w-3xl sm:px-6">
+      <div class="py-12 sm:relative sm:mt-12 sm:py-16 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+        <div class="hidden sm:block">
+          <div class="absolute inset-y-0 left-1/2 w-screen bg-gray-50 rounded-l-3xl lg:left-80 lg:right-0 lg:w-full"></div>
+          <svg class="absolute top-8 right-1/2 -mr-3 lg:m-0 lg:left-0" width="404" height="392" fill="none" viewBox="0 0 404 392"><defs><pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" /></pattern></defs><rect width="404" height="392" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)" /></svg>
+        </div>
+        <div class="relative pl-4 -mr-40 sm:mx-auto sm:max-w-3xl sm:px-0 lg:max-w-none lg:h-full lg:pl-12">
+          <a href="https://talent.locode.dev">
+            <img class="w-full rounded-md shadow-xl ring-1 ring-black ring-opacity-5 lg:h-full lg:w-auto lg:max-w-none"
+                 src="/img/pages/locode/talent/screenshot.png" alt="">
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<h2 id="your-first.net-8-blazor-app">Your first .NET 8 Blazor App<a class="header-anchor" href="javascript:;" onclick="location.hash='#your-first.net-8-blazor-app'" aria-label="Permalink"> </a></h2>
+<p>You won't get to appreciate the sum of Blazor's improvements until you create your first .NET 8 Blazor App where you'll be
+pleasantly surprised that Blazor Apps render fast, clean HTML without needing to load large Web Assembly assets needed for
+Blazor WebAssembly Apps or starting a stateful Web Socket connection required for Blazor Server Interactive Apps.</p>
+<h3 id="static-rendering-is-now-the-default">Static Rendering is now the default<a class="header-anchor" href="javascript:;" onclick="location.hash='#static-rendering-is-now-the-default'" aria-label="Permalink"> </a></h3>
+<p>This is because the <strong>default rendering mode</strong> for Blazor uses neither of these technologies, instead it returns to
+traditional Web App development where Blazor Pages now return clean, glorious HTML - courtesy of Blazor's
+<a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes">Static render mode</a>.</p>
+<p><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes"><img src="/img/pages/release-notes/v8/blazor-ssr.png" alt="" /></a></p>
+<h2 id="choose-your-compromise">Choose your compromise<a class="header-anchor" href="javascript:;" onclick="location.hash='#choose-your-compromise'" aria-label="Permalink"> </a></h2>
+<p>Previously we were forced to choose upfront whether we wanted to build a Blazor Web Assembly App or a Blazor Server App and
+the compromises that came with them, which for public Internet Web Apps wasn't even a choice as Blazor Server Apps perform poorly
+over high latency Internet connections.</p>
+<p>This meant choosing Blazor Web Assembly which required downloading a large WASM runtime with users experiencing a long
+delay before the App was functional. To minimize this impact our Blazor WebAssembly Tailwind template included
+<a href="https://blazor-tailwind.jamstacks.net/docs/prerender">built-in prerendering</a> where as part of deployment would
+generate <strong>static .html pages</strong> that were deployed with the Blazor Web Assembly front-end UI that can be hosted on CDN
+edge networks to further improve load times.</p>
+<p>Whilst this meant the App's UI would be rendered immediately, it still wouldn't be functional until the Web Assembly runtime was
+downloaded and initialized, which would flicker as the static UI was replaced with Blazor's WASM rendered UI, then later
+Authenticated users would experience further delay and UI jank whilst the App signs in the Authenticated User.
+Whilst prerendering is an improvement over the default blank loading screen, it's still not ideal for Internet hosted Apps.</p>
+<h2 id="net-8-blazor-is-a-game-changer">.NET 8 Blazor is a Game Changer<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-8-blazor-is-a-game-changer'" aria-label="Permalink"> </a></h2>
+<p>The situation has greatly improved in .NET 8 where your entire App no longer needs to be bound to a single Interactivity mode.
+Even better, Blazor's default <strong>static rendering</strong> mode results in the best UX where the Website Layout and important
+landing pages can be rendered instantly.</p>
+<h3 id="interactive-only-when-you-need-it">Interactive only when you need it<a class="header-anchor" href="javascript:;" onclick="location.hash='#interactive-only-when-you-need-it'" aria-label="Permalink"> </a></h3>
+<p>Only pages that need Blazor's interactivity features can opt-in to whichever Blazor interactive rendering mode makes
+the most sense, either on a page-by-page or component basis, or by choosing <code>RenderMode.InteractiveAuto</code> which uses
+<strong>InteractiveWebAssembly</strong> if the WASM runtime is loaded or <strong>InteractiveServer</strong> if it isn't.</p>
+<h3 id="enhanced-navigation-ftw">Enhanced Navigation FTW<a class="header-anchor" href="javascript:;" onclick="location.hash='#enhanced-navigation-ftw'" aria-label="Permalink"> </a></h3>
+<p>Ultimately we expect Blazor's new <strong>Enhanced Navigation</strong> will likely be the feature that delivers the best UX gains
+users will experience given it's enabled by default and gives traditional statically rendered Web Apps instant SPA-like
+navigation responsiveness where new pages are swapped in without needing to perform expensive full page reloads.</p>
+<p>It's beauty lies in being able to do this as a mostly transparent detail without the traditional SPA complexity of needing
+to manage complex state or client-side routing. It's a smart implementation that's able to perform fine-grained
+DOM updates to only parts of pages that have changed, providing the ultimate UX of preserving page state,
+like populated form fields and scroll position, to deliver a fast and responsive UX that previously wasn't attainable
+from the simplicity of a Server Rendered App.</p>
+<h3 id="full-stack-web-ui">Full Stack Web UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#full-stack-web-ui'" aria-label="Permalink"> </a></h3>
+<p>Blazor's static rendering with enhanced navigation and its opt-in flexibility makes .NET 8 Blazor a game changer,
+expanding it from a very niche set of use-cases that weren't too adversely affected by its Interactivity mode downsides,
+to becoming a viable solution for developing any kind of .NET Web App, especially as it can also be utilized within
+existing ASP.NET MVC and Razor Pages Apps.</p>
+<h3 id="benefits-over-mvc-and-razor-pages">Benefits over MVC and Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#benefits-over-mvc-and-razor-pages'" aria-label="Permalink"> </a></h3>
+<p>In addition, Blazor's superior component model allows building better encapsulated, more reusable and easier-to-use UI components
+which has enabled Blazor's rich 3rd Party library ecosystem to flourish, that we ourselves utilize to develop
+the high productivity Tailwind Components in the <a href="https://blazor-gallery.servicestack.net">ServiceStack.Blazor</a> component library.</p>
+<p>So far there's only upsides for .NET Web App development, the compromises only kick in when you need Blazor's interactivity features,
+luckily these can now be scoped to just the Pages and Components that need them. But how often do we need them?</p>
+<h3 id="when-do-you-need-blazors-interactivity-features">When do you need Blazor's Interactivity features?<a class="header-anchor" href="javascript:;" onclick="location.hash='#when-do-you-need-blazors-interactivity-features'" aria-label="Permalink"> </a></h3>
+<p>It ultimately depends on what App your building, but a lot of Websites can happily display dynamic content, navigate quickly
+with enhanced navigation, fill out and submit forms - all in Blazor's default static rendering mode.</p>
+<p>Not even advanced features like <strong>Streaming Rendering</strong> used in Blazor Template's
+<a href="https://github.com/dotnet/aspnetcore/blob/v8.0.0/src/ProjectTemplates/Web.ProjectTemplates/content/BlazorWeb-CSharp/BlazorWeb-CSharp/Components/Pages/Weather.razor">Weather.razor</a>
+page require interactivity, as its progressive rendered UI updates are achieved in a single request without interactivity.
+In fact the only time <code>@rendermode InteractiveServer</code> is needed in the default Blazor template is in the
+<a href="https://github.com/dotnet/aspnetcore/blob/v8.0.0/src/ProjectTemplates/Web.ProjectTemplates/content/BlazorWeb-CSharp/BlazorWeb-CSharp/Components/Pages/Counter.razor#L3">Counter.razor</a>
+page whose C# Event Handling require it.</p>
+<p>Ultimately some form of Interactivity will be required when adding behavior or client-side functionality that
+runs after pages have rendered, but you still have some options left before being forced to opt into an Interactive Blazor solution.</p>
+<h3 id="interactive-feature-options">Interactive Feature Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#interactive-feature-options'" aria-label="Permalink"> </a></h3>
+<p>We can see some of these options utilized in the Blazor Template
+<a href="https://github.com/dotnet/aspnetcore/blob/v8.0.0/src/ProjectTemplates/Web.ProjectTemplates/content/BlazorWeb-CSharp/BlazorWeb-CSharp/Components/Layout/NavMenu.razor">NavMenu.razor</a>
+component which uses Blazor's <code>@onclick</code> directive to add client-side behavior to simulate mouse clicks to toggle UI elements:</p>
+<pre><code class="language-html">&lt;div class=&quot;nav-scrollable&quot; onclick=&quot;document.querySelector('.navbar-toggler').click()&quot;&gt;
+</code></pre>
+<p>and submitting forms to Logout users:</p>
+<pre><code class="language-html">&lt;LogoutForm id=&quot;logout-form&quot; /&gt;
+&lt;NavLink class=&quot;nav-link&quot; onclick=&quot;document.getElementById('logout-form').submit(); return false;&quot;&gt;
+    &lt;span class=&quot;bi bi-arrow-bar-left&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt; Logout
+&lt;/NavLink&gt;
+</code></pre>
+<p>Effectively using JavaScript to add interactivity to static rendered pages to avoid paying Blazor's Interactivity tax.</p>
+<h4 id="avoiding-interactivity-for-chrome-elements">Avoiding Interactivity for Chrome elements<a class="header-anchor" href="javascript:;" onclick="location.hash='#avoiding-interactivity-for-chrome-elements'" aria-label="Permalink"> </a></h4>
+<p>This is especially important for any features you want to add to the Websites Layout or Chrome UI which you'll always want to be
+statically rendered so landing pages can load fast and render SEO-friendly server rendered content.</p>
+<p>This meant we couldn't use ServiceStack.Blazor's existing <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Blazor/src/ServiceStack.Blazor/Components/Tailwind/DarkModeToggle.razor">DarkModeToggle.razor</a>
+component for toggling on/off DarkMode since its statically rendered inside the Websites Layout and requires Interactivity to work.</p>
+<h3 id="vanilla-js-blazor-components">Vanilla JS Blazor Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#vanilla-js-blazor-components'" aria-label="Permalink"> </a></h3>
+<p>Fortunately utilizing simple element JavaScript callbacks was enough to be able to re-implement its functionality with Vanilla JS
+in the new <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Blazor/src/ServiceStack.Blazor/Components/Tailwind/DarkModeToggleLite.razor">DarkModeToggleLite.razor</a>
+component which works in all Blazor rendering modes, in both full-page or enhanced navigation loads:</p>
+<pre><code class="language-html">&lt;button type=&quot;button&quot; onclick=&quot;toggleDarkMode()&quot; class=@ClassNames(DarkModeToggle.ButtonClasses, Class) role=&quot;switch&quot; aria-checked=&quot;false&quot; @attributes=&quot;AdditionalAttributes&quot;&gt;
+    &lt;span class=&quot;@DarkModeToggle.InnerClasses&quot; data-class-light=&quot;translate-x-5&quot; data-class-dark=&quot;translate-x-0&quot;&gt;
+        &lt;span class=&quot;@DarkModeToggle.IconClasses&quot; data-class-light=&quot;opacity-0 ease-out duration-100&quot; data-class-dark=&quot;opacity-100 ease-in duration-200&quot; aria-hidden=&quot;true&quot;&gt;
+            &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; class=&quot;h-4 w-4 text-gray-400&quot; preserveAspectRatio=&quot;xMidYMid meet&quot; viewBox=&quot;0 0 32 32&quot;&gt;&lt;path fill=&quot;currentColor&quot; d=&quot;M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3Z&quot; /&gt;&lt;/svg&gt;
+        &lt;/span&gt;
+        &lt;span class=&quot;@DarkModeToggle.IconClasses&quot; data-class-light=&quot;opacity-100 ease-in duration-200&quot; data-class-dark=&quot;opacity-0 ease-out duration-100&quot; aria-hidden=&quot;true&quot;&gt;
+            &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; class=&quot;h-4 w-4 text-indigo-600&quot; preserveAspectRatio=&quot;xMidYMid meet&quot; viewBox=&quot;0 0 32 32&quot;&gt;&lt;path fill=&quot;currentColor&quot; d=&quot;M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6ZM5.394 6.813L6.81 5.399l3.505 3.506L8.9 10.319zM2 15.005h5v2H2zm3.394 10.193L8.9 21.692l1.414 1.414l-3.505 3.506zM15 25.005h2v5h-2zm6.687-1.9l1.414-1.414l3.506 3.506l-1.414 1.414zm3.313-8.1h5v2h-5zm-3.313-6.101l3.506-3.506l1.414 1.414l-3.506 3.506zM15 2.005h2v5h-2z&quot; /&gt;&lt;/svg&gt;
+        &lt;/span&gt;
+    &lt;/span&gt;
+&lt;/button&gt;
+
+&lt;script&gt;
+window.toggleDarkMode = (function() {
+    let isDark = localStorage.getItem('color-scheme') === 'dark'
+    const html = document.documentElement
+    function renderDarkMode() {
+        html.style.setProperty('color-scheme', isDark ? 'dark' : null)
+        html.classList.toggle('dark', isDark)
+        document.querySelectorAll('[data-class-light]').forEach(el =&gt; {
+            const removeClasses = isDark
+                    ? el.dataset.classLight
+                    : el.dataset.classDark
+            const addClasses = isDark
+                    ? el.dataset.classDark
+                    : el.dataset.classLight
+
+            removeClasses.split(' ').forEach(c =&gt; el.classList.remove(c))
+            addClasses.split(' ').forEach(c =&gt; el.classList.add(c))
+        })
+    }
+    renderDarkMode()
+
+    document.addEventListener('DOMContentLoaded', () =&gt;
+            Blazor.addEventListener('enhancedload', () =&gt; {
+                isDark = localStorage.getItem('color-scheme') === 'dark'
+                html.classList.toggle('dark', isDark)
+                renderDarkMode()
+            }))
+
+    return function() {
+        isDark = !isDark
+        localStorage.setItem('color-scheme', isDark ? 'dark' : 'light')
+        renderDarkMode()
+    }
+})()
+&lt;/script&gt;
+</code></pre>
+<h3 id="scripts-not-re-executed-in-enhanced-navigation">Scripts not re-executed in Enhanced Navigation<a class="header-anchor" href="javascript:;" onclick="location.hash='#scripts-not-re-executed-in-enhanced-navigation'" aria-label="Permalink"> </a></h3>
+<p>To support enhanced navigation you'll need to be aware that <code>&lt;script&gt;</code> tags are <strong>only executed once</strong> on initial page load.
+You'll instead need to register a callback with Blazor's <code>enhancedload</code> event for any startup logic that needs re-executing,
+which is fired after Blazor merges the new page's DOM with the existing DOM, and is where the <code>&lt;DarkModeToggleLite&gt;</code>
+component re-renders itself with the correct state.</p>
+<h3 id="try-it-out">Try it out!<a class="header-anchor" href="javascript:;" onclick="location.hash='#try-it-out'" aria-label="Permalink"> </a></h3>
+<p>With that it's ready for action, try it out in a new <a href="https://github.com/NetCoreTemplates/blazor">blazor</a> Project
+or from its Live Demo by toggling on/off Dark Mode Component in the top right corner:</p>
+<div class="not-prose mt-8 grid grid-cols-2 gap-4">
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="https://blazor.web-templates.io/?light">
+        <img class="p-2" src="/img/pages/release-notes/v8/blazor-light.webp">
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor.web-templates.io?light</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="https://blazor.web-templates.io/?dark">
+        <img class="p-2" src="/img/pages/release-notes/v8/blazor-dark.webp">
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor.web-templates.io?dark</div>
+    </a>
+</div>
+<h3 id="declarative-javascript-modules">Declarative JavaScript Modules<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-javascript-modules'" aria-label="Permalink"> </a></h3>
+<p>Unfortunately many other approaches won't work with Blazor's Enhanced Navigation, for example whilst the built-in
+ASP.NET Identity Pages all work without Blazor's Interactivity, the <a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Components/Pages/Account/Manage/EnableAuthenticator.razor">EnableAuthenticator.razor</a>
+page doesn't actually include a solution for providing a visual QR Code barcode which mobile phones can easily scan to
+setup 2FA Authentication.</p>
+<p>Whilst the placeholders are there, that implementation detail is left to us to workout, perhaps because they don't want
+to force an Interactivity rendering mode in the default template.</p>
+<p>The natural way to implement it is to use the popular <a href="https://davidshimjs.github.io/qrcodejs/">qrcodejs</a> library
+by following its instructions and adding a simple inline script to the page:</p>
+<h4 id="dont-use-in-line-scripts-for-logic-that-needs-to-be-re-executed">Don't use in-line scripts for logic that needs to be re-executed<a class="header-anchor" href="javascript:;" onclick="location.hash='#dont-use-in-line-scripts-for-logic-that-needs-to-be-re-executed'" aria-label="Permalink"> </a></h4>
+<pre><code class="language-html">&lt;div data-permanent id=&quot;qrCode&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;qrCodeData&quot; data-url=&quot;@_authenticatorUri&quot;&gt;&lt;/div&gt;
+
+&lt;script src=&quot;lib/js/qrcode.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+new QRCode(document.getElementById('qrCode'), 
+    document.getElementById('qrCodeData').dataset.url)
+&lt;/script&gt;
+</code></pre>
+<p>Whilst this works as expected in full page reloads, it doesn't work in Blazor's Enhanced Navigation as the <code>&lt;script&gt;</code> tag
+is only executed once on initial page load and not re-executed when the page is loaded with enhanced navigation.</p>
+<p>Your options are to change all links to that page with <code>data-enhance-nav=&quot;false&quot;</code> to turn off enhanced navigation
+to that page, or the solution that worked best for us is to use <strong>declarative instructions</strong> to specify which JavaScript
+modules should be loaded for any page, which we can do by adding a <code>data-module</code> attribute to any element, e.g:</p>
+<pre><code class="language-html">&lt;div data-module=&quot;pages/Account/Manage/EnableAuthenticator.mjs&quot;&gt;
+</code></pre>
+<p>These instructions are handled by <a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/wwwroot/mjs/app.mjs">app.mjs</a>
+on each navigation which loads the JS module and <code>load()</code> function if it exists.</p>
+<p>Which for <code>EnableAuthenticator.razor</code> page loads the
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/wwwroot/pages/Account/Manage/EnableAuthenticator.mjs">EnableAuthenticator.mjs</a>
+JavaScript Module which dynamically loads the <code>qrcode.min.js</code> library and initializes the QR Code on its exported <code>load()</code> function:</p>
+<pre><code class="language-js">import { addScript, $1 } from &quot;@servicestack/client&quot;
+const loadJs = addScript('lib/js/qrcode.min.js')
+
+export default {
+    async load() {
+        await loadJs
+        new QRCode($1(&quot;#qrCode&quot;), $1('#qrCodeData').dataset.url)
+    }
+}
+</code></pre>
+<p>Which now works as expected in both full page reloads and Blazor's Enhanced Navigation:</p>
+<p><a href="https://blazor.web-templates.io/Account/Manage/EnableAuthenticator"><img src="/img/pages/release-notes/v8/blazor-identityauth-qrcode.png" alt="" /></a></p>
+<h3 id="blazor-without-blazor-interactivity">Blazor without Blazor Interactivity<a class="header-anchor" href="javascript:;" onclick="location.hash='#blazor-without-blazor-interactivity'" aria-label="Permalink"> </a></h3>
+<p>So right now we have a Blazor App that's predominantly statically rendered, with fast and SEO-friendly without any downsides
+of the Blazor's Interactivity options, but how much of our App can we implement without Blazor Interactivity?</p>
+<h2 id="declarative-vue-components">Declarative Vue Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-vue-components'" aria-label="Permalink"> </a></h2>
+<p>Thankfully we can use the same approach we used for loading JavaScript modules to load Vue.js components, by using the
+<code>data-component</code> attribute to specify which <strong>global</strong> Vue component to mount with any properties optionally
+specified in the<code>data-props</code> attribute, e.g:</p>
+<pre><code class="language-html">&lt;div data-component=&quot;GettingStarted&quot; data-props=&quot;{template:'blazor'}&quot;&gt;&lt;/div&gt; 
+</code></pre>
+<p>This does require ensuring all components loaded this way are registered as a global component, as done in:</p>
+<pre><code class="language-js">import GettingStarted from &quot;./components/GettingStarted.mjs&quot;
+
+/** Shared Global Components */
+const Components = {
+    GettingStarted,
+}
+
+export function mount(sel, component, props) {
+    const app = createApp(component, props)
+    Object.keys(Components).forEach(name =&gt; {
+        app.component(name, Components[name])
+    })
+    app.mount(document.querySelector(sel))
+}
+</code></pre>
+<p>However this does mean that all global components would need to be downloaded before any Vue Components can be rendered the
+first time a website is accessed.</p>
+<h3 id="lazy-loading-vue-components">Lazy Loading Vue Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#lazy-loading-vue-components'" aria-label="Permalink"> </a></h3>
+<p>To avoid this we can instead use the <code>data-component</code> attribute to specify the path to the Vue component to load,
+ensuring that only the Vue components required for the current page is loaded, e.g:</p>
+<pre><code class="language-html">&lt;div data-component=&quot;pages/Counter.mjs&quot;&gt;&lt;/div&gt; 
+</code></pre>
+<p>Which is how we can implement Vue Components that work in statically rendered or enhanced navigation pages:</p>
+<pre><code class="language-js">import { ref } from 'vue'
+
+export default {
+    template: `
+        &lt;p class=&quot;my-4&quot;&gt;Current count: {‎{currentCount}‎}&lt;/p&gt;
+
+        &lt;PrimaryButton @click=&quot;incrementCount&quot;&gt;Click me&lt;/PrimaryButton&gt;
+    `,
+    setup() {
+        const currentCount = ref(0)
+        const incrementCount = () =&gt; currentCount.value++
+
+        return { currentCount, incrementCount }
+    }
+}
+</code></pre>
+<h2 id="new.net-8-blazor-vue-template">New .NET 8 Blazor Vue Template!<a class="header-anchor" href="javascript:;" onclick="location.hash='#new.net-8-blazor-vue-template'" aria-label="Permalink"> </a></h2>
+<p>This ends up being how the Interactive features in the new <a href="https://github.com/NetCoreTemplates/blazor-vue">blazor-vue</a> template
+are implemented - ideal for building fast, SEO-friendly statically rendered Blazor Web Apps where all its dynamic functionally
+uses Vue.js to progressively enhance its static rendered content - eliminating Blazor's limitations of using static
+rendering to implement an entire App:</p>
+<p><a href="https://github.com/NetCoreTemplates/blazor-vue"><img src="/img/pages/release-notes/v8/blazor-ssr-advantages.webp" alt="" /></a></p>
+<h3 id="blazor-vue-tailwind-template">Blazor Vue Tailwind Template<a class="header-anchor" href="javascript:;" onclick="location.hash='#blazor-vue-tailwind-template'" aria-label="Permalink"> </a></h3>
+<p>The new <a href="https://github.com/NetCoreTemplates/blazor-vue">blazor-vue</a> template implements all the features of the
+<a href="https://github.com/NetCoreTemplates/blazor">blazor</a> template but reimplements all its interactive features with
+Vue.js to and the <a href="/vue/">Vue Components</a> library.</p>
+<div class="not-prose mt-16 flex flex-col items-center">
+   <div class="flex">
+      <svg class="w-28 h-28 text-purple-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"></path></svg>
+   </div>
+</div>
+<div class="not-prose mt-4 px-4 sm:px-6">
+<div class="text-center"><h3 id="razor-ssg" class="text-4xl sm:text-5xl md:text-6xl tracking-tight font-extrabold text-gray-900">
+    Blazor Vue Template
+</h3></div>
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ujbTGn4IwFs" style="background-image: url('https://img.youtube.com/vi/ujbTGn4IwFs/maxresdefault.jpg')"></lite-youtube>
+</div>
+</div>
+<div class="not-prose relative bg-white dark:bg-black py-4">
+    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Create a new Blazor Vue Tailwind App</p>
+        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
+            Create a new Blazor Vue Tailwind project with your preferred project name:
+        </p>
+    </div>
+    <blazor-vue-template repo="NetCoreTemplates/blazor-vue" name="Blazor Vue"></blazor-vue-template>
+</div>
+<h3 id="faster-iterative-development">Faster iterative development<a class="header-anchor" href="javascript:;" onclick="location.hash='#faster-iterative-development'" aria-label="Permalink"> </a></h3>
+<p>Other benefits of using Vue for Interactivity is the fast iterative feedback loop during development that even applies
+to its <a href="https://blazor-vue.web-templates.io/blog">Markdown-powered Blog</a> which itself can embed rich interactive Vue Components and rich JavaScript UIs
+like Chart.js in its <a href="https://blazor-vue.web-templates.io/posts/razor-ssg-new-blog-features">Markdown Blog Posts</a> thanks to its unapologetic, complexity-free
+<a href="https://world.hey.com/dhh/you-can-t-get-faster-than-no-build-7a44131c">#NoBuild</a> solution.</p>
+<h3 id="statically-rendered-blazor-apps">Statically Rendered Blazor Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#statically-rendered-blazor-apps'" aria-label="Permalink"> </a></h3>
+<p>Whilst Blazor Interactivity may remain the predominant solution amongst .NET developers we believe .NET 8 Blazor opens the doors,
+for progressively enhanced statically-rendered Blazor Apps which has now become our preferred solution for developing
+most .NET Web Apps.</p>
+<p>It overcomes our biggest gripe with Blazor Web Assembly, that we were unsuccessful in
+<a href="https://blazor-tailwind.jamstacks.net/docs/prerender">prerendering away</a> its poor startup performance and UI jank
+in Internet Apps.</p>
+<h2 id="blazor-vue-diffusion">Blazor Vue Diffusion<a class="header-anchor" href="javascript:;" onclick="location.hash='#blazor-vue-diffusion'" aria-label="Permalink"> </a></h2>
+<p>So when we learned about .NET 8's static default rendering mode and enhanced navigation we jumped at the opportunity to
+create the Blazor Vue template which was used to re-implement Blazor Diffusion with Blazor SSR and Vue.js - a statically
+rendered Blazor App that uses Vue.js for all its functionality.</p>
+<h3 class="not-prose text-center pb-8">
+    <a class="text-4xl text-blue-600 hover:underline" href="https://blazordiffusion.com">https://blazordiffusion.com</a>
+</h3>
+<p><a href="https://github.com/NetCoreApps/BlazorDiffusion">Blazor Diffusion</a> is our Blazor Demo App we used to showcase how you
+could use <a href="https://youtu.be/66DgLHExC9E">Universal API Components</a> to build Blazor Components and entire Blazor Apps
+whose source code runs in both Blazor Server and Blazor Web Assembly Interactive modes, which was first
+developed with <a href="https://github.com/NetCoreApps/BlazorDiffusion">Blazor Server</a> then used a
+<a href="https://github.com/NetCoreApps/BlazorDiffusionWasm/blob/main/sync.bat">sync.bat</a> script to export its source code into
+a <a href="https://github.com/NetCoreApps/BlazorDiffusionWasm">Blazor Web Assembly</a> project that was deployed instead.</p>
+<p>The Blazor Vue version starts from a clean slate, utilizing statically rendered Blazor for faster page loads and generating
+SEO-friendly content:</p>
+<p><a href="https://blazordiffusion.com/"><img src="/img/pages/release-notes/v8/blazordiffusionvue.webp" alt="" /></a></p>
+<p>We're very pleased with the results, much faster loading times, enhanced navigation, no UI jankiness, better SEO - essentially
+a better UX overall, despite not needing any prerendering solution - all whilst enjoying a faster iterative development experience
+where all Vue component changes were immediately visible after save.</p>
+<p>You can compare the differences of each Blazor Solution from the Live Demos below:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Live Demo</th>
+<th>Source Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Blazor Vue</td>
+<td><a href="https://blazordiffusion.com">blazordiffusion.com</a></td>
+<td><a href="https://github.com/NetCoreApps/BlazorDiffusionVue">BlazorDiffusionVue</a></td>
+</tr>
+<tr>
+<td>Blazor Web Assembly</td>
+<td><a href="https://api.blazordiffusion.com">api.blazordiffusion.com</a></td>
+<td><a href="https://github.com/NetCoreApps/BlazorDiffusionWasm">BlazorDiffusionWasm</a></td>
+</tr>
+<tr>
+<td>Blazor Server</td>
+<td><a href="https://server.blazordiffusion.com">server.blazordiffusion.com</a></td>
+<td><a href="https://github.com/NetCoreApps/BlazorDiffusion">BlazorDiffusion</a></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Live Demos hosted on a shared <a href="http://cloud.hetzner.com">Hetzner Cloud VM</a> using SQLite that's replicated to <a href="https://developers.cloudflare.com/r2/">Cloudflare R2</a> with <a href="/ormlite/litestream">Litestream</a></p>
+</blockquote>
+<h2 id="asp.net-core-identity-auth-in.net-8-templates">ASP.NET Core Identity Auth in .NET 8 Templates<a class="header-anchor" href="javascript:;" onclick="location.hash='#asp.net-core-identity-auth-in.net-8-templates'" aria-label="Permalink"> </a></h2>
+<p>A significant change we've added to our new .NET 8 Project Templates is the adoption of the same
+ASP.NET Core Identity Authentication that's configured in Microsoft's default Projects templates.</p>
+<h3 id="history-of-servicestack-authentication">History of ServiceStack Authentication<a class="header-anchor" href="javascript:;" onclick="location.hash='#history-of-servicestack-authentication'" aria-label="Permalink"> </a></h3>
+<p>Since the dawn of ServiceStack we've always maintained our own <a href="/auth/authentication-and-authorization">Authentication and Authorization</a>
+provider model, primarily as it was the only way to provide an integrated and unified Authentication model
+that worked across all our supported hosting platforms, inc. .NET Framework, ASP.NET Core on .NET Framework, HttpListener
+and what's now .NET (fka .NET Core).</p>
+<p>In the meantime the Authentication story in ASP.NET has undergone several cycles of changes over the years, whereas
+ServiceStack's Auth providers have remained relatively consistent and stable, with no schema changes required since release whilst still providing flexible
+options for <a href="/auth/auth-repository#extending-userauth-tables">extending UserAuth tables</a> and
+typed <a href="/auth/sessions#using-typed-sessions-in-servicestack">User Sessions</a>.</p>
+<h4 id="net-framework-considered-legacy">.NET Framework considered legacy<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-framework-considered-legacy'" aria-label="Permalink"> </a></h4>
+<p>Although the multi-platform support of the unified Authentication model has been vital for Organizations migrating their systems
+to .NET (Core) where ServiceStack Customers have been able to enjoy <a href="/netcore#exceptional-code-reuse">Exceptional Code reuse</a>,
+it's become clear that the .NET platform (e.g. .NET 8) is the only platform that should be considered for new projects and
+that .NET Framework should only be considered a stable legacy platform for running existing systems on.</p>
+<p>Given Microsoft has committed to <a href="https://devblogs.microsoft.com/dotnet/whats-new-with-identity-in-dotnet-8/">Authentication Improvements in .NET 8</a>
+it's become more important to easily integrate ServiceStack with new and existing .NET projects to access these new features
+than to continue recommending ServiceStack's unified Auth Providers as the default option for new projects.</p>
+<h3 id="servicestack-will-use-asp.net-core-identity-auth-in-new-projects">ServiceStack will use ASP.NET Core Identity Auth in new projects<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack-will-use-asp.net-core-identity-auth-in-new-projects'" aria-label="Permalink"> </a></h3>
+<p>Going forward all new ServiceStack .NET Project Templates will adopt ASP.NET Identity Auth, which will closely follow the
+same approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the new .NET 8
+<a href="/posts/net8-blazor-template">Blazor</a> and <a href="/posts/net8-best-blazor">Blazor Vue</a> project templates adopts the exact same
+Auth configuration as Microsoft's default Blazor Project Template configured with <strong>Individual</strong> Identity Auth.</p>
+<p>To start off, the new .NET 8 Blazor and MVC Project Templates are configured to use the new Identity Auth Integration:</p>
+<div class="not-prose mx-auto px-8">
+  <identity-auth-templates></identity-auth-templates>
+</div>
+<p>The configuration and source code for the above projects are a good reference for how to configure ServiceStack with
+Identity Auth in your own projects.</p>
+<p>These use the same Individual Identity Auth Pages that Microsoft's MVC and Blazor templates use, except they've been enhanced
+to use <strong>Tailwind CSS</strong> instead of Bootstrap, includes a <strong>visual QR Code</strong> implementation that was missing and includes an
+<code>IEmailSender</code> SMTP solution that's easily enabled via Configuration to use your preferred <strong>SMTP Server</strong>.</p>
+<h3 id="migrating-to-asp.net-core-identity-auth">Migrating to ASP.NET Core Identity Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#migrating-to-asp.net-core-identity-auth'" aria-label="Permalink"> </a></h3>
+<p>Migrating from ServiceStack Auth to Identity Auth should be relatively straight-forward as ServiceStack uses a compatible
+Identity v2 password hashing format, which should let you migrate your users to Identity Auth without them noticing.</p>
+<p>To help with any migrations we've published an <a href="/auth/migrate-to-identity-auth">Identity Auth Migration Guide</a> we've used
+to convert existing ServiceStack Auth Apps to use Identity Auth.</p>
+<h2 id="servicestacks-identity-auth-integration">ServiceStack's Identity Auth Integration<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestacks-identity-auth-integration'" aria-label="Permalink"> </a></h2>
+<p>ServiceStack's Identity Auth integration is focused on high compatibility so existing ServiceStack Customers
+require minimal effort to migrate existing code bases to use the new Identity Auth integration, despite Identity Auth
+being an entirely different Auth Provider model and implementation.</p>
+<p>It does this by retaining a lot of the existing user-facing Authentication and Session abstractions that ServiceStack APIs
+use for Authorization as well as existing endpoints and Request/Response DTOs that ServiceStack Clients use to Authenticate,
+but replace their internal implementation to use ASP.NET Identity Auth instead.</p>
+<p>The new Identity Auth integration is contained in the .NET 6+ <strong>ServiceStack.Extensions</strong> NuGet package:</p>
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;ServiceStack.Extensions&quot; Version=&quot;8.*&quot; /&gt;
+</code></pre>
+<p>Which at a minimum lets you configure ServiceStack to use Identity Auth by simply registering the existing <code>AuthFeature</code>
+plugin with the Application's custom EF <code>ApplicationUser</code> Data Model:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(IdentityAuth.For&lt;ApplicationUser&gt;()));
+</code></pre>
+<p>It requires minimal configuration as all Authorization is configured using ASP.NET Core's
+standard APIs, any configuration in this plugin is then just used to customize Identity Auth's integration with ServiceStack.</p>
+<p>There's also no new concepts to learn as all ASP .NET Core endpoints, pages and controllers continue to Authenticate against
+the populated <code>ClaimsPrincipal</code> whilst all ServiceStack APIs continue to Authenticate against the populated typed
+<a href="/auth/sessions">User Session</a>.</p>
+<p>The <code>AuthFeature</code> works by registering the following Identity Auth Providers:</p>
+<h3 id="identity-auth-providers">Identity Auth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#identity-auth-providers'" aria-label="Permalink"> </a></h3>
+<ul>
+<li><a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs">IdentityApplicationAuthProvider</a> - Converts an Identity Auth <code>ClaimsPrincipal</code> into a ServiceStack Session</li>
+<li><a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityCredentialsAuthProvider.cs">IdentityCredentialsAuthProvider</a> - Implements ServiceStack's <code>Authenticate</code> API using Identity Auth</li>
+<li><a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityJwtAuthProvider.cs">IdentityJwtAuthProvider</a> - Converts an Identity Auth JWT into an Authenticated ServiceStack Session</li>
+</ul>
+<p>Only the <code>IdentityApplicationAuthProvider</code> is registered by default which is required to convert Identity Auth's <code>ClaimPrincipal</code>
+into an Authenticated ServiceStack <a href="/auth/sessions">Session</a>. The other Auth Providers are required if you want to enable authentication with
+ServiceStack's endpoints. E.g. ServiceStack's <a href="https://servicestack.net/auto-ui">Built-in UIs</a> would require the Credentials Auth
+to be enabled to authenticate via the built-in Sign In dialogs.</p>
+<h3 id="configuring-auth-providers">Configuring Auth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuring-auth-providers'" aria-label="Permalink"> </a></h3>
+<p>Which is what all the Blazor and MVC Identity Auth templates enable by default in
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Configure.Auth.cs">Configure.Auth.cs</a>:</p>
+<pre><code class="language-csharp">public class ConfigureAuth : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt; 
+        {
+            appHost.Plugins.Add(new AuthFeature(IdentityAuth.For&lt;ApplicationUser&gt;(
+                // Configure ServiceStack's Integration with Identity Auth
+                options =&gt; {
+                    options.EnableCredentialsAuth = true;
+                    options.SessionFactory = () =&gt; new CustomUserSession();
+                })
+            ));
+        });
+}
+</code></pre>
+<p>If you're using a <code>CustomUserSession</code> you'll also need to register it with the <code>SessionFactory</code> for it to be used.</p>
+<p>Each of the Identity Auth Providers can also be customized individually:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(IdentityAuth.For&lt;ApplicationUser&gt;(options =&gt; {
+        // Configure IdentityApplicationAuthProvider
+        options.AuthApplication...
+
+        // Configure IdentityCredentialsAuthProvider
+        options.EnableCredentialsAuth = true;
+        options.AuthCredentials...
+
+        // Configure IdentityJwtAuthProvider
+        options.EnableJwtAuth = true;
+        options.AuthJwt...
+    })
+));
+</code></pre>
+<p>Typically you'll want to use the included Identity UI Pages and dependencies to register new users and assign roles,
+but if you have any existing client integrations that use ServiceStack APIs they can also be enabled with:</p>
+<pre><code class="language-csharp">Plugins.Add(new AuthFeature(IdentityAuth.For&lt;ApplicationUser&gt;(options =&gt; {
+    // Include ServiceStack's Register API
+    options.IncludeRegisterService = true;
+    
+    // Include ServiceStack's AssignRoles and UnAssignRoles APIs
+    options.IncludeAssignRoleServices = true;
+));
+</code></pre>
+<h3 id="extending-identity-auth-cookies-and-user-sessions">Extending Identity Auth Cookies and User Sessions<a class="header-anchor" href="javascript:;" onclick="location.hash='#extending-identity-auth-cookies-and-user-sessions'" aria-label="Permalink"> </a></h3>
+<p>By default all <a href="https://github.com/ServiceStack/ServiceStack/blob/3ab3d23c85cf48435b8cd9386f25afab79fcb542/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs#L49">well known Claim Names</a>
+are used to populate the User Session, but you can also include additional claims in the Identity Auth Cookie
+and use them to populate the User Session by overriding <code>PopulateFromClaims()</code> in your
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp.ServiceInterface/Data/CustomUserSession.cs">CustomUserSession.cs</a>, e.g:</p>
+<pre><code class="language-csharp">public class CustomUserSession : AuthUserSession
+{
+    public override void PopulateFromClaims(IRequest httpReq, ClaimsPrincipal principal)
+    {
+        // Populate Session with data from Identity Auth Claims
+        ProfileUrl = principal.FindFirstValue(JwtClaimTypes.Picture);
+    }
+}
+
+// Add additional claims to the Identity Auth Cookie
+public class AdditionalUserClaimsPrincipalFactory(UserManager&lt;ApplicationUser&gt; userManager, RoleManager&lt;IdentityRole&gt; roleManager, IOptions&lt;IdentityOptions&gt; optionsAccessor)
+    : UserClaimsPrincipalFactory&lt;ApplicationUser,IdentityRole&gt;(userManager, roleManager, optionsAccessor)
+{
+    public override async Task&lt;ClaimsPrincipal&gt; CreateAsync(ApplicationUser user)
+    {
+        var principal = await base.CreateAsync(user);
+        var identity = (ClaimsIdentity)principal.Identity!;
+
+        var claims = new List&lt;Claim&gt;();
+        // Add additional claims here
+        if (user.ProfileUrl != null)
+        {
+            claims.Add(new Claim(JwtClaimTypes.Picture, user.ProfileUrl));
+        }
+
+        identity.AddClaims(claims);
+        return principal;
+    }
+}
+</code></pre>
+<h3 id="custom-application-user-primary-key">Custom Application User Primary Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-application-user-primary-key'" aria-label="Permalink"> </a></h3>
+<p>The default <code>IdentityUser</code> uses a <code>string</code> as the primary key populated with a <code>Guid</code>, but you could also change it to use an
+<code>int</code> by having your EF IdentityUser Data Model inherit from <code>IdentityUser&lt;int&gt;</code> instead:</p>
+<pre><code class="language-csharp">public class AppUser : IdentityUser&lt;int&gt;
+{
+    //...
+}
+</code></pre>
+<p>You'll also need to specify the Key Type when registering the <code>AuthFeature</code> plugin:</p>
+<pre><code class="language-csharp">public class ConfigureAuth : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt; {
+            appHost.Plugins.Add(new AuthFeature(IdentityAuth.For&lt;AppUser,int&gt;(
+                options =&gt; {
+                    options.EnableCredentialsAuth = true;
+                    options.SessionFactory = () =&gt; new CustomUserSession();
+                })
+            ));
+        });
+}
+</code></pre>
+<p>Which the new .NET 8 BlazorDiffusion App does in <a href="https://github.com/NetCoreApps/BlazorDiffusionVue/blob/main/BlazorDiffusion/Configure.Auth.cs">Configure.Auth.cs</a>
+to be compatible with its existing ServiceStack <code>UserAuth</code> tables which used an <code>int</code> primary key.</p>
+<h2 id="using-identity-auth-in-servicestack-apps">Using Identity Auth in ServiceStack Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-identity-auth-in-servicestack-apps'" aria-label="Permalink"> </a></h2>
+<p>One of the primary benefits of adopting Identity Auth is the wealth of documentation and resources available for it,
+which also applies to how you would use Identity Auth to secure your own Apps.</p>
+<p>If you're new to Identity Auth we recommend starting with the official introduction from Microsoft:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity">Introduction to Identity on ASP.NET Core</a></li>
+</ul>
+<p>To learn about securing Blazor Apps, go to:</p>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/security/">ASP.NET Core Blazor authentication and authorization</a></li>
+</ul>
+<h3 id="declarative-validation-attributes">Declarative Validation Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-validation-attributes'" aria-label="Permalink"> </a></h3>
+<p>The recommended way to protect your ServiceStack APIs is to continue to use the <a href="/declarative-validation">Declarative Validation</a>
+attributes which are decoupled from any implementation so be safely annotated on Request DTOs without adding
+any implementation dependencies, where they're also accessible to Clients and UIs using the Request DTOs to invoke your APIs.</p>
+<p>The available Typed Authorization Attributes include:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[ValidateIsAuthenticated]</code></td>
+<td>Restrict access toAuthenticated Users only</td>
+</tr>
+<tr>
+<td><code>[ValidateIsAdmin]</code></td>
+<td>Restrict access to Admin Users only</td>
+</tr>
+<tr>
+<td><code>[ValidateHasRole]</code></td>
+<td>Restrict access to only Users assigned with this Role</td>
+</tr>
+<tr>
+<td><code>[ValidateHasClaim]</code></td>
+<td>Restrict access to only Users assigned with this Claim</td>
+</tr>
+<tr>
+<td><code>[ValidateHasScope]</code></td>
+<td>Restrict access to only Users assigned with this Scope</td>
+</tr>
+</tbody>
+</table>
+<p>That can be annotated on <strong>Request DTOs</strong> to protect APIs:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+[ValidateIsAdmin]
+[ValidateHasRole(role)]
+[ValidateHasClaim(type,value)]
+[ValidateHasScope(scope)]
+public class Secured {}
+</code></pre>
+<h3 id="smtp-iemailsender">SMTP IEmailSender<a class="header-anchor" href="javascript:;" onclick="location.hash='#smtp-iemailsender'" aria-label="Permalink"> </a></h3>
+<p>The .NET 8 Templates also include a nice solution for sending Identity Auth emails through the <code>IEmailSender</code> interface
+which drops the Email Request in the registered Background MQ in
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Configure.Mq.cs">Configure.Mq.cs</a>
+which uses it to invoke the <code>SendEmail</code> API in
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp.ServiceInterface/EmailServices.cs">EmailServices</a> in a
+managed background worker:</p>
+<pre><code class="language-csharp">public class EmailSender(IMessageService messageService) : IEmailSender
+{
+    public Task SendEmailAsync(string email, string subject, string htmlMessage)
+    {
+        using var mqClient = messageService.CreateMessageProducer();
+        mqClient.Publish(new SendEmail
+        {
+            To = email,
+            Subject = subject,
+            BodyHtml = htmlMessage,
+        });
+
+        return Task.CompletedTask;
+    }
+}
+</code></pre>
+<p>To enable it you'll need to register your preferred SMTP Server in your App's <code>appsettings.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;SmtpConfig&quot;: {
+    &quot;Username&quot;: &quot;username&quot;,
+    &quot;Password&quot;: &quot;password&quot;,
+    &quot;Host&quot;: &quot;smtp.mailtrap.io&quot;,
+    &quot;Port&quot;: 587,
+    &quot;FromEmail&quot;: &quot;mail@example.org&quot;
+  }
+}
+</code></pre>
+<p>Then uncomment the <code>EmailSender</code> registration in your <code>Program.cs</code></p>
+<pre><code class="language-csharp">services.AddSingleton&lt;IEmailSender, EmailSender&gt;();
+</code></pre>
+<h3 id="send-any-app-email">Send any App Email<a class="header-anchor" href="javascript:;" onclick="location.hash='#send-any-app-email'" aria-label="Permalink"> </a></h3>
+<p>The nice part about this solution is that it's not limited to just sending Identity Auth emails, you can also use it to send
+any App Email, either by publishing a message to the registered MQ with <code>PublishMessage</code> or by using the
+<a href="/service-gateway">Service Gateway</a> to invoke the API directly, e.g:</p>
+<pre><code class="language-csharp">public class MyServices : Service
+{
+    public object Any(MyRequest request)
+    {
+        // Send Email in managed Background MQ Worker
+        PublishMessage(new SendEmail {
+            To = email,
+            Subject = subject,
+            BodyHtml = body,
+        });
+
+        // Block until Email is sent to SMTP Serve
+        Gateway.Send(new SendEmail {
+            To = email,
+            Subject = subject,
+            BodyHtml = body,
+        });
+    }
+}
+</code></pre>
+<h2 id="end-to-end-typed-api-support-for-php">End-to-end Typed API support for PHP!<a class="header-anchor" href="javascript:;" onclick="location.hash='#end-to-end-typed-api-support-for-php'" aria-label="Permalink"> </a></h2>
+<p><img src="/img/pages/servicestack-reference/php-reference.png" alt="ServiceStack and PHP Banner" /></p>
+<p>We're happy to announce the next <a href="/add-servicestack-reference">Add ServiceStack Reference</a> language to enjoy
+end-to-end typed support is - <a href="https://www.php.net">PHP</a>!</p>
+<div class="flex justify-center">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
+</div>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types from directly within
+PhpStorm using <a href="https://plugins.jetbrains.com/plugin/7749-servicestack/">ServiceStack IntelliJ Plugin</a> - providing a simple way to give clients typed access to your
+ServiceStack Services.</p>
+<h3 id="first-class-development-experience">First class development experience<a class="header-anchor" href="javascript:;" onclick="location.hash='#first-class-development-experience'" aria-label="Permalink"> </a></h3>
+<p><a href="https://www.php.net">PHP</a> is one of the worlds most popular programming languages thanks to its ease of use,
+platform independence, large standard library, flexibility and fast development experience which sees it excels as
+a popular language for web development and for development of popular CMS products like WordPress, Drupal and Joomla
+thanks to its flexibility, embeddability and ease of customization.</p>
+<p>To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports PHP as a
+1st class Add ServiceStack Reference supported language which gives PHP developers an end-to-end typed API for consuming
+ServiceStack APIs, complete with IDE integration in <a href="https://www.jetbrains.com/phpstorm/">PhpStorm</a> as well as
+<a href="/dotnet-tool#addupdate-servicestack-references">built-in support in x dotnet tool</a>
+to generate Typed and annotated PHP DTOs for a remote ServiceStack instance from a single command-line.</p>
+<h3 id="ideal-idiomatic-typed-message-based-api">Ideal idiomatic Typed Message-based API<a class="header-anchor" href="javascript:;" onclick="location.hash='#ideal-idiomatic-typed-message-based-api'" aria-label="Permalink"> </a></h3>
+<p>To maximize the utility of PHP DTOs and enable richer tooling support and greater development experience, PHP DTOs are generated as
+Typed <a href="https://www.php.net/manual/en/class.jsonserializable.php">JsonSerializable</a> classes with
+<a href="https://www.php.net/manual/en/language.oop5.decon.php#language.oop5.decon.constructor.promotion">promoted constructors</a>
+and annotated with <a href="https://phpstan.org/writing-php-code/phpdoc-types">PHPDoc Types</a> - that's invaluable when scaling
+large PHP code-bases and greatly improves discoverability of a remote API. DTOs are also enriched with interface markers
+and Annotations which enables its optimal end-to-end typed API:</p>
+<p>The PHP DTOs and <code>JsonServiceClient</code> library follow
+<a href="https://infinum.com/handbook/wordpress/coding-standards/php-coding-standards/naming">PHP naming conventions</a>
+so they'll naturally fit into existing PHP code bases. Here's a sample of <a href="https://techstacks.io">techstacks.io</a>
+generated PHP DTOs containing string and int Enums, an example AutoQuery and a standard Request &amp; Response DTO showcasing
+the rich typing annotations and naming conventions used:</p>
+<pre><code class="language-php">enum TechnologyTier : string
+{
+    case ProgrammingLanguage = 'ProgrammingLanguage';
+    case Client = 'Client';
+    case Http = 'Http';
+    case Server = 'Server';
+    case Data = 'Data';
+    case SoftwareInfrastructure = 'SoftwareInfrastructure';
+    case OperatingSystem = 'OperatingSystem';
+    case HardwareInfrastructure = 'HardwareInfrastructure';
+    case ThirdPartyServices = 'ThirdPartyServices';
+}
+
+enum Frequency : int
+{
+    case Daily = 1;
+    case Weekly = 7;
+    case Monthly = 30;
+    case Quarterly = 90;
+}
+
+// @Route(&quot;/technology/search&quot;)
+#[Returns('QueryResponse')]
+/**
+ * @template QueryDb of Technology
+ * @template QueryDb1 of TechnologyView
+ */
+class FindTechnologies extends QueryDb implements IReturn, IGet, JsonSerializable
+{
+    public function __construct(
+        /** @var array&lt;int&gt;|null */
+        public ?array $ids=null,
+        /** @var string|null */
+        public ?string $name=null,
+        /** @var string|null */
+        public ?string $vendorName=null,
+        /** @var string|null */
+        public ?string $nameContains=null,
+        /** @var string|null */
+        public ?string $vendorNameContains=null,
+        /** @var string|null */
+        public ?string $descriptionContains=null
+    ) {
+    }
+
+    /** @throws Exception */
+    public function fromMap($o): void {
+        parent::fromMap($o);
+        if (isset($o['ids'])) $this-&gt;ids = JsonConverters::fromArray('int', $o['ids']);
+        if (isset($o['name'])) $this-&gt;name = $o['name'];
+        if (isset($o['vendorName'])) $this-&gt;vendorName = $o['vendorName'];
+        if (isset($o['nameContains'])) $this-&gt;nameContains = $o['nameContains'];
+        if (isset($o['vendorNameContains'])) $this-&gt;vendorNameContains = $o['vendorNameContains'];
+        if (isset($o['descriptionContains'])) $this-&gt;descriptionContains = $o['descriptionContains'];
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
+    {
+        $o = parent::jsonSerialize();
+        if (isset($this-&gt;ids)) $o['ids'] = JsonConverters::toArray('int', $this-&gt;ids);
+        if (isset($this-&gt;name)) $o['name'] = $this-&gt;name;
+        if (isset($this-&gt;vendorName)) $o['vendorName'] = $this-&gt;vendorName;
+        if (isset($this-&gt;nameContains)) $o['nameContains'] = $this-&gt;nameContains;
+        if (isset($this-&gt;vendorNameContains)) $o['vendorNameContains'] = $this-&gt;vendorNameContains;
+        if (isset($this-&gt;descriptionContains)) $o['descriptionContains'] = $this-&gt;descriptionContains;
+        return empty($o) ? new class(){} : $o;
+    }
+    public function getTypeName(): string { return 'FindTechnologies'; }
+    public function getMethod(): string { return 'GET'; }
+    public function createResponse(): mixed { return QueryResponse::create(genericArgs:['TechnologyView']); }
+}
+
+// @Route(&quot;/orgs/{Id}&quot;, &quot;DELETE&quot;)
+class DeleteOrganization implements IReturnVoid, IDelete, JsonSerializable
+{
+    public function __construct(
+        /** @var int */
+        public int $id=0
+    ) {
+    }
+
+    /** @throws Exception */
+    public function fromMap($o): void {
+        if (isset($o['id'])) $this-&gt;id = $o['id'];
+    }
+    
+    /** @throws Exception */
+    public function jsonSerialize(): mixed
+    {
+        $o = [];
+        if (isset($this-&gt;id)) $o['id'] = $this-&gt;id;
+        return empty($o) ? new class(){} : $o;
+    }
+    public function getTypeName(): string { return 'DeleteOrganization'; }
+    public function getMethod(): string { return 'DELETE'; }
+    public function createResponse(): void {}
+}
+</code></pre>
+<p>The smart PHP <code>JsonServiceClient</code> available in the <a href="https://packagist.org/packages/servicestack/client">servicestack/client</a>
+packagist package enables the same productive, typed API development experience available in our other 1st-class supported
+client platforms.</p>
+<p>Using promoted constructors enables DTOs to be populated using a single constructor expression utilizing named parameters
+which together with the generic <code>JsonServiceClient</code> enables end-to-end typed API Requests in a single LOC:</p>
+<pre><code class="language-php">use Servicestack\JsonServiceClient;
+use dtos\Hello;
+
+$client = new JsonServiceClient(&quot;https://test.servicestack.net&quot;);
+
+/** @var HelloResponse $response */
+$response = client-&gt;get(new Hello(name:&quot;World&quot;));
+</code></pre>
+<blockquote>
+<p>The <code>HelloResponse</code> optional type hint doesn't change runtime behavior but enables static analysis tools and IDEs like PyCharm to provide rich intelli-sense and development time feedback.</p>
+</blockquote>
+<h2 id="installation">Installation<a class="header-anchor" href="javascript:;" onclick="location.hash='#installation'" aria-label="Permalink"> </a></h2>
+<p>Ensure you have <a href="https://www.php.net/manual/en/install.php">PHP</a> and <a href="https://getcomposer.org/doc/00-intro.md">Composer</a> installed.</p>
+<p>The only requirements for PHP apps to perform typed API Requests are the generated PHP DTOs and the generic <code>JsonServiceClient</code>
+which can be installed in Composer projects with:</p>
+<pre><code class="language-bash">$ composer require servicestack/client
+</code></pre>
+<p>Or by adding the package to your <code>composer.json</code> then installing the dependencies:</p>
+<pre><code class="language-json">{
+  &quot;require&quot;: {
+    &quot;servicestack/client&quot;: &quot;^1.0&quot;
+  }
+}
+</code></pre>
+<h3 id="phpstorm-servicestack-plugin">PhpStorm ServiceStack Plugin<a class="header-anchor" href="javascript:;" onclick="location.hash='#phpstorm-servicestack-plugin'" aria-label="Permalink"> </a></h3>
+<p>PHP developers of <a href="https://www.jetbrains.com/phpstorm/">PhpStorm</a> can get a simplified development experience for consuming
+ServiceStack Services by installing the <a href="https://plugins.jetbrains.com/plugin/7749-servicestack">ServiceStack Plugin</a> from the JetBrains Marketplace:</p>
+<p><a href="https://plugins.jetbrains.com/plugin/7749-servicestack"><img src="/img/pages/servicestack-reference/pycharm-servicestack-plugin.png" alt="" /></a></p>
+<p>Where you'll be able to right-click on a directory and click on <strong>ServiceStack Reference</strong> on the context menu:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-add-servicestack-reference.png" alt="" /></p>
+<p>To launch the <strong>Add PHP ServiceStack Reference</strong> dialog where you can enter the remote URL of the ServiceStack endpoint you wish to call to generate the Typed PHP DTOs for all APIs which by default will saved to <code>dtos.php</code>:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-add-servicestack-reference-dialog.png" alt="" /></p>
+<p>Then just import the DTOs and <code>JsonServiceClient</code> to be able to consume any of the remote ServiceStack APIs:</p>
+<pre><code class="language-php">&lt;?php
+
+require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer autoload
+require_once 'dtos.php';
+
+use dtos\FindTechnologies;
+use Servicestack\JsonServiceClient;
+
+$client = JsonServiceClient::create(&quot;https://techstacks.io&quot;);
+
+$response = $client-&gt;send(new FindTechnologies(
+    ids: [1,2,4,6],
+    vendorName: &quot;Google&quot;));
+
+print_r($response);
+</code></pre>
+<p>If any of the the remote APIs change their DTOs can be updated by right-clicking on <code>dtos.php</code> and clicking <strong>Update ServiceStack Reference</strong>:</p>
+<p><img src="/img/pages/servicestack-reference/pycharm-update-servicestack-reference.png" alt="" /></p>
+<p>For more usage examples and information about ServiceStack's PHP support checkout the
+<a href="/php-add-servicestack-reference">PHP Add ServiceStack Reference</a> docs.</p>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/releases/v8_00.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/releases/" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Releases
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/releases/v6_11" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                ServiceStack v6.11
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#net-8'" data-id="net-8" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            .NET 8
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="all-nuget-packages-include-net8.0-builds" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#all-nuget-packages-include-net8.0-builds'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            All NuGet Packages include net8.0 builds
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="all.net-project-templates-upgraded-to.net-8" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#all.net-project-templates-upgraded-to.net-8'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            All .NET Project Templates upgraded to .NET 8
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="net-8-docker-containerization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#net-8-docker-containerization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            .NET 8 Docker Containerization
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#new.net-8-blazor-template'" data-id="new.net-8-blazor-template" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            New .NET 8 Blazor Template
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#asp.net-core-identity-integration'" data-id="asp.net-core-identity-integration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ASP.NET Core Identity Integration
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#responsive-and-interactive-uis-with-tailwind-css'" data-id="responsive-and-interactive-uis-with-tailwind-css" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Responsive and Interactive UIs with Tailwind CSS
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#servicestack.blazor-tailwind-components'" data-id="servicestack.blazor-tailwind-components" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ServiceStack.Blazor Tailwind Components
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#other-template-features'" data-id="other-template-features" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Other Template Features
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="talent-blazor-demo-upgraded" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#talent-blazor-demo-upgraded'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Talent Blazor Demo Upgraded
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#your-first.net-8-blazor-app'" data-id="your-first.net-8-blazor-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Your first .NET 8 Blazor App
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="static-rendering-is-now-the-default" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#static-rendering-is-now-the-default'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Static Rendering is now the default
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#choose-your-compromise'" data-id="choose-your-compromise" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Choose your compromise
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#net-8-blazor-is-a-game-changer'" data-id="net-8-blazor-is-a-game-changer" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            .NET 8 Blazor is a Game Changer
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="interactive-only-when-you-need-it" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#interactive-only-when-you-need-it'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Interactive only when you need it
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="enhanced-navigation-ftw" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#enhanced-navigation-ftw'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Enhanced Navigation FTW
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="full-stack-web-ui" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#full-stack-web-ui'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Full Stack Web UI
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="benefits-over-mvc-and-razor-pages" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#benefits-over-mvc-and-razor-pages'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Benefits over MVC and Razor Pages
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="when-do-you-need-blazors-interactivity-features" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#when-do-you-need-blazors-interactivity-features'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            When do you need Blazor&#x27;s Interactivity features?
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="interactive-feature-options" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#interactive-feature-options'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Interactive Feature Options
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="vanilla-js-blazor-components" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#vanilla-js-blazor-components'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Vanilla JS Blazor Components
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="scripts-not-re-executed-in-enhanced-navigation" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#scripts-not-re-executed-in-enhanced-navigation'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Scripts not re-executed in Enhanced Navigation
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="try-it-out" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#try-it-out'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Try it out!
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="declarative-javascript-modules" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#declarative-javascript-modules'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Declarative JavaScript Modules
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="blazor-without-blazor-interactivity" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#blazor-without-blazor-interactivity'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Blazor without Blazor Interactivity
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#declarative-vue-components'" data-id="declarative-vue-components" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Declarative Vue Components
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="lazy-loading-vue-components" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#lazy-loading-vue-components'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Lazy Loading Vue Components
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#new.net-8-blazor-vue-template'" data-id="new.net-8-blazor-vue-template" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            New .NET 8 Blazor Vue Template!
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="blazor-vue-tailwind-template" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#blazor-vue-tailwind-template'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Blazor Vue Tailwind Template
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="faster-iterative-development" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#faster-iterative-development'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Faster iterative development
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="statically-rendered-blazor-apps" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#statically-rendered-blazor-apps'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Statically Rendered Blazor Apps
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#blazor-vue-diffusion'" data-id="blazor-vue-diffusion" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Blazor Vue Diffusion
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#asp.net-core-identity-auth-in.net-8-templates'" data-id="asp.net-core-identity-auth-in.net-8-templates" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ASP.NET Core Identity Auth in .NET 8 Templates
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="history-of-servicestack-authentication" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#history-of-servicestack-authentication'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            History of ServiceStack Authentication
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="servicestack-will-use-asp.net-core-identity-auth-in-new-projects" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#servicestack-will-use-asp.net-core-identity-auth-in-new-projects'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ServiceStack will use ASP.NET Core Identity Auth in new projects
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="migrating-to-asp.net-core-identity-auth" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#migrating-to-asp.net-core-identity-auth'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Migrating to ASP.NET Core Identity Auth
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#servicestacks-identity-auth-integration'" data-id="servicestacks-identity-auth-integration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            ServiceStack&#x27;s Identity Auth Integration
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="identity-auth-providers" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#identity-auth-providers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Identity Auth Providers
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="configuring-auth-providers" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#configuring-auth-providers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Configuring Auth Providers
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="extending-identity-auth-cookies-and-user-sessions" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#extending-identity-auth-cookies-and-user-sessions'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Extending Identity Auth Cookies and User Sessions
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="custom-application-user-primary-key" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#custom-application-user-primary-key'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Custom Application User Primary Key
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#using-identity-auth-in-servicestack-apps'" data-id="using-identity-auth-in-servicestack-apps" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Using Identity Auth in ServiceStack Apps
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="declarative-validation-attributes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#declarative-validation-attributes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Declarative Validation Attributes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="smtp-iemailsender" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#smtp-iemailsender'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            SMTP IEmailSender
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="send-any-app-email" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#send-any-app-email'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Send any App Email
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#end-to-end-typed-api-support-for-php'" data-id="end-to-end-typed-api-support-for-php" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            End-to-end Typed API support for PHP!
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="first-class-development-experience" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#first-class-development-experience'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            First class development experience
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="ideal-idiomatic-typed-message-based-api" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#ideal-idiomatic-typed-message-based-api'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Ideal idiomatic Typed Message-based API
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#installation'" data-id="installation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Installation
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="phpstorm-servicestack-plugin" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#phpstorm-servicestack-plugin'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            PhpStorm ServiceStack Plugin
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+        import App from "/pages/releases/v8_00.mjs" 
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

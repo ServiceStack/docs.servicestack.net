@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2023-11-18T15:27:45.3444996Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Migrate to ASP.NET Core Identity Auth</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-indigo-500 text-gray-900">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+                        <a href="/locode/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            Locode
+                        </a>
+                        <a href="/grpc/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            gRPC
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+                    <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Locode
+                    </a>
+                    <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        gRPC
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-16 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/auth/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Auth                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/auth/authentication-and-authorization" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Authentication &amp; Authorization
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/auth-repository" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Auth Repository
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-servicestack" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ServiceStack Auth in MVC
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identity-aspnet" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using ASP.NET Identity Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/identityserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Using IdentityServer4 Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/sessions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sessions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/jwt-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        JWT AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/api-key-authprovider" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Key AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/signin-with-apple" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Sign in with Apple AuthProvider
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/restricting-services" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Restricting Services
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/encrypted-messaging" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Encrypted Messaging
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/auth/anti-forgery" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Anti Forgery
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Migrate to ASP.NET Core Identity Auth
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><h2 id="migrate-from-servicestack-auth-to-identity-auth">Migrate from ServiceStack Auth to Identity Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#migrate-from-servicestack-auth-to-identity-auth'" aria-label="Permalink"> </a></h2>
+<p>Migrating from ServiceStack Auth to Identity Auth should be relatively straight-forward as ServiceStack uses a compatible
+Identity v2 password hashing format, which should let you migrate your users to Identity Auth without them noticing.</p>
+<div class="info custom-block">
+                <p class="custom-block-title">TIP</p><p>Please ensure your App database is backed up before performing any migrations</p>
+</div>
+<h3 id="rename-old-appuser-table">1. Rename old AppUser table<a class="header-anchor" href="javascript:;" onclick="location.hash='#rename-old-appuser-table'" aria-label="Permalink"> </a></h3>
+<p>You'll want to use a different name so it doesn't conflict with the new Identity <code>ApplicationUser</code>. This is only needed
+to query the User data to migrate to Identity Auth, you'll be able to remove it after successfully migrating all Users.</p>
+<p>You don't need to include all the properties of the <code>UserAuth</code> base table, just the ones you want to migrate to Identity Auth,
+which for Blazor Diffusion was only:</p>
+<pre><code class="language-csharp">// Used by OrmLite to fetch User data to migrate from old ServiceStack `AppUser` table
+[Alias(&quot;AppUser&quot;)]
+public class OldAppUser
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string UserName { get; set; }
+    public string DisplayName { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string? Handle { get; set; }
+    public string Email { get; set; }
+    public string PasswordHash { get; set; }
+    public string? ProfileUrl { get; set; }
+    public string? Avatar { get; set; } //overrides ProfileUrl
+    public string? LastLoginIp { get; set; }
+    public DateTime? LastLoginDate { get; set; }
+    public string RefIdStr { get; set; }
+    public DateTime? LockedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
+}
+</code></pre>
+<h3 id="create-identity-auth-data-model">2. Create Identity Auth Data Model<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-identity-auth-data-model'" aria-label="Permalink"> </a></h3>
+<p>If you have a lot of existing references to the <code>AppUser</code> name you'll want to retain the same name so the existing references
+wont need to be updated. Essentially your custom EF IdentityUser will want a copy of all the properties you want to migrate
+other than <code>Id</code>, <code>Email</code>, and <code>PasswordHash</code> that's already defined in the base <code>IdentityUser</code> class:</p>
+<pre><code class="language-csharp">[Alias(&quot;AspNetUsers&quot;)] // Tell OrmLite which table this EF Data Model maps to
+public class AppUser : IdentityUser&lt;int&gt;
+{
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? DisplayName { get; set; }
+    public string? ProfileUrl { get; set; }
+    [Input(Type = &quot;file&quot;), UploadTo(&quot;avatars&quot;)]
+    public string? Avatar { get; set; } //overrides ProfileUrl
+    public string? Handle { get; set; }
+    public int? RefId { get; set; }
+    public string RefIdStr { get; set; } = Guid.NewGuid().ToString();
+    public bool IsArchived { get; set; }
+    public DateTime? ArchivedDate { get; set; }
+    public string? LastLoginIp { get; set; }
+    public DateTime? LastLoginDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
+}
+</code></pre>
+<p>The <code>AppUser</code> Data Model and <code>int</code> primary key would also need to be registered in your
+<a href="https://github.com/NetCoreApps/BlazorDiffusionVue/blob/main/BlazorDiffusion/Configure.Auth.cs">Configure.Auth.cs</a>:</p>
+<pre><code class="language-csharp">public class ConfigureAuth : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt; {
+            appHost.Plugins.Add(new AuthFeature(IdentityAuth.For&lt;AppUser,int&gt;(
+                options =&gt; {
+                    options.EnableCredentialsAuth = true;
+                    options.SessionFactory = () =&gt; new CustomUserSession();
+                })
+            ));
+        });
+}
+</code></pre>
+<h3 id="add-authentication-configuration">3. Add Authentication Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#add-authentication-configuration'" aria-label="Permalink"> </a></h3>
+<p>You'll need to configure Entity Framework and add your desired ASP.NET Identity Auth configuration to your <strong>Program.cs</strong>.</p>
+<p>We recommend copying from a new Microsoft or ServiceStack .NET 8 Project which closely matches the Authentication
+options you want to enable.</p>
+<h4 id="using-identity-auth-application-cookie">Using Identity Auth Application Cookie<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-identity-auth-application-cookie'" aria-label="Permalink"> </a></h4>
+<p>For example you can start with the recommended Authentication for a new Blazor Project from its <a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Program.cs">Program.cs</a>:</p>
+<pre><code class="language-csharp">services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddIdentityCookies();
+services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(&quot;App_Data&quot;));
+
+// $ dotnet ef migrations add CreateIdentitySchema
+// $ dotnet ef database update
+var connectionString = config.GetConnectionString(&quot;DefaultConnection&quot;) ?? throw new InvalidOperationException(&quot;Connection string 'DefaultConnection' not found.&quot;);
+services.AddDbContext&lt;ApplicationDbContext&gt;(options =&gt;
+    options.UseSqlite(connectionString, b =&gt; b.MigrationsAssembly(nameof(MyApp))));
+services.AddDatabaseDeveloperPageExceptionFilter();
+
+services.AddIdentityCore&lt;ApplicationUser&gt;(options =&gt; options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles&lt;IdentityRole&gt;()
+    .AddEntityFrameworkStores&lt;ApplicationDbContext&gt;()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+services.AddSingleton&lt;IEmailSender, NoOpEmailSender&gt;();
+services.AddScoped&lt;IUserClaimsPrincipalFactory&lt;ApplicationUser&gt;, AdditionalUserClaimsPrincipalFactory&gt;();
+</code></pre>
+<h4 id="using-identity-auth-oauth-providers">Using Identity Auth OAuth Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-identity-auth-oauth-providers'" aria-label="Permalink"> </a></h4>
+<p>Alternatively if you want to add support for external OAuth logins you can copy from the <strong>MVC Tailwind</strong> Authentication
+configuration in its <a href="https://github.com/NetCoreTemplates/mvc-tailwind/blob/main/MyApp/Program.cs">Program.cs</a> which will
+also require adding the NuGet dependencies of the OAuth providers you want to support which you can get from its
+<a href="https://github.com/NetCoreTemplates/mvc-tailwind/blob/main/MyApp/MyApp.csproj">MyApp.csproj</a></p>
+<h3 id="create-and-run-ef-migrations">4. Create and Run EF Migrations<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-and-run-ef-migrations'" aria-label="Permalink"> </a></h3>
+<p>After your App is properly configured you'll want to create the EF Migrations for your the Identity Auth User tables
+by installing the <a href="https://learn.microsoft.com/en-us/ef/core/cli/dotnet">dotnet-ef tool</a> and running:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>dotnet ef migrations add CreateIdentitySchema</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Which should create the EF Migrations in the <code>/Migrations</code> folder, you can then run the migrations to create the
+Identity Auth tables in your App's configured database:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>dotnet ef database update</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="implement-the-migrate-users-task">5. Implement the Migrate Users Task<a class="header-anchor" href="javascript:;" onclick="location.hash='#implement-the-migrate-users-task'" aria-label="Permalink"> </a></h3>
+<p>This could be implemented in a separate Application or Unit Test although we've found the easiest way to migrate existing users
+is to implement a custom <a href="https://docs.servicestack.net/app-tasks">App Task</a> as it's able to make use of your App's configured Authentication, EF and OrmLite dependencies
+that can then be run from the command-line.</p>
+<p>The implementation should be fairly straight-forward, you'll basically just need to create a new Identity Auth User
+using the <code>UserManager&lt;AppUser&gt;</code> dependency for each of your existing users:</p>
+<pre><code class="language-csharp">public class ConfigureDbMigrations : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureAppHost(appHost =&gt; {
+            AppTasks.Register(&quot;migrate.users&quot;, _ =&gt; {
+                var log = appHost.GetApplicationServices().GetRequiredService&lt;ILogger&lt;ConfigureDbMigrations&gt;&gt;();
+
+                log.LogInformation(&quot;Running migrate.users...&quot;);
+                var scopeFactory = appHost.GetApplicationServices().GetRequiredService&lt;IServiceScopeFactory&gt;();
+                using var scope = scopeFactory.CreateScope();
+                using var dbContext = scope.ServiceProvider.GetRequiredService&lt;ApplicationDbContext&gt;();
+                using var db = scope.ServiceProvider.GetRequiredService&lt;IDbConnectionFactory&gt;().Open();
+                var migrateUsers = db.Select(db.From&lt;OldAppUser&gt;().OrderBy(x =&gt; x.Id));
+
+                log.LogInformation(&quot;Migrating {Count} Existing ServiceStack Users to Identity Auth Users...&quot;, migrateUsers.Count);
+                MigrateExistingUsers(dbContext, scope.ServiceProvider, migrateUsers).Wait();
+            });
+            AppTasks.Run();
+        });
+
+    private async Task MigrateExistingUsers(ApplicationDbContext dbContext, IServiceProvider services, 
+        List&lt;OldAppUser&gt; migrateUsers, string tempPassword=&quot;p@55wOrd&quot;)
+    {
+        var userManager = services.GetRequiredService&lt;UserManager&lt;AppUser&gt;&gt;();
+        var now = DateTime.UtcNow;
+
+        foreach (var user in migrateUsers)
+        {
+            var appUser = new AppUser
+            {
+                Id = user.Id,
+                UserName = user.Email,
+                Email = user.Email,
+                DisplayName = user.DisplayName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Handle = user.Handle,
+                ProfileUrl = user.ProfileUrl,
+                Avatar = user.Avatar,
+                RefIdStr = user.RefIdStr ?? Guid.NewGuid().ToString(),
+                LockoutEnabled = true,
+                LockoutEnd = user.LockedDate != null ? now.AddYears(10) : now,
+                LastLoginDate = user.LastLoginDate,
+                LastLoginIp = user.LastLoginIp,
+                CreatedDate = user.CreatedDate,
+                ModifiedDate = user.ModifiedDate,
+                // Verify you want existing Users emails to be confirmed
+                EmailConfirmed = true,
+            };
+            await userManager.CreateAsync(appUser, tempPassword);
+
+            // Update raw Password Hash using EF
+            if (user.PasswordHash != null)
+            {
+                dbContext.Users
+                    .Where(x =&gt; x.Id == user.Id)
+                    .ExecuteUpdate(setters =&gt; setters.SetProperty(x =&gt; x.PasswordHash, user.PasswordHash));
+            }
+        }
+    }
+}    
+</code></pre>
+<p>As there's no official API for updating the raw <code>PasswordHash</code> you'll need to use EF's <code>ExecuteUpdate()</code> API to update it
+on the <code>AspNetUsers</code> table directly.</p>
+<p>It should be noted that ServiceStack Auth still uses ASP.NET Cor's previous Identity v2 format for hashing its passwords,
+this will be automatically re-hashed using the latest ASP.NET Identity v3 format after users successfully sign in.</p>
+<h4 id="optimizing-the-passwordhash-update">Optimizing the PasswordHash Update<a class="header-anchor" href="javascript:;" onclick="location.hash='#optimizing-the-passwordhash-update'" aria-label="Permalink"> </a></h4>
+<p>Whilst migrating users should be a once-off task, if you have a lot of users you may want to optimize the <code>PasswordHash</code> update
+from a <strong>N+1</strong> query per user to a single query that updates all users in a single command.</p>
+<p>You'll need to use the <strong>UPDATE FROM</strong> syntax that's supported by your RDBMS's, here's an example of how to do it in SQLite:</p>
+<pre><code class="language-sql">UPDATE AspNetUsers
+SET PasswordHash = u.PasswordHash
+FROM (SELECT Email, PasswordHash FROM AppUser WHERE PasswordHash is NOT NULL) AS u
+WHERE u.Email = AspNetUsers.Email;
+</code></pre>
+<h4 id="migrating-roles">Migrating Roles<a class="header-anchor" href="javascript:;" onclick="location.hash='#migrating-roles'" aria-label="Permalink"> </a></h4>
+<p>Migrating Roles will depend how their stored in your App, you'll first need to ensure each role is created in the <code>AspNetRoles</code>
+table with:</p>
+<pre><code class="language-csharp">string[] allRoles = [...]; // All Roles in your App
+var roleManager = services.GetRequiredService&lt;RoleManager&lt;IdentityRole&gt;&gt;();
+foreach (var roleName in allRoles)
+{
+    var roleExist = await roleManager.RoleExistsAsync(roleName);
+    if (!roleExist)
+    {
+        await roleManager.CreateAsync(new IdentityRole(roleName));
+    }
+}
+</code></pre>
+<p>You can then assign Roles to Users using the <code>UserManager&lt;AppUser&gt;</code>, e.g:</p>
+<pre><code class="language-csharp">string[] roles = [...]; // Roles to assign to User 
+var newUser = await userManager.FindByEmailAsync(user.Email!);
+await userManager.AddToRolesAsync(user, roles);
+</code></pre>
+<h3 id="run-the-migrate.users-task">6. Run the migrate.users Task<a class="header-anchor" href="javascript:;" onclick="location.hash='#run-the-migrate.users-task'" aria-label="Permalink"> </a></h3>
+<p>With everything in place, all that's left is to run the <code>migrate.users</code> App Task from the command-line:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>dotnet run --AppTasks=migrate.users</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h3 id="verify-users-can-sign-in">7. Verify Users can Sign In<a class="header-anchor" href="javascript:;" onclick="location.hash='#verify-users-can-sign-in'" aria-label="Permalink"> </a></h3>
+<p>After successfully migrating all your users you should check the new <code>IdentityUser</code> table to verify all the User data
+you want has been migrated as well as verifying they can sign in with their existing credentials.</p>
+<p>The easiest way to include the Identity Auth UI Pages to your App is to copy your Application into a new .NET 8 Project
+that already includes them, you can create a new Blazor App with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x new blazor ProjectNamespace</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Or create a new MVC App with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x new mvc-tailwind ProjectNamespace</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Alternatively you can manually copy the pages from the project template repositories, for Blazor most of the Identity Auth
+UI Pages are in the
+<a href="https://github.com/NetCoreTemplates/blazor/tree/main/MyApp/Components/Identity">Components/Identity</a> and
+<a href="https://github.com/NetCoreTemplates/blazor/tree/main/MyApp/Components/Pages/Account">Pages/Account</a> folders.</p>
+<p>For MVC, most of the Identity UI are in the
+<a href="https://github.com/NetCoreTemplates/mvc-tailwind/blob/main/MyApp/Controllers/AccountController.cs">Account</a>
+and <a href="https://github.com/NetCoreTemplates/mvc-tailwind/blob/main/MyApp/Controllers/ManageController.cs">Manage</a> controllers
+as well as their
+<a href="https://github.com/NetCoreTemplates/mvc-tailwind/tree/main/MyApp/Views/Account">Views/Account</a> and
+<a href="https://github.com/NetCoreTemplates/mvc-tailwind/tree/main/MyApp/Views/Manage">Views/Manage</a> folders.</p>
+<h3 id="smtp-iemailsender">SMTP IEmailSender<a class="header-anchor" href="javascript:;" onclick="location.hash='#smtp-iemailsender'" aria-label="Permalink"> </a></h3>
+<p>The .NET 8 Templates include a nice solution for sending Identity Auth emails through the <code>IEmailSender</code> interface
+which drops the Email Request in the registered Background MQ in
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Configure.Mq.cs">Configure.Mq.cs</a>
+which uses it to invoke the <code>SendEmail</code> API in
+<a href="https://github.com/NetCoreTemplates/blazor/blob/main/MyApp.ServiceInterface/EmailServices.cs">EmailServices</a> in a
+managed background worker:</p>
+<pre><code class="language-csharp">public class EmailSender(IMessageService messageService) : IEmailSender
+{
+    public Task SendEmailAsync(string email, string subject, string htmlMessage)
+    {
+        using var mqClient = messageService.CreateMessageProducer();
+        mqClient.Publish(new SendEmail
+        {
+            To = email,
+            Subject = subject,
+            BodyHtml = htmlMessage,
+        });
+
+        return Task.CompletedTask;
+    }
+}
+</code></pre>
+<p>To enable it you'll need to register your preferred SMTP Server in your App's <code>appsettings.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;SmtpConfig&quot;: {
+    &quot;Username&quot;: &quot;username&quot;,
+    &quot;Password&quot;: &quot;password&quot;,
+    &quot;Host&quot;: &quot;smtp.mailtrap.io&quot;,
+    &quot;Port&quot;: 587,
+    &quot;FromEmail&quot;: &quot;mail@example.org&quot;
+  }
+}
+</code></pre>
+<p>Then replace the <code>IEmailSender</code> registration in your <code>Program.cs</code></p>
+<pre><code class="language-csharp">services.AddSingleton&lt;IEmailSender, EmailSender&gt;();
+</code></pre>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/auth/migrate-to-identity-auth.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#migrate-from-servicestack-auth-to-identity-auth'" data-id="migrate-from-servicestack-auth-to-identity-auth" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Migrate from ServiceStack Auth to Identity Auth
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="rename-old-appuser-table" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#rename-old-appuser-table'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            1. Rename old AppUser table
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="create-identity-auth-data-model" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#create-identity-auth-data-model'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            2. Create Identity Auth Data Model
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="add-authentication-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#add-authentication-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            3. Add Authentication Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="create-and-run-ef-migrations" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#create-and-run-ef-migrations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            4. Create and Run EF Migrations
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="implement-the-migrate-users-task" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#implement-the-migrate-users-task'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            5. Implement the Migrate Users Task
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="run-the-migrate.users-task" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#run-the-migrate.users-task'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            6. Run the migrate.users Task
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="verify-users-can-sign-in" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#verify-users-can-sign-in'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            7. Verify Users can Sign In
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="smtp-iemailsender" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#smtp-iemailsender'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            SMTP IEmailSender
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
