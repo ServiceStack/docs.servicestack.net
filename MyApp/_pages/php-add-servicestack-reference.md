@@ -184,15 +184,15 @@ Or by adding the package to your `composer.json` then installing the dependencie
 PHP developers of [PhpStorm](https://www.jetbrains.com/phpstorm/) can get a simplified development experience for consuming 
 ServiceStack Services by installing the [ServiceStack Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack) from the JetBrains Marketplace:
 
-[![](/img/pages/servicestack-reference/pycharm-servicestack-plugin.png)](https://plugins.jetbrains.com/plugin/7749-servicestack)
+[![](/img/pages/servicestack-reference/phpstorm-servicestack-plugin.webp)](https://plugins.jetbrains.com/plugin/7749-servicestack)
 
 Where you'll be able to right-click on a directory and click on **ServiceStack Reference** on the context menu:
 
-![](/img/pages/servicestack-reference/pycharm-add-servicestack-reference.png)
+![](/img/pages/servicestack-reference/phpstorm-add-servicestack-reference.webp)
 
 To launch the **Add PHP ServiceStack Reference** dialog where you can enter the remote URL of the ServiceStack endpoint you wish to call to generate the Typed PHP DTOs for all APIs which by default will saved to `dtos.php`:
 
-![](/img/pages/servicestack-reference/pycharm-add-servicestack-reference-dialog.png)
+![](/img/pages/servicestack-reference/phpstorm-add-servicestack-reference-dialog.webp)
 
 Then just import the DTOs and `JsonServiceClient` to be able to consume any of the remote ServiceStack APIs:
 
