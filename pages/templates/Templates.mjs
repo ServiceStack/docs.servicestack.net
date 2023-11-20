@@ -8,7 +8,11 @@ export function template(repo, name, icon, tags, demo) {
 export const Index = [
     template('blazor', 'Blazor', 'Blazor', ['tailwind']),
     template('blazor-vue', 'Blazor Vue', 'Blazor',['tailwind']),
-    template('mvc-tailwind', 'MVC', 'Windows',['tailwind']),
+    template('mvc', 'MVC', 'Windows',['tailwind']),
+    template('razor', 'Razor Pages', 'Razor',['tailwind']),
+    template('mvc-bootstrap', 'MVC', 'Windows',['bootstrap']),
+    template('razor-bootstrap', 'Razor Pages', 'Razor',['bootstrap']),
+    template('razor-pages', 'Razor Pages', 'Razor',['bootstrap']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
 
 console.log('Index', Index)
@@ -26,7 +30,7 @@ export default {
       </div>
    </div>
 </section>
-<section class="w-full flex grid grid-cols-3 gap-4 text-center">
+<section :class="['w-full flex grid gap-4 text-center', templates.length === 1 ? 'grid-cols-1' : templates.length === 2 ? 'grid-cols-2' : 'grid-cols-3']">
    <div v-for="template in templates" class="mb-2">
       <div class="flex justify-center text-center">
          <a class="archive-url hover:no-underline" :href="zipUrl('NetCoreTemplates/' + template.repo)">
@@ -46,11 +50,11 @@ export default {
             </div>
          </a>
       </div>
-      <a v-if="template.demo" :href="'https://' + template.demo">{{template.demo}}</a>
+      <a v-if="template.demo && hide !== 'demo'" :href="'https://' + template.demo">{{template.demo}}</a>
    </div>
 </section>   
 </div>`,
-    props: { templates: Array },
+    props: { templates: Array, hide:String },
     setup(props) {
 
         const project = ref('MyApp')
