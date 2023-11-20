@@ -85,7 +85,6 @@ Additional documentation for specific Auth Providers:
 ## ASP.NET Core Project Templates with integrated Auth 
 
   - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - using the [mvcauth](https://github.com/NetCoreTemplates/mvcauth) project template
-  - [Using ASP.NET Identity Auth](/auth/identity-aspnet) - using the [mvcidentity](https://github.com/NetCoreTemplates/mvcidentity) project template
   - [Using IdentityServer4 Auth](/auth/identityserver) - using the [mvcidentityserver](https://github.com/NetCoreTemplates/mvcidentityserver) project template
 
 ## [World Validation](/world-validation)

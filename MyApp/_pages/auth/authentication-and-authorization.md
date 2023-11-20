@@ -138,7 +138,6 @@ The `NetCoreIdentityAuthProvider` is a bi-directional Authentication adapter tha
 rest of your ASP.NET Core and MVC Application where it enables the following popular scenarios:
 
  - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - Use ServiceStack Auth to power ASP.NET Identity Auth, pre-configured in the [mvcauth](https://github.com/NetCoreTemplates/mvcauth) project template. 
- - [Using ASP.NET Identity Auth in ServiceStack](/auth/identity-aspnet) - Use ASP.NET Identity Auth to Authenticate ServiceStack Services, pre-configured in the [mvcidentity](https://github.com/NetCoreTemplates/mvcidentity) project template.
  - [Using IdentityServer4 Auth in ServiceStack](/auth/identityserver) - Use IdentityServer4 to Authenticate ASP.NET Core and ServiceStack Services, 
 pre-configured in the [mvcidentityserver](https://github.com/NetCoreTemplates/mvcidentityserver) project template.
 

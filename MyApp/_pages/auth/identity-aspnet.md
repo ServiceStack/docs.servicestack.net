@@ -1,11 +1,17 @@
 ---
 slug: authentication-identity-aspnet
-title: Using ASP.NET Identity Auth in ServiceStack
+title: ASP.NET Identity Auth in ServiceStack (Legacy)
 ---
 
-[mvcidentity](https://github.com/NetCoreTemplates/mvcidentity) is a .NET 6.0 MVC Website integrated with ServiceStack using ASP.NET Identity Auth:
+:::info
+For new projects we recommend starting with the new [ASP.NET Core Identity Auth](/identity-auth) templates.
+:::
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentity.png)](https://github.com/NetCoreTemplates/mvcidentity)
+---
+
+[mvcidentity](https://github.com/LegacyTemplates/mvcidentity) is a .NET 6.0 MVC Website integrated with ServiceStack using ASP.NET Identity Auth:
+
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcidentity.png)](https://github.com/LegacyTemplates/mvcidentity)
 
 Create new `mvcidentity` project with:
 
@@ -13,7 +19,7 @@ Create new `mvcidentity` project with:
 x new mvcidentity ProjectName
 :::
 
-[mvcidentity](https://github.com/NetCoreTemplates/mvcidentity) is essentially the same App with the same functionality as [mvcauth](https://github.com/NetCoreTemplates/mvcauth)
+[mvcidentity](https://github.com/LegacyTemplates/mvcidentity) is essentially the same App with the same functionality as [mvcauth](https://github.com/NetCoreTemplates/mvcauth)
 but rewritten to use ASP.NET Identity Auth instead of ServiceStack Auth, including the registration options which are handled implemented
 using MVC Controllers instead of ServiceStack's built-in Services:
 
@@ -32,10 +38,10 @@ services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     .AddDefaultTokenProviders();
 ```
 
-The rest of [Startup.cs](https://github.com/NetCoreTemplates/mvcidentity/blob/master/MyApp/Startup.cs) contains the
+The rest of [Startup.cs](https://github.com/LegacyTemplates/mvcidentity/blob/master/MyApp/Startup.cs) contains the
 standard setup for configuring ASP.NET Identity Auth with the same Twitter, Facebook, Google and Microsoft OAuth Providers.
 
-A custom [ApplicationUser](https://github.com/NetCoreTemplates/mvcidentity/blob/master/MyApp/Models/ApplicationUser.cs) 
+A custom [ApplicationUser](https://github.com/LegacyTemplates/mvcidentity/blob/master/MyApp/Models/ApplicationUser.cs) 
 EF DataModel is used to better prepare for real world usage to show how to propagate custom User metadata  
 down into Authenticated UserSessions. `mvcidentity` starts with an extended `ApplicationUser` that captures basic info about
 the user and capture external references to any 3rd Party OAuth providers that Users have signed in with:
@@ -171,7 +177,7 @@ Alternatively use `req.GetCacheClient()` if you want to use your registered `ICa
 In addition to populating the Users Roles we also want to populate our custom User metadata on our `ApplicationUser` EF model,
 for this we can use the new `GetIdentityUserById<T>` API which we'll also want to cache.
 
-This brings us to the end result in [mvcidentity](https://github.com/NetCoreTemplates/mvcidentity) project template:
+This brings us to the end result in [mvcidentity](https://github.com/LegacyTemplates/mvcidentity) project template:
 
 ```csharp
 Plugins.Add(new AuthFeature(() => new CustomUserSession(), 

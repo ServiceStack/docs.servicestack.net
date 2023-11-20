@@ -166,17 +166,6 @@ x new angular-spa-netfx ProjectName
 x new mvcauth ProjectName
 :::
 
-### mvcidentity
-
-.NET 6.0 MVC Website integrated with ServiceStack using MVC Identity Auth
-
-[![](/img/pages/auth/signin/mvcidentity.png)](https://github.com/NetCoreTemplates/mvcidentity)
-
-.NET 6+
-:::sh
-x new mvcidentity ProjectName
-:::
-
 ### mvcidentityserver
 
 .NET 6.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth

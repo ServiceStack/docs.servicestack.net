@@ -19,7 +19,7 @@ const BlazorVueTemplate = {
 
 const IdentityAuthTemplates = {
     components: { Templates },
-    template:`<Templates :templates="[Index['blazor'], Index['blazor-vue'], Index['mvc-tailwind']]" />`,
+    template:`<Templates :templates="[Index['blazor'], Index['blazor-vue'], Index['razor'], Index['mvc'], Index['razor-bootstrap'], Index['mvc-bootstrap']]" hide="demo" />`,
     setup() {
         return { Index }
     }
