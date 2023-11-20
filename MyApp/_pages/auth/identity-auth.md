@@ -30,24 +30,67 @@ Given Microsoft has committed to [Authentication Improvements in .NET 8](https:/
 it's become more important to easily integrate ServiceStack with new and existing .NET projects to access these new features
 than to continue recommending ServiceStack's unified Auth Providers as the default option for new projects.
 
-### ServiceStack will use ASP.NET Core Identity Auth in new projects
+### ASP.NET Core Identity Auth now used in new Integrated Auth projects
 
-Going forward all new ServiceStack .NET Project Templates will adopt ASP.NET Identity Auth, which will closely follow the
+Going forward all new ServiceStack .NET Project Templates will adopt ASP.NET Identity Auth, which closely follows the
 same approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the new .NET 8
-[Blazor](/posts/net8-blazor-template) and [Blazor Vue](/posts/net8-best-blazor) project templates adopts the exact same
-Auth configuration as Microsoft's default Blazor Project Template configured with **Individual** Identity Auth.
+**Blazor** and **Blazor Vue** project templates adopts the exact same
+Auth configuration as Microsoft's default Blazor Project Template configured with **Individual** Identity Auth,
+likewise with the **Bootstrap** and **Tailwind** styled **MVC** and **Razor Pages** templates.
 
-To start off, the new .NET 8 Blazor and MVC Project Templates are configured to use the new Identity Auth Integration:
+Where you can now create new ServiceStack Integrated Identity Auth Templates for each of ASP.NET Core's major Blazor,
+Razor Pages and MVC Templates:
 
 <div class="not-prose mx-auto px-8">
+  <h3 id="identityauth-template" class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900">
+      Create a Project with ASP.NET Identity Auth
+  </h3>
   <identity-auth-templates></identity-auth-templates>
 </div>
+
+### Identity Auth Template Live Demos
+
+For a quick preview of what these look like, checkout out their Internet Hosted Live Demos:
+
+<div class="not-prose mt-8 grid grid-cols-2 gap-4">
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="https://blazor.web-templates.io">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/blazor.png">
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor.web-templates.io</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://blazor-vue.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/blazor-vue.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor-vue.web-templates.io</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://razor-tailwind.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/razor.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">razor.web-templates.io</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://mvc.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">mvc.web-templates.io</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://razor-bootstrap.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/razor-bootstrap.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">razor-bootstrap.web-templates.io</div>
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://mvc-bootstrap.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc-bootstrap.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">mvc-bootstrap.web-templates.io</div>
+    </a>
+</div>
+
 
 The configuration and source code for the above projects are a good reference for how to configure ServiceStack with
 Identity Auth in your own projects.
 
-These use the same Individual Identity Auth Pages that Microsoft's MVC and Blazor templates use, except they've been enhanced
-to use **Tailwind CSS** instead of Bootstrap, includes a **visual QR Code** implementation that was missing and includes an
+The **Bootstrap** versions use same Individual Identity Auth Pages that Microsoft's **Razor Pages** and **MVC** templates use,
+whilst the **Tailwind** versions have been enhanced to use **Tailwind CSS** instead of Bootstrap,
+includes a **visual QR Code** implementation that was missing and includes an
 `IEmailSender` SMTP solution that's easily enabled via Configuration to use your preferred **SMTP Server**.
 
 ### Migrating to ASP.NET Core Identity Auth
@@ -263,6 +306,27 @@ That can be annotated on **Request DTOs** to protect APIs:
 [ValidateHasScope(scope)]
 public class Secured {}
 ```
+
+### Using Identity Auth in ServiceStack Clients
+
+As ServiceStack Identity Auth integration registers replacements Auth Providers for ServiceStack's built-in Auth Providers,
+existing ServiceStack Client integrations will continue to work without any changes, e.g:
+
+```csharp
+const client = new JsonApiClient(baseUrl);
+
+var response = await client.ApiAsync(new Authenticate {
+    provider = "credentials",
+    UserName = userName,
+    Password = password,
+});
+```
+
+The difference being that instead of returning an Authenticated ServiceStack Session Cookie, it instead returns an
+ASP.NET's Identity `.AspNetCore.Identity.Application` Cookie which it will be used to perform Authenticated API requests.
+
+This transparent re-implementation of ServiceStack Auth Providers and endpoints is also how ServiceStack's
+[Built-in UIs](https://servicestack.net/auto-ui) was able to continue to work without any code changes.
 
 ### SMTP IEmailSender
 
