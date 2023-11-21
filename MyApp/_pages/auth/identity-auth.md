@@ -2,18 +2,16 @@
 title: ASP.NET Core Identity Auth
 ---
 
-
-
 ### ASP.NET Core Identity Auth now used in new Integrated Auth projects
 
-Going forward all new ServiceStack .NET Project Templates will adopt ASP.NET Identity Auth, which closely follows the
-same approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the new .NET 8
-**Blazor** and **Blazor Vue** project templates adopts the exact same
-Auth configuration as Microsoft's default Blazor Project Template configured with **Individual** Identity Auth,
-likewise with the **Bootstrap** and **Tailwind** styled **MVC** and **Razor Pages** templates.
+ASP.NET Core Identity Auth is the default Auth Model adopted in new ServiceStack projects which closely follows the same 
+approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the .NET 8
+**Blazor** and **Blazor Vue** project templates adopts the exact same Auth configuration as Microsoft's default Blazor Project 
+Template configured with **Individual** Identity Auth, likewise with the **Bootstrap** and **Tailwind** styled **MVC** and 
+**Razor Pages** templates.
 
-Where you can now create new ServiceStack Integrated Identity Auth Templates for each of ASP.NET Core's major Blazor,
-Razor Pages and MVC Templates:
+You can find ServiceStack Integrated Identity Auth Templates for each of ASP.NET Core's major Blazor, Razor Pages and MVC 
+Project Templates:
 
 <div class="not-prose mx-auto px-8">
   <h3 id="identityauth-template" class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900">
