@@ -1,158 +1,266 @@
 ---
-title: Security Overview
+title: Authentication Overview
 ---
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="XKq7TkZAzeg" style="background-image: url('https://img.youtube.com/vi/XKq7TkZAzeg/maxresdefault.jpg')"></lite-youtube>
+## Authentication Models
 
-See the [Authentication and Authorization](/auth/authentication-and-authorization) docs to learn about Authentication in ServiceStack which
-is encompassed by the high-level Overview:
+As of [ServiceStack v8](/releases/v8_00) there are 2 main Authentication Models available to ServiceStack Apps:
 
-![Authentication Overview](/img/pages/security/auth-highlevel-overview.svg?sanitize=true)
+ - [ASP .NET Core Identity](/auth/identity-auth) - Recommended for .NET 8+ Apps
+ - [ServiceStack Auth](/auth/authentication-and-authorization) - Universal Auth Model compatible with all ServiceStack Apps  (e.g. .NET or .NET Framework)
 
-ServiceStack uses a standard HTTP Session implementation which uses an **Auth Repository** to persist users and a [Caching Provider](/caching) to 
-store Authenticated User Sessions:
+### ASP.NET Core Identity Auth now default from ServiceStack v8
 
-![Session Based Authentication](/img/pages/security/auth-session-auth.svg?sanitize=true)
+A significant change from **ServiceStack v8** is the adoption of the same ASP.NET Core Identity Authentication 
+that's configured in Microsoft's default Projects templates in ServiceStack's new Project Templates.
 
-Once Authentication is established [Session Cookies](/auth/sessions) are used to reference a Users typed Authenticated User Session:
+## History of ServiceStack Authentication
 
-![Session Requests](/img/pages/security/auth-session-requests.svg?sanitize=true)
+ServiceStack has always maintained its own [Authentication and Authorization](https://docs.servicestack.net/auth/authentication-and-authorization) provider model, 
+primarily as it was the only way to provide an integrated and unified Authentication model that worked across all our 
+supported hosting platforms, inc. .NET Framework, ASP.NET Core on .NET Framework, HttpListener and .NET (fka .NET Core).
 
-ServiceStack also supports Auth Providers that "Authenticate per request" where both Authentication and Validation are performed within the same request:
+Whilst the Authentication story in ASP.NET has undergone several cycles of changes over the years, the ServiceStack 
+Auth Model has  remained relatively consistent and stable, with no schema changes required since release whilst still 
+providing flexible options for [extending UserAuth tables](https://docs.servicestack.net/auth/auth-repository#extending-userauth-tables) and typed [User Sessions](https://docs.servicestack.net/auth/sessions#using-typed-sessions-in-servicestack).
 
-![Auth with Request Auth Providers](/img/pages/security/auth-auth-with-request-providers.svg?sanitize=true)
+### .NET Framework considered legacy
 
-## Auth Providers
+Although the multi-platform support of the unified Authentication model has been vital for Organizations migrating their systems
+to .NET (Core) where ServiceStack Customers have been able to enjoy [Exceptional Code reuse](https://docs.servicestack.net/netcore#exceptional-code-reuse),
+it's become clear that the .NET platform (e.g. .NET 8) is the only platform that should be considered for new projects and
+that .NET Framework should only be considered a stable legacy platform for running existing systems on.
 
-ServiceStack's built-in Auth Providers fall into 3 main categories:
+Given Microsoft has committed to [Authentication Improvements in .NET 8](https://devblogs.microsoft.com/dotnet/whats-new-with-identity-in-dotnet-8/)
+it's become more important to easily integrate ServiceStack with new and existing .NET projects to access these new features
+than to continue recommending ServiceStack's unified Auth Providers as the default option for new projects.
 
-### Credentials Auth Providers
+## Protecting Services
 
-If using ServiceStack to manage your Apps entire Authentication and persistence of Users you would use one of the available Auth Repositories
-and authenticate against one of the following Auth Providers:
+### Declarative Validation Attributes
 
-| Provider        | Class Name                | Route                 | Description                                                                                               |
-|-----------------|---------------------------|-----------------------|-----------------------------------------------------------------------------------------------------------|
-| **Credentials** | `CredentialsAuthProvider` | **/auth/credentials** | Standard Authentication using Username/Password                                                           |
-| **Basic Auth**  | `BasicAuthProvider`       | HTTP Basic Auth       | Username/Password sent via [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication)   |
-| **Digest Auth** | `DigestAuthProvider`      | HTTP Digest Auth      | Username/Password hash via [HTTP Digest Auth](https://en.wikipedia.org/wiki/Digest_access_authentication) |
+The recommended way to protect your ServiceStack APIs is to continue to use the [Declarative Validation](https://docs.servicestack.net/declarative-validation)
+attributes which are decoupled from any implementation so be safely annotated on Request DTOs without adding
+any implementation dependencies, where they're also accessible to Clients and UIs using the Request DTOs to invoke your APIs.
 
-### OAuth Providers
+The available Typed Authorization Attributes include:
 
-The following OAuth Providers are built into ServiceStack and can be used in both ASP.NET Core and .NET Framework Apps:
+| Attribute                   | Description                                            |
+|-----------------------------|--------------------------------------------------------|
+| `[ValidateIsAuthenticated]` | Restrict access toAuthenticated Users only             |
+| `[ValidateIsAdmin]`         | Restrict access to Admin Users only                    |
+| `[ValidateHasRole]`         | Restrict access to only Users assigned with this Role  |
+| `[ValidateHasClaim]`        | Restrict access to only Users assigned with this Claim |
+| `[ValidateHasScope]`        | Restrict access to only Users assigned with this Scope |
 
-| Provider          | Class Name                   | Route                    | Create OAuth App Link                                                                   |
-|-------------------|------------------------------|--------------------------|-----------------------------------------------------------------------------------------|
-| **Facebook**      | `FacebookAuthProvider`       | **/auth/facebook**       | [developers.facebook.com/apps](https://developers.facebook.com/apps)                    |
-| **Twitter**       | `TwitterAuthProvider`        | **/auth/twitter**        | [dev.twitter.com/apps](https://dev.twitter.com/apps)                                    |
-| **Google**        | `GoogleAuthProvider`         | **/auth/google**         | [console.developers.google.com](https://console.developers.google.com/apis/credentials) |
-| **GitHub**        | `GithubAuthProvider`         | **/auth/github**         | [github.com/settings/applications/new](https://github.com/settings/applications/new)    |
-| **Microsoft**     | `MicrosoftGraphAuthProvider` | **/auth/microsoftgraph** | [apps.dev.microsoft.com](https://apps.dev.microsoft.com)                                |
-| **LinkedIn**      | `LinkedInAuthProvider`       | **/auth/linkedin**       | [www.linkedin.com/secure/developer](https://www.linkedin.com/secure/developer)          |
-| **Yammer**        | `YammerAuthProvider`         | **/auth/yammer**         | [www.yammer.com/client_applications](http://www.yammer.com/client_applications)         |
-| **Yandex**        | `YandexAuthProvider`         | **/auth/yandex**         | [oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new)                        |
-| **VK**            | `VkAuthProvider`             | **/auth/vkcom**          | [vk.com/editapp?act=create](http://vk.com/editapp?act=create)                           |
-| **Odnoklassniki** | `OdnoklassnikiAuthProvider`  | **/auth/odnoklassniki**  | [www.odnoklassniki.ru/devaccess](http://www.odnoklassniki.ru/devaccess)                 |
+That can be annotated on **Request DTOs** to protect APIs:
 
-More information about how OAuth providers works, see the video tutorial below.
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="aQqF3Sf2fco" style="background-image: url('https://img.youtube.com/vi/aQqF3Sf2fco/maxresdefault.jpg')"></lite-youtube>
-
-### IAuthWithRequest Auth Providers
-
-The following Auth Providers all implement `IAuthWithRequest` and "Authenticate per-request":
-
-| Provider          | Class Name                   | Auth Method  | Description |
-|-|-|-|-|
-| **JWT**           | `JwtAuthProvider`            | Bearer Token | Stateless Auth Provider using [JSON Web Tokens](/auth/jwt-authprovider)  |
-| **API Keys**      | `ApiKeyAuthProvider`         | Bearer Token | Allow 3rd Parties access to [authenticate without a password](/auth/api-key-authprovider) |
-| **Basic Auth**    | `BasicAuthProvider`          | Basic Auth   | Authentication using [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) |
-| **Digest Auth**   | `DigestAuthProvider`         | Digest Auth  | Authentication using [HTTP Digest Auth](https://en.wikipedia.org/wiki/Digest_access_authentication) |
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NTCUT7atoLo" style="background-image: url('https://img.youtube.com/vi/NTCUT7atoLo/maxresdefault.jpg')"></lite-youtube>
-
-Other special Auth Providers that Authenticate per-request:
-
- - **Windows Auth** in `AspNetWindowsAuthProvider`  - Authentication using [Windows Auth](https://support.microsoft.com/en-us/help/323176/how-to-implement-windows-authentication-and-authorization-in-asp-net) built into ASP.NET.
- - **Claims Auth** in `NetCoreIdentityAuthProvider` - Pass through Auth Provider that delegates to ASP.NET Core Identity Auth or Identity Server.
-
-Additional documentation for specific Auth Providers:
-
-  - [JWT Auth Provider](/auth/jwt-authprovider)
-  - [API Key Auth Provider](/auth/api-key-authprovider)
-  - [Open Id 2.0 Support](/auth/openid)     
-
-## ASP.NET Core Project Templates with integrated Auth 
-
-  - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - using the [mvcauth](https://github.com/NetCoreTemplates/mvcauth) project template
-  - [Using IdentityServer4 Auth](/auth/identityserver) - using the [mvcidentityserver](https://github.com/NetCoreTemplates/mvcidentityserver) project template
-
-## [World Validation](/world-validation)
-
-See the annotated [World Validation Docs](/world-validation) for a detailed walks through and showcases the implementation 
-of how the most popular **Server HTML rendered** approaches and **Client UI rendered** technologies use the same Authentication and Registration Services.
-
-## Live Demos
-
-To illustrate Authentication integration with ServiceStack, see the authentication-enabled 
-[Live Demos](https://github.com/ServiceStackApps/LiveDemos) below:
-
-### .NET Core
-
-  - [New TechStacks](https://github.com/NetCoreApps/TechStacks)
-    - GitHub, Twitter and JWT Auth
-  - [SimpleAuth.Mvc](https://github.com/NetCoreApps/SimpleAuth.Mvc)
-    - Twitter, Facebook, GitHub, VK, Yandex and Credentials Auth
-  - [Chat](https://github.com/NetCoreApps/Chat)
-    - Twitter, Facebook and GitHub Auth
-
-### Mobile
-
-  - [Android Java Chat](https://github.com/ServiceStackApps/AndroidJavaChat)
-    - Facebook, Twitter and Google Auth
-  - [Android Xamarin Chat](https://github.com/ServiceStackApps/AndroidXamarinChat)
-    - Twitter Auth
-
-### .NET Framework
-
-  - [HttpBenchmarks Application](https://github.com/ServiceStackApps/HttpBenchmarks)
-    - [Step-by-Step Authentication Guide](https://github.com/ServiceStackApps/HttpBenchmarks#authentication)
-    - Twitter, Facebook, Google, LinkedIn and Credentials Auth
-  - [Angular TechStacks](https://github.com/ServiceStackApps/TechStacks)
-    - Twitter, GitHub and JWT Auth
-  - [Gistlyn](https://github.com/ServiceStack/Gistlyn)
-    - GitHub and JWT Auth
-  - [AWS Auth](https://github.com/ServiceStackApps/AwsApps) 
-    - Twitter, Facebook, GitHub, Google, Yahoo, LinkedIn, and Credentials Auth
-  - [MVC and WebForms Example](/servicestack-integration) 
-    - Twitter, Facebook, GitHub, Google, Yahoo, LinkedIn, VK, Credentials and Windows Auth
-  - [Chat](https://github.com/ServiceStackApps/LiveDemos#chat)
-    - Twitter, Facebook and GitHub Auth
-  - [React Chat](https://github.com/ServiceStackApps/ReactChat)
-    - Twitter, Facebook and GitHub Auth
-  - [SocialBootstrap Api](https://github.com/ServiceStackApps/LiveDemos#social-bootstrap-api)
-    - Twitter, Facebook, Yahoo and Credentials Auth
+```csharp
+[ValidateIsAuthenticated]
+[ValidateIsAdmin]
+[ValidateHasRole(role)]
+[ValidateHasClaim(type,value)]
+[ValidateHasScope(scope)]
+public class Secured {}
+```
 
 
-## Sessions
+## The Authenticate attribute
 
-See the [Session docs](/auth/sessions) for more info about customizing Sessions and handling different Session and Auth events.
+The `[Authenticate]` [Request Filter Attribute](/filter-attributes) tells ServiceStack which Services needs authentication by adding it to your Service implementations, e.g:
 
-### Restricting Services
+```csharp
+[Authenticate]
+public class SecuredService : Service
+{
+    public object Get(Secured request)
+    {
+        IAuthSession session = this.GetSession();
+        return new SecuredResponse() { Test = "You're" + session.FirstName };
+    }
 
-See the [Restricting Services docs](/auth/restricting-services) for learning how to control the Visibility and Access restrictions on any service using the `[Restrict]` attribute. 
+    public object Put(Secured request)
+    {
+        return new SecuredResponse() { Test = "Valid!" };
+    }
 
+    public object Post(Secured request)
+    {
+        return new SecuredResponse() { Test = "Valid!" };
+    }
 
-<a name="community"></a>
+    public object Delete(Secured request)
+    {
+        return new SecuredResponse() { Test = "Valid!" };
+    }
+}
+```
 
-# Community Resources
+If you want, that authentication is only required for GET and PUT requests for example, you have to provide some extra parameters to the `Authenticate` attribute.
 
-  - [Building a ServiceStack OAuth2 resource server using DotNetOpenAuth](http://dylanbeattie.blogspot.com/2013/08/building-servicestack-based-oauth2.html) by [@dylanbeattie](https://twitter.com/dylanbeattie)
-  - [Declarative authorization in REST services in SharePoint with F#](http://sergeytihon.wordpress.com/2013/06/28/declarative-authorization-in-rest-services-in-sharepoint-with-f-and-servicestack/) by [@sergey_tihon](https://twitter.com/sergey_tihon)
-  - [Authenticate ServiceStack services against an Umbraco membership provider](http://stackoverflow.com/a/16845317/85785) by [Gavin Faux](http://stackoverflow.com/users/1664508/gavin-faux)
-  - [Using OAuth with ArcGIS Online and ServiceStack](http://davetimmins.com/2013/April/OAuth-with-ArcGISOnline-ServiceStack/) by [@davetimmins](https://twitter.com/davetimmins)
-  - [LinkedIn Provider for ServiceStack Authentication](http://www.binoot.com/2013/03/30/linkedin-provider-for-servicestack-authentication/) by [@binu_thayamkery](https://twitter.com/binu_thayamkery)
-  - [A Step by Step guide to create a Custom IAuthProvider](http://enehana.nohea.com/general/customizing-iauthprovider-for-servicestack-net-step-by-step/) by [@rngoodness](https://twitter.com/rngoodness)
-  - [Simple API Key Authentication With ServiceStack](http://rossipedia.com/blog/2013/03/simple-api-key-authentication-with-servicestack/) by [@rossipedia](https://twitter.com/rossipedia)
-  - [Authenticating ServiceStack REST API using HMAC](http://jokecamp.wordpress.com/2012/12/16/authenticating-servicestack-rest-api-using-hmac/) by [@jokecamp](https://twitter.com/jokecamp)
-  - ServiceStack Credentials Authentication and EasyHttp: [Part 1](http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of), [Part 2](http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of-1), [Part 3](http://blogs.lessthandot.com/index.php/DesktopDev/MSTech/servicestack-credentialsauthentication-and-easyhtpp-of-2) by [@chrissie1](https://twitter.com/chrissie1)
+```csharp
+[Authenticate(ApplyTo.Get | ApplyTo.Put)] 
+```
+
+## RequiredRole and RequiredPermission attributes
+
+ServiceStack also includes a built-in role & permission based authorization attributes where you can apply the `[Required*]` Request Filter Attributes on your Service classes to apply to all Services or limited to a single Service:
+
+```csharp
+[Authenticate]
+//All HTTP (GET, POST...) methods need "CanAccess"
+[RequiredRole("Admin")]
+[RequiredPermission("CanAccess")]
+public class MyServices : Service
+{
+    public object Get(Secured request) {}
+
+    [RequiredPermission("CanAdd")]
+    public object Put(Secured request) {}
+    
+    [RequiredPermission("CanAdd")]
+    public object Post(Secured request) {}
+    
+    [RequiredPermission("AdminRights", "CanDelete")]
+    public object Delete(Secured request) {}
+}
+```
+
+Now the client needs the permissions:
+
+- **CanAccess** to make a GET request
+- **CanAccess**, **CanAdd** to make a PUT/POST request
+- **CanAccess**, **AdminRights** and **CanDelete** to make a DELETE request
+
+If instead you want to allow access to users in **ANY** Role or Permission use:
+
+```csharp
+[RequiresAnyRole("Admin","Member")]
+[RequiresAnyRole(ApplyTo.Put | ApplyTo.Post, "Admin","Owner","Member")]
+[RequiresAnyPermission(ApplyTo.Delete, "AdminRights", "CanDelete")]
+public class MyServices : Service
+{
+    public object Get(Secured request) {}
+    public object Put(Secured request) {}
+    public object Post(Secured request) {}
+    public object Delete(Secured request) {}
+}
+```
+
+These attributes can also be applied to Request DTOs however as they would add a dependency to **ServiceStack.dll**, it's recommended to
+
+## Enabling Authentication at different levels
+
+### Using the [Authenticate] Attribute
+
+You can protect services by adding the `[Authenticate]` attribute on either the Action:
+
+```csharp
+class MyService : Service 
+{
+    [Authenticate] 
+    public object Get(Protected request) { ... }
+}
+```
+
+The Request DTO
+
+```csharp
+[Authenticate] 
+class Protected { ... }
+```
+
+Or the service implementation
+
+```csharp
+[Authenticate] 
+class MyService : Service 
+{
+    public object Get(Protected request) { ... }
+}
+```
+
+Or by inheriting from a base class
+
+```csharp
+[Authenticate] 
+class MyServiceBase : Service { ... }
+
+class MyService : MyServiceBase {
+    public object Get(Protected request) { ... }
+}
+```
+
+### In Process Authenticated Requests
+
+You can enable the `CredentialsAuthProvider` to allow **In Process** requests to Authenticate without a Password with:
+
+```csharp
+new CredentialsAuthProvider {
+    SkipPasswordVerificationForInProcessRequests = true,
+}
+```
+
+When enabled this lets **In Process** Service Requests to login as a specified user without needing to provide their password.
+
+For example this could be used to create an [Intranet Restricted](/auth/restricting-services) **Admin-Only** Service that lets you login as another user so you can debug their account without knowing their password with:
+
+```csharp
+[RequiredRole("Admin")]
+[Restrict(InternalOnly=true)]
+public class ImpersonateUser 
+{
+    public string UserName { get; set; }
+}
+
+public class MyAdminServices : Service
+{
+    public async Task<object> Any(ImpersonateUser request)
+    {
+        using var service = base.ResolveService<AuthenticateService>(); //In Process
+        return await service.PostAsync(new Authenticate {
+            provider = AuthenticateService.CredentialsProvider,
+            UserName = request.UserName,
+        });
+    }
+}
+```
+
+::: info
+Your Services can use the new `Request.IsInProcessRequest()` to identify Services that were executed in-process
+:::
+
+### Using a Global Request Filter
+
+Otherwise you can use a [global Request Filter](/request-and-response-filters) if you wanted to restrict all requests any other way, e.g something like:
+
+```csharp
+GlobalRequestFiltersAsync.Add(async (req, res, requestDto) =>
+{
+    if (ShouldProtectRequest(requestDto)) 
+    {
+        await new AuthenticateAttribute().ExecuteAsync(req, res, requestDto);
+    }
+});
+```
+
+### GET Authenticate Requests are disabled by default
+
+**GET** `/auth/{provider}` requests are disabled by default to discourage sending confidential information in the URL.
+
+The current exceptions which still allow **GET** requests include:
+
+- `/auth` - Used to check if a User is Authenticated
+- `/auth/logout` - Logging Out
+- All OAuth Providers who starts their OAuth flow by navigating to `/auth/{provider}`
+
+You can allow **GET** Authentication requests with:
+
+```csharp
+new AuthFeature {
+    AllowGetAuthenticateRequests = req => true
+}
+```
+
+Although it's recommended to change your code to use `POST` instead of `GET` requests.
+Otherwise you can use the `IRequest req` parameter to check against a white list of known requests types.

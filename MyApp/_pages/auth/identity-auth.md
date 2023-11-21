@@ -2,33 +2,7 @@
 title: ASP.NET Core Identity Auth
 ---
 
-## ASP.NET Core Identity Auth in .NET 8 Templates
 
-A significant change we've added to our new .NET 8 Project Templates is the adoption of the same
-ASP.NET Core Identity Authentication that's configured in Microsoft's default Projects templates.
-
-### History of ServiceStack Authentication
-
-Since the dawn of ServiceStack we've always maintained our own [Authentication and Authorization](https://docs.servicestack.net/auth/authentication-and-authorization)
-provider model, primarily as it was the only way to provide an integrated and unified Authentication model
-that worked across all our supported hosting platforms, inc. .NET Framework, ASP.NET Core on .NET Framework, HttpListener
-and what's now .NET (fka .NET Core).
-
-In the meantime the Authentication story in ASP.NET has undergone several cycles of changes over the years, whereas
-ServiceStack's Auth providers have remained relatively consistent and stable, with no schema changes required since release whilst still providing flexible
-options for [extending UserAuth tables](https://docs.servicestack.net/auth/auth-repository#extending-userauth-tables) and
-typed [User Sessions](https://docs.servicestack.net/auth/sessions#using-typed-sessions-in-servicestack).
-
-#### .NET Framework considered legacy
-
-Although the multi-platform support of the unified Authentication model has been vital for Organizations migrating their systems
-to .NET (Core) where ServiceStack Customers have been able to enjoy [Exceptional Code reuse](https://docs.servicestack.net/netcore#exceptional-code-reuse),
-it's become clear that the .NET platform (e.g. .NET 8) is the only platform that should be considered for new projects and
-that .NET Framework should only be considered a stable legacy platform for running existing systems on.
-
-Given Microsoft has committed to [Authentication Improvements in .NET 8](https://devblogs.microsoft.com/dotnet/whats-new-with-identity-in-dotnet-8/)
-it's become more important to easily integrate ServiceStack with new and existing .NET projects to access these new features
-than to continue recommending ServiceStack's unified Auth Providers as the default option for new projects.
 
 ### ASP.NET Core Identity Auth now used in new Integrated Auth projects
 
@@ -86,7 +60,14 @@ For a quick preview of what these look like, checkout out their Internet Hosted 
 
 
 The configuration and source code for the above projects are a good reference for how to configure ServiceStack with
-Identity Auth in your own projects.
+Identity Auth in your own projects:
+
+- [blazor](blazor)
+- [blazor-vue](blazor-vue)
+- [razor](razor)
+- [mvc](mvc)
+- [razor-bootstrap](razor-bootstrap)
+- [mvc-bootstrap](mvc-bootstrap)
 
 The **Bootstrap** versions use same Individual Identity Auth Pages that Microsoft's **Razor Pages** and **MVC** templates use,
 whilst the **Tailwind** versions have been enhanced to use **Tailwind CSS** instead of Bootstrap,
