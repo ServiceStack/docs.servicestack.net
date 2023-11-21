@@ -1,7 +1,6 @@
 |                                                                            | .NET Core C# Templates                                              |
 |----------------------------------------------------------------------------|---------------------------------------------------------------------|
 | [angular-spa](https://github.com/NetCoreTemplates/angular-spa)             | .NET 8 Angular 15 App with Bootstrap                                |
-| [aurelia-spa](https://github.com/NetCoreTemplates/aurelia-spa)             | .NET 8 Aurelia App with Bootstrap                                   |
 | [blazor](https://github.com/NetCoreTemplates/blazor)                       | .NET 8 Blazor Tailwind App Template                                 |
 | [blazor-server](https://github.com/NetCoreTemplates/blazor-server)         | .NET 8 Blazor Server App with Tailwind                              |
 | [blazor-tailwind](https://github.com/NetCoreTemplates/blazor-tailwind)     | .NET 8 Blazor WASM App with Tailwind                                |
@@ -14,7 +13,6 @@
 | [mvcauth](https://github.com/NetCoreTemplates/mvcauth)                     | .NET 8 MVC App with ServiceStack Auth and Bootstrap                 |
 | [mvcidentityserver](https://github.com/NetCoreTemplates/mvcidentityserver) | .NET 8 MVC App with ServiceStack and IdentityServer4 Auth           |
 | [nextjs](https://github.com/NetCoreTemplates/nextjs)                       | .NET 8 Jamstack Next.js SSG React App with Tailwind                 |
-| [parcel](https://github.com/NetCoreTemplates/parcel)                       | .NET 8 Parcel TypeScript App with Bootstrap                         |
 | [razor](https://github.com/NetCoreTemplates/razor)                         | .NET 8 Razor Pages App with Tailwind                                |
 | [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)     | .NET 8 Razor Pages Identity Auth App with Bootstrap                 |
 | [razor-pages](https://github.com/NetCoreTemplates/razor-pages)             | .NET 8 Razor Pages App with ServiceStack Auth and Bootstrap         |

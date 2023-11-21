@@ -313,12 +313,6 @@ All Single Page App Templates are available for both .NET Core 2.0 and ASP.NET F
  - .NET Framework: [vue-spa-netfx](https://github.com/NetFrameworkTemplates/vue-spa-netfx)
  - Live Preview: [vue-spa.web-templates.io](http://vue-spa.web-templates.io)
  
-#### Aurelia Webpack Bootstrap Template
-
- - .NET Core: [aurelia-spa](https://github.com/NetCoreTemplates/aurelia-spa)
- - .NET Framework: [aurelia-spa](https://github.com/NetFrameworkTemplates/aurelia-spa)
- - Live Preview: [aurelia-spa.web-templates.io](http://aurelia-spa.web-templates.io)
- 
 ### Optimal Dev Workflow with Hot Reloading
 
 The Webpack templates have been updated to utilize [Webpack's DllPlugin](https://robertknight.github.io/posts/webpack-dll-plugins/) which splits your App's TypeScript source code from its vendor dependencies for faster incremental build times. With the improved iteration times our recommendation for development is to run a normal Webpack watched build using the `dev` npm (or Gulp) script:

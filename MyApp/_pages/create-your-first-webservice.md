@@ -249,8 +249,6 @@ Compare and contrast with other major SPA JavaScript Frameworks:
  - [React HelloApi.tsx](https://github.com/NetCoreTemplates/react-spa/blob/master/MyApp/src/components/Home/HelloApi.tsx)
  - [Angular HelloApi.ts](https://github.com/NetCoreTemplates/angular-spa/blob/master/MyApp/src/app/home/HelloApi.ts)
  - [Svelte Home.svelte](https://github.com/NetCoreTemplates/svelte-spa/blob/master/MyApp/src/components/Home.svelte)
- - [Aurelia hello.ts](https://github.com/NetCoreTemplates/aurelia-spa/blob/master/MyApp/src/resources/elements/hello.ts)
- - [Angular v4 hello.ts](https://github.com/NetCoreTemplates/angular-lite-spa/blob/master/MyApp/src/modules/app/home/hello.ts)
 
 ### Web, Mobile and Desktop Apps
 
