@@ -118,8 +118,8 @@ let store = {
 ### Implicit Error Handling
 
 More often you'll want to take advantage of the implicit validation support in `useClient()` which makes its state available to child
-components, alleviating the need to explicitly pass it in each component as seen in razor-tailwind's 
-[Contacts.mjs](https://github.com/NetCoreTemplates/razor-tailwind/blob/main/MyApp/wwwroot/Pages/Contacts.mjs) `Edit` component for its 
+components, alleviating the need to explicitly pass it in each component as seen in razor tailwind's 
+[Contacts.mjs](https://github.com/NetCoreTemplates/razor/blob/net6/MyApp/wwwroot/Pages/Contacts.mjs) `Edit` component for its 
 [/Contacts](https://vue-mjs.web-templates.io/Contacts) page which doesn't do any manual error handling:
 
 ```js

@@ -69,7 +69,7 @@ For example you can use this to view all C# property names and Type info for the
 
 More usefully this can avoid code maintenance and duplication efforts from maintaining enum values on both server and client forms. 
 
-An example of this is in the [Contacts.mjs](https://github.com/NetCoreTemplates/razor-tailwind/blob/main/MyApp/wwwroot/Pages/Contacts.mjs) 
+An example of this is in the [Contacts.mjs](https://github.com/NetCoreTemplates/razor/blob/net6/MyApp/wwwroot/Pages/Contacts.mjs) 
 component which uses the server metadata to populate the **Title** and **Favorite Genre** select options from the `Title` and `FilmGenre` enums:
 
 ```html
