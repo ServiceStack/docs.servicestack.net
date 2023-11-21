@@ -177,38 +177,6 @@ x new mvcauth ProjectName
 x new mvcidentityserver ProjectName
 :::
 
-### react-lite
-
-ASP.NET Core Simple + lite (npm-free) React SPA using TypeScript
-
-[![](/img/pages/auth/signin/react-lite.png)](https://github.com/NetCoreTemplates/react-lite)
-
-.NET 6+
-:::sh
-x new react-lite ProjectName
-:::
-
-ASP.NET Core on .NET Framework
-:::sh
-x new react-lite-corefx ProjectName
-:::
-
-### vue-lite
-
-ASP.NET Core Simple + lite (npm-free) Vue SPA using TypeScript
-
-[![](/img/pages/auth/signin/vue-lite.png)](https://github.com/NetCoreTemplates/vue-lite)
-
-.NET 6+
-:::sh
-x new vue-lite ProjectName
-:::
-
-ASP.NET Core on .NET Framework
-:::sh
-x new vue-lite-corefx ProjectName
-:::
-
 ### vue-nuxt
 
 Nuxt.js SPA App with Bootstrap

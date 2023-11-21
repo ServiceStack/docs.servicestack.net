@@ -22,9 +22,7 @@ Click on the template name below to view a Live Demo and contents of each projec
 | .NET Core C# Templates                                           |                                                              |
 |------------------------------------------------------------------|--------------------------------------------------------------|
 | [angular-spa](https://github.com/NetCoreTemplates/angular-spa)   | .NET 6.0 Angular CLI Bootstrap App                           |
-| [react-lite](https://github.com/NetCoreTemplates/react-lite)     | .NET 6.0 simple + lite (npm-free) React SPA using TypeScript |
 | [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 6.0 React Create App CLI Bootstrap App                  |
-| [vue-lite](https://github.com/NetCoreTemplates/vue-lite)         | .NET 6.0 simple + lite (npm-free) Vue SPA using TypeScript   |
 | [vue-nuxt](https://github.com/NetCoreTemplates/vue-nuxt)         | .NET 6.0 Nuxt.js SPA App with Bootstrap                      |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 6.0 Vue CLI Bootstrap App                               |
 
