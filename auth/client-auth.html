@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-11-21T09:39:17.1379714Z'>
+    <meta name='date' content='2023-11-21T13:56:56.3337455Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Service Clients Authentication</title>
@@ -292,24 +292,28 @@ if (apiAuth.suceeded) {
 view protected Blazor, MVC or Razor Pages after successful authentication.</p>
 <h2 id="authenticating-with-c.net-service-clients">Authenticating with C#/.NET Service Clients<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-with-c.net-service-clients'" aria-label="Permalink"> </a></h2>
 <p>On the client you can use the <a href="/csharp-client">C#/.NET Service Clients</a> to easily consume your authenticated Services.</p>
-<p>To authenticate using your <code>CustomCredentialsAuthProvider</code> by POST'ing a <code>Authenticate</code> Request, e.g:</p>
+<p>You can authenticate against your registered <strong>Credentials</strong> Auth Provider by submitting a populated <code>Authenticate</code> Request DTO, e.g:</p>
 <pre><code class="language-csharp">var client = new JsonServiceClient(BaseUrl);
 
-var authResponse = client.Post(new Authenticate {
-    provider = CredentialsAuthProvider.Name, //= credentials
-    UserName = &quot;test@gmail.com&quot;,
-    Password = &quot;p@55w0rd&quot;,
-    RememberMe = true,
+var apiAuth = await client.ApiAsync(new Authenticate {
+    provider = &quot;credentials&quot;, 
+    UserName = userName,
+    Password = password,
 });
+
+if (apiAuth.Succeeded) 
+{
+    //...
+}
 </code></pre>
 <p>If authentication was successful the Service Client <code>client</code> instance will be populated with authenticated session cookies
 which then allows calling Authenticated services, e.g:</p>
-<pre><code class="language-csharp">var response = await client.ApiAsync(new GetActiveUserId());
+<pre><code class="language-csharp">var api = await client.ApiAsync(new GetActiveUserId());
 </code></pre>
 <p>If you've also registered the <code>BasicAuthProvider</code> it will enable your Services to accept <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Authentication</a>
 which is built-in the Service Clients that you can populate on the Service Client with:</p>
-<pre><code class="language-csharp">client.UserName = &quot;test@gmail.com&quot;;
-client.Password = &quot;p@55w0rd&quot;;
+<pre><code class="language-csharp">client.UserName = userName;
+client.Password = password
 </code></pre>
 <p>Which will also let you access protected Services, e.g:</p>
 <pre><code class="language-csharp">var response = client.Get(new GetActiveUserId());
@@ -322,16 +326,14 @@ the Basic Auth with every request:</p>
 <pre><code class="language-csharp">client.AlwaysSendBasicAuthHeader = true;
 </code></pre>
 <h2 id="authenticating-with-http">Authenticating with HTTP<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-with-http'" aria-label="Permalink"> </a></h2>
-<p>To Authenticate with your <code>CustomCredentialsAuthProvider</code> (which inherits from CredentialsAuthProvider) you would POST:</p>
+<p>To Authenticate against your registered <strong>Credentials</strong> Auth Provider you can <strong>POST</strong> a raw JSON body:</p>
 <p><strong>POST</strong> localhost:60339/auth/credentials?format=json</p>
 <pre><code class="language-json">{
     &quot;UserName&quot;: &quot;admin&quot;,
-    &quot;Password&quot;: &quot;test&quot;,
+    &quot;Password&quot;: &quot;p@55wOrd&quot;,
     &quot;RememberMe&quot;: true
 }
 </code></pre>
-<p>When the client now tries to authenticate with the request above and the auth succeeded, the client will retrieve some
-cookies with a session id which identify the client on each Web Service call.</p>
 </div>
 
                 <div class="not-prose"></div>
