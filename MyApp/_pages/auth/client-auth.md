@@ -37,32 +37,36 @@ view protected Blazor, MVC or Razor Pages after successful authentication.
 
 On the client you can use the [C#/.NET Service Clients](/csharp-client) to easily consume your authenticated Services.
 
-To authenticate using your `CustomCredentialsAuthProvider` by POST'ing a `Authenticate` Request, e.g:
+You can authenticate against your registered **Credentials** Auth Provider by submitting a populated `Authenticate` Request DTO, e.g:
 
 ```csharp
 var client = new JsonServiceClient(BaseUrl);
 
-var authResponse = client.Post(new Authenticate {
-    provider = CredentialsAuthProvider.Name, //= credentials
-    UserName = "test@gmail.com",
-    Password = "p@55w0rd",
-    RememberMe = true,
+var apiAuth = await client.ApiAsync(new Authenticate {
+    provider = "credentials", 
+    UserName = userName,
+    Password = password,
 });
+
+if (apiAuth.Succeeded) 
+{
+    //...
+}
 ```
 
 If authentication was successful the Service Client `client` instance will be populated with authenticated session cookies 
 which then allows calling Authenticated services, e.g:
 
 ```csharp
-var response = await client.ApiAsync(new GetActiveUserId());
+var api = await client.ApiAsync(new GetActiveUserId());
 ```
 
 If you've also registered the `BasicAuthProvider` it will enable your Services to accept [HTTP Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) 
 which is built-in the Service Clients that you can populate on the Service Client with:
 
 ```csharp
-client.UserName = "test@gmail.com";
-client.Password = "p@55w0rd";
+client.UserName = userName;
+client.Password = password
 ```
 
 Which will also let you access protected Services, e.g:
@@ -84,17 +88,14 @@ client.AlwaysSendBasicAuthHeader = true;
 
 ## Authenticating with HTTP
 
-To Authenticate with your `CustomCredentialsAuthProvider` (which inherits from CredentialsAuthProvider) you would POST:
+To Authenticate against your registered **Credentials** Auth Provider you can **POST** a raw JSON body:
 
 **POST** localhost:60339/auth/credentials?format=json
 
 ```json
 {
     "UserName": "admin",
-    "Password": "test",
+    "Password": "p@55wOrd",
     "RememberMe": true
 }
 ```
-
-When the client now tries to authenticate with the request above and the auth succeeded, the client will retrieve some 
-cookies with a session id which identify the client on each Web Service call.
