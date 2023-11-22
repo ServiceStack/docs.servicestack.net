@@ -216,7 +216,7 @@ print_r($response);
 
 If any of the the remote APIs change their DTOs can be updated by right-clicking on `dtos.php` and clicking **Update ServiceStack Reference**:
 
-![](/img/pages/servicestack-reference/pycharm-update-servicestack-reference.png)
+![](/img/pages/servicestack-reference/php-update-servicestack-reference.webp)
 
 ### Simple command-line utility for PHP
 
