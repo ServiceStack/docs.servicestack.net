@@ -9,7 +9,8 @@ Add ServiceStack Reference now supports
 [C#](/csharp-add-servicestack-reference), 
 [TypeScript](/typescript-add-servicestack-reference), 
 [JavaScript](/javascript-add-servicestack-reference),
-[Python](/python-add-servicestack-reference), 
+[Python](/python-add-servicestack-reference),
+[PHP](/php-add-servicestack-reference),
 [Swift](/swift-add-servicestack-reference), 
 [Java](/java-add-servicestack-reference), 
 [Kotlin](/kotlin-add-servicestack-reference), 
@@ -32,6 +33,7 @@ ServiceStackVS offers the generation and updating of these clients through the s
         <td><a href="/typescript-add-servicestack-reference">TypeScript</a></td>
         <td><a href="/javascript-add-servicestack-reference">JavaScript</a></td>
         <td><a href="/python-add-servicestack-reference">Python</a></td>
+        <td><a href="/php-add-servicestack-reference">PHP</a></td>
         <td><a href="/swift-add-servicestack-reference">Swift</a></td>
         <td><a href="/java-add-servicestack-reference">Java</a></td>
         <td><a href="/kotlin-add-servicestack-reference">Kotlin</a></td>
@@ -76,11 +78,11 @@ This video tutorial looks at how we can leverage Add ServiceStack Reference for 
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="WjbhfH45i5k" style="background-image: url('https://img.youtube.com/vi/WjbhfH45i5k/maxresdefault.jpg')"></lite-youtube>
 
-### Call ServiceStack APIs from Python
+### Call ServiceStack APIs from PHP
 
-This video tutorial looks at how we can leverage Add ServiceStack Reference for Python in PyCharm, VSCode and [Python Jupyter Notebooks](/jupyter-notebooks-python).
+This video tutorial looks at how we can easily integrate .NET Typed APIs to extend popular PHP Applications like Wordpress, Drupal or Laravel with [PHP Add ServiceStack Reference](/php-add-servicestack-reference).
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="WjbhfH45i5k" style="background-image: url('https://img.youtube.com/vi/WjbhfH45i5k/maxresdefault.jpg')"></lite-youtube>
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
 
 ### Instant Client Apps
 
