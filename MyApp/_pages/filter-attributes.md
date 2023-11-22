@@ -34,7 +34,7 @@ Or if you prefer you can instead implement one of the Request or Response Filter
 ```csharp
 public interface IRequestFilterBase
 {
-    int Priority { get; }      // Prioity of <0 are tun before Global Request Filters. >=0 Run after
+    int Priority { get; }      // Prioity of <0 are run before Global Request Filters. >=0 Run after
     IRequestFilterBase Copy(); // A new shallow copy of this filter is used on every request.
 }
 
