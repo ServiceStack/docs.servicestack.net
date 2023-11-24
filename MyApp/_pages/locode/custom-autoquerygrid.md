@@ -3,7 +3,7 @@ title: Custom AutoQueryGrid
 ---
 
 Locode lets you easily replace entire Locode Pages with your own, thanks to the reusable [AutoQueryGrid](/vue/gallery/autoquerygrid) component in the [Vue Component Library](/vue/) which lets you reuse custom components in your Vue Project templates to replace functionality in Locode, e.g. we can copy the custom 
-[Bookings AutoQueryGrid](https://vue-mjs.web-templates.io/bookings-auto) Vue 3 component in the new [vue-mjs](https://vue-mjs.web-templates.io) Project Template
+[Bookings AutoQueryGrid](https://blazor-vue.web-templates.io/secure/bookings) Vue 3 component in the new [blazor-vue](https://blazor-vue.web-templates.io) Project Template
 and use it to manage our Bookings in Locode by registering a Vue 3 component with the name:
 
 `{DataModel}Page`

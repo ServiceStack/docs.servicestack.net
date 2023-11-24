@@ -5,7 +5,7 @@ group: Library
 
 Vue.js Apps can access Authenticated Users using [useAuth()](/vue/use-auth)
 which can also be populated without the overhead of an Ajax request by embedding the response of the built-in
-[Authenticate API](https://vue-mjs.web-templates.io/ui/Authenticate?tab=details) inside `_Layout.cshtml` with:
+[Authenticate API](https://blazor-vue.web-templates.io/ui/Authenticate?tab=details) inside `_Layout.cshtml` with:
 
 ```html
 <script type="module">
@@ -31,7 +31,7 @@ const {
 ```
 
 An example where this is used is in 
-[Bookings.mjs](https://github.com/NetCoreTemplates/vue-mjs/blob/main/MyApp/wwwroot/Pages/Bookings.mjs)
+[Bookings.mjs](https://github.com/NetCoreTemplates/blazor-vue/blob/main/MyApp/wwwroot/pages/Bookings.mjs)
 to control whether the `<AutoEditForm>` component should enable its delete functionality:
 
 ```js

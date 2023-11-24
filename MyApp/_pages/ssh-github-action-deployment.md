@@ -9,7 +9,7 @@ before deploying it via SSH to a vanilla Linux Server running Docker Compose.
 
 ## ServiceStack GitHub Action Deployments
 
-The [release.yml](https://github.com/NetCoreTemplates/vue-mjs/blob/main/.github/workflows/release.yml) 
+The [release.yml](https://github.com/NetCoreTemplates/blazor-vue/blob/main/.github/workflows/release.yml) 
 in project templates enables GitHub Actions CI deployment to a dedicated server with SSH access.
 
 ## Overview

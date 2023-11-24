@@ -82,8 +82,8 @@ Use `NavList` for rendering a vertical navigation list with Icons:
 Using `href` with Button components will style hyper links to behave like buttons:
 
 ```html
-<PrimaryButton href="https://vue-mjs.web-templates.io/" class="mr-2">
-    Vue.mjs Template
+<PrimaryButton href="https://blazor-vue.web-templates.io/" class="mr-2">
+    Blazor Vue Template
 </PrimaryButton>
 
 <SecondaryButton href="/vue/">
@@ -92,7 +92,7 @@ Using `href` with Button components will style hyper links to behave like button
 ```
 
 <div class="my-8 not-prose">
-    <primary-button href="https://vue-mjs.web-templates.io/" class="mr-2">Vue.mjs Template</primary-button>
+    <primary-button href="https://blazor-vue.web-templates.io/" class="mr-2">Blazor Vue Template</primary-button>
     <secondary-button href="/vue/">Vue Component Docs</secondary-button>
 </div>
 

@@ -243,7 +243,7 @@ const api = client.api(new Hello({ name: props.name }))
 
 Compare and contrast with other major SPA JavaScript Frameworks:
 
- - [Vue 3 HelloApi.mjs](https://github.com/NetCoreTemplates/vue-mjs/blob/main/MyApp/wwwroot/mjs/components/HelloApi.mjs)
+ - [Vue 3 HelloApi.mjs](https://github.com/NetCoreTemplates/blazor-vue/blob/main/MyApp/wwwroot/posts/components/HelloApi.mjs)
  - [Vue SSG using swrClient](https://github.com/NetCoreTemplates/vue-ssg/blob/main/ui/src/components/HelloApi.vue)
  - [Next.js with swrClient](https://github.com/NetCoreTemplates/nextjs/blob/main/ui/components/intro.tsx)
  - [React HelloApi.tsx](https://github.com/NetCoreTemplates/react-spa/blob/master/MyApp/src/components/Home/HelloApi.tsx)
@@ -262,7 +262,7 @@ The above `init` projects allow you to create a minimal web app, to create a mor
 
 ## Simple, Modern Razor Pages & MVC Vue 3 Tailwind Templates
 
-The new Tailwind Razor Pages & MVC Templates enable rapid development of Modern Tailwind Apps without the [pitfalls plaguing SPAs](https://vue-mjs.web-templates.io/posts/javascript):
+The new Tailwind Razor Pages & MVC Templates enable rapid development of Modern Tailwind Apps without the [pitfalls plaguing SPAs](https://servicestack.net/posts/javascript):
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="SyppvQB7IPs" style="background-image: url('https://img.youtube.com/vi/SyppvQB7IPs/maxresdefault.jpg')"></lite-youtube>
 
