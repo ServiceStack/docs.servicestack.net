@@ -3,6 +3,7 @@ title: Ultimate Vue SPA & SSG Jamstack templates for .NET
 url: https://youtu.be/D-rU0lU_B4I
 tags: vue,vite,jamstack
 date: 01-02-2022
+order: 5
 ---
 
 In this video tutorial, we introduce the `vue-ssg` template, a powerful combination of Vite, Vue3, and ServiceStack 
