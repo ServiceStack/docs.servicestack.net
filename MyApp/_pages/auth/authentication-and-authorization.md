@@ -18,6 +18,13 @@ that Admins can use to assign Roles/Permissions to existing users.
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="XKq7TkZAzeg" style="background-image: url('https://img.youtube.com/vi/XKq7TkZAzeg/maxresdefault.jpg')"></lite-youtube>
 
+<div class="not-prose mx-auto px-8">
+  <h3 id="identityauth-template" class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900">
+      Create a Project with ServiceStack Auth
+  </h3>
+  <servicestack-auth-templates></servicestack-auth-templates>
+</div>
+
 ### Highly customizable and versatile
 
 ServiceStack's Authentication is also highly customizable and versatile from being able to choose from the plethora of Auth Providers
