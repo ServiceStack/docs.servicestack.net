@@ -38,7 +38,11 @@ export default {
       </div>
    </div>
 </section>
-<section :class="['w-full flex grid gap-4 text-center', templates.length === 1 ? 'grid-cols-1' : templates.length === 2 ? 'grid-cols-2' : 'grid-cols-3']">
+<section :class="['w-full flex grid gap-4 text-center', templates.length === 1 
+    ? 'grid-cols-1' 
+    : templates.length === 2 
+        ? 'grid-cols-2 max-w-md mx-auto' 
+        : 'grid-cols-3']">
    <div v-for="template in templates" class="mb-2">
       <div class="flex justify-center text-center">
          <a class="archive-url hover:no-underline" :href="zipUrl('NetCoreTemplates/' + template.repo)">

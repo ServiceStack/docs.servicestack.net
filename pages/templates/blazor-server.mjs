@@ -1,11 +1,17 @@
-import BlazorTemplate from "../templates/BlazorTemplate.mjs"
-import BlazorTemplates from "../templates/BlazorTemplates.mjs"
+import Templates, { Index } from "../templates/Templates.mjs"
+
+const BlazorTemplates = {
+    components: { Templates },
+    template:`<Templates :templates="[Index['blazor'], Index['blazor-vue']]" hide="demo" />`,
+    setup() {
+        return { Index }
+    }
+}
 
 export default {
     install(app) {
     },
     components: {
-        BlazorTemplate,
         BlazorTemplates,
     },
     setup() {
