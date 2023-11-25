@@ -25,9 +25,6 @@ export const Index = [
     template('svelte-spa', 'Svelte SPA', 'Angular',['bootstrap']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
 
-//     template:`<Templates :templates="[Index['vue-mjs'], Index['nextjs'], Index['vue-vite'], Index['vue-ssg'], Index['razor-pages'], Index['mvcauth'], Index['script']]" hide="demo" />`,
-console.log('Index', Index)
-
 export default {
     template:`<div>
 <section class="w-full flex flex-col justify-center text-center">
