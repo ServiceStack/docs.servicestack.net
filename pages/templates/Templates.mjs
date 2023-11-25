@@ -12,9 +12,20 @@ export const Index = [
     template('razor', 'Razor Pages', 'Razor',['tailwind']),
     template('mvc-bootstrap', 'MVC', 'Windows',['bootstrap']),
     template('razor-bootstrap', 'Razor Pages', 'Razor',['bootstrap']),
+    template('vue-mjs', 'Razor Pages', 'Razor',['tailwind','autoquery']),
+    template('nextjs', 'Next.js', 'Nextjs',['tailwind','autoquery']),
+    template('vue-vite', 'Vue Vite', 'Vue',['tailwind','autoquery']),
+    template('vue-ssg', 'Vue SSG', 'Vue',['tailwind','autoquery']),
     template('razor-pages', 'Razor Pages', 'Razor',['bootstrap']),
+    template('mvcauth', 'MVC', 'Windows',['bootstrap']),
+    template('script', 'MVC', 'Windows',['bootstrap']),
+    template('vue-spa', 'Vue SPA', 'Vue',['bootstrap']),
+    template('react-spa', 'React SPA', 'React',['bootstrap']),
+    template('angular-spa', 'Angular SPA', 'Angular',['bootstrap']),
+    template('svelte-spa', 'Svelte SPA', 'Angular',['bootstrap']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
 
+//     template:`<Templates :templates="[Index['vue-mjs'], Index['nextjs'], Index['vue-vite'], Index['vue-ssg'], Index['razor-pages'], Index['mvcauth'], Index['script']]" hide="demo" />`,
 console.log('Index', Index)
 
 export default {
