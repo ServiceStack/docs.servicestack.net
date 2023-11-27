@@ -462,19 +462,6 @@ Which Rider provides a nice UX for running directly from the IDE where it will p
 
 ![](/img/pages/ormlite/migration-scripts.png)
 
-### Use with Entity Framework Migrations
-
-For convenience if you're using both Entity Framework and OrmLite within the same project you can change `npm run migrate` to run both
-Entity Framework and OrmLite Migrations with a single command:
-
-```json
-{
-  "scripts": {
-    "migrate": "dotnet ef database update && dotnet run --AppTasks=migrate"
-  }
-}
-```
-
 ### ASP .NET Core Projects
 
 General (i.e. non-ServiceStack) ASP.NET Core Apps can instead configure AppTasks before `app.Run()` in their **Program.cs**:
@@ -490,21 +477,47 @@ app.Run();
 
 ### New RDBMS Projects configured with DB Migrations by default
 
-Now that OrmLite has a formal solution for implementing and executing schema changes, the [Quick install RDBMS mix scripts](/ormlite/installation.html#quick-install-in-asp-net-core-with-mix) are now configured to include **migrations** by default.
+Now that OrmLite has a formal solution for implementing and executing schema changes, the [Quick install RDBMS mix scripts](/ormlite/installation.html#quick-install-in-asp-net-core-with-mix) 
+are now configured to include **migrations** by default.
 
-### Failed migration behavior
+### Run OrmLite and Entity Framework Migrations together
 
-Executing migrations from the command-line is also how they are run in CI. The strategy we've employed in our [GitHub Action Deployment Templates](/github-action-templates) is to run the container to execute the **migrate** AppTask on the host machine first to validate migration was successful before completing deployment of the new App, so that a failed migration will cause deployment to fail and the previous App version to continue to run.
+For convenience if you're using both Entity Framework and OrmLite within the same project you can change the `npm run migrate`
+AppTask to run both Entity Framework and OrmLite Migrations by expanding the AppTask to run EF Migrations:
 
-::: info
-Ensure you are using Docker Compose v2+ and `--exit-code-from` the migration service in the `release.yml` file, in the `Run remote db migrations` step.
-:::
+```csharp
+public class ConfigureDbMigrations : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureAppHost(appHost => {
+            var migrator = new Migrator(appHost.Resolve<IDbConnectionFactory>(), typeof(Migration1000).Assembly);
+            AppTasks.Register("migrate", _ =>
+            {
+                var log = appHost.GetApplicationServices().GetRequiredService<ILogger<ConfigureDbMigrations>>();
+                log.LogInformation("Running EF Migrations...");
+                var scopeFactory = appHost.GetApplicationServices().GetRequiredService<IServiceScopeFactory>();
+                using (var scope = scopeFactory.CreateScope())
+                {
+                    using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    db.Database.EnsureCreated();
+                    db.Database.Migrate();
+                }
+                log.LogInformation("Running OrmLite Migrations...");
+                migrator.Run();
+            });
+            AppTasks.Register("migrate.revert", args => migrator.Revert(args[0]));
+            AppTasks.Run();
+        });
+}
+```
 
 ## Running migrations from GitHub Actions
 
-Where applicable, [GitHub Action deployments](/github-action-templates) have been updated to automatically run on deployment before the new version of your application starts up. This is done in the **Run remote db migrations** step. 
+Where applicable, [GitHub Action deployments](/github-action-templates) have been updated to automatically run on deployment before the new 
+version of your application starts up. This is done in the **Run remote db migrations** step. 
 
-Output can be found in your GitHub Action run output. The task that is run is controlled in the `.deploy/docker-compose-template.yml` file as a separate service which is only run if specified directly or with the `--profiles migration` option.
+Output can be found in your GitHub Action run output. The task that is run is controlled in the `.deploy/docker-compose-template.yml` 
+file as a separate service which is only run if specified directly or with the `--profiles migration` option.
 
 ::: info
 If you are using the template GitHub Actions and deploying to an Ubuntu 22.04 server, ensure you ssh key is generated using non RSA SHA1 algorithm.
@@ -533,6 +546,18 @@ Ensure you have v2+ of Docker Compose
 A compatibility script can be used for `docker-compose` via the following script.
 `echo 'docker compose --compatibility "$@"' > /usr/local/bin/docker-compose`
 `sudo chmod +x /bin/docker-compose`
+:::
+
+### Failed migration behavior
+
+Executing migrations from the command-line is also how they are run in CI. The strategy we've employed in our
+[GitHub Action Deployment Templates](/github-action-templates) is to run the container to execute the **migrate** AppTask on the host
+machine first to validate migration was successful before completing deployment of the new App, so that a failed migration
+will cause deployment to fail and the previous App version to continue to run.
+
+::: info
+Ensure you are using Docker Compose v2+ and `--exit-code-from` the migration service in the `release.yml` file, in the 
+`Run remote db migrations` step.
 :::
 
 ## Running migrations from unit tests
