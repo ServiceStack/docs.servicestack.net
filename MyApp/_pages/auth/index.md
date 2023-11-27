@@ -12,7 +12,7 @@ As of [ServiceStack v8](/releases/v8_00) there are 2 main Authentication Models 
 ### ASP.NET Core Identity Auth now default from ServiceStack v8
 
 A significant change from **ServiceStack v8** is the adoption of the same ASP.NET Core Identity Authentication 
-that's configured in Microsoft's default Projects templates in ServiceStack's new Project Templates.
+that's configured in Microsoft's default Projects templates is also used in ServiceStack's newest Project Templates.
 
 ## History of ServiceStack Authentication
 
