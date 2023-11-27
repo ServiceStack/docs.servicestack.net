@@ -60,12 +60,12 @@ For a quick preview of what these look like, checkout out their Internet Hosted 
 The configuration and source code for the above projects are a good reference for how to configure ServiceStack with
 Identity Auth in your own projects:
 
-- [blazor](blazor)
-- [blazor-vue](blazor-vue)
-- [razor](razor)
-- [mvc](mvc)
-- [razor-bootstrap](razor-bootstrap)
-- [mvc-bootstrap](mvc-bootstrap)
+- [blazor](https://github.com/NetCoreTemplates/blazor)
+- [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)
+- [razor](https://github.com/NetCoreTemplates/razor)
+- [mvc](https://github.com/NetCoreTemplates/mvc)
+- [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)
+- [mvc-bootstrap](https://github.com/NetCoreTemplates/mvc-bootstrap)
 
 The **Bootstrap** versions use same Individual Identity Auth Pages that Microsoft's **Razor Pages** and **MVC** templates use,
 whilst the **Tailwind** versions have been enhanced to use **Tailwind CSS** instead of Bootstrap,
