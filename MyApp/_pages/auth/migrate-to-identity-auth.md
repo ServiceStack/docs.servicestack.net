@@ -223,7 +223,7 @@ public class ConfigureDbMigrations : IHostingStartup
 As there's no official API for updating the raw `PasswordHash` you'll need to use EF's `ExecuteUpdate()` API to update it
 on the `AspNetUsers` table directly.
 
-It should be noted that ServiceStack Auth still uses ASP.NET Cor's previous Identity v2 format for hashing its passwords,
+It should be noted that ServiceStack Auth still uses ASP.NET Core's previous Identity v2 format for hashing its passwords,
 this will be automatically re-hashed using the latest ASP.NET Identity v3 format after users successfully sign in.
 
 #### Optimizing the PasswordHash Update
