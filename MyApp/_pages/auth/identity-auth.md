@@ -144,6 +144,8 @@ public class ConfigureAuth : IHostingStartup
 
 If you're using a `CustomUserSession` you'll also need to register it with the `SessionFactory` for it to be used.
 
+### Configure Individual Auth Providers
+
 Each of the Identity Auth Providers can also be customized individually:
 
 ```csharp
@@ -161,6 +163,8 @@ Plugins.Add(new AuthFeature(IdentityAuth.For<ApplicationUser>(options => {
     })
 ));
 ```
+
+### Enable Optional ServiceStack Auth Services
 
 Typically you'll want to use the included Identity UI Pages and dependencies to register new users and assign roles,
 but if you have any existing client integrations that use ServiceStack APIs they can also be enabled with:
