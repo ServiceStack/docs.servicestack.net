@@ -191,48 +191,9 @@ class MyService : MyServiceBase {
 }
 ```
 
-### In Process Authenticated Requests
-
-You can enable the `CredentialsAuthProvider` to allow **In Process** requests to Authenticate without a Password with:
-
-```csharp
-new CredentialsAuthProvider {
-    SkipPasswordVerificationForInProcessRequests = true,
-}
-```
-
-When enabled this lets **In Process** Service Requests to login as a specified user without needing to provide their password.
-
-For example this could be used to create an [Intranet Restricted](/auth/restricting-services) **Admin-Only** Service that lets you login as another user so you can debug their account without knowing their password with:
-
-```csharp
-[RequiredRole("Admin")]
-[Restrict(InternalOnly=true)]
-public class ImpersonateUser 
-{
-    public string UserName { get; set; }
-}
-
-public class MyAdminServices : Service
-{
-    public async Task<object> Any(ImpersonateUser request)
-    {
-        using var service = base.ResolveService<AuthenticateService>(); //In Process
-        return await service.PostAsync(new Authenticate {
-            provider = AuthenticateService.CredentialsProvider,
-            UserName = request.UserName,
-        });
-    }
-}
-```
-
-::: info
-Your Services can use the new `Request.IsInProcessRequest()` to identify Services that were executed in-process
-:::
-
 ### Using a Global Request Filter
 
-Otherwise you can use a [global Request Filter](/request-and-response-filters) if you wanted to restrict all requests any other way, e.g something like:
+Otherwise you can use a [Global Request Filter](/request-and-response-filters) if you wanted to restrict all requests any other way, e.g something like:
 
 ```csharp
 GlobalRequestFiltersAsync.Add(async (req, res, requestDto) =>
