@@ -8,6 +8,7 @@ export function template(repo, name, icon, tags, demo) {
 export const Index = [
     template('blazor', 'Blazor', 'Blazor', ['tailwind']),
     template('blazor-vue', 'Blazor Vue', 'Blazor',['tailwind']),
+    template('blazor-wasm', 'Blazor WASM', 'Blazor',['tailwind']),
     template('mvc', 'MVC', 'Windows',['tailwind']),
     template('razor', 'Razor Pages', 'Razor',['tailwind']),
     template('mvc-bootstrap', 'MVC', 'Windows',['bootstrap']),

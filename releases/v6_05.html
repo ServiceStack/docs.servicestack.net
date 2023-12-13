@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-12-03T01:27:12.1112987Z'>
+    <meta name='date' content='2023-12-13T06:25:17.8040212Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v6.5</title>
@@ -603,14 +603,14 @@ Releases                                    </span>
 <div class="not-prose relative">
   <div class="grid grid-cols-1 sm:grid-cols-2 text-center">
     <div>
-        <a class="flex flex-col" href="https://blazor-server.jamstacks.net/?light">
-            <div class="py-4">blazor-server.jamstacks.net/?light</div>
+        <a class="flex flex-col" href="https://blazor.web-templates.io/?light">
+            <div class="py-4">blazor.web-templates.io/?light</div>
             <img class="rounded-xl overflow-hidden" src="/img/pages/blazor/blazor-gallery-light.png">
         </a>
     </div>
     <div>
-        <a class="flex flex-col" href="https://blazor-server.jamstacks.net/?dark">
-            <div class="py-4">blazor-server.jamstacks.net/?dark</div>
+        <a class="flex flex-col" href="https://blazor.web-templates.io/?dark">
+            <div class="py-4">blazor.web-templates.io/?dark</div>
             <img class="rounded-xl overflow-hidden" src="/img/pages/blazor/blazor-gallery-dark.png">
         </a>
     </div>
@@ -1138,50 +1138,7 @@ Plugins.Add(new FilesUploadFeature(
 <li>Write Files to R2</li>
 <li>Recalculating temporal scores and ranking of Artifacts and Albums</li>
 <li>Recording Analytics</li>
-<li>Prerendering pages at runtime</li>
 </ul>
-<h3 id="prerendering-blazor-pages-at-runtime">Prerendering Blazor Pages at runtime<a class="header-anchor" href="javascript:;" onclick="location.hash='#prerendering-blazor-pages-at-runtime'" aria-label="Permalink"> </a></h3>
-<p>The <a href="https://blazor-tailwind.jamstacks.net/docs/prerender">current prerendering solution</a> built into the Blazor WASM template follows the <a href="https://jamstack.org/">JAMStack</a> approach of pre-rendering pages at build time, however in order to keep the home page &quot;fresh&quot; and show the newest &amp; most liked images first we needed a solution that pre-renders pages at runtime and publishes them to R2 object storage where the Blazor WASM static assets are deployed to.</p>
-<p>This feature is implemented in <a href="https://github.com/NetCoreApps/BlazorDiffusion/blob/main/BlazorDiffusion/Configure.Ui.cs">Configure.Ui.cs</a> where it lets you specify the pages to render, any custom parameters and where to save it:</p>
-<pre><code class="language-csharp">container.Register&lt;IPrerenderer&gt;(c =&gt; new Prerenderer
-{
-    BaseUrl = appConfig.BaseUrl,
-    VirtualFiles = virtualFiles,
-    PrerenderDir = &quot;/prerender&quot;,
-    Renderer = c.Resolve&lt;IComponentRenderer&gt;(),
-    Pages = {
-        new(typeof(Pages.Index),  &quot;/index.html&quot;,  new() { [nameof(Pages.Index.LazyLoad)] = &quot;false&quot; }),
-        new(typeof(Pages.Albums), &quot;/albums.html&quot;, new() { [nameof(Pages.Index.LazyLoad)] = &quot;false&quot; }),
-    }
-});
-</code></pre>
-<p>To avoid a dependency to bUnit in our App we've created a new <code>ComponentRenderer</code> to render Blazor components to string that's useful if needing to render a Blazor Component to HTML in an API, e.g. you can create a generic API to render any component with:</p>
-<pre><code class="language-csharp">[Route(&quot;/render/{Type}&quot;)]
-public class RenderComponent : IGet, IReturn&lt;string&gt; 
-{
-    public string Type { get; set; }
-}
-
-//...
-
-public async Task&lt;object&gt; Any(RenderComponent request)
-{
-    var componentType = GetComponentType(request.Type); //TODO resolve Component Type from Name
-    var httpContext = ((NetCoreRequest)Request).HttpContext;
-    var args = Request.GetRequestParams().ToObjectDictionary();
-    var renderer = new ComponentRender();
-    var html = await renderer.RenderComponentAsync(componentType, httpContext, args);
-    return html;
-}
-</code></pre>
-<p>Where it will populate a component instance from a QueryString then render it to string that can be called like:</p>
-<pre><code>/render/MyPage?Param1=A&amp;Param2=B
-</code></pre>
-<p>Or if needing to render a component outside of a HTTP Context (e.g. in a Background Task or Console App), you can create a empty HttpContext with the new <code>HttpContextFactory</code>, e.g:</p>
-<pre><code class="language-csharp">var testContext = HttpContextFactory.CreateHttpContext(baseUrl);
-var renderer = new ComponentRender();
-var html = await renderer.RenderComponentAsync(componentType, testContext, args);
-</code></pre>
 <h2 id="universal-blazor-components">Universal Blazor Components<a class="header-anchor" href="javascript:;" onclick="location.hash='#universal-blazor-components'" aria-label="Permalink"> </a></h2>
 <p>Blazor Server has become our preferred platform for Interactive <strong>Intranet</strong> Apps which excels in <strong>low-latency environments</strong> to enable a best-in-class responsive end-user UX that also offers a superior development experience in Visual Studio's live reload where it enables a fast iterative development workflow and good debugging experience.</p>
 <p>A fantastic property of Blazor is its support for multiple hosting modes which allows the same components from being able to run in the Browser with Blazor WASM or rendered on the Server with Blazor Server. But whilst Blazor is capable of it, this trait is typically conceded in most Apps with database access where it recommends using
@@ -1277,10 +1234,10 @@ public interface IServiceGatewayFormAsync
                 <p class="custom-block-title">WARNING</p><p><strong>Additionally, again for security reasons, you must not use IHttpContextAccessor within Blazor apps.</strong> Blazor apps run outside of the context of the ASP.NET Core pipeline. The HttpContext isn't guaranteed to be available within the IHttpContextAccessor, nor is it guaranteed to be holding the context that started the Blazor app</p>
 </div>
 <p>This was particularly concerning since using <code>IHttpContextAccessor</code> was the only solution that ever worked in successfully maintaining Authentication state across Blazor Server App, HttpClient and external Browser session, and as such is frequently promoted as the solution for implementing <a href="https://www.learmoreseekmore.com/2022/01/part3-blazorsrver-cookie-authentication.html">Blazor Server Cookie Authentication</a> or <a href="https://auth0.com/blog/call-protected-api-in-aspnet-core/">Calling protected APIs with Auth0</a>.</p>
-<p>Luckily we were able to get the desired authentication functionality by adopting Microsoft's &quot;recommended way to pass request state to the Blazor app&quot; through parameters to the root component which required breaking changes to <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/Pages/_Host.cshtml">_Host.cshtml</a> to pass the Browser's Request Session to the App:</p>
+<p>Luckily we were able to get the desired authentication functionality by adopting Microsoft's &quot;recommended way to pass request state to the Blazor app&quot; through parameters to the root component which required breaking changes to <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/Pages/_Host.cshtml">_Host.cshtml</a> to pass the Browser's Request Session to the App:</p>
 <pre><code class="language-cs">&lt;component type=&quot;typeof(App)&quot; param-InitialState=&quot;Request.GetInitialHostState()&quot; render-mode=&quot;ServerPrerendered&quot; /&gt;
 </code></pre>
-<p>Where this initial State is loaded into the App's scoped <code>HostState</code> context in <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/App.razor">App.razor</a>:</p>
+<p>Where this initial State is loaded into the App's scoped <code>HostState</code> context in <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/App.razor">App.razor</a>:</p>
 <pre><code class="language-csharp">@code {
     [Parameter] public InitialHostState? InitialState { get; set; }
 
@@ -1299,27 +1256,27 @@ public interface IServiceGatewayFormAsync
 <h2 id="upgrading-existing-blazor-projects">Upgrading existing Blazor Projects<a class="header-anchor" href="javascript:;" onclick="location.hash='#upgrading-existing-blazor-projects'" aria-label="Permalink"> </a></h2>
 <p>To make use of new Blazor Features in this release, existing Blazor Server and WASM templates will need to include the latest tailwind classes ServiceStack.Blazor uses by updating:</p>
 <ul>
-<li><a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/wwwroot/tailwind/ServiceStack.Blazor.html">/wwwroot/tailwind/ServiceStack.Blazor.html</a></li>
+<li><a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/wwwroot/tailwind/ServiceStack.Blazor.html">/wwwroot/tailwind/ServiceStack.Blazor.html</a></li>
 </ul>
-<p>It's not required, but we recommend calling <code>JS.init()</code> to initialize ServiceStack.Blazor's JS helper after importing it in <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/Pages/_Layout.cshtml">_Layout.cshtml</a> in Blazor Server or <a href="https://github.com/NetCoreTemplates/blazor-tailwind/blob/main/MyApp.Client/wwwroot/index.html">index.html</a> in WASM:</p>
+<p>It's not required, but we recommend calling <code>JS.init()</code> to initialize ServiceStack.Blazor's JS helper after importing it in <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/Pages/_Layout.cshtml">_Layout.cshtml</a> in Blazor Server or <a href="https://github.com/LegacyTemplates/blazor-tailwind/blob/main/MyApp.Client/wwwroot/index.html">index.html</a> in WASM:</p>
 <pre><code class="language-html">&lt;script src=&quot;/js/servicestack-blazor.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;JS.init()&lt;/script&gt;
 </code></pre>
-<p>To avoid future breaking changes to the base constructor when needing access to new dependencies, the Blazor WASM <a href="https://github.com/NetCoreTemplates/blazor-tailwind/blob/main/MyApp.Client/Auth/ServiceStackStateProvider.cs">/Auth/ServiceStackStateProvider.cs</a> was changed to inject a context encapsulating all its required dependencies:</p>
+<p>To avoid future breaking changes to the base constructor when needing access to new dependencies, the Blazor WASM <a href="https://github.com/LegacyTemplates/blazor-tailwind/blob/main/MyApp.Client/Auth/ServiceStackStateProvider.cs">/Auth/ServiceStackStateProvider.cs</a> was changed to inject a context encapsulating all its required dependencies:</p>
 <pre><code class="language-csharp">public class ServiceStackStateProvider : BlazorWasmAuthenticationStateProvider
 {
     public ServiceStackStateProvider(BlazorWasmAuthContext ctx, ILogger&lt;BlazorWasmAuthenticationStateProvider&gt; log)
         : base(ctx, log) { }
 }
 </code></pre>
-<p>Whilst Blazor Server's <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/Auth/ServiceStackStateProvider.cs">/Auth/ServiceStackStateProvider.cs</a> was changed to:</p>
+<p>Whilst Blazor Server's <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/Auth/ServiceStackStateProvider.cs">/Auth/ServiceStackStateProvider.cs</a> was changed to:</p>
 <pre><code class="language-csharp">public class ServiceStackStateProvider : BlazorServerAuthenticationStateProvider
 {
     public ServiceStackStateProvider(BlazorServerAuthContext ctx, ILogger&lt;BlazorServerAuthenticationStateProvider&gt; log) 
         : base(ctx, log) {}
 }
 </code></pre>
-<p>As described above the <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/Pages/_Host.cshtml">/Pages/_Host.cshtml</a> and <a href="https://github.com/NetCoreTemplates/blazor-server/blob/main/MyApp/App.razor">App.razor</a> will also need updating to utilize Blazor Server's Unified Authentication.</p>
+<p>As described above the <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/Pages/_Host.cshtml">/Pages/_Host.cshtml</a> and <a href="https://github.com/LegacyTemplates/blazor-server/blob/main/MyApp/App.razor">App.razor</a> will also need updating to utilize Blazor Server's Unified Authentication.</p>
 <h2 id="add-servicestack-reference">Add ServiceStack Reference<a class="header-anchor" href="javascript:;" onclick="location.hash='#add-servicestack-reference'" aria-label="Permalink"> </a></h2>
 <p>The native types code generation in <a href="/add-servicestack-reference">Add ServiceStack Reference</a> was improved to better support C# nullable annotations where this mixed type containing both value and reference nullable types:</p>
 <pre><code class="language-csharp">public class Data
@@ -1616,12 +1573,6 @@ public partial class Data
                                                         <span v-hash="'#background-mq'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Background MQ
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="prerendering-blazor-pages-at-runtime" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#prerendering-blazor-pages-at-runtime'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Prerendering Blazor Pages at runtime
                                                         </span>
                                                     </li>
                                             </ul>
