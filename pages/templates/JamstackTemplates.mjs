@@ -116,7 +116,7 @@ export default {
                   <div class="count mt-1 text-gray-400 text-sm"></div>
                </div>
             </a>
-            <a class="text-sm text-center mr-4" href="https://blazor-wasm.jamstacks.net">blazor-wasm.jamstacks.net</a>
+            <a class="text-sm text-center mr-4" href="https://blazor-wasm.web-templates.io">blazor-wasm.web-templates.io</a>
          </div>
       </div>
    </div>
