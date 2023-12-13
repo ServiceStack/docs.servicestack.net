@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-12-13T07:40:36.0934086Z'>
+    <meta name='date' content='2023-12-13T09:27:01.3357883Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Authentication Overview</title>
@@ -432,38 +432,8 @@ class MyService : MyServiceBase {
     public object Get(Protected request) { ... }
 }
 </code></pre>
-<h3 id="in-process-authenticated-requests">In Process Authenticated Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#in-process-authenticated-requests'" aria-label="Permalink"> </a></h3>
-<p>You can enable the <code>CredentialsAuthProvider</code> to allow <strong>In Process</strong> requests to Authenticate without a Password with:</p>
-<pre><code class="language-csharp">new CredentialsAuthProvider {
-    SkipPasswordVerificationForInProcessRequests = true,
-}
-</code></pre>
-<p>When enabled this lets <strong>In Process</strong> Service Requests to login as a specified user without needing to provide their password.</p>
-<p>For example this could be used to create an <a href="/auth/restricting-services">Intranet Restricted</a> <strong>Admin-Only</strong> Service that lets you login as another user so you can debug their account without knowing their password with:</p>
-<pre><code class="language-csharp">[RequiredRole(&quot;Admin&quot;)]
-[Restrict(InternalOnly=true)]
-public class ImpersonateUser 
-{
-    public string UserName { get; set; }
-}
-
-public class MyAdminServices : Service
-{
-    public async Task&lt;object&gt; Any(ImpersonateUser request)
-    {
-        using var service = base.ResolveService&lt;AuthenticateService&gt;(); //In Process
-        return await service.PostAsync(new Authenticate {
-            provider = AuthenticateService.CredentialsProvider,
-            UserName = request.UserName,
-        });
-    }
-}
-</code></pre>
-<div class="info custom-block">
-                <p class="custom-block-title">INFO</p><p>Your Services can use the new <code>Request.IsInProcessRequest()</code> to identify Services that were executed in-process</p>
-</div>
 <h3 id="using-a-global-request-filter">Using a Global Request Filter<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-a-global-request-filter'" aria-label="Permalink"> </a></h3>
-<p>Otherwise you can use a <a href="/request-and-response-filters">global Request Filter</a> if you wanted to restrict all requests any other way, e.g something like:</p>
+<p>Otherwise you can use a <a href="/request-and-response-filters">Global Request Filter</a> if you wanted to restrict all requests any other way, e.g something like:</p>
 <pre><code class="language-csharp">GlobalRequestFiltersAsync.Add(async (req, res, requestDto) =&gt;
 {
     if (ShouldProtectRequest(requestDto)) 
@@ -566,12 +536,6 @@ Otherwise you can use the <code>IRequest req</code> parameter to check against a
                                                         <span v-hash="'#using-the-authenticate-attribute'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Using the 
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="in-process-authenticated-requests" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#in-process-authenticated-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            In Process Authenticated Requests
                                                         </span>
                                                     </li>
                                                     <li data-id="using-a-global-request-filter" class="text-gray-500 hover:text-gray-900">
