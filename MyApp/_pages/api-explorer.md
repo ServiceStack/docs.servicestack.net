@@ -11,7 +11,7 @@ This video provides a quick overview of API Explorer's v1 featureset:
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="lUDlTMq9DHU" style="background-image: url('https://img.youtube.com/vi/lUDlTMq9DHU/maxresdefault.jpg')"></lite-youtube>
 
 ::: info DEMO
-A Live demo is available at **/ui** in all ServiceStack **v6+** Apps, e.g: [blazor-wasm-api.jamstacks.net/ui](https://blazor-wasm-api.jamstacks.net/ui)
+A Live demo is available at **/ui** in all ServiceStack **v6+** Apps, e.g: [vue-vite-api.jamstacks.net/ui](https://vue-vite-api.jamstacks.net/ui)
 :::
 
 The entire API Explorer UI is driven by the **rich metadata** around your APIs typed Service Contracts and AppHost's **registered plugins**.
@@ -25,7 +25,7 @@ The entire API Explorer UI is driven by the **rich metadata** around your APIs t
 
 If your AppHost has the ServiceStack [AuthFeature](/auth/authentication-and-authorization) plugin registered, the home page will display a **Sign In** dialog based on the its **configured Auth Providers**. 
 
-This is what you'll see in a new [Blazor WASM](https://blazor-wasm-api.jamstacks.net/ui) project which has **Credentials** Auth, **JWT** as well as **Facebook**, **Google** and **Microsoft** OAuth providers registered in [Configure.Auth.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/Configure.Auth.cs)
+This is what you'll see in a new [Vue Vite](https://vue-vite-api.jamstacks.net/ui) project which has **Credentials** Auth, **JWT** as well as **Facebook**, **Google** and **Microsoft** OAuth providers registered in [Configure.Auth.cs](https://github.com/NetCoreTemplates/vue-vite/blob/main/api/MyApp/Configure.Auth.cs)
 
 ```csharp
 Plugins.Add(new AuthFeature(() => new CustomUserSession(),
@@ -47,7 +47,7 @@ Plugins.Add(new AuthFeature(() => new CustomUserSession(),
 
 Where it will dynamically render the **Sign Up** form with the App's enabled Auth capabilities.
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/signin.png">
 </a>
 
@@ -95,7 +95,7 @@ Plugins.Add(new AdminUsersFeature());
 
 It also displays **Admin UI** links that only **Admin** Users have access to.
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/admin-user.png">
 </a>
 
@@ -137,7 +137,7 @@ The `Raw` response forces a `CamelCase` response since the API Explorer interfac
 Those using `SnakeCase` or `PascalCase` will see a different response outside of API Explorer.
 :::
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/QueryBookings?body=preview" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/QueryBookings?body=preview" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-form-QueryBookings.png">
 </a>
 
@@ -178,7 +178,7 @@ public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
 Generates the following UI:
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/CreateBooking">
+    <a href="https://vue-vite-api.jamstacks.net/ui/CreateBooking">
         <img src="/img/pages/apiexplorer/api-form-CreateBooking.png" style="max-width:850px;">
     </a>
 </div>
@@ -190,7 +190,7 @@ to further customize the Input UI control for each property as a **declarative a
 API Form also supports auto binding [Argument Exceptions](/error-handling) or [Fluent](/validation) & [Declarative](/declarative-validation) Validation rules where any validation errors will be contextually displayed next to the invalid property. Here's both the resulting invalid UI & the Error Response DTO that generated it:
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/CreateBooking">
+    <a href="https://vue-vite-api.jamstacks.net/ui/CreateBooking">
         <img src="/img/pages/apiexplorer/api-form-CreateBooking-invalid.png" style="max-width:850px;">
     </a>
 </div>
@@ -204,7 +204,7 @@ Another useful API form feature is being able to call APIs with a **JSON request
 Real-time JSON validation is also displayed for added assistance, warning you whenever the JSON is malformed.
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/CreateBooking">
+    <a href="https://vue-vite-api.jamstacks.net/ui/CreateBooking">
         <img src="/img/pages/apiexplorer/api-form-CreateBooking-json.png" style="max-width:850px;">
     </a>
 </div>
@@ -222,7 +222,7 @@ This is where API consumers would go to learn about each API where it displays a
  - It's an [AutoQuery CRUD](/autoquery/crud) API implementing `ICreateDb<Booking>` indicating it creates entries in the **Booking** RDBMS Table 
  - It returns an `IdResponse` which we can intuitively infer returns the new Booking **Id** for successfully created Bookings
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/CreateBooking?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/CreateBooking?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-details-CreateBooking.png">
 </a>
 
@@ -278,7 +278,7 @@ It includes the necessary steps to call your APIs from client Apps, following th
 
 At which point without any code-gen or build tools, they'll end up with an Typed API configured to your APIs endpoint. E.g. this is what it looks like to **Python** developers utilizing our [most recently supported language](/releases/v5_12):
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/QueryBookings?tab=code&lang=python" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/QueryBookings?tab=code&lang=python" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-code-QueryBookings-python.png">
 </a>
 
@@ -327,7 +327,7 @@ public class Booking : AuditBase
 
 Where it generates clean API docs displayed in a human-friendly table layout containing properties of its **Request DTO** Type and inherited **base class** properties, starting with the APIs Request DTO followed by all its referenced dependent types - resulting in the details page containing a complete snapshot of all types used in the API:
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/QueryBookings?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/QueryBookings?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-details-QueryBookings.png">
 </a>
 
@@ -405,10 +405,10 @@ export const CreateBookingDocs = {
 
 ### Dynamic Components
 
-[QueryTodos](https://blazor-wasm-api.jamstacks.net/ui/QueryTodos?tab=details) is a more advanced example that generates a dynamic UI shared by all TODO APIs
+[QueryTodos](https://vue-vite-api.jamstacks.net/ui/QueryTodos?tab=details) is a more advanced example that generates a dynamic UI shared by all TODO APIs
 that generate its reactive **Mini Navigation UI** users can use to cycle through **all TODO API docs** with a `v-href="{ op }"` custom directive:
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/QueryTodos?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/QueryTodos?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-details-docs-Todos.png">
 </a>
 
@@ -528,13 +528,13 @@ export const RegisterDocs = {
 
 Generates docs for the built-in **Register** API that includes **C#** Syntax highlighting using the pre-configured [highlightjs](https://highlightjs.org) directive:
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/Register?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/Register?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-details-docs-Register.png">
 </a>
 
 Whilst [/ui/docs/AuthenticateDocs.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack/modules/ui/docs/AuthenticateDocs.mjs) demonstrates a more advanced example in generating a responsive dynamic tab layout containing multiple relevant ServiceStack Auth YouTube videos:
 
-<a href="https://blazor-wasm-api.jamstacks.net/ui/Authenticate?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
+<a href="https://vue-vite-api.jamstacks.net/ui/Authenticate?tab=details" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-details-docs-Authenticate.png">
 </a>
 
@@ -587,7 +587,7 @@ export default Brand
 Which override's the built-in `Brand` component to replace the Logo on the top-right of API Explorer, [Locode](/locode/) and the [Admin UI](/admin-ui) with the custom version below:
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/">
+    <a href="https://vue-vite-api.jamstacks.net/ui/">
         <img src="/img/pages/apiexplorer/brand-blazor-wasm.png" style="max-width:850px;border:1px solid rgb(229 231 235);">
     </a>
 </div>
@@ -602,7 +602,7 @@ ConfigurePlugin<UiFeature>(feature => {
 ```
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/Register">
+    <a href="https://vue-vite-api.jamstacks.net/ui/Register">
         <img src="/img/pages/apiexplorer/brand-vue-ssg.png" style="max-width:850px;border:1px solid rgb(229 231 235);">
     </a>
 </div>
@@ -721,7 +721,7 @@ appHost.ConfigureOperation<Register>(op => op.FormLayout = new()
 Which overrides the default Auto UI Form to use this custom layout:
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-wasm-api.jamstacks.net/ui/Register">
+    <a href="https://vue-vite-api.jamstacks.net/ui/Register">
         <img src="/img/pages/apiexplorer/api-form-Register.png" style="max-width:850px;">
     </a>
 </div>

@@ -144,8 +144,8 @@ the `custom-*.html` placeholders below:
 
 The [Blazor WASM](/templates/blazor-bootstrap) template includes example App customizations with
 [Custom API Docs](/api-explorer#api-docs) for its 
-[CreateBooking](https://blazor-wasm-api.jamstacks.net/ui/CreateBooking?tab=details) and
-[Todos APIs](https://blazor-wasm-api.jamstacks.net/ui/QueryTodos?tab=details):
+[CreateBooking](https://vue-vite-api.jamstacks.net/ui/CreateBooking?tab=details) and
+[Todos APIs](https://vue-vite-api.jamstacks.net/ui/QueryTodos?tab=details):
 
 <ul class="list-none">
     <li>

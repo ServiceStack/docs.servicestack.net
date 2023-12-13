@@ -62,9 +62,9 @@ const Brand = {
 export default Brand
 ```
 
-To render its [custom App Brand component](https://blazor-wasm-api.jamstacks.net/ui):
+To render its [custom App Brand component](https://vue-vite-api.jamstacks.net/ui):
 
-[![](/img/pages/locode/custom-brand.png)](https://blazor-wasm-api.jamstacks.net/ui)
+[![](/img/pages/locode/custom-brand.png)](https://vue-vite-api.jamstacks.net/ui)
 
 ## Custom Table Icons
 
