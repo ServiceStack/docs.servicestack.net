@@ -115,7 +115,7 @@ For a closer look at ServiceStack.Blazor Components in action, download & run th
 Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/templates/dotnet-new):
 
 :::sh
-x new LegacyTemplates/blazor-tailwind ProjectName
+x new blazor ProjectName
 :::
 
 <div class="relative bg-white py-4 mt-12">

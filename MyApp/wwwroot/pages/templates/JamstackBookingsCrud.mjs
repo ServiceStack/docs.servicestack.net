@@ -27,10 +27,10 @@ export default {
         </div>
     </template>
     <template #blazor>
-        <a href="https://blazor-wasm.jamstacks.net/bookings-crud">
+        <a href="https://vue-vite.jamstacks.net/bookings-crud">
             <img src="/img/pages/jamstack/bookings-blazor.png">
             <div class="text-center mb-3">
-                blazor-wasm.jamstacks.net/bookings-crud
+                blazor-wasm.web-templates.io/bookings-crud
             </div>
         </a>
         <div class="flex justify-center items-center">

@@ -357,19 +357,19 @@ public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
 
 To initially render this form:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://blazor-wasm.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new.png" class="max-w-screen-md" />
 </a>
 
 Whose `[ValidateNotEmpty]` [declarative validator](/declarative-validation) filters down to the **client Input** UI to prevent unnecessary invalid API requests:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://blazor-wasm.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new-validation-client.png" class="max-w-screen-md" />
 </a>
 
 Validation of server error responses looks like:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://blazor-wasm.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new-validation-server.png" class="max-w-screen-md" />
 </a>
 
@@ -418,7 +418,7 @@ complexity of maintaining your Apps dependencies in both client and server proje
 optimal result since prerendering is typically used so Apps can host their SSG content on static file hosts, instead SSR does the 
 opposite whose forced runtime coupling to the .NET Server Host prohibits Blazor WASM Apps from being served from a CDN.
 
-As this defeats [many of the benefits](https://blazor-wasm.jamstacks.net/docs/hosting) of a Blazor WASM Jamstack App in the first place, 
+As this defeats [many of the benefits](https://blazor-wasm.web-templates.io/docs/hosting) of a Blazor WASM Jamstack App in the first place, 
 we've instead opted for a more optimal solution that doesn't compromise its CDN hostability.
 
 ### Increasing Perceived Performance
@@ -542,11 +542,11 @@ which you'll see initially before being reverting to a flat border when the Blaz
 ```
 
 With just this, every page now benefits from an instant App chrome to give the perception that our App has loaded instantly
-before any C# in our Blazor App is run. E.g. here's what the [Blazor Counter](https://blazor-wasm.jamstacks.net/counter) page looks like while it's loading:
+before any C# in our Blazor App is run. E.g. here's what the [Blazor Counter](https://blazor-wasm.web-templates.io/counter) page looks like while it's loading:
 
 ![](/img/pages/jamstack/blazor-wasm/loading.png)
 
-If you click refresh the [/counter](https://blazor-wasm.jamstacks.net/counter) page a few times you'll see the new loading screen prior to the Counter page being available.
+If you click refresh the [/counter](https://blazor-wasm.web-templates.io/counter) page a few times you'll see the new loading screen prior to the Counter page being available.
 
 Our App is now in a pretty shippable state with decent UX of a loading page that looks like it loaded instantly instead
 of the "under construction" Loading... page from the default Blazor WASM project template.
@@ -556,7 +556,7 @@ need updating when add/removing menu items.
 
 ### Improving UX with Prerendering
 
-We'll now turn our focus to the most important page in our App, the [Home Page](https://blazor-wasm.jamstacks.net) which is the page most people will see
+We'll now turn our focus to the most important page in our App, the [Home Page](https://blazor-wasm.web-templates.io) which is the page most people will see
 when loading the App from the first time.
 
 With the above temp App chrome already in place, a simple generic pre-rendering solution to be able to load any prerendered
@@ -685,7 +685,7 @@ $ dotnet publish -c Release /p:APP_TASKS=prerender
 
 Now when we next commit code, the GitHub CI Action will run the above task to generate our
 [/prerender/index.html](https://github.com/NetCoreTemplates/blazor-wasm/blob/gh-pages/prerender/index.html) page
-that now loads our [Home Page](https://blazor-wasm.jamstacks.net) instantly!
+that now loads our [Home Page](https://blazor-wasm.web-templates.io) instantly!
 
 [![](/img/pages/jamstack/blazor-wasm/home-prerendered.png)](/)
 
@@ -870,7 +870,7 @@ within `<!--PAGE--><!--/PAGE-->` markers.
 After it's also executed by the same MSBuild task run by GitHub Actions it prerenders all `/wwwroot/content/*.md` pages
 which are written to the [/wwwroot/docs/*.html](https://github.com/NetCoreTemplates/blazor-wasm/tree/gh-pages/docs) folder.
 
-This results in the path to the pre-generated markdown docs i.e. [/docs/prerender](https://blazor-wasm.jamstacks.net/docs/prerender) having the **exact same path**
+This results in the path to the pre-generated markdown docs i.e. [/docs/prerender](https://github.com/LegacyTemplates/blazor-tailwind/blob/main/MyApp.Client/wwwroot/content/prerender.md) having the **exact same path**
 as its route in the Blazor App, which when exists, CDNs give priority to over the SPA fallback the Blazor App is loaded with.
 
 It shares similar behavior as the home page where its pre-rendered content is initially loaded before it's replaced with the

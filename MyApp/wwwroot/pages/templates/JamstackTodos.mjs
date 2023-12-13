@@ -22,10 +22,10 @@ export default {
         </div>
     </template>
     <template #blazor>
-        <a href="https://blazor-wasm.jamstacks.net/todomvc">
+        <a href="https://blazor-wasm.web-templates.io/todomvc">
             <img src="/img/pages/jamstack/todos-blazor.png">
             <div class="text-center mb-3">
-                blazor-wasm.jamstacks.net/todomvc
+                blazor-wasm.web-templates.io/todomvc
             </div>
         </a>
         <div class="flex justify-center items-center">
