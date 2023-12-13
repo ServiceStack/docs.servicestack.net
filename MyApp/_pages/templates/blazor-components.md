@@ -133,14 +133,14 @@ The Blazor Tailwind templates also include the ability to override the users col
 <div class="not-prose relative">
   <div class="grid grid-cols-1 sm:grid-cols-2 text-center">
     <div>
-        <a class="flex flex-col" href="https://blazor-server.jamstacks.net/?light">
-            <div class="py-4">blazor-server.jamstacks.net/?light</div>
+        <a class="flex flex-col" href="https://blazor.web-templates.io/?light">
+            <div class="py-4">blazor.web-templates.io/?light</div>
             <img class="rounded-xl overflow-hidden" src="/img/pages/blazor/blazor-gallery-light.png">
         </a>
     </div>
     <div>
-        <a class="flex flex-col" href="https://blazor-server.jamstacks.net/?dark">
-            <div class="py-4">blazor-server.jamstacks.net/?dark</div>
+        <a class="flex flex-col" href="https://blazor.web-templates.io/?dark">
+            <div class="py-4">blazor.web-templates.io/?dark</div>
             <img class="rounded-xl overflow-hidden" src="/img/pages/blazor/blazor-gallery-dark.png">
         </a>
     </div>

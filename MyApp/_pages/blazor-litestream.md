@@ -28,7 +28,7 @@ This can be used directly below to create a new Blazor Tailwind project directly
 <section class="not-prose my-20 text-center">
     <div class="flex">
         <div class="flex flex-1 flex-col items-center">
-            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor-tailwind?Name=MyApp&Mix=blazor-litestream-aws">
+            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor?Name=MyApp&Mix=blazor-litestream-aws">
                 <img src="/img/pages/litestream/aws_square.svg" alt="AWS S3" class="w-44">
             </a>
             <span class="block text-xl font-medium text-gray-900">
@@ -36,7 +36,7 @@ This can be used directly below to create a new Blazor Tailwind project directly
             </span>
         </div>
         <div class="flex flex-1 flex-col items-center">
-            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor-tailwind?Name=MyApp&Mix=blazor-litestream-azure">
+            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor?Name=MyApp&Mix=blazor-litestream-azure">
                 <img src="/img/pages/litestream/azure_square.svg" alt="Azure Blob Storage" class="w-44">
             </a>
             <span class="block text-xl font-medium text-gray-900">
@@ -44,7 +44,7 @@ This can be used directly below to create a new Blazor Tailwind project directly
             </span>
         </div>
         <div class="flex flex-1 flex-col items-center">
-            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor-tailwind?Name=MyApp&Mix=blazor-litestream-sftp">
+            <a href="https://account.servicestack.net/archive/NetCoreTemplates/blazor?Name=MyApp&Mix=blazor-litestream-sftp">
                 <img src="/img/pages/litestream/sftp.png" alt="SFTP" class="w-44">
             </a>
             <span class="block text-xl font-medium text-gray-900">
@@ -65,8 +65,8 @@ Since Litestream is tied to deployment, hosting environment & preferred configur
 | Project Template     | AWS S3                  | Azure Blob Storage        | SFTP (generic)           | 
 |----------------------|-------------------------|---------------------------|--------------------------|
 | **web**              | litestream-aws          | litestream-azure          | litestream-sftp          | 
-| **blazor-server**    | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
-| **blazor-tailwind**  | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
+| **blazor**           | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
+| **blazor-vue**       | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **blazor-wasm**      | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **vue-ssg**          | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
 | **vue-vite**         | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
@@ -117,7 +117,7 @@ A compatibility script can be used for `docker-compose` via the following script
 
 Now that we have our host created with Docker and Docker Compose installed, we need to do some one-off configuration to make it easy to host and deploy our application to it using GitHub Actions and docker-compose.
 
-As a part of the `blazor-tailwind` project template, you will have a file called `nginx-proxy-compose.yml` in the `.deploy` directory. This contains a docker compose configuration to run an NGINX reverse proxy and a companion container to automatically manage TLS certificates via LetsEncrypt.
+As a part of the `blazor` project template, you will have a file called `nginx-proxy-compose.yml` in the `.deploy` directory. This contains a docker compose configuration to run an NGINX reverse proxy and a companion container to automatically manage TLS certificates via LetsEncrypt.
 
 ```yaml
 version: '2'
@@ -182,7 +182,7 @@ Your Linux host is now ready to deploy to using GitHub Actions.
 
 ## GitHub Actions
 
-The Blazor-Tailwind project templates and Litestream mix templates have a `release.yml` GitHub Action workflow to deploying your application to a Linux host like the one we just set up.
+The Blazor project templates and Litestream mix templates have a `release.yml` GitHub Action workflow to deploying your application to a Linux host like the one we just set up.
 This workflow uses SSH access to remotely copy files and execute `docker compose` commands on the remote host.
 
 Docker images are stored on GitHub Container Repository packages, and pulled down on the remote host during deployment.
@@ -199,7 +199,7 @@ To get this working, repository secrets in your GitHub repository need to be pop
 | LETSENCRYPT_EMAIL     | Email address where you want notifications to go specifically related to this application domain | me@email.com       |
 | AWS_S3_BUCKET         | An S3 bucket name where Litestream will be replicating data                                      | my-s3-bucket-name  |
 | AWS_ACCESS_KEY_ID     | The key ID for programmatic access to AWS with read/write access to the S3 bucket                |                    |
- | AWS_SECRET_ACCESS_KEY | The access key for programmatic access to AWS with read/write access to the S3 bucket            |
+| AWS_SECRET_ACCESS_KEY | The access key for programmatic access to AWS with read/write access to the S3 bucket            |
 
 These repository secrets can be added by using the GitHub repository under `Settings`, `Secrets`, `Actions`.
 

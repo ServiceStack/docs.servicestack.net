@@ -156,7 +156,7 @@ to override any server defaults.
 Date: 2023-02-08 13:13:28
 Version: 6.60
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor-server.jamstacks.net
+BaseUrl: https://blazor.web-templates.io
 
 //AddServiceStackTypes: True
 //AddDocAnnotations: True

@@ -69,8 +69,8 @@ Below is a table matching project templates to mix templates including different
 | Project Template     | AWS S3                  | Azure Blob Storage        | SFTP (generic)           | 
 |----------------------|-------------------------|---------------------------|--------------------------|
 | **web**              | litestream-aws          | litestream-azure          | litestream-sftp          | 
-| **blazor-server**    | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
-| **blazor-tailwind**  | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
+| **blazor**           | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
+| **blazor-vue**       | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **blazor-wasm**      | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **vue-ssg**          | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
 | **vue-vite**         | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |

@@ -47,7 +47,6 @@ We've put together a quick check list to help decide which templates we'd recomm
 | [Vue SSG](https://github.com/NetCoreTemplates/vue-ssg)  | If you prefer Vue and SEO is important                                          |
 | [Blazor Tailwind](/templates/blazor-tailwind)           | If you prefer a full C# Stack or are developing Line of Business (LOB) Apps     |
 | [Vue SPA](https://github.com/NetCoreTemplates/vue-vite) | If you prefer Vue and happy to trade SEO benefits of SSG for a simpler template |
-| [Blazor WASM](/templates/blazor-bootstrap)                        | If you prefer using Blazor WASM with Bootstrap CSS                              |
 
 Still not sure? familiarize yourself with their respective dev models by comparing their functionality equivalent TODOs MVC Examples:
 
@@ -86,13 +85,13 @@ The optional `DEPLOY_CDN` secret lets you control whether to deploy your App's s
 | -                                                                      | -                             | -                                 |
 | [nextjs](https://github.com/NetCoreTemplates/nextjs)                   | nextjs.jamstacks.net          | nextjs-api.jamstacks.net          |
 | [vue-ssg](https://github.com/NetCoreTemplates/vue-ssg)                 | vue-ssg.jamstacks.net         | vue-ssg-api.jamstacks.net         |
-| [blazor-tailwind](https://github.com/NetCoreTemplates/blazor-tailwind) | blazor-tailwind.jamstacks.net | blazor-tailwind-api.jamstacks.net |
+| [blazor](https://github.com/NetCoreTemplates/blazor)                   | blazor.web-templates.io       | blazor.web-templates.io           |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)                 | vue-spa.jamstacks.net         | vue-spa-api.jamstacks.net         |
-| [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm)         | blazor-wasm.jamstacks.net     | blazor-wasm-api.jamstacks.net     |
+| [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm)         | blazor-wasm.web-templates.io  | blazor-wasm.web-templates.io      |
 
 ## Blazor WebAssembly
 
-The [Blazor WebAssembly (WASM)](/templates/blazor-bootstrap) template offers a pure end-to-end integrated C# solution to building a high performance web application with [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) and ServiceStack. Due to the integrated dev model we've been able to achieve in Blazor it's become **our preferred technology** to use to develop **Line of Business Apps** since it's the only C# Razor solution adopting our preferred [API First Development](/api-first-development) model with Web UIs reusing the same well-defined APIs as Mobile and Desktop Apps.
+The [Blazor WebAssembly (WASM)](/templates/blazor-tailwind) template offers a pure end-to-end integrated C# solution to building a high performance web application with [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) and ServiceStack. Due to the integrated dev model we've been able to achieve in Blazor it's become **our preferred technology** to use to develop **Line of Business Apps** since it's the only C# Razor solution adopting our preferred [API First Development](/api-first-development) model with Web UIs reusing the same well-defined APIs as Mobile and Desktop Apps.
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="TIgjMf_vtCI" style="background-image: url('https://img.youtube.com/vi/TIgjMf_vtCI/maxresdefault.jpg')"></lite-youtube>
 
@@ -102,23 +101,14 @@ Typically the **large download sizes** & slow initial load times of Blazor WASM 
 
 <p class="pt-3 text-center">You can see the results of this in its live demo when loading the home page, which only has a slight delay:</p>
 
-<a class="flex flex-col justify-center items-center hover:no-underline mb-8" href="https://blazor-wasm.jamstacks.net">
-    <h3 class="mb-3">blazor-wasm.jamstacks.net</h3>
+<a class="flex flex-col justify-center items-center hover:no-underline mb-8" href="https://blazor-wasm.web-templates.io">
+    <h3 class="mb-3">blazor-wasm.web-templates.io</h3>
     <img src="/img/pages/jamstack/blazor-wasm/home.png" class="border border-solid border-gray-200 max-w-screen-sm">
 </a>
 
-<p class="pt-3 text-center">Whilst the markdown page explaining how it's done <b>loads instantly</b></p>
-
-<a class="flex flex-col justify-center items-center hover:no-underline mb-8" href="https://blazor-wasm.jamstacks.net/docs/prerender">
-    <h3 class="mb-3">blazor-wasm.jamstacks.net/docs/prerender</h3>
-    <img src="/img/pages/jamstack/blazor-wasm/markdown-prerender.png" class="border border-solid border-gray-200 max-w-screen-sm">
-</a>
-
-In both cases pages are rendered before Blazor WASM has loaded allowing users to familiarize themselves with each page whilst Blazor WASM loads itself in the background. The resulting **SEO benefits** are especially valuable for the pre-rendered Markdown pages and lets users start reading your content instantly.
-
 ### Learn more
 
-To find out more watch its [YouTube overview](https://youtu.be/TIgjMf_vtCI) and visit the [Blazor WASM docs](/templates/blazor-bootstrap).
+To find out more watch its [YouTube overview](https://youtu.be/TIgjMf_vtCI) and visit the [Blazor WASM docs](/templates/blazor-tailwind).
 
 ## Razor SSG
 

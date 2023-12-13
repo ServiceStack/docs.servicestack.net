@@ -2,8 +2,6 @@
 |----------------------------------------------------------------------------|---------------------------------------------------------------------|
 | [angular-spa](https://github.com/NetCoreTemplates/angular-spa)             | .NET 8 Angular 15 App with Bootstrap                                |
 | [blazor](https://github.com/NetCoreTemplates/blazor)                       | .NET 8 Blazor Tailwind App Template                                 |
-| [blazor-server](https://github.com/NetCoreTemplates/blazor-server)         | .NET 8 Blazor Server App with Tailwind                              |
-| [blazor-tailwind](https://github.com/NetCoreTemplates/blazor-tailwind)     | .NET 8 Blazor WASM App with Tailwind                                |
 | [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)               | .NET 8 Blazor Static Rendered Vue interactivity App with Tailwind   |
 | [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm)             | .NET 8 Blazor WASM App with Bootstrap                               |
 | [empty](https://github.com/NetCoreTemplates/empty)                         | .NET 8 Empty Single Project App                                     |

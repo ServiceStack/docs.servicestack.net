@@ -20,7 +20,7 @@ Plugins.Add(new AdminUsersFeature());
 ```
 
 <div class="not-prose"> 
-<a href="https://blazor-tailwind-api.jamstacks.net/admin-ui">
+<a href="https://razor-pages.web-templates.io/admin-ui">
     <h3 class="text-center font-medium text-3xl mb-3">/admin-ui/users</h3>
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/users.png">
@@ -37,7 +37,7 @@ An `IAuthRepository` is a required registered dependency to be able to use the `
 By default, the Add and Edit Users forms contains the default layout of common properties in [UserAuth.cs](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/UserAuth.cs)
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-tailwind-api.jamstacks.net/admin-ui/users?edit=2">
+    <a href="https://razor-pages.web-templates.io/admin-ui/users?edit=2">
         <img src="/img/pages/admin-ui/users-edit-default.png" style="max-width:800px;">
     </a>
 </div>
@@ -124,7 +124,7 @@ appHost.Plugins.Add(new ServiceStack.Admin.AdminUsersFeature {
 Enabling the use of custom properties as well as formatting for ease of use. `UserFormLayout` updates the `Create` and `Edit` screens in the Admin UI.
 
 <div class="flex justify-center py-8">
-    <a href="https://blazor-tailwind-api.jamstacks.net/admin-ui/users?edit=2">
+    <a href="https://razor-pages.web-templates.io/admin-ui/users?edit=2">
         <img src="/img/pages/admin-ui/users-edit-custom.png" style="max-width:800px;">
     </a>
 </div>

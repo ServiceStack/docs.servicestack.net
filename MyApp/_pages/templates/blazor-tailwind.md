@@ -15,12 +15,12 @@ title: Blazor Tailwind
 
 The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.
 
-<a href="https://blazor-tailwind.jamstacks.net">
+<a href="https://blazor.web-templates.io">
     <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
         <img class="" src="/img/pages/blazor/blazor-tailwind-splash.png">
     </div>
     <div class="pt-4 text-center">
-        blazor-tailwind.jamstacks.net
+        blazor.web-templates.io
     </div>
 </a>
 
@@ -99,44 +99,6 @@ For a closer look at ServiceStack.Blazor Components in action, download & run th
     </div>    
 </div>
 
-<div class="relative bg-white dark:bg-black py-4">
-    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Loads instantly with great SEO</p>
-        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
-            All Blazor WASM templates 
-            <a href="https://blazor-tailwind.jamstacks.net/docs/prerender">incorporate prerendering</a>
-            to achieve their 
-            <a href="https://blazor-tailwind.jamstacks.net">instant load times</a> 
-            that greatly benefits the built-in markdown pages with great SEO
-        </p>
-    </div>
-</div>
-
-<a href="https://blazor-tailwind.jamstacks.net/docs/prerender">
-    <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
-        <img class="" src="/img/pages/blazor/blazor-prerendering.png">
-    </div>
-</a>
-
-Pre-rendering works by replacing the [Blazor WASM loading page](https://blazor-tailwind.jamstacks.net/docs/prerender#increasing-perceived-performance)
-with an equivalent looking HTML page dynamically generated in JavaScript which renders the same Blazor App's Chrome, rendered using the same
-shared navigation defined in JavaScript to render the App's Top & Sidebar navigation links in a simple CSV format:
-
-```js
-TOP = `
-    $0.40 /mo,        /docs/hosting
-    Prerendering,     /docs/prerender
-    Deployments,      /docs/deploy
-`
-SIDEBAR = `
-    Counter,          /counter,       /img/nav/counter.svg
-    Todos,            /todomvc,       /img/nav/todomvc.svg
-    Bookings CRUD,    /bookings-crud, /img/nav/bookings-crud.svg
-    Call Hello,       /hello$,        /img/nav/hello.svg
-    Call HelloSecure, /hello-secure,  /img/nav/hello-secure.svg
-    Fetch data,       /fetchdata,     /img/nav/fetchdata.svg
-`
-```
 
 <div class="relative bg-white dark:bg-black py-4">
     <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
@@ -148,12 +110,12 @@ SIDEBAR = `
     </div>
 </div>
 
-<blazor-template repo="NetCoreTemplates/blazor-server" repo2="NetCoreTemplates/blazor-tailwind" class="not-prose pb-8"></blazor-template>
+<blazor-templates class="not-prose pb-8"></blazor-templates>
 
 Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/templates/dotnet-new):
 
 :::sh
-x new blazor-tailwind ProjectName
+x new LegacyTemplates/blazor-tailwind ProjectName
 :::
 
 <div class="relative bg-white py-4 mt-12">
@@ -194,13 +156,13 @@ The Tailwind & Bootstrap components share the same functionally equivalent base 
 
 #### Themable 
 
-Should it be needed, their decoupled design also allows easy customization by running the included [README.ss](https://github.com/NetCoreTemplates/blazor-tailwind/blob/main/MyApp.Client/Shared/Components/README.ss) executable documentation to copy each controls **Razor** UI markup locally into your project, enabling easy customization of all UI input controls.
+Should it be needed, their decoupled design also allows easy customization by running the included [README.ss](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/Components/README.ss) executable documentation to copy each controls **Razor** UI markup locally into your project, enabling easy customization of all UI input controls.
 
 ### Bookings CRUD Example
 
 To demonstrate ServiceStack's clean & highly productive Blazor dev model, we'll walk through implementing the [AutoQuery Bookings CRUD](/autoquery/crud-bookings) example in Blazor.
 
-Since we're using [AutoQuery CRUD](/autoquery/crud) we only need to define the Request DTO with the input fields we want the user to populate in our `Booking` RDBMS table in [Bookings.cs](https://github.com/NetCoreTemplates/blazor-tailwind/blob/main/MyApp.ServiceModel/Bookings.cs):
+Since we're using [AutoQuery CRUD](/autoquery/crud) we only need to define the Request DTO with the input fields we want the user to populate in our `Booking` RDBMS table in [Bookings.cs](https://github.com/NetCoreTemplates/blazor/blob/main/MyApp.ServiceModel/Bookings.cs):
 
 ```csharp
 [Tag("bookings"), Description("Create a new Booking")]
@@ -232,7 +194,7 @@ The `[Tag]`, `[Description]` and `[Input]` attributes are optional to markup how
 ### Blazor WASM App
 
 Thanks to ServiceStack's [Recommended Project Structure](/physical-project-structure) no any additional classes are needed as we're able to bind UI Controls directly to our typed server `CreateBooking` Request DTO used to define the API in 
-[BookingsCrud/Create.razor](https://github.com/NetCoreTemplates/blazor-tailwind/blob/main/MyApp.Client/Pages/BookingsCrud/Create.razor):
+[BookingsCrud/Create.razor](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/BookingsCrud/Create.razor):
 
 ```csharp
 <form @onsubmit="_ => OnSubmit()" @onsubmit:preventDefault>
@@ -324,17 +286,13 @@ The UI validation binding uses Blazor's `<CascadingValue>` to propagate any `api
 That's all there's to it, we use [Tailwind's CSS Grid classes](https://tailwindcss.com/docs/grid-template-columns) to define our UI layout which shows each control in its own row for mobile UIs or 2 fields per row in resolutions larger than the [Tailwind's sm: responsive breakpoint](https://tailwindcss.com/docs/responsive-design) to render our beautiful Bookings Form:
 
 <div class="mx-auto max-w-screen-md text-center py-8">
-    <a href="https://blazor-tailwind.jamstacks.net/bookings-crud">
-        <img src="/img/pages/blazor/bookings-create.png">
-    </a>
+    <img src="/img/pages/blazor/bookings-create.png">
 </div>
 
 Which utilizes both client and server validation upon form submission, displaying UX friendly contextual errors under each field when they violate any server [declarative validation](/declarative-validation) or Client UI **required** rules:
 
 <div class="mx-auto max-w-screen-md text-center py-8">
-    <a href="https://blazor-tailwind.jamstacks.net/bookings-crud">
         <img src="/img/pages/blazor/bookings-create-validation.png">
-    </a>
 </div>
 
 ## Optimal Development Workflow
