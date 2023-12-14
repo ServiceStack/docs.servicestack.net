@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2023-12-13T09:27:01.3584493Z'>
+    <meta name='date' content='2023-12-14T07:07:30.8537507Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Managing connections</title>
@@ -370,27 +370,10 @@ redis://clientid:password@localhost:6380?ssl=true&amp;db=1
 <pre><code class="language-csharp">var connString = $&quot;redis://{Host}?ssl=true&amp;username={Username}&amp;password={Password.UrlEncode()}&quot;;
 var redisManager = new RedisManagerPool(connString);
 </code></pre>
-<h2 id="servicestack.redis-ssl-support"><a href="/ssl-redis-azure">ServiceStack.Redis SSL Support</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.redis-ssl-support'" aria-label="Permalink"> </a></h2>
-<p>ServiceStack.Redis supports <strong>SSL connections</strong> making it suitable for accessing remote Redis server instances over a
-<strong>secure SSL connection</strong>.</p>
-<p><img src="https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png" alt="Azure Redis Cache" /></p>
-<h4 id="specify-ssl-protocol">Specify SSL Protocol<a class="header-anchor" href="javascript:;" onclick="location.hash='#specify-ssl-protocol'" aria-label="Permalink"> </a></h4>
-<p>Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the <code>sslprotocols</code> modifier, e.g:</p>
-<pre><code class="language-csharp">var connString = $&quot;redis://{Host}?ssl=true&amp;sslprotocols=Tls12&amp;password={Password.UrlEncode()}&quot;;
-var redisManager = new RedisManagerPool(connString);
-using var client = redisManager.GetClient();
-//...
-</code></pre>
 <h3 id="connecting-to-azure-redis"><a href="/ssl-redis-azure">Connecting to Azure Redis</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#connecting-to-azure-redis'" aria-label="Permalink"> </a></h3>
 <p>As connecting to <a href="http://azure.microsoft.com/en-us/services/cache/">Azure Redis Cache</a> via SSL was the primary use-case for this feature,
 we've added a new
 <a href="/ssl-redis-azure">Getting connected to Azure Redis via SSL</a> to help you get started.</p>
-<h2 id="redis-geo"><a href="https://github.com/ServiceStackApps/redis-geo">Redis GEO</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#redis-geo'" aria-label="Permalink"> </a></h2>
-<p>The <a href="http://antirez.com/news/104">release of Redis 3.2.0</a> brings it exciting new
-<a href="http://redis.io/commands/geoadd">GEO capabilities</a> which will let you store Lat/Long coordinates in Redis
-and query locations within a specified radius. To demonstrate this functionality we've created a new
-<a href="https://github.com/ServiceStackApps/redis-geo">Redis GEO Live Demo</a> which lets you click on anywhere in
-the U.S. to find the list of nearest cities within a given radius, Live Demo at: <a href="https://redis.netcore.io">https://redis.netcore.io</a></p>
 <h2 id="redis-client-managers">Redis Client Managers<a class="header-anchor" href="javascript:;" onclick="location.hash='#redis-client-managers'" aria-label="Permalink"> </a></h2>
 <p>The recommended way to access <code>RedisClient</code> instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class.</p>
 <h3 id="redismanagerpool">RedisManagerPool<a class="header-anchor" href="javascript:;" onclick="location.hash='#redismanagerpool'" aria-label="Permalink"> </a></h3>
@@ -412,7 +395,127 @@ the U.S. to find the list of nearest cities within a given radius, Live Demo at:
 </code></pre>
 <p><strong>Pooling Behavior</strong></p>
 <p>The <code>PooledRedisClientManager</code> imposes a maximum connection limit and when its maximum pool size has been reached will instead block on any new connection requests until the next <code>RedisClient</code> is released back into the pool. If no client became available within <code>PoolTimeout</code>, a Pool <code>TimeoutException</code> will be thrown.</p>
-<h4 id="read-only-clients">Read Only Clients<a class="header-anchor" href="javascript:;" onclick="location.hash='#read-only-clients'" aria-label="Permalink"> </a></h4>
+<h2 id="redis-configuration">Redis Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#redis-configuration'" aria-label="Permalink"> </a></h2>
+<p>In addition to configuring Redis Client Managers directly, management and behavior of Redis connections can also configured using the static <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Redis/src/ServiceStack.Redis/RedisConfig.cs">RedisConfig.cs</a> class, e.g:</p>
+<h4 id="configure-pool-size-of-redis-client-managers">Configure Pool Size of Redis Client Managers<a class="header-anchor" href="javascript:;" onclick="location.hash='#configure-pool-size-of-redis-client-managers'" aria-label="Permalink"> </a></h4>
+<pre><code class="language-csharp">RedisConfig.DefaultMaxPoolSize = 100;
+</code></pre>
+<p>Available Redis Client Configuration options and their defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DefaultConnectTimeout</code></td>
+<td><strong>-1</strong> (none)</td>
+<td>The default RedisClient Socket ConnectTimeout</td>
+</tr>
+<tr>
+<td><code>DefaultSendTimeout</code></td>
+<td><strong>-1</strong> (none)</td>
+<td>The default RedisClient Socket SendTimeout</td>
+</tr>
+<tr>
+<td><code>DefaultReceiveTimeout</code></td>
+<td><strong>-1</strong> (none)</td>
+<td>The default RedisClient Socket ReceiveTimeout</td>
+</tr>
+<tr>
+<td><code>DefaultIdleTimeOutSecs</code></td>
+<td><strong>240</strong> seconds</td>
+<td>Default Idle TimeOut before a connection is considered to be stale</td>
+</tr>
+<tr>
+<td><code>DefaultRetryTimeout</code></td>
+<td><strong>10000</strong> ms</td>
+<td>The default RetryTimeout for auto retry of failed operations</td>
+</tr>
+<tr>
+<td><code>DefaultMaxPoolSize</code></td>
+<td><strong>null</strong> (none)</td>
+<td>Max Pool Size for Pooled Redis Client Managers (overrides DefaultPoolSizeMultiplier)</td>
+</tr>
+<tr>
+<td><code>DefaultPoolSizeMultiplier</code></td>
+<td><strong>50</strong></td>
+<td>The default pool size multiplier if no pool size is specified</td>
+</tr>
+<tr>
+<td><code>BackOffMultiplier</code></td>
+<td><strong>10</strong> ms</td>
+<td>The BackOff multiplier failed Auto Retries starts from</td>
+</tr>
+<tr>
+<td><code>CommandKeysBatchSize</code></td>
+<td><strong>10000</strong> keys</td>
+<td>Batch size of keys to include in a single Redis Command (e.g. DEL k1 k2...)</td>
+</tr>
+<tr>
+<td><code>VerifyMasterConnections</code></td>
+<td><strong>true</strong></td>
+<td>Whether Connections to Master hosts should be verified they're still a master</td>
+</tr>
+<tr>
+<td><code>RetryReconnectOnFailedMasters</code></td>
+<td><strong>true</strong></td>
+<td>Whether to retry re-connecting on same connection if not a master instance</td>
+</tr>
+<tr>
+<td><code>HostLookupTimeoutMs</code></td>
+<td><strong>200</strong> ms</td>
+<td>The ConnectTimeout on clients used to find the next available host</td>
+</tr>
+<tr>
+<td><code>AssumeServerVersion</code></td>
+<td><strong>null</strong> (none)</td>
+<td>Skip ServerVersion Checks by specifying Min Version number</td>
+</tr>
+<tr>
+<td><code>DeactivatedClientsExpiry</code></td>
+<td><strong>0</strong> seconds</td>
+<td>How long to hold deactivated clients for before disposing their connection</td>
+</tr>
+<tr>
+<td><code>EnableVerboseLogging</code></td>
+<td><strong>false</strong></td>
+<td>Whether Debug Logging should log detailed Redis operations</td>
+</tr>
+<tr>
+<td><code>AssertAccessOnlyOnSameThread</code></td>
+<td><strong>false</strong></td>
+<td>Assert all access using pooled RedisClient instance is limited to same thread</td>
+</tr>
+</tbody>
+</table>
+<h3 id="servicestack.redis-ssl-support"><a href="/ssl-redis-azure">ServiceStack.Redis SSL Support</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.redis-ssl-support'" aria-label="Permalink"> </a></h3>
+<p>ServiceStack.Redis supports <strong>SSL connections</strong> making it suitable for accessing remote Redis server instances over a
+<strong>secure SSL connection</strong>.</p>
+<p><img src="https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png" alt="Azure Redis Cache" /></p>
+<h4 id="specify-ssl-protocol">Specify SSL Protocol<a class="header-anchor" href="javascript:;" onclick="location.hash='#specify-ssl-protocol'" aria-label="Permalink"> </a></h4>
+<p>Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the <code>sslprotocols</code> modifier, e.g:</p>
+<pre><code class="language-csharp">var connString = $&quot;redis://{Host}?ssl=true&amp;sslprotocols=Tls12&amp;password={Password.UrlEncode()}&quot;;
+var redisManager = new RedisManagerPool(connString);
+using var client = redisManager.GetClient();
+//...
+</code></pre>
+<p>If needed the <code>RedisConfig</code> Certificate selecation and validation callbacks can be used to <a href="http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx">Validate SSL Certificates</a>:</p>
+<pre><code class="language-csharp">RedisConfig.CertificateSelectionCallback = (object sender, 
+    string targetHost, 
+    X509CertificateCollection localCertificates,
+    X509Certificate remoteCertificate, 
+    string[] acceptableIssuers) =&gt; ...
+
+RedisConfig.CertificateValidationCallback = (object sender,
+    X509Certificate certificate,
+    X509Chain chain,
+    SslPolicyErrors sslPolicyErrors) =&gt; ...
+</code></pre>
+<h3 id="read-only-clients">Read Only Clients<a class="header-anchor" href="javascript:;" onclick="location.hash='#read-only-clients'" aria-label="Permalink"> </a></h3>
 <p>By default resolving a RedisClient with <code>GetRedisClient()</code> or <code>GetRedisClientAsync()</code> will return a client connected to the configured primary (master) host, if you also have replica (slave) hosts configured, you can access it with the <code>GetReadOnlyClient()</code> or <code>GetReadOnlyClientAsync()</code> APIs, e.g:</p>
 <pre><code class="language-csharp">using var redisReadOnly = clientsManager.GetReadOnlyClient();
 </code></pre>
@@ -507,6 +610,12 @@ List&lt;string&gt; days = redisNative.LRange(&quot;days&quot;, 0, -1);
 <li><a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSetAsync.cs">IRedisSetAsync</a></li>
 <li><a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSortedSetAsync.cs">IRedisSortedSetAsync</a></li>
 </ul>
+<h2 id="redis-geo"><a href="https://github.com/ServiceStackApps/redis-geo">Redis GEO</a><a class="header-anchor" href="javascript:;" onclick="location.hash='#redis-geo'" aria-label="Permalink"> </a></h2>
+<p>The <a href="http://antirez.com/news/104">release of Redis 3.2.0</a> brings <a href="http://redis.io/commands/geoadd">GEO capabilities</a>
+which will let you store Lat/Long coordinates in Redis and query locations within a specified radius.
+To demonstrate this functionality we've created a new
+<a href="https://github.com/ServiceStackApps/redis-geo">Redis GEO Live Demo</a> which lets you click on anywhere in
+the U.S. to find the list of nearest cities within a given radius, Live Demo at: <a href="https://redis.netcore.io">https://redis.netcore.io</a></p>
 </div>
 
                 <div class="not-prose"></div>
@@ -569,6 +678,19 @@ List&lt;string&gt; days = redisNative.LRange(&quot;days&quot;, 0, -1);
                                                         <span v-hash="'#pooledredisclientmanager'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             PooledRedisClientManager
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#redis-configuration'" data-id="redis-configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Redis Configuration
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="read-only-clients" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#read-only-clients'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Read Only Clients
                                                         </span>
                                                     </li>
                                                     <li data-id="basicredisclientmanager" class="text-gray-500 hover:text-gray-900">
