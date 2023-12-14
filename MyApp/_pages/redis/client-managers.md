@@ -88,37 +88,11 @@ var connString = $"redis://{Host}?ssl=true&username={Username}&password={Passwor
 var redisManager = new RedisManagerPool(connString);
 ```
 
-## [ServiceStack.Redis SSL Support](/ssl-redis-azure)
-
-ServiceStack.Redis supports **SSL connections** making it suitable for accessing remote Redis server instances over a
-**secure SSL connection**.
-
-![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
-
-#### Specify SSL Protocol
-
-Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
-
-```csharp
-var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
-var redisManager = new RedisManagerPool(connString);
-using var client = redisManager.GetClient();
-//...
-```
-
 ### [Connecting to Azure Redis](/ssl-redis-azure)
 
 As connecting to [Azure Redis Cache](http://azure.microsoft.com/en-us/services/cache/) via SSL was the primary use-case for this feature,
 we've added a new
 [Getting connected to Azure Redis via SSL](/ssl-redis-azure) to help you get started.
-
-## [Redis GEO](https://github.com/ServiceStackApps/redis-geo)
-
-The [release of Redis 3.2.0](http://antirez.com/news/104) brings it exciting new
-[GEO capabilities](http://redis.io/commands/geoadd) which will let you store Lat/Long coordinates in Redis
-and query locations within a specified radius. To demonstrate this functionality we've created a new
-[Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in
-the U.S. to find the list of nearest cities within a given radius, Live Demo at: https://redis.netcore.io
 
 ## Redis Client Managers
 
@@ -156,7 +130,72 @@ container.Register<IRedisClientsManager>(c =>
 
 The `PooledRedisClientManager` imposes a maximum connection limit and when its maximum pool size has been reached will instead block on any new connection requests until the next `RedisClient` is released back into the pool. If no client became available within `PoolTimeout`, a Pool `TimeoutException` will be thrown.
 
-#### Read Only Clients
+## Redis Configuration
+
+In addition to configuring Redis Client Managers directly, management and behavior of Redis connections can also configured using the static [RedisConfig.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Redis/src/ServiceStack.Redis/RedisConfig.cs) class, e.g:
+
+#### Configure Pool Size of Redis Client Managers
+
+```csharp
+RedisConfig.DefaultMaxPoolSize = 100;
+```
+
+Available Redis Client Configuration options and their defaults:
+
+| Property | Default | Description |
+| - | - | - |
+| `DefaultConnectTimeout`         | **-1** (none)     | The default RedisClient Socket ConnectTimeout |
+| `DefaultSendTimeout`            | **-1** (none)     | The default RedisClient Socket SendTimeout |
+| `DefaultReceiveTimeout`         | **-1** (none)     | The default RedisClient Socket ReceiveTimeout |
+| `DefaultIdleTimeOutSecs`        | **240** seconds   | Default Idle TimeOut before a connection is considered to be stale |
+| `DefaultRetryTimeout`           | **10000** ms      | The default RetryTimeout for auto retry of failed operations |
+| `DefaultMaxPoolSize`            | **null** (none)   | Max Pool Size for Pooled Redis Client Managers (overrides DefaultPoolSizeMultiplier) |
+| `DefaultPoolSizeMultiplier`     | **50**            | The default pool size multiplier if no pool size is specified |
+| `BackOffMultiplier`             | **10** ms         | The BackOff multiplier failed Auto Retries starts from |
+| `CommandKeysBatchSize`          | **10000** keys    | Batch size of keys to include in a single Redis Command (e.g. DEL k1 k2...) |
+| `VerifyMasterConnections`       | **true**          | Whether Connections to Master hosts should be verified they're still a master |
+| `RetryReconnectOnFailedMasters` | **true**          | Whether to retry re-connecting on same connection if not a master instance |
+| `HostLookupTimeoutMs`           | **200** ms        | The ConnectTimeout on clients used to find the next available host |
+| `AssumeServerVersion`           | **null** (none)   | Skip ServerVersion Checks by specifying Min Version number |
+| `DeactivatedClientsExpiry`      | **0** seconds     | How long to hold deactivated clients for before disposing their connection |
+| `EnableVerboseLogging`          | **false**         | Whether Debug Logging should log detailed Redis operations |
+| `AssertAccessOnlyOnSameThread`  | **false**         | Assert all access using pooled RedisClient instance is limited to same thread |
+
+
+### [ServiceStack.Redis SSL Support](/ssl-redis-azure)
+
+ServiceStack.Redis supports **SSL connections** making it suitable for accessing remote Redis server instances over a
+**secure SSL connection**.
+
+![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
+
+#### Specify SSL Protocol
+
+Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
+
+```csharp
+var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
+var redisManager = new RedisManagerPool(connString);
+using var client = redisManager.GetClient();
+//...
+```
+
+If needed the `RedisConfig` Certificate selecation and validation callbacks can be used to [Validate SSL Certificates](http://msdn.microsoft.com/en-us/library/office/dd633677(v=exchg.80).aspx):
+
+```csharp
+RedisConfig.CertificateSelectionCallback = (object sender, 
+    string targetHost, 
+    X509CertificateCollection localCertificates,
+    X509Certificate remoteCertificate, 
+    string[] acceptableIssuers) => ...
+
+RedisConfig.CertificateValidationCallback = (object sender,
+    X509Certificate certificate,
+    X509Chain chain,
+    SslPolicyErrors sslPolicyErrors) => ...
+```
+
+### Read Only Clients
 
 By default resolving a RedisClient with `GetRedisClient()` or `GetRedisClientAsync()` will return a client connected to the configured primary (master) host, if you also have replica (slave) hosts configured, you can access it with the `GetReadOnlyClient()` or `GetReadOnlyClientAsync()` APIs, e.g:
 
@@ -263,4 +302,12 @@ The async support in ServiceStack.Redis is designed for optimal efficiency and u
 - [IRedisListAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisListAsync.cs)
 - [IRedisSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSetAsync.cs)
 - [IRedisSortedSetAsync](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisSortedSetAsync.cs)
+
+## [Redis GEO](https://github.com/ServiceStackApps/redis-geo)
+
+The [release of Redis 3.2.0](http://antirez.com/news/104) brings [GEO capabilities](http://redis.io/commands/geoadd) 
+which will let you store Lat/Long coordinates in Redis and query locations within a specified radius. 
+To demonstrate this functionality we've created a new
+[Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in
+the U.S. to find the list of nearest cities within a given radius, Live Demo at: https://redis.netcore.io
 
