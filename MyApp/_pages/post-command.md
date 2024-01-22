@@ -935,7 +935,7 @@ If Users were authenticated with **Remember Me** checked their Session will be s
 Making a `GET` request to the `Authenticate` API is another way you can test which user you're authenticated as, e.g:
 
 :::sh
-x GET -ss-id FoCHJK9Apl9mrcaq3ceE https://vue-spa.web-templates.io Authenticate
+x GET -ss-id FoCHJK9Apl9mrcaq3ceE https://blazor-vue.web-templates.io Authenticate
 :::
 
 Output:

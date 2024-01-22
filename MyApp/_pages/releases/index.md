@@ -293,25 +293,21 @@ All Single Page App Templates are available for both .NET Core 2.0 and ASP.NET F
 
  - .NET Core: [angular-spa](https://github.com/NetCoreTemplates/angular-spa)
  - .NET Framework: [angular-spa-netfx](https://github.com/NetFrameworkTemplates/angular-spa-netfx)
- - Live Preview: [angular-spa.web-templates.io](http://angular-spa.web-templates.io)
 
 #### Angular 4 Material Design Lite Template
 
  - .NET Core: [angular-lite-spa](https://github.com/NetCoreTemplates/angular-lite-spa)
  - .NET Framework: [angular-lite-spa-netfx](https://github.com/NetFrameworkTemplates/angular-lite-spa-netfx)
- - Live Preview: [angular-lite-spa.web-templates.io](http://angular-lite-spa.web-templates.io)
 
 #### React 16 Webpack Bootstrap Template
 
  - .NET Core: [react-spa](https://github.com/NetCoreTemplates/react-spa)
  - .NET Framework: [react-spa-netfx](https://github.com/NetFrameworkTemplates/react-spa-netfx)
- - Live Preview: [react-spa.web-templates.io](http://react-spa.web-templates.io)
  
 #### Vue 2.5 Webpack Bootstrap Template
 
  - .NET Core: [vue-spa](https://github.com/NetCoreTemplates/vue-spa)
  - .NET Framework: [vue-spa-netfx](https://github.com/NetFrameworkTemplates/vue-spa-netfx)
- - Live Preview: [vue-spa.web-templates.io](http://vue-spa.web-templates.io)
  
 ### Optimal Dev Workflow with Hot Reloading
 
@@ -366,7 +362,6 @@ There are 3 templates for each of the different technologies that can be used wi
  - .NET Core: [script](https://github.com/NetCoreTemplates/script)
  - .NET Framework: [script-netfx](https://github.com/NetFrameworkTemplates/script-netfx)
  - ASP.NET Core on .NET Framework: [script-corefx](https://github.com/NetFrameworkCoreTemplates/script-corefx)
- - Live Preview: [script.web-templates.io](http://script.web-templates.io)
 
 #### Hot Reloading
 
@@ -386,7 +381,6 @@ Those who prefer starting from an Empty slate can use the `web` template to crea
 
  - .NET Core: [selfhost](https://github.com/NetCoreTemplates/selfhost)
  - .NET Framework: [selfhost-netfx](https://github.com/NetFrameworkTemplates/selfhost-netfx)
- - Live Preview: [selfhost.web-templates.io](http://selfhost.web-templates.io)
 
 ### .NET Core 2.0 ServiceStack WebApp Template
 
@@ -400,11 +394,6 @@ See [sharpscript.net/docs/sharp-apps](https://sharpscript.net/docs/sharp-apps) t
 ### .NET Framework Templates
 
 Likewise there are 2 .NET Framework Templates without .NET Core 2.0 equivalents as they contain Windows-only .NET Framework dependencies. This includes our React Desktop Template which supports packaging your Web App into 4 different ASP.NET, Winforms, OSX Cocoa and cross-platform Console App Hosts:
-
-#### React Desktop Apps Template
-
- - .NET Framework: [react-desktop-apps-netfx](https://github.com/NetFrameworkTemplates/react-desktop-apps-netfx)
- - Live Preview: [react-desktop-apps-netfx.web-templates.io](http://react-desktop-apps-netfx.web-templates.io)
  
 ### Windows Service Template
 

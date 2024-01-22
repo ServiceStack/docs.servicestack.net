@@ -65,8 +65,7 @@ Which will create a new .NET 6.0 MVC Project called **AcmeMvc**. The Template Na
         The <code class="highlighter-rouge">script</code> Project Template is configured to develop Websites using <a href="https://sharpscript.net/docs/script-pages">#Script Pages</a>, a simpler and cleaner alternative to Razor that lets you utilize simple #Script Expressions for evaluating Server logic in <code class="highlighter-rouge">.html</code> pages. #Script doesn’t require any precompilation, is easier to learn and more intuitive for non-programmers that’s more suitable for a <a href="https://sharpscript.net/usecases/">number of use-cases</a>. Use <code class="highlighter-rouge">script</code> if you want an <a href="/releases/v4_5_14#why-templates">alternative to Razor</a> syntax and the heavy machinery required to support it.
     </td>
     <td align="center">
-        <a href="http://script.web-templates.io"><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/templates.png" width="450" /></a>
-        <p><a href="http://script.web-templates.io">script.web-templates.io</a></p>
+        <img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/templates.png" width="450" />
     </td>
 </tr>
 </table>

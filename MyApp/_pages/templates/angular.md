@@ -27,9 +27,9 @@ See the documentation in each project for more info on features of each template
 
 .NET 6.0 Angular 9 project generated with [Angular CLI](https://github.com/angular/angular-spa).
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa.png)](http://angular-spa.web-templates.io/)
+![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa.png)
 
-> Browse [source code](https://github.com/NetCoreTemplates/angular-spa), view live demo [angular-spa.web-templates.io](http://angular-spa.web-templates.io) and install with [x new](/web-new):
+> Browse [source code](https://github.com/NetCoreTemplates/angular-spa) and install with [x new](/web-new):
 
 Create new Angular Project for .NET 6.0:
 

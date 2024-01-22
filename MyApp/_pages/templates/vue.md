@@ -30,10 +30,6 @@ Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-spa.png)](https://github.com/NetCoreTemplates/vue-spa)
 
-::: info Live Demo
-[vue-spa.web-templates.io](http://vue-spa.web-templates.io)
-:::
-
 Create new Vue 2.5 Project for .NET 6.0:
 
 ```bash
@@ -51,10 +47,6 @@ $ x new vue-spa-netfx ProjectName
 Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/) and the [vuetify cli plugin](https://github.com/vuetifyjs/vue-cli-plugin-vuetify).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-spa.png)](https://github.com/NetCoreTemplates/vuetify-spa)
-
-::: info Live Demo
-[vuetify-spa.web-templates.io](http://vuetify-spa.web-templates.io)
-:::
 
 Create new Vuetify Project for .NET 6.0:
 
@@ -74,10 +66,6 @@ Bootstrapped with [Nuxt.js starter template](https://nuxtjs.org/guide/installati
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-nuxt.png)](https://github.com/NetCoreTemplates/vue-nuxt)
 
-::: info Live Demo
-[vue-nuxt.web-templates.io](http://vue-nuxt.web-templates.io)
-:::
-
 Create new Nuxt.js v1.4.2 Project for .NET 6.0:
 
 ```bash
@@ -95,10 +83,6 @@ $ x new vue-nuxt-netfx ProjectName
 Bootstrapped with [Nuxt.js + Vuetify.js starter template](https://github.com/vuetifyjs/nuxt).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-nuxt.png)](https://github.com/NetCoreTemplates/vuetify-nuxt)
-
-::: info Live Demo
-[vuetify-nuxt.web-templates.io](http://vuetify-nuxt.web-templates.io)
-:::
 
 Create new Nuxt Vuetify Project for .NET 6.0:
 

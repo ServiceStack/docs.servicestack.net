@@ -78,8 +78,8 @@ public class CustomCredentialsAuthProvider : CredentialsAuthProvider
 
 Where the `Input` utility can be used to configure most HTML Form Input control properties that automatically configures to use the desired Input control for each property Type.
 
-You can Sign In with any of the users in the [Blazor WASM Sign In](https://blazor-wasm.jamstacks.net/signin) page configured in 
-[Configure.AuthRepository.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/Configure.AuthRepository.cs), i.e:
+You can Sign In with any of the users in the [Vue Vite Sign In](https://vue-vite.jamstacks.net/signin) page configured in 
+[Configure.AuthRepository.cs](https://github.com/NetCoreTemplates/vue-vite/blob/main/api/MyApp/Configure.AuthRepository.cs), i.e:
 
 | Username           | Password | Role     |
 | ------------------ | -------- | -------- |
