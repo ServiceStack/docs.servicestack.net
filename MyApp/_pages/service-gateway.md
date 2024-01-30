@@ -146,7 +146,7 @@ interface, e.g:
 ```csharp
 public override void Configure(Container container)
 {
-    container.Register<IServiceGateway>(c => new JsonServiceClient(baseUrl));
+    container.Register<IServiceGateway>(c => new JsonApiClient(baseUrl));
 }
 ```
 
@@ -163,7 +163,7 @@ public class CustomServiceGatewayFactory : ServiceGatewayFactoryBase
         var isLocal = HostContext.Metadata.RequestTypes.Contains(requestType);
         var gateway = isLocal
             ? (IServiceGateway)base.localGateway
-            : new JsonServiceClient(alternativeBaseUrl);
+            : new JsonApiClient(alternativeBaseUrl);
         return gateway;
     }
 }
