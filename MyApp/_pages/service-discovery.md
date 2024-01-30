@@ -3,7 +3,11 @@ slug: service-discovery
 title: Service Discovery
 ---
 
-ServiceStack is fortunate to have a vibrant community which quickly saw the capabilities on offer in [Service Gateway](/service-gateway) whom have jumped in with a number of high-quality, well-documented and supported value-added OSS solutions:
+
+::: warning DEPRECATED
+These community plugins are no longer maintained however their code bases should still serve useful in different approaches for implementing
+a dynamic Service Discovery solution:
+:::
 
 ## [ServiceStack.Discovery.Consul](https://github.com/MacLeanElectrical/servicestack-discovery-consul)
 
