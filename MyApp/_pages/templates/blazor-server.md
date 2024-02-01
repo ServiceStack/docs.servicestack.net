@@ -13,7 +13,7 @@ title: Blazor Server Tailwind Template
       <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
         <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Blazor Server Tailwind Template</p>
         <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500">
-          Ultimate dev model & UX ideal for low-latency Intranet environments 
+          Ultimate dev model & UX ideal for low-latency Intranet environments
         </p>
       </div>
     </div>
@@ -30,8 +30,8 @@ The Blazor Server App template offers a number compelling advantages over Blazor
 
  - A superior dev model and debugging experience
  - Improved live-reload and faster iterative dev cycles
- - Full access to .NET Server functionality 
- - Better start times & UI responsiveness 
+ - Full access to .NET Server functionality
+ - Better start times & UI responsiveness
  - Less complexity from unnecessary client project or pre-rendering solutions
 
 Although [the limitations](https://learn.microsoft.com/en-us/aspnet/core/blazor/hosting-models?view=aspnetcore-6.0#blazor-server) of its highly-coupled stateful server rendering session architecture does make it a poor fit for most high latency Internet sites which we continue to recommend our [Blazor WASM project template](/templates/blazor-tailwind) for.
@@ -111,7 +111,7 @@ A fantastic property of Blazor is its support for multiple hosting modes which a
 
 ## Blazing Fast Networkless APIs
 
-Whilst better performing, having Blazor components access DB's directly encourages a more tightly-coupled and less reusable & testable architecture than the traditional well-defined API dev model used in client/server Mobile & Desktop Apps or Web SPA Apps like WASM. 
+Whilst better performing, having Blazor components access DB's directly encourages a more tightly-coupled and less reusable & testable architecture than the traditional well-defined API dev model used in client/server Mobile & Desktop Apps or Web SPA Apps like WASM.
 
 To achieve the best of both worlds, we've enabled support for utilizing the In Process [Service Gateway](/service-gateway) in Blazor Server Apps which lets you retain the traditional client/server dev model for invoking your Server APIs **In Process** - avoiding any serialization, HTTP networking or even Kestrel middleware overhead to invoke your APIs directly!
 
@@ -144,7 +144,7 @@ BlazorConfig.Set(new() {
 });
 ```
 
-Which changes all `Api*` methods in Blazor components and Pages inheriting ServiceStack.Blazor's [BlazorComponentBase](https://reference.servicestack.net/api/ServiceStack.Blazor/BlazorComponentBase) to use the registered `JsonApiClient` client. 
+Which changes all `Api*` methods in Blazor components and Pages inheriting ServiceStack.Blazor's [BlazorComponentBase](https://reference.servicestack.net/api/ServiceStack.Blazor/BlazorComponentBase) to use the registered `JsonApiClient` client.
 
 Other components can access both the InProcess Gateway or `JsonApiClient` by injecting the `IClientFactory` dependency into their components, e.g:
 
@@ -204,7 +204,7 @@ public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
     public IServiceGateway Gateway => ClientFactory!.GetGateway();
     public JsonApiClient Client => ClientFactory!.GetClient();
 
-    public virtual Task<ApiResult<TResponse>> ApiAsync<TResponse>(IReturn<TResponse> request) => UseGateway 
+    public virtual Task<ApiResult<TResponse>> ApiAsync<TResponse>(IReturn<TResponse> request) => UseGateway
         ? Gateway.ManagedApiAsync(request)
         : Client.ManagedApiAsync(request);
 
