@@ -85,6 +85,7 @@ The JSON API Route also supports returning API responses in multiple [registered
  - `/api/{Request}.csv`
  - `/api/{Request}.xml`
  - `/api/{Request}.jsv`
+ - `/api/{Request}.jsonl`
  - `/api/{Request}.html`
  
 
