@@ -112,7 +112,9 @@ For a quick reference the following **bool** customizations are supported:
         <tr><th>Name</th><th>Alias</th></tr>
     </thead>
     <tr><td>EmitCamelCaseNames</td><td>eccn</td></tr>
+    <tr><td>EmitPascalCaseNames</td><td>epcn</td></tr>
     <tr><td>EmitLowercaseUnderscoreNames</td><td>elun</td></tr>
+    <tr><td>ExcludeDefaultValues</td><td>edv</td></tr>
     <tr><td>IncludeNullValues</td><td>inv</td></tr>
     <tr><td>IncludeNullValuesInDictionaries</td><td>invid</td></tr>
     <tr><td>IncludeDefaultEnums</td><td>ide</td></tr>
