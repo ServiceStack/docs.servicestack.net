@@ -617,6 +617,7 @@ JsConfig.AllowRuntimeTypeInTypesWithNamespaces = new HashSet<string>
     "ServiceStack.Auth",
     "ServiceStack.Messaging",
 };
+```
 
 The above rules can be extended to allow your own conventions. If you just need to allow a specific Type you can instead just implement:
 
