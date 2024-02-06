@@ -49,6 +49,15 @@ services.AddServiceStack(typeof(MyServices).Assembly, c => {
 });
 ```
 
+Then you can call `app.UseServiceStack()` as before, but this time configure it with Mapped Endpoints:
+
+```csharp
+app.UseServiceStack(new AppHost(), options =>
+{
+    options.MapEndpoints();
+});
+```
+
 ### Moving from Funq to ASP.NET Core's built in Dependency Injection system
 
 Since ServiceStack services are registered earlier in the setup, we need to move the discovery of your ServiceStack APIs to earlier in the setup as well. 
