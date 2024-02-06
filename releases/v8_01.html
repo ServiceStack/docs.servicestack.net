@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-02-06T11:49:26.2570095Z'>
+    <meta name='date' content='2024-02-06T14:01:47.8561805Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v8.1</title>
@@ -1745,6 +1745,21 @@ We upgraded the production release of this application to use our <a href="https
 <p>The new <code>InteractiveAuto</code> mode in Blazor for .NET 8 provides the best of both worlds for Blazor applications.
 A built in pre-rendering solution means that you can have a fast initial load time, but still have a responsive UI for subsequent visits.</p>
 <p>And since the ServiceStack.Blazor components have been updated for .NET 8, you can take advantage of the high-productivity UI components to quickly create customizable and professional-looking admin pages in a Blazor application.</p>
+<h2 id="breaking-changes">Breaking Changes<a class="header-anchor" href="javascript:;" onclick="location.hash='#breaking-changes'" aria-label="Permalink"> </a></h2>
+<p>In order to promote adoption of ASP.NET Core's APIs the <code>IServiceProvider.TryResolve&lt;T&gt;()</code> extension method was removed:</p>
+<pre><code class="language-csharp">services.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
+    new OrmLiteCrudEvents(c.Resolve&lt;IDbConnectionFactory&gt;()));
+</code></pre>
+<p>Which should be replaced with IServiceProvider's <code>GetService&lt;T&gt;()</code> and <code>GetRequiredService&lt;T&gt;()</code>:</p>
+<pre><code class="language-csharp">services.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
+    new OrmLiteCrudEvents(c.GetRequiredService&lt;IDbConnectionFactory&gt;()));
+</code></pre>
+<h3 id="servicestack-methods-in-razor-pages">ServiceStack Methods in Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack-methods-in-razor-pages'" aria-label="Permalink"> </a></h3>
+<p>Some ServiceStack Html Helper Extension Methods in <strong>Razor Pages</strong> when Endpoint Routing is enabled will require access to the Request Context
+that may need to fallback to using <code>IHttpContextAccessor</code> which would need to be made available in your App with:</p>
+<pre><code class="language-csharp">services.AddHttpContextAccessor();
+</code></pre>
+<p>Alternatively you can upgrade to the <a href="/pre-release">Pre Release</a> NuGet packages to fix the Request Context Resolution.</p>
 <h2 id="feedback">Feedback<a class="header-anchor" href="javascript:;" onclick="location.hash='#feedback'" aria-label="Permalink"> </a></h2>
 <p>If you have any questions or feedback about anything in this release, please feel free to reach out to us on the <a href="https://forums.servicestack.net">Customer Forums</a> or <a href="https://servicestack.net/ask">GitHub Discussions</a>.</p>
 </div>
@@ -2125,6 +2140,19 @@ A built in pre-rendering solution means that you can have a fast initial load ti
                                                         <span v-hash="'#conclusion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Conclusion
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#breaking-changes'" data-id="breaking-changes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Breaking Changes
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="servicestack-methods-in-razor-pages" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#servicestack-methods-in-razor-pages'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ServiceStack Methods in Razor Pages
                                                         </span>
                                                     </li>
                                             </ul>
