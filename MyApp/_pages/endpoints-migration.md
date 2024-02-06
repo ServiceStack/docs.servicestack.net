@@ -1,5 +1,5 @@
 ---
-slug: endpoint-migration
+slug: endpoints-migration
 title: Migrating to .NET 8 Endpoints
 ---
 
