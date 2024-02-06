@@ -58,6 +58,10 @@ app.UseServiceStack(new AppHost(), options =>
 });
 ```
 
+:::info NOTE
+This configuration is required and is an opt-in feature. If you do not call `options.MapEndpoints()`, your ServiceStack APIs will not be mapped to standard ASP.NET Core Endpoints.
+:::
+
 ### Moving from Funq to ASP.NET Core's built in Dependency Injection system
 
 Since ServiceStack services are registered earlier in the setup, we need to move the discovery of your ServiceStack APIs to earlier in the setup as well. 
