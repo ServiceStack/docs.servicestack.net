@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-02-06T17:00:31.5346586Z'>
+    <meta name='date' content='2024-02-07T13:34:46.1624060Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v8.1</title>
@@ -1086,7 +1086,7 @@ any customizations that you can optionally apply to ASP.NET Core's JSON APIs and
 <p>Whilst <code>System.Text.Json</code> is highly efficient, it's also very strict in the inputs it accepts where you may want to
 revert back to using ServiceStack's JSON Serializer for specific APIs, esp. when needing to support non-updatable
 external clients.</p>
-<p>This can done by annotating Request DTOs with <code>[SystemJson]</code> attribute, specifying when to use <strong>System.Text.Json</strong>,
+<p>This can be done by annotating Request DTOs with <code>[SystemJson]</code> attribute, specifying when to use <strong>System.Text.Json</strong>,
 e.g: you can limit to only use it for serializing an <strong>APIs Response</strong> with:</p>
 <pre><code class="language-csharp">[SystemJson(UseSystemJson.Response)]
 public class CreateUser : IReturn&lt;IdResponse&gt;
@@ -1473,18 +1473,32 @@ configurable in .NET Apps with the <code>.AddJwtBearer()</code> extension method
                 </div>
             </div>
 <p>Then enable Open API, Swagger UI, ServiceStack's support for Swagger UI and the JWT Bearer Auth option:</p>
-<pre><code class="language-csharp">services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+<pre><code class="language-csharp">public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen();
+                services.AddServiceStackSwagger();
+                services.AddJwtAuth();
+                //services.AddBasicAuth&lt;Data.ApplicationUser&gt;();
+            
+                services.AddTransient&lt;IStartupFilter,StartupFilter&gt;();
+            }
+        });
 
-services.AddServiceStack(typeof(MyServices).Assembly, c =&gt; {
-    c.AddSwagger(o =&gt; {
-        o.AddJwtBearer();
-    });
-});
-
-var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
+    public class StartupFilter : IStartupFilter
+    {
+        public Action&lt;IApplicationBuilder&gt; Configure(Action&lt;IApplicationBuilder&gt; next) =&gt; app =&gt;
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            next(app);
+        };
+    }
+}
 </code></pre>
 <p>This will enable the <strong>Authorize</strong> button in Swagger UI where you can authenticate with a JWT Token:</p>
 <p><img src="/img/pages/auth/identity/jwt-swagger-ui.png" alt="" /></p>
@@ -1757,12 +1771,6 @@ A built in pre-rendering solution means that you can have a fast initial load ti
 <pre><code class="language-csharp">services.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
     new OrmLiteCrudEvents(c.GetRequiredService&lt;IDbConnectionFactory&gt;()));
 </code></pre>
-<h3 id="servicestack-methods-in-razor-pages">ServiceStack Methods in Razor Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack-methods-in-razor-pages'" aria-label="Permalink"> </a></h3>
-<p>Some ServiceStack Html Helper Extension Methods in <strong>Razor Pages</strong> when Endpoint Routing is enabled will require access to the Request Context
-that may need to fallback to using <code>IHttpContextAccessor</code> which would need to be made available in your App with:</p>
-<pre><code class="language-csharp">services.AddHttpContextAccessor();
-</code></pre>
-<p>Alternatively you can upgrade to the <a href="/pre-release">Pre Release</a> NuGet packages to fix the Request Context Resolution.</p>
 <h2 id="feedback">Feedback<a class="header-anchor" href="javascript:;" onclick="location.hash='#feedback'" aria-label="Permalink"> </a></h2>
 <p>If you have any questions or feedback about anything in this release, please feel free to reach out to us on the <a href="https://forums.servicestack.net">Customer Forums</a> or <a href="https://servicestack.net/ask">GitHub Discussions</a>.</p>
 </div>
@@ -2151,14 +2159,6 @@ that may need to fallback to using <code>IHttpContextAccessor</code> which would
                                         <span v-hash="'#breaking-changes'" data-id="breaking-changes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Breaking Changes
                                         </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="servicestack-methods-in-razor-pages" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#servicestack-methods-in-razor-pages'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            ServiceStack Methods in Razor Pages
-                                                        </span>
-                                                    </li>
-                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#feedback'" data-id="feedback" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">

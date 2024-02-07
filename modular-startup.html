@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-02-06T17:00:30.9827826Z'>
+    <meta name='date' content='2024-02-07T13:34:45.5468021Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Modular Startup</title>
@@ -1345,20 +1345,17 @@ now being configured in <a href="https://github.com/NetCoreTemplates/web/blob/ma
 
 namespace MyApp;
 
-public class AppHost : AppHostBase, IHostingStartup
+public class AppHost() : AppHostBase(&quot;MyApp&quot;), IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
         .ConfigureServices(services =&gt; {
-            // Configure ASP .NET Core IOC Dependencies
+            // Configure ASP.NET Core IOC Dependencies
         });
 
-    public AppHost() : base(&quot;MyApp&quot;, typeof(MyServices).Assembly) {}
-
-    public override void Configure(Container container)
+    public override void Configure()
     {
-        // Configure ServiceStack only IOC, Config &amp; Plugins
+        // Configure ServiceStack, Run custom logic after ASP.NET Core Startup
         SetConfig(new HostConfig {
-            UseSameSiteCookies = true
         });
     }
 }
@@ -1467,111 +1464,88 @@ ServiceStack App can be configured with MongoDB, ServiceStack Auth and a MongoDB
                     </div>
                 </div>
             </div>
-<h3 id="configureapphost">ConfigureAppHost<a class="header-anchor" href="javascript:;" onclick="location.hash='#configureapphost'" aria-label="Permalink"> </a></h3>
-<p>Looking deeper, we can see where we're plugins are able to configure ServiceStack via the <code>.ConfigureAppHost()</code> extension method:</p>
-<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureAuth))]
+<h3 id="services-and-app-customizations">Services and App Customizations<a class="header-anchor" href="javascript:;" onclick="location.hash='#services-and-app-customizations'" aria-label="Permalink"> </a></h3>
+<p>Modular Startup configurations are flexible enough to encapsulate customizing ASP.NET Core's IOC and the built <code>WebApplication</code>
+by registering a <code>IStartupFilter</code> which is required by the Open API v3 Modular Configuration:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix openapi3</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
 
 namespace MyApp;
 
-// Add any additional metadata properties you want to store in the Users Typed Session
-public class CustomUserSession : AuthUserSession
+public class ConfigureOpenApi : IHostingStartup
 {
-}
-
-// Custom Validator to add custom validators to built-in /register Service requiring DisplayName and ConfirmPassword
-public class CustomRegistrationValidator : RegistrationValidator
-{
-    public CustomRegistrationValidator()
-    {
-        RuleSet(ApplyTo.Post, () =&gt;
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt;
         {
-            RuleFor(x =&gt; x.DisplayName).NotEmpty();
-            RuleFor(x =&gt; x.ConfirmPassword).NotEmpty();
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen();
+
+                services.AddServiceStackSwagger();
+                services.AddBasicAuth&lt;Data.ApplicationUser&gt;();
+                //services.AddJwtAuth();
+
+                services.AddTransient&lt;IStartupFilter, StartupFilter&gt;();
+            }
         });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action&lt;IApplicationBuilder&gt; Configure(Action&lt;IApplicationBuilder&gt; next) =&gt; app =&gt;
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            next(app);
+        };
     }
 }
+</code></pre>
+<h3 id="configureapphost">ConfigureAppHost<a class="header-anchor" href="javascript:;" onclick="location.hash='#configureapphost'" aria-label="Permalink"> </a></h3>
+<p>Looking deeper, we can see where we're plugins are able to configure ServiceStack via the <code>.ConfigureAppHost()</code> extension method to
+execute custom logic on <code>AppHost</code> Startup:</p>
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureAutoQuery))]
 
-public class ConfigureAuth : IHostingStartup
+namespace MyApp;
+
+public class ConfigureAutoQuery : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
         .ConfigureServices(services =&gt; {
-            //services.AddSingleton&lt;ICacheClient&gt;(new MemoryCacheClient()); //Store User Sessions in Memory Cache (default)
+            // Enable Audit History
+            services.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
+                new OrmLiteCrudEvents(c.GetRequiredService&lt;IDbConnectionFactory&gt;()));
+
+            // For TodosService
+            services.AddPlugin(new AutoQueryDataFeature());
+
+            // For Bookings https://docs.servicestack.net/autoquery-crud-bookings
+            services.AddPlugin(new AutoQueryFeature
+            {
+                MaxLimit = 1000,
+                //IncludeTotal = true,
+            });
         })
         .ConfigureAppHost(appHost =&gt; {
-            var appSettings = appHost.AppSettings;
-            appHost.Plugins.Add(new AuthFeature(() =&gt; new CustomUserSession(),
-                new IAuthProvider[] {
-                    new CredentialsAuthProvider(appSettings),     /* Sign In with Username / Password credentials */
-                    new FacebookAuthProvider(appSettings),        /* Create App https://developers.facebook.com/apps */
-                    new GoogleAuthProvider(appSettings),          /* Create App https://console.developers.google.com/apis/credentials */
-                    new MicrosoftGraphAuthProvider(appSettings),  /* Create App https://apps.dev.microsoft.com */
-                }));
-
-            appHost.Plugins.Add(new RegistrationFeature()); //Enable /register Service
-
-            //override the default registration validation with your own custom implementation
-            appHost.RegisterAs&lt;CustomRegistrationValidator, IValidator&lt;Register&gt;&gt;();
+            appHost.Resolve&lt;ICrudEvents&gt;().InitSchema();
         });
 }
 </code></pre>
-<p>By default, any AppHost configuration is called before <code>AppHost.Configure()</code> is run, the AppHost can be further customized after its run:</p>
-<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureAuthRepository))]
-
-namespace MyApp;
-
-// Custom User Table with extended Metadata properties
-public class AppUser : UserAuth
-{
-    public string ProfileUrl { get; set; }
-    public string LastLoginIp { get; set; }
-    public DateTime? LastLoginDate { get; set; }
-}
-
-public class AppUserAuthEvents : AuthEvents
-{
-    public override void OnAuthenticated(IRequest req, IAuthSession session, IServiceBase authService, 
-        IAuthTokens tokens, Dictionary&lt;string, string&gt; authInfo)
-    {
-        var authRepo = HostContext.AppHost.GetAuthRepository(req);
-        using (authRepo as IDisposable)
-        {
-            var userAuth = (AppUser)authRepo.GetUserAuth(session.UserAuthId);
-            userAuth.ProfileUrl = session.GetProfileUrl();
-            userAuth.LastLoginIp = req.UserHostAddress;
-            userAuth.LastLoginDate = DateTime.UtcNow;
-            authRepo.SaveUserAuth(userAuth);
-        }
-    }
-}
-
-public class ConfigureAuthRepository : IHostingStartup
-{
-    public void Configure(IWebHostBuilder builder) =&gt; builder
-        .ConfigureServices(services =&gt; services.AddSingleton&lt;IAuthRepository&gt;(c =&gt;
-            new OrmLiteAuthRepository&lt;AppUser, UserAuthDetails&gt;(c.Resolve&lt;IDbConnectionFactory&gt;()) {
-                UseDistinctRoleTables = true
-            }))
-        .ConfigureAppHost(appHost =&gt; {
-            var authRepo = appHost.Resolve&lt;IAuthRepository&gt;();
-            authRepo.InitSchema();
-            // CreateUser(authRepo, &quot;admin@email.com&quot;, &quot;Admin User&quot;, &quot;p@55wOrd&quot;, roles:new[]{ RoleNames.Admin });
-        }, afterConfigure: appHost =&gt; 
-            appHost.AssertPlugin&lt;AuthFeature&gt;().AuthEvents.Add(new AppUserAuthEvents()));
-
-    // Add initial Users to the configured Auth Repository
-    public void CreateUser(IAuthRepository authRepo, string email, string name, string password, string[] roles)
-    {
-        if (authRepo.GetUserAuthByUserName(email) == null)
-        {
-            var newAdmin = new AppUser { Email = email, DisplayName = name };
-            var user = authRepo.CreateUserAuth(newAdmin, password);
-            authRepo.AssignRoles(user, roles);
-        }
-    }
-}
-</code></pre>
 <h3 id="customize-apphost-at-different-startup-lifecycles">Customize AppHost at different Startup Lifecycles<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-apphost-at-different-startup-lifecycles'" aria-label="Permalink"> </a></h3>
-<p>To cater for all plugins, AppHost configurations can be registered at different stages within the AppHost's initialization:</p>
+<p>By default, any AppHost configuration is called before <code>AppHost.Configure()</code> is run, but to cater for all plugins, AppHost configurations can be registered at different stages within the AppHost's initialization:</p>
 <pre><code class="language-csharp">public void Configure(IWebHostBuilder builder) =&gt; builder
     .ConfigureAppHost(
         beforeConfigure:    appHost =&gt; /* fired before AppHost.Configure() */, 
@@ -1662,7 +1636,7 @@ public class ConfigureAutoQuery : IConfigureAppHost
     }
 }
 </code></pre>
-<pre><code class="language-csharp">// net6.0 modular startup using IHostingStartup
+<pre><code class="language-csharp">// net8.0 modular startup using IHostingStartup
 using Microsoft.AspNetCore.Hosting;
 using ServiceStack;
 
@@ -1672,16 +1646,13 @@ namespace Chinook;
 
 public class ConfigureAutoQuery : IHostingStartup
 {
-    public void Configure(IWebHostBuilder builder)
-    {
-        builder.ConfigureAppHost(appHost =&gt;
-        {
-            appHost.Plugins.Add(new AutoQueryFeature {
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices(services =&gt; {
+            services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
                 IncludeTotal = true
             });
         });
-    }
 }
 </code></pre>
 <blockquote>
@@ -1734,6 +1705,12 @@ public class ConfigureAutoQuery : IHostingStartup
                                             Module composition using 
                                         </span>
                                             <ul class="ml-4">
+                                                    <li data-id="services-and-app-customizations" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#services-and-app-customizations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Services and App Customizations
+                                                        </span>
+                                                    </li>
                                                     <li data-id="configureapphost" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#configureapphost'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
