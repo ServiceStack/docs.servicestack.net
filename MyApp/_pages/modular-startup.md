@@ -40,20 +40,17 @@ now being configured in [Configure.AppHost.cs](https://github.com/NetCoreTemplat
 
 namespace MyApp;
 
-public class AppHost : AppHostBase, IHostingStartup
+public class AppHost() : AppHostBase("MyApp"), IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
         .ConfigureServices(services => {
-            // Configure ASP .NET Core IOC Dependencies
+            // Configure ASP.NET Core IOC Dependencies
         });
 
-    public AppHost() : base("MyApp", typeof(MyServices).Assembly) {}
-
-    public override void Configure(Container container)
+    public override void Configure()
     {
-        // Configure ServiceStack only IOC, Config & Plugins
+        // Configure ServiceStack, Run custom logic after ASP.NET Core Startup
         SetConfig(new HostConfig {
-            UseSameSiteCookies = true
         });
     }
 }
@@ -127,119 +124,87 @@ Likewise, you can replace MongoDB with a completely different PostgreSQL RDBMS i
 x mix auth auth-db postgres
 :::
 
-### ConfigureAppHost
+### Services and App Customizations
 
-Looking deeper, we can see where we're plugins are able to configure ServiceStack via the `.ConfigureAppHost()` extension method:
+Modular Startup configurations are flexible enough to encapsulate customizing ASP.NET Core's IOC and the built `WebApplication`
+by registering a `IStartupFilter` which is required by the Open API v3 Modular Configuration:
+
+:::sh
+x mix openapi3
+:::
 
 ```csharp
-[assembly: HostingStartup(typeof(MyApp.ConfigureAuth))]
+[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
 
 namespace MyApp;
 
-// Add any additional metadata properties you want to store in the Users Typed Session
-public class CustomUserSession : AuthUserSession
-{
-}
-
-// Custom Validator to add custom validators to built-in /register Service requiring DisplayName and ConfirmPassword
-public class CustomRegistrationValidator : RegistrationValidator
-{
-    public CustomRegistrationValidator()
-    {
-        RuleSet(ApplyTo.Post, () =>
-        {
-            RuleFor(x => x.DisplayName).NotEmpty();
-            RuleFor(x => x.ConfirmPassword).NotEmpty();
-        });
-    }
-}
-
-public class ConfigureAuth : IHostingStartup
+public class ConfigureOpenApi : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices(services => {
-            //services.AddSingleton<ICacheClient>(new MemoryCacheClient()); //Store User Sessions in Memory Cache (default)
-        })
-        .ConfigureAppHost(appHost => {
-            var appSettings = appHost.AppSettings;
-            appHost.Plugins.Add(new AuthFeature(() => new CustomUserSession(),
-                new IAuthProvider[] {
-                    new CredentialsAuthProvider(appSettings),     /* Sign In with Username / Password credentials */
-                    new FacebookAuthProvider(appSettings),        /* Create App https://developers.facebook.com/apps */
-                    new GoogleAuthProvider(appSettings),          /* Create App https://console.developers.google.com/apis/credentials */
-                    new MicrosoftGraphAuthProvider(appSettings),  /* Create App https://apps.dev.microsoft.com */
-                }));
+        .ConfigureServices((context, services) =>
+        {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen();
 
-            appHost.Plugins.Add(new RegistrationFeature()); //Enable /register Service
+                services.AddServiceStackSwagger();
+                services.AddBasicAuth<Data.ApplicationUser>();
+                //services.AddJwtAuth();
 
-            //override the default registration validation with your own custom implementation
-            appHost.RegisterAs<CustomRegistrationValidator, IValidator<Register>>();
+                services.AddTransient<IStartupFilter, StartupFilter>();
+            }
         });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            next(app);
+        };
+    }
 }
 ```
 
-By default, any AppHost configuration is called before `AppHost.Configure()` is run, the AppHost can be further customized after its run:
+### ConfigureAppHost
+
+Looking deeper, we can see where we're plugins are able to configure ServiceStack via the `.ConfigureAppHost()` extension method to 
+execute custom logic on `AppHost` Startup:
 
 ```csharp
-[assembly: HostingStartup(typeof(MyApp.ConfigureAuthRepository))]
+[assembly: HostingStartup(typeof(MyApp.ConfigureAutoQuery))]
 
 namespace MyApp;
 
-// Custom User Table with extended Metadata properties
-public class AppUser : UserAuth
-{
-    public string ProfileUrl { get; set; }
-    public string LastLoginIp { get; set; }
-    public DateTime? LastLoginDate { get; set; }
-}
-
-public class AppUserAuthEvents : AuthEvents
-{
-    public override void OnAuthenticated(IRequest req, IAuthSession session, IServiceBase authService, 
-        IAuthTokens tokens, Dictionary<string, string> authInfo)
-    {
-        var authRepo = HostContext.AppHost.GetAuthRepository(req);
-        using (authRepo as IDisposable)
-        {
-            var userAuth = (AppUser)authRepo.GetUserAuth(session.UserAuthId);
-            userAuth.ProfileUrl = session.GetProfileUrl();
-            userAuth.LastLoginIp = req.UserHostAddress;
-            userAuth.LastLoginDate = DateTime.UtcNow;
-            authRepo.SaveUserAuth(userAuth);
-        }
-    }
-}
-
-public class ConfigureAuthRepository : IHostingStartup
+public class ConfigureAutoQuery : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices(services => services.AddSingleton<IAuthRepository>(c =>
-            new OrmLiteAuthRepository<AppUser, UserAuthDetails>(c.Resolve<IDbConnectionFactory>()) {
-                UseDistinctRoleTables = true
-            }))
-        .ConfigureAppHost(appHost => {
-            var authRepo = appHost.Resolve<IAuthRepository>();
-            authRepo.InitSchema();
-            // CreateUser(authRepo, "admin@email.com", "Admin User", "p@55wOrd", roles:new[]{ RoleNames.Admin });
-        }, afterConfigure: appHost => 
-            appHost.AssertPlugin<AuthFeature>().AuthEvents.Add(new AppUserAuthEvents()));
+        .ConfigureServices(services => {
+            // Enable Audit History
+            services.AddSingleton<ICrudEvents>(c =>
+                new OrmLiteCrudEvents(c.GetRequiredService<IDbConnectionFactory>()));
 
-    // Add initial Users to the configured Auth Repository
-    public void CreateUser(IAuthRepository authRepo, string email, string name, string password, string[] roles)
-    {
-        if (authRepo.GetUserAuthByUserName(email) == null)
-        {
-            var newAdmin = new AppUser { Email = email, DisplayName = name };
-            var user = authRepo.CreateUserAuth(newAdmin, password);
-            authRepo.AssignRoles(user, roles);
-        }
-    }
+            // For TodosService
+            services.AddPlugin(new AutoQueryDataFeature());
+
+            // For Bookings https://docs.servicestack.net/autoquery-crud-bookings
+            services.AddPlugin(new AutoQueryFeature
+            {
+                MaxLimit = 1000,
+                //IncludeTotal = true,
+            });
+        })
+        .ConfigureAppHost(appHost => {
+            appHost.Resolve<ICrudEvents>().InitSchema();
+        });
 }
 ```
 
 ### Customize AppHost at different Startup Lifecycles
 
-To cater for all plugins, AppHost configurations can be registered at different stages within the AppHost's initialization:
+By default, any AppHost configuration is called before `AppHost.Configure()` is run, but to cater for all plugins, AppHost configurations can be registered at different stages within the AppHost's initialization:
 
 ```csharp
 public void Configure(IWebHostBuilder builder) => builder
@@ -352,7 +317,7 @@ public class ConfigureAutoQuery : IConfigureAppHost
 ```
 
 ```csharp
-// net6.0 modular startup using IHostingStartup
+// net8.0 modular startup using IHostingStartup
 using Microsoft.AspNetCore.Hosting;
 using ServiceStack;
 
@@ -362,16 +327,13 @@ namespace Chinook;
 
 public class ConfigureAutoQuery : IHostingStartup
 {
-    public void Configure(IWebHostBuilder builder)
-    {
-        builder.ConfigureAppHost(appHost =>
-        {
-            appHost.Plugins.Add(new AutoQueryFeature {
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices(services => {
+            services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
                 IncludeTotal = true
             });
         });
-    }
 }
 ```
 
