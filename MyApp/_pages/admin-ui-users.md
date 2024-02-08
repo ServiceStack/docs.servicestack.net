@@ -2,6 +2,10 @@
 title: User Admin Feature
 ---
 
+::: info
+When using ASP.NET Core **Identity Auth** refer to [Identity Auth Admin Users UI](/admin-ui-identity-users) instead
+:::
+
 The User Admin Plugin is a lightweight API for providing user management functionality around Auth Repository APIs and enables remote programmatic access to manage your registered [User Auth Repository](/auth/authentication-and-authorization#user-auth-repository), featuring:
 
  - Works with existing `IUserAuthRepository` sync or async providers

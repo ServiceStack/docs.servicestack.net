@@ -2,9 +2,14 @@
 title: Identity User Admin Feature
 ---
 
-Now that ServiceStack is deeply integrated into ASP.NET Core Apps, we're back to refocusing our efforts on adding value-added features that can benefit all .NET Core Apps.
+::: info
+When using **ServiceStack Auth** refer to [Admin Users UI](/admin-ui-users) instead
+:::
 
-The new Identity Auth Admin UI is an example of this, which can be enabled when registering the `AuthFeature` Plugin:
+
+## Registration
+
+The Identity Auth Admin UI can be enabled when registering the `AuthFeature` Plugin by calling `AdminUsersFeature()`:
 
 ```csharp
 public class ConfigureAuth : IHostingStartup
@@ -24,11 +29,15 @@ public class ConfigureAuth : IHostingStartup
 Which just like the ServiceStack Auth [Admin Users UI](/admin-ui-users) enables a
 Admin UI that's only accessible to **Admin** Users for managing **Identity Auth** users at `/admin-ui/users`.
 
+## User Search Results
+
 Which displays a limited view of a User's info due to the minimal properties on the default `IdentityAuth` model:
 
 <div>
     <img class="shadow" src="/img/pages/auth/identity/admin-ui-users-default.png">
 </div>
+
+### Custom Search Result Properties
 
 These User Search results are customizable by specifying the `ApplicationUser` properties you want displayed instead:
 
@@ -50,6 +59,8 @@ options.AdminUsersFeature(feature =>
     <img class="shadow" src="/img/pages/auth/identity/admin-ui-users-custom.png">
 </div>
 
+### Custom Search Result Behavior
+
 The default display Order of Users is also customizable:
 
 ```csharp
@@ -70,6 +81,8 @@ feature.SearchUsersFilter = (q, query) =>
 };
 ```
 
+## Default Create and Edit Users Forms
+
 The default Create and Edit Admin Users UI are also limited to editing the minimal `IdentityAuth` properties:
 
 <div>
@@ -81,6 +94,8 @@ Whilst the Edit page includes standard features to lockout users, change user pa
 <div>
     <img class="shadow" src="/img/pages/auth/identity/admin-ui-users-edit.png">
 </div>
+
+### Custom Create and Edit Forms
 
 By default Users are locked out indefinitely, but this can also be changed to lock users out to a specific date, e.g:
 
@@ -110,6 +125,8 @@ feature.FormLayout =
 ```
 
 That can override the new `ApplicationUser` Model that's created and any Validation:
+
+### Custom User Creation
 
 ```csharp
 feature.CreateUser = () => new ApplicationUser { EmailConfirmed = true };
@@ -144,10 +161,4 @@ feature.OnAfterUpdateUser  = (request, user) => { ... };
 feature.OnBeforeDeleteUser = (request, userId) => { ... };
 feature.OnAfterDeleteUser  = (request, userId) => { ... };
 ```
-
-## Learn More
-
-To further assist migrating to ASP .NET Identity Auth we've published a more detailed Migration guide highlighting and tackling 
-other considerations including **Migrating Roles** and User **Foreign Keys References** in
-[Migrating to ASP.NET Core Identity for Authentication](https://servicestack.net/posts/identity-migration).
 
