@@ -2,6 +2,251 @@
 title: Blazor Tailwind
 ---
 
+
+<div class="not-prose mt-16 flex flex-col items-center">
+   <div class="flex">
+      <svg class="w-28 h-28 text-purple-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"></path></svg>
+   </div>
+</div>
+<div class="not-prose mt-4 px-4 sm:px-6">
+<div class="text-center"><h3 id="blazor-template" class="text-4xl sm:text-5xl md:text-6xl tracking-tight font-extrabold text-gray-900">
+    Blazor WASM Tailwind
+</h3></div>
+<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="BXjcKkaK-nM" style="background-image: url('https://img.youtube.com/vi/BXjcKkaK-nM/maxresdefault.jpg')"></lite-youtube>
+</div>
+</div>
+
+<div class="relative bg-white dark:bg-black py-4">
+    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+        <h2 class="text-base font-semibold uppercase tracking-wider text-indigo-600">Getting Started</h2>
+        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Create a new Blazor WASM Tailwind App</p>
+        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
+            Create a new Blazor WASM Tailwind project with your preferred project name:
+        </p>
+    </div>
+</div>
+
+<blazor-templates class="not-prose pb-8"></blazor-templates>
+
+Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/templates/dotnet-new):
+
+:::sh
+x new blazor-wasm ProjectName
+:::
+
+The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.
+
+<a href="https://blazor-wasm.web-templates.io">
+    <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
+        <img class="" src="/img/pages/blazor/blazor-tailwind-splash.png">
+    </div>
+    <div class="pt-4 text-center">
+        blazor-wasm.web-templates.io
+    </div>
+</a>
+
+Since the release of .NET 8, we have been upgrading our [Blazor Templates](https://servicestack.net/start) and example applications to take advantage of some of the new features, including making use of static Server Side Rendering (SSR) for Blazor, which allows for faster initial page loads and better SEO, and our [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm) template uses `InteractiveAuto` by default to provide a more Responsive UI.
+
+## What is InteractiveAuto?
+
+Blazor for .NET 8 has [four different rendering modes](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes) you can take advantage of:
+
+- Static Server (static SSR)
+- Interactive Server
+- Interactive WebAssembly (WASM)
+- Interactive Auto
+
+For non-interactive pages, the static SSR mode is the fastest, as it renders the page on the server and sends the HTML to the client.
+However, when your page needs to be interactive, you need to use one of the interactive modes.
+
+Prior to .NET 8, there was a trade-off between the two available render modes (static server rendering wasn't yet available).
+The `Interactive Server` mode was faster to load, but the `Interactive WASM` mode was more responsive.
+
+The initial load times for `Interactive WASM` could be quite slow, as the entire application and all its dependencies needed to be downloaded before the page could render most of the content.
+
+<img class="border-gray-800 border-t border-r" src="/img/pages/blazor/wasm/blazor-wasm-6-slow.gif">
+
+> The initial load time for the `Interactive WASM` mode can be quite slow even for a minimal app
+
+Our templates previously worked around this limitation with a custom Pre-Rendering solution, as the wait times were too long for a good user experience.
+
+.NET 8's new `Interactive Auto` mode provides the best of both worlds as pre-rendering is now enabled by default.
+
+<img class="border-gray-800 border-r" src="/img/pages/blazor/wasm/blazor-wasm-8-fast.gif">
+
+When the page is first loaded, it uses the `Interactive Server` mode, which is faster than `Interactive WASM` as it doesn't need to download WASM resources.
+So the user can start interacting with the page straight away, but with a slight delay for each of their interactions due to having to perform round-trips to the server for each interaction.
+
+In the background, the WASM resources are downloaded which can then be used to render the site on the client for subsequent visits.
+
+## Using InteractiveAuto in your Blazor application
+
+In Blazor for .NET 8, render modes can be set on both a per-page and per-component basis.
+
+```html
+@page "/counter"
+@rendermode InteractiveAuto
+
+<Counter />
+```
+
+```html
+<Counter @rendermode="RenderMode.InteractiveAuto" />
+```
+
+## ServiceStack.Blazor Components
+
+The [ServiceStack.Blazor Components](https://blazor-gallery.jamstacks.net) have been updated for .NET 8 and work with the new `InteractiveAuto` render mode.
+
+This means you can focus more on your application logic and less on the UI, as the components provide a high-productivity UI for common tasks such as CRUD operations.
+
+### AutoQueryGrid
+
+The [AutoQueryGrid](https://blazor-gallery.servicestack.net/gallery/autoquerygrid) component provides a full-featured data grid that can be used to display and edit data from an AutoQuery service.
+This is ideal for creating custom admin pages for your application. 
+By integrating your admin screens into your application, you can optimize the user experience for specific workflows and get a huge amount of reuse of your existing AutoQuery services.
+
+```html
+<AutoQueryGrid Model="Modifier" Apis="Apis.AutoQuery<QueryModifiers,CreateModifier,UpdateModifier,DeleteModifier>()" />
+```
+
+![](/img/pages/blazor/wasm/autoquerygrid.png)
+
+For [BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto), our StableDiffusion example application, we used the AutoQueryGrid to create a custom admin page for managing the modifiers in the application.
+
+![](/img/pages/blazor/wasm/stablediffusion-modifiers.png)
+
+This is the simplest and fastest use of the AutoQueryGrid component, but it can also be heavily customized for lots of different use cases.
+
+In [BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto) we customize the grid to enable easy navigation contextually between separate customized admin screens for each Creative, linking to related table data.
+
+![](/img/pages/blazor/wasm/blazordiffusion-creatives.png)
+
+```html
+<AutoQueryGrid @ref=@grid Model="Creative" Apis="Apis.AutoQuery<QueryCreatives,UpdateCreative,HardDeleteCreative>()"
+               ConfigureQuery="ConfigureQuery">
+    <EditForm>
+        <div class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <CreativeEdit Creative="context" OnClose="grid.OnEditDone" />
+            </div>
+        </div>
+    </EditForm>
+    <Columns>
+        <Column Title="User" Field="(Creative x) => x.OwnerId" />
+        <Column Title="Id" Field="(Creative x) => x.Id" />
+        <Column Field="(Creative x) => x.Modifiers">
+            <Template>
+                @if (context.Modifiers?.Count > 0)
+                {
+                <TextLink class="flex" href=@($"/admin/modifiers?Ids={string.Join(",", context.Modifiers.Select(x => x.ModifierId))}")>
+                    <Icon class="w-6 h-6 mr-1" Image=@typeof(Modifier).GetIcon() />
+                    @TextUtils.Pluralize("Modifier", context.Modifiers)
+                </TextLink>
+                }
+            </Template>
+        </Column>
+        <Column Field="(Creative x) => x.Artists">
+            <Template>
+                @if (context.Artists?.Count > 0)
+                {
+                <TextLink class="flex" href=@($"/admin/artists?Ids={string.Join(",", context.Artists.Select(x => x.ArtistId))}")>
+                    <Icon class="w-6 h-6 mr-1" Image=@typeof(Artist).GetIcon() />
+                    @TextUtils.Pluralize("Artist", context.Artists)
+                </TextLink>
+                }
+            </Template>
+        </Column>
+        <Column Field="(Creative x) => x.Artifacts">
+            <Template>
+                @if (context.Artifacts?.Count > 0)
+                {
+                <TextLink class="flex" href=@($"/admin/artifacts?CreativeId={context.Id}")>
+                    <Icon class="w-6 h-6 mr-1" Image=@typeof(Artifact).GetIcon() />
+                    @TextUtils.Pluralize("Artifact", context.Artifacts)
+                </TextLink>
+                }
+            </Template>
+        </Column>
+        <Column Field="(Creative x) => x.Key" />
+        <Column Field="(Creative x) => x.CreatedDate" Format="s" />
+        <Column Field="(Creative x) => x.UserPrompt" />
+    </Columns>
+</AutoQueryGrid>
+```
+
+In the above example, we use the `ConfigureQuery` parameter to customize the query used by the AutoQueryGrid when displaying values.
+This is ideal if you want to filter the data for specific workflows, for example, only showing the data that is relevant to the current user.
+
+We combine this with a `Tabs` component to provide a navigation bar for the user to switch between the different filters on the same AutoQueryGrid.
+
+```html
+<Tabs TabOptions="TabOptions" TabChanged="TabChangedAsync" />
+```
+
+:::{.shadow .max-w-screen-sm}
+![](/img/pages/blazor/wasm/blazordiffusion-tab.png)
+:::
+
+<p></p>
+
+:::{.shadow .max-w-screen-sm}
+![](/img/pages/blazor/wasm/blazordiffusion-tab1.png)
+:::
+
+We also use the `EditForm` parameter to customize the edit form for the AutoQueryGrid, so the workflow for editing a Creative is optimized using your own completely custom UI.
+
+```html
+<AutoQueryGrid @ref=@grid Model="Creative" Apis="Apis.AutoQuery<QueryCreatives,UpdateCreative,HardDeleteCreative>()"
+               ConfigureQuery="ConfigureQuery">
+    <EditForm>
+        <div class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <CreativeEdit Creative="context" OnClose="grid.OnEditDone" />
+            </div>
+        </div>
+    </EditForm>
+```
+
+## Upgrading to .NET 8
+
+[BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto) was an example application we originally developed for .NET 6.
+We upgraded the production release of this application to use our [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue) template, which can be perfect for public-facing web applications and teams that don't mind including a JavaScript framework in their application.
+
+However, to show the flexibility of Blazor for .NET 8, we also upgraded the whole application from our updated `blazor-wasm` template to take advantage of the new `InteractiveAuto` mode.
+
+### Component Compatibility
+
+Since the ServiceStack.Blazor library has been updated for .NET 8, we just needed to bring over the shared components from the original application and update the references to the new library.
+
+When upgrading your application pages and components, you will need to avoid any JavaScript interop that runs during the `InitializeAsync` lifecycle method, as this is not supported in the `InteractiveAuto` mode.
+
+### Running on both Server vs Client
+
+When using the `InteractiveAuto` mode, first visits will be running on the server, so your pages and components need to be available to both projects, as well as have any required dependencies registered in both projects `Program.cs` files.
+
+By placing your shared pages and components in a shared project like the `.Client` project in the `blazor-wasm` template, you can easily share them between the two projects.
+
+Look for any of your pages or components that use the `@injects` directive, as these will need to be registered in both projects.
+
+::: info
+Avoid sharing sensitive information via dependency injection, as this will be available to the client at runtime which will be able to be decompiled and inspected.
+:::
+
+### Source code and live demo
+
+The source code for the upgraded `BlazorDiffusionAuto` application is [available on GitHub](https://github.com/NetCoreApps/BlazorDiffusionAuto) and you can view a live demo of the application at [auto.blazordiffusion.com](https://auto.blazordiffusion.com).
+
+### Conclusion
+
+The new `InteractiveAuto` mode in Blazor for .NET 8 provides the best of both worlds for Blazor applications.
+A built in pre-rendering solution means that you can have a fast initial load time, but still have a responsive UI for subsequent visits.
+
+And since the ServiceStack.Blazor components have been updated for .NET 8, you can take advantage of the high-productivity UI components to quickly create customizable and professional-looking admin pages in a Blazor application.
+
+---
+
 <div id="blazor-components" class="hide-title not-prose mt-16 mb-8 ml-20 flex flex-col items-center">
     <div class="flex">
         <svg class="w-40 h-40 text-purple-600 mr-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"/></svg>
@@ -12,17 +257,6 @@ title: Blazor Tailwind
         <span class="mr-6" style="color:#44A8B3">Tailwind</span>
     </h2>
 </div>
-
-The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.
-
-<a href="https://blazor.web-templates.io">
-    <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
-        <img class="" src="/img/pages/blazor/blazor-tailwind-splash.png">
-    </div>
-    <div class="pt-4 text-center">
-        blazor.web-templates.io
-    </div>
-</a>
 
 ### Blazor Tailwind Components
 
@@ -99,24 +333,6 @@ For a closer look at ServiceStack.Blazor Components in action, download & run th
     </div>    
 </div>
 
-
-<div class="relative bg-white dark:bg-black py-4">
-    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 class="text-base font-semibold uppercase tracking-wider text-indigo-600">Getting Started</h2>
-        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Create a new Blazor WASM Tailwind App</p>
-        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
-            Customize and Download a new Tailwind Blazor WASM project with your preferred project name:
-        </p>
-    </div>
-</div>
-
-<blazor-templates class="not-prose pb-8"></blazor-templates>
-
-Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/templates/dotnet-new):
-
-:::sh
-x new blazor ProjectName
-:::
 
 <div class="relative bg-white py-4 mt-12">
     <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">

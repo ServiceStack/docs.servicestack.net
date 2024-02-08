@@ -1,7 +1,10 @@
 ---
-slug: routing
 title: Routing
 ---
+
+::: info
+For docs on routing with ServiceStack's latest .NET 8 Templates see [Endpoint Routing](/endpoint-routing)
+:::
 
 ## Pre-defined Routes
 
@@ -46,16 +49,6 @@ This simple convention makes it easy to remember the route new APIs are immediat
 ### Benefits in Jamstack Apps
 
 The `/api` route is particularly useful in Jamstack Apps as the 2 ways to call back-end APIs from decoupled UIs hosted on CDNs is to make CORS requests which doesn't send pre-flight CORS requests for [Simple Browser requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests). As such, we can improve the latency of **GET** and **POST** API Requests by configuring our `JsonServiceClient` to use `/api` and to not send the `Content-Type: application/json` HTTP Header which isn't necessary for `/api` requests which always expects and returns JSON:
-
-### Configuring in TypeScript
-
-```ts
-import { JsonApiClient } from "@servicestack/client"
-
-const client = JsonApiClient.create(baseUrl)
-```
-
-It also benefits the **alternative method** to CORS in only needing to define a **single reverse proxy rule** on the CDN host to proxy all API requests to downstream back-end servers.
 
 #### Configuring in .NET
 
@@ -115,6 +108,22 @@ To avoid potential conflicts `/api` isn't registered if your AppHost configures 
 ConfigurePlugin<PredefinedRoutesFeature>(feature => feature.JsonApiRoute = null);
 ```
 
+### Revert to Legacy Predefined Routes
+
+You can unset the base path to revert back to using the older `/json/reply/{Request}` pre-defined route, e.g:
+
+#### JavaScript/TypeScript
+
+```ts
+client.basePath = null;
+```
+
+#### Java/Kotlin
+
+```java
+client.setBasePath();
+```
+
 
 ## Custom Routes
 
@@ -157,7 +166,7 @@ The QueryString, FormData and HTTP Request Body isn't apart of the Route (i.e. o
 Using a route with a wild card path like:
 
 ```csharp
-[Route("/hello/{Name*}")]
+[Route("/hello/{**Name}")]
 ```
 
 matches any number of variable paths:
@@ -189,7 +198,7 @@ The Fallback route is useful for HTML5 Single Page App websites handling server 
 do not have Server Routes, e.g [MyServices.cs](https://github.com/NetCoreTemplates/vue-spa/blob/master/MyApp.ServiceInterface/MyServices.cs):
 
 ```csharp
-[FallbackRoute("/{PathInfo*}", Matches="AcceptsHtml")]
+[FallbackRoute("/{**PathInfo}", Matches="AcceptsHtml")]
 public class FallbackForClientRoutes
 {
     public string PathInfo { get; set; }
@@ -276,6 +285,23 @@ and to match only **GET** request for `/Customers?Key=Value` and `/Customers/{Id
 Routes
     .Add<GetContact>("/Contacts", "GET")
     .Add<GetContact>("/Contacts/{ContactId}", "GET");
+```
+
+### ServiceStack Routing Compatibility
+
+To improve compatibility with ServiceStack [Endpoint Routing](/endpoint-routing), Routes supports parsing ASP.NET Core's 
+Route Constraints but as they're inert you would need to continue to use
+[Custom Route Rules](/routing#custom-rules) to distinguish between different routes matching 
+the same path at different specificity:
+
+```csharp
+[Route("/users/{Id:int}", Matches = "**/{int}")]
+[Route("/users/{UserName:string}")]
+public class GetUser : IGet, IReturn<User>
+{
+    public int? Id { get; set; }
+    public int? UserName { get; set; }
+}
 ```
 
 ## Content Negotiation

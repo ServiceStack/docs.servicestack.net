@@ -1,7 +1,11 @@
 ---
-slug: ioc
 title: ServiceStack's IOC 
 ---
+
+::: info
+When using ASP.NET Core **Endpoint Routing** refer to [ASP.NET Core IOC](/net-ioc) instead
+:::
+
 
 ServiceStack uses a slightly modified version of [Funq](http://funq.codeplex.com/) - which was adopted because 
 of its excellent [performance and memory characteristics](http://www.servicestack.net/benchmarks/). 
@@ -19,9 +23,8 @@ For each of these features, dependencies are resolved for all parameters in the 
 
 ## .NET Core Compatible Registration APIs
 
-To retain the same nomenclature that .NET Core uses to register dependencies you can use the 
-[.NET Core-compatible overloads](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/ContainerNetCoreExtensions.cs)
-letting you use a single consistent API to register dependencies in both ServiceStack's and .NET Core's IOC 
+To retain compatibility with ASP .NET Core IOC we recommend using Funq's `IServiceCollection` and `IServiceProvider` interfaces
+when registering dependencies, letting you use a single consistent API to register dependencies in both ServiceStack's and .NET Core's IOC 
 making it easy to move registrations between the two, e.g:
 
 ```csharp
@@ -50,17 +53,16 @@ most arguments as well as all public properties.
 ```csharp
 public override void Configure(Container container)
 {
-   container.RegisterAutoWired<MyType>();
-   container.RegisterAutoWiredAs<MyType,IMyType>();
+   container.AddSingleton<MyType>();
+   container.AddSingleton<IMyType,MyType>();
 }
 ```
 
 There's also support for registration of run-time types with these APIs below:
 
 ```csharp
-container.RegisterAutoWiredType(typeof(MyType));
-container.RegisterAutoWiredType(typeof(MyType),typeof(IMyType));
-container.RegisterAutoWiredTypes(typeof(MyType),typeof(MyType2),typeof(MyType3));
+container.AddSingleton(typeof(MyType));
+container.AddSingleton(typeof(IMyType),typeof(MyType));
 ```
 
 ## Custom Registration
@@ -74,9 +76,10 @@ In addition to Auto-wiring Funq allows you to customize the creation of your ins
 This is useful when your dependencies require custom configuration. E.g:
 
 ```csharp
-container.Register(c => new MyType(c.Resolve<IDependency>(), connectionString));
-container.Register<IMyType>(c => new MyType(c.Resolve<IDependency>(), connectionString));
-container.Register(c => CreateAndInitializeMyType(c.Resolve<IDependency1>(), c.Resolve<IDependency2>));
+container.AddSingleton(c => new MyType(c.GetRequiredService<IDependency>(), connectionString));
+container.AddSingleton<IMyType>(c => new MyType(c.GetRequiredService<IDependency>(), connectionString));
+container.AddSingleton(c => CreateAndInitializeMyType(
+    c.GetRequiredService<IDependency1>(), c.GetRequiredService<IDependency2>));
 ```
 
 ### Register instances
@@ -85,7 +88,7 @@ Other than factories, you can also register custom instances where instead of re
 can return an instance:
 
 ```csharp
-container.Register(new MyType(c.Resolve<IDependency>(), connectionString));
+container.AddSingleton(new MyType(c.GetRequiredService<IDependency>(), connectionString));
 ```
 
 ::: info
@@ -98,18 +101,18 @@ auto-wired (ie **the properties and the constructor are not injected**)
 By default all dependencies registered in Funq have singleton scope, where the same instance is injected into all dependencies. This behaviour can be changed by defining the scope explicitly, which is supported with the following APIs:
 
 ```csharp
-container.Register(c => new MyType()).ReusedWithin(ReuseScope.None); 
-container.RegisterAutoWired<MyType>().ReusedWithin(ReuseScope.None); 
-container.RegisterAutoWiredAs<MyType,IMyType>().ReusedWithin(ReuseScope.None); 
-container.RegisterAutoWiredType(typeof(MyType), ReuseScope.None); 
-container.RegisterAutoWiredType(typeof(MyType), typeof(IMyType), ReuseScope.None); 
+container.AddSingleton(c => new MyType()); 
+container.AddSingleton<MyType>(); 
+container.AddSingleton<IMyType,MyType>(); 
+container.AddSingleton(typeof(MyType)); 
+container.AddSingleton(typeof(IMyType), typeof(MyType)); 
 ```
 
 ### Supported Lifetime Scopes
 
-- `ReuseScope.Container`: Singleton scope (a instance is used per application lifetime)
-- `ReuseScope.Request`: Request scope (a instance is used per request lifetime)
-- `ReuseScope.None`: Transient scope (a new instance is created every time)
+- `AddSingleton`: Singleton scope (a instance is used per application lifetime)
+- `AddScoped`: Request scope (a instance is used per request lifetime)
+- `AddTransient`: Transient scope (a new instance is created every time)
 
 #### Scoped Dependencies
 
@@ -134,7 +137,7 @@ Otherwise if you need to resolve Request Scoped .NET Core dependencies you can r
 ```csharp
 public object Any(MyRequest request)
 {
-    var requestScope = base.Request.TryResolve<IScoped>();
+    var requestScope = base.Request.GetService<IScoped>();
 }
 ```
 
@@ -143,8 +146,7 @@ Alternatively you can register the dependencies in ServiceStack's IOC instead, e
 ```csharp
 public override void Configure(Container container)
 {
-    services.RegisterAutoWiredAs<Scoped,IScoped>()
-        .ReusedWithin(ReuseScope.Request);
+    container.AddScoped<IScoped,Scoped>();
 }
 ```
 
@@ -155,11 +157,11 @@ Where they'd be resolved within ServiceStack's Request Scope instead of via ASP.
 Registering dependencies in ServiceStack's IOC are only available within ServiceStack, you can access 
 **scoped ASP.NET Core dependencies** and create Custom IOC Scopes using the `IRequest` APIs below:
 
- - `IRequest.TryResolveScoped<T>()`
- - `IRequest.TryResolveScoped()`
- - `IRequest.ResolveScoped<T>()`
- - `IRequest.ResolveScoped()`
  - `IRequest.CreateScope()`
+ - `IRequest.GetService()`
+ - `IRequest.GetService<T>()`
+ - `IRequest.GetRequiredService()`
+ - `IRequest.GetRequiredService<T>()`
  - `IRequest.GetServices()`
  - `IRequest.GetServices<T>()`
 
@@ -197,7 +199,7 @@ Whilst ServiceStack's IOC doesn't have a native support for registering types ba
 ```csharp
 GetType().Assembly.GetTypes()
     .Where(x => x.IsOrHasGenericInterfaceTypeOf(typeof(ICommand<>)))
-    .Each(x => container.RegisterAutoWiredType(x));
+    .Each(x => container.AddSingleton(x));
 ```
 
 ## Use another IoC container

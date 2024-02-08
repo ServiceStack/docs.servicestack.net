@@ -3,6 +3,10 @@ slug: jwt-authprovider
 title: JWT Auth Provider
 ---
 
+::: info
+When using [ASP.NET Core Identity Auth](/auth/identity-auth) refer to [JWT Identity Auth](/auth/jwt-identity-auth) instead
+:::
+
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NTCUT7atoLo" style="background-image: url('https://img.youtube.com/vi/NTCUT7atoLo/maxresdefault.jpg')"></lite-youtube>
 
 The `JwtAuthProvider` is our integrated Auth solution for the popular [JSON Web Tokens](https://jwt.io/) (JWT) industry standard which is easily enabled by registering the `JwtAuthProvider` with the `AuthFeature` plugin:

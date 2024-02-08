@@ -1,34 +1,105 @@
 ---
-slug: openapi
-title: Open API
+title: Open API v3
 ---
 
-![](/img/pages/openapi/openapi-banner.png)
+![](/img/pages/openapi/v3/openapiv3-logo.png)
 
-[Open API](https://www.openapis.org/) is a specification and complete framework implementation for describing, producing, consuming, and visualizing RESTful web services. ServiceStack implements the 
-[OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) back-end and embeds the Swagger UI front-end in a separate plugin which is available under [OpenAPI NuGet package](http://nuget.org/packages/ServiceStack.Api.OpenApi/):
-
-:::copy
-`<PackageReference Include="ServiceStack.Api.OpenApi" Version="6.*" />`
+::: info
+For documentation on using `OpenApiFeature` refer to [Open API v2](/openapi-v2) instead
 :::
 
-## Installation
+Utilizing the same ASP.NET Core [Endpoint Routing](/endpoint-routing) that the rest of the ASP.NET Core App uses enables 
+your ServiceStack APIs to integrate with your wider ASP.NET Core application, opening up more opportunities for greater reuse.
 
-You can enable Open API by registering the `OpenApiFeature` plugin in AppHost with:
+This opens up the ability to use common third party tooling to implement application-wide features like OpenAPI v3 specification 
+generation support for your endpoints offered by the `Swashbuckle.AspNetCore` package.
+
+To make this integration as easy as possible we're maintaining the `ServiceStack.AspNetCore.OpenApi` package to incorporate additional 
+information from your ServiceStack APIs into Swagger metadata.
+
+![](/img/pages/openapi/v3/openapi-v3-swagger-ui.png)
+
+In this guide we will look at how you can take advantage of the new OpenAPI v3 Swagger support using mapped Endpoints, 
+customizing the generated specification, as well as touch on other related changes when using [Endpoint Routing](/endpoint-routing).
+
+## AppHost Initialization
+
+To use Swashbuckle your ServiceStack App needs to be configured to use [Endpoint Routing](/endpoint-routing) and
+[ASP.NET Core IOC](/net-ioc) where registration of your ServiceStack Services and App's Dependencies & Plugins need to be setup
+before your `WebApplication` is built, e.g:
+
+#### Program.cs
+```csharp
+// Register ServiceStack APIs, Dependencies and Plugins:
+services.AddServiceStack(typeof(MyServices).Assembly);
+
+var app = builder.Build();
+//...
+
+// Register ServiceStack AppHost
+app.UseServiceStack(new AppHost(), options => {
+    options.MapEndpoints();
+});
+
+app.Run();
+```
+
+Once configured to use Endpoint Routing we can the [mix](https://docs.servicestack.net/mix-tool) tool to apply the 
+[openapi3](https://gist.github.com/gistlyn/dac47b68e77796902cde0f0b7b9c6ac2) Startup Configuration with:
+
+:::sh
+x mix openapi3
+:::
+
+### Manually Configure OpenAPI v3 and Swagger UI 
+
+This will install the required ASP.NET Core Microsoft, Swashbuckle and ServiceStack Open API NuGet packages:
+
+```xml
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.*" />
+<PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
+<PackageReference Include="ServiceStack.AspNetCore.OpenApi" Version="8.*" />
+```
+
+Then add the `Configure.OpenApi.cs` [Modular Startup](https://docs.servicestack.net/modular-startup) class to your project:
 
 ```csharp
-public override void Configure(Container container)
-{
-    ...
-    Plugins.Add(new OpenApiFeature());
+[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
 
-    // Uncomment CORS feature if it needs to be accessible from external sites 
-    // Plugins.Add(new CorsFeature()); 
-    ...
+namespace MyApp;
+
+public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) =>
+        {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen(); // Swashbuckle
+
+                services.AddServiceStackSwagger();
+                services.AddBasicAuth<ApplicationUser>(); // Enable HTTP Basic Auth
+                //services.AddJwtAuth(); // Enable & Use JWT Auth
+
+                services.AddTransient<IStartupFilter, StartupFilter>();
+            }
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+            => app => {
+                // Provided by Swashbuckle library
+                app.UseSwagger();
+                app.UseSwaggerUI();
+                next(app);
+            };
+    }
 }
 ```
 
-Then you will be able to view the Swagger UI from `/swagger-ui/`. A link to **Swagger UI** will also be available from your `/metadata` [Metadata Page](/metadata-page).
+All this setup is done for you in our updated [Identity Auth .NET 8 Templates](https://servicestack.net/start).
 
 ## Open API Attributes
 
@@ -77,6 +148,7 @@ need to be changed to
 
 Here is the table for type migration
 
+:::{.table}
 | Swagger Type (DataType) | OpenAPI Type (DataType) | OpenAPI Format (Format)     |
 |-------------------------|-------------------------|-----------------------------|
 | Array                   | array                   |                             |
@@ -89,6 +161,7 @@ Here is the table for type migration
 | int                     | integer                 | int32                       |
 | long                    | integer                 | int64                       |
 | string                  | string                  |                             |
+:::
 
 You can use `[ApiAllowableValues]` lets you anotate enum properties as well as a restriction for values in array, e.g:
 
@@ -133,275 +206,75 @@ To exclude entire Services from showing up in OpenAPI or any other Metadata Serv
 public class MyRequestDto { ... }
 ```
 
-### Operation filters
+## More Control
 
-You can override operation or parameter definitions by specifying the appropriate filter in plugin configuration:
+One point of friction with our previous `OpenApiFeature` plugin was the missing customization ability to the OpenAPI spec to somewhat disconnect from the defined ServiceStack service, and related C# Request and Response DTOs since it used Request DTOs property attributes making the *structure* of the OpenAPI schema mapping quite ridged, preventing the ability for certain customizations.
+
+For example, if we have an `UpdateTodo` Request DTO that looks like the following class:
 
 ```csharp
-Plugins.Add(new OpenApiFeature
+[Route("/todos/{Id}", "PUT")]
+public class UpdateTodo : IPut, IReturn<Todo>
 {
-    OperationFilter = (verb, operation) => operation.Tags.Add("all operations")
-});
-```
-
-Available configuration options:
-
-- `ApiDeclarationFilter` - allows to modify final result of returned OpenAPI json
-- `OperationFilter` - allows to modify operations
-- `SchemaFilter` - allows to modify OpenAPI schema for user types
-- `SchemaPropertyFilter` - allows to modify propery declarations in OpenAPI schema
-
-### Properties naming conventions
-
-You can control naming conventions of generated properties by following configuration options:
-
-- `UseCamelCaseSchemaPropertyNames` - generate camel case property names
-- `UseLowercaseUnderscoreSchemaPropertyNames` - generate underscored lower cased property names (to enable this feature `UseCamelCaseModelPropertyNames` must also be set) 
-
-Example:
-
-```csharp
-Plugins.Add(new OpenApiFeature
-{
-    UseCamelCaseSchemaPropertyNames = true,
-    UseLowercaseUnderscoreSchemaPropertyNames = true
-});
-```
-
-### Change default Verbs
-
-If left unspecified, the `[Route]` attribute allows Services to be called from any HTTP Verb which by default 
-are listed in the Open API specification under the most popular HTTP Verbs, namely `GET`, `POST`, `PUT` and `DELETE`.
-
-This can be modified with `AnyRouteVerbs` which will let you specify which Verbs should be generated 
-for **ANY** Routes with unspecified verbs, e.g. we can restrict it to only emit routes for `GET` and `POST` Verbs with:
-
-```csharp
-Plugins.Add(new OpenApiFeature
-{
-    AnyRouteVerbs =  new List<string> { HttpMethods.Get, HttpMethods.Post }
-});
-```
-
-### Miscellaneous configuration options
-
-- `DisableAutoDtoInBodyParam` - disables adding `body` parameter for Request DTO to operations
-- `LogoUrl` - url of the logo image for Swagger UI
-
-Example:
-
-```csharp
-Plugins.Add(new OpenApiFeature
-{
-    DisableAutoDtoInBodyParam = true
-});
-```
-
-## Virtual File System
-
-The docs on the Virtual File System shows how to override embedded resources:
-
-### Overriding OpenAPI Embedded Resources
-
-ServiceStack's [Virtual File System](/virtual-file-system) supports multiple file source locations where you can override OpenAPI's embedded files by including your own custom files in the same location as the existing embedded files. This lets you replace built-in ServiceStack embedded resources with your own by simply copying the [/swagger-ui](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Api.OpenApi/swagger-ui) files you want to customize and placing them in your Website Directory at:
-
-```
-/swagger-ui
-    /css
-    /fonts
-    /images
-    /lang
-    /lib
-    index.html
-    swagger-ui.js
-```
-
-#### Injecting custom JavaScript
-
-As part of the customization you can add custom `patch.js` and `patch-preload.js`:
-
-```
-/swagger-ui
-    patch.js
-    patch-preload.js
-```
-
-which will be injected in the `/swagger-ui` index page, `patch-preload.js` is embedded before `swaggerUi.load()` is called:
-
-```js
-// contents of patch-preload.js
-
-window.swaggerUi.load();
-```
-
-So you can use it to customize the `swaggerUi` configuration object before it's loaded, whilst `patch.js` is embedded just before the end of the `</body>` tag, e.g:
-
-```html
-<script type='text/javascript'>
-// contents of patch.js
-</script>
-</body>
-```
-
-### Swagger UI Security
-
-There are 2 custom security methods supported **Bearer** and **Basic Auth**. 
-
-You can specify to use Swagger's support for API Key Authentication with:
-
-```csharp
-Plugins.Add(new OpenApiFeature
-{
-    UseBearerSecurity = true,
-});
-```
-
-This will instruct Swagger to use their API Key Authentication when clicking the **Authorize** button which will be sent in API requests to your Authenticated Services. As the **value** field is for the entire Authorization HTTP Header you'd need to add your JWT Token or API Key prefixed with `Bearer `:
-
-![](./img/pages/openapi/bearer-auth.png)
-
-Which you can use to use to Authenticate with "Bearer token" Auth Providers like [API Key](/auth/api-key-authprovider) and [JWT Auth Providers](/auth/jwt-authprovider).
-
-### Basic Auth in OpenAPI
-
-You can instruct Swagger to use HTTP Basic Auth with:
-
-```csharp
-Plugins.Add(new OpenApiFeature
-{
-    UseBasicSecurity = true,
-});
-```
-
-This lets Users call protected Services using the Username and Password fields in Swagger UI. 
-Swagger UI sends these credentials with every API request using HTTP Basic Auth, which can be enabled in your AppHost with:
-
-```csharp
-Plugins.Add(new AuthFeature(...,
-    new IAuthProvider[] { 
-        new BasicAuthProvider(), //Allow Sign-ins with HTTP Basic Auth
-    }));
-```
-
-To login, you need to click "Authorize" button.
-
-![](./img/pages/openapi/1-swaggerui-authorize.png)
-
-And then enter username and password.
-
-![](./img/pages/openapi/2-swaggerui-password.png)
-
-Also you can click "Try it out" button on services, which requires authentication and browser will prompt a window with user/password field for entering basic auth credentials.
-
-Alternatively you can authenticate outside Swagger (e.g. via an OAuth Provider) which will also let you
-call protected Services in `/swagger-ui`.
-
-## Generating AutoRest client
-
-You can use OpenAPI plugin to automatically generate client using [Autorest](https://github.com/Azure/Autorest). 
-To use AutoRest first install it from npm:
-
-:::sh
-npm install -g autorest
-:::
-
-Then you need to download the Open API specification for your Services using a tool like curl:
-
-:::sh
-curl http://your.domain/openapi > openapi.json
-:::
-
-Or using `iwr` if you have PowerShell installed:
-
-:::sh
-iwr http://your.domain/openapi -o openapi.json
-:::
-
-You can then use the `openapi.json` with autorest to generate a client for your API in your preferred language, e.g:
-
-:::sh
-autorest --latest-release -Input openapi.json -CodeGenerator CSharp -OutputDirectory AutoRestClient -Namespace AutoRestClient
-:::
-
-This will generate directory containing your model types and REST operations that you can use with the 
-generated client, e.g:
-
-```csharp
-using (var client = new SampleProjectAutoRestClient("http://localhost:20000"))
-{
-    var dto = new SampleDto { /* .... */ }; 
-    var result = client.SampleOperation.Post(body: dto);
-
-    // process result
+    public long Id { get; set; }
+    [ValidateNotEmpty]
+    public string Text { get; set; }
+    public bool IsFinished { get; set; }
 }
 ```
 
-AutoRest clients will allow usage of tooling that have adopted AutoRest and is a good stop gap solution for generating
-native clients for languages that [Add ServiceStack Reference](/add-servicestack-reference) doesn't support yet like
-Python and Ruby.
+Previously, we would get a default Swagger UI that enabled all the properties as `Paramters` to populate:
 
-### AutoRest Generated Clients vs Add ServiceStack Reference
+![](/img/pages/openapi/v3/openapi-v2-defaults.png)
 
-However AutoRest generated clients are similar to WCF Service Reference generated clients where it generates RPC-style Clients that emits both implementation logic and models for sending each request that's coupled to external HttpClient 
-and JSON.NET dependencies. This approach generates significantly more code generation that populates a directory containing
-[multiple implementation and Model classes](https://github.com/ServiceStack/ServiceStack/tree/master/tests/ServiceStack.OpenApi.Tests/GeneratedClient)
-generated for each Service.
+While this correctly describes the Request DTO structure, sometimes as developers we get requirements for how we want to present our APIs to our users from within the Swagger UI. 
 
-In contrast [Add ServiceStack Reference](/add-servicestack-reference) adopts the 
-venerable [Data Transfer Object](https://martinfowler.com/eaaCatalog/dataTransferObject.html), 
-[Gateway](https://martinfowler.com/eaaCatalog/gateway.html) and 
-[Remote Facade](https://martinfowler.com/eaaCatalog/remoteFacade.html) Service patterns where it only needs to generate
-clean, implementation-free DTO models that it captures in **a single source file** for all supported languages. 
+With the updated SwaggerUI, and the use of the `Swashbuckle` library, we get the following UI by default:
 
-The generated DTOs are cleaner and more reusable where it isn't coupled to any Serialization implementation and
-can be reused in any of ServiceStack's message-based 
-[Service Clients and Serialization Formats](/csharp-client#httpwebrequest-service-clients)
-or different [Service Gateway](/service-gateway) implementations.
-The models are also richer where it's able to include additional metadata attributes and marker interfaces 
-that isn't possible when tunneling through a generic API specification. 
+![](/img/pages/openapi/v3/openapi-v3-defaults-application-json.png)
 
-The use of intelligent generic Service Clients will always be able to provide a richer more productive development 
-experience that can enable higher-level, value-added functionality like 
-[Structured Error Handling](/error-handling), [Smart HTTP Caching](/cache-aware-clients), 
-[Auto Batching](/auto-batched-requests), [Encrypted Messaging](/auth/encrypted-messaging#encrypted-service-client), 
-[AutoQuery Streaming](/autoquery/rdbms#service-clients-support), 
-[Request Compression](/csharp-client#client--server-request-compression), integrated authentication and lots more.
+These are essentially the same, we have a CRUD Todo API that takes a `UpdateTodo` Request DTO, and returns a `Todo` Response DTO. ServiceStack needs to have uniquely named Request DTOs, so we can't have a `Todo` schema as the Request DTO despite the fact that it is the same structure as our `Todo` model. 
+This is a good thing, as it allows us to have a clean API contract, and separation of concerns between our Request DTOs and our models. 
+However, it might not be desired to present this to our users, since it can be convenient to think about CRUD services as taking the same resource type as the response.
 
-### Known issues
+To achieve this, we use the Swashbuckle library to customize the OpenAPI spec generation. Depending on what you want to customize, you can use the `SchemaFilter` or `OperationFilter` options. In this case, we want to customize the matching operation to reference the `Todo` schema for the Request Body.
 
-Autorest generated clients do not support `application/octet-stream` MIME type, which is used when service returns `byte[]` array. You can track [this issue on Github](https://github.com/Azure/autorest/issues/1932).
+First, we create a new class that implements the `IOperationFilter` interface.
 
-## Publish Azure Management API
+```csharp
+public class OperationRenameFilter : IOperationFilter
+{
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    {
+        if (context.ApiDescription.HttpMethod == "PUT" &&
+            context.ApiDescription.RelativePath == "todos/{Id}")
+        {
+            operation.RequestBody.Content["application/json"].Schema.Reference = 
+                new OpenApiReference {
+                    Type = ReferenceType.Schema,
+                    Id = "Todo"
+                };
+        }
+    }
+}
+```
 
-Login to [Azure Portal](https://portal.azure.com) and search for `API management service`.
+The above matches some information about the `UpdateTodo` request we want to customize, and then sets the `Reference` property of the `RequestBody` to the `Todo` schema.
+We can then add this to the `AddSwaggerGen` options in the `Program.cs` file.
 
-![](./img/pages/azure-api-management/1-search.png)
+```csharp
+builder.Services.AddSwaggerGen(o =>
+{
+    o.OperationFilter<OperationRenameFilter>();
+});
+```
 
-Choose `API management service`. In opened window click `Add` button.
+The result is the following Swagger UI:
 
-![](./img/pages/azure-api-management/2-add.png)
+![](/img/pages/openapi/v3/openapi-v3-customized-application-json.png)
 
-Fill the creation form. Put your own values in `Name`, `Resource Group`, `Organization name` and `Administrator email`. When creation form will be ready, click `Create` button.
+This is just one simple example of how you can customize the OpenAPI spec generation, and `Swashbuckle` has some great documentation on the different ways you can customize the generated spec.
+And these customizations impact any of your ASP.NET Core Endpoints, not just your ServiceStack APIs.
 
-![](./img/pages/azure-api-management/3-create.png)
-
-Wait while Management API will be activated. It can take more than forty minutes. When it ready click on created API management resource.
-
-![](./img/pages/azure-api-management/4-activating.png)
-
-In opened window click `APIs - PREVIEW` menu item on the left pane.
-
-![](./img/pages/azure-api-management/5-publisher-portal.png)
-
-Choose `OpenAPI specification` in `Add API` section.
-
-![](./img/pages/azure-api-management/6-add-api.png)
-
-Fill the url with location of you services, ended with `/openapi` or just click `Upload` button and upload OpenAPI json definition, which is available at `/openapi` path of your services.
-
-![](./img/pages/azure-api-management/7-create-api.png)
-
-After successfull import you should see list of available operations for your services
-
-![](./img/pages/azure-api-management/8-created.png)
-
+Now that ServiceStack APIs can be mapped to standard ASP.NET Core Endpoints, it opens up a lot of possibilities for integrating your 
+ServiceStack APIs into the larger ASP.NET Core ecosystem. 
