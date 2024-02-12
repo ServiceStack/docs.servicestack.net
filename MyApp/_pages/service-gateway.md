@@ -217,8 +217,7 @@ This demonstrates the underpinnings by which we can plug into and intercept all 
 Whether or not Systems 
 [benefit overall from a fine-grained microservices architecture](http://blog.cleancoder.com/uncle-bob/2014/09/19/MicroServicesAndJars.html),
 enough to justify the additional latency, management and infrastructure overhead it requires, we still see 
-value in the development process of
-[designing for Microservices](https://channel9.msdn.com/events/Build/2016/C918) where decoupling naturally 
+value in the development process of designing for Microservices where decoupling naturally 
 isolated components into loosely-coupled subsystems has software-architecture benefits with overall complexity 
 of an entire system being reduced into smaller, more manageable logical scopes which encapsulates their capabilities behind re-usable, 
 [coarse-grained messages to small, well-defined facades](http://stackoverflow.com/a/32940275/85785).
