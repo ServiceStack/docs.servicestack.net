@@ -116,6 +116,13 @@ app.Run();
 Which configures ServiceStack APIs to be registered and executed along-side Minimal APIs, Razor Pages, SignalR, MVC 
 and Web API Controllers, etc, utilizing the same routing, metadata and execution pipeline.
 
+### Migrating to ASP.NET Core Endpoints
+
+To assist ServiceStack users in upgrading their existing projects we've created a migration guide walking through 
+the steps required to adopt these new defaults:
+
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="RaDHkk4tfdU" style="background-image: url('https://img.youtube.com/vi/RaDHkk4tfdU/maxresdefault.jpg')"></lite-youtube>
+
 #### View ServiceStack APIs along-side ASP.NET Core APIs
 
 Amongst other benefits, this integration is evident in endpoint metadata explorers like the `Swashbuckle` library 
