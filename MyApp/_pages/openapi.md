@@ -14,6 +14,8 @@ your ServiceStack APIs to integrate with your wider ASP.NET Core application, op
 This opens up the ability to use common third party tooling to implement application-wide features like OpenAPI v3 specification 
 generation support for your endpoints offered by the `Swashbuckle.AspNetCore` package.
 
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="zAq9hp7ojn4" style="background-image: url('https://img.youtube.com/vi/zAq9hp7ojn4/maxresdefault.jpg')"></lite-youtube>
+
 To make this integration as easy as possible we're maintaining the `ServiceStack.AspNetCore.OpenApi` package to incorporate additional 
 information from your ServiceStack APIs into Swagger metadata.
 
