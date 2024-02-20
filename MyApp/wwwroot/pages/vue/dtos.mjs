@@ -2,7 +2,7 @@
 Date: 2023-06-16 04:45:37
 Version: 6.90
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor-gallery-api.jamstacks.net
+BaseUrl: https://blazor-gallery.jamstacks.net
 
 //AddServiceStackTypes: True
 //AddDocAnnotations: True

@@ -60,7 +60,7 @@ import CustomBooking from "./autoquerygrid/CustomBooking.mjs"
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery-api.jamstacks.net'))
+        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
     },
     components: {
         Responsive,
