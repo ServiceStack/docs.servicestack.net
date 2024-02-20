@@ -3,9 +3,55 @@ slug: corsfeature
 title: CORS Feature
 ---
 
-### Enabling Global CORS support
+### Enable CORS in ASP .NET Core Apps
 
-The **CorsFeature** wraps CORS headers into an encapsulated [Plugin][1] to make it much easier to add CORS support to your ServiceStack services. 
+Optionally .NET Apps can utilize the built-in [ASP.NET CORS Support](https://learn.microsoft.com/en-us/aspnet/core/security/cors) with the mix in:
+
+:::sh
+x mix cors
+:::
+
+This will add the `Configure.Cors.cs` [Modular Startup](/modular-startup) to your Host project which
+can be further customized to support your use-case:
+
+```csharp
+[assembly: HostingStartup(typeof(MyApp.ConfigureCors))]
+
+namespace MyApp;
+
+public class ConfigureCors : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices(services =>
+        {
+            services.AddCors(options => {
+                options.AddDefaultPolicy(policy => {
+                    policy.WithOrigins([
+                        "http://localhost:5000", "https://localhost:5001", "http://localhost:8080",
+                        "https://localhost:5173", "http://localhost:5173",
+                    ])
+                    .AllowCredentials()
+                    .WithHeaders(["Content-Type", "Allow", "Authorization"])
+                    .SetPreflightMaxAge(TimeSpan.FromHours(1));
+                });
+            });
+            services.AddTransient<IStartupFilter, StartupFilter>();
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.UseCors();
+            next(app);
+        };
+    }        
+}
+```
+
+### CORS Feature Plugin
+
+The **CorsFeature** plugin supports all ServiceStack Hosts which wraps CORS headers into an encapsulated [Plugin][1] to make it much easier to add CORS support to your ServiceStack services. 
 
 Commonly this is now all that's needed:
 
