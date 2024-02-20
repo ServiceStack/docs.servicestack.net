@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-02-19T05:25:45.2485148Z'>
+    <meta name='date' content='2024-02-20T09:51:14.1043101Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>CORS Feature</title>
@@ -1341,8 +1341,59 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><h3 id="enabling-global-cors-support">Enabling Global CORS support<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-global-cors-support'" aria-label="Permalink"> </a></h3>
-<p>The <strong>CorsFeature</strong> wraps CORS headers into an encapsulated <a href="/plugins">Plugin</a> to make it much easier to add CORS support to your ServiceStack services.</p>
+                <div class="content"><h3 id="enable-cors-in-asp.net-core-apps">Enable CORS in ASP .NET Core Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#enable-cors-in-asp.net-core-apps'" aria-label="Permalink"> </a></h3>
+<p>Optionally .NET Apps can utilize the built-in <a href="https://learn.microsoft.com/en-us/aspnet/core/security/cors">ASP.NET CORS Support</a> with the mix in:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix cors</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>This will add the <code>Configure.Cors.cs</code> <a href="/modular-startup">Modular Startup</a> to your Host project which
+can be further customized to support your use-case:</p>
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureCors))]
+
+namespace MyApp;
+
+public class ConfigureCors : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices(services =&gt;
+        {
+            services.AddCors(options =&gt; {
+                options.AddDefaultPolicy(policy =&gt; {
+                    policy.WithOrigins([
+                        &quot;http://localhost:5000&quot;, &quot;https://localhost:5001&quot;, &quot;http://localhost:8080&quot;,
+                        &quot;https://localhost:5173&quot;, &quot;http://localhost:5173&quot;,
+                    ])
+                    .AllowCredentials()
+                    .WithHeaders([&quot;Content-Type&quot;, &quot;Allow&quot;, &quot;Authorization&quot;])
+                    .SetPreflightMaxAge(TimeSpan.FromHours(1));
+                });
+            });
+            services.AddTransient&lt;IStartupFilter, StartupFilter&gt;();
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action&lt;IApplicationBuilder&gt; Configure(Action&lt;IApplicationBuilder&gt; next) =&gt; app =&gt;
+        {
+            app.UseCors();
+            next(app);
+        };
+    }        
+}
+</code></pre>
+<h3 id="cors-feature-plugin">CORS Feature Plugin<a class="header-anchor" href="javascript:;" onclick="location.hash='#cors-feature-plugin'" aria-label="Permalink"> </a></h3>
+<p>The <strong>CorsFeature</strong> plugin supports all ServiceStack Hosts which wraps CORS headers into an encapsulated <a href="/plugins">Plugin</a> to make it much easier to add CORS support to your ServiceStack services.</p>
 <p>Commonly this is now all that's needed:</p>
 <pre><code class="language-csharp">Plugins.Add(new CorsFeature());
 </code></pre>

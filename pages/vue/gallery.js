@@ -5,7 +5,7 @@ import * as Vue from "vue"
 
 export function createApp(App, props) {
     
-    const client = JsonApiClient.create('https://blazor-gallery-api.jamstacks.net/')
+    const client = JsonApiClient.create('https://blazor-gallery.jamstacks.net/')
     
     const app = Vue.createApp(App)
     app.provide('client', client)
