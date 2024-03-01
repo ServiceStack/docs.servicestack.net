@@ -75,10 +75,10 @@ Technical Preview. Luckily this feature can be polyfilled with the pre-configure
 Then register the `@servicestack/vue` component library with your Vue app with:
 
 ```js
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import ServiceStackVue from "@servicestack/vue"
 
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 
 const app = createApp(component, props)
 app.provide('client', client)

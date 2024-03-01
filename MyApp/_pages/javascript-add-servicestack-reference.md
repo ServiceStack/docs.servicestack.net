@@ -18,10 +18,10 @@ Then to make typed API Requests from web pages, you need only need to reference 
 
 ```html
 <script type="module">
-import { JsonApiClient } from 'https://unpkg.com/@servicestack/client@2/dist/servicestack-client.min.mjs'
+import { JsonServiceClient } from 'https://unpkg.com/@servicestack/client@2/dist/servicestack-client.min.mjs'
 import { Hello } from '/types/mjs'
 
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 
 const api = client.api(new Hello({ name:'World' }))
 if (api.succeeded) {
@@ -72,10 +72,10 @@ This lets us reference the **@servicestack/client** package name in our source c
 
 ```html
 <script type="module">
-import { JsonApiClient, $1, on } from '@servicestack/client'
+import { JsonServiceClient, $1, on } from '@servicestack/client'
 import { Hello } from '/types/mjs'
 
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 on('#txtName', {
     async keyup(el) {
         const api = await client.api(new Hello({ name:el.target.value }))

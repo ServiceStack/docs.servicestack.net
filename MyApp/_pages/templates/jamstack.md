@@ -258,9 +258,9 @@ The `/api` route is particularly useful in Jamstack Apps as the 2 ways to call b
 ### Configuring in TypeScript
 
 ```ts
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 
-const client = JsonApiClient.create(baseUrl)
+const client = new JsonServiceClient(baseUrl)
 ```
 
 It also benefits the **alternative method** to CORS in only needing to define a **single reverse proxy rule** on the CDN host to proxy all API requests to downstream back-end servers.

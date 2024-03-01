@@ -52,9 +52,9 @@ import { Hello } from "./dtos.mjs"
 Either solution gives you the same productive end-to-end Typed API access, e.g:
 
 ```ts
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 
-const client = JsonApiClient.create(baseUrl)
+const client = new JsonServiceClient()
 
 const api = await client.api(new Hello({ Name: 'World' }))
 if (api.succeeded) {
@@ -105,9 +105,9 @@ This lets your source code reference the library by package name to enable using
 
 ```html
 <script type="module">
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 
-const client = JsonApiClient.create(baseUrl)
+const client = new JsonServiceClient()
 
 const api = await client.api(new Hello({ Name: 'World' }))
 </script>
@@ -151,18 +151,18 @@ enable access using old-style `<script>` includes.
 
 ## JsonServiceClient
 
-To create `JsonServiceClient` instances in v6+ projects using the [JSON /api route](/routing#json-api-pre-defined-route) use:
+To create `JsonServiceClient` instances in v6+ projects using the [JSON /api route](/endpoint-routing#api-pre-defined-route) use:
 
 ```js
-const client = JsonApiClient.create(baseUrl)
+const client = new JsonServiceClient(baseUrl)
 ```
 
 Where it's configured to not use any JSON HTTP Headers to enable more efficient CORS requests without preflight requests.
 
-Alternatively all other projects can use the default constructor:
+Alternatively if needed you can use `useBasePath()` to revert back to using legacy `/json/reply` pre-defined Routes:
 
 ```js
-const client = new JsonServiceClient(baseUrl)
+const client = new JsonServiceClient(baseUrl).useBasePath()
 ```
 
 ### API Reference

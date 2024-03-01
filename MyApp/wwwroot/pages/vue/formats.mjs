@@ -1,4 +1,4 @@
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { useFormatters } from "@servicestack/vue"
 import { tracks, players } from "./data.mjs"
 
@@ -17,7 +17,7 @@ function classes(type, tag,depth,cls,index) {
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
     },

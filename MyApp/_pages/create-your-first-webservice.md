@@ -165,10 +165,10 @@ This lets us reference the **@servicestack/client** package name in our source c
 
 ```html
 <script type="module">
-import { JsonApiClient, $1, on } from '@servicestack/client'
+import { JsonServiceClient, $1, on } from '@servicestack/client'
 import { Hello } from '/types/mjs'
 
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 on('#txtName', {
     async keyup(el) {
         const api = await client.api(new Hello({ name:el.target.value }))
@@ -231,11 +231,11 @@ The same TypeScript [JsonServiceClient](/javascript-client) can also be used in 
 </template>
 
 <script setup lang="ts">
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { Hello } from "@/dtos"
 
 const props = defineProps<{ name: string }>()
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 
 const api = client.api(new Hello({ name: props.name }))
 </script>

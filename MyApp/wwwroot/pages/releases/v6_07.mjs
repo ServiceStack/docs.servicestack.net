@@ -1,12 +1,12 @@
 import { onMounted, ref } from "vue"
 import { Authenticate } from "../vue/dtos.mjs"
 import { fetchBookings, tracks, setMetadata } from "../vue/data.mjs"
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { useAuth, useClient } from '@servicestack/vue'
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
     },

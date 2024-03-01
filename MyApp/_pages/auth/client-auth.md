@@ -8,9 +8,9 @@ Typically when using ServiceStack's **@servicestack/client** `JsonServiceClient`
 cookies where you'll be able to make authenticated requests as the currently Authenticated User in your Application: 
 
 ```ts
-import { JsonApiClient } from "@servicestack/client";
+import { JsonServiceClient } from "@servicestack/client";
 
-const client = JsonApiClient.create();
+const client = new JsonServiceClient()
 
 // Uses browser's authenticated cookies by default
 const api = await client.api(new Secured())
@@ -19,9 +19,9 @@ const api = await client.api(new Secured())
 Alternatively you can also authenticate with JavaScript by sending an  `Authenticate` Request, e.g:
 
 ```ts
-import { JsonApiClient } from "@servicestack/client";
+import { JsonServiceClient } from "@servicestack/client";
 
-const client = JsonApiClient.create();
+const client = new JsonServiceClient()
 
 const apiAuth = await client.api(new Authenticate({ provider:'credentials', userName, password }))
 

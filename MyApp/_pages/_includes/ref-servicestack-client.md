@@ -4,10 +4,10 @@ HTML and VanillaJS Web Apps can use the built-in [ES Modules @servicestack/clien
 
 ```html
 <script type="module">
-import { JsonApiClient } from '/js/servicestack-client.mjs'
+import { JsonServiceClient } from '/js/servicestack-client.mjs'
 import { Hello } from '/types/mjs'
 
-const client = JsonApiClient.create()
+const client = new JsonServiceClient()
 async function callHello() {
     const api = await client.api(new Hello)
     if (api.succeeded) {
