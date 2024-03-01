@@ -109,10 +109,11 @@ the above is a short-hand for `new HttpError(HttpStatusCode.NotFound, $"User {re
 
 For more complex validation and to be able to return multiple validation errors ServiceStack includes the excellent [Fluent Validation](https://github.com/JeremySkinner/FluentValidation) library by [@JeremySkinner](http://twitter.com/JeremySkinner) - a very clean and DSL-like way to validate request DTOs. Even contextual validation for each HTTP method (GET, POST, ...) is supported.
 
-ServiceStack's Fluent Validation feature is encapsulated in the `ValidationFeature` plugin which can be registered in your AppHost with:
+ServiceStack's Fluent Validation feature is encapsulated in the `ValidationFeature` plugin which is registered by default,
+it can be removed with:
 
 ```csharp
-Plugins.Add(new ValidationFeature());
+Plugins.RemoveAll(x => x is ValidationFeature);
 ```
 
 ### FluentValidation for request dtos
@@ -231,8 +232,8 @@ The `ValidationFeature` plugin automatically scans and auto-wires all validators
 This default behavior can be **disabled** with:
 
 ```csharp
-Plugins.Add(new ValidationFeature {
-    ScanAppHostAssemblies = false
+appHost.ConfigurePlugin<ValidationFeature>(feature => {
+    feature.ScanAppHostAssemblies = false;
 });
 ```
 
