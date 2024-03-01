@@ -1,11 +1,11 @@
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import ServiceStackVue, { useMetadata } from "@servicestack/vue"
 
 import * as Vue from "vue"
 
 export function createApp(App, props) {
     
-    const client = JsonApiClient.create('https://blazor-gallery.jamstacks.net/')
+    const client = new JsonServiceClient('https://blazor-gallery.jamstacks.net/')
     
     const app = Vue.createApp(App)
     app.provide('client', client)

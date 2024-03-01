@@ -1,5 +1,5 @@
 import { createApp, reactive, ref } from "vue"
-import { JsonApiClient, $1, $$ } from "@servicestack/client"
+import { JsonServiceClient, $1, $$ } from "@servicestack/client"
 import ServiceStackVue from "@servicestack/vue"
 import HelloApi from "./components/HelloApi.mjs"
 import GettingStarted from "./components/GettingStarted.mjs"
@@ -116,7 +116,7 @@ export function mountAll() {
 /** @param {any} [exports] */
 export function init(exports) {
     if (AppData.init) return
-    client = JsonApiClient.create()
+    client = new JsonServiceClient()
     AppData = reactive(AppData)
     AppData.init = true
     mountAll()

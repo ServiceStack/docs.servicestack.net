@@ -1,13 +1,13 @@
 import { onMounted } from "vue"
 import { Authenticate } from "./dtos.mjs"
 import { useAuth, useClient } from '@servicestack/vue'
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import Responsive from "./autoquerygrid/Responsive.mjs"
 import CustomBooking from "./autoquerygrid/CustomBooking.mjs"
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
         Responsive,

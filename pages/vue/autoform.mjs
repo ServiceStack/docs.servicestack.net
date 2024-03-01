@@ -1,5 +1,5 @@
 import { ref, computed, onMounted, provide } from "vue"
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { useClient, useMetadata } from "@servicestack/vue"
 import { QueryBookings, UpdateBooking } from "./dtos.mjs"
 import { fetchBookings } from "./data.mjs"
@@ -55,7 +55,7 @@ export const Fields = {
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: { Fields },
     setup() {

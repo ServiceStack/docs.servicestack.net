@@ -1,11 +1,11 @@
 import { ref } from "vue"
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { QueryBookings } from "./dtos.mjs"
 import { allContacts, files } from "./data.mjs"
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
     },

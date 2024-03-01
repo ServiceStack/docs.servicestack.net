@@ -1,8 +1,8 @@
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
     },

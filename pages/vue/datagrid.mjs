@@ -4,7 +4,7 @@ import { ref, provide, inject, onMounted } from "vue"
 import { Authenticate, Booking } from "./dtos.mjs"
 import { fetchBookings, tracks } from "./data.mjs"
 import { useAuth, useClient, useFormatters } from '@servicestack/vue'
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { forecasts } from './data.mjs'
 
 export const Default = {
@@ -91,7 +91,7 @@ export const Responsive = {
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
         Default,

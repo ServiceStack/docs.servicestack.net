@@ -1,5 +1,5 @@
 import { ref, computed, onMounted, provide, watchEffect } from "vue"
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { useAuth, useClient, useMetadata } from "@servicestack/vue"
 import { DeleteBooking, QueryBookings, UpdateBooking, UpdateContact } from "./dtos.mjs"
 import { tracks, allContacts, files, fetchBookings } from "./data.mjs"
@@ -136,7 +136,7 @@ export const TagInputExamples = {
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
         //AutocompleteExamples,

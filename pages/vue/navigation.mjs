@@ -1,4 +1,4 @@
-import { JsonApiClient } from "@servicestack/client"
+import { JsonServiceClient } from "@servicestack/client"
 import { Icons } from "./data.mjs"
 
 export const NavListExamples = {
@@ -23,7 +23,7 @@ const C = { template:`<h3 class="text-center text-2xl">C Tab Body</h3>` }
 
 export default {
     install(app) {
-        app.provide('client', JsonApiClient.create('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
     },
     components: {
     },
