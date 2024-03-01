@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-03-01T05:43:43.3394764Z'>
+    <meta name='date' content='2024-03-01T12:47:01.2823000Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Validation and Error Handling</title>
@@ -1414,8 +1414,9 @@ catch (WebServiceException webEx)
 <p>the above is a short-hand for <code>new HttpError(HttpStatusCode.NotFound, $&quot;User {request.Name} does not exist&quot;)</code> which returns a <strong>404</strong> NotFound StatusCode on the wire.</p>
 <h2 id="validation-feature">Validation Feature<a class="header-anchor" href="javascript:;" onclick="location.hash='#validation-feature'" aria-label="Permalink"> </a></h2>
 <p>For more complex validation and to be able to return multiple validation errors ServiceStack includes the excellent <a href="https://github.com/JeremySkinner/FluentValidation">Fluent Validation</a> library by <a href="http://twitter.com/JeremySkinner">@JeremySkinner</a> - a very clean and DSL-like way to validate request DTOs. Even contextual validation for each HTTP method (GET, POST, ...) is supported.</p>
-<p>ServiceStack's Fluent Validation feature is encapsulated in the <code>ValidationFeature</code> plugin which can be registered in your AppHost with:</p>
-<pre><code class="language-csharp">Plugins.Add(new ValidationFeature());
+<p>ServiceStack's Fluent Validation feature is encapsulated in the <code>ValidationFeature</code> plugin which is registered by default,
+it can be removed with:</p>
+<pre><code class="language-csharp">Plugins.RemoveAll(x =&gt; x is ValidationFeature);
 </code></pre>
 <h3 id="fluentvalidation-for-request-dtos">FluentValidation for request dtos<a class="header-anchor" href="javascript:;" onclick="location.hash='#fluentvalidation-for-request-dtos'" aria-label="Permalink"> </a></h3>
 <p>The example below uses this request dto for validation:</p>
@@ -1510,8 +1511,8 @@ call a custom Async <code>GetStringLength</code> Service that returns the same <
 <h3 id="register-validators">Register Validators<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-validators'" aria-label="Permalink"> </a></h3>
 <p>The <code>ValidationFeature</code> plugin automatically scans and auto-wires all validators in the <code>AppHost.ServiceAssemblies</code> that's injected in the <code>AppHost</code> constructor.</p>
 <p>This default behavior can be <strong>disabled</strong> with:</p>
-<pre><code class="language-csharp">Plugins.Add(new ValidationFeature {
-    ScanAppHostAssemblies = false
+<pre><code class="language-csharp">appHost.ConfigurePlugin&lt;ValidationFeature&gt;(feature =&gt; {
+    feature.ScanAppHostAssemblies = false;
 });
 </code></pre>
 <p>Otherwise if the validators are in other assembles they can be registered using <code>RegisterValidators()</code>, e.g:</p>
