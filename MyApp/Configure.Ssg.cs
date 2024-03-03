@@ -3,7 +3,6 @@ using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ServiceStack.IO;
-using ServiceStack.Logging;
 using ServiceStack.Text;
 
 [assembly: HostingStartup(typeof(MyApp.ConfigureSsg))]
@@ -18,7 +17,9 @@ public class ConfigureSsg : IHostingStartup
             context.Configuration.GetSection(nameof(AppConfig)).Bind(AppConfig.Instance);
             services.AddSingleton(AppConfig.Instance);
             services.AddSingleton<RazorPagesEngine>();
+            services.AddSingleton<MarkdownIncludes>();
             services.AddSingleton<MarkdownPages>();
+            services.AddSingleton<MarkdownWhatsNew>();
             services.AddSingleton<MarkdownVideos>();
             services.AddSingleton<MarkdownMeta>();
         })
@@ -41,14 +42,17 @@ public class ConfigureSsg : IHostingStartup
                     }
                 });
 
+                var includes = appHost.Resolve<MarkdownIncludes>();
                 var pages = appHost.Resolve<MarkdownPages>();
+                var whatsNew = appHost.Resolve<MarkdownWhatsNew>();
                 var videos = appHost.Resolve<MarkdownVideos>();
                 var meta = appHost.Resolve<MarkdownMeta>();
 
-                meta.Features = new() { pages, videos };
-                meta.Features.ForEach(x => x.VirtualFiles = appHost.VirtualFiles);
+                meta.Features = [pages, whatsNew, videos];
                 
+                includes.LoadFrom("_includes");
                 pages.LoadFrom("_pages");
+                whatsNew.LoadFrom("_whatsnew");
                 videos.LoadFrom("_videos");
                 AppConfig.Instance.GitPagesBaseUrl ??= ResolveGitBlobBaseUrl(appHost.ContentRootDirectory);
             },
@@ -64,7 +68,6 @@ public class ConfigureSsg : IHostingStartup
                     var distDir = appHost.ContentRootDirectory.RealPath.CombineWith("dist");
                     if (Directory.Exists(distDir))
                         FileSystemVirtualFiles.DeleteDirectory(distDir);
-
                     FileSystemVirtualFiles.CopyAll(
                         new DirectoryInfo(appHost.ContentRootDirectory.RealPath.CombineWith("wwwroot")),
                         new DirectoryInfo(distDir));
@@ -72,12 +75,12 @@ public class ConfigureSsg : IHostingStartup
                     // Render .html redirect files
                     RazorSsg.PrerenderRedirectsAsync(appHost.ContentRootDirectory.GetFile("redirects.json"), distDir)
                         .GetAwaiter().GetResult();
-                    
+
                     var razorFiles = appHost.VirtualFiles.GetAllMatchingFiles("*.cshtml");
                     RazorSsg.PrerenderAsync(appHost, razorFiles, distDir).GetAwaiter().GetResult();
                 });
             });
-
+    
     private string? ResolveGitBlobBaseUrl(IVirtualDirectory contentDir)
     {
         var srcDir = new DirectoryInfo(contentDir.RealPath);
