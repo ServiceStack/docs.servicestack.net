@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-03-01T12:47:00.6145484Z'>
+    <meta name='date' content='2024-03-03T20:01:21.9324329Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Auto Batched Requests</title>
@@ -1343,7 +1343,7 @@ mount('#header', Header)
 
                 <div class="content"><p>One of the best ways to improve performance, efficiency and reduce latency is to minimize the number of network requests required, which is one of the reasons we've always encouraged <a href="/why-servicestack#servicestack-encourages-development-of-message-style-re-usable-and-batch-full-web-services">Coarse-grained API designs</a> - which also lend themselves to better encapsulation and re-use.</p>
 <p>A common use-case that can be improved are clients making multiple requests to the same API, but due to the lack of a better alternative batched API or control over the server implementation, will default to making multiple N+1 web service requests.</p>
-<h2 id="all-services-support-batching">All Services support Batching<a class="header-anchor" href="javascript:;" onclick="location.hash='#all-services-support-batching'" aria-label="Permalink"> </a></h2>
+<h2 id="all-services-support-batching">All Services support Batching<a class="header-anchor" href="javascript:;" onclick="location.hash='#all-services-support-batching'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Thanks to it's <a href="/advantages-of-message-based-web-services">message-based design</a>, ServiceStack is able to enable high-level generic functionality like Request Batching which is now implicitly available for all Services, without any additional effort - where multiple requests of the same type can be sent together in a single HTTP Request.</p>
 <p>This is enabled in all <a href="/csharp-client">.NET Service Clients</a> via the new <code>SendAll()</code> and <code>SendAllOneWay()</code> API's, e.g:</p>
 <pre><code class="language-csharp">var client = new JsonServiceClient(BaseUrl);
@@ -1369,10 +1369,10 @@ one of the Requests threw an Exception it will contain the number of requests th
     }
 }
 </code></pre>
-<h2 id="request-execution-flow">Request Execution Flow<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-execution-flow'" aria-label="Permalink"> </a></h2>
+<h2 id="request-execution-flow">Request Execution Flow<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-execution-flow'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>From the Service's point of view nothing changes. Request DTO's still get executed one at a time, through all existing filters just as if they we're sent on their own. They're just delivered together within a single HTTP Request, in this case POST'ed as JSON to the <code>/json/reply/Request[]</code> <a href="/routing#pre-defined-routes">pre-defined route</a>:</p>
 <p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/auto-batched-requests.png" alt="Auto Batched Requests" /></p>
-<h2 id="custom-batched-requests-implementations">Custom Batched Requests Implementations<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-batched-requests-implementations'" aria-label="Permalink"> </a></h2>
+<h2 id="custom-batched-requests-implementations">Custom Batched Requests Implementations<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-batched-requests-implementations'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>If a client was previously calling the same API 100 times, the existing overhead of 100 HTTP Requests would be reduced to just <strong>1 HTTP Request</strong> when batched. Although the above Service would still be calling Redis 100 times to store each Response.</p>
 <p>If later this API has become really hot and you want to improve it even further, you can later add a custom implementation that accepts a <code>Request[]</code> and it will only get called once, with access to all the Request DTO's together. In this case we can use a custom implementation and take advantage of Redis's own batched API's and reduce this further to 1 Redis operation:</p>
 <pre><code class="language-csharp">public class MyServices : Service
@@ -1416,7 +1416,7 @@ one of the Requests threw an Exception it will contain the number of requests th
 }
 </code></pre>
 <p>Just like with normal Batched Requests, Custom Batched implementations are still executed one at a time through all request/response filters, taking advantage of any existing logic/validation.</p>
-<h2 id="defining-a-request-dto-to-accept-a-collection-of-types">Defining a Request DTO to accept a collection of Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#defining-a-request-dto-to-accept-a-collection-of-types'" aria-label="Permalink"> </a></h2>
+<h2 id="defining-a-request-dto-to-accept-a-collection-of-types">Defining a Request DTO to accept a collection of Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#defining-a-request-dto-to-accept-a-collection-of-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>If you instead only wanted multiple Requests to be treated as a single Request through the entire pipeline you can create a new Request DTO that inherits from <code>List&lt;TRequest&gt;</code> which then gets treated as a normal Request DTO e, g:</p>
 <pre><code class="language-csharp">public class Requests : List&lt;Request&gt; {}
 
@@ -1432,7 +1432,7 @@ public class MyServices : Service
 }
 </code></pre>
 <p>More examples of Auto Batched Requests and its behavior can be found in the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/ReplyAllTests.cs">ReplyAllTests suite</a>.</p>
-<h2 id="auto-batch-index">Auto Batch Index<a class="header-anchor" href="javascript:;" onclick="location.hash='#auto-batch-index'" aria-label="Permalink"> </a></h2>
+<h2 id="auto-batch-index">Auto Batch Index<a class="header-anchor" href="javascript:;" onclick="location.hash='#auto-batch-index'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The current index of the Auto Batched Request being processed is now being maintained in <code>IRequest.Items[Keywords.AutoBatchIndex]</code>.</p>
 <p>In Error Responses the index of the request that failed is now being populated in your Response DTO's <code>ResponseStatus.Meta[&quot;AutoBatchIndex&quot;]</code>.</p>
 <p>To also maintain the active <code>AutoBatchIndex</code> in <a href="#custom-batched-requests-implementations">Custom Batched Requests Implementations</a>
@@ -1453,11 +1453,6 @@ you can use the <code>IRequest.EachRequest()</code> extension method, e.g:</p>
 
                 <div class="not-prose"></div>
                 
-                    <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/auto-batched-requests.md" target="_blank" rel="noopener noreferrer">
-                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
-                        </a>
-                    </div>
 
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">

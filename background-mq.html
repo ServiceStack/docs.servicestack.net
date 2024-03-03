@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-03-01T12:47:00.6397719Z'>
+    <meta name='date' content='2024-03-03T20:01:21.9562758Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Background MQ Service</title>
@@ -1343,7 +1343,7 @@ mount('#header', Header)
 
                 <div class="content"><p>The <code>BackgroundMqService</code> is a full-featured <code>IMessageService</code> implementation that provides the functionality of <a href="/messaging">distributed MQ Server</a> but doesn't require any infrastructure dependencies. It's ideal for <strong>queueing long-running background tasks</strong> by publishing Request DTOs, control execution throughput by creating different sized Thread Pools per message type, inspect the status and statistics of different MQ Workers, stop and restart processing messages, etc. It's a complete implementation implementing the same <a href="/messaging#message-workflow">MQ Message flow</a> and passes the existing MQ Test suites so you'll be able to substitute it for any of the other MQ Servers. But it still doesn't persist messages across App restarts so we recommend using it in combination with persistence to an external data source - generally a good idea for tracking the status of long-running jobs.</p>
 <p>To illustrate an example we'll walkthrough TechStacks implementation of what's likely the most popular use of background job in Web Apps - sending emails...</p>
-<h2 id="using-background-service-to-send-emails">Using Background Service to send Emails<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-background-service-to-send-emails'" aria-label="Permalink"> </a></h2>
+<h2 id="using-background-service-to-send-emails">Using Background Service to send Emails<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-background-service-to-send-emails'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Configuring the <code>BackgroundMqService</code> is the same as every other MQ Server, i.e. register it in the IOC and register handlers for the Request DTO of each Service you want to be able to run in the background:</p>
 <pre><code class="language-csharp">container.Register&lt;IMessageService&gt;(c =&gt; new BackgroundMqService());
 var mqServer = container.Resolve&lt;IMessageService&gt;();
@@ -1533,7 +1533,7 @@ private async Task RecordEmailSentToUser(long notificationId, int userId)
         WHERE id = @id&quot;, new { userId, id = notificationId });
 }
 </code></pre>
-<h2 id="replaying-messages">Replaying Messages<a class="header-anchor" href="javascript:;" onclick="location.hash='#replaying-messages'" aria-label="Permalink"> </a></h2>
+<h2 id="replaying-messages">Replaying Messages<a class="header-anchor" href="javascript:;" onclick="location.hash='#replaying-messages'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The <code>RetryPendingNotifications</code> Service replays incomplete notifications by publishing new <code>SendNotification</code> messages which are executed by the <code>BackgroundMqService</code> as normal.
 This also lets you replay failed notifications by setting <code>Failed</code> to <code>null</code> and recalling the Service. As the state of each task is persisted after each step, it can fail at any point and the replayed task will be able to restart where it left off.</p>
 <pre><code class="language-csharp">public object Any(RetryPendingNotifications request)
@@ -1558,7 +1558,7 @@ This also lets you replay failed notifications by setting <code>Failed</code> to
     };
 }
 </code></pre>
-<h2 id="mq-status">MQ Status<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-status'" aria-label="Permalink"> </a></h2>
+<h2 id="mq-status">MQ Status<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-status'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The other benefit from persisting the status of each tasks is being able to inspect the <code>Notification</code> and <code>EmailTemplate</code> table to be able to monitor the progress of each Task.</p>
 <p>We can also call the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Messaging/IMessageService.cs">IMessageService</a> APIs to inspect the state of the Background MQ Service. We can use the Service below to make the APIs accessible remotely:</p>
 <pre><code class="language-csharp">[Route(&quot;/mq/stop&quot;)]  // Stop the Background Service and all MQ Workers from processing more messages
@@ -1698,7 +1698,7 @@ STATS for SendSystemEmail:
   LastMessageProcessed:           4/9/18 7:44:47 PM
 ------------------------------
 </code></pre>
-<h3 id="mq-collection-stats">MQ Collection Stats<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-collection-stats'" aria-label="Permalink"> </a></h3>
+<h3 id="mq-collection-stats">MQ Collection Stats<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-collection-stats'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>You can also get info on the Queue Collection for a specific DTO Type with:</p>
 <pre><code class="language-csharp">var bgService = (BackgroundMqService)HostContext.Resolve&lt;IMessageService&gt;();
 var mqCollection = bgService.GetCollection(typeof(Poco));
@@ -1730,11 +1730,6 @@ List&lt;IMessageHandlerStats&gt; stats = workers.Map(x =&gt; x.GetStats());
 
                 <div class="not-prose"></div>
                 
-                    <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/background-mq.md" target="_blank" rel="noopener noreferrer">
-                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
-                        </a>
-                    </div>
 
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
