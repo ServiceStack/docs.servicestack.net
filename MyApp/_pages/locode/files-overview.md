@@ -36,13 +36,18 @@ uses to handle profile image uploads for Contacts and Users in different locatio
 [Configure.AppHost.cs](https://github.com/NetCoreApps/TalentBlazor/blob/main/TalentBlazor/Configure.AppHost.cs):
 
 ```csharp
-var wwwrootVfs = GetVirtualFileSource<FileSystemVirtualFiles>();
-Plugins.Add(new FilesUploadFeature(
-    new UploadLocation("profiles", wwwrootVfs, allowExtensions:FileExt.WebImages,
-        resolvePath: ctx => $"/profiles/{ctx.FileName}"),
-
-    new UploadLocation("users", wwwrootVfs, allowExtensions:FileExt.WebImages,
-        resolvePath: ctx => $"/profiles/users/{ctx.UserAuthId}.{ctx.FileExtension}"));
+.ConfigureServices((context, services) =>
+{
+    // Configure ASP.NET Core IOC Dependencies
+    var wwwrootVfs = new FileSystemVirtualFiles(context.HostingEnvironment.WebRootPath);
+    services.AddPlugin(new FilesUploadFeature(
+        new UploadLocation("profiles", wwwrootVfs, allowExtensions:FileExt.WebImages,
+            resolvePath: ctx => $"/profiles/{ctx.FileName}"),
+        new UploadLocation("users", wwwrootVfs, allowExtensions:FileExt.WebImages,
+            resolvePath: ctx => $"/profiles/users/{ctx.UserAuthId}.{ctx.FileExtension}"),
+        //...
+    ));
+});
 ```
 
 As both locations are uploaded to the App's `/wwwroot` folder they'll be immediately accessible after they're uploaded.
@@ -158,15 +163,19 @@ is needed for this use-case, that:
  - Allows **non-authenticated Users** to upload & download their attachments
 
 ```csharp
-var appDataVfs = new FileSystemVirtualFiles(ContentRootDirectory.RealPath.CombineWith("App_Data"));
-Plugins.Add(new FilesUploadFeature(
-    //...
-    new UploadLocation("applications", appDataVfs, maxFileCount: 3, maxFileBytes: 10_000_000,
-        resolvePath: ctx => ctx.GetLocationPath((ctx.Dto is CreateJobApplication create
-            ? $"jobapp/{create.JobId}/{create.ContactId}/{ctx.FileName}"
-            : $"app/{ctx.Dto.GetId()}") + $"/{ctx.DateSegment}/{ctx.FileName}"),
-        readAccessRole: RoleNames.AllowAnon, writeAccessRole: RoleNames.AllowAnon)
-));
+.ConfigureServices((context, services) =>
+{
+    // Configure ASP.NET Core IOC Dependencies
+    var appDataVfs = new FileSystemVirtualFiles(context.HostingEnvironment.ContentRootPath.CombineWith("App_Data").AssertDir());
+    services.AddPlugin(new FilesUploadFeature(
+        //...
+        new UploadLocation("applications", appDataVfs, maxFileCount: 3, maxFileBytes: 10_000_000,
+            resolvePath: ctx => ctx.GetLocationPath((ctx.Dto is CreateJobApplication create
+                    ? $"jobapp/{create.JobId}/{create.ContactId}/{ctx.FileName}"
+                    : $"app/{ctx.Dto.GetId()}") + $"/{ctx.DateSegment}/{ctx.FileName}"),
+            readAccessRole: RoleNames.AllowAnon, writeAccessRole: RoleNames.AllowAnon)
+    ));
+});
 ```
 
 In this case instead of resolving a relative path from `/wwwroot` it uses `ctx.GetLocationPath()` to resolve to a managed 
@@ -471,39 +480,72 @@ Virtual Files providers that's still able to utilize the same custom configurati
 [Configure.AppHost.cs](https://github.com/NetCoreApps/FileBlazor/blob/main/FileBlazor/Configure.AppHost.cs):
 
 ```csharp
-var appFs = new FileSystemVirtualFiles(ContentRootDirectory.RealPath.CombineWith("App_Data").AssertDir());
-var s3Client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1);
-var s3DataVfs = new S3VirtualFiles(s3Client, "file-blazor-demo");
-var azureBlobVfs = new AzureBlobVirtualFiles(azureBlobConnString, "file-blazor-demo");
-
-Plugins.Add(new FilesUploadFeature(
-    new UploadLocation("azure", azureBlobVfs,
-        readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
-        validateUpload: ValidateUpload, validateDownload: ValidateDownload),
-    new UploadLocation("s3", s3DataVfs,
-        readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
-        validateUpload: ValidateUpload, validateDownload: ValidateDownload),
-    new UploadLocation("fs", appFs,
-        readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
-        validateUpload: ValidateUpload, validateDownload: ValidateDownload)
-));
-
-static string ResolveUploadPath(FilesUploadContext ctx) =>
-    ctx.Dto is IAppFile { FileAccessType: { } } createFile
-        ? createFile.FileAccessType != FileAccessType.Private
-            ? ctx.GetLocationPath($"/{createFile.FileAccessType}/{ctx.FileName}")
-            : ctx.GetLocationPath($"/{createFile.FileAccessType}/{ctx.UserAuthId}/{ctx.FileName}")
-        : throw HttpError.BadRequest("Invalid file creation request.");
-
-static void ValidateUpload(IRequest request, IHttpFile file)
+.ConfigureServices((context, services) =>
 {
-    if (request.Dto is IAppFile createFile)
+    // Configure ASP.NET Core IOC Dependencies
+    //...
+    var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID") ??
+                         Environment.GetEnvironmentVariable("LOCAL_AWS_ACCESS_KEY_ID");
+    var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY") ??
+                             Environment.GetEnvironmentVariable("LOCAL_AWS_SECRET_ACCESS_KEY");
+    var azureBlobConnString = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING") ??
+                              Environment.GetEnvironmentVariable("LOCAL_AZURE_BLOB_CONNECTION_STRING");
+
+    var appFs = new FileSystemVirtualFiles(context.HostingEnvironment.ContentRootPath.CombineWith("App_Data").AssertDir());
+    var s3Client = new AmazonS3Client(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.USEast1);
+    var s3DataVfs = new S3VirtualFiles(s3Client, "file-blazor-demo");
+
+    if(string.IsNullOrEmpty(azureBlobConnString))
+        Log.Warn("Started without Azure Blob Storage configured.");
+    
+    var uploadLocations = new[] {
+        new UploadLocation("s3", s3DataVfs,
+            readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
+            validateUpload: ValidateUpload, validateDownload: ValidateDownload,
+            maxFileBytes: 10 * 1024 * 1024),
+        new UploadLocation("fs", appFs,
+            readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
+            validateUpload: ValidateUpload, validateDownload: ValidateDownload,
+            maxFileBytes: 10 * 1024 * 1024),
+        // User profiles
+        new UploadLocation("users", appFs, allowExtensions: FileExt.WebImages,
+            resolvePath: ctx => $"/profiles/users/{ctx.UserAuthId}.{ctx.FileExtension}",
+            maxFileBytes: 10 * 1024 * 1024)
+    };
+
+    if (!string.IsNullOrEmpty(azureBlobConnString))
+    {
+        var azureBlobVfs = new AzureBlobVirtualFiles(azureBlobConnString, "fileblazordemo");
+        uploadLocations = uploadLocations.Prepend(new UploadLocation("azure", azureBlobVfs,
+            readAccessRole: RoleNames.AllowAnon, resolvePath: ResolveUploadPath,
+            validateUpload: ValidateUpload, validateDownload: ValidateDownload,
+            maxFileBytes: 10 * 1024 * 1024)).ToArray();
+    }
+    
+    var uploadPlugin = new FilesUploadFeature(uploadLocations);
+    services.AddPlugin(uploadPlugin);
+});
+//...
+private static string ResolveUploadPath(FilesUploadContext ctx)
+{
+    if (ctx.Dto is IFileItemRequest { FileAccessType: { } } createFile)
+    {
+        return createFile.FileAccessType != FileAccessType.Private
+            ? ctx.GetLocationPath($"/{createFile.FileAccessType}/{ctx.FileName}")
+            : ctx.GetLocationPath($"/{createFile.FileAccessType}/{ctx.UserAuthId}/{ctx.FileName}");
+    }
+    throw HttpError.BadRequest("Invalid file creation request.");
+}
+
+private static void ValidateUpload(IRequest request, IHttpFile file)
+{
+    if (request.Dto is IFileItemRequest createFile)
     {
         var accessType = createFile.FileAccessType;
         var ext = file.FileName.LastRightPart('.');
-        if (accessType == FileAccessType.Gallery && ext != null && FileExt.Images.Contains(ext) == false)
-            throw new ArgumentException("Supported file extensions: {0}".LocalizeFmt(request, 
-                string.Join(", ", FileExt.Images.Map(x => '.' + x).OrderBy(x => x))), file.FileName);
+        if (accessType == FileAccessType.Team && ext != null && FileExt.WebImages.Contains(ext) == false)
+            throw new ArgumentException("Supported file extensions: {0}".LocalizeFmt(request,
+                string.Join(", ", FileExt.WebImages.Map(x => '.' + x).OrderBy(x => x))), file.FileName);
     }
     else
         throw new HttpError("Invalid request.");
@@ -521,8 +563,8 @@ They're also a great solution for Integration Testing managed file access withou
 [AutoQueryCrudTests.References.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.References.cs)
 
 ```csharp
-var memFs = GetVirtualFileSource<MemoryVirtualFiles>();
-Plugins.Add(new FilesUploadFeature(
+var memFs = new MemoryVirtualFiles();
+services.AddPlugin(new FilesUploadFeature(
     new UploadLocation("profiles", memFs),
     new UploadLocation("applications", memFs, maxFileCount: 3, maxFileBytes: 10_000_000,
         resolvePath: ctx => ctx.GetLocationPath((ctx.Dto is CreateJobApplication create
@@ -570,17 +612,24 @@ managed by the `FilesUploadFeature` to persist images to its configured `FileSys
 [Blazor Diffusion](/blazor-diffusion) uses the Managed Files Upload Feature configured in [Configure.AppHost.cs](https://github.com/NetCoreApps/BlazorDiffusion/blob/main/BlazorDiffusion/Configure.AppHost.cs) for all its website File Uploads:
 
 ```csharp
-var appFs = VirtualFiles = new R2VirtualFiles(s3Client, appConfig.ArtifactBucket);
-Plugins.Add(new FilesUploadFeature(
+var r2Client = new AmazonS3Client(appConfig.R2AccessId, appConfig.R2AccessKey, new AmazonS3Config
+{
+    ServiceURL = $"https://{appConfig.R2Account}.r2.cloudflarestorage.com"
+});
+services.AddSingleton(r2Client);
+var localFs = new FileSystemVirtualFiles(context.HostingEnvironment.ContentRootPath.CombineWith("App_Files").AssertDir());
+var appFs = VirtualFiles = hasR2 ? new R2VirtualFiles(r2Client, appConfig.ArtifactBucket) : localFs;
+services.AddPlugin(new FilesUploadFeature(
     new UploadLocation("artifacts", appFs,
         readAccessRole: RoleNames.AllowAnon,
         maxFileBytes: AppData.MaxArtifactSize),
-    new UploadLocation("avatars", appFs, allowExtensions: FileExt.WebImages, 
+    new UploadLocation("avatars", appFs, allowExtensions: FileExt.WebImages,
         // Use unique URL to invalidate CDN caches
-        resolvePath: ctx => X.Map((CustomUserSession)ctx.Session, x => $"/avatars/{x.RefIdStr[..2]}/{x.RefIdStr}/{ctx.FileName}")!,
+        resolvePath: ctx => X.Map((CustomUserSession)ctx.Session,
+            x => $"/avatars/{x.RefIdStr[..2]}/{x.RefIdStr}/{ctx.FileName}")!,
         maxFileBytes: AppData.MaxAvatarSize,
-        transformFile: ImageDetails.TransformAvatarAsync)
-    ));
+        transformFile: ImageUtils.TransformAvatarAsync)
+));
 ```
 
 It utilizes the new **transformFile:** option to transform an uploaded file and save a reference to the transformed file instead. This is used to only save a reference to the **128x128** resized avatar used by the App, whilst still persisting the original uploaded image in a [Background MQ](/background-mq) task in case a higher resolution of their avatar is needed later.
