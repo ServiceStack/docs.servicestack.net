@@ -6,6 +6,7 @@ slug: release-notes-history
 ## 2024
 
 - [v8.1](/releases/v8_01)
+- [v8.2](/releases/v8_02)
 
 ## 2023
 
