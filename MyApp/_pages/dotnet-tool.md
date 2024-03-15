@@ -302,8 +302,8 @@ We need to fill this `smtp` object with settings such as username, password, hos
       "Password": "AWS_SECRET_ACCESS_KEY",
       "Host": "email-smtp.us-east-1.amazonaws.com",
       "Port": 587,
-      "From": "email address",
       "FromName": "From Name",
+      "FromEmail": "email@address.com",
       "Bcc": "bcc email address"
     }
   }
