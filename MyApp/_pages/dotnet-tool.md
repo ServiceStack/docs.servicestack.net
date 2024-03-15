@@ -286,7 +286,7 @@ For example, we could have the following `original.json` file:
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "smtp": {}
+  "SmtpConfig": {}
 }
 ```
 
@@ -296,7 +296,7 @@ We need to fill this `smtp` object with settings such as username, password, hos
 [
   {
     "op": "add",
-    "path": "/smtp",
+    "path": "/SmtpConfig",
     "value": {
       "UserName": "AWS_ACCESS_KEY_ID",
       "Password": "AWS_SECRET_ACCESS_KEY",
@@ -320,7 +320,7 @@ Once this patch is applied, our `appsettings.json` transforms into:
       "Microsoft.AspNetCore": "Warning"
     }
   },
-  "smtp": {
+  "SmtpConfig": {
     "UserName": "AWS_ACCESS_KEY_ID",
     "Password": "AWS_SECRET_ACCESS_KEY",
     "Host": "email-smtp.us-east-1.amazonaws.com",
