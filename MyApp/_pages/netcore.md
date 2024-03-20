@@ -272,10 +272,6 @@ a functional Todos Web App back-end in a single
 [Startup.cs](https://github.com/NetCoreApps/Todos/blob/master/src/Todos/Startup.cs) that we created using 
 the **ASP.NET Core Web Application (.NET Core)** Empty VS.NET Template.
 
-The `Program` class remains unchanged from the template and defines the entry-point for your 
-Console Application that just Configures and Starts a Kestrel HTTP Server behind an IIS Reverse Proxy via 
-the `AspNetCoreModule` HTTP Handler configured in your **web.config**:
-
 ```csharp
 public class Program
 {
@@ -295,48 +291,33 @@ public class Program
 
 ### .NET Core Startup
 
-The `Startup` class is what you'll use to configure your .NET App. The only difference from the default
-VS.NET Template is the single line to Register your ServiceStack AppHost in .NET Core's `IApplicationBuilder`
-pipeline:
+
+Alternatively you can start with any of the [.NET Core Templates](https://github.com/NetCoreTemplates/) which 
+uses ASP .NET Core's recommended [Top-level statements](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/program-structure/top-level-statements) for its [Program.cs](https://github.com/NetCoreTemplates/razor-pages/blob/main/MyApp/Program.cs) Startup class, e.g:
 
 ```csharp
-public class Startup
+var builder = WebApplication.CreateBuilder(args);
+
+// Configure ASP .NET Core Dependencies
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public IConfiguration Configuration { get; }
-    public Startup(IConfiguration configuration) => Configuration = configuration;
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services)
-    {
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-    {
-        loggerFactory.AddConsole();
-
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        //Register your ServiceStack AppHost as a .NET Core module
-        app.UseServiceStack(new AppHost { 
-            AppSettings = new NetCoreAppSettings(Configuration) // Use **appsettings.json** and config sources
-        }); 
-
-        app.Run(async (context) =>
-        {
-            await context.Response.WriteAsync("Hello World!");
-        });
-    }
+    app.UseDeveloperExceptionPage();
 }
+
+//Register your ServiceStack AppHost as a .NET Core module
+app.UseServiceStack(new AppHost()); 
+
+app.Run(async (context) =>
+{
+    await context.Response.WriteAsync("Hello World!");
+});
 ```
 
 This shows the minimum code required to configure ServiceStack to run in .NET Core. It works similarly to the 
-[Wildcard HttpHandler configuration](https://github.com/ServiceStackApps/Todos/blob/fdcffd37d4ad49daa82b01b5876a9f308442db8c/src/Todos/Web.config#L37)
-in your ASP.NET **Web.config** telling ASP.NET to route all requests to ServiceStack. The difference here 
+[Wildcard HttpHandler configuration](https://github.com/ServiceStackApps/Todos/blob/fdcffd37d4ad49daa82b01b5876a9f308442db8c/src/Todos/Web.config#L37) in your ASP.NET **Web.config** telling ASP.NET to route all requests to ServiceStack. The difference here 
 is that ServiceStack is registered in a pipeline and only receives requests that weren't handled in any of
 the preceding modules. Likewise ServiceStack will just call the next Module in the pipeline for any Requests 
 that it's not configured to handle, this is in contrast to ASP.NET 4.5 where ServiceStack was designed to handle 
@@ -374,9 +355,7 @@ The other change needed outside the Todos ServiceStack implementation was to mat
 of serving static files from the **WebRootPath** which just required moving all static resources into the 
 [/wwwroot](https://github.com/NetCoreApps/Todos/tree/master/src/Todos/wwwroot) folder.
 
-And with that the Todos port was complete, which you can view from the deployed location below:
-
- - [http://todos.netcore.io](http://todos.netcore.io) - Linux / Docker / nginx / .NET Core
+And with that the [Todos port](https://github.com/NetCoreApps/Todos) was complete.
 
 ## Seamless Integration with .NET Core
 
@@ -515,11 +494,6 @@ public class AppHost : AppHostBase, IHostingStartup
     public void Configure(IWebHostBuilder builder) => builder
         .ConfigureServices(services => {
             // Configure ASP .NET Core IOC Dependencies
-        })
-        .Configure(app => {
-            // Configure ASP .NET Core App
-            if (!HasInit)
-                app.UseServiceStack(new AppHost());
         });
 
     public AppHost() : base("MyApp", typeof(MyServices).Assembly) {}
@@ -547,22 +521,7 @@ This will let you drop-in your custom `AppHost` into a [ModularStartup enabled A
 
 ### .NET Core IAppSettings Adapter
 
-Most .NET Core Templates are also configured to use the new `NetCoreAppSettings` adapter to utilize .NET Core's new `IConfiguration` config model in ServiceStack by initializing the `AppHost` with .NET Core's pre-configured `IConfiguration` that's injected into the [Startup.cs](https://github.com/NetCoreTemplates/vue-spa/blob/master/MyApp/Startup.cs) constructor, e.g:
-
-```csharp
-public class Startup
-{
-    public IConfiguration Configuration { get; }
-    public Startup(IConfiguration configuration) => Configuration = configuration;
-
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-        app.UseServiceStack(new AppHost {
-            AppSettings = new NetCoreAppSettings(Configuration)
-        });
-    }
-}
-```
+.NET Core Templates are also pre-configured to use the new `NetCoreAppSettings` adapter to utilize .NET Core's new `IConfiguration` config model in ServiceStack by default.
 
 This lets you use **appsettings.json** and .NET Core's other Configuration Sources from ServiceStack's `IAppSettings` API where it continues to resolve both primitive values and complex Types, e.g:
 
@@ -724,23 +683,9 @@ requests by registering the `RequestInfoHandler` as the last module in .NET Core
 pipeline, e.g:
 
 ```csharp
-public class Startup
-{
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-    {
-        loggerFactory.AddConsole();
+app.UseServiceStack(new AppHost());
 
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        app.UseServiceStack(new AppHost());
-
-        app.Use(new RequestInfoHandler());
-    }
-}
+app.Use(new RequestInfoHandler());
 ```
 
 Some other examples of HTTP Handlers you could use is returning an image by registering a `StaticFileHandler`
