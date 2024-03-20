@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-03-15T05:24:10.9128697Z'>
+    <meta name='date' content='2024-03-20T06:55:02.1046431Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>.NET Core Overview</title>
@@ -1751,9 +1751,6 @@ idiomatically register your ServiceStack AppHost into .NET Core's <code>IApplica
 a functional Todos Web App back-end in a single
 <a href="https://github.com/NetCoreApps/Todos/blob/master/src/Todos/Startup.cs">Startup.cs</a> that we created using
 the <strong>ASP.NET Core Web Application (.NET Core)</strong> Empty VS.NET Template.</p>
-<p>The <code>Program</code> class remains unchanged from the template and defines the entry-point for your
-Console Application that just Configures and Starts a Kestrel HTTP Server behind an IIS Reverse Proxy via
-the <code>AspNetCoreModule</code> HTTP Handler configured in your <strong>web.config</strong>:</p>
 <pre><code class="language-csharp">public class Program
 {
     public static void Main(string[] args)
@@ -1770,45 +1767,29 @@ the <code>AspNetCoreModule</code> HTTP Handler configured in your <strong>web.co
 }
 </code></pre>
 <h3 id="net-core-startup">.NET Core Startup<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-core-startup'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The <code>Startup</code> class is what you'll use to configure your .NET App. The only difference from the default
-VS.NET Template is the single line to Register your ServiceStack AppHost in .NET Core's <code>IApplicationBuilder</code>
-pipeline:</p>
-<pre><code class="language-csharp">public class Startup
+<p>Alternatively you can start with any of the <a href="https://github.com/NetCoreTemplates/">.NET Core Templates</a> which
+uses ASP .NET Core's recommended <a href="https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/program-structure/top-level-statements">Top-level statements</a> for its <a href="https://github.com/NetCoreTemplates/razor-pages/blob/main/MyApp/Program.cs">Program.cs</a> Startup class, e.g:</p>
+<pre><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// Configure ASP .NET Core Dependencies
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public IConfiguration Configuration { get; }
-    public Startup(IConfiguration configuration) =&gt; Configuration = configuration;
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services)
-    {
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-    {
-        loggerFactory.AddConsole();
-
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        //Register your ServiceStack AppHost as a .NET Core module
-        app.UseServiceStack(new AppHost { 
-            AppSettings = new NetCoreAppSettings(Configuration) // Use **appsettings.json** and config sources
-        }); 
-
-        app.Run(async (context) =&gt;
-        {
-            await context.Response.WriteAsync(&quot;Hello World!&quot;);
-        });
-    }
+    app.UseDeveloperExceptionPage();
 }
+
+//Register your ServiceStack AppHost as a .NET Core module
+app.UseServiceStack(new AppHost()); 
+
+app.Run(async (context) =&gt;
+{
+    await context.Response.WriteAsync(&quot;Hello World!&quot;);
+});
 </code></pre>
 <p>This shows the minimum code required to configure ServiceStack to run in .NET Core. It works similarly to the
-<a href="https://github.com/ServiceStackApps/Todos/blob/fdcffd37d4ad49daa82b01b5876a9f308442db8c/src/Todos/Web.config#L37">Wildcard HttpHandler configuration</a>
-in your ASP.NET <strong>Web.config</strong> telling ASP.NET to route all requests to ServiceStack. The difference here
+<a href="https://github.com/ServiceStackApps/Todos/blob/fdcffd37d4ad49daa82b01b5876a9f308442db8c/src/Todos/Web.config#L37">Wildcard HttpHandler configuration</a> in your ASP.NET <strong>Web.config</strong> telling ASP.NET to route all requests to ServiceStack. The difference here
 is that ServiceStack is registered in a pipeline and only receives requests that weren't handled in any of
 the preceding modules. Likewise ServiceStack will just call the next Module in the pipeline for any Requests
 that it's not configured to handle, this is in contrast to ASP.NET 4.5 where ServiceStack was designed to handle
@@ -1838,10 +1819,7 @@ to run on .NET Core which was able to reuse the entire existing Service implemen
 <p>The other change needed outside the Todos ServiceStack implementation was to match .NET Core's default convention
 of serving static files from the <strong>WebRootPath</strong> which just required moving all static resources into the
 <a href="https://github.com/NetCoreApps/Todos/tree/master/src/Todos/wwwroot">/wwwroot</a> folder.</p>
-<p>And with that the Todos port was complete, which you can view from the deployed location below:</p>
-<ul>
-<li><a href="http://todos.netcore.io">http://todos.netcore.io</a> - Linux / Docker / nginx / .NET Core</li>
-</ul>
+<p>And with that the <a href="https://github.com/NetCoreApps/Todos">Todos port</a> was complete.</p>
 <h2 id="seamless-integration-with.net-core">Seamless Integration with .NET Core<a class="header-anchor" href="javascript:;" onclick="location.hash='#seamless-integration-with.net-core'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In addition to running flawlessly on .NET Core we're also actively striving to find how we can best
 integrate with and leverage the surrounding .NET Core ecosystem and have made several changes to that end:</p>
@@ -1947,11 +1925,6 @@ public class AppHost : AppHostBase, IHostingStartup
     public void Configure(IWebHostBuilder builder) =&gt; builder
         .ConfigureServices(services =&gt; {
             // Configure ASP .NET Core IOC Dependencies
-        })
-        .Configure(app =&gt; {
-            // Configure ASP .NET Core App
-            if (!HasInit)
-                app.UseServiceStack(new AppHost());
         });
 
     public AppHost() : base(&quot;MyApp&quot;, typeof(MyServices).Assembly) {}
@@ -1974,20 +1947,7 @@ to precisely control where ServiceStack is registered within its preferred ASP .
 <p>This will let you drop-in your custom <code>AppHost</code> into a <a href="/modular-startup">ModularStartup enabled ASP.NET Core App</a> to enable the same
 &quot;no-touch&quot; auto-registration.</p>
 <h3 id="net-core-iappsettings-adapter">.NET Core IAppSettings Adapter<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-core-iappsettings-adapter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Most .NET Core Templates are also configured to use the new <code>NetCoreAppSettings</code> adapter to utilize .NET Core's new <code>IConfiguration</code> config model in ServiceStack by initializing the <code>AppHost</code> with .NET Core's pre-configured <code>IConfiguration</code> that's injected into the <a href="https://github.com/NetCoreTemplates/vue-spa/blob/master/MyApp/Startup.cs">Startup.cs</a> constructor, e.g:</p>
-<pre><code class="language-csharp">public class Startup
-{
-    public IConfiguration Configuration { get; }
-    public Startup(IConfiguration configuration) =&gt; Configuration = configuration;
-
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-        app.UseServiceStack(new AppHost {
-            AppSettings = new NetCoreAppSettings(Configuration)
-        });
-    }
-}
-</code></pre>
+<p>.NET Core Templates are also pre-configured to use the new <code>NetCoreAppSettings</code> adapter to utilize .NET Core's new <code>IConfiguration</code> config model in ServiceStack by default.</p>
 <p>This lets you use <strong>appsettings.json</strong> and .NET Core's other Configuration Sources from ServiceStack's <code>IAppSettings</code> API where it continues to resolve both primitive values and complex Types, e.g:</p>
 <pre><code class="language-csharp">bool debug = AppSettings.Get&lt;bool&gt;(&quot;DebugMode&quot;, false);
 MyConfig myConfig = AppSettings.Get&lt;MyConfig&gt;();
@@ -2098,23 +2058,9 @@ the <code>IApplicationBuilder</code> pipeline. This lets you for instance return
 <a href="/debugging.html#request-info">?debug=requestinfo</a> route for any unhandled
 requests by registering the <code>RequestInfoHandler</code> as the last module in .NET Core's <code>IApplicationBuilder</code>
 pipeline, e.g:</p>
-<pre><code class="language-csharp">public class Startup
-{
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-    {
-        loggerFactory.AddConsole();
+<pre><code class="language-csharp">app.UseServiceStack(new AppHost());
 
-        if (env.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage();
-        }
-
-        app.UseServiceStack(new AppHost());
-
-        app.Use(new RequestInfoHandler());
-    }
-}
+app.Use(new RequestInfoHandler());
 </code></pre>
 <p>Some other examples of HTTP Handlers you could use is returning an image by registering a <code>StaticFileHandler</code>
 configured with the <strong>virtualPath</strong> of the image (from <strong>ContentRootPath</strong>):</p>
