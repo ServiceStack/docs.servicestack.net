@@ -12,7 +12,7 @@ title: Litestream
 
 One of ServiceStack's primary goals is delivering great value and performance, attributes exemplified in all modern [jamstacks.net](https://jamstacks.net) templates which are maximally designed to deliver ultimate performance for a .NET App by adopting a [Jamstack architecture](https://jamstack.org), enabling redundant hosting of their decoupled UI's on inexpensive CDN edge caches - most optimal place to deliver best performance. 
 
-This also happens to be the cheapest to place to host its static files, taking load away from more expensive .NET App Servers and move them to free Cloudflare or GitHub CDNs, which all Jamstack Live Demos take advantage of to enable their [**$0.40 /mo** TCO](https://jamstacks.net/posts/hosting) for hosting their .NET Docker Apps which are only needed to serve the JSON APIs used to power their Jamstack UIs.
+This also happens to be the cheapest to place to host its static files, taking load away from more expensive .NET App Servers and move them to free Cloudflare or GitHub CDNs, which all Jamstack Live Demos take advantage of to enable their [**$0.40 /mo** TCO](https://jamstacks.net/posts/jamstacks_hosting) for hosting their .NET Docker Apps which are only needed to serve the JSON APIs used to power their Jamstack UIs.
 
 ## Expensive Managed Databases
 
