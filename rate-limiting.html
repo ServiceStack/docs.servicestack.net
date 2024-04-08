@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-04-08T13:56:35.1160079Z'>
+    <meta name='date' content='2024-04-08T13:56:35.4333988Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Error Handling</title>
+    <title>Rate Limiting</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -397,7 +397,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/rate-limiting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/rate-limiting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Rate Limiting
                                     </a>
                                 </li>
@@ -452,7 +452,7 @@ mount('#header', Header)
                                 </h2>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
-                                    <a href="/error-handling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/error-handling" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Overview
                                     </a>
                                 </li>
@@ -1340,331 +1340,220 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Error Handling
+                            Rate Limiting
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><h2 id="throwing-c-exceptions">Throwing C# Exceptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#throwing-c-exceptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>In most cases you won't need to be concerned with ServiceStack's error handling since it provides native support for the normal use-case of throwing C# Exceptions, e.g.:</p>
-<pre><code class="language-csharp">public object Post(User request) 
+                <div class="content"><p>Rate limiting is an important technique for protecting web APIs and applications from excessive traffic and abuse.
+By throttling the number of requests a client can make in a given time period, rate limiting helps ensure fair usage,
+maintains performance and availability, and defends against denial-of-service attacks.</p>
+<p>ASP.NET Core provides built-in middleware for rate limiting based on client IP address or client ID. And now with <a href="/releases/v8_01">ServiceStack v8.1</a>,
+ServiceStack has added support for ASP.NET Core endpoints, making it possible to leverage the same rate limiting middleware
+across all ASP.NET Core endpoints, including ServiceStack APIs.</p>
+<p>In this post, we'll look at how to enable rate limiting in an ASP.NET Core app using the standard middleware.
+Then we'll explore some more advanced options to fine-tune the rate limiting behavior. Finally, we'll see how to implement
+per-user rate limiting for multi-tenant SaaS applications using ASP.NET Core Identity and ServiceStack Mapped Endpoints.</p>
+<p>Setting Up Rate Limiting To get started, let's enable the basic rate limiting middleware in an ASP.NET Core application:</p>
+<ol>
+<li>Install the <code>Microsoft.AspNetCore.RateLimiting</code> NuGet package</li>
+<li>In the <code>Program.cs</code>, add <code>AddRateLimiter</code> to register the rate limiting services:</li>
+</ol>
+<pre><code class="language-csharp">builder.Services.AddRateLimiter(options =&gt;
 {
-    if (string.IsNullOrEmpty(request.Name))
-        throw new ArgumentNullException(&quot;Name&quot;);
-}
-</code></pre>
-<h3 id="default-mapping-of-c-exceptions-to-http-errors">Default Mapping of C# Exceptions to HTTP Errors<a class="header-anchor" href="javascript:;" onclick="location.hash='#default-mapping-of-c-exceptions-to-http-errors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>By Default C# Exceptions inheriting from:</p>
-<ul>
-<li><code>ArgumentException</code> or <code>SerializationException</code> or <code>FormatException</code> is returned as a <strong>400 BadRequest</strong></li>
-<li><code>NotImplementedException</code> or <code>NotSupportedException </code> is returned as a <strong>405 MethodNotAllowed</strong></li>
-<li><code>FileNotFoundException</code> is return as <strong>404 NotFound</strong></li>
-<li><code>AuthenticationException</code> is returned as <strong>401 Unauthorized</strong></li>
-<li><code>UnauthorizedAccessException</code> is returned as <strong>403 Forbidden</strong></li>
-<li><code>OptimisticConcurrencyException</code> is returned as <strong>409 Conflict</strong></li>
-<li>All Other normal C# Exceptions are returned as <strong>500 InternalServerError</strong></li>
-</ul>
-<p>Other custom mappings can be added to the <a href="/error-handling#custom-mapping-of-c-exceptions-to-http-error-status">Config.MapExceptionToStatusCode dictionary</a>,
-by <a href="/error-handling#implementing-ihasstatuscode">implementing IHasStatusCode interface</a> or by <a href="/error-handling#returning-a-httperror">returning a HttpError</a>.</p>
-<h3 id="webserviceexception">WebServiceException<a class="header-anchor" href="javascript:;" onclick="location.hash='#webserviceexception'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>All Exceptions get injected into the <code>ResponseStatus</code> property of your Response DTO that is serialized into your ServiceClient's preferred Content-Type making error handling transparent regardless of your preferred format - i.e., the same C# Error handling code can be used for all ServiceClients.</p>
-<pre><code class="language-csharp">try 
-{
-    var client = new JsonServiceClient(BaseUri);
-    var response = client.Send&lt;UserResponse&gt;(new User());
-} 
-catch (WebServiceException webEx) 
-{
-    /*
-      webEx.StatusCode        = 400
-      webEx.StatusDescription = ArgumentNullException
-      webEx.ErrorCode         = ArgumentNullException
-      webEx.ErrorMessage      = Value cannot be null. Parameter name: Name
-      webEx.StackTrace        = (your Server Exception StackTrace - in DebugMode)
-      webEx.ResponseDto       = (your populated Response DTO)
-      webEx.ResponseStatus    = (your populated Response Status DTO)
-      webEx.GetFieldErrors()  = (individual errors for each field if any)
-    */
-}
-</code></pre>
-<p>Where the <code>StatusCode</code> and <code>StatusDescription</code> are the HTTP StatusCode and Description which shows the top-level HTTP-layer details that all HTTP Clients see. The StatusDescription is typically short and used to indicate the type of Error returned which by default is the Type of the Exception thrown. HTTP Clients normally inspect the <code>StatusCode</code> to determine how to handle the error on the client.</p>
-<p>All <a href="/clients-overview">Service Clients</a> also have access to Application-level Error details which are returned in the Error Response DTO Body where the <code>ErrorCode</code> holds the Exception Type and is what clients would inspect to determine and handle the Type of Exception it is whilst the <code>ErrorMessage</code> holds the Server Exception Message which provides a human-friendly, longer and descriptive description of the Error that can be displayed to the end user. In <a href="/debugging#debugmode">DebugMode</a> the <code>StackTrace</code> is populated with the Server StackTrace to help front-end developers from identifying the cause and location of the Error.</p>
-<p>If the Error refers to a particular field such as a Field Validation Exception, <code>GetFieldErrors()</code> holds the error information for each field that has an Error.</p>
-<p>These defaults can be changed to provide further customized error responses by the various options below:</p>
-<h3 id="enabling-stacktraces">Enabling StackTraces<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-stacktraces'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>By default displaying StackTraces in Response DTOs are only enabled in Debug builds, although this behavior is overridable with:</p>
-<pre><code class="language-csharp">SetConfig(new HostConfig { DebugMode = true });
-</code></pre>
-<h3 id="error-response-types">Error Response Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-response-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The Error Response that gets returned when an Exception is thrown varies on whether a conventionally-named <code>{RequestDto}Response</code> DTO exists or not.</p>
-<h4 id="if-it-exists">If it exists:<a class="header-anchor" href="javascript:;" onclick="location.hash='#if-it-exists'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<p>The <code>{RequestDto}Response</code> is returned, regardless of the service method's response type. If the <code>{RequestDto}Response</code> DTO has a <strong>ResponseStatus</strong> property, it is populated otherwise no <strong>ResponseStatus</strong> will be returned.  (If you have decorated the <code>{ResponseDto}Response</code> class and properties with <code>[DataContract]/[DataMember]</code> attributes, then <strong>ResponseStatus</strong> also needs to be decorated, to get populated).</p>
-<h4 id="otherwise-if-it-doesnt">Otherwise, if it doesn't:<a class="header-anchor" href="javascript:;" onclick="location.hash='#otherwise-if-it-doesnt'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<p>A generic <code>ErrorResponse</code> gets returned with a populated <strong>ResponseStatus</strong> property.</p>
-<p>The <a href="/clients-overview">Service Clients</a> transparently handles the different Error Response types, and for schema-less formats like JSON/JSV/etc there's no actual visible difference between returning a <strong>ResponseStatus</strong> in a custom or generic <code>ErrorResponse</code> - as they both output the same response on the wire.</p>
-<h2 id="custom-exceptions">Custom Exceptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-exceptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Ultimately all ServiceStack WebServiceExceptions are just Response DTO's with a populated <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/ResponseStatus.cs">ResponseStatus</a> that are returned with a HTTP Error Status. There are a number of different ways to customize how Exceptions are returned including:</p>
-<h3 id="custom-mapping-of-c-exceptions-to-http-error-status">Custom mapping of C# Exceptions to HTTP Error Status<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-mapping-of-c-exceptions-to-http-error-status'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>You can change what HTTP Error Status is returned for different Exception Types by configuring them with:</p>
-<pre><code class="language-csharp">SetConfig(new HostConfig { 
-    MapExceptionToStatusCode = {
-        { typeof(CustomInvalidRoleException), 403 },
-        { typeof(CustomerNotFoundException), 404 },
-    }
-});
-</code></pre>
-<h3 id="returning-a-httperror">Returning a HttpError<a class="header-anchor" href="javascript:;" onclick="location.hash='#returning-a-httperror'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>If you want even finer grained control of your HTTP errors you can either <strong>throw</strong> or <strong>return</strong> an <strong>HttpError</strong> letting you customize the <strong>Http Headers</strong> and <strong>Status Code</strong> and HTTP Response <strong>body</strong> to get exactly what you want on the wire:</p>
-<pre><code class="language-csharp">public object Get(User request) 
-{
-    throw HttpError.NotFound($&quot;User {request.Name} does not exist&quot;);
-}
-</code></pre>
-<p>The above returns a <strong>404</strong> NotFound StatusCode on the wire and is a short-hand for:</p>
-<pre><code class="language-csharp">new HttpError(HttpStatusCode.NotFound, 
-    $&quot;User {request.Name} does not exist&quot;);
-</code></pre>
-<h3 id="httperror-with-a-custom-response-dto">HttpError with a Custom Response DTO<a class="header-anchor" href="javascript:;" onclick="location.hash='#httperror-with-a-custom-response-dto'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The <code>HttpError</code> can also be used to return a more structured Error Response with:</p>
-<pre><code class="language-csharp">var responseDto = new ErrorResponse { 
-    ResponseStatus = new ResponseStatus {
-        ErrorCode = typeof(ArgumentException).Name,
-        Message = &quot;Invalid Request&quot;,
-        Errors = new List&lt;ResponseError&gt; {
-            new ResponseError {
-                ErrorCode = &quot;NotEmpty&quot;,
-                FieldName = &quot;Company&quot;,
-                Message = &quot;'Company' should not be empty.&quot;
-            }
-        }
-    }
-};
-
-throw new HttpError(HttpStatusCode.BadRequest, &quot;ArgumentException&quot;) {
-    Response = responseDto,
-}; 
-</code></pre>
-<h3 id="implementing-iresponsestatusconvertible">Implementing IResponseStatusConvertible<a class="header-anchor" href="javascript:;" onclick="location.hash='#implementing-iresponsestatusconvertible'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>You can also override the serialization of Custom Exceptions by implementing the <code>IResponseStatusConvertible</code>
-interface to return your own populated ResponseStatus instead. This is how <code>ValidationException</code> allows customizing the Response DTO is by <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/FluentValidation/ValidationException.cs">having ValidationException implement</a> the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Model/IResponseStatusConvertible.cs">IResponseStatusConvertible</a> interface.</p>
-<p>E.g. Here's a custom Exception example that returns a populated Field Error:</p>
-<pre><code class="language-csharp">public class CustomFieldException : Exception, IResponseStatusConvertible
-{
-  ...
-    public string FieldErrorCode { get; set; }
-    public string FieldName { get; set; }
-    public string FieldMessage { get; set; }
-
-    public ResponseStatus ToResponseStatus() =&gt; new ResponseStatus {
-        ErrorCode = GetType().Name,
-        Message = Message,
-        Errors = new List&lt;ResponseError&gt; {
-            new ResponseError {
-                ErrorCode = FieldErrorCode,
-                FieldName = FieldName,
-                Message = FieldMessage
-            }
-        }
-    }
-}
-</code></pre>
-<h3 id="implementing-ihasstatuscode">Implementing IHasStatusCode<a class="header-anchor" href="javascript:;" onclick="location.hash='#implementing-ihasstatuscode'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>In addition to customizing the HTTP Response Body of C# Exceptions with
-<a href="/error-handling#implementing-iresponsestatusconvertible">IResponseStatusConvertible</a>,
-you can also customize the HTTP Status Code by implementing <code>IHasStatusCode</code>:</p>
-<pre><code class="language-csharp">public class Custom401Exception : Exception, IHasStatusCode
-{
-    public int StatusCode =&gt; 401;
-}
-</code></pre>
-<p>Likewise <code>IHasStatusDescription</code> can be used to customize the <code>StatusDescription</code> and <code>IHasErrorCode</code> for customizing the <code>ErrorCode</code> returned, instead of its Exception Type.</p>
-<h3 id="overriding-onexceptiontypefilter-in-your-apphost">Overriding OnExceptionTypeFilter in your AppHost<a class="header-anchor" href="javascript:;" onclick="location.hash='#overriding-onexceptiontypefilter-in-your-apphost'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>You can also catch and modify the returned <code>ResponseStatus</code> returned by overriding <code>OnExceptionTypeFilter</code> in your AppHost, e.g. <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/ServiceStackHost.Runtime.cs#L310">ServiceStack uses this</a> to customize the returned ResponseStatus to automatically add a custom field error for <code>ArgumentExceptions</code> with the specified <code>ParamName</code>, e.g:</p>
-<pre><code class="language-csharp">public virtual void OnExceptionTypeFilter(
-    Exception ex, ResponseStatus responseStatus)
-{
-    var argEx = ex as ArgumentException;
-    var isValidationSummaryEx = argEx is ValidationException;
-    if (argEx != null &amp;&amp; !isValidationSummaryEx &amp;&amp; argEx.ParamName != null)
+    options.GlobalLimiter = PartitionedRateLimiter.Create&lt;HttpContext, string&gt;(httpContext =&gt;
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(), 
+            factory: partition =&gt; new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 100,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+    
+    options.OnRejected = (context, cancellationToken) =&gt;
     {
-        var paramMsgIndex = argEx.Message.LastIndexOf(&quot;Parameter name:&quot;);
-        var errorMsg = paramMsgIndex &gt; 0
-            ? argEx.Message.Substring(0, paramMsgIndex)
-            : argEx.Message;
-
-        responseStatus.Errors.Add(new ResponseError
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
         {
-            ErrorCode = ex.GetType().Name,
-            FieldName = argEx.ParamName,
-            Message = errorMsg,
-        });
-    }
-}
-</code></pre>
-<h3 id="intercept-service-exceptions">Intercept Service Exceptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#intercept-service-exceptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>As an alternative way of customizing Service Exceptions is to override <code>OnExceptionAsync()</code>
-callback in your <code>Service</code> class (or base class) to intercept and modify Request DTOs, Responses or Error Responses, e.g:</p>
-<pre><code class="language-csharp">class MyServices : Service
-{
-    //Return custom error with additional metadata
-    public override Task&lt;object&gt; OnExceptionAsync(object requestDto, Exception ex)
-    {
-        var error = DtoUtils.CreateErrorResponse(requestDto, ex);
-        if (error is IHttpError httpError)
-        {                
-            var errorStatus = httpError.Response.GetResponseStatus();
-            errorStatus.Meta = new Dictionary&lt;string,string&gt; {
-                [&quot;InnerType&quot;] = ex.InnerException?.GetType().Name
-            };
+            context.HttpContext.Response.Headers.RetryAfter = retryAfter.TotalSeconds.ToString();
         }
-        return Task.FromResult(error);
-    }
-}
-</code></pre>
-<div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>Return <code>null</code> to continue with default error handling</p>
-</div>
-<h3 id="custom-http-errors">Custom HTTP Errors<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-http-errors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>In Any Request or Response Filter you can short-circuit the <a href="/order-of-operations">Request Pipeline</a> by emitting a Custom HTTP Response and Ending the request, e.g:</p>
-<pre><code class="language-csharp">this.PreRequestFilters.Add((req,res) =&gt; 
-{
-    if (req.PathInfo.StartsWith(&quot;/admin&quot;) &amp;&amp; 
-        !req.GetSession().HasRole(&quot;Admin&quot;, req.TryResolve&lt;IAuthRepository&gt;())) 
-    {
-        res.StatusCode = (int)HttpStatusCode.Forbidden;
-        res.StatusDescription = &quot;Requires Admin Role&quot;;
-        res.EndRequest();
-    }
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.WriteAsync(&quot;Too many requests. Please try again later.&quot;);
+
+        return new ValueTask();
+    };
 });
 </code></pre>
-<p>Or if you need access to the Request DTO you can use a <a href="/request-and-response-filters">Global Request Filter</a> instead, e.g:</p>
-<pre><code class="language-csharp">GlobalRequestFilters.Add((req,res,dto) =&gt; {
-    if (req.Verb == HttpMethods.Post &amp;&amp; dto is Authenticate authDto 
-        &amp;&amp; authDto.provider == CredentialsAuthProvider.Name &amp;&amp; !authDto.UseTokenCookie) {
-        res.StatusCode = (int)HttpStatusCode.Forbidden;
-        res.StatusDescription = &quot;Must use stateless JWT Cookies&quot;;
-        res.EndRequest();       
-    }
-});
+<p>This sets up a fixed window rate limiter with a limit of 100 requests per minute, partitioned by either authenticated username or client host name.</p>
+<ol>
+<li>Add the <code>UseRateLimiter</code> middleware to the pipeline:</li>
+</ol>
+<pre><code class="language-csharp">app.UseRateLimiter();
 </code></pre>
-<div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>To end the Request in a  Custom HttpHandler use <code>res.EndHttpHandlerRequest()</code></p>
-</div>
-<h3 id="fallback-error-pages">Fallback Error Pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#fallback-error-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Use <code>IAppHost.GlobalHtmlErrorHttpHandler</code> for specifying a <strong>fallback HttpHandler</strong> for all error status codes, e.g.:</p>
-<pre><code class="language-csharp">public override void Configure(Container container)
-{
-    this.GlobalHtmlErrorHttpHandler = new RazorHandler(&quot;/oops&quot;),
-}
-</code></pre>
-<p>For more fine-grained control, use <code>IAppHost.CustomErrorHttpHandlers</code> for specifying custom HttpHandlers to use with specific error status codes, e.g:</p>
-<pre><code class="language-csharp">public override void Configure(Container container)
-{
-    this.CustomErrorHttpHandlers[HttpStatusCode.NotFound] = 
-        new SharpPageHandler(&quot;/notfound&quot;);
-    this.CustomErrorHttpHandlers[HttpStatusCode.Unauthorized] = 
-        new SharpPageHandler(&quot;/login&quot;);
-    this.CustomErrorHttpHandlers[HttpStatusCode.Forbidden] = 
-        new SharpPageHandler(&quot;/forbidden&quot;);
-}
-</code></pre>
-<p>Will render the contents of the <code>/notfound.html</code> for 404 NotFound Requests and <code>/login.html</code> page for 401 Unauthorized requests if you're using
-static HTML, Single Page Apps or <a href="https://sharpscript.net/docs/script-pages">#Script Pages</a>.</p>
-<p>If you're using Razor instead you can <code>RazorHandler</code> to render <code>/notfound.cshtml</code> or <code>/login.cshtml</code> ServiceStack Razor pages:</p>
-<pre><code class="language-csharp">public override void Configure(Container container)
-{
-    this.CustomErrorHttpHandlers[HttpStatusCode.NotFound] = 
-        new RazorHandler(&quot;/notfound&quot;);
-    this.CustomErrorHttpHandlers[HttpStatusCode.Unauthorized] = 
-        new RazorHandler(&quot;/login&quot;);
-    this.CustomErrorHttpHandlers[HttpStatusCode.Forbidden] = 
-        new RazorHandler(&quot;/forbidden&quot;);
-}
-</code></pre>
-<h3 id="register-handlers-for-handling-service-exceptions">Register handlers for handling Service Exceptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-handlers-for-handling-service-exceptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>ServiceStack and its <a href="/api-design">API Design</a> provides a flexible way to intercept exceptions. If you need a single entry point for all service exceptions, you can add a handler to <code>AppHost.ServiceExceptionHandler</code> in <code>Configure</code>. To handle exceptions occurring outside of services you can set the global <code>AppHost.UncaughtExceptionHandlers</code> handler, e.g.:</p>
-<pre><code class="language-csharp">public override void Configure(Container container)
-{
-    //Handle Exceptions occurring in Services:
-
-    this.ServiceExceptionHandlers.Add((httpReq, request, exception) =&gt; {
-        //log your exceptions here
-        ...
-        return null; //continue with default Error Handling
-
-        //or return your own custom response
-        //return DtoUtils.CreateErrorResponse(request, exception);
-    });
-
-    //Handle Unhandled Exceptions occurring outside of Services
-    //E.g. Exceptions during Request binding or in filters:
-    this.UncaughtExceptionHandlers.Add((req, res, operationName, ex) =&gt; {
-         res.Write($&quot;Error: {ex.GetType().Name}: {ex.Message}&quot;);
-         res.EndRequest(skipHeaders: true);
-    });
-}
-</code></pre>
-<h4 id="async-exception-handlers">Async Exception Handlers<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-exception-handlers'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<p>If your handlers need to make any async calls they can use the Async versions instead:</p>
-<pre><code class="language-csharp">this.ServiceExceptionHandlersAsync.Add(async (httpReq, request, ex) =&gt;
-{
-    await LogServiceExceptionAsync(httpReq, request, ex);
-
-    if (ex is UnhandledException)
-        throw ex;
-
-    if (request is IQueryDb)
-        return DtoUtils.CreateErrorResponse(request, new ArgumentException(&quot;AutoQuery request failed&quot;));
-
-    return null;
-});
-
-this.UncaughtExceptionHandlersAsync.Add(async (req, res, operationName, ex) =&gt;
-{
-    await res.WriteAsync($&quot;UncaughtException '{ex.GetType().Name}' at '{req.PathInfo}'&quot;);
-    res.EndRequest(skipHeaders: true);
-});
-</code></pre>
-<h3 id="gatewayexceptionhandlers">GatewayExceptionHandlers<a class="header-anchor" href="javascript:;" onclick="location.hash='#gatewayexceptionhandlers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Gateway Exception Handlers provide the same Exception Handling callbacks as ServiceExceptions which you can use
-to intercept Exceptions from Gateway requests:</p>
-<pre><code class="language-csharp">IAppHost.GatewayExceptionHandlers
-IAppHost.GatewayExceptionHandlersAsync 
-</code></pre>
-<p>Gateway Exceptions can also be intercepted in your <code>AppHost</code> by overriding:</p>
-<pre><code class="language-csharp">public override async Task OnGatewayException(IRequest httpReq, object request, Exception ex) =&gt; ...
-</code></pre>
-<h3 id="error-handling-using-a-custom-servicerunner">Error handling using a custom ServiceRunner<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling-using-a-custom-servicerunner'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>If you want to provide different error handlers for different actions and services you can just tell ServiceStack to run your services in your own custom <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Web/IServiceRunner.cs">IServiceRunner</a> and implement the <strong>HandleException</strong> event hook in your AppHost:</p>
-<pre><code class="language-csharp">public override IServiceRunner&lt;TRequest&gt; CreateServiceRunner&lt;TRequest&gt;(
-    ActionContext actionContext)
-{           
-    return new MyServiceRunner&lt;TRequest&gt;(this, actionContext); 
-}
-</code></pre>
-<p>Where <strong>MyServiceRunner</strong> is just a custom class implementing the custom hooks you're interested in, e.g.:</p>
-<pre><code class="language-csharp">public class MyServiceRunner&lt;T&gt; : ServiceRunner&lt;T&gt; 
-{
-    public MyServiceRunner(IAppHost appHost, ActionContext actionContext) 
-        : base(appHost, actionContext) {}
-
-    public override object HandleException(IRequest request, 
-        T request, Exception ex) {
-      // Called whenever an exception is thrown in your Services Action
-    }
-}
-</code></pre>
-<h1 id="community-resources">Community Resources<a class="header-anchor" href="javascript:;" onclick="location.hash='#community-resources'" aria-label="Permalink">&ZeroWidthSpace;</a></h1>
+<p>With this basic setup, the API is now protected from excessive requests from individual clients.
+If a client exceeds the limit of 100 requests/minute, subsequent requests will receive a <code>HTTP 429 Too Many Requests</code> response.</p>
+<p>Advanced Options The rate limiting middleware provides several options to customize the behavior:</p>
 <ul>
-<li><a href="http://www.philliphaydon.com/2012/03/09/service-stack-exceptions-and-errors/">ServiceStack Exceptions and Errors</a> by <a href="https://twitter.com/philliphaydon">@philliphaydon</a></li>
+<li><code>PermitLimit</code> - The maximum number of requests allowed in the time window</li>
+<li><code>QueueLimit</code> - The maximum number of requests that can be queued when the limit is exceeded. Set to 0 to disable queueing.</li>
+<li><code>Window</code> - The time window for the limit, e.g. 1 minute, 1 hour, etc.</li>
+<li><code>AutoReplenishment</code> - Whether the rate limit should reset automatically at the end of each window</li>
 </ul>
+<p>For example, to allow short bursts but constrain average rate, we could implement a sliding window algorithm:</p>
+<pre><code class="language-csharp">options.GlobalLimiter = PartitionedRateLimiter.Create&lt;HttpContext, string&gt;(httpContext =&gt;
+    RateLimitPartition.GetSlidingWindowLimiter(
+        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+        factory: partition =&gt; new SlidingWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = 100,
+            QueueLimit = 25,
+            Window = TimeSpan.FromMinutes(1),
+            SegmentsPerWindow = 4
+        }));
+
+options.OnRejected = (context, cancellationToken) =&gt;
+{
+    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+    {
+        context.HttpContext.Response.Headers.RetryAfter = retryAfter.TotalSeconds.ToString();
+    }
+
+    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+    context.HttpContext.Response.WriteAsync(&quot;Too many requests. Please try again later.&quot;);
+
+    return new ValueTask();
+};
+</code></pre>
+<p>This allows up to 100 requests per minute on average, with the ability to burst up to 25 additional requests which are queued.</p>
+<h2 id="per-user-rate-limiting-for-saas-applications">Per-User Rate Limiting for SaaS Applications<a class="header-anchor" href="javascript:;" onclick="location.hash='#per-user-rate-limiting-for-saas-applications'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In a typical SaaS application, each user or tenant may have a different subscription plan that entitles them to a certain level of API usage.
+We can implement this per-user rate limiting by leveraging ASP.NET Core Identity to authenticate users and retrieve their plan details,
+and then configuring the rate limiter accordingly.</p>
+<p>First, ensure you have ASP.NET Core Identity set up in your application to handle user authentication. Then, add a property to your
+user class to store the rate limit for each user based on their plan:</p>
+<pre><code class="language-csharp">public class ApplicationUser : IdentityUser
+{
+    public int RateLimit { get; set; }
+}
+</code></pre>
+<p>Next, update the rate limiter configuration to partition by user and read the rate limit from the user's plan:</p>
+<pre><code class="language-csharp">builder.Services.AddRateLimiter(options =&gt;
+{
+    options.AddPolicy(&quot;per-user&quot;, context =&gt;
+    {
+        var user = context.User.Identity?.Name;
+        if (string.IsNullOrEmpty(user))
+        {
+            // Fallback to host name for unauthenticated requests
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: context.Request.Headers.Host.ToString(),
+                factory: partition =&gt; new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 100,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1)
+                });
+        }
+        // User exists
+        // Get the user's rate limit from their plan
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userManager = context.RequestServices.GetService&lt;UserManager&lt;ApplicationUser&gt;&gt;();
+        var appUser = userManager.FindByIdAsync(userId).Result;
+        var rateLimit = appUser?.RateLimit ?? 0;
+
+        // Create a user-specific rate limiter
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: user,
+            factory: partition =&gt; new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = rateLimit,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            });
+    });
+});
+</code></pre>
+<p>This configuration first checks if the request is authenticated. If not, it falls back to the default host-based rate limiting.</p>
+<p>For authenticated requests, it retrieves the user ID from the authentication claims and looks up the user in the ASP.NET Core Identity <code>UserManager</code>.
+It then reads the <code>RateLimit</code> property from the user object, which should be set based on the user's subscription plan.</p>
+<p>Finally, it creates a user-specific rate limiter using the <code>PartitionedRateLimiter</code> with the user's ID as the partition key and
+their personal rate limit as the <code>PermitLimit</code>.</p>
+<p>With this setup, each user will be rate limited independently based on their plan allowance. If a user exceeds their personal limit,
+they will receive a <code>429 Too Many Requests</code> response, while other users can continue making requests up to their own limits.</p>
+<p>Not only that, our rate handling is consistent across ASP.NET Core Endpoints regardless of how they are implemented, be it ServiceStack APIs,
+MVC Controllers, Minimal APIs etc. If you do need to target ServiceStack APIs with a specific policy name, you can create one with a
+policy name and use it when calling <code>UseServiceStack</code>.</p>
+<pre><code class="language-csharp">services.AddRateLimiter(options =&gt;
+{
+    // Policy name &quot;per-user&quot; is used by ServiceStack Mapped Endpoints
+    options.AddPolicy(&quot;per-user&quot;, context =&gt;
+    {
+        var user = context.User.Identity?.Name;
+        if (string.IsNullOrEmpty(user))
+        {
+            // Fallback to host name for unauthenticated requests
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: context.Request.Headers.Host.ToString(),
+                factory: partition =&gt; new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 100,
+                    QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1)
+                });
+        }
+        // User exists
+        // Get the user's rate limit from their plan
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userManager = context.RequestServices.GetService&lt;UserManager&lt;ApplicationUser&gt;&gt;();
+        var appUser = userManager.FindByIdAsync(userId).Result;
+        var rateLimit = appUser?.RateLimit ?? 0;
+
+        // Create a user-specific rate limiter
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: user,
+            factory: partition =&gt; new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = rateLimit,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            });
+    });
+    
+    // ...
+});
+
+//...
+
+// Make sure to call UseRateLimiter
+app.UseRateLimiter();
+
+// Specify which policy is used by ServiceStack Mapped Endpoints
+app.UseServiceStack(new AppHost(), options =&gt; {
+    options.MapEndpoints();
+    options.RouteHandlerBuilders.Add((routeBuilder, operation, method, route) =&gt;
+    {
+        routeBuilder.RequireRateLimiting(policyName: &quot;per-user&quot;);
+    });
+});
+</code></pre>
+<p>By combining ASP.NET Core rate limiting with ASP.NET Core Identity in this way, you can implement flexible, per-user rate limiting
+suitable for multi-tenant SaaS applications. The same approach can be extended to handle different rate limits for different API endpoints
+or user roles as needed. By upgrading ServiceStack to use ASP.NET Core Endpoints, you can now leverage the same rate limiting middleware
+across all ASP.NET Core Endpoints, including ServiceStack APIs.</p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/error-handling.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/rate-limiting.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -1672,18 +1561,18 @@ IAppHost.GatewayExceptionHandlersAsync
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/soap-support" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/endpoint-routing" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                SOAP support
+                                                Endpoint Routing
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/validation" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Validation
+                                            <a href="/order-of-operations" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Order of Operations
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -1702,114 +1591,9 @@ IAppHost.GatewayExceptionHandlersAsync
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#throwing-c-exceptions'" data-id="throwing-c-exceptions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Throwing C# Exceptions
+                                        <span v-hash="'#per-user-rate-limiting-for-saas-applications'" data-id="per-user-rate-limiting-for-saas-applications" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Per-User Rate Limiting for SaaS Applications
                                         </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="default-mapping-of-c-exceptions-to-http-errors" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#default-mapping-of-c-exceptions-to-http-errors'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Default Mapping of C# Exceptions to HTTP Errors
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="webserviceexception" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#webserviceexception'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            WebServiceException
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="enabling-stacktraces" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#enabling-stacktraces'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Enabling StackTraces
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="error-response-types" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#error-response-types'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Error Response Types
-                                                        </span>
-                                                    </li>
-                                            </ul>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#custom-exceptions'" data-id="custom-exceptions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Custom Exceptions
-                                        </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="custom-mapping-of-c-exceptions-to-http-error-status" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#custom-mapping-of-c-exceptions-to-http-error-status'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Custom mapping of C# Exceptions to HTTP Error Status
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="returning-a-httperror" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#returning-a-httperror'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Returning a HttpError
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="httperror-with-a-custom-response-dto" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#httperror-with-a-custom-response-dto'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            HttpError with a Custom Response DTO
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="implementing-iresponsestatusconvertible" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#implementing-iresponsestatusconvertible'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Implementing IResponseStatusConvertible
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="implementing-ihasstatuscode" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#implementing-ihasstatuscode'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Implementing IHasStatusCode
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="overriding-onexceptiontypefilter-in-your-apphost" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#overriding-onexceptiontypefilter-in-your-apphost'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Overriding OnExceptionTypeFilter in your AppHost
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="intercept-service-exceptions" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#intercept-service-exceptions'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Intercept Service Exceptions
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="custom-http-errors" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#custom-http-errors'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Custom HTTP Errors
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="fallback-error-pages" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#fallback-error-pages'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Fallback Error Pages
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="register-handlers-for-handling-service-exceptions" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#register-handlers-for-handling-service-exceptions'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Register handlers for handling Service Exceptions
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="gatewayexceptionhandlers" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#gatewayexceptionhandlers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            GatewayExceptionHandlers
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="error-handling-using-a-custom-servicerunner" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#error-handling-using-a-custom-servicerunner'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Error handling using a custom ServiceRunner
-                                                        </span>
-                                                    </li>
-                                            </ul>
                                     </li>
                             </ul>
                         </div>
