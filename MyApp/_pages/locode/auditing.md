@@ -198,7 +198,7 @@ simple POCOs to define the precise schema of the underlying RDBMS tables and API
 
  - Productive end-to-end [typed Development Model in 9 languages](https://servicestack.net/service-reference)
  - [Declarative Dev Model](/locode/declarative) for defining Authentication, Validation, Documentation & UI Customizations
- - Beautiful, UX-Friendly, capability-based Customizable UI in [Locode](https://www.locode.dev)
+ - Beautiful, UX-Friendly, capability-based Customizable UI in [Locode](https://servicestack.net/locode)
  - Rich analysis, API discoverability & [simplified client integrations](/api-explorer#code-tab) in [API Explorer](/api-explorer)
  - Powerful querying capabilities in [AutoQuery](/autoquery/)
  - Full executable [Audit History Tracking](/autoquery/audit-log)

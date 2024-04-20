@@ -8,7 +8,7 @@ through C# Attributes by annotating C# API Types and Data Models with the extens
 This declarative expressiveness also extends to [UI Attributes](#ui-metadata-attributes) that can customize the behavior and appearance of 
 Form UIs and formatted tabular resultsets, whose customizations are reused across all ServiceStack Auto UIs and Component libraries, including:
 
- - [Locode](https://www.locode.dev)
+ - [Locode](https://servicestack.net/locode)
  - [API Explorer](/api-explorer)
  - [Vue Tailwind Components](/vue/)
  - [Blazor Tailwind Components](/templates/blazor-components)
@@ -222,7 +222,7 @@ These attributes can be used to document and annotate APIs which will customize 
 Metadata services, [Add ServiceStack Reference](/add-servicestack-reference)
 generated DTOs and metadata driven, capability-based Auto UIs like
 [API Explorer](/api-explorer),
-[Locode](https://www.locode.dev) and
+[Locode](https://servicestack.net/locode) and
 [Swagger UI](/openapi).
 
 ### Annotate APIs
@@ -264,7 +264,7 @@ Refer to the [Formatters docs](/locode/formatters) for more info on how to use f
 
 ### Custom Fields and Inputs
 
-These attributes can be used to customize how fields and HTML Input controls in Auto UIs like [Locode](https://www.locode.dev)
+These attributes can be used to customize how fields and HTML Input controls in Auto UIs like [Locode](https://servicestack.net/locode)
 and [API Explorer](/api-explorer).
 
 | Attribute       | Description                                                               |
