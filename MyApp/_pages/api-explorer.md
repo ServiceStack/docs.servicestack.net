@@ -19,7 +19,7 @@ The entire API Explorer UI is driven by the **rich metadata** around your APIs t
 - The **Sidebar** - Displaying a list of APIs each user has access to
 - The **API** tab - Providing dynamic form to call & inspect your APIs
 - The **Details** tab - Containing a complete description of your APIs & its dependent types
-- The **Code** tab - Letting API consumers browse API Service contracts in their preferred language ([9 languages supported](https://servicestack.net/service-reference))
+- The **Code** tab - Letting API consumers browse API Service contracts in their preferred language ([11 languages supported](https://servicestack.net/service-reference))
 
 <p class="text-center py-4 text-xl">Lets learn about each feature with screenshots 📷</p>
 
@@ -268,7 +268,7 @@ Request and response names are links to show C# generated code representations o
 
 ## Code Tab
 
-The **Code** tab allows developers consuming your APIs from different programming backgrounds explore each APIs in their **preferred programming language** - currently supporting [9 different languages](https://servicestack.net/service-reference).
+The **Code** tab allows developers consuming your APIs from different programming backgrounds explore each APIs in their **preferred programming language** - currently supporting [11 different languages](https://servicestack.net/service-reference).
 
 It includes the necessary steps to call your APIs from client Apps, following the same pattern for each language:
 

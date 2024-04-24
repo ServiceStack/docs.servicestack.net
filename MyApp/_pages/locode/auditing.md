@@ -196,7 +196,7 @@ effort it takes to implement a traditional CRUD API with AutoQuery:
 Which reduces the development to effort of creating Full Stack Apps down to declaring your Data Models and APIs with
 simple POCOs to define the precise schema of the underlying RDBMS tables and API contract, that can then benefit from: 
 
- - Productive end-to-end [typed Development Model in 9 languages](https://servicestack.net/service-reference)
+ - Productive end-to-end [typed Development Model in 11 languages](https://servicestack.net/service-reference)
  - [Declarative Dev Model](/locode/declarative) for defining Authentication, Validation, Documentation & UI Customizations
  - Beautiful, UX-Friendly, capability-based Customizable UI in [Locode](https://servicestack.net/locode)
  - Rich analysis, API discoverability & [simplified client integrations](/api-explorer#code-tab) in [API Explorer](/api-explorer)
