@@ -266,7 +266,7 @@ Request and response names are links to show C# generated code representations o
 
 ## Code Tab
 
-The **Code** tab allows developers consuming your APIs from different programming backgrounds explore each APIs in their **preferred programming language** - currently supporting [9 different languages](https://servicestack.net/service-reference).
+The **Code** tab allows developers consuming your APIs from different programming backgrounds explore each APIs in their **preferred programming language** - currently supporting [11 different languages](https://servicestack.net/service-reference).
 
 It includes the necessary steps to call your APIs from client Apps, following the same pattern for each language:
 
@@ -274,7 +274,7 @@ It includes the necessary steps to call your APIs from client Apps, following th
  2. Copy and install the package containing ServiceStack's generic JSON Service Client
  3. Copy the initial source code pre-configured to call the API they want
 
-At which point without any code-gen or build tools, they'll end up with an Typed API configured to your APIs endpoint. E.g. this is what it looks like to **Python** developers utilizing our [most recently supported language](/releases/v5_12):
+At which point without any code-gen or build tools, they'll end up with an Typed API configured to your APIs endpoint. E.g. this is what it looks like to **Python** developers:
 
 <a href="https://vue-vite-api.jamstacks.net/ui/QueryBookings?tab=code&lang=python" class="block my-8 p-4 rounded shadow hover:shadow-lg">
     <img src="/img/pages/apiexplorer/api-code-QueryBookings-python.png">
