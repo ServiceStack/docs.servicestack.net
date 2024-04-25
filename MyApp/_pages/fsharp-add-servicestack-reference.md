@@ -35,7 +35,7 @@ As there's no configuration stored about the ServiceStack Reference you might be
 Just like with C#, F# Native Types can be used in ServiceStack's [Generic Service Clients](/csharp-client) providing and end-to-end Typed API whose PCL support also allows F# to be used in [mobile clients apps](https://github.com/ServiceStackApps/HelloMobile) without having to share compiled DTOs:
 
 ```fsharp
-let client = new JsonServiceClient("https://stackapis.netcore.io")
+let client = new JsonServiceClient("https://blazor-vue.web-templates.io")
 let response = client.Get(new SearchQuestions(
     Tags = new List<string>([ "redis"; "ormlite" ])))        
 
@@ -70,7 +70,7 @@ The header comments in the generated DTO's allows for further customization of h
 (* Options:
 Date: 2014-10-21 00:45:38
 Version: 1
-BaseUrl: https://stackapis.netcore.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //MakeDataContractsExtensible: False
 //AddReturnMarker: True

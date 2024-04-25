@@ -56,7 +56,7 @@ The header comments in the generated DTO's allows for further customization of h
 ' Options:
 'Date: 2014-10-21 00:45:05
 'Version: 1
-'BaseUrl: https://stackapis.netcore.io
+'BaseUrl: https://blazor-vue.web-templates.io
 '
 '''MakePartial: True
 '''MakeVirtual: True
@@ -78,7 +78,7 @@ To override these options on the client, the comment has to be changed to start 
 ' Options:
 'Date: 2014-10-21 00:45:05
 'Version: 1
-'BaseUrl: https://stackapis.netcore.io
+'BaseUrl: https://blazor-vue.web-templates.io
 '
 'MakePartial: False
 '''MakeVirtual: True

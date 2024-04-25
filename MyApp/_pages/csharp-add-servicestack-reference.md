@@ -34,7 +34,7 @@ If your server has been updated and you want to update to client DTOs, simply ri
 
 ## Consuming Services from Mobile Clients
 
-Thanks to [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) PCL Support, it can also be used from within supported client platforms. Here's a quick Android demo of adding a ServiceStack reference to [stackapis.netcore.io](https://stackapis.netcore.io/) and consuming one of StackApi's Services:
+Thanks to [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) PCL Support, it can also be used from within supported client platforms. Here's a quick Android demo of adding a ServiceStack reference to [blazor-vue.web-templates.io](https://blazor-vue.web-templates.io) and consuming one of StackApi's Services:
 
 [![Android Add ServiceStack Reference](https://raw.githubusercontent.com/ServiceStack/ServiceStackVS/master/Images/android-add-ref-demo.gif)](https://raw.githubusercontent.com/ServiceStack/ServiceStackVS/master/Images/android-add-ref-demo.gif)
 
@@ -46,7 +46,7 @@ The header comments in the generated DTOs allows for further customization of ho
 /* Options:
 Date: 2015-10-07 11:01:27
 Version: 4.046
-BaseUrl: https://stackapis.netcore.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //GlobalNamespace: 
 //MakePartial: True
@@ -71,7 +71,7 @@ To override these options on the client, the `//` has to be removed. For example
 /* Options:
 Date: 2015-10-07 11:01:27
 Version: 4.046
-BaseUrl: https://stackapis.netcore.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //GlobalNamespace: 
 MakePartial: False
