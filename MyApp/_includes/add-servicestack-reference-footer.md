@@ -82,7 +82,7 @@ TypeScriptGenerator.PrePropertyFilter = (sb , prop, type) => {
 
 ### Live examples
 
-  - [stackapis.netcore.io/types/metadata](https://stackapis.netcore.io/types/metadata)
+  - [blazor-vue.web-templates.io/types/metadata](https://blazor-vue.web-templates.io/types/metadata)
 
 This model is then used to generate the generated types, which for C# is at `/types/csharp`.
 
