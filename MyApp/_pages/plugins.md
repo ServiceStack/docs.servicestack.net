@@ -461,7 +461,7 @@ The ServiceStack.Webhooks plugin is versatile and supports persisting event subs
 Install [ServiceStack.Webhooks](https://www.nuget.org/packages/ServiceStack.Webhooks) from NuGet:
 
 :::copy
-`<PackageReference Include="ServiceStack.Webhooks" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Webhooks" Version="8.*" />`
 :::
 
 Register the `WebhookFeature` plugin in your AppHost:

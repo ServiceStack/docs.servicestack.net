@@ -51,7 +51,7 @@ All of ServiceStack's support for AWS is encapsulated within the single **Servic
 references the latest modular AWSSDK **v3.1x** dependencies **.NET 4.5+** projects can install from NuGet with:
 
 :::copy
-`<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Aws" Version="8.*" />`
 :::
 
 This **ServiceStack.Aws** NuGet package includes implementations for the following ServiceStack providers:
@@ -537,7 +537,7 @@ configurations, related items, conventions, aliases, dep-free data annotation at
 PocoDynamo is contained in ServiceStack's AWS NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Aws" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Aws" Version="8.*" />`
 :::
    
 > PocoDynamo has a 10 Tables [free-quota usage](https://servicestack.net/download#free-quotas) limit which is unlocked with a [license key](https://servicestack.net/pricing).

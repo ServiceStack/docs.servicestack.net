@@ -99,14 +99,14 @@ HTML or XML fragments can also be copied by escaping them first:
 
 ```markdown
 :::copy
-`<PackageReference Include="ServiceStack" Version="6.*" />`
+`<PackageReference Include="ServiceStack" Version="8.*" />`
 :::
 ```
 
 #### Output
 
 :::copy
-`<PackageReference Include="ServiceStack" Version="6.*" />`
+`<PackageReference Include="ServiceStack" Version="8.*" />`
 :::
 
 ### sh

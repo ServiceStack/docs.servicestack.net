@@ -17,7 +17,7 @@ You can find .NET Core Razor features documented in [razor.netcore.io](http://ra
 is maintained in our MVC NuGet package that can be installed with: 
 
 :::copy
-`<PackageReference Include="ServiceStack.Mvc" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Mvc" Version="8.*" />`
 :::
 
 

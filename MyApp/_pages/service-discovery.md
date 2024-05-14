@@ -17,7 +17,7 @@ highly available features in [consul.io](https://www.consul.io/) to provide auto
 de-registration of ServiceStack Services on AppHost **StartUp** and **Dispose** that's available from:
 
 :::copy
-`<PackageReference Include="ServiceStack.Discovery.Consul" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Discovery.Consul" Version="8.*" />`
 :::
 
 Without any additional effort beyond registering the `ConsulFeature` plugin and starting a new ServiceStack 
@@ -60,7 +60,7 @@ The [RedisServiceDiscoveryFeature](https://github.com/rsafier/ServiceStack.Disco
 but only requires access to Redis-backed datastore, but is otherwise just as easy to install:
 
 :::copy
-`<PackageReference Include="ServiceStack.Discovery.Redis" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Discovery.Redis" Version="8.*" />`
 :::
 
 and Configure:

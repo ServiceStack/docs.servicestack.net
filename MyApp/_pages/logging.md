@@ -11,37 +11,37 @@ Currently there are 5 different .NET logging providers available on NuGet:
 **[NLog](https://nuget.org/packages/ServiceStack.Logging.NLog)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.NLog" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.NLog" Version="8.*" />`
 :::
 
 **[Elmah](https://nuget.org/packages/ServiceStack.Logging.Elmah)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.Elmah" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.Elmah" Version="8.*" />`
 :::
 
 **[Log4Net](https://nuget.org/packages/ServiceStack.Logging.Log4Net)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.Log4Net" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.Log4Net" Version="8.*" />`
 :::
 
 **[EventLog](https://nuget.org/packages/ServiceStack.Logging.EventLog)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.EventLog" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.EventLog" Version="8.*" />`
 :::
 
 **[SlackLog](https://www.nuget.org/packages/ServiceStack.Logging.Slack/)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.Slack" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.Slack" Version="8.*" />`
 :::
 
 **[SerilogLogger](https://www.nuget.org/packages/ServiceStack.Logging.Serilog/)**
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.Serilog" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.Serilog" Version="8.*" />`
 :::
 
 ::: info
@@ -222,7 +222,7 @@ More usage examples are available in [SlackLogFactoryTests](https://github.com/S
 To Configure Serilog Logging, first download [ServiceStack.Logging.Serilog](https://www.nuget.org/packages/ServiceStack.Logging.Serilog) from NuGet:
 
 :::copy
-`<PackageReference Include="ServiceStack.Logging.Serilog" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Logging.Serilog" Version="8.*" />`
 :::
 
 Then configure ServiceStack to use `SerilogFactory`:

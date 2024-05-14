@@ -186,7 +186,7 @@ project shows how to launch both the .NET Core App and a customized CEF browser 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.*" />
 
-    <PackageReference Include="ServiceStack.CefGlue.Win64" Version="6.*" />
+    <PackageReference Include="ServiceStack.CefGlue.Win64" Version="8.*" />
   </ItemGroup>
 
 </Project>

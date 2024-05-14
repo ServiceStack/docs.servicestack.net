@@ -11,7 +11,7 @@ title: Swagger API
 [Swagger 1.2 Spec](https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md) back-end and embeds the Swagger UI front-end in a separate plugin which is available under [Swagger NuGet package](http://nuget.org/packages/ServiceStack.Api.Swagger/):
 
 :::copy
-`<PackageReference Include="ServiceStack.Api.Swagger" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Api.Swagger" Version="8.*" />`
 :::
 
 ## Installation

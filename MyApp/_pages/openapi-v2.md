@@ -13,7 +13,7 @@ When using ASP.NET Core **Endpoint Routing** refer to [ASP.NET Core Swashbuckle 
 [OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) back-end and embeds the Swagger UI front-end in a separate plugin which is available under [OpenAPI NuGet package](http://nuget.org/packages/ServiceStack.Api.OpenApi/):
 
 :::copy
-`<PackageReference Include="ServiceStack.Api.OpenApi" Version="6.*" />`
+`<PackageReference Include="ServiceStack.Api.OpenApi" Version="8.*" />`
 :::
 
 ## Installation

@@ -34,10 +34,10 @@ By default the App is configured to use a local SQLite database, we can extend i
 by adding the necessary **RDBMS** and `AdminDatabaseFeature` NuGet packages in `DatabaseTest.csproj`:
 
 ```xml
-<PackageReference Include="ServiceStack.OrmLite.MySql" Version="6.*" />
-<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="6.*" />
-<PackageReference Include="ServiceStack.OrmLite.SqlServer.Data" Version="6.*" />
-<PackageReference Include="ServiceStack.Server" Version="6.*" />
+<PackageReference Include="ServiceStack.OrmLite.MySql" Version="8.*" />
+<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="8.*" />
+<PackageReference Include="ServiceStack.OrmLite.SqlServer.Data" Version="8.*" />
+<PackageReference Include="ServiceStack.Server" Version="8.*" />
 ```
 
 ::: info TIP
