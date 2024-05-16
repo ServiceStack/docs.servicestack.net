@@ -87,7 +87,8 @@ Lets you customize [Locode Apps](https://servicestack.net/locode) where [Custom 
 a locally modified copy from
 [/components/*.mjs](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/locode/components)
 
-```
+```files
+/locode
     /components
         *.mjs
     custom.js
@@ -100,10 +101,11 @@ a locally modified copy from
 Is where to customize your Services [API Explorer UI](/api-explorer) where each API can
 be documented by adding [Custom API Docs](/api-explorer#api-docs) to `/docs/*.mjs`,
 whilst existing components can be overridden in 
-[/components/*.html](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/ui/components)
+[/components/*.mjs](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/ui/components)
 and custom UI added to `custom.*`
 
-```
+```files
+/ui
     /docs
         *.mjs
     /components
@@ -119,7 +121,8 @@ Is where to add any customizations to [Admin UI](/admin-ui) by overriding existi
 [/components/*.mjs](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/admin-ui/components)
 or adding custom UI to `custom.*`
 
-```
+```files
+/admin-ui
     /components
         *.mjs
     custom.js
@@ -134,7 +137,8 @@ The shared folder is where you can customize all Apps by overriding generic comp
 whilst custom HTML can be added to the `<head/>`, at the start and end of the `<body/>` of each App by including
 the `custom-*.html` placeholders below:
 
-```
+```files
+/shared
     custom-head.html
     custom-body.html
     custom-end.html        
