@@ -88,7 +88,7 @@ a locally modified copy from
 [/components/*.mjs](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/locode/components)
 
 ```files
-/locode
+/wwwroot/modules/locode
     /components
         *.mjs
     custom.js
@@ -105,7 +105,7 @@ whilst existing components can be overridden in
 and custom UI added to `custom.*`
 
 ```files
-/ui
+/wwwroot/modules/ui
     /docs
         *.mjs
     /components
@@ -122,7 +122,7 @@ Is where to add any customizations to [Admin UI](/admin-ui) by overriding existi
 or adding custom UI to `custom.*`
 
 ```files
-/admin-ui
+/wwwroot/modules/admin-ui
     /components
         *.mjs
     custom.js
@@ -138,7 +138,7 @@ whilst custom HTML can be added to the `<head/>`, at the start and end of the `<
 the `custom-*.html` placeholders below:
 
 ```files
-/shared
+/wwwroot/modules/shared
     custom-head.html
     custom-body.html
     custom-end.html        

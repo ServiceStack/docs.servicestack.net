@@ -550,22 +550,33 @@ When your App is run with `dotnet watch` it takes advantage ASP .NET Core's buil
 
 Which results in being more productive then using C# attributes as changes are immediately visible without a restart.
 
-## Override built-in Components
+## Customizing API Explorer
 
-The built-in UIs also lets you override existing components by adding custom versions in `/js/components` e.g. 
+You can override each built-in Component in API Explorer by maintaining local customized versions in `/wwwroot/modules/ui`
+where each API can be documented by adding [Custom API Docs](/api-explorer#api-docs) to `/docs/*.mjs`,
+whilst existing components can be overridden in 
+[/components/*.mjs](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/modules/ui/components)
+and custom UI added to `custom.*`
 
-<ul class="list-none">
-    <li>
-        <a href="https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/js/components" class="font-medium">/js/components</a>
-        <ul class="list-none">
-            <li>
-                <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Blazor/tests/ServiceStack.Blazor.Bootstrap.Tests/Server/js/components/Brand.mjs">
-                    Brand.mjs
-                </a>
-            </li>
-        </ul>
-    </li>
-</ul>
+```files
+/wwwroot/modules/ui
+    /docs
+        *.mjs
+    /components
+        *.mjs
+    custom.js
+    custom.css
+    custom.html
+```
+
+The `custom.html` and `custom.js` allows for further customization by including custom scripts and HTML fragments at the bottom of 
+API Explorer which will let you modify API Explorer after it's loaded.
+
+### Override built-in Components
+
+The built-in UIs also lets you override existing components by adding custom versions in 
+[/js/components](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack/src/ServiceStack/js/components), e.g:
+
 
 ```js
 const Brand = {
