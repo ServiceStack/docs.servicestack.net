@@ -28,7 +28,7 @@ If we solve this, Individual developers can take advantage of our [Free Licenses
 
 Our [Jamstack live demos](https://jamstacks.net) have been able to avoid these expensive costs by being configured with [SQLite](https://www.sqlite.org) by default, which OrmLite lets you easily change to use your [preferred RDBMS](/ormlite/installation). But when storing live customer data you'll want to ensure you have redundant backups to protect against data loss and why we were excited to learn about [Litestream](https://litestream.io) for enabling effortless replicas & restores to a number of [popular storage providers](https://litestream.io/guides/).
 
-Litestream is being developed by [@benbjohnson](https://twitter.com/benbjohnson), the creator of the popular the popular [BoltDB NoSQL embeddable DB](https://github.com/boltdb/bolt), used in a number of critical software components like [etcd](https://www.ibm.com/cloud/learn/etcd) to manage critical information distributed systems need, most notably, the configuration, state and metadata for [Kubernetes](https://kubernetes.io).
+Litestream is being developed by [@benbjohnson](https://twitter.com/benbjohnson), the creator of the popular [BoltDB NoSQL embeddable DB](https://github.com/boltdb/bolt), used in a number of critical software components like [etcd](https://www.ibm.com/cloud/learn/etcd) to manage critical information distributed systems need, most notably, the configuration, state and metadata for [Kubernetes](https://kubernetes.io).
 
 Thankfully Ben saw the potential for SQLite as a better replacement of BoltDB as a dependency-free application database and went about resolving the primary issue preventing SQLite from being used in production server-side Apps.
 
