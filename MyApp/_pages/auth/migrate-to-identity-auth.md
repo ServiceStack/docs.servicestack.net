@@ -82,8 +82,8 @@ public class ConfigureAuth : IHostingStartup
         .ConfigureAppHost(appHost => {
             appHost.Plugins.Add(new AuthFeature(IdentityAuth.For<AppUser,int>(
                 options => {
-                    options.EnableCredentialsAuth = true;
                     options.SessionFactory = () => new CustomUserSession();
+                    options.CredentialsAuth();
                 })
             ));
         });
