@@ -560,13 +560,13 @@ and custom UI added to `custom.*`
 
 ```files
 /wwwroot/modules/ui
-    /docs
-        *.mjs
-    /components
-        *.mjs
-    custom.js
-    custom.css
-    custom.html
+  /docs
+    *.mjs
+  /components
+    *.mjs
+  custom.js
+  custom.css
+  custom.html
 ```
 
 The `custom.html` and `custom.js` allows for further customization by including custom scripts and HTML fragments at the bottom of 

@@ -89,11 +89,11 @@ a locally modified copy from
 
 ```files
 /wwwroot/modules/locode
-    /components
-        *.mjs
-    custom.js
-    custom.css
-    custom.html
+  /components
+    *.mjs
+  custom.js
+  custom.css
+  custom.html
 ```
 
 ### /ui
@@ -106,13 +106,13 @@ and custom UI added to `custom.*`
 
 ```files
 /wwwroot/modules/ui
-    /docs
-        *.mjs
-    /components
-        *.mjs
-    custom.js
-    custom.css
-    custom.html
+  /docs
+    *.mjs
+  /components
+    *.mjs
+  custom.js
+  custom.css
+  custom.html
 ```
 
 ### /admin-ui
@@ -123,11 +123,11 @@ or adding custom UI to `custom.*`
 
 ```files
 /wwwroot/modules/admin-ui
-    /components
-        *.mjs
-    custom.js
-    custom.css
-    custom.html
+  /components
+    *.mjs
+  custom.js
+  custom.css
+  custom.html
 ```
 
 ### /shared
@@ -139,9 +139,9 @@ the `custom-*.html` placeholders below:
 
 ```files
 /wwwroot/modules/shared
-    custom-head.html
-    custom-body.html
-    custom-end.html        
+  custom-head.html
+  custom-body.html
+  custom-end.html        
 ```
 
 ### Custom App Example
