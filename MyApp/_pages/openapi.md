@@ -46,7 +46,7 @@ app.UseServiceStack(new AppHost(), options => {
 app.Run();
 ```
 
-Once configured to use Endpoint Routing we can the [mix](https://docs.servicestack.net/mix-tool) tool to apply the 
+Once configured to use Endpoint Routing we can then use the [mix](https://docs.servicestack.net/mix-tool) tool to apply the 
 [openapi3](https://gist.github.com/gistlyn/dac47b68e77796902cde0f0b7b9c6ac2) Startup Configuration with:
 
 :::sh
