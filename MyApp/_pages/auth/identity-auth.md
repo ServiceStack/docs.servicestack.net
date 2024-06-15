@@ -34,6 +34,11 @@ For a quick preview of what these look like, checkout out their Internet Hosted 
         <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/blazor-vue.png"></div>
         <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor-vue.web-templates.io</div>
     </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://blazor-wasm.web-templates.io">
+        <div style="max-height:350px;overflow:hidden">
+        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/blazor-wasm.png"></div>
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">blazor-wasm.web-templates.io</div>
+    </a>
     <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://razor.web-templates.io">
         <div style="max-height:350px;overflow:hidden">
         <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/razor.png"></div>
@@ -49,11 +54,6 @@ For a quick preview of what these look like, checkout out their Internet Hosted 
         <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/razor-bootstrap.png"></div>
         <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">razor-bootstrap.web-templates.io</div>
     </a>
-    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://mvc-bootstrap.web-templates.io">
-        <div style="max-height:350px;overflow:hidden">
-        <img class="p-2" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc-bootstrap.png"></div>
-        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">mvc-bootstrap.web-templates.io</div>
-    </a>
 </div>
 
 
@@ -62,6 +62,7 @@ Identity Auth in your own projects:
 
 - [blazor](https://github.com/NetCoreTemplates/blazor)
 - [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)
+- [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm)
 - [razor](https://github.com/NetCoreTemplates/razor)
 - [mvc](https://github.com/NetCoreTemplates/mvc)
 - [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)
