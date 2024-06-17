@@ -64,7 +64,7 @@ doesn't already exist.
 
 ### Creating Seed API Keys
 
-The plugin can also be used to programatically generate API Keys for specified Users:
+The plugin can also be used to programmatically generate API Keys for specified Users:
 
 ```csharp
 if (feature.ApiKeyCount(db) == 0)
