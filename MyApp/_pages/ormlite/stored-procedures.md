@@ -36,8 +36,8 @@ var results = await db.SqlListAsync<LetterFrequency>("spSearchLetters",
 ```csharp
 using var cmd = db.SqlProc("spSearchLetters", new { pLetter = "C" }));
 
-var rows = await cmd.ConvertToList<LetterFrequency>();
-var ints = await cmd.ConvertToList<int>();
+var rows = cmd.ConvertToList<LetterFrequency>();
+var ints = cmd.ConvertToList<int>();
 ```
 
 ## Stored Procedures with output params
