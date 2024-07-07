@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-07-02T09:09:49.1364333Z'>
+    <meta name='date' content='2024-07-07T09:46:40.7510640Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery AutoGen CRUD Services</title>
@@ -279,13 +279,22 @@ AutoQuery                                    </span>
                     </div>
                 </div>
             </div>
+<h3 id="register-db-connection">Register DB Connection<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-db-connection'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The important parts of this project is the registering the OrmLite DB Connection, the above configuration and the local <strong>northwind.sqlite</strong> database, i.e:</p>
 <pre><code class="language-csharp">container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt;
     new OrmLiteConnectionFactory(MapProjectPath(&quot;~/northwind.sqlite&quot;), SqliteDialect.Provider));
+</code></pre>
+<p>When using <a href="/endpoint-routing">Endpoint Routing</a> the DB Factory also needs to be initialized on <code>GenerateCrudServices</code>, e.g:</p>
+<pre><code class="language-csharp">var dbFactory = new OrmLiteConnectionFactory(
+    context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
+    SqliteDialect.Provider);
+container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt; dbFactory);
 
 Plugins.Add(new AutoQueryFeature {
     MaxLimit = 1000,
-    GenerateCrudServices = new GenerateCrudServices {}
+    GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
+    }
 });
 </code></pre>
 <h2 id="export-code-first-dtos">Export Code-First DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#export-code-first-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
@@ -495,6 +504,7 @@ Schema: custom
 <p>This is what the magical <code>AutoRegister</code> flag does for us:</p>
 <pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         AutoRegister = true,
         //....
     }
@@ -541,15 +551,25 @@ x mix autocrudgen sqlite northwind.sqlite</p>
                 </div>
             </div>
 <p>Which will mix in the <a href="https://gist.github.com/gistlyn/464a80c15cb3af4f41db7810082dc00c">autocrudgen</a> gist to enable AutoQuery and tell it to Auto Generate AutoQuery and CRUD Services for all tables in the registered RDBMS (default schema):</p>
-<pre><code class="language-csharp">public class ConfigureAutoQuery : IConfigureAppHost
+<pre><code class="language-csharp">public class ConfigureDb : IHostingStartup
 {
-    public void Configure(IAppHost appHost)
+    public void Configure(IWebHostBuilder builder)
     {
-        appHost.Plugins.Add(new AutoQueryFeature {
-            MaxLimit = 1000,
-            GenerateCrudServices = new GenerateCrudServices {
-                AutoRegister = true
-            }
+        builder.ConfigureServices((context,services) =&gt;
+        {
+            var dbFactory = new OrmLiteConnectionFactory(
+                context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
+                SqliteDialect.Provider);
+                
+            services.AddSingleton&lt;IDbConnectionFactory&gt;(dbFactory);
+                
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                GenerateCrudServices = new GenerateCrudServices {
+                    DbFactory = dbFactory,
+                    AutoRegister = true
+                }
+            });
         });
     }
 }
@@ -559,8 +579,7 @@ x mix autocrudgen sqlite northwind.sqlite</p>
 <pre><code class="language-csharp">public void Configure(IServiceCollection services)
 {
     services.AddSingleton&lt;IDbConnectionFactory&gt;(new OrmLiteConnectionFactory(
-        Configuration.GetConnectionString(&quot;DefaultConnection&quot;) 
-            ?? &quot;northwind.sqlite&quot;,
+        Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
         SqliteDialect.Provider));
 }
 </code></pre>
@@ -741,6 +760,7 @@ void main(List&lt;String&gt; args) async {
 <p>With this you could have a single API Gateway Servicifying access to multiple System RDBMS Tables &amp; Schemas, e.g:</p>
 <pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         CreateServices = {
             new CreateCrudServices(),
             new CreateCrudServices { Schema = &quot;AltSchema&quot; },
@@ -791,6 +811,7 @@ Plugins.Add(new AutoQueryFeature {
     MaxLimit = 100,
     GenerateCrudServices = new GenerateCrudServices
     {
+        DbFactory = dbFactory,
         ServiceFilter = (op,req) =&gt; 
         {
             // Require all Write Access to Tables to be limited to Authenticated Users
@@ -948,6 +969,7 @@ EnsureUser(&quot;manager@gmail.com&quot;,  name:&quot;The Manager&quot;,  roles:
 <pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
     MaxLimit = 1000,
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         AutoRegister = true,
         GenerateOperationsFilter = ctx =&gt; {
             if (ctx.TableName == &quot;applications&quot;)
