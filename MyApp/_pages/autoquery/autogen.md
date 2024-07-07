@@ -35,15 +35,28 @@ As you'll need to use 2 terminal windows, I'd recommend opening the project with
 code NorthwindAuto
 :::
 
+### Register DB Connection
+
 The important parts of this project is the registering the OrmLite DB Connection, the above configuration and the local **northwind.sqlite** database, i.e:
 
 ```csharp
 container.AddSingleton<IDbConnectionFactory>(c =>
     new OrmLiteConnectionFactory(MapProjectPath("~/northwind.sqlite"), SqliteDialect.Provider));
+```
+
+When using [Endpoint Routing](/endpoint-routing) the DB Factory also needs to be initialized on `GenerateCrudServices`, e.g:
+
+```csharp
+var dbFactory = new OrmLiteConnectionFactory(
+    context.Configuration.GetConnectionString("DefaultConnection"),
+    SqliteDialect.Provider);
+container.AddSingleton<IDbConnectionFactory>(c => dbFactory);
 
 Plugins.Add(new AutoQueryFeature {
     MaxLimit = 1000,
-    GenerateCrudServices = new GenerateCrudServices {}
+    GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
+    }
 });
 ```
 
@@ -181,6 +194,7 @@ This is what the magical `AutoRegister` flag does for us:
 ```csharp
 Plugins.Add(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         AutoRegister = true,
         //....
     }
@@ -216,15 +230,25 @@ x mix autocrudgen sqlite northwind.sqlite
 Which will mix in the [autocrudgen](https://gist.github.com/gistlyn/464a80c15cb3af4f41db7810082dc00c) gist to enable AutoQuery and tell it to Auto Generate AutoQuery and CRUD Services for all tables in the registered RDBMS (default schema):
 
 ```csharp
-public class ConfigureAutoQuery : IConfigureAppHost
+public class ConfigureDb : IHostingStartup
 {
-    public void Configure(IAppHost appHost)
+    public void Configure(IWebHostBuilder builder)
     {
-        appHost.Plugins.Add(new AutoQueryFeature {
-            MaxLimit = 1000,
-            GenerateCrudServices = new GenerateCrudServices {
-                AutoRegister = true
-            }
+        builder.ConfigureServices((context,services) =>
+        {
+            var dbFactory = new OrmLiteConnectionFactory(
+                context.Configuration.GetConnectionString("DefaultConnection"),
+                SqliteDialect.Provider);
+                
+            services.AddSingleton<IDbConnectionFactory>(dbFactory);
+                
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                GenerateCrudServices = new GenerateCrudServices {
+                    DbFactory = dbFactory,
+                    AutoRegister = true
+                }
+            });
         });
     }
 }
@@ -237,8 +261,7 @@ The [sqlite](https://gist.github.com/gistlyn/768d7b330b8c977f43310b954ceea668) g
 public void Configure(IServiceCollection services)
 {
     services.AddSingleton<IDbConnectionFactory>(new OrmLiteConnectionFactory(
-        Configuration.GetConnectionString("DefaultConnection") 
-            ?? "northwind.sqlite",
+        Configuration.GetConnectionString("DefaultConnection"),
         SqliteDialect.Provider));
 }
 ```
@@ -420,6 +443,7 @@ With this you could have a single API Gateway Servicifying access to multiple Sy
 ```csharp
 Plugins.Add(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         CreateServices = {
             new CreateCrudServices(),
             new CreateCrudServices { Schema = "AltSchema" },
@@ -474,6 +498,7 @@ Plugins.Add(new AutoQueryFeature {
     MaxLimit = 100,
     GenerateCrudServices = new GenerateCrudServices
     {
+        DbFactory = dbFactory,
         ServiceFilter = (op,req) => 
         {
             // Require all Write Access to Tables to be limited to Authenticated Users
@@ -638,6 +663,7 @@ You can change each of these default conventions with the new `GenerateOperation
 Plugins.Add(new AutoQueryFeature {
     MaxLimit = 1000,
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = dbFactory,
         AutoRegister = true,
         GenerateOperationsFilter = ctx => {
             if (ctx.TableName == "applications")
