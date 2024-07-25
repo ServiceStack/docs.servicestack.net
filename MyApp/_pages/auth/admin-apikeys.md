@@ -201,6 +201,15 @@ public object Any(QueryTodos request)
 }
 ```
 
+### Admin Only APIs
+
+For APIs that should only be accessible to Admin Users (using AuthSecret) use `[ValidateIsAdmin]`, e.g:
+
+```csharp
+[ValidateIsAdmin]
+public class AdminResetTodos : IPost, IReturnVoid {}
+```
+
 ### API Explorer
 
 Support for API Keys is also integrated into the [API Explorer](/api-explorer) allowing
@@ -243,7 +252,7 @@ with an alternative Bearer Token allowing the same client to call both **Authent
 
 ```csharp
 var client = new JsonApiClient(BaseUrl) {
-    BearerToken = jwt,
+    BearerToken = AuthSecret,
     Headers = {
         [HttpHeaders.XApiKey] = apiKey
     }
@@ -254,8 +263,23 @@ var client = new JsonApiClient(BaseUrl) {
 
 ```ts
 const client = new JsonServiceClient(BaseUrl)
-client.bearerToken = apiKey
+client.bearerToken = AuthSecret
 client.headers.set('X-Api-Key', apiKey)
+```
+
+## Development
+
+You can avoid having to re-renter AuthSecret and API Keys during Development by populating every request with
+the configured Admin AuthSecret which allows you to call both `[ValidateApiKey]` and `[ValidateIsAdmin]` protected APIs:
+
+```csharp
+#if DEBUG
+PreRequestFilters.Add((req, res) =>
+{
+    req.Items[Keywords.AuthSecret] = authSecret;
+    req.Items[Keywords.Authorization] = "Bearer " + authSecret;
+});
+#endif
 ```
 
 ### Summary
