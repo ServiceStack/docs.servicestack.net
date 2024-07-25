@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-07-07T09:46:39.5173844Z'>
+    <meta name='date' content='2024-07-25T13:39:24.4933682Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Simple Auth for .NET 8 Apps</title>
@@ -443,6 +443,11 @@ based on Features assigned to the API Key, e.g:</p>
     }
 }
 </code></pre>
+<h3 id="admin-only-apis">Admin Only APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#admin-only-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For APIs that should only be accessible to Admin Users (using AuthSecret) use <code>[ValidateIsAdmin]</code>, e.g:</p>
+<pre><code class="language-csharp">[ValidateIsAdmin]
+public class AdminResetTodos : IPost, IReturnVoid {}
+</code></pre>
 <h3 id="api-explorer">API Explorer<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-explorer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Support for API Keys is also integrated into the <a href="/api-explorer">API Explorer</a> allowing
 users to use their API Keys to access API Key protected Services which are highlighted with a <strong>Key</strong> Icon:</p>
@@ -468,7 +473,7 @@ client.bearerToken = apiKey
 with an alternative Bearer Token allowing the same client to call both <strong>Authenticated</strong> and <strong>API Key</strong> protected APIs, e.g:</p>
 <h4 id="c-1">C#<a class="header-anchor" href="javascript:;" onclick="location.hash='#c-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
 <pre><code class="language-csharp">var client = new JsonApiClient(BaseUrl) {
-    BearerToken = jwt,
+    BearerToken = AuthSecret,
     Headers = {
         [HttpHeaders.XApiKey] = apiKey
     }
@@ -476,8 +481,19 @@ with an alternative Bearer Token allowing the same client to call both <strong>A
 </code></pre>
 <h4 id="typescript-1">TypeScript<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-1'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
 <pre><code class="language-ts">const client = new JsonServiceClient(BaseUrl)
-client.bearerToken = apiKey
+client.bearerToken = AuthSecret
 client.headers.set('X-Api-Key', apiKey)
+</code></pre>
+<h2 id="development">Development<a class="header-anchor" href="javascript:;" onclick="location.hash='#development'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>You can avoid having to re-renter AuthSecret and API Keys during Development by populating every request with
+the configured Admin AuthSecret which allows you to call both <code>[ValidateApiKey]</code> and <code>[ValidateIsAdmin]</code> protected APIs:</p>
+<pre><code class="language-csharp">#if DEBUG
+PreRequestFilters.Add((req, res) =&gt;
+{
+    req.Items[Keywords.AuthSecret] = authSecret;
+    req.Items[Keywords.Authorization] = &quot;Bearer &quot; + authSecret;
+});
+#endif
 </code></pre>
 <h3 id="summary">Summary<a class="header-anchor" href="javascript:;" onclick="location.hash='#summary'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>We hope this shows how stand-alone .NET 8 Microservices and self-contained Docker Apps can use the
@@ -518,6 +534,30 @@ and <strong>typed Service Client</strong> integrations.</p>
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#development'" data-id="development" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Development
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="summary" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#summary'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Summary
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    
