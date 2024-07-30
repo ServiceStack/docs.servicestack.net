@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-07-25T13:39:24.5985448Z'>
+    <meta name='date' content='2024-07-30T13:43:23.0509853Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery AutoGen CRUD Services</title>
@@ -284,18 +284,25 @@ AutoQuery                                    </span>
 <pre><code class="language-csharp">container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt;
     new OrmLiteConnectionFactory(MapProjectPath(&quot;~/northwind.sqlite&quot;), SqliteDialect.Provider));
 </code></pre>
-<p>When using <a href="/endpoint-routing">Endpoint Routing</a> the DB Factory also needs to be initialized on <code>GenerateCrudServices</code>, e.g:</p>
-<pre><code class="language-csharp">var dbFactory = new OrmLiteConnectionFactory(
-    context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
-    SqliteDialect.Provider);
-container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt; dbFactory);
+<p>When using <a href="/endpoint-routing">Endpoint Routing</a> the DB Factory also needs to be initialized on <code>GenerateCrudServices</code>, the easiest way to do that would be to register AutoQueryFeature plugin in <code>Configure.Db.cs</code> e.g:</p>
+<pre><code class="language-csharp">public class ConfigureDb : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            var dbFactory = new OrmLiteConnectionFactory(
+                context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
+                SqliteDialect.Provider);
+            container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt; dbFactory);
 
-Plugins.Add(new AutoQueryFeature {
-    MaxLimit = 1000,
-    GenerateCrudServices = new GenerateCrudServices {
-        DbFactory = dbFactory,
-    }
-});
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                GenerateCrudServices = new GenerateCrudServices {
+                    DbFactory = dbFactory,
+                }
+            });
+            // ...
+        });
+}
 </code></pre>
 <h2 id="export-code-first-dtos">Export Code-First DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#export-code-first-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>After restarting your App with AutoGen's <code>GenerateCrudServices</code> enabled you can export the auto-generated APIs and Data Models into code-first C# classes</p>
