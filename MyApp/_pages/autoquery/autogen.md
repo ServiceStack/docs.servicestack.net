@@ -44,20 +44,27 @@ container.AddSingleton<IDbConnectionFactory>(c =>
     new OrmLiteConnectionFactory(MapProjectPath("~/northwind.sqlite"), SqliteDialect.Provider));
 ```
 
-When using [Endpoint Routing](/endpoint-routing) the DB Factory also needs to be initialized on `GenerateCrudServices`, e.g:
+When using [Endpoint Routing](/endpoint-routing) the DB Factory also needs to be initialized on `GenerateCrudServices`, the easiest way to do that would be to register AutoQueryFeature plugin in `Configure.Db.cs` e.g:
 
 ```csharp
-var dbFactory = new OrmLiteConnectionFactory(
-    context.Configuration.GetConnectionString("DefaultConnection"),
-    SqliteDialect.Provider);
-container.AddSingleton<IDbConnectionFactory>(c => dbFactory);
+public class ConfigureDb : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            var dbFactory = new OrmLiteConnectionFactory(
+                context.Configuration.GetConnectionString("DefaultConnection"),
+                SqliteDialect.Provider);
+            container.AddSingleton<IDbConnectionFactory>(c => dbFactory);
 
-Plugins.Add(new AutoQueryFeature {
-    MaxLimit = 1000,
-    GenerateCrudServices = new GenerateCrudServices {
-        DbFactory = dbFactory,
-    }
-});
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                GenerateCrudServices = new GenerateCrudServices {
+                    DbFactory = dbFactory,
+                }
+            });
+            // ...
+        });
+}
 ```
 
 ## Export Code-First DTOs
