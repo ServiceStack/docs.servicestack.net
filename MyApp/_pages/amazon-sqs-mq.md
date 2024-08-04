@@ -3,6 +3,22 @@ slug: amazon-sqs-mq
 title: Amazon SQS MQ
 ---
 
+## Enable in an existing Web App
+
+Use the `sqs` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
+
+:::sh
+x mix sqs
+:::
+
+## Worker Service Template
+
+To start using Amazon SQS in stand-alone MQ Servers (i.e. without HTTP access) is to run the MQ Server in an ASP.NET Core Worker Service by starting from a pre-configured project template:
+
+<worker-templates template="worker-sqs"></worker-templates>
+
+## Manual Configuration
+
 Support for registering Amazon Simple Queue Service (SQS) as an [MQ Server](/messaging) is available in [ServiceStack.Aws](https://www.nuget.org/packages/ServiceStack.Aws) NuGet package:
 
 :::copy

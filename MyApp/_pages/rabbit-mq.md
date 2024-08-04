@@ -1,7 +1,22 @@
 ---
-slug: rabbit-mq
 title: Rabbit MQ
 ---
+
+## Enable in an existing Web App
+
+Use the `rabbitmq` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
+
+:::sh
+x mix rabbitmq
+:::
+
+## Worker Service Template
+
+To start usingRabbit MQ in stand-alone MQ Servers (i.e. without HTTP access) is to run the MQ Server in an ASP.NET Core Worker Service by starting from a pre-configured project template:
+
+<worker-templates template="worker-rabbitmq"></worker-templates>
+
+## ServiceStack.RabbitMq
 
 A nice advantage of ServiceStack's message-based design is its ability to host its Services on a variety of different endpoints. This design makes it possible to host Services via [MQ Servers](/messaging), enable [SOAP support](/soap-support) in addition to ServiceStack's strong HTTP Web Services story. One MQ Server we support is the extremely popular and robust Open Source AMQP messaging broker: [Rabbit MQ](http://www.rabbitmq.com).
 
@@ -10,8 +25,6 @@ A nice advantage of ServiceStack's message-based design is its ability to host i
 A great way to get started with Rabbit MQ on Windows is by following the 
 [Rabbit MQ Windows Installation guide](https://github.com/mythz/rabbitmq-windows)
 which also includes sample source code for accessing Rabbit MQ Server using the .NET [RabbitMQ.Client](https://www.nuget.org/packages/RabbitMQ.Client) on NuGet.
-
-## ServiceStack.RabbitMq
 
 ServiceStack builds on top of **RabbitMQ.Client** to provide concrete implementations for 
 [ServiceStack's high-level Messaging APIs](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Messaging/)

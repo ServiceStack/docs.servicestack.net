@@ -3,6 +3,20 @@ slug: redis-mq
 title: Redis MQ
 ---
 
+## Enable in an existing Web App
+
+Use the `redismq` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
+
+:::sh
+x mix redismq
+:::
+
+## Worker Service Template
+
+To start using Redis MQ in stand-alone MQ Servers (i.e. without HTTP access) is to run the MQ Server in an ASP.NET Core Worker Service by starting from a pre-configured project template:
+
+<worker-templates template="worker-redismq"></worker-templates>
+
 ## MQ Examples
 
 The [Reusability ServiceStack.UseCase](https://github.com/ServiceStack/ServiceStack.UseCases/tree/master/Reusability) contains a good introductory demo of using MQ's(message-queues) in ServiceStack where the same services can be called via Web Service or via MQ. Using MQ's provide instant response times, in addition to reliable and durable execution of your services. 
