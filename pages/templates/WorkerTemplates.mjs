@@ -1,4 +1,5 @@
 import { ref, computed } from "vue"
+import { template } from "./Templates.mjs"
 
 export default {
     template: `<section class="not-prose w-full flex flex-col justify-center text-center">
@@ -12,7 +13,7 @@ export default {
     <section class="w-full flex flex-col justify-center text-center">
     <div class="mt-4 mb-2">
        <div class="flex flex-wrap justify-center">
-          <div>
+          <div v-if="!template || template == 'worker-rabbitmq'">
                <a class="hover:no-underline" :href="zipUrl('NetCoreTemplates/worker-rabbitmq')">
                    <div class="bg-white dark:bg-gray-800 px-4 py-4 mr-4 mb-4 rounded-lg shadow-lg text-center items-center justify-center hover:shadow-2xl dark:border-2 dark:border-pink-600 dark:hover:border-blue-600" style="min-width:150px">
                        <div class="text-center font-extrabold flex items-center justify-center mb-2">
@@ -34,7 +35,7 @@ export default {
                    </div>
                </a>
            </div>
-          <div>
+          <div v-if="!template || template == 'worker-redismq'">
                <a class="hover:no-underline" :href="zipUrl('NetCoreTemplates/worker-redismq')">
                    <div class="bg-white dark:bg-gray-800 px-4 py-4 mr-4 mb-4 rounded-lg shadow-lg text-center items-center justify-center hover:shadow-2xl dark:border-2 dark:border-pink-600 dark:hover:border-blue-600" style="min-width:150px">
                        <div class="text-center font-extrabold flex items-center justify-center mb-2">
@@ -56,7 +57,7 @@ export default {
                    </div>
                </a>
            </div>
-          <div>
+          <div v-if="!template || template == 'worker-servicebus'">
                <a class="hover:no-underline" :href="zipUrl('NetCoreTemplates/worker-servicebus')">
                    <div class="bg-white dark:bg-gray-800 px-4 py-4 mr-4 mb-4 rounded-lg shadow-lg text-center items-center justify-center hover:shadow-2xl dark:border-2 dark:border-pink-600 dark:hover:border-blue-600" style="min-width:150px">
                        <div class="text-center font-extrabold flex items-center justify-center mb-2">
@@ -78,7 +79,7 @@ export default {
                    </div>
                </a>
            </div>
-          <div>
+          <div v-if="!template || template == 'worker-sqs'">
                <a class="hover:no-underline" :href="zipUrl('NetCoreTemplates/worker-sqs')">
                    <div class="bg-white dark:bg-gray-800 px-4 py-4 mr-4 mb-4 rounded-lg shadow-lg text-center items-center justify-center hover:shadow-2xl dark:border-2 dark:border-pink-600 dark:hover:border-blue-600" style="min-width:150px">
                        <div class="text-center font-extrabold flex items-center justify-center mb-2">
@@ -104,6 +105,7 @@ export default {
     </div>
     </section>
 </section>`,
+    props: { template: String },
     setup(props) {
         const project = ref('MyApp')
         const projectZip = computed(() => (project.value || 'MyApp') + '.zip')

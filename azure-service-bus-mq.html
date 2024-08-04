@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-07-30T13:43:22.1079179Z'>
+    <meta name='date' content='2024-08-04T03:57:53.5572563Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Azure Service Bus MQ</title>
@@ -1356,7 +1356,27 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>Support for registering Azure Service Bus as an <a href="/messaging">MQ Server</a> in ServiceStack is available in <a href="https://www.nuget.org/packages/ServiceStack.Azure">ServiceStack.Azure</a> NuGet package:</p>
+                <div class="content"><h2 id="enable-in-an-existing-web-app">Enable in an existing Web App<a class="header-anchor" href="javascript:;" onclick="location.hash='#enable-in-an-existing-web-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Use the <code>servicebus</code> mixin to register an <a href="/messaging">MQ Server</a> for Azure Service Bus with an existing .NET App:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix servicebus</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h2 id="worker-service-template">Worker Service Template<a class="header-anchor" href="javascript:;" onclick="location.hash='#worker-service-template'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To start using Azure Service Bus in stand-alone MQ Servers (i.e. without HTTP access) is to run the MQ Server in an ASP.NET Core Worker Service by starting from a pre-configured project template:</p>
+<p><worker-templates template="worker-servicebus"></worker-templates></p>
+<h2 id="manual-configuration">Manual Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#manual-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Support for registering Azure Service Bus as an <a href="/messaging">MQ Server</a> in ServiceStack is available in <a href="https://www.nuget.org/packages/ServiceStack.Azure">ServiceStack.Azure</a> NuGet package:</p>
 <div class="not-prose copy cp flex cursor-pointer mb-3" onclick="copy(this)">
                 <div class="flex-grow bg-gray-700">
                     <div class="pl-4 py-1 pb-1.5 align-middle text-lg text-white"><p><code>&lt;PackageReference Include=&quot;ServiceStack.Azure&quot; Version=&quot;8.*&quot; /&gt;</code></p>
@@ -1372,12 +1392,24 @@ mount('#header', Header)
                 </div>
             </div>
 <p>Once installed ServiceBus can be configured the same way as any other <a href="/messaging">MQ Servers</a>, by first registering the ServiceBus <code>IMessageService</code> provider followed by registering all ServiceStack Services you want to be able to invoke via MQ’s:</p>
-<pre><code class="language-csharp">container.Register&lt;IMessageService&gt;(c =&gt; new ServiceBusMqServer(ConnectionString));
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureMq))]
 
-var mqServer = container.Resolve&lt;IMessageService&gt;();
-mqServer.RegisterHandler&lt;MyRequest&gt;(ExecuteMessage);
+namespace MyApp;
 
-AfterInitCallbacks.Add(appHost =&gt; mqServer.Start());
+public class ConfigureMq : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            services.AddSingleton&lt;IMessageService&gt;(c =&gt; 
+                new ServiceBusMqServer(context.Configuration.GetConnectionString(&quot;ServiceBus&quot;)));
+        })
+        .ConfigureAppHost(afterAppHostInit: appHost =&gt; {
+            var mqServer = appHost.Resolve&lt;IMessageService&gt;().Start();
+            // Register MQ endpoints for APIs
+            mqServer.RegisterHandler&lt;MyRequest&gt;(ExecuteMessage);
+            mqServer.Start();
+        });
+}
 </code></pre>
 </div>
 
@@ -1414,6 +1446,32 @@ AfterInitCallbacks.Add(appHost =&gt; mqServer.Start());
                     </div>
             </div>
                 
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#enable-in-an-existing-web-app'" data-id="enable-in-an-existing-web-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Enable in an existing Web App
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#worker-service-template'" data-id="worker-service-template" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Worker Service Template
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#manual-configuration'" data-id="manual-configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Manual Configuration
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 
         </div>
     </div>    
@@ -1432,14 +1490,7 @@ import { ref } from "vue"
 import { mount } from "app.mjs"
 
 
-    const App = {
-        setup() {
-            function nav(url) {
-                window.open(url)
-            }
-            return { nav }
-        }
-    }
+        import App from "/pages/azure-service-bus-mq.mjs" 
     
 const Sidebar = {
     setup() {
