@@ -398,7 +398,8 @@ type ApiPrefs = {
 }
 
 type FormStyle  = "slideOver" | "card"
-type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
+type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings"
+  | "verticalLines"
 
 type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 
