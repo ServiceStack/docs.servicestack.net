@@ -391,6 +391,23 @@ defineProps<{
     create?: boolean
     edit?: string|number
 }>()
+
+type ApiPrefs = {
+    take?: number
+    selectedColumns?: string[]    
+}
+
+type FormStyle  = "slideOver" | "card"
+type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
+
+type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+
+type GridAllowOptions = 
+  "filtering"   | "queryString" | "queryFilters"
+
+type GridShowOptions = 
+  "toolbar"     | "preferences" | "pagingNav"        | "pagingInfo"  | "downloadCsv" | 
+  "refresh"     | "copyApiUrl"  | "resetPreferences" | "filtersView" | "newItem"
 ```
 
 ## AutoQueryGrid Events
