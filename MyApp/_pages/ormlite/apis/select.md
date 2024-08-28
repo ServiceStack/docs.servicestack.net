@@ -196,6 +196,30 @@ q = db.From<Track>()
 var top2CountOfAByYear = db.Dictionary<string, int>(q);
 ```
 
+## Sql.In
+
+### Nested Typed Sub Select Sql Expressions 
+
+The `Sql.In()` API supports nesting and combining of multiple Typed SQL Expressions together
+in a single SQL Query, e.g:
+
+```csharp
+var usaCustomerIds = db.From<Customer>(c => c.Country == "USA").Select(c => c.Id);
+var usaCustomerOrders = db.Select(db.From<Order>()
+    .Where(x => Sql.In(x.CustomerId, usaCustomerIds)));
+``` 
+
+### SQL IN with collections
+
+By using `Sql.In` from within a `SqlExpression<T>`, multiple values can be checked for a match in your query.
+
+```csharp
+db.Select<Author>(x => Sql.In(x.City, "London", "Madrid", "Berlin"));
+
+var cities = new[] { "London", "Madrid", "Berlin" };
+db.Select<Author>(x => Sql.In(x.City, cities));
+```
+
 ## SqlExpression with JOIN examples
 
 Just like SQL, SqlExpression supports multiple JOIN's that can leverage OrmLite's Reference Conventions for Simple, Terse and Intuitive Table JOIN's:
