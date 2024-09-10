@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-08-28T07:48:02.2828603Z'>
+    <meta name='date' content='2024-09-10T07:14:23.4762556Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Logging &amp; Profiling UI</title>
@@ -1376,20 +1376,48 @@ mount('#header', Header)
 <p>Which will add the <a href="/modular-startup">Modular Startup</a> configuration to your Host project that registers both Request Logging &amp; Profiling features when running your App in <a href="/debugging#debugmode">DebugMode</a> (i.e. Development):</p>
 <pre><code class="language-csharp">public class ConfigureProfiling : IHostingStartup
 {
-    public void Configure(IWebHostBuilder builder)
-    {
-        builder.ConfigureAppHost(host =&gt; {
-            host.Plugins.AddIfDebug(new RequestLogsFeature {
-                EnableResponseTracking = true,
-            });
-            
-            host.Plugins.AddIfDebug(new ProfilingFeature {
-                IncludeStackTrace = true,
-            });
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddPlugin(new ProfilingFeature
+                {
+                    IncludeStackTrace = true,
+                });
+            }
         });
-    }
 }
 </code></pre>
+<p>Whilst Request Logs can be added with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix requestlogs</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Or if you prefer to store Request Logs in an SQLite database then use the following command:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix sqlitelogs</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 <p>The default configuration looks at providing useful information during development, where the response request bodies are captured in the Request Logger and the StackTrace is captured on the important events where they can be useful.</p>
 <h3 id="configuration">Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Depending on your App you'll want to change these defaults, e.g. if you're persisting the request logs using the <a href="/request-logger#csv-request-logger">CSV Request Logger</a> or <a href="/request-logger#redis-request-logger">Redis Request Logger</a> it may not be feasible to <strong>capture all API responses</strong> if they're very large.</p>
