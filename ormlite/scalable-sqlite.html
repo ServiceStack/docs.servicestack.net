@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2024-09-11T15:14:19.6051010Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Scalable SQLite</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-indigo-500 text-gray-900">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+                        <a href="/locode/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            Locode
+                        </a>
+                        <a href="/grpc/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            gRPC
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+                    <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Locode
+                    </a>
+                    <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        gRPC
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-16 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/ormlite/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+OrmLite                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/installation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Installation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/async-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Async APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/db-migrations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        DB Migrations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/litestream" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Litestream
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/install-postgres-mysql-sqlserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Install Postgres, MySql &amp; MSSQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multi-database-app" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multiple App Databases
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/scalable-sqlite" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Scalable SQLite
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    OrmLite APIs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/apis/select" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Select APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/update" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Update APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Delete APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/schema" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schema APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Advanced Topics
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/bulk-inserts" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Bulk Inserts
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/reference-support" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Reference Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/typed-joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Typed Join Expressions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dynamic-result-sets" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dynamic Result Sets
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Database Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/type-converters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Type Converters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        OrmLite Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ensure-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Ensure APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/introspection" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Logging &amp; Introspection
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/complex-type-serializers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Complex Type Serializers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/filters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert &amp; Update Filters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/custom-sql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Custom SQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customized-sql-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Customizations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dictionary-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dictionary APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    RDBMS specific features
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/sql-server-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Server Features
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/postgres-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PostgreSQL Features
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Background Info
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/optimistic-concurrency" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Optimistic Concurrency
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/untyped-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Untyped APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/autogen-t4" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen &amp; T4 templates
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/stored-procedures" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Stored Procedures
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multi-database-connections" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multi database connections
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/shippers-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        OrmLite Shippers example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customer-orders-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Customer Orders example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/aws-rds-databases" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AWS &amp; RDS Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/limitations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Limitations
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Scalable SQLite
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p>Ever since adding <a href="/ormlite/litestream">support for Litestream</a> in
+our project's templates <a href="https://servicestack.net/posts/kubernetes_not_required">GitHub Action Deployments</a>
+we've been using SQLite as the backend for our new .NET Apps as it's the
+<a href="/ormlite/litestream#savings-at-scale">most cost-effective option</a>
+that frees us from needing to use a cloud managed database which lets us make use of Hetzner's much cheaper
+<a href="https://www.hetzner.com/cloud/">US Cloud VMs</a>.</p>
+<p>We're also seeing increased usage of SQLite Server Apps with <a href="https://github.com/bluesky-social/atproto/pull/1705">Bluesky Social</a>
+having moved to SQLite and all of 37 Signals new <a href="https://once.com">Once</a> Web Apps
+<a href="https://world.hey.com/dhh/multi-tenancy-is-what-s-hard-about-scaling-web-services-dd1e0e81">using SQLite</a>
+and Cloud Providers building distributed databases on top of SQLite like
+<a href="https://blog.cloudflare.com/introducing-d1/">Cloudflare D1</a> and Fly.io's
+multi-region distributed <a href="https://fly.io/docs/litefs/">LiteFS</a> solution.</p>
+<p>SQLite is highly-performant and can handle a large number of concurrent read operations and its
+write operations are roughly <a href="https://www.sqlite.org/fasterthanfs.html">35% Faster</a>
+than writing to the Filesystem directly with very low latency that's often faster than other RDBMS's
+courtesy of its proximity to the running application.</p>
+<h2 id="single-concurrent-writer">Single Concurrent Writer<a class="header-anchor" href="javascript:;" onclick="location.hash='#single-concurrent-writer'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The primary limitation of SQLite is that it only supports a single concurrent writer, which means if you
+have multiple requests writing to the same database at the same time, they will need to coordinate access.</p>
+<p>As long as we can overcome this limitation SQLite can be an excellent choice to power many Web Apps. In the
+previous ServiceStack v8.3 release we <a href="/commands#use-case-sqlite-writes">worked around this limitation</a>
+by using <a href="/commands#mq-command-dtos">MQ Command DTOs</a> to route all DB
+Writes to be executed by a single Background MQ Thread.</p>
+<p>This works great for <a href="/commands#messaging">messaging-based architectures</a>
+where you can queue commands to be processed serially, but the overhead of using commands for all
+DB writes can be cumbersome when needing to perform sporadic writes within complex logic.</p>
+<h2 id="multiple-sqlite-databases">Multiple SQLite Databases<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-sqlite-databases'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Firstly a great way to reduce contention is to use separate SQLite databases for different
+subsystems of your Application that way load is distributed across multiple DBs
+and writes across each SQLite database can be executed concurrently.</p>
+<p>This is especially important for write heavy operations like
+<a href="https://servicestack.net/posts/sqlite-request-logs">SQLite Request Logging</a> or if your App stores every interaction
+of your App for A/B testing, storing them in separate <code>analytics.db</code> databases will remove
+any contention from your primary database.</p>
+<p>The other techniques below demonstrates concurrent safe techniques for accessing an SQLite DB:</p>
+<h3 id="always-use-synchronous-apis-for-sqlite">Always use Synchronous APIs for SQLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#always-use-synchronous-apis-for-sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Generally it's recommended to use non-blocking Async APIs for any I/O Operations however as
+SQLite doesn't make Network I/O requests and its native implementation is blocking, its Async DB
+APIs are just pseudo-async wrappers around SQLite's blocking APIs which just adds unnecessary
+overhead. For this reason we recommend <strong>always</strong> using synchronous APIs for SQLite, especially
+as it's not possible to await inside a lock:</p>
+<pre><code class="language-csharp">lock (Locks.AppDb)
+{
+    //Can't await inside a lock
+    //await Db.UpdateAsync(row); 
+    Db.Update(row);
+}
+</code></pre>
+<p>It's also safe to assume SQLite will always block since all
+<a href="https://www.sqlite.org/asyncvfs.html">Asynchronous I/O efforts</a> were abandoned in favor
+of <a href="https://www.sqlite.org/wal.html">WAL mode</a> which mitigates the cost of blocking <strong>fsync()</strong>.</p>
+<h2 id="database-locks">Database Locks<a class="header-anchor" href="javascript:;" onclick="location.hash='#database-locks'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The new <code>Locks</code> class maintains an object lock for each registered database connection that can be
+used to synchronize <strong>write access</strong> for different SQLite databases, e.g:</p>
+<pre><code class="language-js">var row = db.SingleById&lt;Table&gt;(request.Id);
+row.PopulateWithNonDefaultValues(request);
+lock (Locks.AppDb)
+{
+    Db.Update(row);
+}
+</code></pre>
+<p><code>Locks.AppDb</code> can be used synchronize db writes for the App's primary database, e.g. <code>App_Data/app.db</code>.</p>
+<p>Whilst <code>Locks.GetDbLock(namedConnection)</code> can be used to get the DB Write Lock for any other
+<a href="/ormlite/multi-database-app">registered SQLite Database</a> by using
+the same named connection the SQLite Database Connection was registered against, e.g:</p>
+<pre><code class="language-csharp">var dbFactory = new OrmLiteConnectionFactory(connStr, SqliteDialect.Provider);
+dbFactory.RegisterConnection(Databases.Search, 
+    $&quot;DataSource=App_Data/search.db;Cache=Shared&quot;, SqliteDialect.Provider);
+dbFactory.RegisterConnection(Databases.Analytics, 
+    $&quot;DataSource=App_Data/analytics.db;Cache=Shared&quot;, SqliteDialect.Provider);
+
+//...
+using var dbSearch = dbFactory.Open(Database.Search);
+locks (Locks.GetDbLock(Database.Search))
+{
+    dbSearch.Insert(row);
+}
+
+using var dbAnalytics = dbFactory.Open(Database.Analytics);
+locks (Locks.GetDbLock(Database.Analytics))
+{
+    dbAnalytics.Insert(row);
+}
+</code></pre>
+<h2 id="queuing-db-writes-with-synccommand">Queuing DB Writes with SyncCommand<a class="header-anchor" href="javascript:;" onclick="location.hash='#queuing-db-writes-with-synccommand'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><code>Locks</code> are a great option for synchronizing DB Writes that need to be executed within
+complex logic blocks, however locks can cause contention in highly concurrent Apps.
+One way to remove contention is to serially execute DB Writes instead which we can
+do by executing DB Writes within <code>SyncCommand*</code> commands and using a named <code>[Worker(Workers.AppDb)]</code>
+attribute for Writes to the primary database, e.g:</p>
+<pre><code class="language-csharp">[Worker(Workers.AppDb)]
+public class DeleteCreativeCommand(IDbConnection db) 
+    : SyncCommand&lt;DeleteCreative&gt;
+{
+    protected override void Run(DeleteCreative request)
+    {
+        var artifactIds = request.ArtifactIds;
+        db.Delete&lt;AlbumArtifact&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;ArtifactReport&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;ArtifactLike&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;Artifact&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;CreativeArtist&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;CreativeModifier&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;Creative&gt;(x =&gt; x.Id == request.Id);
+    }
+}
+</code></pre>
+<p>Other databases should use its named connection for its named worker, e.g:</p>
+<pre><code class="language-csharp">[Worker(Databases.Search)]
+public class DeleteSearchCommand(IDbConnectionFactory dbFactory) 
+    : SyncCommand&lt;DeleteSearch&gt;
+{
+    protected override void Run(DeleteSearch request)
+    {
+        using var db = dbFactory.Open(Databases.Search);
+        db.DeleteById&lt;ArtifactFts&gt;(request.Id);
+        //...
+    }
+}
+</code></pre>
+<p>Where it will be executed within its Database Lock.</p>
+<h2 id="executing-commands">Executing Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Now everytime the commands are executed they will be added to a ConcurrentQueue
+where they'll be serially executed by the worker's Background Task:</p>
+<pre><code class="language-csharp">public class MyServices(IBackgroundJobs jobs) : Service
+{
+    public void Any(DeleteCreative request)
+    {
+        // Queues a durable job to execute the command with the named worker
+        var jobRef = jobs.EnqueueCommand&lt;DeleteCreativeCommand&gt;(request);
+        // Returns immediately with a reference to the Background Job
+    }
+
+    public async Task Any(DeleteSearch request)
+    {
+        // Executes a transient (i.e. non-durable) job with the named worker
+        var result = await jobs.RunCommandAsync&lt;DeleteSearchCommand&gt;(request);
+        // Returns after the command is executed with its result (if any)
+    }
+}
+</code></pre>
+<p>When using any <code>SyncCommand*</code> base class, its execution still uses database locks
+but any contention is alleviated as they're executed serially by a single worker thread.</p>
+<h3 id="autoquery-crud-database-write-locks">AutoQuery Crud Database Write Locks<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-database-write-locks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To avoid SQLite concurrency write exceptions all DB Writes should be executed within
+its database lock or a named worker. Including the auto-generated <a href="/autoquery/crud">AutoQuery Crud</a>
+APIs which will implicitly use Database Locks if the <strong>primary database is SQLite</strong>.</p>
+<p>AutoQuery CRUD can also be explicitly configured to always be executed within Database Locks with:</p>
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
+    UseDatabaseWriteLocks = true
+});
+</code></pre>
+<h2 id="sqlite-web-apps">SQLite Web Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#sqlite-web-apps'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>That's about it, by using any of the above techniques to guard against concurrent writes
+you can take advantage of the <a href="/ormlite/litestream#the-right-time-for-server-side-sqlite">simplicity, value and performance benefits</a>
+of SQLite in your Apps and utilize a solution like <a href="https://litestream.io">litestream.io</a>
+for real-time replication of your SQLite databases to highly reliable managed storage.</p>
+<p>SQLite's <a href="https://www.sqlite.org/whentouse.html#checklist_for_choosing_the_right_database_engine">Checklist For Choosing The Right Database Engine</a>
+covers the few situations when a traditional Client/Server RDBMS will be more appropriate.</p>
+<p>The primary use-case would be when your App needs to be distributed across multiple App Servers
+as using SQLite essentially forces you into scaling up, which gets more appealing every year
+with hardware getting cheaper and faster and cheap hosting providers like <a href="https://www.hetzner.com">hetzner.com</a>
+where you can get bare metal 48 Core/96 vCore EPYC Servers with fast NVMe SSDs for <strong>€236</strong> per month -
+a fraction of the cost of comparable performance with any cloud managed solution</p>
+<p><a href="https://www.hetzner.com/dedicated-rootserver/"><img src="/img/pages/sqlite/hetzner-epyc-48.webp" alt="" /></a></p>
+<p>Which is a fraction of what it would cost for comparable performance using cloud managed databases:</p>
+<p><a href="https://azure.microsoft.com/en-us/pricing/details/azure-sql-database/single/"><img src="/img/pages/sqlite/azure-sql-database.webp" alt="" /></a></p>
+<p>In the rare cases where you need to scale beyond a single server you'll initially be able to
+scale out your different App databases onto different servers.</p>
+<p>Beyond that, if your App permits you may be able to adopt a multi-tenant architecture like
+<a href="https://bsky.social/about">Bluesky Social</a> with each tenant having their own SQLite database
+to effectively enable infinite scaling.</p>
+<p>For further info on using high performance SQLite in production web apps check out
+<a href="https://x.com/aarondfrancis">@aarondfrancis</a> comprehensive website and course at
+<a href="https://highperformancesqlite.com">highperformancesqlite.com</a> -
+which contains a lot of great content accessible for free.</p>
+<h2 id="example-sqlite-apps">Example SQLite Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-sqlite-apps'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Our confidence in SQLite being the best choice for many web applications has led us to adopt
+it to power our latest web applications which are all
+<a href="https://servicestack.net/posts/kubernetes_not_required">deployed to a shared Hetzner VM</a>
+whose <a href="https://servicestack.net/posts/jamstacks_hosting">inexpensive hosting costs</a> allows us to host
+and make them <strong>available for free!</strong></p>
+<p>All projects are open-source and employ the different techniques detailed above that should serve
+as a great resource of how they're used in real-world Web Applications:</p>
+<h3 id="blazor-diffusion">Blazor Diffusion<a class="header-anchor" href="javascript:;" onclick="location.hash='#blazor-diffusion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Generate images for free using custom <a href="https://civitai.com">Civit AI</a> and <a href="https://huggingface.co/black-forest-labs/FLUX.1-schnell">FLUX-schnell</a>
+models:</p>
+<p><a href="https://blazordiffusion.com"><img src="/img/pages/sqlite/blazordiffusion.webp" alt="" /></a></p>
+<ul>
+<li>Website: <a href="https://blazordiffusion.com">blazordiffusion.com</a></li>
+<li>GitHub: <a href="https://github.com/NetCoreApps/BlazorDiffusionVue/">github.com/NetCoreApps/BlazorDiffusionVue</a></li>
+</ul>
+<h3 id="pvq.app">pvq.app<a class="header-anchor" href="javascript:;" onclick="location.hash='#pvq.app'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>An OSS alternative to StackOverflow which uses the best proprietary and OSS Large Language Models
+to answer your technical questions. <a href="https://pvq.app">pvq.app</a> is populated with over <strong>1M+ answers</strong> for the highest
+rated StackOverflow questions - checkout <a href="https://pvq.app/leaderboard">pvq.app/leaderboard</a>
+to find the best performing LLM models (results are surprising!)</p>
+<p><a href="https://pvq.app"><img src="/img/pages/sqlite/pvq.webp" alt="" /></a></p>
+<ul>
+<li>Website: <a href="https://pvq.app">pvq.app</a></li>
+<li>GitHub: <a href="https://github.com/ServiceStack/pvq.app">github.com/ServiceStack/pvq.app</a></li>
+</ul>
+<h3 id="ai-server">AI Server<a class="header-anchor" href="javascript:;" onclick="location.hash='#ai-server'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The independent Microservice used to provide all AI Features used by the above applications.
+It's already been used to execute millions of LLM and Comfy UI Requests to generate Open AI Chat Answers
+and Generated Images used to populate the
+<a href="https://blazordiffusion.com">blazordiffusion.com</a> and <a href="https://pvq.app">pvq.app</a> websites.</p>
+<p>It was the project used to develop and test <a href="/background-jobs">Background Jobs</a> in action
+where it serves as a private gateway to process all LLM, AI and image transformations requests
+that any of our Apps need where it dynamically delegates requests across multiple Ollama,
+Open AI Chat, LLM Gateway, Comfy UI, Whisper and ffmpeg providers.</p>
+<p><a href="https://openai.servicestack.net"><img src="/img/pages/sqlite/ai-server.webp" alt="" /></a>
+<a href="https://openai.servicestack.net"><img src="/img/pages/sqlite/ai-server-chat.webp" alt="" /></a></p>
+<ul>
+<li>Website: <a href="https://openai.servicestack.net">openai.servicestack.net</a></li>
+<li>GitHub: <a href="https://github.com/ServiceStack/ai-server">github.com/ServiceStack/ai-server</a></li>
+</ul>
+<p>In addition to maintaining a history of AI Requests, it also provides file storage
+for its CDN-hostable AI generated assets and on-the-fly, cacheable image transformations.</p>
+<h3 id="private-ai-gateway">Private AI Gateway<a class="header-anchor" href="javascript:;" onclick="location.hash='#private-ai-gateway'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>We're developing AI Server as a <strong>Free OSS Product</strong> that runs as a single Docker Container
+Microservice that Admins can use its built-in UIs to add multiple Ollama instances,
+Open AI Gateways to execute LLM requests and Client Docker agents installed with Comfy UI,
+ffmpeg and Whisper to handle all other non-LLM Requests.</p>
+<h4 id="multiple-ollama-open-ai-gateway-and-comfy-ui-agents">Multiple Ollama, Open AI Gateway and Comfy UI Agents<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-ollama-open-ai-gateway-and-comfy-ui-agents'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>The AI Server Docker container itself wont require any infrastructure dependencies or
+specific hardware requirements, however any Ollama endpoints or Docker Comfy UI Agents added
+will need to run on GPU-equipped servers.</p>
+<h4 id="native-end-to-end-typed-integrations-to-most-popular-languages">Native end-to-end Typed Integrations to most popular languages<a class="header-anchor" href="javascript:;" onclick="location.hash='#native-end-to-end-typed-integrations-to-most-popular-languages'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>ServiceStack's <a href="/add-servicestack-reference">Add ServiceStack Reference</a>
+feature is used to provide native typed integrations to C#, TypeScript, JavaScript, Python, PHP, Swift, Java,
+Kotlin, Dart, F# and VB.NET projects which organizations can drop into their heterogeneous
+environments to manage their private AI Services used across their different Apps.</p>
+<h4 id="protected-access-with-api-keys">Protected Access with API Keys<a class="header-anchor" href="javascript:;" onclick="location.hash='#protected-access-with-api-keys'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>AI Server utilizes <a href="/auth/admin-apikeys">Simple Auth with API Keys</a>
+letting Admins create and distribute API Keys to only allow authorized clients to access their
+AI Server's APIs, which can be optionally further restricted to only
+<a href="/auth/apikeys#creating-user-api-keys">allow access to specific APIs</a>.</p>
+<h2 id="active-development">Active Development<a class="header-anchor" href="javascript:;" onclick="location.hash='#active-development'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>AI Server is still actively developed whilst we finish adding support for different
+AI Requests in its first V1 release, including:</p>
+<h4 id="large-language-models">Large Language Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#large-language-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>Open AI Chat
+<ul>
+<li>Support for Ollama endpoints</li>
+<li>Support for Open Router, Open AI, Mistral AI, Google and Groq API Gateways</li>
+</ul>
+</li>
+</ul>
+<h4 id="comfy-ui-agent-replicate-dall-e-3">Comfy UI Agent / Replicate / DALL-E 3<a class="header-anchor" href="javascript:;" onclick="location.hash='#comfy-ui-agent-replicate-dall-e-3'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>Text to Image</li>
+</ul>
+<h4 id="comfy-ui-agent">Comfy UI Agent<a class="header-anchor" href="javascript:;" onclick="location.hash='#comfy-ui-agent'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>Image to Image
+<ul>
+<li>Image Upscaling</li>
+<li>Image with Mask</li>
+</ul>
+</li>
+<li>Image to Text</li>
+<li>Text to Audio</li>
+<li>Text to Speech</li>
+<li>Speech to Text</li>
+</ul>
+<h4 id="ffmpeg">ffmpeg<a class="header-anchor" href="javascript:;" onclick="location.hash='#ffmpeg'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>image/video/audio format conversions</li>
+<li>image/video scaling</li>
+<li>image/video cropping</li>
+<li>image/video watermarking</li>
+<li>video trimming</li>
+</ul>
+<h4 id="managed-file-storage">Managed File Storage<a class="header-anchor" href="javascript:;" onclick="location.hash='#managed-file-storage'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li>Blob Storage - isolated and restricted by API Key</li>
+</ul>
+<h3 id="v1-release">V1 Release<a class="header-anchor" href="javascript:;" onclick="location.hash='#v1-release'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>We'll announce <strong>V1</strong> after we've finished implementing the above AI Features with any
+necessary Admin UIs, feature documentation / API Docs and have streamlined the
+Server Install / Client Setup experience. After V1 we'll be happy to start accepting
+any external contributions for other AI Features users would like AI Server to support.</p>
+<p>To get notified when AI Server is ready for public consumption,
+follow <a href="https://twitter.com/servicestack">@ServiceStack</a>
+or <a href="https://servicestack.net/posts/scalable-sqlite#top">join our ~Quarterly Newsletter</a>.</p>
+<p>In the meantime you can reach us at <a href="https://github.com/ServiceStack/Discuss/discussions">ServiceStack/Discuss</a>
+with any AI Server questions.</p>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/scalable-sqlite.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/ormlite/multi-database-app" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Multiple App Databases
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/ormlite/apis/select" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Select APIs
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#single-concurrent-writer'" data-id="single-concurrent-writer" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Single Concurrent Writer
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#multiple-sqlite-databases'" data-id="multiple-sqlite-databases" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multiple SQLite Databases
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="always-use-synchronous-apis-for-sqlite" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#always-use-synchronous-apis-for-sqlite'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Always use Synchronous APIs for SQLite
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#database-locks'" data-id="database-locks" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Database Locks
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#queuing-db-writes-with-synccommand'" data-id="queuing-db-writes-with-synccommand" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Queuing DB Writes with SyncCommand
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#executing-commands'" data-id="executing-commands" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Executing Commands
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="autoquery-crud-database-write-locks" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-crud-database-write-locks'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery Crud Database Write Locks
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#sqlite-web-apps'" data-id="sqlite-web-apps" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            SQLite Web Apps
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#example-sqlite-apps'" data-id="example-sqlite-apps" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Example SQLite Apps
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="blazor-diffusion" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#blazor-diffusion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Blazor Diffusion
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="pvq.app" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#pvq.app'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            pvq.app
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="ai-server" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#ai-server'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AI Server
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="private-ai-gateway" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#private-ai-gateway'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Private AI Gateway
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#active-development'" data-id="active-development" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Active Development
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="v1-release" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#v1-release'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            V1 Release
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
