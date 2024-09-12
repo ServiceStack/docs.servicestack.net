@@ -125,6 +125,23 @@ The following Core APIs also have extension methods on `HttpClient` which existi
  - `SendStreamToUrl()`
  - `SendStreamToUrlAsync()`
 
+## HTTP Client Factory HTTP Utils
+
+ServiceStack registers a named `IHttpClientFactory` that's configured with the same defaults as the built-in [HttpUtils](/http-utils) including using Default Credentials and support for Brotli, Deflate and GZip compression.
+
+You can access this via `IHttpClientFactory.HttpUtilsClient()` extension method, e.g:
+
+```csharp
+public class MyServices(IHttpClientFactory clientFactory) : Service
+{
+    public async Task<object> Any(MyRequest request)
+    {
+        using HttpClient client = clientFactory.HttpUtilsClient();
+        //...
+    }
+}
+```
+
 ### Url Extensions
 
 You can make use of the accompanying String Extensions to programmatically construct a url as seen in this Twitter API example:

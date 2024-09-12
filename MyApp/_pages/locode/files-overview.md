@@ -472,6 +472,33 @@ let api = await client.apiForm(new MultipartRequest(), formData)
 
 Where `apiForm` can be used to submit `FormData` requests for normal API Requests, or `apiFormVoid` for `IReturnVoid` API requests.
 
+## API Keys protected managed File Uploads
+
+Managed file uploads can also be protected with [Identity Auth API Keys](/auth/apikeys) by setting `requireApiKey:`, e.g:
+
+```csharp
+var fileFs = new FileSystemVirtualFiles(context.HostingEnvironment.ContentRootPath);
+services.AddPlugin(new FilesUploadFeature(
+    new UploadLocation("pub", 
+        fileFs,
+        readAccessRole: RoleNames.AllowAnon,
+        requireApiKey: new(),
+        maxFileBytes: 10 * 1024 * 1024,
+        resolvePath:ctx => "pub".CombineWith(ctx.Request.GetApiKey().Key, ctx.FileName)),
+    new UploadLocation("secure", 
+        fileFs,
+        requireApiKey: new("manager"),
+        maxFileBytes: 10 * 1024 * 1024,
+        resolvePath:ctx => "secure".CombineWith(ctx.Request.GetApiKey().Key, ctx.FileName))
+));
+```
+
+This configuration shows a **pub** upload location allowing for anonymous reads but all writes requiring an API Key. 
+
+The **secure** upload location requires an API key with a **manager** [Scope](/auth/apikeys#scopes) which is required for both read and write access.
+
+In both cases the upload locations will store the files in a sub-directory named after API Key used to upload it.
+
 ## Substitutable Virtual File Providers
 
 We've also created the [File Blazor Demo](https://github.com/NetCoreApps/FileBlazor) to further demonstrate the versatility of the 
@@ -555,9 +582,7 @@ private static void ValidateUpload(IRequest request, IHttpFile file)
 
 ### Memory Virtual File Sources
 
-ServiceStack AppHost's are configured with an empty Memory VFS which can be used to transiently prepopulate App files 
-from external sources on Startup or maintain temporary working files with the same lifetime of the App without needing 
-to persist to disk.
+ServiceStack AppHost's are configured with an empty Memory VFS which can be used to transiently prepopulate App files from external sources on Startup or maintain temporary working files with the same lifetime of the App without needing to persist to disk.
 
 They're also a great solution for Integration Testing managed file access without creating any persistent artifacts as done in
 [AutoQueryCrudTests.References.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.References.cs)
