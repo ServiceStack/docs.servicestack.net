@@ -669,33 +669,33 @@ public class NotifyCheckUrlsCommand(IHttpClientFactory clientFactory)
 `ReplyTo` can be any URL which by default will have the result POST'ed back to the URL with a JSON
 Content-Type. Typically URLs will contain a reference Id so external clients can correlate a callback
 with the internal process that initiated the job. If the callback API is publicly available you'll
-want to use an internal Id that can't be guessed so the callback can't be spoofed like a Guid, e.g:
+want to use an internal Id that can't be guessed so the callback can't be spoofed, like a Guid, e.g:
 
 `$"https://api.example.com?refId={RefId}"`
 
-If needed the callback URL can be customized on how the HTTP Request is sent:
+If needed the callback URL can be customized on how the HTTP Request callback is sent.
 
 If the URL contains a space, the text before the space is treated as the HTTP method:
 
 `"PUT https://api.example.com"`
 
-If the auth part contains a colon :, it's treated as Basic Auth.
+If the auth part contains a colon `:` it's treated as Basic Auth:
 
 `"username:password@https://api.example.com"`
 
-If name starts with 'http.' sends a HTTP Header
+If name starts with `http.` sends a HTTP Header
 
 `"http.X-API-Key:myApiKey@https://api.example.com"`
 
-Otherwise used as Bearer Token:
+Otherwise it's sent as a Bearer Token:
 
 `"myToken123@https://api.example.com"`
 
-Bearer Token or HTTP Headers starting with '$' is substituted with Environment Variable if exists
+Bearer Token or HTTP Headers starting with `$` is substituted with Environment Variable if exists:
 
 `"$API_TOKEN@https://api.example.com"`
 
-When needed headers, passwords and tokens can be URL encoded if they contain any delimiter characters.  
+When needed headers, passwords and tokens can be URL encoded if they contain any delimiter characters.
 
 ## Implementing Commands
 
