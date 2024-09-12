@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-11T15:14:20.3035287Z'>
+    <meta name='date' content='2024-09-12T03:56:18.4978044Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Background Jobs</title>
@@ -1394,7 +1394,9 @@ as a background job in addition to <a href="/commands">Commands</a> added in the
 <a href="/releases/v8_03">last v8.3 release</a> used for encapsulating units of logic
 that can be used as internal invokable, inspectable and auto-retryable building blocks.</p>
 <h3 id="real-time-admin-ui">Real Time Admin UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#real-time-admin-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Dashboard Summary of Executed, Failed and Cancelled Jobs and Worker Stats</p>
+<p>The Background Jobs Admin UI provides a real time view into the status of all background jobs including
+their progress, completion times, Executed, Failed and Cancelled Jobs, etc. which is useful for monitoring
+and debugging purposes.</p>
 <p><img src="/img/pages/jobs/jobs-dashboard.webp" alt="" /></p>
 <p>View Real-time progress of queued Jobs</p>
 <p><img src="/img/pages/jobs/jobs-queue.webp" alt="" /></p>
@@ -1538,26 +1540,6 @@ the following options:</p>
 <li><code>ReplyTo</code> - Optional field for capturing where to send notification for completion of a Job</li>
 <li><code>Args</code> - Optional String Dictionary of Arguments that can be attached to a Job</li>
 </ul>
-<h3 id="executing-non-durable-jobs">Executing non-durable jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-non-durable-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><code>IBackgroundJobs</code> also supports <code>RunCommand</code> methods to be able to execute jobs transiently
-(i.e. non-durable), which is useful for commands that want to be serially executed by a named worker
-but don't need to be persisted.</p>
-<p>You could use this to queue system emails to be sent by the same <strong>smtp</strong> worker and are happy to
-avoid tracking its state and execution history in the Jobs database.</p>
-<pre><code class="language-csharp">var job = jobs.RunCommand&lt;SendEmailCommand&gt;(new SendEmail { ... }, 
-    new() {
-        Worker = &quot;smtp&quot;
-    });
-</code></pre>
-<p>In this case <code>RunCommand</code> returns the actual <code>BackgroundJob</code> instance that will be updated by
-the worker.</p>
-<p>You can also use <code>RunCommandAsync</code> if you prefer to wait until the job has been executed. Instead
-of a Job it returns the <strong>Result</strong> of the command if it returned one.</p>
-<pre><code class="language-csharp">var result = await jobs.RunCommandAsync&lt;SendEmailCommand&gt;(new SendEmail {...}, 
-    new() {
-        Worker = &quot;smtp&quot;
-    });
-</code></pre>
 <h3 id="schedule-recurring-tasks">Schedule Recurring Tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#schedule-recurring-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="DtB8KaXXMCM" playlabel="Schedule your Reoccurring Tasks with Background Jobs!" style="background-image:url('https://img.youtube.com/vi/DtB8KaXXMCM/maxresdefault.jpg')"></lite-youtube>
 <p>APIs and Commands can be scheduled to run at either a <code>TimeSpan</code> or
@@ -1585,6 +1567,26 @@ jobs.RecurringApi(Schedule.Interval(TimeSpan.FromMinutes(1)), new CheckUrls {
 either create or update the scheduled task registration without losing track of the
 last time the Recurring Task was run which is also viewable in the Jobs Admin UI:</p>
 <p><img src="/img/pages/jobs/jobs-scheduled-tasks-last-job.webp" alt="" /></p>
+<h3 id="executing-non-durable-jobs">Executing non-durable jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-non-durable-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>IBackgroundJobs</code> also supports <code>RunCommand</code> methods to be able to execute jobs transiently
+(i.e. non-durable), which is useful for commands that want to be serially executed by a named worker
+but don't need to be persisted.</p>
+<p>You could use this to queue system emails to be sent by the same <strong>smtp</strong> worker and are happy to
+avoid tracking its state and execution history in the Jobs database.</p>
+<pre><code class="language-csharp">var job = jobs.RunCommand&lt;SendEmailCommand&gt;(new SendEmail { ... }, 
+    new() {
+        Worker = &quot;smtp&quot;
+    });
+</code></pre>
+<p>In this case <code>RunCommand</code> returns the actual <code>BackgroundJob</code> instance that will be updated by
+the worker.</p>
+<p>You can also use <code>RunCommandAsync</code> if you prefer to wait until the job has been executed. Instead
+of a Job it returns the <strong>Result</strong> of the command if it returned one.</p>
+<pre><code class="language-csharp">var result = await jobs.RunCommandAsync&lt;SendEmailCommand&gt;(new SendEmail {...}, 
+    new() {
+        Worker = &quot;smtp&quot;
+    });
+</code></pre>
 <h3 id="serially-execute-jobs-with-named-workers">Serially Execute Jobs with named Workers<a class="header-anchor" href="javascript:;" onclick="location.hash='#serially-execute-jobs-with-named-workers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>By default jobs are executed immediately in a new Task, we can also change the behavior to
 instead execute jobs one-by-one in a serial queue by specifying them to use the same named
@@ -2107,16 +2109,16 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                                             Background Job Options
                                                         </span>
                                                     </li>
-                                                    <li data-id="executing-non-durable-jobs" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#executing-non-durable-jobs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Executing non-durable jobs
-                                                        </span>
-                                                    </li>
                                                     <li data-id="schedule-recurring-tasks" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#schedule-recurring-tasks'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Schedule Recurring Tasks
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="executing-non-durable-jobs" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#executing-non-durable-jobs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Executing non-durable jobs
                                                         </span>
                                                     </li>
                                                     <li data-id="serially-execute-jobs-with-named-workers" class="text-gray-500 hover:text-gray-900">
