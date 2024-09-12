@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-12T04:10:50.5599993Z'>
+    <meta name='date' content='2024-09-12T14:45:46.2771806Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Managed Files Uploads</title>
@@ -739,6 +739,26 @@ let formData = new FormData(document.forms[0])
 let api = await client.apiForm(new MultipartRequest(), formData)
 </code></pre>
 <p>Where <code>apiForm</code> can be used to submit <code>FormData</code> requests for normal API Requests, or <code>apiFormVoid</code> for <code>IReturnVoid</code> API requests.</p>
+<h2 id="api-keys-protected-managed-file-uploads">API Keys protected managed File Uploads<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-keys-protected-managed-file-uploads'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Managed file uploads can also be protected with <a href="/auth/apikeys">Identity Auth API Keys</a> by setting <code>requireApiKey:</code>, e.g:</p>
+<pre><code class="language-csharp">var fileFs = new FileSystemVirtualFiles(context.HostingEnvironment.ContentRootPath);
+services.AddPlugin(new FilesUploadFeature(
+    new UploadLocation(&quot;pub&quot;, 
+        fileFs,
+        readAccessRole: RoleNames.AllowAnon,
+        requireApiKey: new(),
+        maxFileBytes: 10 * 1024 * 1024,
+        resolvePath:ctx =&gt; &quot;pub&quot;.CombineWith(ctx.Request.GetApiKey().Key, ctx.FileName)),
+    new UploadLocation(&quot;secure&quot;, 
+        fileFs,
+        requireApiKey: new(&quot;manager&quot;),
+        maxFileBytes: 10 * 1024 * 1024,
+        resolvePath:ctx =&gt; &quot;secure&quot;.CombineWith(ctx.Request.GetApiKey().Key, ctx.FileName))
+));
+</code></pre>
+<p>This configuration shows a <strong>pub</strong> upload location allowing for anonymous reads but all writes requiring an API Key.</p>
+<p>The <strong>secure</strong> upload location requires an API key with a <strong>manager</strong> <a href="/auth/apikeys#scopes">Scope</a> which is required for both read and write access.</p>
+<p>In both cases the upload locations will store the files in a sub-directory named after API Key used to upload it.</p>
 <h2 id="substitutable-virtual-file-providers">Substitutable Virtual File Providers<a class="header-anchor" href="javascript:;" onclick="location.hash='#substitutable-virtual-file-providers'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>We've also created the <a href="https://github.com/NetCoreApps/FileBlazor">File Blazor Demo</a> to further demonstrate the versatility of the
 <code>FilesUploadFeature</code> to seamlessly manage uploading files to multiple different locations using different
@@ -817,9 +837,7 @@ private static void ValidateUpload(IRequest request, IHttpFile file)
 //...
 </code></pre>
 <h3 id="memory-virtual-file-sources">Memory Virtual File Sources<a class="header-anchor" href="javascript:;" onclick="location.hash='#memory-virtual-file-sources'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>ServiceStack AppHost's are configured with an empty Memory VFS which can be used to transiently prepopulate App files
-from external sources on Startup or maintain temporary working files with the same lifetime of the App without needing
-to persist to disk.</p>
+<p>ServiceStack AppHost's are configured with an empty Memory VFS which can be used to transiently prepopulate App files from external sources on Startup or maintain temporary working files with the same lifetime of the App without needing to persist to disk.</p>
 <p>They're also a great solution for Integration Testing managed file access without creating any persistent artifacts as done in
 <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.References.cs">AutoQueryCrudTests.References.cs</a></p>
 <pre><code class="language-csharp">var memFs = new MemoryVirtualFiles();
@@ -1026,6 +1044,11 @@ services.AddPlugin(new FilesUploadFeature(
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#uploading-files-from-jstypescript'" data-id="uploading-files-from-jstypescript" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Uploading Files from JS/TypeScript
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#api-keys-protected-managed-file-uploads'" data-id="api-keys-protected-managed-file-uploads" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            API Keys protected managed File Uploads
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
