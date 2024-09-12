@@ -92,9 +92,9 @@ of a singular growing database, visible in the [Database Admin UI](/admin-ui-dat
 SQLite logs will also make it easier to generate monthly aggregate reports to provide key insights
 into the usage of your App.
 
-## Admin Logging UI
+## AutoQuery Grid Admin Logging UI
 
 As SQLite Requests Logs also makes it efficiently possible to sort and filter through logs, the
-Logging UI will switch to using a fully queryable AutoQueryGrid when using `SqliteRequestLogger`:
+Logging UI will switch to using a fully queryable `AutoQueryGrid` when using `SqliteRequestLogger`:
 
 ![](/img/pages/sqlite/sqlite-request-logs.webp)
