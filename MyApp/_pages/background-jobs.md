@@ -36,7 +36,9 @@ that can be used as internal invokable, inspectable and auto-retryable building 
 
 ### Real Time Admin UI
 
-Dashboard Summary of Executed, Failed and Cancelled Jobs and Worker Stats
+The Background Jobs Admin UI provides a real time view into the status of all background jobs including 
+their progress, completion times, Executed, Failed and Cancelled Jobs, etc. which is useful for monitoring 
+and debugging purposes. 
 
 ![](/img/pages/jobs/jobs-dashboard.webp)
 
@@ -178,35 +180,6 @@ the following options:
  - `ReplyTo` - Optional field for capturing where to send notification for completion of a Job
  - `Args` - Optional String Dictionary of Arguments that can be attached to a Job
 
-### Executing non-durable jobs
-
-`IBackgroundJobs` also supports `RunCommand` methods to be able to execute jobs transiently 
-(i.e. non-durable), which is useful for commands that want to be serially executed by a named worker 
-but don't need to be persisted.
-
-You could use this to queue system emails to be sent by the same **smtp** worker and are happy to 
-avoid tracking its state and execution history in the Jobs database.
-
-```csharp
-var job = jobs.RunCommand<SendEmailCommand>(new SendEmail { ... }, 
-    new() {
-        Worker = "smtp"
-    });
-```
-
-In this case `RunCommand` returns the actual `BackgroundJob` instance that will be updated by 
-the worker. 
-
-You can also use `RunCommandAsync` if you prefer to wait until the job has been executed. Instead
-of a Job it returns the **Result** of the command if it returned one. 
-
-```csharp
-var result = await jobs.RunCommandAsync<SendEmailCommand>(new SendEmail {...}, 
-    new() {
-        Worker = "smtp"
-    });
-```
-
 ### Schedule Recurring Tasks
 
 :::youtube DtB8KaXXMCM
@@ -246,6 +219,35 @@ either create or update the scheduled task registration without losing track of 
 last time the Recurring Task was run which is also viewable in the Jobs Admin UI:
 
 ![](/img/pages/jobs/jobs-scheduled-tasks-last-job.webp)
+
+### Executing non-durable jobs
+
+`IBackgroundJobs` also supports `RunCommand` methods to be able to execute jobs transiently 
+(i.e. non-durable), which is useful for commands that want to be serially executed by a named worker 
+but don't need to be persisted.
+
+You could use this to queue system emails to be sent by the same **smtp** worker and are happy to 
+avoid tracking its state and execution history in the Jobs database.
+
+```csharp
+var job = jobs.RunCommand<SendEmailCommand>(new SendEmail { ... }, 
+    new() {
+        Worker = "smtp"
+    });
+```
+
+In this case `RunCommand` returns the actual `BackgroundJob` instance that will be updated by 
+the worker. 
+
+You can also use `RunCommandAsync` if you prefer to wait until the job has been executed. Instead
+of a Job it returns the **Result** of the command if it returned one. 
+
+```csharp
+var result = await jobs.RunCommandAsync<SendEmailCommand>(new SendEmail {...}, 
+    new() {
+        Worker = "smtp"
+    });
+```
 
 ### Serially Execute Jobs with named Workers
 
