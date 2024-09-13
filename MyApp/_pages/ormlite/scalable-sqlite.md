@@ -104,13 +104,13 @@ dbFactory.RegisterConnection(Databases.Analytics,
 
 //...
 using var dbSearch = dbFactory.Open(Database.Search);
-locks (Locks.GetDbLock(Database.Search))
+lock (Locks.GetDbLock(Database.Search))
 {
     dbSearch.Insert(row);
 }
 
 using var dbAnalytics = dbFactory.Open(Database.Analytics);
-locks (Locks.GetDbLock(Database.Analytics))
+lock (Locks.GetDbLock(Database.Analytics))
 {
     dbAnalytics.Insert(row);
 }
