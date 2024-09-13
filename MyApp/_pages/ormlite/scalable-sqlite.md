@@ -159,34 +159,65 @@ public class DeleteSearchCommand(IDbConnectionFactory dbFactory)
 }
 ```
 
-Where it will be executed within its Database Lock. 
-
-## Executing Commands
-
-Now everytime the commands are executed they will be added to a ConcurrentQueue
-where they'll be serially executed by the worker's Background Task: 
+Example of a DB Write command with result:
 
 ```csharp
-public class MyServices(IBackgroundJobs jobs) : Service
+[Worker(Databases.Albums)]
+public class CreateAlbumCommand(IDbConnectionFactory dbFactory) 
+    : SyncCommandWithResult<CreateAlbum,Album>
 {
-    public void Any(DeleteCreative request)
+    protected override Album Run(CreateAlbum request)
     {
-        // Queues a durable job to execute the command with the named worker
-        var jobRef = jobs.EnqueueCommand<DeleteCreativeCommand>(request);
-        // Returns immediately with a reference to the Background Job
-    }
-
-    public async Task Any(DeleteSearch request)
-    {
-        // Executes a transient (i.e. non-durable) job with the named worker
-        var result = await jobs.RunCommandAsync<DeleteSearchCommand>(request);
-        // Returns after the command is executed with its result (if any)
+        using var db = dbFactory.Open(Databases.Albums);
+        var album = request.ConvertTo<Album>();
+        album.Id = db.Insert(album, selectIdentity:true);
+        foreach (var artifact in request.Artifacts)
+        {
+            artifact.AlbumId = album.Id;
+            db.Insert(artifact);
+        }
+        return album;
     }
 }
 ```
 
+Where it will be executed within its Database Lock. 
+
+## Executing Commands
+
+Now everytime commands are executed they'll be added to a ConcurrentQueue of the specified worker. Commands delegated to different named workers execute concurrently, whilst commands with the same worker are executed serially.
+
+
 When using any `SyncCommand*` base class, its execution still uses database locks
 but any contention is alleviated as they're executed serially by a single worker thread.
+
+
+```csharp
+public class MyServices(IBackgroundJobs jobs) : Service
+{
+    // Returns immediately with a reference to the Background Job
+    public object Any(DeleteCreative request)
+    {
+        // Queues a durable job to execute the command with the AppDb Worker
+        var jobRef = jobs.EnqueueCommand<DeleteCreativeCommand>(request);
+
+        // Executes Command with Databases.Search worker
+        jobs.EnqueueCommand<DeleteSearchCommand>(new DeleteSearch {
+            Id = request.ArtifactId
+        });
+
+        return jobRef;
+    }
+
+    // Returns after the command is executed with its result (if any)
+    public async Task Any(CreateAlbum request)
+    {
+        // Executes a transient (i.e. non-durable) job with the named worker
+        var album = await jobs.RunCommandAsync<CreateAlbumCommand>(request);
+        return album;
+    }
+}
+```
 
 ### AutoQuery Crud Database Write Locks
 
