@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T07:35:24.8757632Z'>
+    <meta name='date' content='2024-09-13T09:39:19.2190120Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Scalable SQLite</title>
@@ -527,29 +527,55 @@ public class DeleteSearchCommand(IDbConnectionFactory dbFactory)
     }
 }
 </code></pre>
-<p>Where it will be executed within its Database Lock.</p>
-<h2 id="executing-commands">Executing Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Now everytime the commands are executed they will be added to a ConcurrentQueue
-where they'll be serially executed by the worker's Background Task:</p>
-<pre><code class="language-csharp">public class MyServices(IBackgroundJobs jobs) : Service
+<p>Example of a DB Write command with result:</p>
+<pre><code class="language-csharp">[Worker(Databases.Albums)]
+public class CreateAlbumCommand(IDbConnectionFactory dbFactory) 
+    : SyncCommandWithResult&lt;CreateAlbum,Album&gt;
 {
-    public void Any(DeleteCreative request)
+    protected override Album Run(CreateAlbum request)
     {
-        // Queues a durable job to execute the command with the named worker
-        var jobRef = jobs.EnqueueCommand&lt;DeleteCreativeCommand&gt;(request);
-        // Returns immediately with a reference to the Background Job
-    }
-
-    public async Task Any(DeleteSearch request)
-    {
-        // Executes a transient (i.e. non-durable) job with the named worker
-        var result = await jobs.RunCommandAsync&lt;DeleteSearchCommand&gt;(request);
-        // Returns after the command is executed with its result (if any)
+        using var db = dbFactory.Open(Databases.Albums);
+        var album = request.ConvertTo&lt;Album&gt;();
+        album.Id = db.Insert(album, selectIdentity:true);
+        foreach (var artifact in request.Artifacts)
+        {
+            artifact.AlbumId = album.Id;
+            db.Insert(artifact);
+        }
+        return album;
     }
 }
 </code></pre>
+<p>Where it will be executed within its Database Lock.</p>
+<h2 id="executing-commands">Executing Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Now everytime commands are executed they'll be added to a ConcurrentQueue of the specified worker. Commands delegated to different named workers execute concurrently, whilst commands with the same worker are executed serially.</p>
 <p>When using any <code>SyncCommand*</code> base class, its execution still uses database locks
 but any contention is alleviated as they're executed serially by a single worker thread.</p>
+<pre><code class="language-csharp">public class MyServices(IBackgroundJobs jobs) : Service
+{
+    // Returns immediately with a reference to the Background Job
+    public object Any(DeleteCreative request)
+    {
+        // Queues a durable job to execute the command with the AppDb Worker
+        var jobRef = jobs.EnqueueCommand&lt;DeleteCreativeCommand&gt;(request);
+
+        // Executes Command with Databases.Search worker
+        jobs.EnqueueCommand&lt;DeleteSearchCommand&gt;(new DeleteSearch {
+            Id = request.ArtifactId
+        });
+
+        return jobRef;
+    }
+
+    // Returns after the command is executed with its result (if any)
+    public async Task Any(CreateAlbum request)
+    {
+        // Executes a transient (i.e. non-durable) job with the named worker
+        var album = await jobs.RunCommandAsync&lt;CreateAlbumCommand&gt;(request);
+        return album;
+    }
+}
+</code></pre>
 <h3 id="autoquery-crud-database-write-locks">AutoQuery Crud Database Write Locks<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-database-write-locks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>To avoid SQLite concurrency write exceptions all DB Writes should be executed within
 its database lock or a named worker. Including the auto-generated <a href="/autoquery/crud">AutoQuery Crud</a>

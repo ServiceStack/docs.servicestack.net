@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T07:35:25.6216722Z'>
+    <meta name='date' content='2024-09-13T09:39:19.8882112Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Background Jobs</title>
@@ -646,6 +646,11 @@ mount('#header', Header)
                                         Overview
                                     </a>
                                 </li>
+                                <li class="relative">
+                                    <a href="/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Commands
+                                    </a>
+                                </li>
                         </ul>
                                 <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
                                     MQ Messaging
@@ -1044,11 +1049,6 @@ mount('#header', Header)
                                 <li class="relative">
                                     <a href="/openapi-v2" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Open API v2
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Commands
                                     </a>
                                 </li>
                                 <li class="relative">
@@ -1951,7 +1951,7 @@ want to use an internal Id that can't be guessed so the callback can't be spoofe
 <p>However commands executed via Background Jobs have additional context your commands may need to
 access during execution, including the <code>BackgroundJob</code> itself, the <code>CancellationToken</code> and
 an Authenticated User Context.</p>
-<p>To reduce the effort in creating commands with a <code>IRequest</code> context we've added a number ergonomic
+<p><div><p>To reduce the effort in creating commands with a <code>IRequest</code> context we've added a number ergonomic
 base classes to better capture the different call-styles a unit of logic can have including
 <strong>Sync</strong> or <strong>Async</strong> execution, whether they require <strong>Input Arguments</strong> or have <strong>Result Outputs</strong>.</p>
 <p>Choosing the appropriate Abstract base class benefits from IDE tooling in generating the method
@@ -1962,7 +1962,7 @@ signature highlights any missing async methods that are called without the token
 <li><code>SyncCommand</code> - Requires No Arguments</li>
 <li><code>SyncCommand&lt;TRequest&gt;</code> - Requires TRequest Argument</li>
 <li><code>SyncCommandWithResult&lt;TResult&gt;</code> - Requires No Args and returns Result</li>
-<li><code>SyncCommandWithResult&lt;TReq,TResult&gt;</code> - Requires Arg and returns Result</li>
+<li><code>SyncCommandWithResult&lt;TRequest,TResult&gt;</code> - Requires Argument and returns Result</li>
 </ul>
 <pre><code class="language-csharp">public record MyArgs(int Id);
 public record MyResult(string Message);
@@ -1983,8 +1983,7 @@ public class MyCommandArgs(ILogger&lt;MyCommandNoArgs&gt; log) : SyncCommand&lt;
     }
 }
 
-public class MyCommandWithResult(ILogger&lt;MyCommandNoArgs&gt; log) 
-    : SyncCommandWithResult&lt;MyResult&gt;
+public class MyCommandWithResult(ILogger&lt;MyCommandNoArgs&gt; log) : SyncCommandWithResult&lt;MyResult&gt;
 {
     protected override MyResult Run()
     {
@@ -2008,7 +2007,7 @@ public class MyCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
 <li><code>AsyncCommand</code> - Requires No Arguments</li>
 <li><code>AsyncCommand&lt;TRequest&gt;</code> - Requires TRequest Argument</li>
 <li><code>AsyncCommandWithResult&lt;TResult&gt;</code> - Requires No Args and returns Result</li>
-<li><code>AsyncCommandWithResult&lt;TReq,TResult&gt;</code> - Requires Arg and returns Result</li>
+<li><code>AsyncCommandWithResult&lt;TReq,TResult&gt;</code> - Requires Argument and returns Result</li>
 </ul>
 <pre><code class="language-csharp">public class MyAsyncCommandNoArgs(ILogger&lt;MyCommandNoArgs&gt; log) : AsyncCommand
 {
@@ -2021,7 +2020,7 @@ public class MyCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
 public class MyAsyncCommandArgs(ILogger&lt;MyCommandNoArgs&gt; log) 
     : AsyncCommand&lt;MyArgs&gt;
 {
-    protected override async Task RunAsync(MyArgs request, CancellationToken t)
+    protected override async Task RunAsync(MyArgs request, CancellationToken token)
     {
         log.LogInformation(&quot;Async called with {Id}&quot;, request.Id);
     }
@@ -2048,6 +2047,8 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
     }
 }
 </code></pre>
+
+</div></p>
 </div>
 
                 <div class="not-prose"></div>
@@ -2071,8 +2072,8 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/messaging" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Overview
+                                            <a href="/commands" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Commands
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -2192,20 +2193,6 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                         <span v-hash="'#implementing-commands'" data-id="implementing-commands" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Implementing Commands
                                         </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="sync-commands" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#sync-commands'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Sync Commands
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="async-commands" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#async-commands'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Async Commands
-                                                        </span>
-                                                    </li>
-                                            </ul>
                                     </li>
                             </ul>
                         </div>

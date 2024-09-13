@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T07:35:25.6664837Z'>
+    <meta name='date' content='2024-09-13T09:39:19.9316394Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Commands Feature</title>
@@ -646,6 +646,11 @@ mount('#header', Header)
                                         Overview
                                     </a>
                                 </li>
+                                <li class="relative">
+                                    <a href="/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Commands
+                                    </a>
+                                </li>
                         </ul>
                                 <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
                                     MQ Messaging
@@ -1044,11 +1049,6 @@ mount('#header', Header)
                                 <li class="relative">
                                     <a href="/openapi-v2" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Open API v2
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
-                                        Commands
                                     </a>
                                 </li>
                                 <li class="relative">
@@ -1505,18 +1505,137 @@ public interface IHasResult&lt;out T&gt;
     }
 }
 </code></pre>
-<h3 id="messaging">Messaging<a class="header-anchor" href="javascript:;" onclick="location.hash='#messaging'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Although for better resilience and scalability we recommend utilizing a messaging pattern to notify the outputs of a
-command by publishing messages to invoke dependent logic instead of returning a result, e.g:</p>
-<pre><code class="language-csharp">public class AddTodoCommand(IDbConnection db, IMessageProducer mq) 
-    : IAsyncCommand&lt;CreateTodo&gt;
+<h3 id="ergonomic-base-classes">Ergonomic Base Classes<a class="header-anchor" href="javascript:;" onclick="location.hash='#ergonomic-base-classes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Often you'll also need to make additional Request Context available to the command that's not apart of the
+Command Request or registered from the IOC like an Authenticated User Context or <code>CancellationToken</code>.</p>
+<p><div><p>To reduce the effort in creating commands with a <code>IRequest</code> context we've added a number ergonomic
+base classes to better capture the different call-styles a unit of logic can have including
+<strong>Sync</strong> or <strong>Async</strong> execution, whether they require <strong>Input Arguments</strong> or have <strong>Result Outputs</strong>.</p>
+<p>Choosing the appropriate Abstract base class benefits from IDE tooling in generating the method
+signature that needs to be implemented whilst Async commands with Cancellation Tokens in its method
+signature highlights any missing async methods that are called without the token.</p>
+<h3 id="sync-commands">Sync Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#sync-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><code>SyncCommand</code> - Requires No Arguments</li>
+<li><code>SyncCommand&lt;TRequest&gt;</code> - Requires TRequest Argument</li>
+<li><code>SyncCommandWithResult&lt;TResult&gt;</code> - Requires No Args and returns Result</li>
+<li><code>SyncCommandWithResult&lt;TRequest,TResult&gt;</code> - Requires Argument and returns Result</li>
+</ul>
+<pre><code class="language-csharp">public record MyArgs(int Id);
+public record MyResult(string Message);
+
+public class MyCommandNoArgs(ILogger&lt;MyCommandNoArgs&gt; log) : SyncCommand
 {
-    public async Task ExecuteAsync(CreateTodo request)
+    protected override void Run()
+    {
+        log.LogInformation(&quot;Called with No Args&quot;);
+    }
+}
+
+public class MyCommandArgs(ILogger&lt;MyCommandNoArgs&gt; log) : SyncCommand&lt;MyArgs&gt;
+{
+    protected override void Run(MyArgs request)
+    {
+        log.LogInformation(&quot;Called with {Id}&quot;, request.Id);
+    }
+}
+
+public class MyCommandWithResult(ILogger&lt;MyCommandNoArgs&gt; log) : SyncCommandWithResult&lt;MyResult&gt;
+{
+    protected override MyResult Run()
+    {
+        log.LogInformation(&quot;Called with No Args and returns Result&quot;);
+        return new MyResult(&quot;Hello World&quot;);
+    }
+}
+
+public class MyCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log) 
+    : SyncCommandWithResult&lt;MyArgs,MyResult&gt;
+{
+    protected override MyResult Run(MyArgs request)
+    {
+        log.LogInformation(&quot;Called with {Id} and returns Result&quot;, request.Id);
+        return new MyResult(&quot;Hello World&quot;);
+    }
+}
+</code></pre>
+<h3 id="async-commands">Async Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><code>AsyncCommand</code> - Requires No Arguments</li>
+<li><code>AsyncCommand&lt;TRequest&gt;</code> - Requires TRequest Argument</li>
+<li><code>AsyncCommandWithResult&lt;TResult&gt;</code> - Requires No Args and returns Result</li>
+<li><code>AsyncCommandWithResult&lt;TReq,TResult&gt;</code> - Requires Argument and returns Result</li>
+</ul>
+<pre><code class="language-csharp">public class MyAsyncCommandNoArgs(ILogger&lt;MyCommandNoArgs&gt; log) : AsyncCommand
+{
+    protected override async Task RunAsync(CancellationToken token)
+    {
+        log.LogInformation(&quot;Async called with No Args&quot;);
+    }
+}
+
+public class MyAsyncCommandArgs(ILogger&lt;MyCommandNoArgs&gt; log) 
+    : AsyncCommand&lt;MyArgs&gt;
+{
+    protected override async Task RunAsync(MyArgs request, CancellationToken token)
+    {
+        log.LogInformation(&quot;Async called with {Id}&quot;, request.Id);
+    }
+}
+
+public class MyAsyncCommandWithResult(ILogger&lt;MyCommandNoArgs&gt; log) 
+    : AsyncCommandWithResult&lt;MyResult&gt;
+{
+    protected override async Task&lt;MyResult&gt; RunAsync(CancellationToken token)
+    {
+        log.LogInformation(&quot;Async called with No Args and returns Result&quot;);
+        return new MyResult(&quot;Hello World&quot;);
+    }
+}
+
+public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log) 
+    : AsyncCommandWithResult&lt;MyArgs,MyResult&gt;
+{
+    protected override async Task&lt;MyResult&gt; RunAsync(
+        MyArgs request, CancellationToken token)
+    {
+        log.LogInformation(&quot;Called with {Id} and returns Result&quot;, request.Id);
+        return new MyResult(&quot;Hello World&quot;);
+    }
+}
+</code></pre>
+
+</div></p>
+<h2 id="messaging-workflow">Messaging Workflow<a class="header-anchor" href="javascript:;" onclick="location.hash='#messaging-workflow'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For greater resilience and scalability we recommend utilizing a messaging pattern to notify the outputs of a
+command by publishing messages to invoke dependent logic instead of returning a result, e.g:</p>
+<h3 id="background-jobs">Background Jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">public class AddTodoCommand(IDbConnection db, IBackgroundJobs jobs) : SyncCommand&lt;MyArgs&gt;
+{
+    protected override void Run(MyArgs request)
     {
         var newTodo = request.ConvertTo&lt;Todo&gt;();
-        newTodo.Id = await db.InsertAsync(newTodo, selectIdentity:true);
+        newTodo.Id = db.Insert(newTodo, selectIdentity:true);
+        
+        // Non Durable Example
+        jobs.RunCommand&lt;SendNotificationCommand&gt;(
+            new SendNotification { TodoCreated = newTodo });
+
+        // Durable Example
+        jobs.EnqueueCommand&lt;SendNotificationCommand&gt;(
+            new SendNotification { TodoCreated = newTodo });
+    }
+}
+</code></pre>
+<h3 id="background-mq">Background MQ<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-mq'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">public class AddTodoCommand(IDbConnection db, IMessageProducer mq) : SyncCommand&lt;MyArgs&gt;
+{
+    protected override void Run(MyArgs request)
+    {
+        var newTodo = request.ConvertTo&lt;Todo&gt;();
+        newTodo.Id = db.Insert(newTodo, selectIdentity:true);
         mq.Publish(new SendNotification { TodoCreated = newTodo });
-    }    
+    }
 }
 </code></pre>
 <p>Which decouples the sender and receiver of the message, allowing it to finish without needing to wait and concern itself
@@ -1535,9 +1654,8 @@ execution step can be executed on different threads, independently monitored and
 <p>As they're not dependent on any framework and can support multiple execution patterns, we believe Commands make great
 building blocks for insulating units of logic as they're simple and testable and allow for managed execution which can
 easily add logging, monitoring, and resilience around your logic.</p>
-<h3 id="background-mq">Background MQ<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-mq'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>It should be noted adopting a messaging pattern doesn't require additional infrastructure complexity of an external MQ Server
-as you can use the <a href="/background-mq">Background MQ</a> to execute messages in configurable managed background threads.</p>
+<h3 id="background-jobs-or-mq">Background Jobs or MQ<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-jobs-or-mq'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>It should be noted adopting a messaging pattern doesn't require additional infrastructure complexity of an external MQ Server as you can use <a href="/background-jobs">Background Jobs</a> or <a href="/background-mq">Background MQ</a> to execute messages in managed background threads.</p>
 <h3 id="executing-commands">Executing Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Commands are effectively a pattern to structure your logic that doesn't depend on any implementation assembly or
 framework, so they can just be executed directly, e.g:</p>
@@ -1621,9 +1739,61 @@ by <strong>Admin</strong> Users.</p>
 <pre><code class="language-csharp">[Tag(&quot;Todos&quot;)]
 public class AddTodoCommand() : IAsyncCommand&lt;CreateTodo&gt; {}
 </code></pre>
-<h2 id="mq-integration">MQ Integration<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-integration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Although <code>CommandsFeature</code> is a standalone feature we're registering it in the new Identity Auth Templates <code>Configure.Mq.cs</code>
-which already uses the Background MQ to execute messages in managed background threads where it's used to send Identity Auth emails:</p>
+<h2 id="execute-commands-in-durable-background-jobs">Execute Commands in Durable Background Jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#execute-commands-in-durable-background-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In addition to being able to execute <strong>Commands</strong> with the <code>ICommandExecutor</code> or from the UI, they can also be executed as part of a <a href="/background-jobs">Durable Background Job</a> where you'll be able to track and monitor
+their progress in real-time.</p>
+<p>Background Jobs is already configured in all new <a href="https://servicestack.net/start">Identity Auth Templates</a>
+in order to send all Identity Auth Emails. Whilst existing Projects can enable it in their .NET 8 Apps with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>x mix jobs</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Which adds a reference to the <a href="https://www.nuget.org/packages/ServiceStack.Jobs">ServiceStack.Jobs</a> NuGet package
+and includes the <a href="/modular-startup">Modular Startup</a> configuration below:</p>
+<pre><code class="language-csharp">public class ConfigureBackgroundJobs : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices(services =&gt; {
+            services.AddPlugin(new CommandsFeature());
+            services.AddPlugin(new BackgroundsJobFeature());
+            services.AddHostedService&lt;JobsHostedService&gt;();
+         }).ConfigureAppHost(afterAppHostInit: appHost =&gt; {
+            var services = appHost.GetApplicationServices();
+            var jobs = services.GetRequiredService&lt;IBackgroundJobs&gt;();
+            // Example of registering a Recurring Job to run Every Hour
+            //jobs.RecurringCommand&lt;MyCommand&gt;(Schedule.Hourly);
+        });
+}
+
+public class JobsHostedService(ILogger&lt;JobsHostedService&gt; log, IBackgroundJobs jobs) 
+    : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await jobs.StartAsync(stoppingToken);
+        
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        while (!stoppingToken.IsCancellationRequested &amp;&amp; 
+            await timer.WaitForNextTickAsync(stoppingToken))
+        {
+            await jobs.TickAsync();
+        }
+    }
+}
+</code></pre>
+<h2 id="background-mq-integration">Background MQ Integration<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-mq-integration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Although <code>CommandsFeature</code> is a standalone feature it can also be configured and used along with <a href="/background-mq">Background MQ</a> which is a good option if you intend on adopting another <a href="/messaging">Message Queue Broker</a> in
+your App's in future.</p>
 <pre><code class="language-csharp">public class ConfigureMq : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
@@ -1642,19 +1812,99 @@ which already uses the Background MQ to execute messages in managed background t
 </code></pre>
 <p>Despite being 2 independent features, they work well together as the Background MQ can be used to execute Commands in
 managed background threads of which a single thread is used to execute each Request Type by default (configurable per request).</p>
-<p>You'd typically want to use queues to improve scalability by reducing locking and concurrency contention of heavy resources
-by having requests queued and executed in a managed background thread where it's able to execute requests as fast as it can without contention.
-Queues are also a great solution for working around single thread limitations of resources like writes to SQLite databases.</p>
+<p>You'd typically want to use queues to improve scalability by reducing locking and concurrency contention of heavy resources by having requests queued and executed in a managed background thread where it's able to execute requests as fast as it can without contention. Queues are also a great solution for working around single thread limitations of resources like writes to SQLite databases.</p>
 <h2 id="use-case-sqlite-writes">Use Case - SQLite Writes<a class="header-anchor" href="javascript:;" onclick="location.hash='#use-case-sqlite-writes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>As we've started to use server-side SQLite databases for our new Apps given its <a href="/ormlite/litestream">many benefits</a>
-we needed a solution to workaround its limitation of not being able to handle multiple writes concurrently.</p>
-<p>One of the benefits of using SQLite is creating and managing multiple databases is relatively cheap, so we can mitigate
-this limitation somewhat by maintaining different subsystems in separate databases, e.g:</p>
+<p>As we've started to <a href="/ormlite/scalable-sqlite">use server-side SQLite databases</a> for our new Apps given its <a href="/ormlite/litestream">many benefits</a> we needed a solution to workaround its limitation of not being able to handle multiple writes concurrently.</p>
+<p>One of the benefits of using SQLite is creating and managing <a href="/ormlite/scalable-sqlite#multiple-sqlite-databases">multiple databases</a> is relatively cheap, so we can mitigate this limitation somewhat by maintaining different subsystems in separate databases, e.g:</p>
 <p><a href="/img/pages/commands/pvq-databases.png"><img src="/img/pages/commands/pvq-databases.png" alt="" /></a></p>
 <p>But each database can only be written to by a single thread at a time, which we can now easily facilitate with
-<strong>Background MQ</strong> and <strong>MQ Command DTOs</strong>.</p>
+<strong>Background Jobs</strong> or <strong>MQ Command DTOs</strong>.</p>
+<p>In all cases we recommend using <a href="/ormlite/scalable-sqlite#always-use-synchronous-apis-for-sqlite">Sync DB APIs for SQLite</a> since their underlying implementation always blocks.</p>
+<h3 id="queuing-db-writes-with-synccommand-background-jobs">Queuing DB Writes with SyncCommand Background Jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#queuing-db-writes-with-synccommand-background-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>One way to remove contention is to serially execute DB Writes which we can do by executing DB Writes within <code>SyncCommand*</code> and using a named <code>[Worker(Workers.AppDb)]</code> attribute for Writes to the primary database, e.g:</p>
+<pre><code class="language-csharp">[Worker(Workers.AppDb)]
+public class DeleteCreativeCommand(IDbConnection db) 
+    : SyncCommand&lt;DeleteCreative&gt;
+{
+    protected override void Run(DeleteCreative request)
+    {
+        var artifactIds = request.ArtifactIds;
+        db.Delete&lt;AlbumArtifact&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;ArtifactReport&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;ArtifactLike&gt;(x =&gt; artifactIds.Contains(x.ArtifactId));
+        db.Delete&lt;Artifact&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;CreativeArtist&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;CreativeModifier&gt;(x =&gt; x.CreativeId == request.Id);
+        db.Delete&lt;Creative&gt;(x =&gt; x.Id == request.Id);
+    }
+}
+</code></pre>
+<p>Other databases should use its named connection for its named worker, e.g:</p>
+<pre><code class="language-csharp">[Worker(Databases.Search)]
+public class DeleteSearchCommand(IDbConnectionFactory dbFactory) 
+    : SyncCommand&lt;DeleteSearch&gt;
+{
+    protected override void Run(DeleteSearch request)
+    {
+        using var db = dbFactory.Open(Databases.Search);
+        db.DeleteById&lt;ArtifactFts&gt;(request.Id);
+        //...
+    }
+}
+</code></pre>
+<p>Example of a DB Write command with result:</p>
+<pre><code class="language-csharp">[Worker(Databases.Albums)]
+public class CreateAlbumCommand(IDbConnectionFactory dbFactory) 
+    : SyncCommandWithResult&lt;CreateAlbum,Album&gt;
+{
+    protected override Album Run(CreateAlbum request)
+    {
+        using var db = dbFactory.Open(Databases.Albums);
+        var album = request.ConvertTo&lt;Album&gt;();
+        album.Id = db.Insert(album, selectIdentity:true);
+        foreach (var artifact in request.Artifacts)
+        {
+            artifact.AlbumId = album.Id;
+            db.Insert(artifact);
+        }
+        return album;
+    }
+}
+</code></pre>
+<p>Where it will be executed within its Database Lock.</p>
+<h3 id="running-commands">Running Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#running-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You'll typically want to run DB Write Commands with <code>RunCommand*</code> APIs which are a faster and lighter weight
+alternative then durable jobs which are persisted in the <strong>jobs.db</strong> before execution.</p>
+<p>Everytime commands are executed they'll be added to a ConcurrentQueue of the specified worker. Commands delegated to different named workers execute concurrently, whilst commands with the same worker are executed serially.</p>
+<p>When using any <code>SyncCommand*</code> base class, its execution still uses database locks
+but any contention is alleviated as they're executed serially by a single worker thread.</p>
+<pre><code class="language-csharp">public class MyServices(IBackgroundJobs jobs) : Service
+{
+    // Returns immediately with a reference to the Background Job
+    public object Any(DeleteCreative request)
+    {
+        // Queues a durable job to execute the command with the AppDb Worker
+        var jobRef = jobs.EnqueueCommand&lt;DeleteCreativeCommand&gt;(request);
+
+        // Executes Command with Databases.Search worker
+        jobs.EnqueueCommand&lt;DeleteSearchCommand&gt;(new DeleteSearch {
+            Id = request.ArtifactId
+        });
+
+        return jobRef;
+    }
+
+    // Returns after the command is executed with its result (if any)
+    public async Task Any(CreateAlbum request)
+    {
+        // Executes a transient (i.e. non-durable) job with the named worker
+        var album = await jobs.RunCommandAsync&lt;CreateAlbumCommand&gt;(request);
+        return album;
+    }
+}
+</code></pre>
 <h3 id="mq-command-dtos">MQ Command DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#mq-command-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>We can use the new <code>[Command]</code> attribute to be able to execute multiple commands on a single Request DTO Properties:</p>
+<p>If using <strong>Background MQ</strong> we can use the <code>[Command]</code> attribute to be able to execute multiple commands on a single Request DTO Properties:</p>
 <pre><code class="language-csharp">[Tag(Tag.Tasks)]
 [Restrict(RequestAttributes.MessageQueue), ExcludeMetadata]
 public class DbWrites : IGet, IReturn&lt;EmptyResponse&gt;
@@ -1741,18 +1991,18 @@ command, using it as the request for the command.</p>
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/openapi-v2" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/background-jobs" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Open API v2
+                                                Overview
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/corsfeature" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                CORS Feature
+                                            <a href="/messaging" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Overview
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -1800,10 +2050,29 @@ command, using it as the request for the command.</p>
                                                             Commands with Results
                                                         </span>
                                                     </li>
-                                                    <li data-id="messaging" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#messaging'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="ergonomic-base-classes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#ergonomic-base-classes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Messaging
+                                                            Ergonomic Base Classes
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#messaging-workflow'" data-id="messaging-workflow" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Messaging Workflow
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="background-jobs" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#background-jobs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Background Jobs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="background-mq" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#background-mq'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Background MQ
                                                         </span>
                                                     </li>
                                                     <li data-id="commands-as-application-building-blocks" class="text-gray-500 hover:text-gray-900">
@@ -1812,10 +2081,10 @@ command, using it as the request for the command.</p>
                                                             Commands as Application Building Blocks
                                                         </span>
                                                     </li>
-                                                    <li data-id="background-mq" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#background-mq'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="background-jobs-or-mq" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#background-jobs-or-mq'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Background MQ
+                                                            Background Jobs or MQ
                                                         </span>
                                                     </li>
                                                     <li data-id="executing-commands" class="text-gray-500 hover:text-gray-900">
@@ -1870,8 +2139,13 @@ command, using it as the request for the command.</p>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#mq-integration'" data-id="mq-integration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            MQ Integration
+                                        <span v-hash="'#execute-commands-in-durable-background-jobs'" data-id="execute-commands-in-durable-background-jobs" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Execute Commands in Durable Background Jobs
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#background-mq-integration'" data-id="background-mq-integration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Background MQ Integration
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
@@ -1879,6 +2153,18 @@ command, using it as the request for the command.</p>
                                             Use Case - SQLite Writes
                                         </span>
                                             <ul class="ml-4">
+                                                    <li data-id="queuing-db-writes-with-synccommand-background-jobs" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#queuing-db-writes-with-synccommand-background-jobs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Queuing DB Writes with SyncCommand Background Jobs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="running-commands" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#running-commands'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Running Commands
+                                                        </span>
+                                                    </li>
                                                     <li data-id="mq-command-dtos" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#mq-command-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
