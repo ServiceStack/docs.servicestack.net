@@ -16,10 +16,16 @@ and Cloud Providers building distributed databases on top of SQLite like
 [Cloudflare D1](https://blog.cloudflare.com/introducing-d1/) and Fly.io's 
 multi-region distributed [LiteFS](https://fly.io/docs/litefs/) solution.
 
-SQLite is highly-performant and can handle a large number of concurrent read operations and its
-write operations are roughly [35% Faster](https://www.sqlite.org/fasterthanfs.html)
-than writing to the Filesystem directly with very low latency that's often faster than other RDBMS's
-courtesy of its proximity to the running application.
+SQLite is a highly-performant DB that can handle a large number of concurrent read operations and
+[35% Faster](https://www.sqlite.org/fasterthanfs.html) filesystem performance for write operations with next 
+to no latency that's often faster than other RDBMS's courtesy of its proximity to the running application which gives it unique advantages over traditional client/server RDBMS's where it's not susceptible to the 
+[N+1 Queries problem](https://www.sqlite.org/np1queryprob.html) and is also able to execute your
+custom C# Logic inside SQL Queries using [Application SQL Functions](https://www.sqlite.org/appfunc.html).
+
+With [litestream.io](https://litestream.io) taking care of real-time replication to managed storage
+we just need to workaround SQLite's single concurrent writer to unlock the value, performance and 
+unique features of SQLite in our Apps which we cover in this release with integrated support for
+Database Locks and Sync Commands.
 
 ## Single Concurrent Writer
 
