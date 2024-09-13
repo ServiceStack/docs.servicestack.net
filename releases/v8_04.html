@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T09:39:19.6059585Z'>
+    <meta name='date' content='2024-09-13T11:39:48.3807025Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v8.4</title>
@@ -768,6 +768,22 @@ either create or update the scheduled task registration without losing track of 
 last time the Recurring Task was run which is also viewable in the Jobs Admin UI:</p>
 <p><img src="/img/pages/jobs/jobs-scheduled-tasks-last-job.webp" alt="" /></p>
 <p>As such it's recommended to always define your App's Scheduled Tasks on Startup:</p>
+<pre><code class="language-csharp">public class ConfigureBackgroundJobs : IHostingStartup
+{
+   public void Configure(IWebHostBuilder builder) =&gt; builder
+     .ConfigureServices((context,services) =&gt; {
+         services.AddPlugin(new CommandsFeature());
+         services.AddPlugin(new BackgroundsJobFeature());
+         services.AddHostedService&lt;JobsHostedService&gt;();
+     }).ConfigureAppHost(afterAppHostInit: appHost =&gt; {
+         var services = appHost.GetApplicationServices();
+
+         var jobs = services.GetRequiredService&lt;IBackgroundJobs&gt;();
+         // Register Scheduled Tasks
+         jobs.RecurringCommand&lt;MyCommand&gt;(Schedule.Hourly);
+     });
+}
+</code></pre>
 <h3 id="executing-non-durable-jobs">Executing non-durable jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-non-durable-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><code>IBackgroundJobs</code> also supports <code>RunCommand</code> methods to be able to execute jobs transiently
 (i.e. non-durable), which is useful for commands that want to be serially executed by a named worker

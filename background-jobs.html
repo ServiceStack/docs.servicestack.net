@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T09:39:19.8882112Z'>
+    <meta name='date' content='2024-09-13T11:39:48.6585168Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Background Jobs</title>
@@ -644,6 +644,11 @@ mount('#header', Header)
                                 <li class="relative">
                                     <a href="/background-jobs" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/recurring-tasks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schedule Recurring Tasks
                                     </a>
                                 </li>
                                 <li class="relative">
@@ -1540,38 +1545,6 @@ the following options:</p>
 <li><code>ReplyTo</code> - Optional field for capturing where to send notification for completion of a Job</li>
 <li><code>Args</code> - Optional String Dictionary of Arguments that can be attached to a Job</li>
 </ul>
-<h3 id="schedule-recurring-tasks">Schedule Recurring Tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#schedule-recurring-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>In addition to queueing jobs to run in the background, it also supports scheduling recurring tasks
-to execute APIs or Commands at fixed intervals.</p>
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="DtB8KaXXMCM" playlabel="Schedule your Reoccurring Tasks with Background Jobs!" style="background-image:url('https://img.youtube.com/vi/DtB8KaXXMCM/maxresdefault.jpg')"></lite-youtube>
-<p>APIs and Commands can be scheduled to run at either a <code>TimeSpan</code> or
-<a href="https://github.com/HangfireIO/Cronos?tab=readme-ov-file#cron-format">CRON Expression</a> interval, e.g:</p>
-<pre><code class="language-csharp">jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(Schedule.Cron(&quot;* * * * *&quot;));
-jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(
-    Schedule.Interval(TimeSpan.FromMinutes(1)));
-
-jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(Schedule.EveryMinute, new CheckUrls {
-    Urls = urls
-});
-
-jobs.RecurringApi(Schedule.Interval(TimeSpan.FromMinutes(1)), new CheckUrls {
-    Urls = urls
-});
-</code></pre>
-<p>That can be registered with an optional <strong>Task Name</strong> and <strong>Background Options</strong>, e.g:</p>
-<pre><code class="language-csharp">jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(&quot;Check URLs&quot;, Schedule.EveryMinute, 
-   new() {
-       RunCommand = true // don't persist job
-   });
-</code></pre>
-<div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>If no name is provided, the Command's Name or APIs Request DTO will be used</p>
-</div>
-<p>Scheduled Tasks are idempotent where the same registration with the same name will
-either create or update the scheduled task registration without losing track of the
-last time the Recurring Task was run which is also viewable in the Jobs Admin UI:</p>
-<p><img src="/img/pages/jobs/jobs-scheduled-tasks-last-job.webp" alt="" /></p>
-<p>As such it's recommended to always define your App's Scheduled Tasks on Startup:</p>
 <h3 id="executing-non-durable-jobs">Executing non-durable jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-non-durable-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><code>IBackgroundJobs</code> also supports <code>RunCommand</code> methods to be able to execute jobs transiently
 (i.e. non-durable), which is useful for commands that want to be serially executed by a named worker
@@ -1685,8 +1658,8 @@ of the current job, e.g:</p>
 <p>Where any dependent jobs are only executed if the job was successfully completed.
 If instead an exception was thrown during execution, the job will be failed and
 all its dependent jobs cancelled and removed from the queue.</p>
-<h3 id="executing-jobs-with-an-authenticated-user-context">Executing jobs with an Authenticated User Context<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-jobs-with-an-authenticated-user-context'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>If you have existing logic dependent on a Authenticated <code>ClaimsPrincipal</code> or ServiceStack
+<h3 id="executing-jobs-with-an-authorized-user-context">Executing jobs with an Authorized User Context<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-jobs-with-an-authorized-user-context'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you have logic dependent on an Authenticated <code>ClaimsPrincipal</code> or ServiceStack
 <code>IAuthSession</code> you can have your APIs and Commands also be executed with that user context
 by specifying the <code>UserId</code> the job should be executed as:</p>
 <pre><code class="language-csharp">var openAiRequest = new CreateOpenAiChat {
@@ -1748,14 +1721,19 @@ and can be filtered in the Jobs Admin UI to help find and analyze executed jobs.
    new() {
       // Group related jobs under a common tag
       Tag = &quot;ai&quot;,
+
       // A User-specified or system generated unique Id to track the job
       RefId = request.RefId,
+      
       // Capture who created the job
       CreatedBy = Request.GetClaimsPrincipal().GetUserName(),
+      
       // Link jobs together that are sent together in a batch
       BatchId = batchId,
+      
       // Capture where to notify the completion of the job to
       ReplyTo = &quot;https:example.org/callback&quot;,
+      
       // Additional properties about the job that aren't in the Request  
       Args = new() {
           [&quot;Additional&quot;] = &quot;Metadata&quot;
@@ -2072,8 +2050,8 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/commands" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Commands
+                                            <a href="/recurring-tasks" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Schedule Recurring Tasks
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -2115,12 +2093,6 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                                             Background Job Options
                                                         </span>
                                                     </li>
-                                                    <li data-id="schedule-recurring-tasks" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#schedule-recurring-tasks'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Schedule Recurring Tasks
-                                                        </span>
-                                                    </li>
                                                     <li data-id="executing-non-durable-jobs" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#executing-non-durable-jobs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2151,10 +2123,10 @@ public class MyAsyncCommandWithArgsAndResult(ILogger&lt;MyCommandNoArgs&gt; log)
                                                             Atomic Batching Behavior
                                                         </span>
                                                     </li>
-                                                    <li data-id="executing-jobs-with-an-authenticated-user-context" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#executing-jobs-with-an-authenticated-user-context'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="executing-jobs-with-an-authorized-user-context" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#executing-jobs-with-an-authorized-user-context'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Executing jobs with an Authenticated User Context
+                                                            Executing jobs with an Authorized User Context
                                                         </span>
                                                     </li>
                                                     <li data-id="queue-job-to-run-after-a-specified-date" class="text-gray-500 hover:text-gray-900">

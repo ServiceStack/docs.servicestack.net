@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T11:39:49.1741635Z'>
+    <meta name='date' content='2024-09-13T11:39:49.1056349Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Service Return Types</title>
+    <title>Schedule Recurring Tasks</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -232,7 +232,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/service-return-types" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/service-return-types" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Service Return Types
                                     </a>
                                 </li>
@@ -647,7 +647,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/recurring-tasks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/recurring-tasks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Schedule Recurring Tasks
                                     </a>
                                 </li>
@@ -1370,191 +1370,135 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Service Return Types
+                            Schedule Recurring Tasks
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>From a birds-eye view ServiceStack can return any of:</p>
+                <div class="content"><p>In addition to queueing jobs to run in the background, it also supports scheduling recurring tasks
+to execute APIs or Commands at fixed intervals.</p>
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="DtB8KaXXMCM" playlabel="Schedule your Reoccurring Tasks with Background Jobs!" style="background-image:url('https://img.youtube.com/vi/DtB8KaXXMCM/maxresdefault.jpg')"></lite-youtube>
+<p>APIs and Commands can be scheduled to run at either a <code>TimeSpan</code> or
+<a href="https://github.com/HangfireIO/Cronos?tab=readme-ov-file#cron-format">CRON Expression</a> interval, e.g:</p>
+<h2 id="cron-expression-examples">CRON Expression Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#cron-expression-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<pre><code class="language-csharp">// Every Minute Expression
+jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(Schedule.Cron(&quot;* * * * *&quot;));
+
+// Every Minute Constant
+jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(Schedule.EveryMinute, new CheckUrls {
+    Urls = urls
+});
+</code></pre>
+<h3 id="cron-format">CRON Format<a class="header-anchor" href="javascript:;" onclick="location.hash='#cron-format'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can use any <strong>unix-cron format</strong> expression supported by the <a href="https://github.com/HangfireIO/Cronos">HangfireIO/Cronos</a> library:</p>
+<pre><code class="language-txt">|------------------------------- Minute (0-59)
+|     |------------------------- Hour (0-23)
+|     |     |------------------- Day of the month (1-31)
+|     |     |     |------------- Month (1-12; or JAN to DEC)
+|     |     |     |     |------- Day of the week (0-6; or SUN to SAT; or 7 for Sunday)
+|     |     |     |     |
+|     |     |     |     |
+*     *     *     *     *
+</code></pre>
+<p>The allowed formats for each field include:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Format of valid values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Minute</td>
+<td>0-59</td>
+</tr>
+<tr>
+<td>Hour</td>
+<td>0-23</td>
+</tr>
+<tr>
+<td>Day of the month</td>
+<td>1-31</td>
+</tr>
+<tr>
+<td>Month</td>
+<td>1-12 (or JAN to DEC)</td>
+</tr>
+<tr>
+<td>Day of the week</td>
+<td>0-6 (or SUN to SAT; or 7 for Sunday)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matching-all-values">Matching all values<a class="header-anchor" href="javascript:;" onclick="location.hash='#matching-all-values'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To match all values for a field, use the asterisk: <code>*</code>, e.g here are two examples in which the minute field is left unrestricted:</p>
 <ul>
-<li>Any <strong>DTO</strong> object -&gt; serialized to Response ContentType</li>
-<li><code>HttpResult</code>, <code>HttpError</code>, <code>CompressedResult</code> or other <code>IHttpResult</code> for Customized HTTP response</li>
+<li><code>* 0 1 1 1</code> - the job runs every minute of the midnight hour on January 1st and Mondays.</li>
+<li><code>* * * * *</code> - the job runs every minute (of every hour, of every day of the month, of every month, every day of the week, because each of these fields is unrestricted too).</li>
 </ul>
-<h4 id="services-should-only-return-reference-types">Services should only return Reference Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#services-should-only-return-reference-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<p>If a Value Type like <code>int</code> or <code>long</code> response is needed, it's recommended to wrap the Value Type in a Response DTO, e.g:</p>
-<pre><code class="language-csharp">public class MyResponse
-{
-    public int Result { get; set; }
-}
-</code></pre>
-<p>Alternatively you can return a naked Value Type response by returning it as a <code>string</code>, e.g:</p>
-<pre><code class="language-csharp">public object Any(MyRequest request) =&gt; &quot;1&quot;;
-</code></pre>
-<h2 id="different-return-types">Different Return Types<a class="header-anchor" href="javascript:;" onclick="location.hash='#different-return-types'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The following types are not converted (to different Content-Types) but get written directly to the Response Stream:</p>
+<h3 id="matching-a-range">Matching a range<a class="header-anchor" href="javascript:;" onclick="location.hash='#matching-a-range'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To match a range of values, specify your start and stop values, separated by a hyphen (-). Do not include spaces in the range. Ranges are inclusive. The first value must be less than the second.</p>
+<p>The following equivalent examples run at midnight on Mondays, Tuesdays, Wednesdays, Thursdays, and Fridays (for all months):</p>
 <ul>
-<li><code>String</code></li>
-<li><code>Stream</code></li>
-<li><code>IStreamWriter</code></li>
-<li><code>byte[]</code> - with the <code>application/octet-stream</code> Content Type</li>
-<li><code>ReadOnlyMemory&lt;char&gt;</code></li>
-<li><code>ReadOnlyMemory&lt;byte&gt;</code></li>
+<li><code>0 0 * * 1-5</code></li>
+<li><code>0 0 * * MON-FRI</code></li>
 </ul>
-<p>From the <a href="https://github.com/ServiceStack/ServiceStack.UseCases/blob/master/HelloWorld/Global.asax.cs">HelloWorld ServiceStack.UseCase</a> demo:</p>
-<pre><code class="language-csharp">public class HelloService : Service
-{
-    public HelloResponse Get(Hello request)
-    {
-        return new HelloResponse { Result = $&quot;Hello, {request.Name}!&quot; };
-
-        //C# client can call with:
-        //var response = client.Get(new Hello { Name = &quot;ServiceStack&quot; });
-    }
-
-    public string Get(HelloHtml request)
-    {
-        return $&quot;&lt;h1&gt;Hello, {request.Name}!&lt;/h1&gt;&quot;;
-    }
-
-    [AddHeader(ContentType = &quot;text/plain&quot;)]
-    public string Get(HelloText request)
-    {
-        return $&quot;&lt;h1&gt;Hello, {request.Name}!&lt;/h1&gt;&quot;;
-    }
-
-    [AddHeader(ContentType = &quot;image/png&quot;)]
-    public Stream Get(HelloImage request)
-    {
-        var width = request.Width.GetValueOrDefault(640);
-        var height = request.Height.GetValueOrDefault(360);
-        var bgColor = request.Background != null ? Color.FromName(request.Background) : Color.ForestGreen;
-        var fgColor = request.Foreground != null ? Color.FromName(request.Foreground) : Color.White;
-
-        var image = new Bitmap(width, height);
-        using (var g = Graphics.FromImage(image))
-        {
-            g.Clear(bgColor);
-
-            var drawString = $&quot;Hello, {request.Name}!&quot;;
-            var drawFont = new Font(&quot;Times&quot;, request.FontSize.GetValueOrDefault(40));
-            var drawBrush = new SolidBrush(fgColor);
-            var drawRect = new RectangleF(0, 0, width, height);
-
-            var drawFormat = new StringFormat {
-                LineAlignment = StringAlignment.Center,
-                Alignment = StringAlignment.Center };
-
-            g.DrawString(drawString, drawFont, drawBrush, drawRect, drawFormat);
-
-            var ms = new MemoryStream();
-            image.Save(ms, ImageFormat.Png);
-            return ms;
-        }
-    }
-}
-</code></pre>
-<h4 id="live-examples-of-the-above-hello-service">Live Examples of the above Hello Service:<a class="header-anchor" href="javascript:;" onclick="location.hash='#live-examples-of-the-above-hello-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<h3 id="matching-a-list">Matching a list<a class="header-anchor" href="javascript:;" onclick="location.hash='#matching-a-list'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Lists can contain any valid value for the field, including ranges. Specify your values, separated by a comma (,). Do not include spaces in the list, e.g:</p>
 <ul>
-<li><a href="http://bootstrapapi.apphb.com/api/hello/ServiceStack">/hello/ServiceStack</a>
-<ul>
-<li><a href="http://bootstrapapi.apphb.com/api/hello/ServiceStack?format=json">/hello/ServiceStack?format=json</a></li>
+<li><code>0 0,12 * * *</code> - the job runs at midnight and noon.</li>
+<li><code>0-5,30-35 * * * *</code> - the job runs in each of the first five minutes of every half hour (at the top of the hour and at half past the hour).</li>
 </ul>
-</li>
-<li><a href="http://bootstrapapi.apphb.com/api/hellotext/ServiceStack">/hellotext/ServiceStack</a></li>
-<li><a href="http://bootstrapapi.apphb.com/api/hellohtml/ServiceStack">/hellohtml/ServiceStack</a></li>
-<li><a href="http://bootstrapapi.apphb.com/api/helloimage/ServiceStack?Width=600&amp;height=300&amp;Foreground=Yellow">/helloimage/ServiceStack?Width=600&amp;height=300&amp;Foreground=Yellow</a></li>
-</ul>
-<h3 id="content-type-specific-service-implementations">Content-Type Specific Service Implementations<a class="header-anchor" href="javascript:;" onclick="location.hash='#content-type-specific-service-implementations'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Service implementations can use <code>Verb{Format}</code> method names to provide a different implementation for handling a specific Content-Type, e.g.
-the Service below defines several different implementation for handling the same Request:</p>
-<pre><code class="language-csharp">[Route(&quot;/my-request&quot;)]
-public class MyRequest 
+<h2 id="timespan-interval-examples">TimeSpan Interval Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#timespan-interval-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<pre><code class="language-csharp">jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(Schedule.Interval(TimeSpan.FromMinutes(1)));
+
+// With Example
+jobs.RecurringApi(Schedule.Interval(TimeSpan.FromMinutes(1)), new CheckUrls {
+    Urls = urls
+});
+</code></pre>
+<p>That can be registered with an optional <strong>Task Name</strong> and <strong>Background Options</strong>, e.g:</p>
+<pre><code class="language-csharp">jobs.RecurringCommand&lt;CheckUrlsCommand&gt;(&quot;Check URLs&quot;, Schedule.EveryMinute, 
+   new() {
+       RunCommand = true // don't persist job
+   });
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>If no name is provided, the Command's Name or APIs Request DTO will be used</p>
+</div>
+<h2 id="idempotent-registration">Idempotent Registration<a class="header-anchor" href="javascript:;" onclick="location.hash='#idempotent-registration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Scheduled Tasks are idempotent where the same registration with the same name will
+either create or update the scheduled task registration without losing track of the
+last time the Recurring Task, as such it's recommended to always define your App's
+Scheduled Tasks on Startup:</p>
+<pre><code class="language-csharp">public class ConfigureBackgroundJobs : IHostingStartup
 {
-    public string Name { get; set; }
-}
+   public void Configure(IWebHostBuilder builder) =&gt; builder
+     .ConfigureServices((context,services) =&gt; {
+         services.AddPlugin(new CommandsFeature());
+         services.AddPlugin(new BackgroundsJobFeature());
+         services.AddHostedService&lt;JobsHostedService&gt;();
+     }).ConfigureAppHost(afterAppHostInit: appHost =&gt; {
+         var services = appHost.GetApplicationServices();
 
-public class ContentTypeServices : Service
-{
-    // Handles all other unspecified Verbs/Formats to /my-request
-    public object Any(MyRequest request) =&gt; ...;
-
-    // Handles GET /my-request for JSON responses
-    public object GetJson(MyRequest request) =&gt; ..; 
-
-    // Handles POST/PUT/DELETE/etc /my-request for HTML Responses
-    public object AnyHtml(MyRequest request) =&gt;  
-        $@&quot;&lt;html&gt;
-            &lt;body&gt;
-                &lt;h1&gt;AnyHtml {request.Name}&lt;/h1&gt;
-            &lt;/body&gt;
-        &lt;/html&gt;&quot;;
-
-    // Handles GET /my-request for HTML Responses
-    public object GetHtml(MyRequest request) =&gt;   
-        $@&quot;&lt;html&gt;
-            &lt;body&gt;
-                &lt;h1&gt;GetHtml {request.Name}&lt;/h1&gt;
-            &lt;/body&gt;
-        &lt;/html&gt;&quot;;
-}
-</code></pre>
-<p>This convention can be used for any of the formats listed in <code>ContentTypes.KnownFormats</code>, which by default includes:</p>
-<ul>
-<li>json</li>
-<li>xml</li>
-<li>jsv</li>
-<li>csv</li>
-<li>html</li>
-<li>protobuf</li>
-<li>msgpack</li>
-<li>wire</li>
-</ul>
-<h2 id="partial-content-support">Partial Content Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#partial-content-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Partial Content Support allows a resource to be split up an accessed in multiple chunks for clients that support HTTP Range Requests. This is a popular feature in download managers for resuming downloads of large files and streaming services for real-time streaming of content (e.g. consumed whilst it's being watched or listened to).</p>
-<p><a href="http://benramsey.com/blog/2008/05/206-partial-content-and-range-requests/">HTTP Partial Content Support</a> is added in true ServiceStack-style where it's now automatically and transparently enabled for any existing services returning:</p>
-<h4 id="a-physical-file">A Physical File<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-physical-file'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<pre><code class="language-csharp">return new HttpResult(new FileInfo(filePath), request.MimeType); 
-</code></pre>
-<h4 id="a-virtual-file">A Virtual File<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-virtual-file'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<pre><code class="language-csharp">return new HttpResult(VirtualFileSources.GetFile(virtualPath)); 
-</code></pre>
-<h4 id="a-memory-stream">A Memory Stream<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-memory-stream'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<pre><code class="language-csharp">return new HttpResult(ms, &quot;audio/mpeg&quot;);
-</code></pre>
-<h4 id="raw-bytes">Raw Bytes<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-bytes'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<pre><code class="language-csharp">return new HttpResult(bytes, &quot;image/png&quot;);
-</code></pre>
-<h4 id="raw-text">Raw Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
-<pre><code class="language-csharp">return new HttpResult(customText, &quot;text/plain&quot;);
-</code></pre>
-<p>Partial Content was also added to static file downloads served directly through ServiceStack which lets you stream mp3 downloads or should you ever want to your static .html, .css, .js, etc.</p>
-<p>You can disable Partial Content support with <code>Config.AllowPartialResponses = false;</code>.</p>
-<p>See the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/PartialContentResultTests.cs">PartialContentResultTests</a> for more examples.</p>
-<h2 id="writing-directly-to-the-response-stream">Writing directly to the Response Stream<a class="header-anchor" href="javascript:;" onclick="location.hash='#writing-directly-to-the-response-stream'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>In addition to returning plain C# objects, ServiceStack allows you to return any <strong>Stream</strong> or <code>IStreamWriterAsync</code> (which is a bit more flexible on how you write to the response stream):</p>
-<pre><code class="language-csharp">public interface IStreamWriterAsync
-{
-    Task WriteToAsync(Stream responseStream, CancellationToken token=default);
+         var jobs = services.GetRequiredService&lt;IBackgroundJobs&gt;();
+         
+         // App's Scheduled Tasks Registrations:
+         jobs.RecurringCommand&lt;MyCommand&gt;(Schedule.Hourly);
+     });
 }
 </code></pre>
-<p>Both though allow you to write directly to the Response OutputStream without any additional conversion overhead.</p>
-<h3 id="customizing-http-headers">Customizing HTTP Headers<a class="header-anchor" href="javascript:;" onclick="location.hash='#customizing-http-headers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>If you want to customize the HTTP headers at the same time you just need to implement <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Web/IHasOptions.cs">IHasOptions</a> where any Dictionary Entry is written to the Response HttpHeaders.</p>
-<pre><code class="language-csharp">public interface IHasOptions
-{
-    IDictionary&lt;string, string&gt; Options { get; }
-}
-</code></pre>
-<p>Further than that, the IHttpResult allows even finer-grain control of the HTTP output (status code, headers, ...) where you can supply a custom Http Response status code. You can refer to the implementation of the <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/HttpResult.cs">HttpResult</a> object for a real-world implementation of these above interfaces.</p>
-<h3 id="further-customizing-the-http-response">Further customizing the HTTP Response<a class="header-anchor" href="javascript:;" onclick="location.hash='#further-customizing-the-http-response'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>See the <a href="/customize-http-responses">Customize HTTP Responses</a> page for more ways of customizing the HTTP Response.</p>
+<h2 id="background-jobs-admin-ui">Background Jobs Admin UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-jobs-admin-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The last job the Recurring Task ran is also viewable in the Jobs Admin UI:</p>
+<p><img src="/img/pages/jobs/jobs-scheduled-tasks-last-job.webp" alt="" /></p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/service-return-types.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/recurring-tasks.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -1562,18 +1506,18 @@ public class ContentTypeServices : Service
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/api-design" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/background-jobs" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Service API Design
+                                                Overview
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/design-rest-services" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Design RESTful Services
+                                            <a href="/commands" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Commands
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -1592,41 +1536,50 @@ public class ContentTypeServices : Service
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#different-return-types'" data-id="different-return-types" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Different Return Types
+                                        <span v-hash="'#cron-expression-examples'" data-id="cron-expression-examples" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            CRON Expression Examples
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="content-type-specific-service-implementations" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#content-type-specific-service-implementations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="cron-format" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#cron-format'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Content-Type Specific Service Implementations
+                                                            CRON Format
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="matching-all-values" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#matching-all-values'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Matching all values
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="matching-a-range" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#matching-a-range'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Matching a range
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="matching-a-list" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#matching-a-list'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Matching a list
                                                         </span>
                                                     </li>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#partial-content-support'" data-id="partial-content-support" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Partial Content Support
+                                        <span v-hash="'#timespan-interval-examples'" data-id="timespan-interval-examples" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            TimeSpan Interval Examples
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#writing-directly-to-the-response-stream'" data-id="writing-directly-to-the-response-stream" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Writing directly to the Response Stream
+                                        <span v-hash="'#idempotent-registration'" data-id="idempotent-registration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Idempotent Registration
                                         </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="customizing-http-headers" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#customizing-http-headers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Customizing HTTP Headers
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="further-customizing-the-http-response" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#further-customizing-the-http-response'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Further customizing the HTTP Response
-                                                        </span>
-                                                    </li>
-                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#background-jobs-admin-ui'" data-id="background-jobs-admin-ui" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Background Jobs Admin UI
+                                        </span>
                                     </li>
                             </ul>
                         </div>
