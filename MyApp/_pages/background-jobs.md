@@ -180,52 +180,6 @@ the following options:
  - `ReplyTo` - Optional field for capturing where to send notification for completion of a Job
  - `Args` - Optional String Dictionary of Arguments that can be attached to a Job
 
-### Schedule Recurring Tasks
-
-In addition to queueing jobs to run in the background, it also supports scheduling recurring tasks 
-to execute APIs or Commands at fixed intervals.
-
-:::youtube DtB8KaXXMCM
-Schedule your Reoccurring Tasks with Background Jobs!
-:::
-
-APIs and Commands can be scheduled to run at either a `TimeSpan` or
-[CRON Expression](https://github.com/HangfireIO/Cronos?tab=readme-ov-file#cron-format) interval, e.g:
-
-```csharp
-jobs.RecurringCommand<CheckUrlsCommand>(Schedule.Cron("* * * * *"));
-jobs.RecurringCommand<CheckUrlsCommand>(
-    Schedule.Interval(TimeSpan.FromMinutes(1)));
-
-jobs.RecurringCommand<CheckUrlsCommand>(Schedule.EveryMinute, new CheckUrls {
-    Urls = urls
-});
-
-jobs.RecurringApi(Schedule.Interval(TimeSpan.FromMinutes(1)), new CheckUrls {
-    Urls = urls
-});
-```
-
-That can be registered with an optional **Task Name** and **Background Options**, e.g:
-
-```csharp
-jobs.RecurringCommand<CheckUrlsCommand>("Check URLs", Schedule.EveryMinute, 
-   new() {
-       RunCommand = true // don't persist job
-   });
-```
-
-:::info
-If no name is provided, the Command's Name or APIs Request DTO will be used
-:::
-
-Scheduled Tasks are idempotent where the same registration with the same name will
-either create or update the scheduled task registration without losing track of the
-last time the Recurring Task was run which is also viewable in the Jobs Admin UI:
-
-![](/img/pages/jobs/jobs-scheduled-tasks-last-job.webp)
-
-As such it's recommended to always define your App's Scheduled Tasks on Startup:
 
 ### Executing non-durable jobs
 
@@ -371,9 +325,9 @@ Where any dependent jobs are only executed if the job was successfully completed
 If instead an exception was thrown during execution, the job will be failed and
 all its dependent jobs cancelled and removed from the queue.
 
-### Executing jobs with an Authenticated User Context
+### Executing jobs with an Authorized User Context
 
-If you have existing logic dependent on a Authenticated `ClaimsPrincipal` or ServiceStack
+If you have logic dependent on an Authenticated `ClaimsPrincipal` or ServiceStack
 `IAuthSession` you can have your APIs and Commands also be executed with that user context
 by specifying the `UserId` the job should be executed as:
 
@@ -449,14 +403,19 @@ var jobRef = jobs.EnqueueCommand<CreateOpenAiChatCommand>(openAiRequest,
    new() {
       // Group related jobs under a common tag
       Tag = "ai",
+
       // A User-specified or system generated unique Id to track the job
       RefId = request.RefId,
+      
       // Capture who created the job
       CreatedBy = Request.GetClaimsPrincipal().GetUserName(),
+      
       // Link jobs together that are sent together in a batch
       BatchId = batchId,
+      
       // Capture where to notify the completion of the job to
       ReplyTo = "https:example.org/callback",
+      
       // Additional properties about the job that aren't in the Request  
       Args = new() {
           ["Additional"] = "Metadata"
