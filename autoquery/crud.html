@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T13:18:34.3747415Z'>
+    <meta name='date' content='2024-09-21T01:38:05.1390159Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery CRUD</title>
@@ -341,23 +341,19 @@ public class UpdateRockstarResponse
 <h2 id="custom-autoquery-crud-implementation">Custom AutoQuery CRUD Implementation<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-autoquery-crud-implementation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Just as you can create <a href="/autoquery/rdbms.html#custom-autoquery-implementations">Custom AutoQuery Implementations</a> to override the default AutoQuery behavior
 you can also override AutoQuery CRUD implementations by creating implementations with AutoQuery CRUD Request DTOs and calling the relevate <code>IAutoQueryDb</code> method, e.g:</p>
-<pre><code class="language-csharp">public class MyCrudServices : Service
+<pre><code class="language-csharp">public class MyCrudServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
-    public object Post(CreateRockstar request) =&gt; AutoQuery.Create(request, base.Request);
-    public object Put(UpdateRockstar request) =&gt; AutoQuery.Update(request, base.Request);
-    public object Delete(DeleteRockstar request) =&gt; AutoQuery.Delete(request, base.Request);
+    public object Post(CreateRockstar request) =&gt; autoQuery.Create(request, base.Request);
+    public object Put(UpdateRockstar request) =&gt; autoQuery.Update(request, base.Request);
+    public object Delete(DeleteRockstar request) =&gt; autoQuery.Delete(request, base.Request);
 }
 
 // Async
-public class MyCrudServices : Service
+public class MyCrudServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
-    public Task&lt;object&gt; Post(CreateRockstar request) =&gt; AutoQuery.CreateAsync(request, base.Request);
-    public Task&lt;object&gt; Put(UpdateRockstar request) =&gt; AutoQuery.UpdateAsync(request, base.Request);
-    public Task&lt;object&gt; Delete(DeleteRockstar request) =&gt; AutoQuery.DeleteAsync(request, base.Request);
+    public Task&lt;object&gt; Post(CreateRockstar request) =&gt; autoQuery.CreateAsync(request, base.Request);
+    public Task&lt;object&gt; Put(UpdateRockstar request) =&gt; autoQuery.UpdateAsync(request, base.Request);
+    public Task&lt;object&gt; Delete(DeleteRockstar request) =&gt; autoQuery.DeleteAsync(request, base.Request);
 }
 </code></pre>
 <h3 id="custom-implementations-using-ormlite-typed-apis">Custom implementations using OrmLite Typed APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#custom-implementations-using-ormlite-typed-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -630,15 +626,13 @@ public class UpdateNamedRockstar : RockstarBase,
 <p>Alternatively the <code>[ConnectionInfo]</code> can be <a href="/multitenancy#connectioninfo-attribute">used on Service implementations</a>, but as AutoQuery doesn't
 have them you'd need to provide custom implementations that can delegate to their respective Auto Crud API, e.g:</p>
 <pre><code class="language-csharp">[ConnectionInfo(NamedConnection = MyDatabases.Reporting)]
-public class MyReportingServices : Service
+public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public Task&lt;object&gt; Any(CreateConnectionInfoRockstar request) =&gt; 
-        AutoQuery.CreateAsync(request, Request);
+        autoQuery.CreateAsync(request, Request);
 
     public Task&lt;object&gt; Any(UpdateConnectionInfoRockstar request) =&gt; 
-        AutoQuery.UpdateAsync(request, Request);
+        autoQuery.UpdateAsync(request, Request);
 }
 </code></pre>
 <h3 id="autofilter">AutoFilter<a class="header-anchor" href="javascript:;" onclick="location.hash='#autofilter'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>

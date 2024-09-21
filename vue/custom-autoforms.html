@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T13:18:35.2785058Z'>
+    <meta name='date' content='2024-09-21T01:38:06.3034531Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Custom Auto Forms</title>
@@ -356,10 +356,8 @@ rendered as <strong>hidden</strong> inputs in our HTML Form with:</p>
 in <a href="https://github.com/NetCoreApps/TypeChatExamples/blob/main/TypeChatExamples.ServiceInterface/CoffeeShopServices.cs">CoffeeShopServices.cs</a>
 contains the custom implementation which continues to utilize AutoQuery's <strong>Partial Update</strong> functionality if there's any changes to update,
 as well as removing or adding any Options the user makes to the <code>Category</code>:</p>
-<pre><code class="language-csharp">public class CoffeeShopServices : Service
+<pre><code class="language-csharp">public class CoffeeShopServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-    
     public async Task&lt;object&gt; Any(UpdateCategory request)
     {
         // Perform all RDBMS Updates within the same Transaction
@@ -370,7 +368,7 @@ as well as removing or adding any Options the user makes to the <code>Category</
         // Only call AutoQuery Update if there's something to update
         if (request.ToObjectDictionary().HasNonDefaultValues(ignoreKeys:ignore))
         {
-            response = (Category) await AutoQuery.PartialUpdateAsync&lt;Category&gt;(request, Request, Db);
+            response = (Category) await autoQuery.PartialUpdateAsync&lt;Category&gt;(request, Request, Db);
         }
         if (request.RemoveOptionIds?.Count &gt; 0)
         {

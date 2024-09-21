@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T13:18:34.1952029Z'>
+    <meta name='date' content='2024-09-21T01:38:05.4229376Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v6.11</title>
@@ -1026,50 +1026,50 @@ it takes to upload and transcribe recordings to Google Cloud, but still within a
 <a href="https://github.com/NetCoreApps/TypeChatExamples/blob/main/TypeChatExamples.ServiceInterface/GptServices.cs">GptServices.cs</a>
 is used to transcribe the uploaded Web Audio recording for <strong>all its examples</strong> which it first creates an entry in the
 <code>Recording</code> RDBMS Table before invoking the Speech-to-Text API that is then updated after its successful or error response:</p>
-<pre><code class="language-csharp">public IAutoQueryDb AutoQuery { get; set; }
-public ISpeechToTextFactory SpeechToTextFactory { get; set; }
-
-public async Task&lt;Recording&gt; Any(CreateRecording request)
+<pre><code class="language-csharp">public class MyServices(IAutoQueryDb autoQuery, ISpeechToTextFactory speechToTextFactory)
 {
-    var feature = request.Feature.ToLower();
-    var recording = (Recording)await AutoQuery.CreateAsync(request, Request);
-    var speechToText = SpeechToTextFactory.Get(request.Feature);
-
-    var transcribeStart = DateTime.UtcNow;
-    await Db.UpdateOnlyAsync(() =&gt; new Recording { TranscribeStart=transcribeStart },
-        where: x =&gt; x.Id == recording.Id);
-
-    ResponseStatus? responseStatus = null;
-    try
+    public async Task&lt;Recording&gt; Any(CreateRecording request)
     {
-        var response = await speechToText.TranscribeAsync(request.Path);
-        var transcribeEnd = DateTime.UtcNow;
-        await Db.UpdateOnlyAsync(() =&gt; new Recording
-        {
-            Feature = feature,
-            Provider = speechToText.GetType().Name,
-            Transcript = response.Transcript,
-            TranscriptConfidence = response.Confidence,
-            TranscriptResponse = response.ApiResponse,
-            TranscribeEnd = transcribeEnd,
-            TranscribeDurationMs = (transcribeEnd-transcribeStart).TotalMilliseconds,
-            Error = response.ResponseStatus.ToJson(),
-        }, where: x =&gt; x.Id == recording.Id);
-        responseStatus = response.ResponseStatus;
-    }
-    catch (Exception e)
-    {
-        await Db.UpdateOnlyAsync(() =&gt; new Recording { Error = e.ToString() },
+        var feature = request.Feature.ToLower();
+        var recording = (Recording)await autoQuery.CreateAsync(request, Request);
+        var speechToText = speechToTextFactory.Get(request.Feature);
+
+        var transcribeStart = DateTime.UtcNow;
+        await Db.UpdateOnlyAsync(() =&gt; new Recording { TranscribeStart=transcribeStart },
             where: x =&gt; x.Id == recording.Id);
-        responseStatus = e.ToResponseStatus();
+
+        ResponseStatus? responseStatus = null;
+        try
+        {
+            var response = await speechToText.TranscribeAsync(request.Path);
+            var transcribeEnd = DateTime.UtcNow;
+            await Db.UpdateOnlyAsync(() =&gt; new Recording
+            {
+                Feature = feature,
+                Provider = speechToText.GetType().Name,
+                Transcript = response.Transcript,
+                TranscriptConfidence = response.Confidence,
+                TranscriptResponse = response.ApiResponse,
+                TranscribeEnd = transcribeEnd,
+                TranscribeDurationMs = (transcribeEnd-transcribeStart).TotalMilliseconds,
+                Error = response.ResponseStatus.ToJson(),
+            }, where: x =&gt; x.Id == recording.Id);
+            responseStatus = response.ResponseStatus;
+        }
+        catch (Exception e)
+        {
+            await Db.UpdateOnlyAsync(() =&gt; new Recording { Error = e.ToString() },
+                where: x =&gt; x.Id == recording.Id);
+            responseStatus = e.ToResponseStatus();
+        }
+
+        recording = await Db.SingleByIdAsync&lt;Recording&gt;(recording.Id);
+
+        if (responseStatus != null)
+            throw new HttpError(responseStatus, HttpStatusCode.BadRequest);
+
+        return recording;
     }
-
-    recording = await Db.SingleByIdAsync&lt;Recording&gt;(recording.Id);
-
-    if (responseStatus != null)
-        throw new HttpError(responseStatus, HttpStatusCode.BadRequest);
-
-    return recording;
 }
 </code></pre>
 <h3 id="client-usage-example">Client Usage Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-usage-example'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1242,18 +1242,18 @@ into Machine readable instructions that our App can understand, guided by the Ap
 <p>TypeChat Examples does this for all its apps in <a href="https://github.com/NetCoreApps/TypeChatExamples/blob/main/TypeChatExamples.ServiceInterface/GptServices.cs">GptServices.cs</a>
 that just like <code>CreateRecording</code> is a custom AutoQuery CRUD Service that uses AutoQuery to create the
 initial <code>Chat</code> record, that's later updated with the GPT Chat API Response:</p>
-<pre><code class="language-csharp">public class GptServices : Service
+<pre><code class="language-csharp">public class GptServices(
+    IAutoQueryDb autoQuery,
+    IPromptProviderFactory promptFactory,
+    ITypeChat typeChat,
+    IPromptProvider promptProvider) : Service
 {
     //...
-    public IAutoQueryDb AutoQuery { get; set; }
-    public IPromptProvider PromptProvider { get; set; }
-    public ITypeChat TypeChatProvider { get; set; }
-    
     public async Task&lt;object&gt; Any(CreateChat request)
     {
         var feature = request.Feature.ToLower();
-        var promptProvider = PromptFactory.Get(feature);
-        var chat = (Chat)await AutoQuery.CreateAsync(request, Request);
+        var promptProvider = promptFactory.Get(feature);
+        var chat = (Chat)await autoQuery.CreateAsync(request, Request);
 
         var chatStart = DateTime.UtcNow;
         await Db.UpdateOnlyAsync(() =&gt; new Chat { ChatStart = chatStart },
@@ -1266,7 +1266,7 @@ initial <code>Chat</code> record, that's later updated with the GPT Chat API Res
             var prompt = await promptProvider.CreatePromptAsync(request.UserMessage);
             var typeChatRequest = CreateTypeChatRequest(feature, schema, prompt, request.UserMessage);
             
-            var response = await TypeChat.TranslateMessageAsync(typeChatRequest);
+            var response = await typeChat.TranslateMessageAsync(typeChatRequest);
             var chatEnd = DateTime.UtcNow;
             await Db.UpdateOnlyAsync(() =&gt; new Chat
             {
@@ -1465,10 +1465,8 @@ rendered as <strong>hidden</strong> inputs in our HTML Form with:</p>
 in <a href="https://github.com/NetCoreApps/TypeChatExamples/blob/main/TypeChatExamples.ServiceInterface/CoffeeShopServices.cs">CoffeeShopServices.cs</a>
 contains the custom implementation which continues to utilize AutoQuery's <strong>Partial Update</strong> functionality if there's any changes to update,
 as well as removing or adding any Options the user makes to the <code>Category</code>:</p>
-<pre><code class="language-csharp">public class CoffeeShopServices : Service
+<pre><code class="language-csharp">public class CoffeeShopServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-    
     public async Task&lt;object&gt; Any(UpdateCategory request)
     {
         // Perform all RDBMS Updates within the same Transaction
@@ -1479,7 +1477,7 @@ as well as removing or adding any Options the user makes to the <code>Category</
         // Only call AutoQuery Update if there's something to update
         if (request.ToObjectDictionary().HasNonDefaultValues(ignoreKeys:ignore))
         {
-            response = (Category) await AutoQuery.PartialUpdateAsync&lt;Category&gt;(request, Request, Db);
+            response = (Category) await autoQuery.PartialUpdateAsync&lt;Category&gt;(request, Request, Db);
         }
         if (request.RemoveOptionIds?.Count &gt; 0)
         {

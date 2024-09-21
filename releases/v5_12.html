@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-09-13T13:18:34.1508986Z'>
+    <meta name='date' content='2024-09-21T01:38:05.3785666Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v5.12</title>
@@ -2264,19 +2264,17 @@ client.CaptureHttp(clear:false);
 });
 </code></pre>
 <p>It also wont generate implementations for custom AutoBatch implementations, e.g. you can add a custom implementation that does what the generated implementation would've done and execute using the same DB Connection and Transaction with:</p>
-<pre><code class="language-csharp">public class CustomAutoQueryServices : Service
+<pre><code class="language-csharp">public class CustomAutoQueryServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public object Any(CreateItem[] requests)
     {
-        using var db = AutoQuery.GetDb&lt;Item&gt;(Request);
+        using var db = autoQuery.GetDb&lt;Item&gt;(Request);
         using var dbTrans = db.OpenTransaction();
 
         var results = new List&lt;object&gt;();
         foreach (var request in requests)
         {
-            var response = await AutoQuery.CreateAsync(request, Request, db);
+            var response = await autoQuery.CreateAsync(request, Request, db);
             results.Add(response);
         }
 
