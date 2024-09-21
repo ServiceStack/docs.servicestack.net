@@ -60,10 +60,8 @@ contains the custom implementation which continues to utilize AutoQuery's **Part
 as well as removing or adding any Options the user makes to the `Category`: 
 
 ```csharp
-public class CoffeeShopServices : Service
+public class CoffeeShopServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-    
     public async Task<object> Any(UpdateCategory request)
     {
         // Perform all RDBMS Updates within the same Transaction
@@ -74,7 +72,7 @@ public class CoffeeShopServices : Service
         // Only call AutoQuery Update if there's something to update
         if (request.ToObjectDictionary().HasNonDefaultValues(ignoreKeys:ignore))
         {
-            response = (Category) await AutoQuery.PartialUpdateAsync<Category>(request, Request, Db);
+            response = (Category) await autoQuery.PartialUpdateAsync<Category>(request, Request, Db);
         }
         if (request.RemoveOptionIds?.Count > 0)
         {

@@ -214,15 +214,13 @@ public class CustomRockstar
 }
 
 // Override with custom implementation
-public class MyQueryServices : Service
+public class MyQueryServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public async Task<object> Any(QueryRockstarAlbums query)
     {
-        using var db = AutoQuery.GetDb(query, base.Request);
-        var q = AutoQuery.CreateQuery(query, base.Request, db);
-        return await AutoQuery.ExecuteAsync(query, q, base.Request, db);
+        using var db = autoQuery.GetDb(query, base.Request);
+        var q = autoQuery.CreateQuery(query, base.Request, db);
+        return await autoQuery.ExecuteAsync(query, q, base.Request, db);
     }
 }
 ```

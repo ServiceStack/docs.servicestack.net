@@ -565,50 +565,50 @@ is used to transcribe the uploaded Web Audio recording for **all its examples** 
 `Recording` RDBMS Table before invoking the Speech-to-Text API that is then updated after its successful or error response:
 
 ```csharp
-public IAutoQueryDb AutoQuery { get; set; }
-public ISpeechToTextFactory SpeechToTextFactory { get; set; }
-
-public async Task<Recording> Any(CreateRecording request)
+public class MyServices(IAutoQueryDb autoQuery, ISpeechToTextFactory speechToTextFactory)
 {
-    var feature = request.Feature.ToLower();
-    var recording = (Recording)await AutoQuery.CreateAsync(request, Request);
-    var speechToText = SpeechToTextFactory.Get(request.Feature);
-
-    var transcribeStart = DateTime.UtcNow;
-    await Db.UpdateOnlyAsync(() => new Recording { TranscribeStart=transcribeStart },
-        where: x => x.Id == recording.Id);
-
-    ResponseStatus? responseStatus = null;
-    try
+    public async Task<Recording> Any(CreateRecording request)
     {
-        var response = await speechToText.TranscribeAsync(request.Path);
-        var transcribeEnd = DateTime.UtcNow;
-        await Db.UpdateOnlyAsync(() => new Recording
-        {
-            Feature = feature,
-            Provider = speechToText.GetType().Name,
-            Transcript = response.Transcript,
-            TranscriptConfidence = response.Confidence,
-            TranscriptResponse = response.ApiResponse,
-            TranscribeEnd = transcribeEnd,
-            TranscribeDurationMs = (transcribeEnd-transcribeStart).TotalMilliseconds,
-            Error = response.ResponseStatus.ToJson(),
-        }, where: x => x.Id == recording.Id);
-        responseStatus = response.ResponseStatus;
-    }
-    catch (Exception e)
-    {
-        await Db.UpdateOnlyAsync(() => new Recording { Error = e.ToString() },
+        var feature = request.Feature.ToLower();
+        var recording = (Recording)await autoQuery.CreateAsync(request, Request);
+        var speechToText = speechToTextFactory.Get(request.Feature);
+
+        var transcribeStart = DateTime.UtcNow;
+        await Db.UpdateOnlyAsync(() => new Recording { TranscribeStart=transcribeStart },
             where: x => x.Id == recording.Id);
-        responseStatus = e.ToResponseStatus();
+
+        ResponseStatus? responseStatus = null;
+        try
+        {
+            var response = await speechToText.TranscribeAsync(request.Path);
+            var transcribeEnd = DateTime.UtcNow;
+            await Db.UpdateOnlyAsync(() => new Recording
+            {
+                Feature = feature,
+                Provider = speechToText.GetType().Name,
+                Transcript = response.Transcript,
+                TranscriptConfidence = response.Confidence,
+                TranscriptResponse = response.ApiResponse,
+                TranscribeEnd = transcribeEnd,
+                TranscribeDurationMs = (transcribeEnd-transcribeStart).TotalMilliseconds,
+                Error = response.ResponseStatus.ToJson(),
+            }, where: x => x.Id == recording.Id);
+            responseStatus = response.ResponseStatus;
+        }
+        catch (Exception e)
+        {
+            await Db.UpdateOnlyAsync(() => new Recording { Error = e.ToString() },
+                where: x => x.Id == recording.Id);
+            responseStatus = e.ToResponseStatus();
+        }
+
+        recording = await Db.SingleByIdAsync<Recording>(recording.Id);
+
+        if (responseStatus != null)
+            throw new HttpError(responseStatus, HttpStatusCode.BadRequest);
+
+        return recording;
     }
-
-    recording = await Db.SingleByIdAsync<Recording>(recording.Id);
-
-    if (responseStatus != null)
-        throw new HttpError(responseStatus, HttpStatusCode.BadRequest);
-
-    return recording;
 }
 ```
 
@@ -805,18 +805,18 @@ that just like `CreateRecording` is a custom AutoQuery CRUD Service that uses Au
 initial `Chat` record, that's later updated with the GPT Chat API Response:
 
 ```csharp
-public class GptServices : Service
+public class GptServices(
+    IAutoQueryDb autoQuery,
+    IPromptProviderFactory promptFactory,
+    ITypeChat typeChat,
+    IPromptProvider promptProvider) : Service
 {
     //...
-    public IAutoQueryDb AutoQuery { get; set; }
-    public IPromptProvider PromptProvider { get; set; }
-    public ITypeChat TypeChatProvider { get; set; }
-    
     public async Task<object> Any(CreateChat request)
     {
         var feature = request.Feature.ToLower();
-        var promptProvider = PromptFactory.Get(feature);
-        var chat = (Chat)await AutoQuery.CreateAsync(request, Request);
+        var promptProvider = promptFactory.Get(feature);
+        var chat = (Chat)await autoQuery.CreateAsync(request, Request);
 
         var chatStart = DateTime.UtcNow;
         await Db.UpdateOnlyAsync(() => new Chat { ChatStart = chatStart },
@@ -829,7 +829,7 @@ public class GptServices : Service
             var prompt = await promptProvider.CreatePromptAsync(request.UserMessage);
             var typeChatRequest = CreateTypeChatRequest(feature, schema, prompt, request.UserMessage);
             
-            var response = await TypeChat.TranslateMessageAsync(typeChatRequest);
+            var response = await typeChat.TranslateMessageAsync(typeChatRequest);
             var chatEnd = DateTime.UtcNow;
             await Db.UpdateOnlyAsync(() => new Chat
             {
