@@ -1,4 +1,5 @@
 import Templates, { Index } from "../templates/Templates.mjs"
+import AudioPlayer from "../podcasts/AudioPlayer.mjs"
 
 const ComposeTemplate = {
     components: { Templates },
@@ -12,6 +13,7 @@ export default {
     install(app) {
     },
     components: {
+        AudioPlayer,
         ComposeTemplate,
     },
     setup() {
