@@ -1,4 +1,5 @@
 import Templates, { Index } from "../templates/Templates.mjs"
+import AudioPlayer from "../podcasts/AudioPlayer.mjs"
 
 const BlazorTemplate = {
     components: { Templates },
@@ -28,6 +29,7 @@ export default {
     install(app) {
     },
     components: {
+        AudioPlayer,
         BlazorTemplate,
         BlazorWasmTemplate,
         BlazorVueTemplate,

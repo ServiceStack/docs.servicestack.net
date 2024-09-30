@@ -98,25 +98,23 @@ The behavior of queries can be completely customized by simply providing your ow
 
 ```csharp
 // Override with custom implementation
-public class MyQueryServices : Service
+public class MyQueryServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     // Sync
     public object Any(FindMovies query)
     {
-        using var db = AutoQuery.GetDb(query, base.Request);
-        var q = AutoQuery.CreateQuery(query, base.Request, db);
-        return AutoQuery.Execute(query, q, base.Request, db);
+        using var db = autoQuery.GetDb(query, base.Request);
+        var q = autoQuery.CreateQuery(query, base.Request, db);
+        return autoQuery.Execute(query, q, base.Request, db);
     }
 
     // Async
     public async Task<object> Any(QueryRockstars query)
     {
-        using var db = AutoQuery.GetDb(query, base.Request);
-        var q = AutoQuery.CreateQuery(query, base.Request, db);
-        return await AutoQuery.ExecuteAsync(query, q, base.Request, db);
-    }    
+        using var db = autoQuery.GetDb(query, base.Request);
+        var q = autoQuery.CreateQuery(query, base.Request, db);
+        return await autoQuery.ExecuteAsync(query, q, base.Request, db);
+    }
 }
 ```
 
@@ -1078,14 +1076,12 @@ public class QueryPosts : QueryDb<Post>
 }
 
 [CacheResponse(Duration = 600)]
-public class PostPublicServices : PostServicesBase
+public class PostPublicServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public object Any(QueryPosts request)
     {
-        using var db = AutoQuery.GetDb(query, base.Request);
-        var q = AutoQuery.CreateQuery(query, base.Request, db) //Populated SqlExpression
+        using var db = autoQuery.GetDb(query, base.Request);
+        var q = autoQuery.CreateQuery(query, base.Request, db) //Populated SqlExpression
 
         q.Where(x => x.Deleted == null);
         
@@ -1197,11 +1193,9 @@ E.g. This implementation applies the `[ConnectionInfo]` behavior to all its Serv
 
 ```csharp
 [ConnectionInfo(NamedConnection = "Reporting")]
-public class MyReportingServices : Service
+public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
-    public Task<object> Any(CreateReport request) => AutoQuery.CreateAsync(request, base.Request);
+    public Task<object> Any(CreateReport request) => autoQuery.CreateAsync(request,base.Request);
 }
 ```
 
@@ -1338,15 +1332,13 @@ Where it's also queryable with:
 We've already covered some of extensibility options with Customizable **QueryDbFields** and **Implicit Conventions**, the most customizable would be to override the default implementation with a custom one, e.g:
 
 ```csharp
-public class MyQueryServices : Service
+public class MyQueryServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     //Override with custom implementation
     public object Any(FindMovies dto)
     {
-        var q = AutoQuery.CreateQuery(dto, Request.GetRequestParams(), base.Request);
-        return AutoQuery.Execute(dto, q, base.Request);
+        var q = autoQuery.CreateQuery(dto, Request.GetRequestParams(), base.Request);
+        return autoQuery.Execute(dto, q, base.Request);
     }
 }
 ```
@@ -1430,19 +1422,17 @@ Plugins.Add(new AutoQueryFeature {
 It also wont generate implementations for custom AutoBatch implementations, e.g. you can add a custom implementation that does what the generated implementation would've done and execute using the same DB Connection and Transaction with:
 
 ```csharp
-public class CustomAutoQueryServices : Service
+public class CustomAutoQueryServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public object Any(CreateItem[] requests)
     {
-        using var db = AutoQuery.GetDb<Item>(Request);
+        using var db = autoQuery.GetDb<Item>(Request);
         using var dbTrans = db.OpenTransaction();
 
         var results = new List<object>();
         foreach (var request in requests)
         {
-            var response = await AutoQuery.CreateAsync(request, Request, db);
+            var response = await autoQuery.CreateAsync(request, Request, db);
             results.Add(response);
         }
 

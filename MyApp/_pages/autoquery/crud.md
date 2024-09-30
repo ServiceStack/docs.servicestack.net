@@ -138,23 +138,19 @@ Just as you can create [Custom AutoQuery Implementations](/autoquery/rdbms.html#
 you can also override AutoQuery CRUD implementations by creating implementations with AutoQuery CRUD Request DTOs and calling the relevate `IAutoQueryDb` method, e.g:
 
 ```csharp
-public class MyCrudServices : Service
+public class MyCrudServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
-    public object Post(CreateRockstar request) => AutoQuery.Create(request, base.Request);
-    public object Put(UpdateRockstar request) => AutoQuery.Update(request, base.Request);
-    public object Delete(DeleteRockstar request) => AutoQuery.Delete(request, base.Request);
+    public object Post(CreateRockstar request) => autoQuery.Create(request, base.Request);
+    public object Put(UpdateRockstar request) => autoQuery.Update(request, base.Request);
+    public object Delete(DeleteRockstar request) => autoQuery.Delete(request, base.Request);
 }
 
 // Async
-public class MyCrudServices : Service
+public class MyCrudServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
-    public Task<object> Post(CreateRockstar request) => AutoQuery.CreateAsync(request, base.Request);
-    public Task<object> Put(UpdateRockstar request) => AutoQuery.UpdateAsync(request, base.Request);
-    public Task<object> Delete(DeleteRockstar request) => AutoQuery.DeleteAsync(request, base.Request);
+    public Task<object> Post(CreateRockstar request) => autoQuery.CreateAsync(request, base.Request);
+    public Task<object> Put(UpdateRockstar request) => autoQuery.UpdateAsync(request, base.Request);
+    public Task<object> Delete(DeleteRockstar request) => autoQuery.DeleteAsync(request, base.Request);
 }
 ```
 
@@ -490,15 +486,13 @@ have them you'd need to provide custom implementations that can delegate to thei
 
 ```csharp
 [ConnectionInfo(NamedConnection = MyDatabases.Reporting)]
-public class MyReportingServices : Service
+public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public Task<object> Any(CreateConnectionInfoRockstar request) => 
-        AutoQuery.CreateAsync(request, Request);
+        autoQuery.CreateAsync(request, Request);
 
     public Task<object> Any(UpdateConnectionInfoRockstar request) => 
-        AutoQuery.UpdateAsync(request, Request);
+        autoQuery.UpdateAsync(request, Request);
 }
 ```
 
