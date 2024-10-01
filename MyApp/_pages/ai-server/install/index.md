@@ -60,3 +60,5 @@ Once the AI Server is running, you can access the Admin Portal at [http://localh
 If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
 
 > You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up`.
+
+You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models. 
