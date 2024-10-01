@@ -5,17 +5,17 @@ description: Introduction to AI Server and its key features
 
 # Overview
 
-AI Server is an independent microservice designed to provide a comprehensive suite of AI features for your applications. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenRouter, Replicate, Comfy UI, Whisper, and ffmpeg.
+AI Server is a way to orchestrate your AI requests through a single self-hosted application to control what AI Providers you use without impacting your client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenRouter, Replicate, Comfy UI, Whisper, and ffmpeg.
 
 
 ## Key Features
 
 - **Unified AI Gateway**: Centralize all your AI requests through a single self-hosted service.
 - **Multi-Provider Support**: Seamlessly integrate with Ollama, Open AI, Comfy UI, and more.
-- **Type-Safe Integrations**: Native end-to-end typed integrations for popular languages including C#, TypeScript, Python, and more.
+- **Type-Safe Integrations**: Native end-to-end typed integrations for 11 popular languages including C#, TypeScript, Python, and more.
 - **Secure Access**: API key authentication to protect your AI resources.
-- **Managed File Storage**: Built-in CDN-hostable storage for AI-generated assets.
-- **Background Job Processing**: Efficient handling of long-running AI tasks.
+- **Managed File Storage**: Built-in cached storage for AI-generated assets.
+- **Background Job Processing**: Efficient handling of long-running AI tasks, capable of distributing workloads to many different providers, both managed and self-hosted.
 - **Custom Deployment**: Run as a single Docker container, with optional GPU-equipped agents for advanced tasks.
 
 ## Why Use AI Server?
