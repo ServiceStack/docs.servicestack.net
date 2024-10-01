@@ -56,7 +56,7 @@ docker compose up
 
 ## Accessing AI Server
 
-Once the AI Server is running, you can access the Admin UI at [http://localhost:5005](http://localhost:5005) to configure your AI providers and generate API keys.
+Once the AI Server is running, you can access the Admin Portal at [http://localhost:5005/admin](http://localhost:5005/admin) to configure your AI providers and generate API keys.
 If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
 
 > You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up`.

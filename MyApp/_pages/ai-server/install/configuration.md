@@ -5,16 +5,18 @@ title: Configuring AI Server
 # Configuring AI Server
 
 AI Server makes orchestration of various AI providers easy by providing a unified gateway to process LLM, AI, and image transformation requests.
-It comes with an Admin Dashboard that allows you to configure your AI providers and generate API keys to control access.
+It comes with an Admin Portal that allows you to configure your AI providers and generate API keys to control access.
 
-## Accessing the Admin Dashboard
+## Accessing the Admin Portal
 
 Running AI Server will land you on a page showing access to:
 
-- **[Admin Dashboard](http://localhost:5005/admin)**: Centralized management of AI providers and API keys.
+- **[Admin Portal](http://localhost:5005/admin)**: Centralized management of AI providers and API keys.
 - **[Admin UI](http://localhost:5005/admin-ui**: ServiceStack built in Admin UI to manage your AI Server.
 - **[API Explorer](http://localhost:5005/ui**: Explore and test the AI Server API endpoints in a friendly UI.
 - **[AI Server Documentation](https://docs.servicestack.net/ai-server/)**: Detailed documentation on how to use AI Server.
+
+> The default credentials to access the Admin Portal are `p@55wOrd`, this can be changed in your `.env` file by setting the `AUTH_SECRET` key.
 
 ## Configuring AI Providers
 
@@ -23,7 +25,7 @@ AI Providers are the external LLM based services like OpenAI, Google, Mistral et
 There are two ways to configure AI Providers:
 
 1. **.env File**: Update the `.env` file with your API keys and run the AI Server for the first time.
-2. **Admin Dashboard**: Use the Admin Dashboard to add, edit, or remove AI Providers and generate AI Server API keys.
+2. **Admin Portal**: Use the Admin Portal to add, edit, or remove AI Providers and generate AI Server API keys.
 
 ### Using the .env File
 
@@ -39,11 +41,11 @@ The .env file is located in the root of the AI Server repository and contains th
 
 Providing the API keys in the .env file will automatically configure the AI Providers when you run the AI Server for the first time.
 
-### Using the Admin Dashboard
+### Using the Admin Portal
 
-The Admin Dashboard provides a more interactive way to manage your AI Providers after the AI Server is running.
+The Admin Portal provides a more interactive way to manage your AI Providers after the AI Server is running.
 
-To access the Admin Dashboard:
+To access the Admin Portal:
 
 1. Navigate to [http://localhost:5005/admin](http://localhost:5005/admin).
 2. Log in with the default credentials `p@55wOrd`.
@@ -62,10 +64,18 @@ AI Server supports the following AI Providers:
 
 ## Generating AI Server API Keys
 
-API keys are used to authenticate requests to AI Server and are generated via the Admin Dashboard.
+API keys are used to authenticate requests to AI Server and are generated via the Admin Portal.
 
 Here you can create new API keys, view existing keys, and revoke keys as needed.
 
 Keys can be created with expiration dates, and restrictions to specific API endpoints, along with notes to help identify the key's purpose.
 
 
+## Stored File Management
+
+AI Server stores results of the AI operations in a pre-configured paths.
+
+- **Artifacts**: AI generated images, audio, and video files, default path is `App_Data/artifacts`.
+- **Files**: Cached variants and processed files, default path is `App_Data/files`.
+
+These paths can be configured in the `.env` file by setting the `ARTIFACTS_PATH` and `AI_FILES_PATH` keys.
