@@ -47,4 +47,4 @@ AI Server simplifies the integration and management of AI capabilities in your a
 - Website: [openai.servicestack.net](https://openai.servicestack.net)
 - GitHub: [github.com/ServiceStack/ai-server](https://github.com/ServiceStack/ai-server)
 
-AI Server is actively developed and continuously expanding its capabilities. Stay tuned for updates and new features as we work towards our first V1 release.
+AI Server is actively developed and continuously expanding its capabilities.
