@@ -39,7 +39,7 @@ AI Server simplifies the integration and management of AI capabilities in your a
 
 1. **Setup**: Follow the Quick Start guide to deploy AI Server.
 2. **Configuration**: Use the Admin Portal to add your AI providers and generate API keys.
-3. **Integration**: Choose your preferred language and use ServiceStack's Add ServiceStack Reference to generate type-safe client libraries.
+3. **Integration**: Choose your preferred language and use AI Server's type-safe APIs to make requests with AI providers, including directly with OpenAI compatible APIs.
 4. **Development**: Start making API calls to AI Server from your application, leveraging the full suite of AI capabilities.
 
 ## Learn More
