@@ -1,4 +1,7 @@
 ```csharp  
+var client = new JsonApiClient("https://api.openai.com/v1");
+client.AddHeader("Authorization", "Bearer " + Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+
 // Using AI Server DTOs with OpenAI API
 var request = new OpenAiChat {
     Model = "gpt-4-turbo",
@@ -9,7 +12,8 @@ var request = new OpenAiChat {
     MaxTokens = 50
 };
 
-var json = JsonSerializer.SerializeToString(request);
-var response = await client.PostAsync("https://api.openai.com/v1/chat/completions", 
-    new StringContent(json, Encoding.UTF8, "application/json"));
+var response = await client.PostAsync<OpenAiChatResponse>(
+    "/chat/completions", 
+    request
+);
 ```
