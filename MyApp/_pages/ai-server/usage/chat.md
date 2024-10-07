@@ -2,8 +2,6 @@
 title: AI Server API Usage
 ---
 
-# AI Server API Usage
-
 AI Server provides a unified API to process requests for AI services to access LLMs, Image Generation, Transcription, and more. The API is designed to be simple to use and easy to integrate into your applications providing many supported languages and frameworks.
 
 ## Making a Chat Request

@@ -3,10 +3,7 @@ title: Overview
 description: Introduction to AI Server and its key features
 ---
 
-# Overview
-
 AI Server is a way to orchestrate your AI requests through a single self-hosted application to control what AI Providers you use without impacting your client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenRouter, Replicate, Comfy UI, Whisper, and ffmpeg.
-
 
 ## Key Features
 

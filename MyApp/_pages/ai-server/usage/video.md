@@ -1,9 +1,7 @@
 ---
-title: "Video Endpoints"
-description: "Processing videos with AI Server"
+title: Video Endpoints
+description: Processing videos with AI Server
 ---
-
-# Processing Videos with AI Server
 
 Also incorporated into the ComfyUI Agent is FFmpeg, which can be used to process videos. AI Server wraps some common operations into easier-to-use endpoints, such as:
 

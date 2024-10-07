@@ -1,8 +1,6 @@
 ---
-title: "Transcribing Audio"
+title: Transcribing Audio
 ---
-
-# Transcribing Audio
 
 AI Server can transcribe audio files to text using the Speech-to-Text provider. This is powered by the Whisper model and is hosted on your own ComfyUI Agent.
 

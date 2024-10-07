@@ -2,8 +2,6 @@
 title: Configuring AI Server
 ---
 
-# Configuring AI Server
-
 AI Server makes orchestration of various AI providers easy by providing a unified gateway to process LLM, AI, and image transformation requests.
 It comes with an Admin Portal that allows you to configure your AI providers and generate API keys to control access.
 

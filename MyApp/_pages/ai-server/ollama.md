@@ -2,8 +2,6 @@
 title: Self-hosted AI Providers with Ollama
 ---
 
-# Self-hosted AI Providers with Ollama
-
 Ollama can be used as an AI Provider type to process LLM requests in AI Server.
 
 ## Setting up Ollama

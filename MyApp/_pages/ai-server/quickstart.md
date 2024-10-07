@@ -3,8 +3,6 @@ title: Quick Start
 description: Get AI Server up and running quickly
 ---
 
-## Quick Start
-
 To get started with AI Server, we need can use the following steps:
 
 - **Clone the Repository**: Clone the AI Server repository from GitHub.

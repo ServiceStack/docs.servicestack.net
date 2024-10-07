@@ -1,9 +1,7 @@
 ---
-title: "Image to Image"
-description: "Generating images from images with AI Server"
+title: Image to Image
+description: Generating images from images with AI Server
 ---
-
-# Image to Image
 
 AI Server has built-in ComfyUI workflows for doing image-to-image generation tasks like inpainting. This takes an image as input and generates a new image based on the input image and any additional prompts you provide.
 

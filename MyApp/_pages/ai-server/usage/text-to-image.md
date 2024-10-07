@@ -1,9 +1,7 @@
 ---
-title: "Text to Image"
-description: "Generating images from text with AI Server"
+title: Text to Image
+description: Generating images from text with AI Server
 ---
-
-# Text to Image
 
 As well as interacting with LLMs to generate text, AI Server can also generate images from text from a few different providers. 
 
