@@ -9,47 +9,48 @@ Also incorporated into the ComfyUI Agent is FFmpeg, which can be used to process
 - **Convert Video**: Convert a video to a different format.
 - **Scale Video**: Scale a video to a different resolution.
 - **Watermark Video**: Add a watermark to a video.
+- **Trim Video**: Trim a video to a specific length.
 
 ## Using Video Endpoints
 
-These endpoints are used in a similar way to the other AI Server endpoints, eg you can provide a RefId, Tag, ReplyTo, and Sync properties to enhance the usage of AI Server.
+These endpoints are used in a similar way to the other AI Server endpoints, e.g., you can provide a RefId and Tag to help categorize the request, and for Queue requests, you can provide a ReplyTo URL to send a POST request to when the request is complete.
 
-### Crop Video
+### Crop Video {#crop-video}
 
-```csharp
-var request = new CropVideo()
-{
-    X = 120,
-    Y = 120,
-    Width = 720,
-    Height = 720,
-    Sync = true
-};
+::include ai-server/cs/crop-video-1.cs.md::
 
-var response = client.PostFilesWithRequest<TransformResponse>(
-    request,
-    [new UploadFile("video", File.OpenRead("video.mp4"), "video.mp4")]
-);
+### Queue Crop Video {#crop-video}
 
-var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo("cropped-video.mp4");
-```
+::include ai-server/cs/queue-crop-video-1.cs.md::
 
-### Convert Video
+### Convert Video {#convert-video}
 
-```csharp
-var request = new ConvertVideo()
-{
-    OutputFormat = ConvertVideoOutputFormat.WebM,
-    Sync = true
-};
+::include ai-server/cs/convert-video-1.cs.md::
 
-var response = client.PostFilesWithRequest<TransformResponse>(
-    request,
-    [new UploadFile("video", File.OpenRead("video.mp4"), "video.mp4")]
-);
+### Queue Convert Video {#convert-video}
 
-var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo("converted-video.webm");
-```
+::include ai-server/cs/queue-convert-video-1.cs.md::
 
+### Scale Video {#scale-video}
+
+::include ai-server/cs/scale-video-1.cs.md::
+
+### Queue Scale Video {#scale-video}
+
+::include ai-server/cs/queue-scale-video-1.cs.md::
+
+### Watermark Video {#watermark-video}
+
+::include ai-server/cs/watermark-video-1.cs.md::
+
+### Queue Watermark Video {#watermark-video}
+
+::include ai-server/cs/queue-watermark-video-1.cs.md::
+
+### Trim Video {#trim-video}
+
+::include ai-server/cs/trim-video-1.cs.md::
+
+### Queue Trim Video {#trim-video}
+
+::include ai-server/cs/queue-trim-video-1.cs.md::

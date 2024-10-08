@@ -5,10 +5,10 @@ var request = new TextToImage()
     Width = 768,
     Model = "flux-schnell",
     PositivePrompt = "A happy llama",
-    NegativePrompt = "bad quality, blurry image",
-    Sync = true
+    NegativePrompt = "bad quality, blurry image"
 };
 
-var response = await client.PostAsync(request);
-response.Outputs[0].Url.DownloadFileTo("llama.jpg");
+var response = await client.ApiAsync(request);
+response.ThrowIfError();
+response.Response.Outputs[0].Url.DownloadFileTo("llama.jpg");
 ```

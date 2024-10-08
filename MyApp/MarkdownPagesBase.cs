@@ -614,6 +614,55 @@ public class PreContainerRenderer : HtmlObjectRenderer<CustomContainer>
     }
 }
 
+public class MermaidContainerRenderer : HtmlObjectRenderer<CustomContainer>
+{
+    protected override void Write(HtmlRenderer renderer, CustomContainer obj)
+    {
+        renderer.EnsureLine();
+        if (renderer.EnableHtmlForBlock)
+        {
+            renderer.Write("<div class=\"mermaid-diagram\">");
+            renderer.WriteLine("<pre class=\"mermaid\">");
+        }
+
+        // Write the Mermaid diagram content
+        if (obj.FirstOrDefault() is LeafBlock leafBlock)
+        {
+            // There has to be an official API to resolve the original text from a renderer?
+            string? FindOriginalText(ContainerBlock? block)
+            {
+                if (block != null)
+                {
+                    if (block.FirstOrDefault(x => x is LeafBlock { Lines.Count: > 0 }) is LeafBlock first)
+                        return first.Lines.Lines[0].Slice.Text;
+                    return FindOriginalText(block.Parent);
+                }
+
+                return null;
+            }
+
+            var originalSource = leafBlock.Lines.Count > 0
+                ? leafBlock.Lines.Lines[0].Slice.Text
+                : FindOriginalText(obj.Parent);
+            if (originalSource == null)
+            {
+                HostContext.Resolve<ILogger<PreContainerRenderer>>().LogError("Could not find original Text");
+                renderer.WriteLine($"Could not find original Text");
+            }
+            else
+            {
+                renderer.WriteEscape(originalSource.AsSpan().Slice(leafBlock.Span.Start, leafBlock.Span.Length));
+            }
+        }
+
+        if (renderer.EnableHtmlForBlock)
+        {
+            renderer.WriteLine("</pre>");
+            renderer.WriteLine("</div>");
+        }
+    }
+}
+
 public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainerInline>
 {
     protected override void Write(HtmlRenderer renderer, CustomContainerInline obj)
@@ -797,6 +846,7 @@ public class ContainerExtensions : IMarkdownExtension
             },
             ["pre"] = new PreContainerRenderer(),
             ["youtube"] = new YouTubeContainerRenderer(),
+            ["mermaid"] = new MermaidContainerRenderer(),
         };
         InlineContainers = new()
         {

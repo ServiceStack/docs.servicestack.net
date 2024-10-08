@@ -1,17 +1,17 @@
 ```csharp
-var request = new CropImage()
+var client = CreateClient(); // JsonApiClient
+
+using var imageStream = File.OpenRead("files/comfyui_upload_test.png");
+var response = client.PostFilesWithRequest<MediaTransformResponse>(new CropImage
 {
-    X = 120,
-    Y = 120,
-    Width = 720,
-    Height = 720
-};
+    X = 10,
+    Y = 10,
+    Width = 100,
+    Height = 100
+}, [
+    new UploadFile("image.png", imageStream) { FieldName = "image" }
+]);
 
-// Returns the cropped image directly as a Stream
-var response = client.PostFilesWithRequest<Stream>(
-    request,
-    [new UploadFile("image", File.OpenRead("image.jpg"), "image.jpg")]
-);
-
-File.WriteAllBytes("result.jpg",response.ReadFully());
+var croppedImageUrl = response.Outputs[0].Url;
+croppedImageUrl.DownloadFileTo("files/comfyui_upload_test_cropped.png");
 ```

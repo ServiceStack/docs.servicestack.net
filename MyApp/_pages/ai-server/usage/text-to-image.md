@@ -35,20 +35,7 @@ When configuring the Comfy AI Provider, you can provide the URL of your ComfyUI 
 
 Once you have configured your AI Server with the providers you want to use, you can make requests to the AI Server API to generate images from text.
 
-```csharp
-var request = new TextToImage()
-{
-    Height = 768,
-    Width = 768,
-    Model = "flux-schnell",
-    PositivePrompt = "A happy llama",
-    NegativePrompt = "bad quality, blurry image",
-    Sync = true
-};
-
-var response = await client.PostAsync(request);
-response.Outputs[0].Url.DownloadFileTo("llama.webp");
-```
+::include ai-server/cs/text-to-image-1.cs.md::
 
 This request will generate an image of a happy llama using the Flux Schnell model. The `PositivePrompt` and `NegativePrompt` properties are used to guide the model on what to generate, and what to avoid. The `Sync` property is used to determine if the request should be processed synchronously or asynchronously. By default, requests are processed asynchronously.
 

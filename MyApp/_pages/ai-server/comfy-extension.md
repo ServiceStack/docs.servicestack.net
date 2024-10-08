@@ -54,7 +54,9 @@ The keys available in the `.env` file are:
 - **HF_TOKEN**: This is the Hugging Face token that will be used to authenticate with the Hugging Face API when trying to download models. If not provided, models requiring Hugging Face authentication like those with user agreements will not be downloaded.
 - **CIVITAI_TOKEN**: This is the Civitai API key that will be used to authenticate with the Civitai API when trying to download models. If not provided, models requiring Civitai authentication like those with user agreements will not be downloaded.
 
-> Models requiring authentication to download are also flagged in the `/lib/data/ai-models.json` file.
+::: info 
+Models requiring authentication to download are also flagged in the `/lib/data/ai-models.json` file.
+:::
 
 ### Accessing the ComfyUI Extension
 

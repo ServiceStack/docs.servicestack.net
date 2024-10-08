@@ -1,7 +1,8 @@
 ```csharp
-var request = new ConvertVideo()
+var request = new ScaleVideo()
 {
-    OutputFormat = ConvertVideoOutputFormat.WebM
+    Width = 1280,
+    Height = 720,
 };
 
 var response = client.PostFilesWithRequest<MediaTransformResponse>(
@@ -10,5 +11,5 @@ var response = client.PostFilesWithRequest<MediaTransformResponse>(
 );
 
 var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo("converted-video.webm");
+videoUrl.DownloadFileTo($"scaled-video.mp4");
 ```

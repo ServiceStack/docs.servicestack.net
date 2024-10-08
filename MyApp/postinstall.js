@@ -13,6 +13,7 @@ const files = {
       'servicestack-client.min.mjs':     '/@servicestack/client@2/dist/servicestack-client.min.mjs',
       'servicestack-vue.mjs':            '/@servicestack/vue@3/dist/servicestack-vue.mjs',
       'servicestack-vue.min.mjs':        '/@servicestack/vue@3/dist/servicestack-vue.min.mjs',
+      'mermaid.mjs':                     '/mermaid@9.1.7/dist/mermaid.esm.min.mjs'
   },
   typings: {
       'vue/index.d.ts':                  '/vue@3/dist/vue.d.ts',

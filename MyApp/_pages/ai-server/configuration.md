@@ -14,7 +14,9 @@ Running AI Server will land you on a page showing access to:
 - **[API Explorer](http://localhost:5005/ui**: Explore and test the AI Server API endpoints in a friendly UI.
 - **[AI Server Documentation](https://docs.servicestack.net/ai-server/)**: Detailed documentation on how to use AI Server.
 
-> The default credentials to access the Admin Portal are `p@55wOrd`, this can be changed in your `.env` file by setting the `AUTH_SECRET` key.
+:::info 
+The default credentials to access the Admin Portal are `p@55wOrd`, this can be changed in your `.env` file by setting the `AUTH_SECRET` key.
+:::
 
 ## Configuring AI Providers
 

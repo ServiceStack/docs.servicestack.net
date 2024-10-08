@@ -1,7 +1,10 @@
 ```csharp
-var request = new ConvertVideo()
+var request = new CropVideo()
 {
-    OutputFormat = ConvertVideoOutputFormat.WebM
+    X = 100,
+    Y = 100,
+    Width = 500,
+    Height = 300
 };
 
 var response = client.PostFilesWithRequest<MediaTransformResponse>(
@@ -10,5 +13,5 @@ var response = client.PostFilesWithRequest<MediaTransformResponse>(
 );
 
 var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo("converted-video.webm");
+videoUrl.DownloadFileTo("cropped-video.mp4");
 ```
