@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-10-09T02:55:43.2077835Z'>
+    <meta name='date' content='2024-10-09T03:06:01.8778674Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Video Endpoints</title>
@@ -469,10 +469,46 @@ videoUrl.DownloadFileTo(&quot;converted-video.mp4&quot;);
 
 </div></p>
 <h3 id="trim-video">Trim Video<a class="header-anchor" href="javascript:;" onclick="location.hash='#trim-video'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div>Could not find: _includes/ai-server/cs/trim-video-1.cs.md
+<p><div><pre><code class="language-csharp">        var request = new TrimVideo
+        {
+            StartTime = &quot;00:05&quot;,
+            EndTime = &quot;00:10&quot;
+        };
+
+        var response = client.PostFilesWithRequest&lt;MediaTransformResponse&gt;(
+            request,
+            [new UploadFile(&quot;test_video.mp4&quot;, File.OpenRead(&quot;files/test_video.mp4&quot;), &quot;video&quot;)]
+        );
+
+        var videoUrl = response.Outputs[0].Url;
+        videoUrl.DownloadFileTo(outputFileName);
+</code></pre>
+
 </div></p>
 <h3 id="trim-video">Queue Trim Video<a class="header-anchor" href="javascript:;" onclick="location.hash='#trim-video'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div>Could not find: _includes/ai-server/cs/queue-trim-video-1.cs.md
+<p><div><pre><code class="language-csharp">        var request = new QueueTrimVideo
+        {
+            StartTime = &quot;00:05&quot;,
+            EndTime = &quot;00:10&quot;
+        };
+
+        var response = client.PostFilesWithRequest&lt;QueueMediaTransformResponse&gt;(
+            request,
+            [new UploadFile(&quot;test_video.mp4&quot;, File.OpenRead(&quot;files/test_video.mp4&quot;), &quot;video&quot;)]
+        );
+
+        var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+        while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
+        {
+            await Task.Delay(1000);
+            status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+        }
+
+        // Download the trimmed video
+        var videoUrl = status.Outputs[0].Url;
+        videoUrl.DownloadFileTo($&quot;trimmed-video-{status.RefId}.mp4&quot;);
+</code></pre>
+
 </div></p>
 </div>
 
