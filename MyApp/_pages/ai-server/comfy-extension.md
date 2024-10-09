@@ -49,13 +49,13 @@ The `.env` file is used to configure the ComfyUI extension during the initial se
 
 The keys available in the `.env` file are:
 
-- **DEFAULT_MODELS**: Comma-separated list of models to load on startup. This will be used to automatically download the models and their related dependencies. The full list of options can be found on your AI Server at `/lib/data/ai-models.json`.
+- **DEFAULT_MODELS**: Comma-separated list of models to load on startup. This will be used to automatically download the models and their related dependencies. The full list of options can be found on your AI Server at `/lib/data/media-models.json`.
 - **API_KEY**: This is the API key that will be used by your AI Server to authenticate with the ComfyUI. If not provided, there will be no authentication required to access your ComfyUI instance.
 - **HF_TOKEN**: This is the Hugging Face token that will be used to authenticate with the Hugging Face API when trying to download models. If not provided, models requiring Hugging Face authentication like those with user agreements will not be downloaded.
 - **CIVITAI_TOKEN**: This is the Civitai API key that will be used to authenticate with the Civitai API when trying to download models. If not provided, models requiring Civitai authentication like those with user agreements will not be downloaded.
 
 ::: info 
-Models requiring authentication to download are also flagged in the `/lib/data/ai-models.json` file.
+Models requiring authentication to download are also flagged in the `/lib/data/media-models.json` file.
 :::
 
 ### Accessing the ComfyUI Extension
