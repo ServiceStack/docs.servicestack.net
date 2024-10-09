@@ -54,3 +54,8 @@ These endpoints are used in a similar way to the other AI Server endpoints, e.g.
 ### Queue Trim Video {#trim-video}
 
 ::include ai-server/cs/queue-trim-video-1.cs.md::
+
+:::info
+These operations depend on support from FFmpeg, which comes installed with the ComfyUI Agent.
+Limitations on encoders, decoders, and filters may apply.
+:::

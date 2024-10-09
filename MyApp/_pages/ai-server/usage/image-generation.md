@@ -60,4 +60,6 @@ AI Server also provides Image-To-Text generation using the ComfyUI Agent that ut
 
 ::include ai-server/cs/queue-image-to-text-1.cs.md::
 
-Note: Ensure that the ComfyUI Agent has the Florence 2 model downloaded and installed for the Image-To-Text functionality to work.
+:::info
+Ensure that the ComfyUI Agent has the Florence 2 model downloaded and installed for the Image-To-Text functionality to work.
+:::
