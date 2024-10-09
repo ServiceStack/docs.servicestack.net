@@ -18,7 +18,7 @@ Alternatively, you can call the same endpoint asynchronously by using the `/api/
 
 ### Async Queue Open AI Chat Completion
 
-::include ai-server/cs/ai-server-queue-openai-chat-completion-1.cs.md::
+::include ai-server/cs/queue-openai-chat-completion-1.cs.md::
 
 Additional optional features on the request to enhance the usage of AI Server include:
 
@@ -34,7 +34,7 @@ Additional optional features on the request to enhance the usage of AI Server in
 One advantage of using AI Server is that it provides a common set of request DTOs in 11 different languages that are compatible with OpenAI's API. This allows you to switch between OpenAI and AI Server without changing your client code.
 This means you can switch to using typed APIs in your preferred language with your existing service providers OpenAI compatible APIs, and optionally switch to AI Server when you're ready to self-host your AI services for better value.
 
-::include ai-server/cs/ai-server-compatible-2.cs.md::
+::include ai-server/cs/open-ai-requests-1.cs.md::
 
 This shows usage of the `OpenAiChat` request DTO directly with OpenAI's API using the ServiceStack `JsonApiClient`, so you get the benefits of using typed APIs in your preferred language with your existing service providers OpenAI compatible APIs.
 

@@ -1,6 +1,6 @@
 ---
-title: ComfyUI Extension
-description: Installing and configuring the ComfyUI extension
+title: ComfyUI Agent
+description: Installing and configuring the ComfyUI Agent for AI Server
 ---
 
 ComfyUI is a powerful workflow tool for various AI related tasks including the ability to create images from text, images from images, and more. It is a key component of AI Server that provides a wide range of processing capabilities.
@@ -11,7 +11,7 @@ As a way to leverage the ComfyUI API in a more accessible manner, we have create
 
 Since a lot of AI workloads require GPUs or other specialized hardware, the ComfyUI Agent can be run on a separate machine with the necessary hardware, and AI Server can be configured to use it as a provider for these kinds of tasks.
 
-## Installing the ComfyUI Extension
+## Installing the ComfyUI Agent
 
 To install this more easily, [we have put together a Docker image and a Docker Compose file](https://github.com/serviceStack/agent-comfy) that you can use to get started with ComfyUI Agent in AI Server that is already bundled with the pretty simple extension, and all the necessary dependencies.
 
@@ -40,7 +40,7 @@ To run the ComfyUI Agent, you can use the following steps:
     CIVITAI_TOKEN=your_civitai_api_key
    ```
 
-3. **Run the Docker Compose**: Start the ComfyUI extension with Docker Compose.
+3. **Run the Docker Compose**: Start the ComfyUI Agent with Docker Compose.
 
     ```sh
     docker compose up
