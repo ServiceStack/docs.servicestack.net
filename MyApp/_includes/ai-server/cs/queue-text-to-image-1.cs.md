@@ -1,5 +1,5 @@
 ```csharp
-        var request = new TextToImage()
+        var request = new QueueTextToImage()
         {
             Height = 768,
             Width = 768,
@@ -9,5 +9,4 @@
         };
         
         var response = client.Post(request);
-        response.Outputs[0].Url.DownloadFileTo(outputFileName);
 ```

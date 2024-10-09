@@ -1,15 +1,15 @@
 ```csharp
-        var request = new QueueCropVideo()
+        var request = new QueueCropImage()
         {
-            X = 100,
-            Y = 100,
-            Width = 500,
-            Height = 300
+            X = 50,
+            Y = 50,
+            Width = 150,
+            Height = 150
         };
         
         var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
             request,
-            [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
+            [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
         );
         
         var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
@@ -21,5 +21,5 @@
         
         // Download the cropped video
         var videoUrl = status.Outputs[0].Url;
-        videoUrl.DownloadFileTo($"cropped-video-{status.RefId}.mp4");
+        videoUrl.DownloadFileTo($"cropped-image-{status.RefId}.jpg");
 ```

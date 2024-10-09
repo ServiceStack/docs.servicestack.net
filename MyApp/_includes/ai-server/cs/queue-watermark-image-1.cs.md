@@ -1,25 +1,25 @@
 ```csharp
-        var request = new QueueCropVideo()
+        var request = new QueueWatermarkImage
         {
-            X = 100,
-            Y = 100,
-            Width = 500,
-            Height = 300
+            Position = WatermarkPosition.BottomRight
         };
-        
+
         var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
             request,
-            [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
+            [
+                new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image"),
+                new UploadFile("watermark_image.png", File.OpenRead("files/watermark_image.png"), "watermark")
+            ]
         );
-        
+
         var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
         while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
         {
             await Task.Delay(1000);
             status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
         }
-        
-        // Download the cropped video
+
+        // Download the watermarked video
         var videoUrl = status.Outputs[0].Url;
-        videoUrl.DownloadFileTo($"cropped-video-{status.RefId}.mp4");
+        videoUrl.DownloadFileTo($"watermarked-image-{status.RefId}.jpg");
 ```

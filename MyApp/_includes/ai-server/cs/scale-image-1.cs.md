@@ -1,10 +1,8 @@
 ```csharp
-        var request = new CropImage()
+        var request = new ScaleImage()
         {
-            X = 50,
-            Y = 50,
-            Width = 150,
-            Height = 150
+            Width = 1280,
+            Height = 720,
         };
         
         var response = client.PostFilesWithRequest<MediaTransformResponse>(
