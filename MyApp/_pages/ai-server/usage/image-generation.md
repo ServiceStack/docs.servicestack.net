@@ -62,4 +62,5 @@ AI Server also provides Image-To-Text generation using the ComfyUI Agent that ut
 
 :::info
 Ensure that the ComfyUI Agent has the Florence 2 model downloaded and installed for the Image-To-Text functionality to work.
+This can be done by setting the `DEFAULT_MODELS` environment variable in the `.env` file to include `image-to-text`
 :::
