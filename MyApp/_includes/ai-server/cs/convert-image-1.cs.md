@@ -1,12 +1,12 @@
 ```csharp
-        var request = new ConvertVideo()
+        var request = new ConvertImage()
         {
-            OutputFormat = ConvertVideoOutputFormat.MOV
+            OutputFormat = ImageOutputFormat.Gif
         };
 
         var response = client.PostFilesWithRequest<MediaTransformResponse>(
             request,
-            [new UploadFile("test_video.webm", File.OpenRead("files/test_video.webm"), "video")]
+            [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
         );
 
         var videoUrl = response.Outputs[0].Url;
