@@ -10,8 +10,8 @@ It comes with an Admin Portal that allows you to configure your AI providers and
 Running AI Server will land you on a page showing access to:
 
 - **[Admin Portal](http://localhost:5005/admin)**: Centralized management of AI providers and API keys.
-- **[Admin UI](http://localhost:5005/admin-ui**: ServiceStack built in Admin UI to manage your AI Server.
-- **[API Explorer](http://localhost:5005/ui**: Explore and test the AI Server API endpoints in a friendly UI.
+- **[Admin UI](http://localhost:5005/admin-ui)**: ServiceStack built in Admin UI to manage your AI Server.
+- **[API Explorer](http://localhost:5005/ui)**: Explore and test the AI Server API endpoints in a friendly UI.
 - **[AI Server Documentation](https://docs.servicestack.net/ai-server/)**: Detailed documentation on how to use AI Server.
 
 :::info 
