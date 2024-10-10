@@ -16,11 +16,11 @@ Once the model is downloaded, and your Ollama instance is running and accessible
 
 Navigating to the Admin Portal in AI Server, select the **AI Providers** menu item on the left sidebar.
 
-![AI Providers](/images/ai-server/ai-providers.png)
+![AI Providers](/img/pages/ai-server/admin-dashboard.png)
 
 Click on the **New Provider** button at the top of the grid.
 
-![New Provider](/images/ai-server/new-provider.png)
+![New Provider](/img/pages/ai-server/admin-dashboard-providers.png)
 
 Select Ollama as the Provider Type at the top of the form, and fill in the required fields:
 
@@ -29,11 +29,13 @@ Select Ollama as the Provider Type at the top of the form, and fill in the requi
 - **API Key**: Optional API key to authenticate with your Ollama instance.
 - **Priority**: The priority of the provider, used to determine the order of provider selection if multiple provide the same model.
 
-![Ollama Provider](/images/ai-server/ollama-provider.png)
+![Ollama Provider](/img/pages/ai-server/admin-dashboard-ollama-provider.png)
 
-Once the URL and API Key are set, requests will be made to your Ollama instance to list available models. These will then be displayed as options to enable for the provider you are configuring.
+Once the URL (and optional API Key) is set, requests will be made to your Ollama instance to list available models.
+By default, it will look for a locally running Ollama instance on port 11434, but you can change the URL to point to your Ollama instance.
+These will then be displayed as options to enable for the provider you are configuring.
 
-![Ollama Models](/images/ai-server/ollama-models.png)
+![Ollama Models](/img/pages/ai-server/ollama-models.png)
 
 Select the models you want to enable for this provider, and click **Save** to save the provider configuration.
 
@@ -41,4 +43,4 @@ Select the models you want to enable for this provider, and click **Save** to sa
 
 Once configured, you can make requests to AI Server to process LLM requests using the models available in your Ollama instance.
 
-Model names in AI Server are common across all providers, enabling you to switch or load balance between providers without changing your client code. See [Usage](https://docs.servicestack.net/ai-server/usage/) for more information on making requests to AI Server.
+Model names in AI Server are common across all providers, enabling you to switch or load balance between providers without changing your client code. See [Usage](https://docs.servicestack.net/ai-server/usage) for more information on making requests to AI Server.
