@@ -9,6 +9,27 @@ Every API provides two modes of operation: synchronous and asynchronous.
 - **Synchronous**: The request is processed immediately and the response returns a URL to download the result. This has a timeout of 60 seconds.
 - **Asynchronous**: The request is queued and processed in the background. The response returns a URL to download the result when it's ready.
 
+## Image Generation APIs
+
+AI Server has built-in ComfyUI workflows for performing image generation tasks using AI models like SDXL and Flux.
+
+The following tasks are available for image generation:
+
+- [Text to Image](/ai-server/text-to-image) - Generate an image based on provided text prompts.
+- [Image to Image](/ai-server/image-to-image) - Generate a new image based on an input image and provided prompts.
+- [Image with Mask](/ai-server/image-with-mask) - Generate a new image based on an input image, a mask, and provided prompts (applied only to the masked area).
+- [Image Upscale](/ai-server/image-upscale) - Upscale an input image to a higher resolution (currently 2x only).
+
+## Speech APIs
+
+AI Server provides endpoints for speech-related tasks, including Speech-to-Text and Text-to-Speech conversions. These endpoints utilize AI models to process audio and text data.
+
+The following tasks are available for speech processing:
+
+- [Speech to Text](/ai-server/speech-to-text) - Convert audio input to text output.
+- [Text to Speech](/ai-server/text-to-speech) - Convert text input to audio output.
+
+
 ## AI Server API Endpoints
 
 AI Server has endpoints for AI tasks as well as media processing tasks.
@@ -32,7 +53,7 @@ AI Server has endpoints for AI tasks as well as media processing tasks.
     - **Async**: `/api/QueueImageUpscale`
 - **Image To Text**: Generate text from images.
     - **Sync**: `/api/ImageToText`
-    - **Async**: `/api/QueueImageToText
+    - **Async**: `/api/QueueImageToText`
 - **Speech to Text**: Transcribe audio to text.
     - **Sync**: `/api/SpeechToText`
     - **Async**: `/api/QueueSpeechToText`
