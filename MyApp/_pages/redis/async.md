@@ -27,11 +27,8 @@ public void ConfigureServices(IServiceCollection services)
 
 //... 
 
-public class MyDep
+public class MyDep(IRedisClientsManagerAsync manager)
 {
-    private IRedisClientsManagerAsync manager;
-    public MyDep(IRedisClientsManagerAsync manager) => this.manager = manager;
-
     public async Task<long> Incr(string key, uint value)
     {
         await using var redis = await manager.GetClientAsync();
