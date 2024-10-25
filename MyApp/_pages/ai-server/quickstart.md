@@ -15,42 +15,23 @@ Clone the AI Server repository from GitHub:
 
 ```sh
 git clone https://github.com/ServiceStack/ai-server
+cd ai-server
+cat install.sh | bash
 ```
 
-### Edit the example.env File
+### Optional ComfyUI Agent
 
-Create your own `.env` file by copying the `example.env` file:
+The installer will also ask if you want to install the ComfyUI Agent locally if you run AI server from the installer. 
+
+If you want to run the ComfyUI Agent separately, you can follow these steps:
 
 ```sh
-cp example.env .env
+git clone https://github.com/ServiceStack/agent-comfy.git
+cd agent-comfy
+cat install.sh | bash
 ```
 
-And then edit the `.env` file with your desired settings:
-
-```sh
-# OpenAI API Key - Head to https://platform.openai.com/account/api-keys to get your API key
-# OPENAI_API_KEY=your-openai-api-key
-# Google Cloud API Key - Head to https://console.cloud.google.com/apis/credentials to get your API key
-# GOOGLE_API_KEY=your-google-api-key
-# OpenRouter API Key - Head to https://openrouter.io/ to get your API key
-# OPENROUTER_API_KEY=your-openrouter-api-key
-# Mistral API Key - Head to https://mistral.ai/ to get your API key
-# MISTRAL_API_KEY=your-mistral-api-key
-# GROQ API Key - Head to https://groq.com/ to get your API key
-# GROQ_API_KEY=your-groq-api-key
-# Custom Port for the AI Server
-PORT=5005
-```
-
-These keys are used during the AI Server initial database setup to configure the AI providers based on the keys you *uncomment and provide*.
-
-### Run the Docker Compose
-
-Start the AI Server with Docker Compose:
-
-```sh
-docker compose up
-```
+Providing your AI Server URL and API Key when prompted will automatically register the ComfyUI Agent with your AI Server to handle related requests.
 
 ## Accessing AI Server
 
