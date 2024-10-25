@@ -108,7 +108,7 @@ Media endpoints are used for processing images, and videos. Videos are processed
 The AI Server is designed to be a lite-weight router for AI services, providing a common interface for AI services to be accessed via APIs with typed client support in many languages. 
 As such, heavy processing tasks are offloaded to other services, including self-hosted ones like the ComfyUI Agent.
 
-:::mermaid
+```mermaid
 graph TD
     A[API Client] -->|API Request| B(<img class="w-24 h-24" src="/img/logo.svg"/>)
     B -->|API Request| C[Replicate API]
@@ -122,4 +122,4 @@ graph TD
     E -->|AI Processing| L[Flux.1.Schnell]
     B -->|Image Processing| H[AI Server]
     B -->|AI Processing| E[ComfyUI Agent]
-:::
+```
