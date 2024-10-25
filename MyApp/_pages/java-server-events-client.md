@@ -20,7 +20,7 @@ with:
 
 ```groovy
 dependencies {
-    implementation 'net.servicestack:android:1.0.48'
+    implementation 'net.servicestack:android:1.1.0'
     ...
 }
 ```
@@ -31,7 +31,7 @@ Or in Maven with:
 <dependency>
   <groupId>net.servicestack</groupId>
   <artifactId>android</artifactId>
-  <version>1.0.48</version>
+  <version>1.1.0</version>
   <type>pom</type>
 </dependency>
 ```

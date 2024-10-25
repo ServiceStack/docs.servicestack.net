@@ -1583,7 +1583,7 @@ the remote ServiceStack instance you want to access, e.g:
 val client = JsonServiceClient("https://techstacks.io")
 ```
 
-> The JsonServiceClient is made available after the [net.servicestack:android](https://bintray.com/servicestack/maven/ServiceStack.Android/view) package is automatically added to your **build.gradle** when adding a ServiceStack reference.
+> The JsonServiceClient is made available after the `net.servicestack:android` package is automatically added to your **build.gradle** when adding a ServiceStack reference.
 
 Typical usage of the Service Client is the same in .NET where you just need to send a populated Request DTO 
 and the Service Client will return a populated Response DTO, e.g:

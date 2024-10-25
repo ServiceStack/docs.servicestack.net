@@ -107,12 +107,12 @@ reference by adding the dependency below:
 ```
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'net.servicestack:android:1.0.48'
+    implementation 'net.servicestack:android:1.1.0'
 }
 ```
 
 This also lets you to change which ServiceStack Client library version you want to use, the example above uses 
-**1.0.48**. The **net.servicestack:android** dependency contains the `AndroidServiceClient` and 
+**1.1.0**. The **net.servicestack:android** dependency contains the `AndroidServiceClient` and 
 `JavaServiceClient` that your projects use to call remote ServiceStack Services using the typed Kotlin DTO's
 added to your project by the **Add ServiceStack Reference** feature.
 
@@ -248,7 +248,7 @@ val client = JsonServiceClient("https://techstacks.io")
 ```
 
 ::: info
-The JsonServiceClient is made available after the [net.servicestack:android](https://bintray.com/servicestack/maven/ServiceStack.Android/view) package is automatically added to your **build.gradle** when adding a ServiceStack reference
+The JsonServiceClient is made available after the `net.servicestack:android` package is automatically added to your **build.gradle** when adding a ServiceStack reference
 :::
 
 Typical usage of the Service Client is the same in .NET where you just need to send a populated Request DTO 

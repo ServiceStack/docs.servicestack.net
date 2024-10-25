@@ -1,5 +1,5 @@
 ---
-title: Video Endpoints
+title: Video Transform Endpoints
 description: Processing videos with AI Server
 ---
 

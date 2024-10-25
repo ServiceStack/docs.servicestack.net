@@ -11,6 +11,7 @@ using Markdig.Syntax.Inlines;
 using Markdig.Extensions.CustomContainers;
 using ServiceStack.IO;
 using ServiceStack.Text;
+using Markdig.Extensions.Diagrams;
 
 namespace MyApp;
 
@@ -112,6 +113,7 @@ public abstract class MarkdownPagesBase<T>(ILogger log, IWebHostEnvironment env,
             .UseAdvancedExtensions()
             .UseAutoLinkHeadings()
             .UseHeadingsMap()
+            .UseCustomDiagramExtension()
             .UseCustomContainers(MarkdigConfig.Instance.ConfigureContainers);
         MarkdigConfig.Instance.ConfigurePipeline?.Invoke(builder);
 
@@ -374,6 +376,45 @@ public class AutoLinkHeadingsExtension : IMarkdownExtension
     }
 }
 
+public class MermaidBlockRenderer(CodeBlockRenderer? underlyingRenderer = null) : HtmlObjectRenderer<CodeBlock>
+{
+    private readonly CodeBlockRenderer underlyingRenderer = underlyingRenderer ?? new CodeBlockRenderer();
+    protected override void Write(HtmlRenderer renderer, CodeBlock obj)
+    {
+        if (obj is not FencedCodeBlock fencedCodeBlock || obj.Parser is not FencedCodeBlockParser parser)
+        {
+            underlyingRenderer.Write(renderer, obj);
+            return;
+        }
+
+        var attributes = obj.TryGetAttributes() ?? new HtmlAttributes();
+        attributes.AddClass("mermaid not-prose");
+        var txt = GetContent(obj);
+        renderer
+            .Write("<pre")
+            .WriteAttributes(attributes)
+            .Write(">")
+            .Write(txt)
+            .WriteLine("</pre>");
+    }
+    private static string GetContent(LeafBlock obj)
+    {
+        var code = new StringBuilder();
+        foreach (var line in obj.Lines.Lines)
+        {
+            var slice = line.Slice;
+            if (slice.Text == null)
+                continue;
+
+            var lineText = slice.Text.Substring(slice.Start, slice.Length);
+            code.AppendLine();
+            code.Append(lineText);
+        }
+
+        return code.ToString();
+    }
+}
+
 public class FilesCodeBlockRenderer(CodeBlockRenderer? underlyingRenderer = null) : HtmlObjectRenderer<CodeBlock>
 {
     private readonly CodeBlockRenderer underlyingRenderer = underlyingRenderer ?? new CodeBlockRenderer();
@@ -614,55 +655,6 @@ public class PreContainerRenderer : HtmlObjectRenderer<CustomContainer>
     }
 }
 
-public class MermaidContainerRenderer : HtmlObjectRenderer<CustomContainer>
-{
-    protected override void Write(HtmlRenderer renderer, CustomContainer obj)
-    {
-        renderer.EnsureLine();
-        if (renderer.EnableHtmlForBlock)
-        {
-            renderer.Write("<div class=\"mermaid-diagram\">");
-            renderer.WriteLine("<pre class=\"mermaid\">");
-        }
-
-        // Write the Mermaid diagram content
-        if (obj.FirstOrDefault() is LeafBlock leafBlock)
-        {
-            // There has to be an official API to resolve the original text from a renderer?
-            string? FindOriginalText(ContainerBlock? block)
-            {
-                if (block != null)
-                {
-                    if (block.FirstOrDefault(x => x is LeafBlock { Lines.Count: > 0 }) is LeafBlock first)
-                        return first.Lines.Lines[0].Slice.Text;
-                    return FindOriginalText(block.Parent);
-                }
-
-                return null;
-            }
-
-            var originalSource = leafBlock.Lines.Count > 0
-                ? leafBlock.Lines.Lines[0].Slice.Text
-                : FindOriginalText(obj.Parent);
-            if (originalSource == null)
-            {
-                HostContext.Resolve<ILogger<PreContainerRenderer>>().LogError("Could not find original Text");
-                renderer.WriteLine($"Could not find original Text");
-            }
-            else
-            {
-                renderer.WriteEscape(originalSource.AsSpan().Slice(leafBlock.Span.Start, leafBlock.Span.Length));
-            }
-        }
-
-        if (renderer.EnableHtmlForBlock)
-        {
-            renderer.WriteLine("</pre>");
-            renderer.WriteLine("</div>");
-        }
-    }
-}
-
 public class IncludeContainerInlineRenderer : HtmlObjectRenderer<CustomContainerInline>
 {
     protected override void Write(HtmlRenderer renderer, CustomContainerInline obj)
@@ -812,7 +804,8 @@ public class ContainerExtensions : IMarkdownExtension
     {
         CodeBlocks = new()
         {
-            ["files"] = origRenderer => new FilesCodeBlockRenderer(origRenderer)
+            ["files"] = origRenderer => new FilesCodeBlockRenderer(origRenderer),
+            ["mermaid"] = origRenderer => new MermaidBlockRenderer(origRenderer),
         };
         BlockContainers = new()
         {
@@ -846,7 +839,6 @@ public class ContainerExtensions : IMarkdownExtension
             },
             ["pre"] = new PreContainerRenderer(),
             ["youtube"] = new YouTubeContainerRenderer(),
-            ["mermaid"] = new MermaidContainerRenderer(),
         };
         InlineContainers = new()
         {
@@ -911,6 +903,24 @@ public class ContainerExtensions : IMarkdownExtension
             htmlRenderer.ObjectRenderers.TryRemove<HtmlCustomContainerInlineRenderer>();
             // Must be inserted before EmphasisRenderer
             htmlRenderer.ObjectRenderers.Insert(0, new CustomContainerInlineRenderers(this));
+        }
+    }
+}
+
+public class CustomDiagramExtension : IMarkdownExtension
+{
+    public void Setup(MarkdownPipelineBuilder pipeline)
+    {
+    }
+
+    public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
+    {
+        if (renderer is HtmlRenderer htmlRenderer)
+        {
+            var codeRenderer = htmlRenderer.ObjectRenderers.FindExact<CodeBlockRenderer>()!;
+            // TODO: Add other well known diagram languages
+            //codeRenderer.BlocksAsDiv.Add("mermaid");
+            codeRenderer.BlocksAsDiv.Add("nomnoml");
         }
     }
 }
@@ -1002,6 +1012,12 @@ public static class MarkdigExtensions
         var ext = new ContainerExtensions();
         configure?.Invoke(ext);
         pipeline.Extensions.AddIfNotAlready(ext);
+        return pipeline;
+    }
+
+    public static MarkdownPipelineBuilder UseCustomDiagramExtension(this MarkdownPipelineBuilder pipeline)
+    {
+        pipeline.Extensions.ReplaceOrAdd<DiagramExtension>(new CustomDiagramExtension());
         return pipeline;
     }
 }

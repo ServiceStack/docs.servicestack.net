@@ -1,5 +1,5 @@
 ---
-title: Image Endpoints
+title: Image Transform Endpoints
 description: Processing images with AI Server
 ---
 
