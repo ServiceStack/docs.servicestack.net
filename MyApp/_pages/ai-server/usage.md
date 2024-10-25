@@ -110,7 +110,7 @@ As such, heavy processing tasks are offloaded to other services, including self-
 
 :::mermaid
 graph TD
-    A[API Client] -->|API Request| B("fab:fa-servicestack")
+    A[API Client] -->|API Request| B(<img class="w-24 h-24" src="/img/logo.svg"/>)
     B -->|API Request| C[Replicate API]
     B -->|API Request| I[OpenRouter API]
     B -->|API Request| D[OpenAI API]
