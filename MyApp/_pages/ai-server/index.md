@@ -3,9 +3,9 @@ title: Overview
 description: Introduction to AI Server and its key features
 ---
 
-AI Server is a way to orchestrate your AI requests through a single self-hosted application to control what AI Providers you use without impacting your client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenRouter, Replicate, Comfy UI, utilizing models like Whisper, SDXL, Flux, and tools like ffmpeg.
+AI Server allows you to orchestrate your systems AI requests through a single self-hosted application to control what AI Providers App's should use without impacting their client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenAI, Anthropic, Mistral AI, Google Cloud, OpenRouter, GroqCloud, Replicate, Comfy UI, utilizing models like Whisper, SDXL, Flux, and tools like FFmpeg.
 
-```mermaid
+```mermaid{.not-prose}
 flowchart TB
     A[AI Server] 
     A --> D{LLM APIs}
@@ -14,37 +14,41 @@ flowchart TB
     A --> F{Comfy UI 
     + 
     FFmpeg}
-    D --> D1[OpenRouter / OpenAI / Mistral / Anthropic / Google Cloud / Groq]  
-    E --> E1[Replicate / dall-e-3 / Text to speech]
-    F --> F1[Diffusion / Whisper / TTS]
+    D --> D1[OpenAI, Anthropic, Mistral, Google, OpenRouter, Groq]  
+    E --> E1[Replicate, dall-e-3, Text to speech]
+    F --> F1[Diffusion, Whisper, TTS]
 ```
-
-## Key Features
-
-- **Unified AI Gateway**: Centralize all your AI requests through a single self-hosted service.
-- **Multi-Provider Support**: Seamlessly integrate with Ollama, Open AI, Comfy UI, and more.
-- **Type-Safe Integrations**: Native end-to-end typed integrations for 11 popular languages.
-- **Secure Access**: API key authentication to protect your AI resources.
-- **Managed File Storage**: Built-in cached storage for AI-generated assets.
-- **Background Job Processing**: Efficient handling of long-running AI tasks, capable of distributing workloads.
-- **Custom Deployment**: Run as a single Docker container, with optional GPU-equipped agents for advanced tasks.
 
 ## Why Use AI Server?
 
 AI Server simplifies the integration and management of AI capabilities in your applications:
 
-1. **Centralized Management**: Manage all your AI providers and requests from a single interface.
-2. **Cost Control**: Monitor and control usage across your organization with detailed request history.
-3. **Flexibility**: Easy to scale and adapt as your AI needs evolve.
-4. **Security**: Keep your AI operations behind your firewall with a private, managed gateway.
-5. **Developer-Friendly**: Type-safe APIs and integrations for a smooth development experience.
+- **Centralized Management**: Manage your LLM, AI and Media Providers, API Keys and usage from a single App
+- **Flexibility**: Easily switch 3rd party providers without impacting your client integrations
+- **Scalability**: Distribute workloads across multiple providers to handle high volumes of requests efficiently
+- **Security**: Self-hosted private gateway to keep AI operations behind firewalls, limit access with API Keys
+- **Developer-Friendly**: Simple development experience utilizing a single client and endpoint and Type-safe APIs
+- **Manage Costs**: Monitor and control usage across your organization with detailed request history
+
+## Key Features
+
+- **Unified AI Gateway**: Centralize all your AI requests & API Key management through a single self-hosted service
+- **Multi-Provider Support**: Seamlessly integrate with Leading LLMs, Ollama, Comfy UI, FFmpeg, and more
+- **Type-Safe Integrations**: Native end-to-end typed integrations for 11 popular programming languages
+- **Secure Access**: Use simple API key authentication to control which AI resources Apps can use
+- **Managed File Storage**: Built-in cached asset storage for AI-generated assets, isolated per API Key
+- **Background Job Processing**: Efficient handling of long-running AI tasks, capable of distributing workloads
+- **Monitoring and Analytics**: Real-time monitoring performance and statistics of executing AI Requests
+- **Recorded**: Auto archival of completed AI Requests into monthly rolling databases
+- **Custom Deployment**: Run as a single Docker container, with optional GPU-equipped agents for advanced tasks
 
 ## Supported AI Capabilities
 
-- **Large Language Models**: Integrate with Open AI Chat, Ollama, and various API gateways including OpenRouter.
-- **Image Generation & Transformations**: Leverages ComfyUI Agent self-hosted, and SaaS providers like Replicate.
-- **Audio Processing**: Text-to-speech, and speech-to-text with Whisper integration.
-- **Video Processing**: Format conversions, scaling, cropping, and more with via ffmpeg.
+- **Large Language Models**: Integrates with Ollama, OpenAI, Anthropic, Mistral, Google, OpenRouter and Groq
+- **Image Generation**: Leverage self-hosted ComfyUI Agents and SaaS providers like Replicate, DALL-E 3
+- **Image Transformations**: Dynamically transform and cache Image Variations for stored assets
+- **Audio Processing**: Text-to-speech, and speech-to-text with Whisper integration
+- **Video Processing**: Format conversions, scaling, cropping, and more with via FFmpeg
 
 ## Getting Started for Developers
 
