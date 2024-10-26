@@ -11,7 +11,6 @@ using Markdig.Syntax.Inlines;
 using Markdig.Extensions.CustomContainers;
 using ServiceStack.IO;
 using ServiceStack.Text;
-using Markdig.Extensions.Diagrams;
 
 namespace MyApp;
 
@@ -372,45 +371,6 @@ public class AutoLinkHeadingsExtension : IMarkdownExtension
     public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
     {
         renderer.ObjectRenderers.Replace<HeadingRenderer>(new AutoLinkHeadingRenderer());
-    }
-}
-
-public class MermaidBlockRenderer(CodeBlockRenderer? underlyingRenderer = null) : HtmlObjectRenderer<CodeBlock>
-{
-    private readonly CodeBlockRenderer underlyingRenderer = underlyingRenderer ?? new CodeBlockRenderer();
-    protected override void Write(HtmlRenderer renderer, CodeBlock obj)
-    {
-        if (obj is not FencedCodeBlock fencedCodeBlock || obj.Parser is not FencedCodeBlockParser parser)
-        {
-            underlyingRenderer.Write(renderer, obj);
-            return;
-        }
-
-        var attributes = obj.TryGetAttributes() ?? new HtmlAttributes();
-        attributes.AddClass("mermaid not-prose");
-        var txt = GetContent(obj);
-        renderer
-            .Write("<pre")
-            .WriteAttributes(attributes)
-            .Write(">")
-            .Write(txt)
-            .WriteLine("</pre>");
-    }
-    private static string GetContent(LeafBlock obj)
-    {
-        var code = new StringBuilder();
-        foreach (var line in obj.Lines.Lines)
-        {
-            var slice = line.Slice;
-            if (slice.Text == null)
-                continue;
-
-            var lineText = slice.Text.Substring(slice.Start, slice.Length);
-            code.AppendLine();
-            code.Append(lineText);
-        }
-
-        return code.ToString();
     }
 }
 
@@ -804,7 +764,6 @@ public class ContainerExtensions : IMarkdownExtension
         CodeBlocks = new()
         {
             ["files"] = origRenderer => new FilesCodeBlockRenderer(origRenderer),
-            ["mermaid"] = origRenderer => new MermaidBlockRenderer(origRenderer),
         };
         BlockContainers = new()
         {
