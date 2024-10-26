@@ -1,8 +1,5 @@
 ```csharp
-var request = new ImageToText() { };
-
-var response = client.PostFilesWithRequest<GenerationResponse>(
-    request,
+var response = client.PostFilesWithRequest(new ImageToText(),
     [new UploadFile("image", File.OpenRead("files/test_image.jpg"), "image")]
 );
 ```

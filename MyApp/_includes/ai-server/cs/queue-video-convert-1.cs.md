@@ -1,11 +1,7 @@
 ```csharp
-var request = new QueueConvertVideo()
-{
-    OutputFormat = ConvertVideoOutputFormat.MP4
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueConvertVideo {
+        OutputFormat = ConvertVideoOutputFormat.MP4
+    },
     [new UploadFile("test_video.webm", File.OpenRead("files/test_video.webm"), "video")]
 );
 

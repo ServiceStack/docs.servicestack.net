@@ -1,11 +1,7 @@
 ```csharp
-var request = new ConvertImage()
-{
-    OutputFormat = ImageOutputFormat.Gif
-};
-
-var response = client.PostFilesWithRequest<MediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new ConvertImage {
+        OutputFormat = ImageOutputFormat.Gif
+    },
     [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
 );
 

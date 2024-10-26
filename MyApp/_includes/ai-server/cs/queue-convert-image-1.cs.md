@@ -1,11 +1,7 @@
 ```csharp
-var request = new QueueConvertImage()
-{
-    OutputFormat = ImageOutputFormat.Png
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueConvertImage {
+        OutputFormat = ImageOutputFormat.Png
+    },
     [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
 );
 

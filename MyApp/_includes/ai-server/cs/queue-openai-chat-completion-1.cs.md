@@ -2,8 +2,7 @@
 var client = GetLocalApiClient("https://localhost:5005");
 client.BearerToken = Environment.GetEnvironmentVariable("AI_SERVER_API_KEY");
 
-var request = new QueueOpenAiChatCompletion
-{
+var response = await client.ApiAsync(new QueueOpenAiChatCompletion {
     Request = new()
     {
         Model = "gpt-4-turbo",
@@ -14,9 +13,7 @@ var request = new QueueOpenAiChatCompletion
         },
         MaxTokens = 50
     }
-};
-
-var response = await client.ApiAsync(request);
+});
 response.ThrowIfError();
 // Response only returns the related job information
 Console.WriteLine($"RefId: {response.Response.RefId}, JobId: {response.Response.Id}");

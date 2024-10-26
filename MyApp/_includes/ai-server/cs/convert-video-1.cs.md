@@ -1,11 +1,7 @@
 ```csharp
-var request = new ConvertVideo()
-{
-    OutputFormat = ConvertVideoOutputFormat.MOV
-};
-
-var response = client.PostFilesWithRequest<MediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new ConvertVideo {
+        OutputFormat = ConvertVideoOutputFormat.MOV
+    },
     [new UploadFile("test_video.webm", File.OpenRead("files/test_video.webm"), "video")]
 );
 

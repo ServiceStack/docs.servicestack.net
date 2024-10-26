@@ -1,12 +1,8 @@
 ```csharp
-var request = new QueueTrimVideo
-{
-    StartTime = "00:05",
-    EndTime = "00:10"
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueTrimVideo {
+        StartTime = "00:05",
+        EndTime = "00:10"
+    },
     [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
 );
 

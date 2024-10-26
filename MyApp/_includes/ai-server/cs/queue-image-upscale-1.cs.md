@@ -1,8 +1,5 @@
 ```csharp
-var request = new QueueImageUpscale() { };
-
-var response = client.PostFilesWithRequest<QueueGenerationResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueImageUpscale(),
     [new UploadFile("image", File.OpenRead("files/test_image.jpg"), "image")]
 );
 ```

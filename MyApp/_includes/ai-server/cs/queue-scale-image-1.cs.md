@@ -1,13 +1,9 @@
 ```csharp
-var request = new QueueScaleImage()
-{
-    Width = 1280,
-    Height = 720,
-    ReplyTo = "https://example.com/my/reply/endpoint" // optional
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueScaleImage {
+        Width = 1280,
+        Height = 720,
+        ReplyTo = "https://example.com/my/reply/endpoint" // optional
+    },
     [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
 );
 

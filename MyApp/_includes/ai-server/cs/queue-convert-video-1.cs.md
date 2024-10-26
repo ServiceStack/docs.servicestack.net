@@ -1,12 +1,8 @@
 ```csharp
-var request = new QueueConvertVideo()
-{
-    Format = "mp4",
-    ReplyTo = "https://example.com/my/reply/endpoint"
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueConvertVideo {
+        Format = "mp4",
+        ReplyTo = "https://example.com/my/reply/endpoint"
+    },
     [new UploadFile("video", File.OpenRead("video.avi"), "video.avi")]
 );
 

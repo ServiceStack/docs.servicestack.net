@@ -1,12 +1,8 @@
 ```csharp
-var request = new ScaleVideo()
-{
-    Width = 1280,
-    Height = 720,
-};
-
-var response = client.PostFilesWithRequest<MediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new ScaleVideo {
+        Width = 1280,
+        Height = 720,
+    },
     [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
 );
 

@@ -1,15 +1,9 @@
 ```csharp
-var request = new QueueWatermarkVideo
-{
-    Position = WatermarkPosition.BottomRight
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
-    [
-        new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video"),
-        new UploadFile("watermark_image.png", File.OpenRead("files/watermark_image.png"), "watermark")
-    ]
+var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
+        Position = WatermarkPosition.BottomRight
+    },
+    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video"),
+     new UploadFile("watermark_image.png", File.OpenRead("files/watermark_image.png"), "watermark")]
 );
 
 var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });

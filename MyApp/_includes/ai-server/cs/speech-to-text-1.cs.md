@@ -1,8 +1,5 @@
 ```csharp
-var request = new SpeechToText{};
-
-var response = client.PostFilesWithRequest<GenerationResponse>(
-    request,
+var response = client.PostFilesWithRequest(new SpeechToText()
     [new UploadFile("test_audio.wav", File.OpenRead("files/test_audio.wav"), "audio")]
 );
 

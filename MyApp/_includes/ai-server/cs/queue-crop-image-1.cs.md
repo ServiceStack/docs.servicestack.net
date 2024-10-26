@@ -1,14 +1,10 @@
 ```csharp
-var request = new QueueCropImage()
-{
-    X = 50,
-    Y = 50,
-    Width = 150,
-    Height = 150
-};
-
-var response = client.PostFilesWithRequest<QueueMediaTransformResponse>(
-    request,
+var response = client.PostFilesWithRequest(new QueueCropImage {
+        X = 50,
+        Y = 50,
+        Width = 150,
+        Height = 150
+    },
     [new UploadFile("test_image.jpg", File.OpenRead("files/test_image.jpg"), "image")]
 );
 
