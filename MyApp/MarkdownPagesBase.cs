@@ -113,7 +113,6 @@ public abstract class MarkdownPagesBase<T>(ILogger log, IWebHostEnvironment env,
             .UseAdvancedExtensions()
             .UseAutoLinkHeadings()
             .UseHeadingsMap()
-            .UseCustomDiagramExtension()
             .UseCustomContainers(MarkdigConfig.Instance.ConfigureContainers);
         MarkdigConfig.Instance.ConfigurePipeline?.Invoke(builder);
 
@@ -907,24 +906,6 @@ public class ContainerExtensions : IMarkdownExtension
     }
 }
 
-public class CustomDiagramExtension : IMarkdownExtension
-{
-    public void Setup(MarkdownPipelineBuilder pipeline)
-    {
-    }
-
-    public void Setup(MarkdownPipeline pipeline, IMarkdownRenderer renderer)
-    {
-        if (renderer is HtmlRenderer htmlRenderer)
-        {
-            var codeRenderer = htmlRenderer.ObjectRenderers.FindExact<CodeBlockRenderer>()!;
-            // TODO: Add other well known diagram languages
-            //codeRenderer.BlocksAsDiv.Add("mermaid");
-            codeRenderer.BlocksAsDiv.Add("nomnoml");
-        }
-    }
-}
-
 public class HeadingsMapExtension : IMarkdownExtension
 {
     public void Setup(MarkdownPipelineBuilder pipeline)
@@ -1012,12 +993,6 @@ public static class MarkdigExtensions
         var ext = new ContainerExtensions();
         configure?.Invoke(ext);
         pipeline.Extensions.AddIfNotAlready(ext);
-        return pipeline;
-    }
-
-    public static MarkdownPipelineBuilder UseCustomDiagramExtension(this MarkdownPipelineBuilder pipeline)
-    {
-        pipeline.Extensions.ReplaceOrAdd<DiagramExtension>(new CustomDiagramExtension());
         return pipeline;
     }
 }
