@@ -1,65 +1,57 @@
 ---
-title: Overview
-description: Introduction to AI Server and its key features
+title: Quick Start
+description: Get AI Server up and running quickly
 ---
 
-AI Server allows you to orchestrate your systems AI requests through a single self-hosted application to control what AI Providers App's should use without impacting their client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenAI, Anthropic, Mistral AI, Google Cloud, OpenRouter, GroqCloud, Replicate, Comfy UI, utilizing models like Whisper, SDXL, Flux, and tools like FFmpeg.
+To get started with AI Server, we need can use the following steps:
 
-```mermaid{.not-prose}
-flowchart TB
-    A[AI Server] 
-    A --> D{LLM APIs}
-    A --> C{Ollama}
-    A --> E{Media APIs}
-    A --> F{Comfy UI 
-    + 
-    FFmpeg}
-    D --> D1[OpenAI, Anthropic, Mistral, Google, OpenRouter, Groq]  
-    E --> E1[Replicate, dall-e-3, Text to speech]
-    F --> F1[Diffusion, Whisper, TTS]
+- **Clone the Repository**: Clone the AI Server repository from GitHub.
+- **Run the Installer**: Run the `install.sh` to set up the AI Server and ComfyUI Agent.
+
+### Quick Start Commands
+
+```sh
+git clone https://github.com/ServiceStack/ai-server
+cd ai-server
+cat install.sh | bash
+```
+### Running the Installer
+
+The installer will detect common environment variables for the supported AI Providers like OpenAI, Google, Anthropic, and others, and prompt ask you if you want to add them to your AI Server configuration.
+
+![](/img/pages/ai-server/install-ai-server.gif)
+
+Alternatively, you can specify which providers you want and provide the APIs before continuing with the installation.
+
+### Optional ComfyUI Agent
+
+The installer will also ask if you want to install the ComfyUI Agent locally if you run AI server from the installer.
+
+If you choose to run AI Server, it will prompt you to install the ComfyUI Agent as well, and assume you want to run it locally.
+
+If you want to run the ComfyUI Agent separately, you can follow these steps:
+
+```sh
+git clone https://github.com/ServiceStack/agent-comfy.git
+cd agent-comfy
+cat install.sh | bash
 ```
 
-## Why Use AI Server?
+Providing your AI Server URL and Auth Secret when prompted will automatically register the ComfyUI Agent with your AI Server to handle related requests.
 
-AI Server simplifies the integration and management of AI capabilities in your applications:
+:::info
+You will be prompted to provide the AI Server URL and ComfyUI Agent URL during the installation.
+These should be the accessible URLs for your AI Server and ComfyUI Agent. When running locally, the ComfyUI Agent will be populated with a docker accessible path as localhost won't be accessible from the AI Server container.
+If you want to reset the ComfyUI Agent settings, remember to remove the provider from the AI Server Admin Portal.
+:::
 
-- **Centralized Management**: Manage your LLM, AI and Media Providers, API Keys and usage from a single App
-- **Flexibility**: Easily switch 3rd party providers without impacting your client integrations
-- **Scalability**: Distribute workloads across multiple providers to handle high volumes of requests efficiently
-- **Security**: Self-hosted private gateway to keep AI operations behind firewalls, limit access with API Keys
-- **Developer-Friendly**: Simple development experience utilizing a single client and endpoint and Type-safe APIs
-- **Manage Costs**: Monitor and control usage across your organization with detailed request history
+## Accessing AI Server
 
-## Key Features
+Once the AI Server is running, you can access the Admin Portal at [http://localhost:5006/admin](http://localhost:5005/admin) to configure your AI providers and generate API keys.
+If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
 
-- **Unified AI Gateway**: Centralize all your AI requests & API Key management through a single self-hosted service
-- **Multi-Provider Support**: Seamlessly integrate with Leading LLMs, Ollama, Comfy UI, FFmpeg, and more
-- **Type-Safe Integrations**: Native end-to-end typed integrations for 11 popular programming languages
-- **Secure Access**: Use simple API key authentication to control which AI resources Apps can use
-- **Managed File Storage**: Built-in cached asset storage for AI-generated assets, isolated per API Key
-- **Background Job Processing**: Efficient handling of long-running AI tasks, capable of distributing workloads
-- **Monitoring and Analytics**: Real-time monitoring performance and statistics of executing AI Requests
-- **Recorded**: Auto archival of completed AI Requests into monthly rolling databases
-- **Custom Deployment**: Run as a single Docker container, with optional GPU-equipped agents for advanced tasks
+::: info
+You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up`.
+:::
 
-## Supported AI Capabilities
-
-- **Large Language Models**: Integrates with Ollama, OpenAI, Anthropic, Mistral, Google, OpenRouter and Groq
-- **Image Generation**: Leverage self-hosted ComfyUI Agents and SaaS providers like Replicate, DALL-E 3
-- **Image Transformations**: Dynamically transform and cache Image Variations for stored assets
-- **Audio Processing**: Text-to-speech, and speech-to-text with Whisper integration
-- **Video Processing**: Format conversions, scaling, cropping, and more with via FFmpeg
-
-## Getting Started for Developers
-
-1. **Setup**: Follow the [Quick Start guide](/ai-server/install) to deploy AI Server.
-2. **Configuration**: Use the Admin Portal to add your AI providers and generate API keys.
-3. **Integration**: Choose your preferred language and use AI Server's type-safe APIs.
-4. **Development**: Start making API calls to AI Server from your application, leveraging the full suite of AI capabilities.
-
-## Learn More
-
-- Hosted Example: [openai.servicestack.net](https://openai.servicestack.net)
-- Source Code: [github.com/ServiceStack/ai-server](https://github.com/ServiceStack/ai-server)
-
-AI Server is actively developed and continuously expanding its capabilities.
+You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.

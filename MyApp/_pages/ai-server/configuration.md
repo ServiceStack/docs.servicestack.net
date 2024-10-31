@@ -27,6 +27,8 @@ There are two ways to configure AI Providers:
 1. **.env File**: Update the `.env` file with your API keys and run the AI Server for the first time.
 2. **Admin Portal**: Use the Admin Portal to add, edit, or remove AI Providers and generate AI Server API keys.
 
+The provided `install.sh` script will prompt you to configure your AI Providers during the initial setup and populate the same .env file.
+
 ### Using the .env File
 
 The `.env` file is used to configure AI Providers during the initial setup of AI Server, and is the easiest way to get started.
@@ -34,6 +36,7 @@ The `.env` file is used to configure AI Providers during the initial setup of AI
 The .env file is located in the root of the AI Server repository and contains the following keys:
 
 - **OPENAI_API_KEY**: OpenAI API Key
+- **ANTHROPIC_API_KEY**: Anthropic API Key
 - **GOOGLE_API_KEY**: Google Cloud API Key
 - **OPENROUTER_API_KEY**: OpenRouter API Key
 - **MISTRAL_API_KEY**: Mistral API Key
@@ -47,7 +50,7 @@ The Admin Portal provides a more interactive way to manage your AI Providers aft
 
 To access the Admin Portal:
 
-1. Navigate to [http://localhost:5005/admin](http://localhost:5005/admin).
+1. Navigate to [http://localhost:5006/admin](http://localhost:5005/admin).
 2. Log in with the default credentials `p@55wOrd`.
 3. Click on the **AI Providers** tab to view and manage your AI Providers.
 
@@ -56,6 +59,7 @@ Here you can add, edit, or remove AI Providers, as well as generate API keys for
 AI Server supports the following AI Providers:
 
 - **OpenAI**: OpenAI Chat API
+- **Anthropic**: Anthropic Claude API
 - **Google**: Google Cloud AI
 - **OpenRouter**: OpenRouter API
 - **Mistral**: Mistral API
@@ -69,7 +73,6 @@ API keys are used to authenticate requests to AI Server and are generated via th
 Here you can create new API keys, view existing keys, and revoke keys as needed.
 
 Keys can be created with expiration dates, and restrictions to specific API endpoints, along with notes to help identify the key's purpose.
-
 
 ## Stored File Management
 
