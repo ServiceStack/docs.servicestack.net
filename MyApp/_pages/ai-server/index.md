@@ -23,6 +23,18 @@ The installer will detect common environment variables for the supported AI Prov
 
 Alternatively, you can specify which providers you want and provide the APIs before continuing with the installation.
 
+## Accessing AI Server
+
+Once the AI Server is running, you can access the Admin Portal at [http://localhost:5006/admin](http://localhost:5005/admin) to configure your AI providers and generate API keys.
+If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
+
+::: info
+The default password to access the Admin Portal is `p@55wOrd`. You can change this in your `.env` file by setting the `AUTH_SECRET` or providing it during the installation process.
+You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up` or re-running the `install.sh`.
+:::
+
+You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
+
 ### Optional ComfyUI Agent
 
 The installer will also ask if you want to install the ComfyUI Agent locally if you run AI server from the installer.
@@ -45,13 +57,3 @@ These should be the accessible URLs for your AI Server and ComfyUI Agent. When r
 If you want to reset the ComfyUI Agent settings, remember to remove the provider from the AI Server Admin Portal.
 :::
 
-## Accessing AI Server
-
-Once the AI Server is running, you can access the Admin Portal at [http://localhost:5006/admin](http://localhost:5005/admin) to configure your AI providers and generate API keys.
-If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
-
-::: info
-You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up`.
-:::
-
-You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
