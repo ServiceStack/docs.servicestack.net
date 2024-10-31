@@ -13,49 +13,31 @@ Since a lot of AI workloads require GPUs or other specialized hardware, the Comf
 
 ## Installing the ComfyUI Agent
 
-To install this more easily, [we have put together a Docker image and a Docker Compose file](https://github.com/serviceStack/agent-comfy) that you can use to get started with ComfyUI Agent in AI Server that is already bundled with the pretty simple extension, and all the necessary dependencies.
+To install this more easily, you can use the `install.sh` script in the ComfyUI Agent repository. This works the same way as the AI Server installer, and will prompt you for the necessary configuration options.
 
-### Running the ComfyUI Agent
+This installer supports both local and remote installations, and will ask you for the necessary configuration options including the Auth Secret for your AI Server instance. The install process will then register the ComfyUI Agent with your AI Server instance, enabling it for the model selections you make during the installation.
 
-To run the ComfyUI Agent, you can use the following steps:
+```sh
+git clone https://github.com/ServiceStack/agent-comfy.git
+cd agent-comfy
+cat install.sh | bash
+```
 
-1. **Clone the Repository**: Clone the ComfyUI Agent repository from GitHub.
+This process will also persist the configuration in the `.env` file in the ComfyUI Agent directory, so you can easily restart the ComfyUI Agent with the same configuration.
 
-    ```sh
-    git clone https://github.com/ServiceStack/agent-comfy.git
-    ```
-   
-2. **Edit the example.env File**: Update the example.env file with your desired settings.
+:::info
+On the first run, the ComfyUI Agent will download the models you selected during the installation process. This can take some time depending on the size of the models and your internet connection speed.
+:::
 
-    ```sh
-    cp example.env .env
-    ```
-   
-    And then edit the `.env` file with your desired settings:
-
-    ```sh
-    DEFAULT_MODELS=sdxl-lightning,flux-schnell
-    API_KEY=your_agent_api_key
-    HF_TOKEN=your_hf_token
-    CIVITAI_TOKEN=your_civitai_api_key
-   ```
-
-3. **Run the Docker Compose**: Start the ComfyUI Agent with Docker Compose.
-
-    ```sh
-    docker compose up
-    ```
-   
 ### .env Configuration
 
 The `.env` file is used to configure the ComfyUI Agent during the initial setup, and is the easiest way to get started.
 
-The keys available in the `.env` file are:
-
-- **DEFAULT_MODELS**: Comma-separated list of models to load on startup. This will be used to automatically download the models and their related dependencies. The full list of options can be found on your AI Server at `/lib/data/media-models.json`.
-- **API_KEY**: This is the API key that will be used by your AI Server to authenticate with the ComfyUI. If not provided, there will be no authentication required to access your ComfyUI Agent instance.
-- **HF_TOKEN**: This is the Hugging Face token that will be used to authenticate with the Hugging Face API when trying to download models. If not provided, models requiring Hugging Face authentication like those with user agreements will not be downloaded.
-- **CIVITAI_TOKEN**: This is the Civitai API key that will be used to authenticate with the Civitai API when trying to download models. If not provided, models requiring Civitai authentication like those with user agreements will not be downloaded.
+```sh
+DEFAULT_MODELS=sdxl-lightning,text-to-speech,speech-to-text,image-upscale-2x,image-to-text
+HF_TOKEN=your_huggingface_token
+AGENT_PASSWORD=password-to-restrict-access-to-agent
+```
 
 ::: info 
 Models requiring authentication to download are also flagged in the `/lib/data/media-models.json` file.
@@ -66,8 +48,9 @@ Models requiring authentication to download are also flagged in the `/lib/data/m
 Once the ComfyUI Agent is running, you can access the ComfyUI Agent instance at [http://localhost:7860](http://localhost:7860) and can be used as a standard ComfyUI.
 The AI Server has pre-defined workflows to interact with your ComfyUI Agent instance to generate images, audio, text, and more.
 
+### Overriding Workflows
+
 These workflows are found in the AI Server AppHost project under `workflows`. These are templated JSON versions of workflows you save in the ComfyUI web interface.
 
-### Advanced Configuration
-
-ComfyUI workflows can be changed or overridden on a per model basis by editing the `workflows` folder in the AI Server AppHost project. Flux Schnell is an example of overriding text-to-image for just a single workflow for which the code can be found in `AiServer/Configure.AppHost.cs`.
+You can override these workflows by creating a new JSON file with the same name and path but in the `App_Data/overrides` folder. For example, to override the `text_to_image` workflow, you would create a file at `App_Data/overrides/text_to_image.json`.
+This would override all calls that use text-to-image workflow sent to your ComfyUI Agent instance. You can also override just `flux-schnell` by creating a file at `App_Data/overrides/flux1/text_to_image.json`, and Stable Diffusion 3.5 at `App_Data/overrides/sd35/text_to_image.json`.

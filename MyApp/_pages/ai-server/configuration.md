@@ -2,47 +2,48 @@
 title: Configuring AI Server
 ---
 
-AI Server makes orchestration of various AI providers easy by providing a unified gateway to process LLM, AI, and image transformation requests.
-It comes with an Admin Portal that allows you to configure your AI providers and generate API keys to control access.
+AI Server can be configured in several ways:
 
-## Accessing the Admin Portal
+- **install.sh Script**: Run the `install.sh` script to set up the AI Server and ComfyUI Agent.
+- **.env File**: Update the `.env` file with your API keys and run the AI Server for the first time.
+- **Admin Portal**: Use the Admin Portal to add, edit, or remove AI Providers and generate AI Server API keys.
 
-Running AI Server will land you on a page showing access to:
+## Running the Installer
 
-- **[Admin Portal](http://localhost:5005/admin)**: Centralized management of AI providers and API keys.
-- **[Admin UI](http://localhost:5005/admin-ui)**: ServiceStack built in Admin UI to manage your AI Server.
-- **[API Explorer](http://localhost:5005/ui)**: Explore and test the AI Server API endpoints in a friendly UI.
-- **[AI Server Documentation](https://docs.servicestack.net/ai-server/)**: Detailed documentation on how to use AI Server.
+The `install.sh` script is the quickest way to get AI Server up and running with the default configuration. This is ideal for local development and testing.
+
+To run the installer:
+
+```sh
+git clone https://github.com/ServiceStack/ai-server.git
+cd ai-server
+cat install.sh | bash
+```
+
+The installer will prompt you to configure your AI Providers and optionally add the ComfyUI Agent.
+
+## `.env` Configuration
+
+The installer populates the `.env` file with the choices you made during the installation script. You can also manually configure the `.env` file with your API keys and settings.
+
+```sh
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+AUTH_SECRET=p@55wOrd
+ASSETS_BASE_URL=http://localhost:5006
+```
+
+After these values are set in your `.env` file, you can run the AI Server for the first time via docker compose:
+
+```sh
+docker compose up
+```
+
+This will perform an initial setup, saving providers configuration in the SQLite database. From here, you can manage your AI Providers via the [Admin Portal](http://localhost:5006/admin).
 
 :::info 
 The default credentials to access the Admin Portal are `p@55wOrd`, this can be changed in your `.env` file by setting the `AUTH_SECRET` key.
 :::
-
-## Configuring AI Providers
-
-AI Providers are the external LLM based services like OpenAI, Google, Mistral etc that AI Server interacts with to process Chat requests.
-
-There are two ways to configure AI Providers:
-
-1. **.env File**: Update the `.env` file with your API keys and run the AI Server for the first time.
-2. **Admin Portal**: Use the Admin Portal to add, edit, or remove AI Providers and generate AI Server API keys.
-
-The provided `install.sh` script will prompt you to configure your AI Providers during the initial setup and populate the same .env file.
-
-### Using the .env File
-
-The `.env` file is used to configure AI Providers during the initial setup of AI Server, and is the easiest way to get started.
-
-The .env file is located in the root of the AI Server repository and contains the following keys:
-
-- **OPENAI_API_KEY**: OpenAI API Key
-- **ANTHROPIC_API_KEY**: Anthropic API Key
-- **GOOGLE_API_KEY**: Google Cloud API Key
-- **OPENROUTER_API_KEY**: OpenRouter API Key
-- **MISTRAL_API_KEY**: Mistral API Key
-- **GROQ_API_KEY**: GROQ API Key
-
-Providing the API keys in the .env file will automatically configure the AI Providers when you run the AI Server for the first time.
 
 ### Using the Admin Portal
 
@@ -65,6 +66,19 @@ AI Server supports the following AI Providers:
 - **Mistral**: Mistral API
 - **GROQ**: GROQ API
 - **Ollama**: Ollama API
+
+Media Providers can also be configured in the Admin Portal. These include:
+
+- **ComfyUI**: ComfyUI Agent
+  - **Image Generation**
+  - **Text-to-Speech**
+  - **Speech-to-Text**
+  - **Video & Image Processing**
+- **Replicate**: Replicate API
+  - **Image Generation**
+- **OpenAI**: OpenAI API
+  - **Image Generation**
+  - **Text-to-Speech**
 
 ## Generating AI Server API Keys
 
