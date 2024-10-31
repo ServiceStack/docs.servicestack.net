@@ -25,6 +25,8 @@ cat install.sh | bash
 
 This process will also persist the configuration in the `.env` file in the ComfyUI Agent directory, so you can easily restart the ComfyUI Agent with the same configuration.
 
+![](/img/pages/ai-server/agent-install.gif)
+
 :::info
 On the first run, the ComfyUI Agent will download the models you selected during the installation process. This can take some time depending on the size of the models and your internet connection speed.
 :::
@@ -40,7 +42,7 @@ AGENT_PASSWORD=password-to-restrict-access-to-agent
 ```
 
 ::: info 
-Models requiring authentication to download are also flagged in the `/lib/data/media-models.json` file.
+Models requiring authentication to download are also flagged in the `/lib/data/media-models.json` file of AI Server GitHub repository.
 :::
 
 ### Accessing the ComfyUI Agent
