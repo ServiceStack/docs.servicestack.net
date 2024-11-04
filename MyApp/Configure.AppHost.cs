@@ -16,6 +16,9 @@ public class AppHost : AppHostBase, IHostingStartup
         SetConfig(new HostConfig {
             IgnorePathInfoPrefixes = {
                 "/templates",
+            },
+            AllowFileExtensions = {
+                "cast"
             }
         });
         Plugins.RemoveAll(x => x is UiFeature);
