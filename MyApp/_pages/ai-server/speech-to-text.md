@@ -4,6 +4,18 @@ title: Speech to Text
 
 AI Server can transcribe audio files to text using the Speech-to-Text provider. This is powered by the Whisper model and is hosted on your own ComfyUI Agent.
 
+## Speech to Text UI
+
+AI Server's Speech to Text UI lets you transcribe audio files from its active Comfy UI Agents:
+
+<div class="not-prose">
+    <h3 class="text-4xl text-center text-indigo-800 pb-3">
+        <span class="text-gray-300">https://localhost:5006</span>/SpeechToText
+    </h3>
+</div>
+
+![](/img/pages/ai-server/uis/SpeechToText.webp)
+
 ## Using Speech to Text Endpoints
 
 ::include ai-server/endpoint-usage.md::

@@ -4,6 +4,17 @@ title: AI Server API Usage
 
 AI Server provides a unified API to process requests for AI services to access LLMs, Image Generation, Transcription, and more. The API is designed to be simple to use and easy to integrate into your applications providing many supported languages and frameworks.
 
+## Chat UI
+
+AI Server's Chat UI lets upi send Open AI Chat requests with custom system prompts to any of its active LLMs:
+
+<div class="not-prose">
+<h3 class="text-4xl text-center text-indigo-800 pb-3"><span class="text-gray-300">https://localhost:5006</span>/Chat
+</h3>
+</div>
+
+![](/img/pages/ai-server/uis/Chat.webp)
+
 ## Making a Chat Request
 
 To make a chat request to AI Server, you can use the `/api/OpenAiChatCompletion` endpoint. This endpoint requires a `OpenAiChatCompletion` request DTO that contains a property matching the `OpenAI` API.

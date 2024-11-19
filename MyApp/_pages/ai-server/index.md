@@ -48,14 +48,16 @@ If your server also has a GPU you can ask the installer to also install the [Com
 
 The ComfyUI Agent is a separate Docker agent for running [ComfyUI](https://www.comfy.org), 
 [Whisper](https://github.com/openai/whisper) and [FFmpeg](https://www.ffmpeg.org) on servers with GPUs to handle 
-AI Server's Media transformations and Media Requests, including:
+AI Server's [Image](/ai-server/transform/image) and 
+[Video transformations](/ai-server/transform/video) and Media Requests, including:
 
- - Text to Image
- - Image to Text
- - Image to Image
- - Image Upscale
- - Speech to Text
- - Text to Speech
+- [Text to Image](/ai-server/text-to-image)
+- [Image to Text](/ai-server/image-to-text)
+- [Image to Image](/ai-server/image-to-image)
+- [Image with Mask](/ai-server/image-with-mask)
+- [Image Upscale](/ai-server/image-upscale)
+- [Speech to Text](/ai-server/speech-to-text)
+- [Text to Speech](/ai-server/text-to-speech)
 
 #### Comfy UI Agent Installer
 

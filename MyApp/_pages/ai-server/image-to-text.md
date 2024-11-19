@@ -2,6 +2,18 @@
 title: Image to Text
 ---
 
+## Image to Text UI
+
+AI Server's Image to Text UI lets you request image classifications from its active Comfy UI Agents:
+
+<div class="not-prose">
+    <h3 class="text-4xl text-center text-indigo-800 pb-3">
+        <span class="text-gray-300">https://localhost:5006</span>/ImageToText
+    </h3>
+</div>
+
+![](/img/pages/ai-server/uis/ImageToText.webp)
+
 ## Using Image to Text Endpoints
 
 ::include ai-server/endpoint-usage.md::
