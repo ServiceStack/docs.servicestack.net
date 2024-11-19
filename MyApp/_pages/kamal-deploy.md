@@ -1,6 +1,10 @@
-# Deploying with Kamal
+---
+title: Deploying with Kamal
+---
 
 ServiceStack templates now support deployment using Kamal, a CLI tool from the BaseCamp team that simplifies containerized application deployments. Kamal wraps SSH and Docker to streamline self-hosting while maintaining GitHub Actions as the CI runner.
+
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="-mDJfRG8mLQ" style="background-image: url('https://img.youtube.com/vi/-mDJfRG8mLQ/maxresdefault.jpg')"></lite-youtube>
 
 ## Overview
 
