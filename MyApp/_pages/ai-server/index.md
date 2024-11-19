@@ -3,19 +3,22 @@ title: Quick Start
 description: Get AI Server up and running quickly
 ---
 
-To get started with AI Server, we need can use the following steps:
+Install AI Server by running [install.sh](https://github.com/ServiceStack/ai-server/blob/main/install.sh):
 
-- **Clone the Repository**: Clone the AI Server repository from GitHub.
-- **Run the Installer**: Run the `install.sh` to set up the AI Server and ComfyUI Agent.
+### 1. Clone the Repository
 
-### Quick Start Commands
+Clone the AI Server repository from GitHub:
 
 ```sh
 git clone https://github.com/ServiceStack/ai-server
+```
+
+### 2. Run the Installer
+
+```sh
 cd ai-server
 cat install.sh | bash
 ```
-### Running the Installer
 
 The installer will detect common environment variables for the supported AI Providers like OpenAI, Google, Anthropic, and others, and prompt ask you if you want to add them to your AI Server configuration.
 
@@ -36,7 +39,7 @@ You can reset the process by deleting your local `App_Data` directory and rerunn
 
 You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
 
-### Optional ComfyUI Agent
+## Optional ComfyUI Agent
 
 The installer will also ask if you want to install the ComfyUI Agent locally if you run AI server from the installer.
 
