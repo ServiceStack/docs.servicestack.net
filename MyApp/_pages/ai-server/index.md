@@ -39,13 +39,27 @@ You can reset the process by deleting your local `App_Data` directory and rerunn
 
 You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
 
-## Optional ComfyUI Agent
+### Optional - Install ComfyUI Agent
 
-The installer will also ask if you want to install the ComfyUI Agent locally if you run AI server from the installer.
+If your server also has a GPU you can ask the installer to also install the [ComfyUI Agent](/ai-server/comfy-extension) locally:
 
-If you choose to run AI Server, it will prompt you to install the ComfyUI Agent as well, and assume you want to run it locally.
+<div data-asciicinema="https://docs.servicestack.net/pages/ai-server/agent-comfy-install.cast" 
+     data-options="{loop:true,poster:'npt:00:09',theme:'dracula',rows:16}"></div>
 
-If you want to run the ComfyUI Agent separately, you can follow these steps:
+The ComfyUI Agent is a separate Docker agent for running [ComfyUI](https://www.comfy.org), 
+[Whisper](https://github.com/openai/whisper) and [FFmpeg](https://www.ffmpeg.org) on servers with GPUs to handle 
+AI Server's Media transformations and Media Requests, including:
+
+ - Text to Image
+ - Image to Text
+ - Image to Image
+ - Image Upscale
+ - Speech to Text
+ - Text to Speech
+
+#### Comfy UI Agent Installer
+
+To install the ComfyUI Agent on a separate server (with a GPU), you can clone and run the ComfyUI Agent installer from there instead:
 
 ```sh
 git clone https://github.com/ServiceStack/agent-comfy.git
