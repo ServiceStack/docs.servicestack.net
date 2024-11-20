@@ -78,6 +78,11 @@ Once you make these changes, commit and push to your repository to trigger the G
 
 Kamal will deploy the required services including Docker and Kamal Proxy if you server doesn't already have them installed.
 
+:::info
+When using ASP.NET Core applications with Kamal-Proxy, ensure your application is running with the environment variable `ASPNETCORE_FORWARDEDHEADERS_ENABLED` set to `true`. 
+The template has this by default, but if you are getting errors with 302 redirects, ensure this is set.
+:::
+
 The authentication between GitHub Container Registry (ghcr.io) and your server is handled by the GitHub Actions workflow, the `deploy.yml` and [Kamal Secrets](https://kamal-deploy.org/docs/configuration/environment-variables/#secrets).
 
 :::info
