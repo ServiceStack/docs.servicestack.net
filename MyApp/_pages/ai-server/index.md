@@ -89,44 +89,41 @@ If you want to reset the ComfyUI Agent settings, remember to remove the provider
 
 The AI Server installer is supported on Linux, macOS, and Windows with WSL2, and all require Docker and Docker Compose to be installed at a minimum.
 
+## Prerequisites 
 
-### Prerequisites AI Server - Windows with WSL2
+### Linux
 
-Windows with WSL2 requires the following prerequisites:
+Linux requires the following software installed:
 
-- Docker Engine accessible from WSL2 like [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- WSL2 with Ubuntu 20.04 LTS or later
-
-### Prerequisites ComfyUI Agent - Windows with WSL2
-
-To run the ComfyUI Agent locally, you will also need:
-
-- Nvidia GPU with [WSL2 CUDA support](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
-
-### Prerequisites AI Server - macOS
-
-macOS requires the following prerequisites:
-
-- Docker Engine
-- Docker Compose
-
-:::info
-ComfyUI Agent will likely not run on macOS as it requires Nvidia GPU with CUDA support.
-:::
-
-### Prerequisites AI Server - Linux
-
-Linux requires the following prerequisites:
-
-- Docker Engine
-- Docker Compose
+- Docker Engine (with Docker Compose)
 - Git
 
-### Prerequisites ComfyUI Agent - Linux
+#### ComfyUI Agent
 
 To run the ComfyUI Agent locally, you will also need:
 
 - Nvidia GPU with CUDA support
 - Nvidia Container Toolkit for [Docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
 
+### macOS
 
+macOS also requires:
+
+- Docker Engine (with Docker Compose)
+
+#### ComfyUI Agent
+
+ComfyUI Agent requires Pytorch running in Docker which isn't available for macOS
+
+### Windows with WSL2
+
+Windows with WSL2 requires the following prerequisites:
+
+- Docker Engine accessible from WSL2 like [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- WSL2 with Ubuntu 20.04 LTS or later
+
+#### ComfyUI Agent
+
+To run the ComfyUI Agent locally, you will also need:
+
+- Nvidia GPU with [WSL2 CUDA support](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
