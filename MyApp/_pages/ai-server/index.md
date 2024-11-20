@@ -9,16 +9,15 @@ Install AI Server by running [install.sh](https://github.com/ServiceStack/ai-ser
 
 Clone the AI Server repository from GitHub:
 
-```sh
+:::sh
 git clone https://github.com/ServiceStack/ai-server
-```
+:::
 
 ### 2. Run the Installer
 
-```sh
-cd ai-server
-cat install.sh | bash
-```
+:::sh
+cd ai-server && cat install.sh | bash
+:::
 
 The installer will detect common environment variables for the supported AI Providers like OpenAI, Google, Anthropic, and others, and prompt ask you if you want to add them to your AI Server configuration.
 
@@ -34,10 +33,13 @@ If you first ran the AI Server with configured API Keys in your `.env` file, you
 
 ::: info
 The default password to access the Admin Portal is `p@55wOrd`. You can change this in your `.env` file by setting the `AUTH_SECRET` or providing it during the installation process.
-You can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up` or re-running the `install.sh`.
 :::
 
 You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
+
+#### Re-install
+
+If needed you can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up` or re-running the `install.sh`.
 
 ### Optional - Install ComfyUI Agent
 
@@ -63,17 +65,21 @@ AI Server's [Image](/ai-server/transform/image) and
 
 To install the ComfyUI Agent on a separate server (with a GPU), you can clone and run the ComfyUI Agent installer from there instead:
 
-```sh
+**Clone the Comfy Agent Repo:**
+
+:::sh
 git clone https://github.com/ServiceStack/agent-comfy.git
-cd agent-comfy
-cat install.sh | bash
-```
+:::
+
+**Run the Comfy Agent Installer:***
+
+:::sh
+cd agent-comfy && cat install.sh | bash
+:::
 
 Providing your AI Server URL and Auth Secret when prompted will automatically register the ComfyUI Agent with your AI Server to handle related requests.
 
-:::info
+
 You will be prompted to provide the AI Server URL and ComfyUI Agent URL during the installation.
 These should be the accessible URLs for your AI Server and ComfyUI Agent. When running locally, the ComfyUI Agent will be populated with a docker accessible path as localhost won't be accessible from the AI Server container.
 If you want to reset the ComfyUI Agent settings, remember to remove the provider from the AI Server Admin Portal.
-:::
-
