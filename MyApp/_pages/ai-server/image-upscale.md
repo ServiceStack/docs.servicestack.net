@@ -2,6 +2,18 @@
 title: Image Upscale
 ---
 
+## Image Upscale UI
+
+AI Server's Image Upscale UI lets you use AI to 2x upscale and image from its active Comfy UI Agents:
+
+<div class="not-prose">
+    <h3 class="text-4xl text-center text-indigo-800 pb-3">
+        <span class="text-gray-300">https://localhost:5006</span>/ImageUpscale
+    </h3>
+</div>
+
+![](/img/pages/ai-server/uis/ImageUpscale.webp)
+
 ## Using Image Upscale Endpoints
 
 ::include ai-server/endpoint-usage.md::

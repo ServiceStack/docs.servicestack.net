@@ -2,8 +2,19 @@
 title: Text to Speech
 ---
 
-## Using Text to Speech Endpoints
+## Text to Speech UI
 
+AI Server's Text to Speech UI lets you create audio files from its active Comfy UI Agents or Open AI Text to Speech models:
+
+<div class="not-prose">
+    <h3 class="text-4xl text-center text-indigo-800 pb-3">
+        <span class="text-gray-300">https://localhost:5006</span>/TextToSpeech
+    </h3>
+</div>
+
+![](/img/pages/ai-server/uis/TextToSpeech.webp)
+
+## Using Text to Speech Endpoints
 
 ::include ai-server/endpoint-usage.md::
 

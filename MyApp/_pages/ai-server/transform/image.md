@@ -5,10 +5,10 @@ description: Processing images with AI Server
 
 AI Server incorporates various image processing capabilities. It wraps some common operations into easier-to-use endpoints, such as:
 
-- **Crop Image**: Crop an image to a specific size.
-- **Convert Image**: Convert an image to a different format.
-- **Scale Image**: Scale an image to a different resolution.
-- **Watermark Image**: Add a watermark to an image.
+- **Crop Image** - Crop an image to a specific size
+- **Convert Image** - Convert an image to a different format
+- **Scale Image** - Scale an image to a different resolution
+- **Watermark Image** - Add a watermark to an image
 
 :::info
 These operations are processed on the AI Server itself, rather than an external API or agent.
