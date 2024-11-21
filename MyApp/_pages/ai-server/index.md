@@ -19,12 +19,11 @@ git clone https://github.com/ServiceStack/ai-server
 cd ai-server && cat install.sh | bash
 :::
 
-The installer will detect common environment variables for the supported AI Providers like OpenAI, Google, Anthropic, and others, and prompt ask you if you want to add them to your AI Server configuration.
+The installer will detect common environment variables for its supported AI Providers including OpenAI, Anthropic, 
+Mistral AI, Google, etc. and prompt if you would like to include any others in your AI Server configuration.
 
 <div data-asciicinema="/pages/ai-server/ai-server-install.cast" 
      data-options="{loop:true,poster:'npt:00:21',theme:'dracula',rows:13}"></div>
-
-Alternatively, you can specify which providers you want and provide the APIs before continuing with the installation.
 
 ## Accessing AI Server
 
