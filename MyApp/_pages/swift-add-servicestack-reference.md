@@ -2,7 +2,7 @@
 title: Swift Add ServiceStack Reference 
 ---
 
-![Swift iOS, XCode and macOS Banner](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/swift-logo-banner.jpg)
+![Swift iOS, XCode and macOS Banner](/img/pages/servicestack-reference/swift-logo-banner.jpg)
 
 ## Swift
 
