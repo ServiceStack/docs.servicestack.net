@@ -26,11 +26,15 @@ The installer will prompt you to configure your AI Providers and optionally add 
 
 The installer populates the `.env` file with the choices you made during the installation script. You can also manually configure the `.env` file with your API keys and settings.
 
-```sh
-OPENAI_API_KEY=your_openai_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
-AUTH_SECRET=p@55wOrd
-ASSETS_BASE_URL=http://localhost:5006
+```ini
+OPENAI_API_KEY=<Your OpenAI API Key>
+ANTHROPIC_API_KEY=<Your Anthropic API Key>
+OPENROUTER_API_KEY=<Your OpenRouter API Key>
+MISTRAL_API_KEY=<Your Mistral API Key>
+GOOGLE_API_KEY=<Your GoogleCloud API Key>
+GROQ_API_KEY=<Your Groq Cloud API Key>
+AUTH_SECRET="p@55wOrd"
+ASSETS_BASE_URL="http://localhost:5006"
 ```
 
 After these values are set in your `.env` file, you can run the AI Server for the first time via docker compose:
