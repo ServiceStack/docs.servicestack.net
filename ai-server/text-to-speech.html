@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-25T16:15:26.6635801Z'>
+    <meta name='date' content='2024-11-25T16:31:33.9801312Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Text to Speech</title>
@@ -351,7 +351,7 @@ var response = client.PostFileWithRequest(new TextToSpeech {
     },
     new UploadFile(&quot;test_audio.wav&quot;, fsAudio, &quot;audio&quot;));
 
-response.Results[0].Url.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 </code></pre>
 
 </div></p>
@@ -362,6 +362,16 @@ var response = client.PostFileWithRequest(new QueueTextToSpeech {
         Text = &quot;Hello, how are you?&quot;
     },
     new UploadFile(&quot;test_audio.wav&quot;, fsAudio, &quot;audio&quot;));
+
+GetArtifactGenerationStatusResponse status = new();
+while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
+{
+    status = client.Get(new GetArtifactGenerationStatus { RefId = response.RefId });
+    Thread.Sleep(1000);
+}
+
+// Download the watermarked image
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 </code></pre>
 
 </div></p>

@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-25T16:15:26.6411805Z'>
+    <meta name='date' content='2024-11-25T16:31:33.9596277Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AI Server API Usage</title>
@@ -334,10 +334,9 @@ Transform                                    </span>
 <h2 id="making-a-chat-request">Making a Chat Request<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-a-chat-request'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>To make a chat request to AI Server, you can use the <code>/api/OpenAiChatCompletion</code> endpoint. This endpoint requires a <code>OpenAiChatCompletion</code> request DTO that contains a property matching the <code>OpenAI</code> API.</p>
 <h3 id="sync-open-ai-chat-completion">Sync Open AI Chat Completion<a class="header-anchor" href="javascript:;" onclick="location.hash='#sync-open-ai-chat-completion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var apiClient = GetLocalApiClient(AiServerUrl);
-apiClient.BearerToken = Environment.GetEnvironmentVariable(&quot;AI_SERVER_API_KEY&quot;);
+<p><div><pre><code class="language-csharp">var client = GetLocalApiClient(AiServerUrl);
 
-var request = new OpenAiChatCompletion {
+var response = client.Post(new OpenAiChatCompletion {
     Model = &quot;llama3.1:8b&quot;,
     Messages =
     [
@@ -345,11 +344,8 @@ var request = new OpenAiChatCompletion {
         new() { Role = &quot;user&quot;, Content = &quot;How do LLMs work?&quot; }
     ],
     MaxTokens = 50
-};
-
-var response = await apiClient.PostAsync(request);
-var openAiResponse = response; // The same
-Console.WriteLine(openAiResponse.Choices[0].Message.Content);
+});
+var answer = response.Choices[0].Message.Content;
 </code></pre>
 
 </div></p>
@@ -357,9 +353,8 @@ Console.WriteLine(openAiResponse.Choices[0].Message.Content);
 <p>Alternatively, you can call the same endpoint asynchronously by using the <code>/api/QueueOpenAiChatCompletion</code> endpoint. This will queue the request for processing and return a URL to check the status of the request and download the response when it's ready.</p>
 <h3 id="async-queue-open-ai-chat-completion">Async Queue Open AI Chat Completion<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-queue-open-ai-chat-completion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><div><pre><code class="language-csharp">var client = GetLocalApiClient(AiServerUrl);
-client.BearerToken = Environment.GetEnvironmentVariable(&quot;AI_SERVER_API_KEY&quot;);
 
-var api = await client.ApiAsync(new QueueOpenAiChatCompletion
+var response = client.Post(new QueueOpenAiChatCompletion
 {
     Request = new()
     {
@@ -372,9 +367,16 @@ var api = await client.ApiAsync(new QueueOpenAiChatCompletion
         MaxTokens = 50
     },
 });
-api.ThrowIfError();
-// Response only returns the related job information
-Console.WriteLine($&quot;RefId: {api.Response.RefId}, JobId: {api.Response.Id}&quot;);
+
+// Poll for Job Completion Status
+GetOpenAiChatStatusResponse status = new();
+while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
+{
+    status = await client.GetAsync(new GetOpenAiChatStatus { RefId = response.RefId });
+    await Task.Delay(1000);
+}
+
+var answer = status.Result.Choices[0].Message.Content;
 </code></pre>
 
 </div></p>
