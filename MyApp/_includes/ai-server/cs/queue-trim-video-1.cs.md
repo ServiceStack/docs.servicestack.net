@@ -14,6 +14,5 @@ while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queue
 }
 
 // Download the trimmed video
-var videoUrl = status.Results[0].Url;
-videoUrl.DownloadFileTo($"trimmed-video-{status.RefId}.mp4");
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```

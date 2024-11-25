@@ -17,6 +17,5 @@ while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queue
 }
 
 // Download the cropped video
-var videoUrl = status.Results[0].Url;
-videoUrl.DownloadFileTo($"cropped-video-{status.RefId}.mp4");
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```

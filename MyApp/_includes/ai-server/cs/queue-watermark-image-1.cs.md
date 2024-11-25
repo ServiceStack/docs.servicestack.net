@@ -15,7 +15,6 @@ while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queue
     await Task.Delay(1000);
 }
 
-// Download the watermarked video
-var videoUrl = status.Results[0].Url;
-videoUrl.DownloadFileTo($"watermarked-image-{status.RefId}.jpg");
+// Download the watermarked image
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```

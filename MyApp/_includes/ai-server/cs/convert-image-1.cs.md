@@ -5,6 +5,5 @@ var response = client.PostFileWithRequest(new ConvertImage {
     },
     new UploadFile("test_image.jpg", fsImage, "image"));
 
-var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

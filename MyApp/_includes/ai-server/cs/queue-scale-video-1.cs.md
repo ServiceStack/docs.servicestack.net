@@ -15,6 +15,5 @@ while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queue
 }
 
 // Download the scaled video
-var videoUrl = status.Results[0].Url;
-videoUrl.DownloadFileTo($"scaled-video-{status.RefId}.mp4");
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```

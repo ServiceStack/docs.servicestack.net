@@ -7,5 +7,5 @@ var response = client.Post(new TextToImage
     PositivePrompt = "A happy llama",
     NegativePrompt = "bad quality, blurry image"
 });
-response.Results[0].Url.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

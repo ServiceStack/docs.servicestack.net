@@ -6,6 +6,5 @@ var response = client.PostFileWithRequest(new ScaleVideo {
     },
     new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

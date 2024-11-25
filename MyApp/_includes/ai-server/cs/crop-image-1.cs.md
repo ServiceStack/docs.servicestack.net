@@ -9,5 +9,5 @@ var response = client.PostFileWithRequest(new CropImage {
     new UploadFile("test_image.jpg", fsImage, "image"));
 
 var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+videoUrl.DownloadFileTo(saveToPath);
 ```

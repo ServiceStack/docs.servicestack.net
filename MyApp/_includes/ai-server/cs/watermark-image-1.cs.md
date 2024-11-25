@@ -8,6 +8,5 @@ var response = client.PostFilesWithRequest(new WatermarkImage {
         new UploadFile("watermark_image.png", fsWatermark, "watermark")
     ]);
 
-var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

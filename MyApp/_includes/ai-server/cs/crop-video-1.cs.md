@@ -8,6 +8,5 @@ var response = client.PostFileWithRequest(new CropVideo {
     },
     new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

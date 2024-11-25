@@ -12,7 +12,6 @@ while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queue
     await Task.Delay(1000);
 }
 
-// Download the converted video
-var videoUrl = status.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+// Download the converted image
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```

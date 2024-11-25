@@ -5,6 +5,5 @@ var response = client.PostFileWithRequest(new ConvertVideo {
     },
     new UploadFile("test_video.webm", fsVideo, "video"));
 
-var videoUrl = response.Results[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

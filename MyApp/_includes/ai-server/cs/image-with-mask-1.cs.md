@@ -9,5 +9,5 @@ var response = client.PostFilesWithRequest(new ImageWithMask {
         new UploadFile("mask", fsMask, "mask")
     ]);
 
-response.Results[0].Url.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```
