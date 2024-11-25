@@ -1,8 +1,7 @@
 ```csharp
-var apiClient = GetLocalApiClient(AiServerUrl);
-apiClient.BearerToken = Environment.GetEnvironmentVariable("AI_SERVER_API_KEY");
+var client = GetLocalApiClient(AiServerUrl);
 
-var request = new OpenAiChatCompletion {
+var response = client.Post(new OpenAiChatCompletion {
     Model = "llama3.1:8b",
     Messages =
     [
@@ -10,9 +9,6 @@ var request = new OpenAiChatCompletion {
         new() { Role = "user", Content = "How do LLMs work?" }
     ],
     MaxTokens = 50
-};
-
-var response = await apiClient.PostAsync(request);
-var openAiResponse = response; // The same
-Console.WriteLine(openAiResponse.Choices[0].Message.Content);
+});
+var answer = response.Choices[0].Message.Content;
 ```

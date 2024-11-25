@@ -5,5 +5,5 @@ var response = client.PostFileWithRequest(new TextToSpeech {
     },
     new UploadFile("test_audio.wav", fsAudio, "audio"));
 
-response.Results[0].Url.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

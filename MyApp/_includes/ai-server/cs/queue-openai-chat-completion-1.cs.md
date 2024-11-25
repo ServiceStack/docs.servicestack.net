@@ -1,8 +1,7 @@
 ```csharp
 var client = GetLocalApiClient(AiServerUrl);
-client.BearerToken = Environment.GetEnvironmentVariable("AI_SERVER_API_KEY");
 
-var api = await client.ApiAsync(new QueueOpenAiChatCompletion
+var response = client.Post(new QueueOpenAiChatCompletion
 {
     Request = new()
     {
@@ -15,7 +14,14 @@ var api = await client.ApiAsync(new QueueOpenAiChatCompletion
         MaxTokens = 50
     },
 });
-api.ThrowIfError();
-// Response only returns the related job information
-Console.WriteLine($"RefId: {api.Response.RefId}, JobId: {api.Response.Id}");
+
+// Poll for Job Completion Status
+GetOpenAiChatStatusResponse status = new();
+while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
+{
+    status = await client.GetAsync(new GetOpenAiChatStatus { RefId = response.RefId });
+    await Task.Delay(1000);
+}
+
+var answer = status.Result.Choices[0].Message.Content;
 ```
