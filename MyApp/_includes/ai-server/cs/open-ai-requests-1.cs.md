@@ -1,6 +1,6 @@
 ```csharp
 var client = new JsonApiClient("https://api.openai.com");
-client.AddHeader("Authorization", "Bearer " + Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+client.BearerToken = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
 // Using AI Server DTOs with OpenAI API
 var request = new OpenAiChatCompletion {
