@@ -1,11 +1,14 @@
 ```csharp
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+using var fsWatermark = File.OpenRead("files/watermark_image.png");
 var response = client.PostFilesWithRequest(new WatermarkVideo {
         Position = WatermarkPosition.BottomRight
     },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video"),
-     new UploadFile("watermark_image.png", File.OpenRead("files/watermark_image.png"), "watermark")]
-);
+    [
+        new UploadFile("test_video.mp4", fsVideo, "video"),
+        new UploadFile("watermark_image.png", fsWatermark, "watermark")
+    ]);
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 ```

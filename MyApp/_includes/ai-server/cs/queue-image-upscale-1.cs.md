@@ -1,5 +1,5 @@
 ```csharp
-var response = client.PostFilesWithRequest(new QueueImageUpscale(),
-    [new UploadFile("image", File.OpenRead("files/test_image.jpg"), "image")]
-);
+using var fsImage = File.OpenRead("files/test_image.jpg");
+var response = client.PostFileWithRequest(new QueueImageUpscale(),
+    new UploadFile("image", fsImage, "image"));
 ```

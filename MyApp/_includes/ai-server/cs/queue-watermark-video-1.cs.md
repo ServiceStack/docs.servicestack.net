@@ -1,19 +1,21 @@
 ```csharp
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+using var fsWatermark = File.OpenRead("files/watermark_image.png");
 var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
         Position = WatermarkPosition.BottomRight
-    },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video"),
-     new UploadFile("watermark_image.png", File.OpenRead("files/watermark_image.png"), "watermark")]
-);
+    }, [
+        new UploadFile("test_video.mp4", fsVideo, "video"),
+        new UploadFile("watermark_image.png", fsWatermark, "watermark")
+    ]);
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the watermarked video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo($"watermarked-video-{status.RefId}.mp4");
 ```

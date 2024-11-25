@@ -1,18 +1,18 @@
 ```csharp
-var response = client.PostFilesWithRequest(new QueueConvertVideo {
+using var fsVideo = File.OpenRead("files/test_video.webm");
+var response = client.PostFileWithRequest(new QueueConvertVideo {
         OutputFormat = ConvertVideoOutputFormat.MP4
     },
-    [new UploadFile("test_video.webm", File.OpenRead("files/test_video.webm"), "video")]
-);
+    new UploadFile("test_video.webm", fsVideo, "video"));
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the converted video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 ```

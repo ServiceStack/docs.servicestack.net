@@ -1,20 +1,21 @@
 ```csharp
-var client = GetLocalApiClient("https://localhost:5005");
+var client = GetLocalApiClient(AiServerUrl);
 client.BearerToken = Environment.GetEnvironmentVariable("AI_SERVER_API_KEY");
 
-var response = await client.ApiAsync(new QueueOpenAiChatCompletion {
+var api = await client.ApiAsync(new QueueOpenAiChatCompletion
+{
     Request = new()
     {
         Model = "gpt-4-turbo",
-        Messages = new List<OpenAiMessage>
-        {
+        Messages =
+        [
             new() { Role = "system", Content = "You are a helpful AI assistant." },
             new() { Role = "user", Content = "How do LLMs work?" }
-        },
+        ],
         MaxTokens = 50
-    }
+    },
 });
-response.ThrowIfError();
+api.ThrowIfError();
 // Response only returns the related job information
-Console.WriteLine($"RefId: {response.Response.RefId}, JobId: {response.Response.Id}");
+Console.WriteLine($"RefId: {api.Response.RefId}, JobId: {api.Response.Id}");
 ```

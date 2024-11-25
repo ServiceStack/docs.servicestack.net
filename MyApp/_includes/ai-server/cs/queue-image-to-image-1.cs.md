@@ -1,8 +1,8 @@
 ```csharp
-var response = client.PostFilesWithRequest(new QueueImageToImage {
+using var fsImage = File.OpenRead("files/comfyui_upload_test.png");
+var response = client.PostFileWithRequest(new QueueImageToImage {
         PositivePrompt = "A beautiful sunset over the ocean",
         NegativePrompt = "A pixelated, low-quality image"
     },
-    [new UploadFile("image", File.OpenRead("files/comfyui_upload_test.png"), "image")]
-);
+    new UploadFile("image", fsImage, "image"));
 ```

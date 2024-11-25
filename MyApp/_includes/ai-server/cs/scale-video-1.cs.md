@@ -1,11 +1,11 @@
 ```csharp
-var response = client.PostFilesWithRequest(new ScaleVideo {
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+var response = client.PostFileWithRequest(new ScaleVideo {
         Width = 1280,
         Height = 720,
     },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
-);
+    new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 ```
