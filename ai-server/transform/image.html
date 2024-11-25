@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-24T13:11:20.6018727Z'>
+    <meta name='date' content='2024-11-25T13:29:05.3109050Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Image Transform Endpoints</title>
@@ -336,140 +336,144 @@ Transform                                    </span>
 <h2 id="using-image-endpoints">Using Image Endpoints<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-image-endpoints'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>These endpoints are used in a similar way to the other AI Server endpoints, e.g., you can provide a RefId and Tag to help categorize the request, and for Queue requests, you can provide a ReplyTo URL to send a POST request to when the request is complete.</p>
 <h3 id="crop-image">Crop Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#crop-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new CropImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new CropImage {
         X = 50,
         Y = 50,
         Width = 150,
         Height = 150
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 </code></pre>
 
 </div></p>
 <h3 id="crop-image">Queue Crop Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#crop-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new QueueCropImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new QueueCropImage {
         X = 50,
         Y = 50,
         Width = 150,
         Height = 150
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the cropped video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo($&quot;cropped-image-{status.RefId}.jpg&quot;);
 </code></pre>
 
 </div></p>
 <h3 id="convert-image">Convert Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#convert-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new ConvertImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new ConvertImage {
         OutputFormat = ImageOutputFormat.Gif
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 </code></pre>
 
 </div></p>
 <h3 id="convert-image">Queue Convert Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#convert-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new QueueConvertImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new QueueConvertImage {
         OutputFormat = ImageOutputFormat.Png
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the converted video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 </code></pre>
 
 </div></p>
 <h3 id="scale-image">Scale Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#scale-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new ScaleImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new ScaleImage {
         Width = 1280,
         Height = 720,
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 </code></pre>
 
 </div></p>
 <h3 id="scale-image">Queue Scale Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#scale-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new QueueScaleImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+var response = client.PostFileWithRequest(new QueueScaleImage {
         Width = 1280,
         Height = 720,
         ReplyTo = &quot;https://example.com/my/reply/endpoint&quot; // optional
     },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;)]
-);
+    new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;));
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the scaled video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo($&quot;scaled-image-{status.RefId}.jpg&quot;);
 </code></pre>
 
 </div></p>
 <h3 id="watermark-image">Watermark Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#watermark-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new WatermarkImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+using var fsWatermark = File.OpenRead(&quot;files/watermark_image.png&quot;);
+var response = client.PostFilesWithRequest(new WatermarkImage {
         Position = WatermarkPosition.BottomRight
-    },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;),
-     new UploadFile(&quot;watermark_image.png&quot;, File.OpenRead(&quot;files/watermark_image.png&quot;), &quot;watermark&quot;)]
-);
+    }, [
+        new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;),
+        new UploadFile(&quot;watermark_image.png&quot;, fsWatermark, &quot;watermark&quot;)
+    ]);
 
-var videoUrl = response.Outputs[0].Url;
+var videoUrl = response.Results[0].Url;
 videoUrl.DownloadFileTo(outputFileName);
 </code></pre>
 
 </div></p>
 <h3 id="watermark-image">Queue Watermark Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#watermark-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p><div><pre><code class="language-csharp">var response = client.PostFilesWithRequest(new QueueWatermarkImage {
+<p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
+using var fsWatermark = File.OpenRead(&quot;files/watermark_image.png&quot;);
+var response = client.PostFilesWithRequest(new QueueWatermarkImage {
         Position = WatermarkPosition.BottomRight
-    },
-    [new UploadFile(&quot;test_image.jpg&quot;, File.OpenRead(&quot;files/test_image.jpg&quot;), &quot;image&quot;),
-     new UploadFile(&quot;watermark_image.png&quot;, File.OpenRead(&quot;files/watermark_image.png&quot;), &quot;watermark&quot;)]
-);
+    }, [
+        new UploadFile(&quot;test_image.jpg&quot;, fsImage, &quot;image&quot;),
+        new UploadFile(&quot;watermark_image.png&quot;, fsWatermark, &quot;watermark&quot;)
+    ]);
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the watermarked video
-var videoUrl = status.Outputs[0].Url;
+var videoUrl = status.Results[0].Url;
 videoUrl.DownloadFileTo($&quot;watermarked-image-{status.RefId}.jpg&quot;);
 </code></pre>
 
