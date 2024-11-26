@@ -55,5 +55,11 @@ The AI Server has pre-defined workflows to interact with your ComfyUI Agent inst
 
 These workflows are found in the AI Server AppHost project under `workflows`. These are templated JSON versions of workflows you save in the ComfyUI web interface.
 
-You can override these workflows by creating a new JSON file with the same name and path but in the `App_Data/overrides` folder. For example, to override the `text_to_image` workflow, you would create a file at `App_Data/overrides/text_to_image.json`.
-This would override all calls that use text-to-image workflow sent to your ComfyUI Agent instance. You can also override just `flux-schnell` by creating a file at `App_Data/overrides/flux1/text_to_image.json`, and Stable Diffusion 3.5 at `App_Data/overrides/sd35/text_to_image.json`.
+You can override these workflows by creating a new JSON file with the same name and path but in the `App_Data/overrides` folder. 
+
+E.g. to override the `text_to_image` workflow, you would create a file at `App_Data/overrides/text_to_image.json`
+
+This would override all calls that use text-to-image workflow sent to your ComfyUI Agent instance. 
+
+You can also override just `flux-schnell` by creating a file at `App_Data/overrides/flux1/text_to_image.json`
+and Stable Diffusion 3.5 at `App_Data/overrides/sd35/text_to_image.json`.
