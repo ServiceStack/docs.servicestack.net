@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-26T07:22:54.6918163Z'>
+    <meta name='date' content='2024-11-26T08:26:46.9975761Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AI Server API Usage</title>
@@ -341,7 +341,7 @@ var answer = response.Choices[0].Message.Content;
 </div></p>
 <p>This request will generate a response from the <code>llama3:8b</code> model using the <code>system</code> and <code>user</code> messages provided. This will perform the operation synchronously, waiting for the response to be generated before returning it to the client.</p>
 <p>Alternatively, you can call the same endpoint asynchronously by using the <code>/api/QueueOpenAiChatCompletion</code> endpoint. This will queue the request for processing and return a URL to check the status of the request and download the response when it's ready.</p>
-<h3 id="async-queue-open-ai-chat-completion">Async Queue Open AI Chat Completion<a class="header-anchor" href="javascript:;" onclick="location.hash='#async-queue-open-ai-chat-completion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<h3 id="queued-open-ai-chat-completion">Queued Open AI Chat Completion<a class="header-anchor" href="javascript:;" onclick="location.hash='#queued-open-ai-chat-completion'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><div><pre><code class="language-csharp">var client = GetLocalApiClient(AiServerUrl);
 
 var response = client.Post(new QueueOpenAiChatCompletion
@@ -379,6 +379,32 @@ var answer = status.Result.Choices[0].Message.Content;
 <ul>
 <li><strong>ReplyTo</strong>: A URL to send a POST request to when the request is complete.</li>
 </ul>
+<h2 id="open-ai-chat-with-replyto-callback">Open AI Chat with ReplyTo Callback<a class="header-anchor" href="javascript:;" onclick="location.hash='#open-ai-chat-with-replyto-callback'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The Queued API also accepts a <strong>ReplyTo Web Callback</strong> for a more reliable push-based App integration
+where responses are posted back to a custom URL Endpoint:</p>
+<pre><code class="language-csharp">var correlationId = Guid.NewGuid().ToString(&quot;N&quot;);
+var response = client.Post(new QueueOpenAiChatCompletion
+{
+    //...
+    ReplyTo = $&quot;https://example.org/api/OpenAiChatResponseCallback?CorrelationId=${correlationId}&quot;
+});
+</code></pre>
+<p>Your callback can add any additional metadata on the callback to assist your App in correlating the response with
+the initiating request which just needs to contain the properties of the <code>OpenAiChatResponse</code> you're interested in
+along with any metadata added to the callback URL, e.g:</p>
+<pre><code class="language-csharp">public class OpenAiChatResponseCallback : IPost, OpenAiChatResponse, IReturnVoid
+{
+    public Guid CorrelationId { get; set; }
+}
+
+public object Post(OpenAiChatResponseCallback request)
+{
+    // Handle OpenAiChatResponse callabck
+}
+</code></pre>
+<p>Unless your callback API is restricted to only accept requests from your AI Server, you should include a
+unique Id like a <code>Guid</code> in the callback URL that can be validated against an initiating request to ensure
+the callback can't be spoofed.</p>
 <h2 id="using-the-ai-server-request-dtos-with-other-openai-compatible-apis">Using the AI Server Request DTOs with other OpenAI compatible APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#using-the-ai-server-request-dtos-with-other-openai-compatible-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>One advantage of using AI Server is that it provides a common set of request DTOs in 11 different languages that are compatible with OpenAI's API. This allows you to switch between OpenAI and AI Server without changing your client code.
 This means you can switch to using typed APIs in your preferred language with your existing service providers OpenAI compatible APIs, and optionally switch to AI Server when you're ready to self-host your AI services for better value.</p>
@@ -460,13 +486,18 @@ var response = await client.PostAsync&lt;OpenAiChatResponse&gt;(
                                                             Sync Open AI Chat Completion
                                                         </span>
                                                     </li>
-                                                    <li data-id="async-queue-open-ai-chat-completion" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#async-queue-open-ai-chat-completion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="queued-open-ai-chat-completion" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#queued-open-ai-chat-completion'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Async Queue Open AI Chat Completion
+                                                            Queued Open AI Chat Completion
                                                         </span>
                                                     </li>
                                             </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#open-ai-chat-with-replyto-callback'" data-id="open-ai-chat-with-replyto-callback" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Open AI Chat with ReplyTo Callback
+                                        </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#using-the-ai-server-request-dtos-with-other-openai-compatible-apis'" data-id="using-the-ai-server-request-dtos-with-other-openai-compatible-apis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
