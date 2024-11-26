@@ -22,8 +22,8 @@ cd ai-server && cat install.sh | bash
 The installer will detect common environment variables for its supported AI Providers including OpenAI, Anthropic, 
 Mistral AI, Google, etc. and prompt if you would like to include any others in your AI Server configuration.
 
-<div data-asciicinema="/pages/ai-server/ai-server-install.cast" 
-     data-options="{loop:true,poster:'npt:00:21',theme:'dracula',rows:13}"></div>
+<ascii-cinema src="/pages/ai-server/ai-server-install.cast" 
+    loop="true" poster="npt:00:21" theme="dracula" rows="12" />
 
 ## Accessing AI Server
 
@@ -44,8 +44,8 @@ If needed you can reset the process by deleting your local `App_Data` directory 
 
 If your server also has a GPU you can ask the installer to also install the [ComfyUI Agent](/ai-server/comfy-extension) locally:
 
-<div data-asciicinema="https://docs.servicestack.net/pages/ai-server/agent-comfy-install.cast" 
-     data-options="{loop:true,poster:'npt:00:09',theme:'dracula',rows:16}"></div>
+<ascii-cinema src="/pages/ai-server/agent-comfy-install.cast" 
+    loop="true" poster="npt:00:09" theme="dracula" rows="13" />
 
 The ComfyUI Agent is a separate Docker agent for running [ComfyUI](https://www.comfy.org), 
 [Whisper](https://github.com/openai/whisper) and [FFmpeg](https://www.ffmpeg.org) on servers with GPUs to handle 
