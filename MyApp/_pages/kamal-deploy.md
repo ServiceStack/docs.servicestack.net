@@ -13,6 +13,7 @@ Kamal enables simple commands to deploy containerized applications to Linux host
 - Reverse proxy setup
 - SSL certificate provisioning
 - Zero-downtime deployments
+- Health checks on deploy
 - Rolling back changes
 
 ::: info
@@ -123,6 +124,7 @@ Kamal supports extensive configuration options including "accessories" for addit
 - Flexible self-hosting solution
 - Various secret management options
 - Built-in rollback capabilities
+- Built-in health checks
 - Simple command-line interface
 
 ::: info
