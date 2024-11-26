@@ -25,8 +25,8 @@ cat install.sh | bash
 
 This process will also persist the configuration in the `.env` file in the ComfyUI Agent directory, so you can easily restart the ComfyUI Agent with the same configuration.
 
-<div data-asciicinema="/pages/ai-server/agent-comfy-install.cast" 
-     data-options="{loop:true,poster:'npt:00:09',theme:'dracula',rows:16}"></div>
+<ascii-cinema src="/pages/ai-server/agent-comfy-install.cast" 
+    loop="true" poster="npt:00:09" theme="dracula" rows="13" />
 
 :::info
 On the first run, the ComfyUI Agent will download the models you selected during the installation process. This can take some time depending on the size of the models and your internet connection speed.

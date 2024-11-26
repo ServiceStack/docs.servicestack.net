@@ -1,11 +1,10 @@
 ```csharp
-var response = client.PostFilesWithRequest(new TrimVideo {
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+var response = client.PostFileWithRequest(new TrimVideo {
         StartTime = "00:05",
         EndTime = "00:10"
     },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
-);
+    new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

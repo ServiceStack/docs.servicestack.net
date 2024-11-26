@@ -1,13 +1,12 @@
 ```csharp
-var response = client.PostFilesWithRequest(new CropVideo {
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+var response = client.PostFileWithRequest(new CropVideo {
         X = 100,
         Y = 100,
         Width = 500,
         Height = 300
     },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
-);
+    new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

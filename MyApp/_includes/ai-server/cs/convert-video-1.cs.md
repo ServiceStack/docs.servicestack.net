@@ -1,10 +1,9 @@
 ```csharp
-var response = client.PostFilesWithRequest(new ConvertVideo {
+using var fsVideo = File.OpenRead("files/test_video.webm");
+var response = client.PostFileWithRequest(new ConvertVideo {
         OutputFormat = ConvertVideoOutputFormat.MOV
     },
-    [new UploadFile("test_video.webm", File.OpenRead("files/test_video.webm"), "video")]
-);
+    new UploadFile("test_video.webm", fsVideo, "video"));
 
-var videoUrl = response.Outputs[0].Url;
-videoUrl.DownloadFileTo(outputFileName);
+File.WriteAllBytes(saveToPath, response.Results[0].Url.GetBytesFromUrl());
 ```

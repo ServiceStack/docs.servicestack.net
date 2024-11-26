@@ -1,19 +1,18 @@
 ```csharp
-var response = client.PostFilesWithRequest(new QueueTrimVideo {
+using var fsVideo = File.OpenRead("files/test_video.mp4");
+var response = client.PostFileWithRequest(new QueueTrimVideo {
         StartTime = "00:05",
         EndTime = "00:10"
     },
-    [new UploadFile("test_video.mp4", File.OpenRead("files/test_video.mp4"), "video")]
-);
+    new UploadFile("test_video.mp4", fsVideo, "video"));
 
-var status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
+GetArtifactGenerationStatusResponse status = new();
 while (status.JobState is BackgroundJobState.Started or BackgroundJobState.Queued)
 {
+    status = await client.GetAsync(new GetArtifactGenerationStatus { RefId = response.RefId });
     await Task.Delay(1000);
-    status = await client.GetAsync(new GetJobStatus { RefId = response.RefId });
 }
 
 // Download the trimmed video
-var videoUrl = status.Outputs[0].Url;
-videoUrl.DownloadFileTo($"trimmed-video-{status.RefId}.mp4");
+File.WriteAllBytes(saveToPath, status.Results[0].Url.GetBytesFromUrl());
 ```
