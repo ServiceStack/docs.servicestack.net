@@ -27,7 +27,7 @@ This request will generate a response from the `llama3:8b` model using the `syst
 
 Alternatively, you can call the same endpoint asynchronously by using the `/api/QueueOpenAiChatCompletion` endpoint. This will queue the request for processing and return a URL to check the status of the request and download the response when it's ready.
 
-### Async Queue Open AI Chat Completion
+### Queued Open AI Chat Completion
 
 ::include ai-server/cs/queue-openai-chat-completion-1.cs.md::
 
@@ -39,6 +39,41 @@ Additional optional features on the request to enhance the usage of AI Server in
 `RefId` and `Tag` are available on both synchronous and asynchronous requests, where as Queue requests also support:
 
 - **ReplyTo**: A URL to send a POST request to when the request is complete.
+
+
+## Open AI Chat with ReplyTo Callback
+
+The Queued API also accepts a **ReplyTo Web Callback** for a more reliable push-based App integration
+where responses are posted back to a custom URL Endpoint:
+
+```csharp
+var correlationId = Guid.NewGuid().ToString("N");
+var response = client.Post(new QueueOpenAiChatCompletion
+{
+    //...
+    ReplyTo = $"https://example.org/api/OpenAiChatResponseCallback?CorrelationId=${correlationId}"
+});
+```
+
+Your callback can add any additional metadata on the callback to assist your App in correlating the response with 
+the initiating request which just needs to contain the properties of the `OpenAiChatResponse` you're interested in
+along with any metadata added to the callback URL, e.g:
+
+```csharp
+public class OpenAiChatResponseCallback : IPost, OpenAiChatResponse, IReturnVoid
+{
+    public Guid CorrelationId { get; set; }
+}
+
+public object Post(OpenAiChatResponseCallback request)
+{
+    // Handle OpenAiChatResponse callabck
+}
+```
+
+Unless your callback API is restricted to only accept requests from your AI Server, you should include a 
+unique Id like a `Guid` in the callback URL that can be validated against an initiating request to ensure 
+the callback can't be spoofed.
 
 ## Using the AI Server Request DTOs with other OpenAI compatible APIs
 
