@@ -116,17 +116,7 @@ Kamal commands are context-aware and will use the configuration from your curren
 
 Kamal supports extensive configuration options including "accessories" for additional features like databases, caches, and more. See the [Kamal documentation](https://kamal-deploy.org/docs/configuration/accessories/) for more information.
 
-## Benefits of Using Kamal
+## Troubleshooting
 
-- Simplified deployment process
-- Automatic SSL certificate management
-- Built on common technology (SSH and Docker)
-- Flexible self-hosting solution
-- Various secret management options
-- Built-in rollback capabilities
-- Built-in health checks
-- Simple command-line interface
-
-::: info
-Kamal is particularly useful for applications that don't require complex scaling beyond a single machine, offering a cost-effective alternative to cloud hosting.
-:::
+If you are having issues with the initial deployment, an earlier bootstrap of the server via GitHub Actions may have failed.
+Delete the `.<app-name>` file in your deployment user's home directory and re-run the GitHub Actions workflow to re-bootstrap the server.
