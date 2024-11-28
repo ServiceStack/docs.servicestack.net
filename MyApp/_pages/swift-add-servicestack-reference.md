@@ -380,54 +380,86 @@ SwiftGenerator.EnumNameStrategy = SwiftGenerator.SwiftStyleEnums;
 The same ideal, high-level API available in [.NET's ServiceClients](/csharp-client) have been translated into idiomatic Swift as seen with its `ServiceClient` protocol definition below:
 
 ```swift
-public protocol ServiceClient
-{
-    func get(request:T) throws -> T.Return
-    func get(request:T) throws -> Void
-    func get(request:T, query:[String:String]) throws -> T.Return
-    func get(relativeUrl:String) throws -> T
-    func getAsync(request:T) -> Promise<T.Return>
-    func getAsync(request:T) -> Promise<Void>
-    func getAsync(request:T, query:[String:String]) -> Promise<T.Return>
-    func getAsync(relativeUrl:String) -> Promise<T>
+public protocol ServiceClient {
+    func get<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func get<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func get<T: IReturn>(_ request: T, query: [String: String]) throws -> T.Return where T: Codable
+    func get<T: Codable>(_ relativeUrl: String) throws -> T
+    func getAsync<T: IReturn>(_ request: T) async throws -> T.Return where T: Codable
+    func getAsync<T: IReturnVoid>(_ request: T) async throws -> Void where T: Codable
+    func getAsync<T: IReturn>(_ request: T, query: [String: String]) async throws -> T.Return where T: Codable
+    func getAsync<T: Codable>(_ relativeUrl: String) async throws -> T
+
+    func post<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func post<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func post<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) throws -> Response
+    func postAsync<T: IReturn>(_ request: T) async throws -> T.Return where T: Codable
+    func postAsync<T: IReturnVoid>(_ request: T) async throws -> Void where T: Codable
+    func postAsync<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) async throws -> Response
+
+    func put<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func put<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func put<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) throws -> Response
+    func putAsync<T: IReturn>(_ request: T) async throws -> T.Return where T: Codable
+    func putAsync<T: IReturnVoid>(_ request: T) async throws -> Void where T: Codable
+    func putAsync<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) async throws -> Response
+
+    func delete<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func delete<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func delete<T: IReturn>(_ request: T, query: [String: String]) throws -> T.Return where T: Codable
+    func delete<T: Codable>(_ relativeUrl: String) throws -> T
+    func deleteAsync<T: IReturn>(_ request: T) async throws -> T.Return where T: Codable
+    func deleteAsync<T: IReturnVoid>(_ request: T) async throws -> Void where T: Codable
+    func deleteAsync<T: IReturn>(_ request: T, query: [String: String]) async throws -> T.Return where T: Codable
+    func deleteAsync<T: Codable>(_ relativeUrl: String) async throws -> T
+
+    func patch<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func patch<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func patch<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) throws -> Response
+    func patchAsync<T: IReturn>(_ request: T) async throws -> T.Return where T: Codable
+    func patchAsync<T: IReturnVoid>(_ request: T) async throws -> Void where T: Codable
+    func patchAsync<Response: Codable, Request: Codable>(_ relativeUrl: String, request: Request?) async throws -> Response
+
+    func send<T: IReturn>(_ request: T) throws -> T.Return where T: Codable
+    func send<T: IReturnVoid>(_ request: T) throws -> Void where T: Codable
+    func send<T: Codable>(intoResponse: T, request: URLRequest) throws -> T
+    func sendAsync<T: Codable>(intoResponse: T, request: URLRequest) async throws -> T
+
+    func postFileWithRequest<T: IReturn & Codable>(request:T, file:UploadFile) throws -> T.Return
+    func postFileWithRequestAsync<T: IReturn & Codable>(request:T, file:UploadFile) async throws -> T.Return
+    func postFileWithRequest<T: IReturn>(_ relativeUrl: String, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) throws -> T.Return
+    func postFileWithRequestAsync<T: IReturn>(_ relativeUrl: String, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) async throws -> T.Return
+    func postFileWithRequest<T: IReturn>(url:URL, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) throws -> T.Return
+    func postFileWithRequestAsync<T: IReturn>(url:URL, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) async throws -> T.Return
+    func postFilesWithRequest<T: IReturn & Codable>(request:T, files:[UploadFile]) throws -> T.Return
+    func postFilesWithRequestAsync<T: IReturn & Codable>(request:T, files:[UploadFile]) async throws -> T.Return
+    func postFilesWithRequest<T: IReturn>(url:URL, request:T, files:[UploadFile]) throws -> T.Return
+    func postFilesWithRequestAsync<T: IReturn>(url:URL, request:T, files:[UploadFile]) async throws -> T.Return
     
-    func post(request:T) throws -> T.Return
-    func post(request:T) throws -> Void
-    func post(relativeUrl:String, request:Request?) throws -> Response
-    func postAsync(request:T) -> Promise<T.Return>
-    func postAsync(request:T) -> Promise<Void>
-    func postAsync(relativeUrl:String, request:Request?) -> Promise<Response>
+    func putFileWithRequest<T: IReturn & Codable>(request:T, file:UploadFile) throws -> T.Return
+    func putFileWithRequestAsync<T: IReturn & Codable>(request:T, file:UploadFile) async throws -> T.Return
+    func putFileWithRequest<T: IReturn>(_ relativeUrl: String, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) throws -> T.Return
+    func putFileWithRequestAsync<T: IReturn>(_ relativeUrl: String, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) async throws -> T.Return
+    func putFileWithRequest<T: IReturn>(url:URL, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) throws -> T.Return
+    func putFileWithRequestAsync<T: IReturn>(url:URL, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) async throws -> T.Return
+    func putFilesWithRequest<T: IReturn & Codable>(request:T, files:[UploadFile]) throws -> T.Return
+    func putFilesWithRequestAsync<T: IReturn & Codable>(request:T, files:[UploadFile]) async throws -> T.Return
+    func putFilesWithRequest<T: IReturn>(url:URL, request:T, files:[UploadFile]) throws -> T.Return
+    func putFilesWithRequestAsync<T: IReturn>(url:URL, request:T, files:[UploadFile]) async throws -> T.Return
     
-    func put(request:T) throws -> T.Return
-    func put(request:T) throws -> Void
-    func put(relativeUrl:String, request:Request?) throws -> Response
-    func putAsync(request:T) -> Promise<T.Return>
-    func putAsync(request:T) -> Promise<Void>
-    func putAsync(relativeUrl:String, request:Request?) -> Promise<Response>
-    
-    func delete(request:T) throws -> T.Return
-    func delete(request:T) throws -> Void
-    func delete(request:T, query:[String:String]) throws -> T.Return
-    func delete(relativeUrl:String) throws -> T
-    func deleteAsync(request:T) -> Promise<T.Return>
-    func deleteAsync(request:T) -> Promise<Void>
-    func deleteAsync(request:T, query:[String:String]) -> Promise<T.Return>
-    func deleteAsync(relativeUrl:String) -> Promise<T>
-    
-    func patch(request:T) throws -> T.Return
-    func patch(request:T) throws -> Void
-    func patch(relativeUrl:String, request:Request?) throws -> Response
-    func patchAsync(request:T) -> Promise<T.Return>
-    func patchAsync(request:T) -> Promise<Void>
-    func patchAsync(relativeUrl:String, request:Request?) -> Promise<Response>
-    
-    func send(request:T) throws -> T.Return
-    func send(request:T) throws -> Void
-    func send(intoResponse:T, request:NSMutableURLRequest) throws -> T
-    func sendAsync(intoResponse:T, request:NSMutableURLRequest) -> Promise<T>
-    
-    func getData(url:String) throws -> NSData
-    func getDataAsync(url:String) -> Promise<NSData>
+    func sendFileWithRequest<T: IReturn>(_ req:inout URLRequest, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) throws -> T.Return
+    func sendFileWithRequestAsync<T: IReturn>(_ req:inout URLRequest, request:T, fileName:String, data:Data, mimeType:String?, fieldName:String?) async throws -> T.Return
+    func sendFilesWithRequest<T: IReturn>(_ req:inout URLRequest, request:T, files:[UploadFile]) throws -> T.Return
+    func sendFilesWithRequestAsync<T: IReturn>(_ req:inout URLRequest, request:T, files:[UploadFile]) async throws -> T.Return
+
+    func getData(url: String) throws -> (Data, HTTPURLResponse)?
+    func getDataAsync(url: String) async throws -> (Data, HTTPURLResponse)?
+    func getData(request: URLRequest, retryIf:((HTTPURLResponse) -> Bool)?) throws -> (Data, HTTPURLResponse)?
+    func getDataAsync(request: URLRequest, retryIf:((HTTPURLResponse) async throws -> Bool)?) async throws -> (Data, HTTPURLResponse)?
+
+    func getCookies() -> [String:String]
+    func getTokenCookie() -> String?
+    func getRefreshTokenCookie() -> String?
 }
 ```
 
@@ -457,21 +489,15 @@ Essentially usage is the same as it is in .NET ServiceClients - where it just ne
 Whilst the sync API's are easy to use their usage should be limited in background threads so they're not blocking the Apps UI whilst waiting for responses. Most of the time when calling services from the Main UI thread you'll want to use the non-blocking async API's, which for the same API looks like:
 
 ```swift
-client.getAsync(AppOverview())
-    .done { 
-        $0.topTechnologies.count //= 100
-        //... 
-    }
+let response = try await client.getAsync(AppOverview())
+Inspect.printDump(response)
 ```
 
 Swift also lets you continue marking it up with explicit Type Information and optional syntax as preferred, e.g: 
 
 ```swift
-client.getAsync(AppOverview())
-    .done({ (r:AppOverviewResponse) in
-        r.topTechnologies.count //= 100
-        //... 
-    })
+let response:AppOverviewResponse = try await client.getAsync(AppOverview())
+Inspect.printDump(response)
 ```
 
 Which is very similar to how we'd make async `Task<T>` calls in C# when not using its async/await language syntax sugar. 
@@ -537,13 +563,17 @@ To handle errors in Async API's we just add a callback on `.error()` API on the 
 let request = ThrowValidation()
 request.email = "invalidemail"
 
-client.postAsync(request)
-    .error { responseError in
-        let status:ResponseStatus = responseError.convertUserInfo()!
-        status.errors.count //= 3
-        //...
-    }
-
+do {
+_ = try await client.postAsync(request)
+} catch let responseError as NSError {    
+    let status:ResponseStatus = responseError.convertUserInfo()!
+    status.errors.count //= 3
+    let field1 = status.errors[0]
+    
+    field1.errorCode! //= InclusiveBetween
+    field1.fieldName! //= Age
+    field1.message!   //= 'Age' must be between 1 and 120. You entered 0.
+}
 ```
 
 ### JsonServiceClient Error Handlers
@@ -599,6 +629,66 @@ var response:GetTechnologyResponse? = client.get("/technology/servicestack")
 the explicit type definition on the return type is required here as Swift uses it as part of the generic method invocation.
 :::
 
+### Uploading Files
+
+The `postFileWithRequestAsync` method can be used to upload a file with an API Request.
+
+For example you can request a [Speech to Text](/ai-server/speech-to-text) 
+transcription by sending an audio file to the `SpeechToText` API using the new `postFilesWithRequest` method:
+
+### Calling AI Server to transcribe an Audio Recording
+
+```swift
+let client = JsonServiceClient(baseUrl: "https://openai.servicestack.net")
+client.bearerToken = apiKey
+
+let request = SpeechToText()
+request.refId = "uniqueUserIdForRequest"
+
+let response = try client.postFilesWithRequest(request:request, 
+    file:UploadFile(fileName:"audio.mp3", data:mp3Data, fieldName:"audio"))
+
+Inspect.printDump(response)
+``` 
+
+### Async Upload Files with API Example
+
+Alternatively use the new `postFileWithRequestAsync` method to call the API asynchronously
+using [Swift 6 Concurrency](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/) 
+new **async/await** feature:
+
+```swift
+let response = try await client.postFileWithRequestAsync(request:request, 
+    file:UploadFile(fileName:"audio.mp3", data:mp3Data, fieldName:"audio"))
+    
+Inspect.printDump(response)
+```
+
+### Multiple file upload with API Request examples
+
+Whilst the `postFilesWithRequest` methods can be used to upload multiple files with an API Request. e.g:
+
+```swift
+let request = WatermarkVideo()
+request.position = .BottomRight
+
+let response = try client.postFilesWithRequest(request: request,
+    files: [
+        UploadFile(fileName: "video.mp4", data:videoData, fieldName:"video"),
+        UploadFile(fileName: "watermark.jpg", data:watermarkData, fieldName:"watermark")
+    ])
+```
+
+Async Example:
+
+```swift
+let response = try await client.postFilesWithRequestAsync(request: request,
+    files: [
+        UploadFile(fileName: "video.mp4", data:videoData, fieldName:"video"),
+        UploadFile(fileName: "watermark.jpg", data:watermarkData, fieldName:"watermark")
+    ])
+```
+
 ### JsonServiceClient Options
 
 Other options that can be configured on JsonServiceClient include:
@@ -607,13 +697,13 @@ Other options that can be configured on JsonServiceClient include:
 client.onError = {(e:NSError) in ... }
 client.timeout = ...
 client.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
-client.requestFilter = {(req:NSMutableURLRequest) in ... }
-client.responseFilter = {(res:NSURLResponse) in ... }
+client.requestFilter = {(req:URLRequest) in ... }
+client.responseFilter = {(res:URLResponse) in ... }
 
 //static Global configuration
 JsonServiceClient.Global.onError = {(e:NSError) in ... }
-JsonServiceClient.Global.requestFilter = {(req:NSMutableURLRequest) in ... }
-JsonServiceClient.Global.responseFilter = {(res:NSURLResponse) in ... }
+JsonServiceClient.Global.requestFilter = {(req:URLRequest) in ... }
+JsonServiceClient.Global.responseFilter = {(res:URLResponse) in ... }
 ```
 
 ## [TechStacks iOS App](https://github.com/ServiceStackApps/TechStacksApp)

@@ -445,6 +445,22 @@ let api = await client.apiForm(new MultipartRequest(), formData)
 
 Where `apiForm` can be used to submit `FormData` requests for normal API Requests, or `apiFormVoid` for `IReturnVoid` API requests.
 
+### TypeScript Speech to Text
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+```js
+// Create FormData and append the file
+const formData = new FormData()
+const audioFile = fs.readFileSync('audio.wav')
+const blob = new Blob([audioFile], { type: 'audio/wav' })
+
+// Explicitly set the field name as 'audio'
+formData.append('audio', blob, 'audio.wav')
+
+const api = await client.apiForm(new SpeechToText(), formData)
+```
+
 ### Raw Data Responses
 
 The `JsonServiceClient` also supports Raw Data responses like `string` and `byte[]` which also get a Typed API 

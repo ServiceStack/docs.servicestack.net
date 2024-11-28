@@ -140,6 +140,8 @@ The [x dotnet tool](/dotnet-tool) provides simple command-line utilities to easi
 dotnet tool install --global x 
 :::
 
+::include npx-get-dtos.md::
+
 This will make the following utilities available from your command-line which will let you download the Server DTO classes for a remote ServiceStack endpoint in your chosen language which you can use with ServiceStack's generic Service clients to be able to make end-to-end API calls.
 
 <table class="table table-bordered">
@@ -389,6 +391,119 @@ in the right-click context menu:
 ![](/img/pages/servicestack-reference/rider-tool-ts-reference-run.png)
 
 If you're updating references frequently you can save time by [assigning it a keyboard shortcut](https://www.jetbrains.com/help/rider/Configuring_Keyboard_and_Mouse_Shortcuts.html).
+
+
+## Multiple File Upload Support with API Requests supported in all languages
+
+To be able to call [AI Server](/ai-server/) APIs requiring file uploads we've added multiple file upload support with API Requests to the generic service clients for all our supported languages.
+
+Here's what that looks like for different languages calling AI Server's `SpeechToText` API:
+
+### C# Speech to Text
+
+```csharp
+using var fsAudio = File.OpenRead("audio.wav");
+var response = client.PostFileWithRequest(new SpeechToText(),
+    new UploadFile("audio.wav", fsAudio, "audio"));
+```
+
+### Dart Speech to Text
+
+```dart
+var audioFile = new File('audio.wav');
+var uploadFile = new UploadFile(
+    fieldName: 'audio',
+    fileName: audioFile.uri.pathSegments.last,
+    contentType: 'audio/wav',
+    contents: await audioFile.readAsBytes()
+);
+
+var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
+```
+
+### Python Speech to Text
+
+```python
+with open("files/audio.wav", "rb") as audio:
+  response = client.post_file_with_request(SpeechToText(), 
+    UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+```
+
+### PHP Speech to Text
+
+```php
+$audioFile = __DIR__ . '/files/audio.wav';
+
+/** @var GenerationResponse $response */
+$response = $client->postFileWithRequest(new SpeechToText(),
+    new UploadFile(
+        filePath: $audioFile,
+        fileName: 'audio.wav',
+        fieldName: 'audio',
+        contentType: 'audio/wav'
+    ));
+```
+
+### Swift Speech to Text
+
+```swift
+guard let audioURL = Bundle.module.url(forResource: "audio.wav", withExtension: nil) else {
+    return
+}
+
+let audioData = try Data(contentsOf: audioURL)
+let response: TextGenerationResponse = try await client.postFileWithRequestAsync(
+    request:SpeechToText(), 
+    file:UploadFile(fileName: "audio.wav", data:audioData, fieldName:"audio"))
+```
+
+### Kotlin Speech to Text
+
+```kotlin
+val audioBytes = Files.readAllBytes(Paths.get("audio.wav"))
+val response = client.postFileWithRequest(SpeechToText(),
+    UploadFile("audio", "audio.wav", "audio/wav", audioBytes))
+```
+
+### Java Speech to Text
+
+```java
+byte[] audioBytes = Files.readAllBytes(Paths.get("audio.wav"));
+var response = client.postFileWithRequest(request,
+    new UploadFile("audio", "audio.wav", "audio/wav", audioBytes));
+```
+
+### TypeScript Speech to Text
+
+```js
+// Create FormData and append the file
+const formData = new FormData()
+const audioFile = fs.readFileSync('audio.wav')
+const blob = new Blob([audioFile], { type: 'audio/wav' })
+
+// Explicitly set the field name as 'audio'
+formData.append('audio', blob, 'audio.wav')
+
+const api = await client.apiForm(new SpeechToText(), formData)
+```
+
+### Multiple File Uploads
+
+All languages also support a `postFilesWithRequest` variant for uploading multiple files with an API Request.
+E.g. here's an example of using `PostFilesWithRequest` to generate a video with a Watermark:
+
+### C# Watermark Video
+
+```csharp
+using var fsVideo = File.OpenRead("video.mp4");
+using var fsWatermark = File.OpenRead("watermark.png");
+var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
+        Position = WatermarkPosition.BottomRight
+    }, [
+        new UploadFile("video.mp4", fsVideo, "video"),
+        new UploadFile("watermark.png", fsWatermark, "watermark")
+    ]);
+```
 
 ## Advantages over WCF
 

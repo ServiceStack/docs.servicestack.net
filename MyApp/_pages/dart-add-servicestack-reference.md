@@ -262,36 +262,62 @@ Both JSON Service Client variants implement the same flexible `IServiceClient` A
 
 ```csharp
 abstract class IServiceClient {
-  String baseUrl;
-  String bearerToken;
-  String refreshToken;
-  String userName;
-  String password;
+  String? baseUrl;
+  String? replyBaseUrl;
+  String? oneWayBaseUrl;
 
-  Future<T> get<T>(IReturn<T> request, {Map<String, dynamic> args});
-  Future<Map<String, dynamic>> getUrl(String path, {Map<String, dynamic> args});
-  Future<T> getAs<T>(String path, {Map<String, dynamic> args, T responseAs});
+  String? bearerToken;
+  String? refreshToken;
+  String? userName;
+  String? password;
 
-  Future<T> post<T>(IReturn<T> request, {dynamic body, Map<String, dynamic> args});
-  Future<Map<String, dynamic>> postToUrl(String path, dynamic body, {Map<String, dynamic> args});
-  Future<T> postAs<T>(String path, dynamic body, {Map<String, dynamic> args, T responseAs});
+  AsyncCallbackFunction? onAuthenticationRequired;
+  String? getTokenCookie();
+  String? getRefreshTokenCookie();
 
-  Future<T> delete<T>(IReturn<T> request, {Map<String, dynamic> args});
-  Future<Map<String, dynamic>> deleteUrl(String path, {Map<String, dynamic> args});
-  Future<T> deleteAs<T>(String path, {Map<String, dynamic> args, T responseAs});
+  void clearCookies();
 
-  Future<T> put<T>(IReturn<T> request, {dynamic body, Map<String, dynamic> args});
-  Future<Map<String, dynamic>> putToUrl(String path, dynamic body, {Map<String, dynamic> args});
-  Future<T> putAs<T>(String path, dynamic body, {Map<String, dynamic> args, T responseAs});
+  Future<ApiResult<T>> api<T>(IReturn<T> request, {Map<String, dynamic>? args, String? method});
 
-  Future<T> patch<T>(IReturn<T> request, {dynamic body, Map<String, dynamic> args});
+  Future<ApiResult<EmptyResponse>> apiVoid(IReturnVoid request, {Map<String, dynamic>? args, String? method});
+
+  Future<T> get<T>(IReturn<T> request, {Map<String, dynamic>? args});
+
+  Future<Map<String, dynamic>> getUrl(String path, {Map<String, dynamic>? args});
+
+  Future<T> getAs<T>(String path, {Map<String, dynamic>? args, T? responseAs});
+
+  Future<T> post<T>(IReturn<T> request, {dynamic body, Map<String, dynamic>? args});
+
+  Future<Map<String, dynamic>> postToUrl(String path, dynamic body, {Map<String, dynamic>? args});
+
+  Future<T> postAs<T>(String path, dynamic body, {Map<String, dynamic>? args, T? responseAs});
+
+  Future<T> delete<T>(IReturn<T> request, {Map<String, dynamic>? args});
+
+  Future<Map<String, dynamic>> deleteUrl(String path, {Map<String, dynamic>? args});
+
+  Future<T> deleteAs<T>(String path, {Map<String, dynamic>? args, T? responseAs});
+
+  Future<T> put<T>(IReturn<T> request, {dynamic body, Map<String, dynamic>? args});
+
+  Future<Map<String, dynamic>> putToUrl(String path, dynamic body, {Map<String, dynamic>? args});
+
+  Future<T> putAs<T>(String path, dynamic body, {Map<String, dynamic>? args, T? responseAs});
+
+  Future<T> patch<T>(IReturn<T> request, {dynamic body, Map<String, dynamic>? args});
+
   Future<Map<String, dynamic>> patchToUrl(String path, dynamic body, {Map<String, dynamic> args});
-  Future<T> patchAs<T>(String path, dynamic body, {Map<String, dynamic> args, T responseAs});
+
+  Future<T> patchAs<T>(String path, dynamic body, {Map<String, dynamic>? args, T? responseAs});
 
   Future<List<T>> sendAll<T>(Iterable<IReturn<T>> requests);
+
   Future<void> sendAllOneWay<T>(Iterable<IReturn<T>> requests);
 
-  Future<T> send<T>(IReturn<T> request, {String method, Map<String, dynamic> args, T responseAs});
+  Future<T> send<T>(IReturn<T> request, {String? method, Map<String, dynamic>? args, T? responseAs});
+
+  void close({bool force = false});
 }
 ```
 
@@ -306,6 +332,29 @@ var vmClient = JsonServiceClient(baseUrl)
 var webClient = JsonWebClient(baseUrl)
     ..responseFilter = (res) => print(res.headers["X-Args"]);
 ```
+
+### Uploading Files
+
+The `postFileWithRequest` method can be used to upload a file with an API Request.
+
+### Dart Speech to Text
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+```dart
+var audioFile = new File('audio.wav');
+var uploadFile = new UploadFile(
+    fieldName: 'audio',
+    fileName: audioFile.uri.pathSegments.last,
+    contentType: 'audio/wav',
+    contents: await audioFile.readAsBytes()
+);
+
+var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
+```
+
+To upload multiple files use `postFilesWithRequest`.
+
 
 #### Comprehensive Test Suite
 

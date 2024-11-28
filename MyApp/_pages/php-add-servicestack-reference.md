@@ -343,7 +343,12 @@ class JsonServiceClient
     public function optionsUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
     public function headUrl(string $path, mixed $responseAs = null, mixed $args = null): mixed;
     public function sendUrl(string $path, ?string $method = null, mixed $responseAs = null, mixed $body = null, 
-        mixed $args = null): mixed
+        mixed $args = null): mixed;
+
+    public function postFileWithRequest(IReturn|IReturnVoid|string $request, UploadFile $file): mixed;
+    public function postFileWithRequestUrl(string $requestUri, mixed $request, UploadFile $file): mixed;
+    public function postFilesWithRequest(IReturn|IReturnVoid|string $request, UploadFile|array $files): mixed;
+    public function postFilesWithRequestUrl(string $requestUri, mixed $request, UploadFile|array $files): mixed;
 
     public function sendAll(array $requestDtos): mixed;       # Auto Batch Reply Requests
     public function sendAllOneWay(array $requestDtos): void;  # Auto Batch Oneway Requests
@@ -650,6 +655,27 @@ $client->postUrl("/custom-path", $request, args:["slug" => "ServiceStack"]);
 
 $client->postUrl("http://example.org/custom-path", $request);
 ```
+
+### Uploading Files
+
+The `post_file_with_request` method can be used to upload a file with an API Request.
+
+### PHP Speech to Text
+
+```php
+$audioFile = __DIR__ . '/files/audio.wav';
+
+/** @var GenerationResponse $response */
+$response = $client->postFileWithRequest(new SpeechToText(),
+    new UploadFile(
+        filePath: $audioFile,
+        fileName: 'audio.wav',
+        fieldName: 'audio',
+        contentType: 'audio/wav'
+    ));
+```
+
+To upload multiple files use `postFilesWithRequest`.
 
 ### Raw Data Responses
 

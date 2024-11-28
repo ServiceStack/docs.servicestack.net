@@ -120,6 +120,15 @@ The [ServiceClient.java](https://github.com/ServiceStack/ServiceStack.Java/blob/
 ```java
 public interface ServiceClient {
     boolean getAlwaysSendBasicAuthHeaders();
+
+    void setBearerToken(String value);
+    String getBearerToken();
+    void setTokenCookie(String value);
+
+    void setRefreshToken(String bearerToken);
+    String getRefreshToken();
+    void setRefreshTokenCookie(String value);
+
     void setAlwaysSendBasicAuthHeaders(boolean value);
     void setCredentials(String userName, String password);
 
@@ -155,6 +164,21 @@ public interface ServiceClient {
     <TResponse> TResponse delete(String path, Class responseType);
     <TResponse> TResponse delete(String path, Type responseType);
     HttpURLConnection delete(String path);
+
+    void setCookie(String name, String value);
+    void setCookie(String name, String value, Long expiresInSecs);
+    void clearCookies();
+    String getCookieValue(String name);
+    String getTokenCookie();
+    String getRefreshTokenCookie();
+
+    <TResponse> TResponse postFileWithRequest(IReturn<TResponse> request, UploadFile file);
+    <TResponse> TResponse postFileWithRequest(Object request, UploadFile file, Object responseType);
+    <TResponse> TResponse postFileWithRequest(String path, Object request, UploadFile file, Object responseType);
+
+    <TResponse> TResponse postFilesWithRequest(IReturn<TResponse> request, UploadFile[] files);
+    <TResponse> TResponse postFilesWithRequest(Object request, UploadFile[] files, Object responseType);
+    <TResponse> TResponse postFilesWithRequest(String path, Object request, UploadFile[] files, Object responseType);
 }
 ```
 
@@ -260,6 +284,22 @@ AuthenticateResponse authResponse = client.post(new Authenticate()
 
 TestAuthResponse response = client.get(new TestAuth());
 ``` 
+
+### Uploading Files
+
+The `postFileWithRequest` method can be used to upload a file with an API Request.
+
+### Java Speech to Text
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+```java
+byte[] audioBytes = Files.readAllBytes(Paths.get("audio.wav"));
+var response = client.postFileWithRequest(request,
+    new UploadFile("audio", "audio.wav", "audio/wav", audioBytes));
+```
+
+To upload multiple files use `postFilesWithRequest`.
 
 ### AndroidServiceClient
 Unlike .NET, Java doesn't have an established Async story or any language support that simplifies execution and composition of Async tasks, as a result the Async story on Android is fairly fragmented with multiple options built-in for executing non-blocking tasks on different threads including:

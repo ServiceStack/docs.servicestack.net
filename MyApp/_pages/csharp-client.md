@@ -184,6 +184,38 @@ var response = await client.SendAsync<HelloResponse>(
 
 The service clients use the automatic [pre-defined routes](/endpoints) for each service.
 
+### File Upload with Request
+
+The `PostFileWithRequest*` methods can be used to upload a file with an API Request.
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+### C# Speech to Text
+
+```csharp
+using var fsAudio = File.OpenRead("audio.wav");
+var response = client.PostFileWithRequest(new SpeechToText(),
+    new UploadFile("audio.wav", fsAudio, "audio"));
+```
+
+### Multiple File Uploads
+
+Whilst the `PostFilesWithRequest*` methods can be used to upload multiple files with an API Request, e.g:
+
+### C# Watermark Video
+
+```csharp
+using var fsVideo = File.OpenRead("video.mp4");
+using var fsWatermark = File.OpenRead("watermark.png");
+var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
+        Position = WatermarkPosition.BottomRight
+    }, [
+        new UploadFile("video.mp4", fsVideo, "video"),
+        new UploadFile("watermark.png", fsWatermark, "watermark")
+    ]);
+```
+
+
 <a name="native-responses"></a>
 
 ### [Cache Aware Service Clients](/cache-aware-clients)
