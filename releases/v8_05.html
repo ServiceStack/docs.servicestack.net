@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-27T16:15:51.9871070Z'>
+    <meta name='date' content='2024-11-28T07:24:25.2467645Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v8.5</title>
@@ -1004,10 +1004,13 @@ image: my-user/myapp
 <h3 id="standardizing-on-kamal">Standardizing on Kamal<a class="header-anchor" href="javascript:;" onclick="location.hash='#standardizing-on-kamal'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>We're excited to migrate our templates to Kamal for deployments as it has distilled the simple approach we have baked in our templates for a number of years whilst dramatically improving on the ergonomics and are excited to see what the BaseCamp team and community around it continues to do to push the project forward.</p>
 <h2 id="simple-api-keys-credentials-auth-provider">Simple API Keys Credentials Auth Provider<a class="header-anchor" href="javascript:;" onclick="location.hash='#simple-api-keys-credentials-auth-provider'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>We've improved the usability of <a href="/auth/admin-apikeys">Simple Auth with API Keys</a> story with the new
-<code>ApiKeyCredentialsProvider</code> which enables .NET Microservices provide user session like behavior using
-simple API Keys which you'd configure together with the <code>AuthSecretAuthProvider</code> and <code>ApiKeysFeature</code> to enable
-a Credentials Auth implementation which users can use with their API Keys or Admin AuthSecret.</p>
+<p>The usability of the <a href="/auth/admin-apikeys">Simple Auth with API Keys</a> story has
+been significantly improved with the new <code>ApiKeyCredentialsProvider</code> which enables .NET Microservices to provide
+persistent UserSession-like behavior using simple API Keys which can be configured together with the
+<code>AuthSecretAuthProvider</code> and <code>ApiKeysFeature</code> to enable a Credentials Auth implementation which users can
+use with their API Keys or Admin AuthSecret.</p>
+<p>A typical configuration for .NET Microservices looking to enable Simple Auth access whose APIs are protected
+by API Keys and their Admin functionality protected by an Admin Auth Secret can be configured with:</p>
 <pre><code class="language-csharp">public class ConfigureAuth : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
@@ -1015,7 +1018,7 @@ a Credentials Auth implementation which users can use with their API Keys or Adm
         {
             services.AddPlugin(new AuthFeature([
                 new ApiKeyCredentialsProvider(),
-                new AuthSecretAuthProvider(AppConfig.Instance.AuthSecret),
+                new AuthSecretAuthProvider(&quot;MyAuthSecret&quot;),
             ]));
             services.AddPlugin(new SessionFeature());
             services.AddPlugin(new ApiKeysFeature());
@@ -1027,10 +1030,68 @@ a Credentials Auth implementation which users can use with their API Keys or Adm
         });
 }
 </code></pre>
-<p>When registered a Credentials Auth dialog will appear for <a href="https://servicestack.net/auto-ui">ServiceStack Built-in UIs</a> allowing users to Sign In with their API Keys or Admin Auth Secret.</p>
-<p><img src="/img/pages/auth/simple/apiexplorer-apikey-credentials.png" alt="" /></p>
-<p>Behind the scenes this creates a server session like normal <a href="/auth/sessions">Session Auth</a> but instead of maintaining an Authenticated User Session it saves the API Key in the session then attaches the API Key to each request which is how it's able to make API Key validated requests with just a session cookie instead of resubmitting their API Key
-for each request.</p>
+<p>When registered a Credentials Auth dialog will appear for <a href="https://servicestack.net/auto-ui">ServiceStack Built-in UIs</a>
+allowing users to Sign In with their <strong>API Keys</strong> or Admin <strong>Auth Secret</strong>.</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer.png" alt="" /></p>
+<h3 id="session-auth-with-api-keys">Session Auth with API Keys<a class="header-anchor" href="javascript:;" onclick="location.hash='#session-auth-with-api-keys'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Behind the scenes this creates a Server <a href="/auth/sessions">Auth Session</a>
+but instead of maintaining an Authenticated User Session it saves the API Key in the session then attaches the API Key to each request. This makes it possible to make API Key validated requests with just a session cookie instead of requiring resubmission of API Keys for each request.</p>
+<h3 id="secure.net-microservices-and-docker-appliances">Secure .NET Microservices and Docker Appliances<a class="header-anchor" href="javascript:;" onclick="location.hash='#secure.net-microservices-and-docker-appliances'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This is an ideal Auth Configuration for .NET Docker Appliances and Microservices like <a href="/posts/ai-server">AI Server</a> that don't need the complexity of ASP .NET Core's Identity Auth machinery and just want to restrict access to their APIs with API Keys and restrict Admin functionality to Administrator's with an Auth Secret.</p>
+<p>The benefit of <code>ApiKeyCredentialsProvider</code> is that it maintains a persistent Session so that end users
+only need to enter their API Key a single time and they'll be able to navigate to all of AI Server's protected pages using their API Key maintained in their Server User Session without needing to re-enter it for each UI and every request.</p>
+<h3 id="user-access-with-api-keys">User Access with API Keys<a class="header-anchor" href="javascript:;" onclick="location.hash='#user-access-with-api-keys'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>AI Server uses <strong>API Keys</strong> to restrict Access to their AI Features to <strong>authorized Users</strong> with Valid API Keys who
+are able to use its Built-in UIs for its AI Features with the Users preferred Name and issued API Key:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-user.png" alt="" /></p>
+<p>After signing in a single time they'll be able to navigate to any protected page and start using AI Server's AI features:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-user-chat.png" alt="" /></p>
+<h3 id="user-access-to-api-explorer">User Access to API Explorer<a class="header-anchor" href="javascript:;" onclick="location.hash='#user-access-to-api-explorer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This also lets users use their existing Auth Session across completely different UIs
+like <a href="/api-explorer">API Explorer</a>
+where they'll have the same access to APIs as they would when calling APIs programatically with their API Keys, e.g:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer-api.png" alt="" /></p>
+<h3 id="coarse-or-fine-grained-api-key-access">Coarse or fine-grained API Key access<a class="header-anchor" href="javascript:;" onclick="location.hash='#coarse-or-fine-grained-api-key-access'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>By default <strong>any</strong> Valid API Key can access restricted services by <code>[ValidateApiKey]</code></p>
+<pre><code class="language-csharp">[ValidateApiKey]
+public class Hello : IGet, IReturn&lt;HelloResponse&gt;
+{
+    public required string Name { get; set; }
+}
+</code></pre>
+<h3 id="api-key-scopes">API Key Scopes<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-key-scopes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>API Keys can be given elevated privileges where only Keys with user defined scopes:</p>
+<p><img src="/img/pages/auth/simple/admin-ui-apikeys-edit.png" alt="" /></p>
+<p>Are allowed to access APIs restricted with that scope:</p>
+<pre><code class="language-csharp">[ValidateApiKey(&quot;todo:read&quot;)]
+public class QueryTodos : QueryDb&lt;Todo&gt;
+{
+    public long? Id { get; set; }
+    public List&lt;long&gt;? Ids { get; set; }
+    public string? TextContains { get; set; }
+}
+</code></pre>
+<h3 id="restricted-api-keys-to-specific-apis">Restricted API Keys to specific APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#restricted-api-keys-to-specific-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>API Keys can also be locked down to only be allowed to call specific APIs:</p>
+<p><img src="/img/pages/auth/simple/admin-ui-apikeys-restrict-to.png" alt="" /></p>
+<h2 id="admin-access">Admin Access<a class="header-anchor" href="javascript:;" onclick="location.hash='#admin-access'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>AI Server also maintains an Admin UI and Admin APIs that are only accessible to <strong>Admin</strong> users who
+Authenticate with the App's configured Admin Auth Secret who are able to access AI Server's Admin
+UIs to monitor Live AI Requests, create new User API Keys, Manage registered AI Providers, etc.</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-admin-jobs.png" alt="" /></p>
+<h3 id="admin-restricted-apis">Admin Restricted APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#admin-restricted-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can restrict APIs to Admin Users by using <code>[ValidateAuthSecret]</code>:</p>
+<pre><code class="language-csharp">[Tag(Tags.Admin)]
+[ValidateAuthSecret]
+[Api(&quot;Add an AI Provider to process AI Requests&quot;)]
+public class CreateAiProvider : ICreateDb&lt;AiProvider&gt;, IReturn&lt;IdResponse&gt;
+{
+    //...
+}
+</code></pre>
+<p>Which are identified in API Explorer with a <strong>padlock</strong> icon whilst APIs restricted by API Key are
+identified with a <strong>key</strong> icon:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer-admin.png" alt="" /></p>
 <h2 id="servicestack.swift-rewritten-for-swift-6">ServiceStack.Swift rewritten for Swift 6<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.swift-rewritten-for-swift-6'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><a href="/swift-add-servicestack-reference"><img src="/img/pages/servicestack-reference/swift-logo-banner.jpg" alt="" /></a></p>
 <p>As part of the release of <a href="/posts/ai-server">AI Server</a> we've upgraded all generic service client libraries
@@ -2181,6 +2242,63 @@ all colleciton types however that was too coarse grained an approach where empty
                                         <span v-hash="'#simple-api-keys-credentials-auth-provider'" data-id="simple-api-keys-credentials-auth-provider" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Simple API Keys Credentials Auth Provider
                                         </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="session-auth-with-api-keys" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#session-auth-with-api-keys'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Session Auth with API Keys
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="secure.net-microservices-and-docker-appliances" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#secure.net-microservices-and-docker-appliances'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Secure .NET Microservices and Docker Appliances
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="user-access-with-api-keys" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#user-access-with-api-keys'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            User Access with API Keys
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="user-access-to-api-explorer" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#user-access-to-api-explorer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            User Access to API Explorer
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="coarse-or-fine-grained-api-key-access" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#coarse-or-fine-grained-api-key-access'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Coarse or fine-grained API Key access
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="api-key-scopes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#api-key-scopes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            API Key Scopes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="restricted-api-keys-to-specific-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#restricted-api-keys-to-specific-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Restricted API Keys to specific APIs
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#admin-access'" data-id="admin-access" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Admin Access
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="admin-restricted-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#admin-restricted-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Admin Restricted APIs
+                                                        </span>
+                                                    </li>
+                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#servicestack.swift-rewritten-for-swift-6'" data-id="servicestack.swift-rewritten-for-swift-6" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
