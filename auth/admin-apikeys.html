@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-28T07:24:25.3180465Z'>
+    <meta name='date' content='2024-11-28T08:16:17.3390052Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Simple Auth for .NET 8 Apps</title>
@@ -292,8 +292,7 @@ but don't need the complexity of ASP .NET Core's Authentication machinery, a sim
 <p>With the introduction of API Keys in this release we're able to provide a simpler Auth Story for .NET 8 Microservices
 that's easy for <strong>Admin</strong> Users to manage and control which trusted clients and B2B Integrations can access their functionality.</p>
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="0ceU91ZBhTQ" playlabel="Simple Auth Story with API Keys ideal for .NET 8 Microservices" style="background-image:url('https://img.youtube.com/vi/0ceU91ZBhTQ/maxresdefault.jpg')"></lite-youtube>
-<p>The easiest way to get started is by creating a new Empty project with API Keys enabled with your preferred database
-to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doesn't require any infrastructure dependencies.</p>
+<p>The easiest way to get started is by creating a new Empty project with API Keys enabled with your preferred database to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doesn't require any infrastructure dependencies.</p>
 <div class="not-prose mx-auto">
   <h3 id="template" class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900">
       Create a new Empty project with API Keys
@@ -316,34 +315,37 @@ to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doe
                     </div>
                 </div>
             </div>
-<p>Which will add the <a href="https://nuget.org/packages/ServiceStack.Server">ServiceStack.Server</a> dependency and the
-<a href="/modular-startup">Modular Startup</a> configuration below:</p>
+<p>Which will add the <a href="https://nuget.org/packages/ServiceStack.Server">ServiceStack.Server</a> dependency and the <a href="/modular-startup">Modular Startup</a> configuration below:</p>
 <pre><code class="language-csharp">public class ConfigureApiKeys : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
-    .ConfigureServices(services =&gt;
-    {
-        services.AddPlugin(new AuthFeature(new AuthSecretAuthProvider(&quot;p@55wOrd&quot;)));
-        services.AddPlugin(new ApiKeysFeature
+        .ConfigureServices(services =&gt;
         {
-            // Optional: Available Scopes Admin Users can assign to any API Key
-            // Features = [
-            //     &quot;Paid&quot;,
-            //     &quot;Tracking&quot;,
-            // ],
-            // Optional: Available Features Admin Users can assign to any API Key
-            // Scopes = [
-            //     &quot;todo:read&quot;,
-            //     &quot;todo:write&quot;,
-            // ],
+            services.AddPlugin(new AuthFeature([
+                new ApiKeyCredentialsProvider(),
+                new AuthSecretAuthProvider(&quot;p@55wOrd&quot;),
+            ]));
+            services.AddPlugin(new SessionFeature());
+            services.AddPlugin(new ApiKeysFeature
+            {
+                // Optional: Available Scopes Admin Users can assign to any API Key
+                // Features = [
+                //     &quot;Paid&quot;,
+                //     &quot;Tracking&quot;,
+                // ],
+                // Optional: Available Features Admin Users can assign to any API Key
+                // Scopes = [
+                //     &quot;todo:read&quot;,
+                //     &quot;todo:write&quot;,
+                // ],
+            });
+        })
+        .ConfigureAppHost(appHost =&gt;
+        {
+            using var db = appHost.Resolve&lt;IDbConnectionFactory&gt;().Open();
+            var feature = appHost.GetPlugin&lt;ApiKeysFeature&gt;();
+            feature.InitSchema(db);
         });
-    })
-    .ConfigureAppHost(appHost =&gt;
-    {
-        using var db = appHost.Resolve&lt;IDbConnectionFactory&gt;().Open();
-        var feature = appHost.GetPlugin&lt;ApiKeysFeature&gt;();
-        feature.InitSchema(db);
-    });
 }
 </code></pre>
 <p>Which configures the <strong>AuthSecretAuthProvider</strong> with the <strong>Admin</strong> password and <strong>ApiKeysFeature</strong> to enable <a href="/auth/apikeys">API Keys</a> support.</p>
@@ -455,6 +457,46 @@ users to use their API Keys to access API Key protected Services which are highl
 <p>Users can enter their API Key by clicking on the <strong>Key</strong> Icon in the top right, or the link in the Warning alert
 when trying to access an API Key protected Service:</p>
 <p><img src="/img/pages/auth/simple/apiexplorer-apikey-dialog.png" alt="" /></p>
+<h2 id="api-keys-and-admin-secret-credentials-auth-provider">API Keys and Admin Secret Credentials Auth Provider<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-keys-and-admin-secret-credentials-auth-provider'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The usability of Simple Admin API Keys is greatly improved with the <code>ApiKeyCredentialsProvider</code> which enables .NET Microservices to provide persistent UserSession-like behavior for API Keys and Admin Auth Secrets to enable a Credentials Auth implementation which users can use with their API Keys or Admin AuthSecret.</p>
+<p>When registered a <strong>Credentials</strong> SignIn dialog will appear for <a href="https://servicestack.net/auto-ui">ServiceStack Built-in UIs</a> allowing users to Sign In with their <strong>API Keys</strong> or Admin <strong>Auth Secret</strong>.</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer.png" alt="" /></p>
+<h3 id="session-auth-with-api-keys">Session Auth with API Keys<a class="header-anchor" href="javascript:;" onclick="location.hash='#session-auth-with-api-keys'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Behind the scenes this creates a Server <a href="/auth/sessions">Auth Session</a>
+but instead of maintaining an Authenticated User Session it saves the API Key in the session then attaches the API Key to each request. This makes it possible to make API Key validated requests with just a session cookie instead of requiring resubmission of API Keys for each request.</p>
+<h3 id="secure.net-microservices-and-docker-appliances">Secure .NET Microservices and Docker Appliances<a class="header-anchor" href="javascript:;" onclick="location.hash='#secure.net-microservices-and-docker-appliances'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This is an ideal Auth Configuration for .NET Docker Appliances and Microservices like <a href="/posts/ai-server">AI Server</a> that don't need the complexity of ASP .NET Core's Identity Auth machinery and just want to restrict access to their APIs with API Keys and restrict Admin functionality to Administrator's with an Auth Secret.</p>
+<p>The benefit of <code>ApiKeyCredentialsProvider</code> is that it maintains a persistent Session so that end users
+only need to enter their API Key a single time and they'll be able to navigate to all of AI Server's protected pages using their API Key maintained in their Server User Session without needing to re-enter it for each UI and every request.</p>
+<h3 id="user-access-with-api-keys">User Access with API Keys<a class="header-anchor" href="javascript:;" onclick="location.hash='#user-access-with-api-keys'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>AI Server uses <strong>API Keys</strong> to restrict Access to their AI Features to <strong>authorized Users</strong> with Valid API Keys who
+are able to use its Built-in UIs for its AI Features with the Users preferred Name and issued API Key:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-user.png" alt="" /></p>
+<p>After signing in a single time they'll be able to navigate to any protected page and start using AI Server's AI features:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-user-chat.png" alt="" /></p>
+<h3 id="user-access-to-api-explorer">User Access to API Explorer<a class="header-anchor" href="javascript:;" onclick="location.hash='#user-access-to-api-explorer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This also lets users use their existing Auth Session across completely different UIs
+like <a href="/api-explorer">API Explorer</a>
+where they'll have the same access to APIs as they would when calling APIs programatically with their API Keys, e.g:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer-api.png" alt="" /></p>
+<h2 id="admin-access">Admin Access<a class="header-anchor" href="javascript:;" onclick="location.hash='#admin-access'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>AI Server also maintains an Admin UI and Admin APIs that are only accessible to <strong>Admin</strong> users who
+Authenticate with the App's configured Admin Auth Secret who are able to access AI Server's Admin
+UIs to monitor Live AI Requests, create new User API Keys, Manage registered AI Providers, etc.</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-admin-jobs.png" alt="" /></p>
+<h3 id="admin-restricted-apis">Admin Restricted APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#admin-restricted-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can restrict APIs to Admin Users by using <code>[ValidateAuthSecret]</code>:</p>
+<pre><code class="language-csharp">[Tag(Tags.Admin)]
+[ValidateAuthSecret]
+[Api(&quot;Add an AI Provider to process AI Requests&quot;)]
+public class CreateAiProvider : ICreateDb&lt;AiProvider&gt;, IReturn&lt;IdResponse&gt;
+{
+    //...
+}
+</code></pre>
+<p>Which are identified in API Explorer with a <strong>padlock</strong> icon whilst APIs restricted by API Key are
+identified with a <strong>key</strong> icon:</p>
+<p><img src="/img/pages/auth/simple/ai-server-auth-apiexplorer-admin.png" alt="" /></p>
 <h3 id="client-usage">Client Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>All HTTP and existing <a href="https://docs.servicestack.net/clients-overview">Service Clients</a> can be configured to use API Keys
 for machine-to-machine communication, which like most API Key implementations can be passed in a <a href="https://datatracker.ietf.org/doc/html/rfc6750#section-2.1">HTTP Authorization Bearer Token</a>
@@ -541,6 +583,62 @@ and <strong>typed Service Client</strong> integrations.</p>
                                 On This Page
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#api-keys-and-admin-secret-credentials-auth-provider'" data-id="api-keys-and-admin-secret-credentials-auth-provider" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            API Keys and Admin Secret Credentials Auth Provider
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="session-auth-with-api-keys" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#session-auth-with-api-keys'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Session Auth with API Keys
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="secure.net-microservices-and-docker-appliances" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#secure.net-microservices-and-docker-appliances'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Secure .NET Microservices and Docker Appliances
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="user-access-with-api-keys" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#user-access-with-api-keys'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            User Access with API Keys
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="user-access-to-api-explorer" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#user-access-to-api-explorer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            User Access to API Explorer
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#admin-access'" data-id="admin-access" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Admin Access
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="admin-restricted-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#admin-restricted-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Admin Restricted APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="client-usage" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#client-usage'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Client Usage
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="api-key-http-header" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#api-key-http-header'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            API Key HTTP Header
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#development'" data-id="development" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Development
