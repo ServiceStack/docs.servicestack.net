@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-28T10:28:19.0610120Z'>
+    <meta name='date' content='2024-11-28T11:08:08.3241668Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Add ServiceStack Reference</title>
@@ -1497,6 +1497,16 @@ be able easily add a typed Service Reference to your Services with just its URL 
                     </div>
                 </div>
             </div>
+<p><div><h3 id="alternative-without.net-npx-get-dtos">Alternative (without .NET): npx get-dtos<a class="header-anchor" href="javascript:;" onclick="location.hash='#alternative-without.net-npx-get-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Alternatively API consumers can use <a href="/npx-get-dtos">npx get-dtos</a> to Add/Update ServiceStack References without needing .NET installed, where any command starting with:</p>
+<pre><code class="language-txt">x &lt;lang&gt;
+</code></pre>
+<p>Can be replaced with:</p>
+<pre><code class="language-txt">npx get-dtos &lt;lang&gt;
+</code></pre>
+<p>To instead Add / Update ServiceStack references using the npm get-dtos package.</p>
+
+</div></p>
 <p>This will make the following utilities available from your command-line which will let you download the Server DTO classes for a remote ServiceStack endpoint in your chosen language which you can use with ServiceStack's generic Service clients to be able to make end-to-end API calls.</p>
 <table class="table table-bordered">
 <tr>
@@ -1943,6 +1953,86 @@ under the <strong>Tools</strong> category:</p>
 in the right-click context menu:</p>
 <p><img src="/img/pages/servicestack-reference/rider-tool-ts-reference-run.png" alt="" /></p>
 <p>If you're updating references frequently you can save time by <a href="https://www.jetbrains.com/help/rider/Configuring_Keyboard_and_Mouse_Shortcuts.html">assigning it a keyboard shortcut</a>.</p>
+<h2 id="multiple-file-upload-support-with-api-requests-supported-in-all-languages">Multiple File Upload Support with API Requests supported in all languages<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-file-upload-support-with-api-requests-supported-in-all-languages'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To be able to call <a href="/ai-server/">AI Server</a> APIs requiring file uploads we've added multiple file upload support with API Requests to the generic service clients for all our supported languages.</p>
+<p>Here's what that looks like for different languages calling AI Server's <code>SpeechToText</code> API:</p>
+<h3 id="c-speech-to-text">C# Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#c-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">using var fsAudio = File.OpenRead(&quot;audio.wav&quot;);
+var response = client.PostFileWithRequest(new SpeechToText(),
+    new UploadFile(&quot;audio.wav&quot;, fsAudio, &quot;audio&quot;));
+</code></pre>
+<h3 id="dart-speech-to-text">Dart Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#dart-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-dart">var audioFile = new File('audio.wav');
+var uploadFile = new UploadFile(
+    fieldName: 'audio',
+    fileName: audioFile.uri.pathSegments.last,
+    contentType: 'audio/wav',
+    contents: await audioFile.readAsBytes()
+);
+
+var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
+</code></pre>
+<h3 id="python-speech-to-text">Python Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#python-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-python">with open(&quot;files/audio.wav&quot;, &quot;rb&quot;) as audio:
+  response = client.post_file_with_request(SpeechToText(), 
+    UploadFile(field_name=&quot;audio&quot;, file_name=&quot;audio.wav&quot;, content_type=&quot;audio/wav&quot;, stream=audio))
+</code></pre>
+<h3 id="php-speech-to-text">PHP Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#php-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-php">$audioFile = __DIR__ . '/files/audio.wav';
+
+/** @var GenerationResponse $response */
+$response = $client-&gt;postFileWithRequest(new SpeechToText(),
+    new UploadFile(
+        filePath: $audioFile,
+        fileName: 'audio.wav',
+        fieldName: 'audio',
+        contentType: 'audio/wav'
+    ));
+</code></pre>
+<h3 id="swift-speech-to-text">Swift Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#swift-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-swift">guard let audioURL = Bundle.module.url(forResource: &quot;audio.wav&quot;, withExtension: nil) else {
+    return
+}
+
+let audioData = try Data(contentsOf: audioURL)
+let response: TextGenerationResponse = try await client.postFileWithRequestAsync(
+    request:SpeechToText(), 
+    file:UploadFile(fileName: &quot;audio.wav&quot;, data:audioData, fieldName:&quot;audio&quot;))
+</code></pre>
+<h3 id="kotlin-speech-to-text">Kotlin Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#kotlin-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-kotlin">val audioBytes = Files.readAllBytes(Paths.get(&quot;audio.wav&quot;))
+val response = client.postFileWithRequest(SpeechToText(),
+    UploadFile(&quot;audio&quot;, &quot;audio.wav&quot;, &quot;audio/wav&quot;, audioBytes))
+</code></pre>
+<h3 id="java-speech-to-text">Java Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#java-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-java">byte[] audioBytes = Files.readAllBytes(Paths.get(&quot;audio.wav&quot;));
+var response = client.postFileWithRequest(request,
+    new UploadFile(&quot;audio&quot;, &quot;audio.wav&quot;, &quot;audio/wav&quot;, audioBytes));
+</code></pre>
+<h3 id="typescript-speech-to-text">TypeScript Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-js">// Create FormData and append the file
+const formData = new FormData()
+const audioFile = fs.readFileSync('audio.wav')
+const blob = new Blob([audioFile], { type: 'audio/wav' })
+
+// Explicitly set the field name as 'audio'
+formData.append('audio', blob, 'audio.wav')
+
+const api = await client.apiForm(new SpeechToText(), formData)
+</code></pre>
+<h3 id="multiple-file-uploads">Multiple File Uploads<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-file-uploads'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>All languages also support a <code>postFilesWithRequest</code> variant for uploading multiple files with an API Request.
+E.g. here's an example of using <code>PostFilesWithRequest</code> to generate a video with a Watermark:</p>
+<h3 id="c-watermark-video">C# Watermark Video<a class="header-anchor" href="javascript:;" onclick="location.hash='#c-watermark-video'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">using var fsVideo = File.OpenRead(&quot;video.mp4&quot;);
+using var fsWatermark = File.OpenRead(&quot;watermark.png&quot;);
+var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
+        Position = WatermarkPosition.BottomRight
+    }, [
+        new UploadFile(&quot;video.mp4&quot;, fsVideo, &quot;video&quot;),
+        new UploadFile(&quot;watermark.png&quot;, fsWatermark, &quot;watermark&quot;)
+    ]);
+</code></pre>
 <h2 id="advantages-over-wcf">Advantages over WCF<a class="header-anchor" href="javascript:;" onclick="location.hash='#advantages-over-wcf'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <ul>
 <li><strong>Simple</strong> Server provides DTOs based on metadata and options provided. No heavy client side tools, just a HTTP request!</li>
@@ -2306,6 +2396,73 @@ export class User implements IReturn&lt;User&gt;
                                                         <span v-hash="'#integrate-with-rider'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Integrate with Rider
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#multiple-file-upload-support-with-api-requests-supported-in-all-languages'" data-id="multiple-file-upload-support-with-api-requests-supported-in-all-languages" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Multiple File Upload Support with API Requests supported in all languages
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="c-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#c-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            C# Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="dart-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#dart-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Dart Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="python-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#python-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Python Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="php-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#php-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            PHP Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="swift-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#swift-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Swift Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="kotlin-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#kotlin-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Kotlin Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="java-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#java-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Java Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="typescript-speech-to-text" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#typescript-speech-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            TypeScript Speech to Text
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="multiple-file-uploads" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#multiple-file-uploads'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Multiple File Uploads
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="c-watermark-video" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#c-watermark-video'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            C# Watermark Video
                                                         </span>
                                                     </li>
                                             </ul>

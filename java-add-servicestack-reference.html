@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-11-28T10:28:19.3917496Z'>
+    <meta name='date' content='2024-11-28T11:08:08.6447330Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Java Add ServiceStack Reference</title>
@@ -1464,6 +1464,15 @@ GlobalNamespace: techstackdtos
 <p>The <a href="https://github.com/ServiceStack/ServiceStack.Java/blob/master/src/AndroidClient/client/src/main/java/net/servicestack/client/ServiceClient.java">ServiceClient.java</a> interface provides a good overview on the API available on the concrete <a href="https://github.com/ServiceStack/ServiceStack.Java/blob/master/src/AndroidClient/client/src/main/java/net/servicestack/client/JsonServiceClient.java">JsonServiceClient</a> class:</p>
 <pre><code class="language-java">public interface ServiceClient {
     boolean getAlwaysSendBasicAuthHeaders();
+
+    void setBearerToken(String value);
+    String getBearerToken();
+    void setTokenCookie(String value);
+
+    void setRefreshToken(String bearerToken);
+    String getRefreshToken();
+    void setRefreshTokenCookie(String value);
+
     void setAlwaysSendBasicAuthHeaders(boolean value);
     void setCredentials(String userName, String password);
 
@@ -1499,6 +1508,21 @@ GlobalNamespace: techstackdtos
     &lt;TResponse&gt; TResponse delete(String path, Class responseType);
     &lt;TResponse&gt; TResponse delete(String path, Type responseType);
     HttpURLConnection delete(String path);
+
+    void setCookie(String name, String value);
+    void setCookie(String name, String value, Long expiresInSecs);
+    void clearCookies();
+    String getCookieValue(String name);
+    String getTokenCookie();
+    String getRefreshTokenCookie();
+
+    &lt;TResponse&gt; TResponse postFileWithRequest(IReturn&lt;TResponse&gt; request, UploadFile file);
+    &lt;TResponse&gt; TResponse postFileWithRequest(Object request, UploadFile file, Object responseType);
+    &lt;TResponse&gt; TResponse postFileWithRequest(String path, Object request, UploadFile file, Object responseType);
+
+    &lt;TResponse&gt; TResponse postFilesWithRequest(IReturn&lt;TResponse&gt; request, UploadFile[] files);
+    &lt;TResponse&gt; TResponse postFilesWithRequest(Object request, UploadFile[] files, Object responseType);
+    &lt;TResponse&gt; TResponse postFilesWithRequest(String path, Object request, UploadFile[] files, Object responseType);
 }
 </code></pre>
 <p>The primary concession is due to Java's generic type erasure which forces the addition overloads that include a <code>Class</code> parameter for specifying the response type to deserialize into as well as a <code>Type</code> parameter overload which does the same for generic types. These overloads aren't required for API's that accept a Request DTO annotated with <code>IReturn&lt;T&gt;</code> interface marker as we're able to encode the Response Type in code-generated Request DTO classes.</p>
@@ -1564,6 +1588,15 @@ be added on subsequent requests to allow you to make authenticated requests afte
 
 TestAuthResponse response = client.get(new TestAuth());
 </code></pre>
+<h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>postFileWithRequest</code> method can be used to upload a file with an API Request.</p>
+<h3 id="java-speech-to-text">Java Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#java-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Here's an example calling <a href="/ai-server/">AI Server's</a> <code>SpeechToText</code> API:</p>
+<pre><code class="language-java">byte[] audioBytes = Files.readAllBytes(Paths.get(&quot;audio.wav&quot;));
+var response = client.postFileWithRequest(request,
+    new UploadFile(&quot;audio&quot;, &quot;audio.wav&quot;, &quot;audio/wav&quot;, audioBytes));
+</code></pre>
+<p>To upload multiple files use <code>postFilesWithRequest</code>.</p>
 <h3 id="androidserviceclient">AndroidServiceClient<a class="header-anchor" href="javascript:;" onclick="location.hash='#androidserviceclient'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Unlike .NET, Java doesn't have an established Async story or any language support that simplifies execution and composition of Async tasks, as a result the Async story on Android is fairly fragmented with multiple options built-in for executing non-blocking tasks on different threads including:</p>
 <ul>
