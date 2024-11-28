@@ -19,15 +19,19 @@ Dart ServiceStack Reference supports **all Dart 2.0 platforms**, including Flutt
 Due to the lack of reflection and Mirror support, consuming JSON APIs can be quite [cumbersome in Flutter](https://flutter.io/cookbook/networking/fetch-data/). But we've been able to achieve the same productive development experience available in [all supported languages](/add-servicestack-reference) where you can use the generated Dart DTOs from any remote v5.1+ ServiceStack endpoint with ServiceStack's Smart generic
 [JsonServiceClient](https://pub.dartlang.org/documentation/servicestack/0.0.7/client/JsonServiceClient-class.html) available in the [servicestack Dart package](https://pub.dartlang.org/packages/servicestack#-installing-tab-), to enable an end-to-end Typed API for calling Services by [sending and receiving native DTOs](/architecture-overview#client-architecture).
 
-### Example Usage
+### Install
 
 You can use the same [x dotnet tool](/dotnet-tool) simple command-line utility to easily Add and Update ServiceStack References for all supported languages:
 
-Install [.NET Core](https://dotnet.microsoft.com/download) then install the `x` dotnet tool:
+Install [.NET SDK](https://dotnet.microsoft.com/download) then install the `x` dotnet tool:
 
 :::sh
 dotnet tool install --global x
 :::
+
+::include npx-get-dtos.md::
+
+### Example Usage
 
 You can then execute `x dart` with the URL of the remote ServiceStack Instance you want to generated DTOs for, e.g:
 

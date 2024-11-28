@@ -96,6 +96,8 @@ The [dotnet tools](/dotnet-tool) include built in support for generating TypeScr
 dotnet tool install --global x 
 :::
 
+::include npx-get-dtos.md::
+
 ### Adding a ServiceStack Reference
 
 To Add a TypeScript ServiceStack Reference just call `x typescript` with the URL of a remote ServiceStack instance:

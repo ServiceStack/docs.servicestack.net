@@ -155,6 +155,8 @@ To install first install the [latest .NET SDK](https://dotnet.microsoft.com/down
 dotnet tool install --global x 
 :::
 
+::include npx-get-dtos.md::
+
 ### Adding a ServiceStack Reference
 
 To Add a Python ServiceStack Reference just call `x python` with the URL of a remote ServiceStack instance:

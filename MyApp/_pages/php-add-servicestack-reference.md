@@ -228,6 +228,8 @@ To install first install the [latest .NET SDK](https://dotnet.microsoft.com/down
 $ dotnet tool install --global x 
 ```
 
+::include npx-get-dtos.md::
+
 ### Adding a ServiceStack Reference
 
 To Add a PHP ServiceStack Reference just call `x php` with the URL of a remote ServiceStack instance:

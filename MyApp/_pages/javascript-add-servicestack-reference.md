@@ -108,6 +108,8 @@ npm install -D @servicestack/client
 
 Where only its TypeScript definitions are used by the IDE during development to enable its type-checking and intelli-sense.
 
+::include npx-get-dtos.md::
+
 ### Rich intelli-sense support
 
 Where you'll be able to benefit from rich intelli-sense support in smart IDEs like [Rider](https://www.jetbrains.com/rider/) for 

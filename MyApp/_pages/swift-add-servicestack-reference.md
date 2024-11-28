@@ -21,6 +21,10 @@ $ dotnet tool install --global x
 
 This will make the `x` dotnet tool available in your `$PATH` which can now be used from within a **Terminal window** at your Xcode project folder.
 
+::include npx-get-dtos.md::
+
+### Reference ServiceStack.Swift
+
 To use the latest `JsonServiceClient` you'll need to add a reference to ServiceStack Swift library using your preferred package manager:
 
 ### Xcode
@@ -37,8 +41,7 @@ https://github.com/ServiceStack/ServiceStack.Swift
 
 ![](/img/pages/dev/xcode-add-servicestack-swift.png)
 
-After adding the dependency both [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) and its 
-[PromiseKit](https://github.com/mxcl/PromiseKit) dependency will be added to your project:
+After adding the dependency [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) will be added to your project:
 
 ![](/img/pages/dev/xcode-servicestack-swift-added.png)
 
@@ -50,20 +53,15 @@ In your [Podfile](https://guides.cocoapods.org/syntax/podfile.html):
 use_frameworks!
 
 # Pods for Project
-pod "ServiceStack", '~> 1.1'
-```
-
-#### Carthage
-
-```ruby
-github "ServiceStack/ServiceStack.Swift" ~> 1.1
+pod "ServiceStack", '~> 6.0.5'
 ```
 
 #### SwiftPM
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ServiceStack/ServiceStack.Swift", from: "1.0.0"),
+    .package(url: "https://github.com/ServiceStack/ServiceStack.Swift.git",
+        Version(6,0,0)..<Version(7,0,0)),
 ],
 ```
 
@@ -74,11 +72,8 @@ Async usage example:
 ```swift
 import ServiceStack
 
-client.getAsync(AppOverview())
-    .done { r in
-        r.topTechnologies.count //= 100
-        //... 
-    }
+let response = try await client.getAsync(AppOverview())
+print(response.topTechnologies.count) //= 100
 ```
 
 Sync usage example:
@@ -167,22 +162,25 @@ The header comments in the generated DTO's allows for further customization of h
 
 ```swift
 /* Options:
-Date: 2017-02-02 02:41:09
-SwiftVersion: 3.0
-Version: 4.55
+Date: 2024-11-28 10:23:42
+SwiftVersion: 6.0
+Version: 8.51
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://techstacks.io
 
 //BaseClass: 
 //AddModelExtensions: True
 //AddServiceStackTypes: True
+//MakePropertiesOptional: True
 //IncludeTypes: 
 //ExcludeTypes: 
-//ExcludeGenericBaseTypes: True
+//ExcludeGenericBaseTypes: False
 //AddResponseStatus: False
 //AddImplicitVersion: 
-//InitializeCollections: True
-//DefaultImports: Foundation
+//AddDescriptionAsComments: True
+//InitializeCollections: False
+//TreatTypesAsStrings: 
+//DefaultImports: Foundation,ServiceStack
 */
 ```
 
