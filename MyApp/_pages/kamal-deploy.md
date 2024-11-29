@@ -118,5 +118,17 @@ Kamal supports extensive configuration options including "accessories" for addit
 
 ## Troubleshooting
 
+### Initial deployment fails
+
 If you are having issues with the initial deployment, an earlier bootstrap of the server via GitHub Actions may have failed.
 Delete the `.<app-name>` file in your deployment user's home directory and re-run the GitHub Actions workflow to re-bootstrap the server.
+
+### Missing the service label
+
+If you are getting:
+
+```
+Image ghcr.io/netcoreapps/northwindauto:latest is missing the 'service' label
+```
+
+Ensure that your AppHost csproj file has `ContainerLabel` with the value matching the `service` in your `deploy.yml` file.
