@@ -155,6 +155,8 @@ To install first install the [latest .NET SDK](https://dotnet.microsoft.com/down
 dotnet tool install --global x 
 :::
 
+::include npx-get-dtos.md::
+
 ### Adding a ServiceStack Reference
 
 To Add a Python ServiceStack Reference just call `x python` with the URL of a remote ServiceStack instance:
@@ -603,6 +605,22 @@ Use the `refresh_token_uri` property when refresh tokens need to be sent to a di
 client.refresh_token = refresh_token
 client.refresh_token_uri = AUTH_URL + "/access-token"
 ```
+
+### Uploading Files
+
+The `post_file_with_request` method can be used to upload a file with an API Request.
+
+### Python Speech to Text
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+```python
+with open("files/audio.wav", "rb") as audio:
+  response = client.post_file_with_request(SpeechToText(), 
+    UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+```
+
+To upload multiple files use `post_files_with_request`.
 
 ## DTO Customization Options 
 

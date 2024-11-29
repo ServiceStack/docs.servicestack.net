@@ -204,31 +204,66 @@ The [ServiceClient.java](https://github.com/ServiceStack/ServiceStack.Java/blob/
 
 ```java
 public interface ServiceClient {
-    public <TResponse> TResponse get(IReturn<TResponse> request);
-    public <TResponse> TResponse get(IReturn<TResponse> request, Map<String,String> queryParams);
-    public <TResponse> TResponse get(String path, Class responseType);
-    public <TResponse> TResponse get(String path, Type responseType);
-    public HttpURLConnection get(String path);
+    boolean getAlwaysSendBasicAuthHeaders();
 
-    public <TResponse> TResponse post(IReturn<TResponse> request);
-    public <TResponse> TResponse post(String path, Object request, Class responseCls);
-    public <TResponse> TResponse post(String path, Object request, Type responseType);
-    public <TResponse> TResponse post(String path, byte[] requestBody, String contentType, Class responseCls);
-    public <TResponse> TResponse post(String path, byte[] requestBody, String contentType, Type responseType);
-    public HttpURLConnection post(String path, byte[] requestBody, String contentType);
+    void setBearerToken(String value);
+    String getBearerToken();
+    void setTokenCookie(String value);
 
-    public <TResponse> TResponse put(IReturn<TResponse> request);
-    public <TResponse> TResponse put(String path, Object request, Class responseType);
-    public <TResponse> TResponse put(String path, Object request, Type responseType);
-    public <TResponse> TResponse put(String path, byte[] requestBody, String contentType, Class responseType);
-    public <TResponse> TResponse put(String path, byte[] requestBody, String contentType, Type responseType);
-    public HttpURLConnection put(String path, byte[] requestBody, String contentType);
+    void setRefreshToken(String bearerToken);
+    String getRefreshToken();
+    void setRefreshTokenCookie(String value);
 
-    public <TResponse> TResponse delete(IReturn<TResponse> request);
-    public <TResponse> TResponse delete(IReturn<TResponse> request, Map<String,String> queryParams);
-    public <TResponse> TResponse delete(String path, Class responseType);
-    public <TResponse> TResponse delete(String path, Type responseType);
-    public HttpURLConnection delete(String path);
+    void setAlwaysSendBasicAuthHeaders(boolean value);
+    void setCredentials(String userName, String password);
+
+    <TResponse> TResponse send(IReturn<TResponse> request);
+    void send(IReturnVoid request);
+
+    <TResponse> TResponse get(IReturn<TResponse> request);
+    void get(IReturnVoid request);
+    <TResponse> TResponse get(IReturn<TResponse> request, Map<String,String> queryParams);
+    <TResponse> TResponse get(String path, Class responseType);
+    <TResponse> TResponse get(String path, Type responseType);
+    HttpURLConnection get(String path);
+
+    <TResponse> TResponse post(IReturn<TResponse> request);
+    void post(IReturnVoid request);
+    <TResponse> TResponse post(String path, Object request, Class responseType);
+    <TResponse> TResponse post(String path, Object request, Type responseType);
+    <TResponse> TResponse post(String path, byte[] requestBody, String contentType, Class responseType);
+    <TResponse> TResponse post(String path, byte[] requestBody, String contentType, Type responseType);
+    HttpURLConnection post(String path, byte[] requestBody, String contentType);
+
+    <TResponse> TResponse put(IReturn<TResponse> request);
+    void put(IReturnVoid request);
+    <TResponse> TResponse put(String path, Object request, Class responseType);
+    <TResponse> TResponse put(String path, Object request, Type responseType);
+    <TResponse> TResponse put(String path, byte[] requestBody, String contentType, Class responseType);
+    <TResponse> TResponse put(String path, byte[] requestBody, String contentType, Type responseType);
+    HttpURLConnection put(String path, byte[] requestBody, String contentType);
+
+    <TResponse> TResponse delete(IReturn<TResponse> request);
+    void delete(IReturnVoid request);
+    <TResponse> TResponse delete(IReturn<TResponse> request, Map<String,String> queryParams);
+    <TResponse> TResponse delete(String path, Class responseType);
+    <TResponse> TResponse delete(String path, Type responseType);
+    HttpURLConnection delete(String path);
+
+    void setCookie(String name, String value);
+    void setCookie(String name, String value, Long expiresInSecs);
+    void clearCookies();
+    String getCookieValue(String name);
+    String getTokenCookie();
+    String getRefreshTokenCookie();
+
+    <TResponse> TResponse postFileWithRequest(IReturn<TResponse> request, UploadFile file);
+    <TResponse> TResponse postFileWithRequest(Object request, UploadFile file, Object responseType);
+    <TResponse> TResponse postFileWithRequest(String path, Object request, UploadFile file, Object responseType);
+
+    <TResponse> TResponse postFilesWithRequest(IReturn<TResponse> request, UploadFile[] files);
+    <TResponse> TResponse postFilesWithRequest(Object request, UploadFile[] files, Object responseType);
+    <TResponse> TResponse postFilesWithRequest(String path, Object request, UploadFile[] files, Object responseType);
 }
 ```
 
@@ -312,6 +347,22 @@ val httpRes:HttpURLConnection = client.get("https://servicestack.net/img/logo.pn
 val imgBytes = Utils.readBytesToEnd(httpRes)
 val img = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
 ```
+
+### Uploading Files
+
+The `postFileWithRequest` method can be used to upload a file with an API Request.
+
+### Kotlin Speech to Text
+
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
+```kotlin
+val audioBytes = Files.readAllBytes(Paths.get("audio.wav"))
+val response = client.postFileWithRequest(SpeechToText(),
+    UploadFile("audio", "audio.wav", "audio/wav", audioBytes))
+```
+
+To upload multiple files use `postFilesWithRequest`.
 
 ### AndroidServiceClient
 

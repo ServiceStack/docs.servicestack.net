@@ -5,8 +5,7 @@ title: ServiceStack's .NET Core Utility Belt
 
 Our `x` and `app` dotnet tools are a versatile invaluable companion for all ServiceStack developers where it's 
 jam packed with functionality to power a number of exciting scenarios where it serves as a [Sharp App](https://sharpscript.net/docs/sharp-apps) 
-delivery platform where they can be run as a .NET Core Windows Desktop App with `app` or as a cross-platform Web App launcher 
-using `web` and we've already how it's now a [`#Script` runner](https://sharpscript.net/docs/sharp-scripts) with `x run` and into a 
+delivery platform where they can be run as a .NET Core Windows Desktop App with `app` or as a cross-platform Web App launcher using `web` and we've already how it's now a [`#Script` runner](https://sharpscript.net/docs/sharp-scripts) with `x run` and into a 
 [Live `#Script` playground](https://sharpscript.net/docs/sharp-scripts#live-script-with-web-watch) with `x watch`.
 
 These tools contains all the functionality ServiceStack Developers or API consumers need that can be used 
@@ -31,7 +30,11 @@ dotnet tool update -g x
 :::
 
 ::: info
-Both `x` and `app` have equivalent base functionality, whilst `app` has superset features for richer [Windows-only integration](/netcore-windows-desktop)
+Both `x` and `app` have equivalent base functionality, whilst `app` has superset [Windows-only Desktop features](/netcore-windows-desktop)
+:::
+
+::: info
+To update and download Add ServiceStack Reference dtos without .NET see [npx get-dtos](/npx-get-dtos)
 :::
 
 ## Usage

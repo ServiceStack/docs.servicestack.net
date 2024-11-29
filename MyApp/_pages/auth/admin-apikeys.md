@@ -19,8 +19,7 @@ that's easy for **Admin** Users to manage and control which trusted clients and 
 Simple Auth Story with API Keys ideal for .NET 8 Microservices
 :::
 
-The easiest way to get started is by creating a new Empty project with API Keys enabled with your preferred database
-to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doesn't require any infrastructure dependencies.
+The easiest way to get started is by creating a new Empty project with API Keys enabled with your preferred database to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doesn't require any infrastructure dependencies.
 
 <div class="not-prose mx-auto">
   <h3 id="template" class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900">
@@ -37,36 +36,39 @@ Existing projects not configured with Authentication can enable this simple Auth
 x mix apikeys-auth
 :::
 
-Which will add the [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server) dependency and the 
-[Modular Startup](/modular-startup) configuration below:
+Which will add the [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server) dependency and the [Modular Startup](/modular-startup) configuration below:
 
 ```csharp
 public class ConfigureApiKeys : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-    .ConfigureServices(services =>
-    {
-        services.AddPlugin(new AuthFeature(new AuthSecretAuthProvider("p@55wOrd")));
-        services.AddPlugin(new ApiKeysFeature
+        .ConfigureServices(services =>
         {
-            // Optional: Available Scopes Admin Users can assign to any API Key
-            // Features = [
-            //     "Paid",
-            //     "Tracking",
-            // ],
-            // Optional: Available Features Admin Users can assign to any API Key
-            // Scopes = [
-            //     "todo:read",
-            //     "todo:write",
-            // ],
+            services.AddPlugin(new AuthFeature([
+                new ApiKeyCredentialsProvider(),
+                new AuthSecretAuthProvider("p@55wOrd"),
+            ]));
+            services.AddPlugin(new SessionFeature());
+            services.AddPlugin(new ApiKeysFeature
+            {
+                // Optional: Available Scopes Admin Users can assign to any API Key
+                // Features = [
+                //     "Paid",
+                //     "Tracking",
+                // ],
+                // Optional: Available Features Admin Users can assign to any API Key
+                // Scopes = [
+                //     "todo:read",
+                //     "todo:write",
+                // ],
+            });
+        })
+        .ConfigureAppHost(appHost =>
+        {
+            using var db = appHost.Resolve<IDbConnectionFactory>().Open();
+            var feature = appHost.GetPlugin<ApiKeysFeature>();
+            feature.InitSchema(db);
         });
-    })
-    .ConfigureAppHost(appHost =>
-    {
-        using var db = appHost.Resolve<IDbConnectionFactory>().Open();
-        var feature = appHost.GetPlugin<ApiKeysFeature>();
-        feature.InitSchema(db);
-    });
 }
 ```
 
@@ -221,6 +223,73 @@ Users can enter their API Key by clicking on the **Key** Icon in the top right, 
 when trying to access an API Key protected Service:
 
 ![](/img/pages/auth/simple/apiexplorer-apikey-dialog.png)
+
+## API Keys and Admin Secret Credentials Auth Provider
+
+The usability of Simple Admin API Keys is greatly improved with the `ApiKeyCredentialsProvider` which enables .NET Microservices to provide persistent UserSession-like behavior for API Keys and Admin Auth Secrets to enable a Credentials Auth implementation which users can use with their API Keys or Admin AuthSecret.
+
+When registered a **Credentials** SignIn dialog will appear for [ServiceStack Built-in UIs](https://servicestack.net/auto-ui) allowing users to Sign In with their **API Keys** or Admin **Auth Secret**.
+
+![](/img/pages/auth/simple/ai-server-auth-apiexplorer.png)
+
+### Session Auth with API Keys
+
+Behind the scenes this creates a Server [Auth Session](/auth/sessions)
+but instead of maintaining an Authenticated User Session it saves the API Key in the session then attaches the API Key to each request. This makes it possible to make API Key validated requests with just a session cookie instead of requiring resubmission of API Keys for each request.
+
+### Secure .NET Microservices and Docker Appliances
+
+This is an ideal Auth Configuration for .NET Docker Appliances and Microservices like [AI Server](/posts/ai-server) that don't need the complexity of ASP .NET Core's Identity Auth machinery and just want to restrict access to their APIs with API Keys and restrict Admin functionality to Administrator's with an Auth Secret.
+
+The benefit of `ApiKeyCredentialsProvider` is that it maintains a persistent Session so that end users
+only need to enter their API Key a single time and they'll be able to navigate to all of AI Server's protected pages using their API Key maintained in their Server User Session without needing to re-enter it for each UI and every request.
+
+### User Access with API Keys
+
+AI Server uses **API Keys** to restrict Access to their AI Features to **authorized Users** with Valid API Keys who
+are able to use its Built-in UIs for its AI Features with the Users preferred Name and issued API Key:
+
+![](/img/pages/auth/simple/ai-server-auth-user.png)
+
+After signing in a single time they'll be able to navigate to any protected page and start using AI Server's AI features:
+
+![](/img/pages/auth/simple/ai-server-auth-user-chat.png)
+
+### User Access to API Explorer
+
+This also lets users use their existing Auth Session across completely different UIs
+like [API Explorer](/api-explorer)
+where they'll have the same access to APIs as they would when calling APIs programatically with their API Keys, e.g:
+
+![](/img/pages/auth/simple/ai-server-auth-apiexplorer-api.png)
+
+## Admin Access
+
+AI Server also maintains an Admin UI and Admin APIs that are only accessible to **Admin** users who 
+Authenticate with the App's configured Admin Auth Secret who are able to access AI Server's Admin
+UIs to monitor Live AI Requests, create new User API Keys, Manage registered AI Providers, etc. 
+
+![](/img/pages/auth/simple/ai-server-auth-admin-jobs.png)
+
+### Admin Restricted APIs
+
+You can restrict APIs to Admin Users by using `[ValidateAuthSecret]`: 
+
+```csharp
+[Tag(Tags.Admin)]
+[ValidateAuthSecret]
+[Api("Add an AI Provider to process AI Requests")]
+public class CreateAiProvider : ICreateDb<AiProvider>, IReturn<IdResponse>
+{
+    //...
+}
+```
+
+Which are identified in API Explorer with a **padlock** icon whilst APIs restricted by API Key are 
+identified with a **key** icon:
+
+![](/img/pages/auth/simple/ai-server-auth-apiexplorer-admin.png)
+
 
 ### Client Usage
 
