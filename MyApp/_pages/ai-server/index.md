@@ -1,128 +1,65 @@
 ---
-title: Quick Start
-description: Get AI Server up and running quickly
+title: Overview
+description: Introduction to AI Server and its key features
 ---
 
-Install AI Server by running [install.sh](https://github.com/ServiceStack/ai-server/blob/main/install.sh):
+AI Server allows you to orchestrate your systems AI requests through a single self-hosted application to control what AI Providers App's should use without impacting their client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenAI, Anthropic, Mistral AI, Google Cloud, OpenRouter, GroqCloud, Replicate, Comfy UI, utilizing models like Whisper, SDXL, Flux, and tools like FFmpeg.
 
-### 1. Clone the Repository
+```mermaid{.not-prose}
+flowchart TB
+    A[AI Server] 
+    A --> D{LLM APIs}
+    A --> C{Ollama}
+    A --> E{Media APIs}
+    A --> F{Comfy UI 
+    + 
+    FFmpeg}
+    D --> D1[OpenAI, Anthropic, Mistral, Google, OpenRouter, Groq]  
+    E --> E1[Replicate, dall-e-3, Text to speech]
+    F --> F1[Diffusion, Whisper, TTS]
+```
 
-Clone the AI Server repository from GitHub:
+## Why Use AI Server?
 
-:::sh
-git clone https://github.com/ServiceStack/ai-server
-:::
+AI Server simplifies the integration and management of AI capabilities in your applications:
 
-### 2. Run the Installer
+- **Centralized Management**: Manage your LLM, AI and Media Providers, API Keys and usage from a single App
+- **Flexibility**: Easily switch 3rd party providers without impacting your client integrations
+- **Scalability**: Distribute workloads across multiple providers to handle high volumes of requests efficiently
+- **Security**: Self-hosted private gateway to keep AI operations behind firewalls, limit access with API Keys
+- **Developer-Friendly**: Simple development experience utilizing a single client and endpoint and Type-safe APIs
+- **Manage Costs**: Monitor and control usage across your organization with detailed request history
 
-:::sh
-cd ai-server && cat install.sh | bash
-:::
+## Key Features
 
-The installer will detect common environment variables for its supported AI Providers including OpenAI, Anthropic, 
-Mistral AI, Google, etc. and prompt if you would like to include any others in your AI Server configuration.
+- **Unified AI Gateway**: Centralize all your AI requests & API Key management through a single self-hosted service
+- **Multi-Provider Support**: Seamlessly integrate with Leading LLMs, Ollama, Comfy UI, FFmpeg, and more
+- **Type-Safe Integrations**: Native end-to-end typed integrations for 11 popular programming languages
+- **Secure Access**: Use simple API key authentication to control which AI resources Apps can use
+- **Managed File Storage**: Built-in cached asset storage for AI-generated assets, isolated per API Key
+- **Background Job Processing**: Efficient handling of long-running AI tasks, capable of distributing workloads
+- **Monitoring and Analytics**: Real-time monitoring performance and statistics of executing AI Requests
+- **Recorded**: Auto archival of completed AI Requests into monthly rolling databases
+- **Custom Deployment**: Run as a single Docker container, with optional GPU-equipped agents for advanced tasks
 
-<ascii-cinema src="/pages/ai-server/ai-server-install.cast" 
-    loop="true" poster="npt:00:21" theme="dracula" rows="12" />
+## Supported AI Capabilities
 
-## Accessing AI Server
+- **Large Language Models**: Integrates with Ollama, OpenAI, Anthropic, Mistral, Google, OpenRouter and Groq
+- **Image Generation**: Leverage self-hosted ComfyUI Agents and SaaS providers like Replicate, DALL-E 3
+- **Image Transformations**: Dynamically transform and cache Image Variations for stored assets
+- **Audio Processing**: Text-to-speech, and speech-to-text with Whisper integration
+- **Video Processing**: Format conversions, scaling, cropping, and more with via FFmpeg
 
-Once the AI Server is running, you can access the Admin Portal at [http://localhost:5006/admin](http://localhost:5005/admin) to configure your AI providers and generate API keys.
-If you first ran the AI Server with configured API Keys in your `.env` file, you providers will be automatically configured for the related services.
+## Getting Started for Developers
 
-::: info
-The default password to access the Admin Portal is `p@55wOrd`. You can change this in your `.env` file by setting the `AUTH_SECRET` or providing it during the installation process.
-:::
+1. **Setup**: Follow the [Quick Start guide](/ai-server/install) to deploy AI Server.
+2. **Configuration**: Use the Admin Portal to add your AI providers and generate API keys.
+3. **Integration**: Choose your preferred language and use AI Server's type-safe APIs.
+4. **Development**: Start making API calls to AI Server from your application, leveraging the full suite of AI capabilities.
 
-You will then be able to make requests to the AI Server API endpoints, and access the Admin Portal user interface like the [Chat interface](http://localhost:5005/admin/Chat) to use your AI Provider models.
+## Learn More
 
-#### Re-install
+- Hosted Example: [openai.servicestack.net](https://openai.servicestack.net)
+- Source Code: [github.com/ServiceStack/ai-server](https://github.com/ServiceStack/ai-server)
 
-If needed you can reset the process by deleting your local `App_Data` directory and rerunning `docker compose up` or re-running the `install.sh`.
-
-### Optional - Install ComfyUI Agent
-
-If your server also has a GPU you can ask the installer to also install the [ComfyUI Agent](/ai-server/comfy-extension) locally:
-
-<ascii-cinema src="/pages/ai-server/agent-comfy-install.cast" 
-    loop="true" poster="npt:00:09" theme="dracula" rows="13" />
-
-The ComfyUI Agent is a separate Docker agent for running [ComfyUI](https://www.comfy.org), 
-[Whisper](https://github.com/openai/whisper) and [FFmpeg](https://www.ffmpeg.org) on servers with GPUs to handle 
-AI Server's [Image](/ai-server/transform/image) and 
-[Video transformations](/ai-server/transform/video) and Media Requests, including:
-
-- [Text to Image](/ai-server/text-to-image)
-- [Image to Text](/ai-server/image-to-text)
-- [Image to Image](/ai-server/image-to-image)
-- [Image with Mask](/ai-server/image-with-mask)
-- [Image Upscale](/ai-server/image-upscale)
-- [Speech to Text](/ai-server/speech-to-text)
-- [Text to Speech](/ai-server/text-to-speech)
-
-#### Comfy UI Agent Installer
-
-To install the ComfyUI Agent on a separate server (with a GPU), you can clone and run the ComfyUI Agent installer from there instead:
-
-**Clone the Comfy Agent Repo:**
-
-:::sh
-git clone https://github.com/ServiceStack/agent-comfy.git
-:::
-
-**Run the Comfy Agent Installer:***
-
-:::sh
-cd agent-comfy && cat install.sh | bash
-:::
-
-Providing your AI Server URL and Auth Secret when prompted will automatically register the ComfyUI Agent with your AI Server to handle related requests.
-
-
-You will be prompted to provide the AI Server URL and ComfyUI Agent URL during the installation.
-These should be the accessible URLs for your AI Server and ComfyUI Agent. When running locally, the ComfyUI Agent will be populated with a docker accessible path as `localhost` won't be accessible from the AI Server container.
-If you want to reset the ComfyUI Agent settings, remember to remove the provider from the AI Server Admin Portal.
-:::
-
-### Supported OS
-
-The AI Server installer is supported on Linux, macOS, and Windows with WSL2, and all require Docker and Docker Compose to be installed at a minimum.
-
-## Prerequisites 
-
-### Linux
-
-Linux requires the following software installed:
-
-- Docker Engine (with Docker Compose)
-- Git
-
-#### ComfyUI Agent
-
-To run the ComfyUI Agent locally, you will also need:
-
-- Nvidia GPU with CUDA support
-- Nvidia Container Toolkit for [Docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
-
-### macOS
-
-macOS also requires:
-
-- Docker Engine (with Docker Compose)
-
-#### ComfyUI Agent
-
-ComfyUI Agent requires Pytorch running in Docker which isn't available for macOS
-
-### Windows with WSL2
-
-Windows with WSL2 requires the following prerequisites:
-
-- Docker Engine accessible from WSL2 like [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- WSL2 with Ubuntu 20.04 LTS or later
-
-#### ComfyUI Agent
-
-To run the ComfyUI Agent locally, you will also need:
-
-- Nvidia GPU with [WSL2 CUDA support](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)
+AI Server is actively developed and continuously expanding its capabilities.
