@@ -93,6 +93,8 @@ class Migration1001 : MigrationBase
 }
 ```
 
+## Imperative Migrations
+
 In addition to being more productive and readable, it also benefits from being able to infer both schema migration and revert changes from the same declarative definition which is an alternative to using the [Modify Schema APIs](/ormlite/apis/schema.html#modify-custom-schema) to perform the same operations:
 
 ```csharp
