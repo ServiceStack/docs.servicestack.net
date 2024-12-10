@@ -43,7 +43,7 @@ any self-hosted AI Server instance, likewise the same generic client can also be
 
 ### TypeScript Example
 
-For example you can get the TypeScript DTOs for the just released [AI Server](/posts/ai-server) with:
+For example you can get the TypeScript DTOs for the just released [AI Server](/ai-server/) with:
 
 :::sh
 `npx get-dtos typescript https://openai.servicestack.net`

@@ -89,9 +89,9 @@ or Join our CreatorKit-powered Monthly Newsletter to follow and keep up to date 
 </div>
 
 As a design goal [CreatorKit's components](/creatorkit/components) will be easily embeddable into any external website,
-where it will be integrated into the [Razor SSG](/posts/razor-ssg) project template to serve as a working demonstration
+where it will be integrated into the [Razor SSG](https://servicestack.net/posts/razor-ssg) project template to serve as a working demonstration
 and reference implementation. As such it's a great option if you're looking to create a Fast, FREE, CDN hostable,
-[simple, modern](/posts/javascript) statically generated website created with Razor & Markdown
+[simple, modern](https://servicestack.net/posts/javascript) statically generated website created with Razor & Markdown
 like [ServiceStack/servicestack.net](https://github.com/ServiceStack/servicestack.net).
 
 ### Feedback welcome

@@ -239,7 +239,7 @@ but instead of maintaining an Authenticated User Session it saves the API Key in
 
 ### Secure .NET Microservices and Docker Appliances
 
-This is an ideal Auth Configuration for .NET Docker Appliances and Microservices like [AI Server](/posts/ai-server) that don't need the complexity of ASP .NET Core's Identity Auth machinery and just want to restrict access to their APIs with API Keys and restrict Admin functionality to Administrator's with an Auth Secret.
+This is an ideal Auth Configuration for .NET Docker Appliances and Microservices like [AI Server](/ai-server/) that don't need the complexity of ASP .NET Core's Identity Auth machinery and just want to restrict access to their APIs with API Keys and restrict Admin functionality to Administrator's with an Auth Secret.
 
 The benefit of `ApiKeyCredentialsProvider` is that it maintains a persistent Session so that end users
 only need to enter their API Key a single time and they'll be able to navigate to all of AI Server's protected pages using their API Key maintained in their Server User Session without needing to re-enter it for each UI and every request.

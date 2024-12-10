@@ -648,7 +648,7 @@ And since every GitHub Repository in the organization is unique, there is no con
 
 ### Cost Optimization: Using a Single Server
 
-In our previous post,[In pursuit of the best value US cloud provider](/posts/hetzner-cloud), we looked for the most cost-effective cloud provider. We found that Hetzner Cloud offers the best value for money, with a powerful server costing around $10 USD per month. This means you can deploy multiple applications on a single server, saving you money and resources.
+In our previous post,[In pursuit of the best value US cloud provider](https://servicestack.net/posts/hetzner-cloud), we looked for the most cost-effective cloud provider. We found that Hetzner Cloud offers the best value for money, with a powerful server costing around $10 USD per month. This means you can deploy multiple applications on a single server, saving you money and resources.
 
 To host lots of our demo applications, we are doing exactly this, meaning we have a per container of less than $0.50 USD per month.
 
