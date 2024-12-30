@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2024-12-10T05:32:22.9593636Z'>
+    <meta name='date' content='2024-12-30T08:18:00.5215228Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery CRUD</title>
@@ -476,6 +476,7 @@ public class MyCrudServices(IAutoQueryDb autoQuery) : Service
     public string SoftDeletedInfo { get; set; }
 }
 </code></pre>
+<h4 id="autopopulate-examples">AutoPopulate Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#autopopulate-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
 <p>We can then create a base Request DTO that all Audit Create Services will implement:</p>
 <pre><code class="language-csharp">[ValidateIsAuthenticated]
 [AutoPopulate(nameof(IAudit.CreatedDate),  Eval = &quot;utcNow&quot;)]
@@ -486,7 +487,34 @@ public class MyCrudServices(IAutoQueryDb autoQuery) : Service
 [AutoPopulate(nameof(IAudit.ModifiedInfo), Eval = &quot;`${userSession.DisplayName} (${userSession.City})`&quot;)]
 public abstract class CreateAuditBase&lt;Table,TResponse&gt; : ICreateDb&lt;Table&gt;, IReturn&lt;TResponse&gt; {}
 </code></pre>
-<p>These all call <a href="https://sharpscript.net/docs/methods">#Script Methods</a> which you can <a href="https://sharpscript.net/docs/script-pages#extend">add/extend yourself</a>.</p>
+<p>These all call <a href="https://sharpscript.net/docs/methods">#Script Methods</a> which you can <a href="https://sharpscript.net/docs/script-pages#extend">add/extend yourself</a>, e.g:</p>
+<pre><code class="language-csharp">public override void Configure()
+{
+    // Register custom script methods
+    ScriptContext.ScriptMethods.Add(new MyScripts());
+}
+
+// Custom #Script Methods, see: https://sharpscript.net/docs/methods
+public class MyScripts : ScriptMethods
+{
+    public string tenantId(ScriptScopeContext scope)
+    {
+        var req = scope.GetRequest();
+        var requestDto = req.Dto;
+        return requestDto is IHasTenantId hasTenantId
+            ? hasTenantId.TenantId // Explicitly set on Request DTO
+            : req.AbsoluteUri.RightPart(&quot;//&quot;).LeftPart('.'); //Fallback to use subdomain
+    }
+}
+
+// Populate Post.TenantId property with `tenantId` #Script Method
+[AutoPopulate(nameof(Post.TenantId), Eval = &quot;tenantId&quot;)]
+public class CreatePost : ICreatDb&lt;Post&gt;, IReturn&lt;IdResponse&gt; 
+{
+    public string Name { get; set; }
+    public string Content { get; set; }
+}
+</code></pre>
 <p>The <code>*Info</code> examples is a superfluous example showing that you can basically evaluate any <code>#Script</code> expression. Typically you'd only save User Id or Username</p>
 <h3 id="autopopulate">AutoPopulate<a class="header-anchor" href="javascript:;" onclick="location.hash='#autopopulate'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <code>[AutoPopulate]</code> attribute tells AutoCrud that you want the DB Table to automatically populate these properties, which can be populated using any of its
