@@ -288,6 +288,8 @@ public abstract class AuditBase : IAudit
 }
 ```
 
+#### AutoPopulate Examples
+
 We can then create a base Request DTO that all Audit Create Services will implement:
 
 ```csharp
@@ -300,7 +302,36 @@ We can then create a base Request DTO that all Audit Create Services will implem
 [AutoPopulate(nameof(IAudit.ModifiedInfo), Eval = "`${userSession.DisplayName} (${userSession.City})`")]
 public abstract class CreateAuditBase<Table,TResponse> : ICreateDb<Table>, IReturn<TResponse> {}
 ```
-These all call [#Script Methods](https://sharpscript.net/docs/methods) which you can [add/extend yourself](https://sharpscript.net/docs/script-pages#extend).
+These all call [#Script Methods](https://sharpscript.net/docs/methods) which you can [add/extend yourself](https://sharpscript.net/docs/script-pages#extend), e.g:
+
+```csharp
+public override void Configure()
+{
+    // Register custom script methods
+    ScriptContext.ScriptMethods.Add(new MyScripts());
+}
+
+// Custom #Script Methods, see: https://sharpscript.net/docs/methods
+public class MyScripts : ScriptMethods
+{
+    public string tenantId(ScriptScopeContext scope)
+    {
+        var req = scope.GetRequest();
+        var requestDto = req.Dto;
+        return requestDto is IHasTenantId hasTenantId
+            ? hasTenantId.TenantId // Explicitly set on Request DTO
+            : req.AbsoluteUri.RightPart("//").LeftPart('.'); //Fallback to use subdomain
+    }
+}
+
+// Populate Post.TenantId property with `tenantId` #Script Method
+[AutoPopulate(nameof(Post.TenantId), Eval = "tenantId")]
+public class CreatePost : ICreatDb<Post>, IReturn<IdResponse> 
+{
+    public string Name { get; set; }
+    public string Content { get; set; }
+}
+```
 
 The `*Info` examples is a superfluous example showing that you can basically evaluate any `#Script` expression. Typically you'd only save User Id or Username
 
