@@ -302,6 +302,9 @@ We can then create a base Request DTO that all Audit Create Services will implem
 [AutoPopulate(nameof(IAudit.ModifiedInfo), Eval = "`${userSession.DisplayName} (${userSession.City})`")]
 public abstract class CreateAuditBase<Table,TResponse> : ICreateDb<Table>, IReturn<TResponse> {}
 ```
+
+The `*Info` examples is a superfluous example showing that you can evaluate any `#Script` expression. Typically you'd only save User Id or Username.
+
 These all call [#Script Methods](https://sharpscript.net/docs/methods) which you can [add/extend yourself](https://sharpscript.net/docs/script-pages#extend), e.g:
 
 ```csharp
@@ -332,8 +335,6 @@ public class CreatePost : ICreatDb<Post>, IReturn<IdResponse>
     public string Content { get; set; }
 }
 ```
-
-The `*Info` examples is a superfluous example showing that you can basically evaluate any `#Script` expression. Typically you'd only save User Id or Username
 
 ### AutoPopulate
 
