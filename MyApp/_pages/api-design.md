@@ -797,20 +797,20 @@ Where `MyServiceRunner<T>` is just a custom class implementing the custom hooks 
 ```csharp
 public class MyServiceRunner<T> : ServiceRunner<T> 
 {
-    public override void OnBeforeExecute(IRequest req, TRequest requestDto) {
+    public override OnBeforeExecute(IRequest req, TRequest request, object service) {
       // Called just before any Action is executed
     }
 
-    public override Task<object> ExecuteAsync(IRequest req, object serviceInstance, TRequest requestDto) {
+    public override Task<object> ExecuteAsync(IRequest req, object instance, TRequest requestDto) {
         // Called to execute the Service instance with the requestDto
         return base.ExecuteAsync(req, serviceInstance, requestDto);
     }
 
-    public override object OnAfterExecute(IRequest req, object response) {
+    public override object OnAfterExecute(IRequest req, object response, object service) {
       // Called just after any Action is executed, you can modify the response returned here as well
     }
 
-    public override Task<object> HandleExceptionAsync(IRequest req, TRequest requestDto, Exception ex) {
+    public override Task<object> HandleExceptionAsync(IRequest req, TRequest requestDto, Exception ex, object instance) {
       // Called whenever an exception is thrown in your Services Action
     }
 }

@@ -405,8 +405,8 @@ public class MyServiceRunner<T> : ServiceRunner<T>
     public MyServiceRunner(IAppHost appHost, ActionContext actionContext) 
         : base(appHost, actionContext) {}
 
-    public override object HandleException(IRequest request, 
-        T request, Exception ex) {
+    public override Task<object> HandleExceptionAsync(IRequest req, TRequest requestDto, 
+        Exception ex, object service) {
       // Called whenever an exception is thrown in your Services Action
     }
 }
