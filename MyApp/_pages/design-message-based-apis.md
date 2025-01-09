@@ -261,17 +261,25 @@ public class BookingsService : Service
 ## Error Handling and Validation
 
 For info on how to add validation you either have the option to just [throw C# exceptions](/error-handling#throwing-c-exceptions) 
-and apply your own customizations to them. You also have the option to use the built-in [Fluent Validation](/validation) 
-but you don't need to inject them into your service as they can all be registered with a single line in your AppHost, e.g:
+and apply your own customizations to them, in addition you also have the option to use the built-in 
+[Declarative Validator](/declarative-validation) attributes on your Request DTO:
 
 ```csharp
-container.RegisterValidators(typeof(CreateBookingValidator).Assembly);
+[ValidateIsAuthenticated]
+public class CreateBooking : IPost, IReturn<CreateBookingResponse>
+{
+    [ValidateNotNull]
+    public DateTime? StartDate { get; set; }
+
+    [ValidateGreatorThan(0)]
+    public int ShiftId { get; set; }
+
+    [ValidateGreatorThan(0)]
+    public int Limit { get; set; }
+}
 ```
 
-Validators are no-touch and invasive free meaning you can add them using a layered approach and maintain them without 
-modifying the service implementation or DTO classes. Since they require an extra class We'd only use them on operations 
-with side-effects e.g. **POST** or **PUT**, as **GET** requests tend to have minimal validation so throwing C# Exceptions 
-typically requires less boilerplate. Here's an example of a validator you could have when creating a Booking:
+Or for more control you can use custom [Fluent Validation](/validation) validators. Validators are no-touch and invasive free meaning you can add them using a layered approach and maintain them without modifying the service implementation or DTO classes. Since they require an extra class We'd only use them on operations with side-effects e.g. **POST** or **PUT**, as **GET** requests tend to have minimal validation so throwing C# Exceptions typically requires less boilerplate. Here's an example of a validator you could have when creating a Booking:
 
 ```csharp
 public class CreateBookingValidator : AbstractValidator<CreateBooking>
