@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-01-03T14:11:10.4892359Z'>
+    <meta name='date' content='2025-01-09T07:39:41.9035766Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Design Message-based APIs</title>
@@ -1600,14 +1600,22 @@ public class BookingsService : Service
 </code></pre>
 <h2 id="error-handling-and-validation">Error Handling and Validation<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling-and-validation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>For info on how to add validation you either have the option to just <a href="/error-handling#throwing-c-exceptions">throw C# exceptions</a>
-and apply your own customizations to them. You also have the option to use the built-in <a href="/validation">Fluent Validation</a>
-but you don't need to inject them into your service as they can all be registered with a single line in your AppHost, e.g:</p>
-<pre><code class="language-csharp">container.RegisterValidators(typeof(CreateBookingValidator).Assembly);
+and apply your own customizations to them, in addition you also have the option to use the built-in
+<a href="/declarative-validation">Declarative Validator</a> attributes on your Request DTO:</p>
+<pre><code class="language-csharp">[ValidateIsAuthenticated]
+public class CreateBooking : IPost, IReturn&lt;CreateBookingResponse&gt;
+{
+    [ValidateNotNull]
+    public DateTime? StartDate { get; set; }
+
+    [ValidateGreatorThan(0)]
+    public int ShiftId { get; set; }
+
+    [ValidateGreatorThan(0)]
+    public int Limit { get; set; }
+}
 </code></pre>
-<p>Validators are no-touch and invasive free meaning you can add them using a layered approach and maintain them without
-modifying the service implementation or DTO classes. Since they require an extra class We'd only use them on operations
-with side-effects e.g. <strong>POST</strong> or <strong>PUT</strong>, as <strong>GET</strong> requests tend to have minimal validation so throwing C# Exceptions
-typically requires less boilerplate. Here's an example of a validator you could have when creating a Booking:</p>
+<p>Or for more control you can use custom <a href="/validation">Fluent Validation</a> validators. Validators are no-touch and invasive free meaning you can add them using a layered approach and maintain them without modifying the service implementation or DTO classes. Since they require an extra class We'd only use them on operations with side-effects e.g. <strong>POST</strong> or <strong>PUT</strong>, as <strong>GET</strong> requests tend to have minimal validation so throwing C# Exceptions typically requires less boilerplate. Here's an example of a validator you could have when creating a Booking:</p>
 <pre><code class="language-csharp">public class CreateBookingValidator : AbstractValidator&lt;CreateBooking&gt;
 {
     public CreateBookingValidator()
