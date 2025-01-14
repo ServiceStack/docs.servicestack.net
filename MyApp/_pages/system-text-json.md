@@ -13,6 +13,26 @@ app.UseServiceStack(new AppHost(), options => {
 });
 ```
 
+### Configure System.Text.Json APIs
+
+You can configure when to use System.Text.Json for APIs when registering to use Endpoint Routing:
+
+```csharp
+app.UseServiceStack(new AppHost(), options => {
+    // Use for Serialization and Deserialization of JSON APIs (default)
+    options.MapEndpoints(useSystemJson:UseSystemJson.Always);
+
+    // Use only for deserializing API Requests
+    options.MapEndpoints(useSystemJson:UseSystemJson.Request);
+
+    // Use only for serializing API Responses
+    options.MapEndpoints(useSystemJson:UseSystemJson.Response);
+
+    // Don't use System.Text.Json for APIs
+    options.MapEndpoints(useSystemJson:UseSystemJson.Never);
+});
+```
+
 ### Enhanced System.Text.Json
 
 To improve compatibility with existing ServiceStack DTOs using ServiceStack.Text [JSON Serializer](/json-format) and
