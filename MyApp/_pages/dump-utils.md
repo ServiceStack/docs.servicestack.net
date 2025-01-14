@@ -27,7 +27,7 @@ $"Top Technologies: {response.TopTechnologies.Dump()}".Print();
 
 ## Example Usage
 
-After importing the **ServiceStack.Text** namespace you can view the values of all fields as seen in [the following example](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/Utils/JsvFormatterTests.cs):
+After importing the **ServiceStack.Text** namespace you can view the values of all fields as seen in [the following example](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/Utils/JsvFormatterTests.cs):
 
 ```csharp
 var model = new TestModel();

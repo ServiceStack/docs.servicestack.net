@@ -19,7 +19,7 @@ that allows for maximum re-use that can leverage an integrated
 for the creation of loosely-coupled 
 [Modularized Service](/modularizing-services) Architectures.
 ServiceStack Services are consumable via an array of built-in fast data formats (inc. 
-[JSON](https://github.com/ServiceStack/ServiceStack.Text), 
+[JSON](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text), 
 XML,
 [CSV](/csv-format),
 [JSONL](/jsonl-format),
@@ -30,7 +30,7 @@ as well as XSD/WSDL for [SOAP endpoints](/soap-support) and
 [Rabbit MQ](/rabbit-mq), 
 [Redis MQ](/redis-mq),
 [Azure Service Bus](/azure-service-bus-mq),
-[Amazon SQS](https://github.com/ServiceStack/ServiceStack.Aws#sqsmqserver) and
+[Amazon SQS](/aws#sqsmqserver) and
 [Background MQ](/background-mq),
 MQ hosts. 
 
@@ -420,7 +420,7 @@ ServiceStack re-uses the custom artifacts above and with zero-config and without
 burden on the developer adds discoverability and provides hosting of your web service on a number 
 of different formats, including: 
  
- - [JSON](https://github.com/ServiceStack/ServiceStack.Text/)
+ - [JSON]/json-format)
  - XML
  - [JSV](/jsv-format)
  - [CSV](/csv-format)

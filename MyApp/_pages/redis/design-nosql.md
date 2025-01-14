@@ -106,7 +106,7 @@ In identifying my entities I have a general preference for 'automated ids' which
 sequential integer ids or Guids - if the entities are going to be distributed across multiple data stores.
 
 Apart from that persisting an object is just a straight forward process of serializing the object graph into a text-serialization format.
-By default, the Redis Client uses [Service Stack's JsonSerializer](https://github.com/ServiceStack/ServiceStack.Text) as it's the fastest and JSON Serializer for .NET.
+By default, the Redis Client uses [Service Stack's JsonSerializer](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text) as it's the fastest and JSON Serializer for .NET.
 
 ```csharp
 //Retrieve strongly-typed Redis clients that let's you natively persist POCO's

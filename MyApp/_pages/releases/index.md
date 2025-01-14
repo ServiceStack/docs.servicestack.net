@@ -1168,7 +1168,7 @@ The VFS providers and extension methods in `ServiceStack.Common` use the same `S
 
 ## ServiceStack.Azure
 
-We've added deeper integration with Azure with [ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure) - a new project containing Azure backed managed implementations for popular ServiceStack providers (as we've done with [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws)):
+We've added deeper integration with Azure with [ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure) - a new project containing Azure backed managed implementations for popular ServiceStack providers (as we've done with [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws)):
 
  - `ServiceBusMqServer` - [MQ Server](/messaging) for invoking ServiceStack Services via Azure ServiceBus
  - `AzureBlobVirtualFiles` - [Virtual File System](/virtual-file-system) provider using Azure Blob Storage

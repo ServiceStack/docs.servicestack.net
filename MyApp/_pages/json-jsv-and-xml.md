@@ -4,7 +4,7 @@ title: JSON, JSV & XML Formats
 ---
 
 ServiceStack supports of course the most-used two webservices formats: XML and JSON. 
-By default, the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text) 
+By default, the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text) 
 serializer is used for JSON. 
 
 ServiceStack also provides a format called JSV:

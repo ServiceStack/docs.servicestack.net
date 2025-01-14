@@ -57,11 +57,11 @@ references the latest modular AWSSDK **v3.1x** dependencies **.NET 4.5+** projec
 This **ServiceStack.Aws** NuGet package includes implementations for the following ServiceStack providers:
 
   - **[PocoDynamo](/aws-pocodynamo)** - Declarative, code-first POCO client for DynamoDB with LINQ support
-  - **[SqsMqServer](https://github.com/ServiceStack/ServiceStack.Aws#sqsmqserver)** - [MQ Server](/messaging) for invoking ServiceStack Services via Amazon SQS MQ Service
-  - **[S3VirtualFiles](https://github.com/ServiceStack/ServiceStack.Aws#s3virtualfiles)** - A read/write [Virtual FileSystem](/virtual-file-system) around Amazon's S3 Simple Storage Service
-  - **[DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack.Aws#dynamodbauthrepository)** - A [UserAuth repository](/auth/authentication-and-authorization) storing UserAuth info in DynamoDB
-  - **[DynamoDbAppSettings](https://github.com/ServiceStack/ServiceStack.Aws#dynamodbappsettings)** - An [AppSettings provider](/appsettings) storing App configuration in DynamoDB
-  - **[DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack.Aws#dynamodbcacheclient)** - A [Caching Provider](/caching) for DynamoDB
+  - **[SqsMqServer](/aws#sqsmqserver)** - [MQ Server](/messaging) for invoking ServiceStack Services via Amazon SQS MQ Service
+  - **[S3VirtualFiles](/aws#s3virtualfiles)** - A read/write [Virtual FileSystem](/virtual-file-system) around Amazon's S3 Simple Storage Service
+  - **[DynamoDbAuthRepository](/aws#dynamodbauthrepository)** - A [UserAuth repository](/auth/authentication-and-authorization) storing UserAuth info in DynamoDB
+  - **[DynamoDbAppSettings](/aws#dynamodbappsettings)** - An [AppSettings provider](/appsettings) storing App configuration in DynamoDB
+  - **[DynamoDbCacheClient](/aws#managed-dynamodb-client)** - A [Caching Provider](/caching) for DynamoDB
 
 ## [AWS Live Examples](https://github.com/ServiceStackApps/AwsApps)
 
@@ -603,23 +603,23 @@ and PocoDynamo will only make the minimum number of requests required to fetch t
 
 ## PocoDynamo Examples
 
-### [DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
+### [DynamoDbCacheClient](/aws#managed-dynamodb-client)
 
 We've been quick to benefit from the productivity advantages of PocoDynamo ourselves where we've used it to rewrite
-[DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
+[DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
 which is now just 2/3 the size and much easier to maintain than the existing 
 [Community-contributed version](https://github.com/ServiceStack/ServiceStack/blob/22aca105d39997a8ea4c9dc20b242f78e07f36e0/src/ServiceStack.Caching.AwsDynamoDb/DynamoDbCacheClient.cs)
 whilst at the same time extending it with even more functionality where it now implements the `ICacheClientExtended` API.
 
-### [DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
+### [DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
 
-PocoDynamo's code-first Typed API made it much easier to implement value-added DynamoDB functionality like the new
-[DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
+PocoDynamo's code-first Typed API made it much easier to implement value-added DynamoDB functionality like the 
+[DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
 which due sharing a similar code-first POCO approach to OrmLite, ended up being a straight-forward port of the existing
 [OrmLiteAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Server/Auth/OrmLiteAuthRepository.cs)
 where it was able to reuse the existing `UserAuth` and `UserAuthDetails` POCO data models.
 
-### [DynamoDbTests](https://github.com/ServiceStack/ServiceStack.Aws/tree/master/tests/ServiceStack.Aws.DynamoDbTests)
+### [DynamoDbTests](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws/tests/ServiceStack.Aws.DynamoDbTests)
 
 Despite its young age we've added a comprehensive test suite behind PocoDynamo which has become our exclusive client
 for developing DynamoDB-powered Apps.

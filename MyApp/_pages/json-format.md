@@ -2,7 +2,7 @@
 title: JSON Format
 ---
 
-[ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text) is an **independent, dependency-free** serialization library containing ServiceStack's core high-performance utils and text processing functionality, including its premier support for JSON.
+[ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text) is an **independent, dependency-free** serialization library containing ServiceStack's core high-performance utils and text processing functionality, including its premier support for JSON.
 
 ### Try out [ServiceStack.Text Live](https://gist.cafe/c71b3f0123b3d9d08c1b11c98c2ff379)
 
@@ -61,13 +61,13 @@ JsonArrayObjects.Parse()
 Although usually used to (de)serialize C#/.NET POCO types, it also includes a flexible API allowing you to deserialize any 
 JSON payload without it's concrete type, see these real-world examples:
 
-  - [Parsing GitHub's v3 API with typed DTOs](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/GithubV3ApiTests.cs)
-  - [Parsing GitHub's JSON response](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/GitHubRestTests.cs)
-  - [Parsing Google Maps JSON Response](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/GMapDirectionsTests.cs)
-  - [Parsing Centroid](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/CentroidTests.cs)
+  - [Parsing GitHub's v3 API with typed DTOs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/GithubV3ApiTests.cs)
+  - [Parsing GitHub's JSON response](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/GitHubRestTests.cs)
+  - [Parsing Google Maps JSON Response](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/GMapDirectionsTests.cs)
+  - [Parsing Centroid](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/CentroidTests.cs)
 
 Also a thin **.NET 4.0 Dynamic JSON** wrapper around ServiceStack's JSON library is included in the 
-[ServiceStack.Razor](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/Pcl.Dynamic.cs) 
+[ServiceStack.Razor](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/Pcl.Dynamic.cs) 
 project. It provides a dynamic, but more succinct API than the above options.
 
 ### JS Utils
@@ -545,13 +545,13 @@ Because the same wire format shared between Dictionaries, POCOs and anonymous ty
 
 Although the JSON Serializer is best optimized for serializing and deserializing .NET types, it's flexible enough to consume 3rd party JSON apis although this generally requires custom de-serialization to convert it into an idiomatic .NET type.
 
-[GitHubRestTests.cs](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/GitHubRestTests.cs)
+[GitHubRestTests.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/GitHubRestTests.cs)
 
-  1. Using [JsonObject](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/JsonObject.cs)
+  1. Using [JsonObject](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/JsonObject.cs)
   2. Using Generic .NET Collection classes
   3. Using Customized DTO's in the shape of the 3rd party JSON response
 
-[CentroidTests](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/UseCases/CentroidTests.cs) is another example that uses the JsonObject to parse a complex custom JSON response. 
+[CentroidTests](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/UseCases/CentroidTests.cs) is another example that uses the JsonObject to parse a complex custom JSON response. 
 
 ## Late-bound Object and Interface Runtime Types
 

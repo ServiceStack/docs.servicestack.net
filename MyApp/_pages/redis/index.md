@@ -30,7 +30,7 @@ With each client providing different layers of abstraction:
 
 * The RedisNativeClient exposes raw `byte[]` apis and does no marshalling and passes all values directly to redis.
 * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
-* The RedisTypedClient provides a generic interface allowing you to add POCO values. POCOs are serialized using [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text) which is then converted to UTF8 bytes and sent to Redis.
+* The RedisTypedClient provides a generic interface allowing you to add POCO values. POCOs are serialized using [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text) which is then converted to UTF8 bytes and sent to Redis.
 
 ## API Overview
 

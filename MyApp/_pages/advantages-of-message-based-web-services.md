@@ -125,7 +125,7 @@ This is illustrated in this example between the [different style of services tha
 Since it promotes clean, re-usable code, ServiceStack has always encouraged the use of code-first [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object)'s for just about everything. i.e. the same POCO can be used: 
 
   - In Request and Response DTO's (on client and server) 
-  - In [JSON, JSV and CSV Text Serializers](https://github.com/ServiceStack/ServiceStack.Text)
+  - In [JSON, JSV and CSV Text Serializers](/formats)
   - As the data model in [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite), [db4o](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.Db4oProvider) and [NHibernate](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.NHibernateProvider%253Fstate%253Dclosed)
   - As the entities stored in [Redis](https://github.com/ServiceStack/ServiceStack.Redis)
   - As blobs stored in [Caches](/caching) and [Sessions](/auth/sessions)
@@ -205,7 +205,7 @@ ServiceStack's JSON & JSV serializers are **case-insensitive** (i.e. supports bo
 JsConfig.Init(Config { TextCase = TextCase.CamelCase });
 ```
 
-They're both [very resilient and can withstand extreme versioning without error](./redis/schemaless-migration.md) making it easy to consume [3rd party APIs](https://github.com/ServiceStack/ServiceStack.Text/tree/master/tests/ServiceStack.Text.Tests/UseCases)
+They're both [very resilient and can withstand extreme versioning without error](./redis/schemaless-migration.md) making it easy to consume 3rd party APIs.
 
 ### Your services can be consumed by more than just HTTP
 

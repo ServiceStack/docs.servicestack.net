@@ -7,7 +7,7 @@ The JSON Responses for all ServiceStack Services can be configured Globally, ind
 
 ## Global Default JSON Configuration
 
-ServiceStack uses the [ServiceStack.Text Serializers](https://github.com/ServiceStack/ServiceStack.Text) for its built-in JSON/JSV and CSV serialization. The serialization can be customized globally by configuring the `JsConfig` or type-specific `JsConfig<T>` static classes with your preferred defaults, e.g:
+ServiceStack uses the [ServiceStack.Text Serializers](/formats) for its built-in JSON/JSV and CSV serialization. The serialization can be customized globally by configuring the `JsConfig` or type-specific `JsConfig<T>` static classes with your preferred defaults, e.g:
 
 ```csharp
 public override void Configure(Container container)
@@ -218,5 +218,5 @@ As it's using [JS Utils](/js-utils) it can also accept JavaScript object literal
 #### Avoid unknown Types in ServiceContracts
 
 Whilst this feature enables some flexibility by effectively poking a hole in your Service Contract as a placeholder for any arbitrary JS data structure, we still recommend only using `object` properties sparingly when it's needed as it only works with JSON/JSV Services, is subject to 
-[security restrictions](https://github.com/ServiceStack/ServiceStack.Text#late-bound-object-and-interface-runtime-types), 
+[security restrictions](/json-format#late-bound-object-and-interface-runtime-types), 
 can't be documented in Metadata Services and isn't supported in most [Add ServiceStack Reference](/add-servicestack-reference) languages.

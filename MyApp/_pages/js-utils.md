@@ -3,7 +3,7 @@ slug: js-utils
 title: JavaScript Utils
 ---
 
-The ServiceStack.Text JSON Serializers are only designed for serializing Typed POCOs, but you can still use it to [deserialize dynamic JSON](https://github.com/ServiceStack/ServiceStack.Text#supports-dynamic-json) but you'd need to specify the Type to deserialize into on the call-site otherwise the value would be returned as a string.
+The ServiceStack.Text JSON Serializers are only designed for serializing Typed POCOs, but you can still use it to [deserialize dynamic JSON](/json-format#supports-dynamic-json) but you'd need to specify the Type to deserialize into on the call-site otherwise the value would be returned as a string.
 
 A more flexible approach to read any arbitrary JavaScript or JSON data structures is to use the high-performance and memory efficient JSON utils in [#Script](https://sharpscript.net) implementation of JavaScript.
 

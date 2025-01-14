@@ -5,7 +5,7 @@ title: Virtual File System
 
 In order to access physical files in view engines from multiple sources, ServiceStack includes its own pluggable virtual file system API that lets it support multiple filesystem backends. 
 
-The virtual file system (VFS) is what allows ServiceStack to support view engines in a standard ASP.NET websites (e.g. serving directories from the root directory) as well in self-hosting stand-alone HttpListener websites and Windows Services serving from the output `/bin` directory as well as embedded resources inside .dlls, [in memory filesystems](/html-css-and-javascript-minification#minify-static-js-css-and-html-files) populated at runtime, [remote datastores like AWS S3](https://github.com/ServiceStack/ServiceStack.Aws#S3VirtualFiles), or in a [remote Azure Blob Storage](https://github.com/ServiceStack/ServiceStack.Azure) or any combination of either.
+The virtual file system (VFS) is what allows ServiceStack to support view engines in a standard ASP.NET websites (e.g. serving directories from the root directory) as well in self-hosting stand-alone HttpListener websites and Windows Services serving from the output `/bin` directory as well as embedded resources inside .dlls, [in memory filesystems](/html-css-and-javascript-minification#minify-static-js-css-and-html-files) populated at runtime, [remote datastores like AWS S3](/aws#s3virtualfiles), or in a [remote Azure Blob Storage](https://github.com/ServiceStack/ServiceStack.Azure) or any combination of either.
 
 ## Virtual File Systems Available
 
@@ -347,7 +347,7 @@ The new `IVirtualFiles` API is available in local FileSystem, In Memory, Gists a
  - `MemoryVirtualFiles`
 
 All `IVirtualFiles` providers share the same 
-[VirtualPathProviderTests](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/tests/ServiceStack.Aws.Tests/S3/VirtualPathProviderTests.cs)
+[VirtualPathProviderTests](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/tests/ServiceStack.Aws.Tests/S3/VirtualPathProviderTests.cs)
 ensuring a consistent behavior where it's now possible to swap between different file storage backends with simple
 configuration as seen in the [Imgur](https://github.com/ServiceStackApps/AwsApps/tree/master/src/AwsApps/imgur) and 
 [REST Files](https://github.com/ServiceStackApps/AwsApps/tree/master/src/AwsApps/restfiles) examples.
@@ -416,8 +416,8 @@ filesystem at your host project's root directory.
 
 ### Examples
 
- - [AWS RazorRockstars](https://github.com/ServiceStack/ServiceStack.Aws#maintain-website-content-in-s3) - Serving all Razor Views and Markdown Content from a S3 bucket
- - [AWS Imgur and REST Files](https://github.com/ServiceStack/ServiceStack.Aws#aws-imgur) - 1 line configuration switch between saving files to local files or S3 Bucket
+ - [AWS RazorRockstars](/aws#maintain-website-content-in-s3) - Serving all Razor Views and Markdown Content from a S3 bucket
+ - [AWS Imgur and REST Files](/aws#aws-imgur) - 1 line configuration switch between saving files to local files or S3 Bucket
 
 ### [ServiceStack.Gap](https://github.com/ServiceStack/ServiceStack.Gap)
 

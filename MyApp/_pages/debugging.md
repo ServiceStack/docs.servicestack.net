@@ -31,11 +31,10 @@ In order to get the best source-based development experience using the latest ve
 Repos you want to use:
 
  - [ServiceStack/ServiceStack](https://github.com/ServiceStack/ServiceStack)
- - [ServiceStack/ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text)
- - [ServiceStack/ServiceStack.Redis](https://github.com/ServiceStack/ServiceStack.Text)
- - [ServiceStack/ServiceStack.OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
- - [ServiceStack/ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws)
- - [ServiceStack/ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure)
+ - [ServiceStack/ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text)
+ - [ServiceStack/ServiceStack.OrmLite](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite)
+ - [ServiceStack/ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws)
+ - [ServiceStack/ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Azure)
 
 Then reference the `*.Source.csproj` of each project you want to reference in your solution. 
 

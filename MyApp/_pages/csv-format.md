@@ -14,7 +14,7 @@ The CSV Serializer used was developed using the same tech that makes [ServiceSta
 
 ### Downloadable Separately
 
-The `CsvSerializer` is maintained in the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text) project which can be downloaded from NuGet at:
+The `CsvSerializer` is maintained in the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text) project which can be downloaded from NuGet at:
 
 :::copy
 `<PackageReference Include="ServiceStack.Text" Version="8.*" />`

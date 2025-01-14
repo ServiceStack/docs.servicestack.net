@@ -871,7 +871,7 @@ Pre request filters are called before deserialization (i. e. before ServiceStack
 
 Significant contributions have also been made on ServiceStack's sub projects: 
 
-  - [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text)
+  - [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text)
   - [ServiceStack.Redis](https://github.com/ServiceStack/ServiceStack.Redis) and the built-in [Redis MQ Server](/redis-mq)
   - [ServiceStack.OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
 
@@ -1374,7 +1374,7 @@ Note: This feature is **automatically** added to all **Abstract/Interface/Object
 
 ## Other features/fixes:
 
-  - Added JSON/JSV custom serialization behaviour injection of BCL value types in e.g: [JsConfig](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/JsConfig.cs#L16)
+  - Added JSON/JSV custom serialization behaviour injection of BCL value types in e.g: [JsConfig](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/JsConfig.cs#L16)
   - Serialization errors now return 400 status code
   - Add option to propagate errors instead of being sent in the response [Tymek Majewski](https://github.com/letssellsomebananas)
   - Added UserAgent to IHttpRequest type
@@ -1601,7 +1601,7 @@ As a result of the change to the deployment dlls where previously ServiceStack.d
 
 To help visualize the dependencies between the various components, here is a tree showing which dependencies each project has:
 
-  * [ServiceStack.Text.dll](https://github.com/ServiceStack/ServiceStack.Text)
+  * [ServiceStack.Text.dll](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text)
   * [ServiceStack.Interfaces.dll](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Interfaces)
 
       * [ServiceStack.Common.dll](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack.Common)

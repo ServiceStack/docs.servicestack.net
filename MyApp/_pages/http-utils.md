@@ -30,7 +30,7 @@ var response = url.GetJsonFromUrl(requestFilter:req => req.With(c => c.UserAgent
 var response = await url.GetJsonFromUrlAsync(requestFilter:req => req.With(c => c.UserAgent = UserAgent));
 ```
 
-Which lets you configure a [HttpRequestConfig](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/HttpRequestConfig.cs) that is equally applied to their `HttpClient` and `HttpWebRequest` implementations. 
+Which lets you configure a [HttpRequestConfig](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/HttpRequestConfig.cs) that is equally applied to their `HttpClient` and `HttpWebRequest` implementations. 
 
 It also includes `Set*` methods to simplify common tasks like creating Authenticated Requests, e.g:
 
@@ -42,7 +42,7 @@ var json = await url.GetJsonFromUrlAsync(requestFilter: req =>
     }), token: token).ConfigAwait();
 ```
 
-The full [HttpRequestConfig](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/HttpRequestConfig.cs) API available in this release include:
+The full [HttpRequestConfig](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/HttpRequestConfig.cs) API available in this release include:
 
 ```csharp
 public class HttpRequestConfig 
@@ -426,13 +426,13 @@ using (new HttpResultsFilter {
 }
 ```
 
-See the [HttpUtilsMockTests.cs](https://github.com/ServiceStack/ServiceStack.Text/blob/master/tests/ServiceStack.Text.Tests/HttpUtilsMockTests.cs) for more examples showing how the HTTP Apis can be mocked.
+See the [HttpUtilsMockTests.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/tests/ServiceStack.Text.Tests/HttpUtilsMockTests.cs) for more examples showing how the HTTP Apis can be mocked.
 
 ## HTTP API Reference
 
 The above description should give you a good idea of how to make use of the APIs, although for a more complete reference we'll post the full signatures here.
 
-Most of the APIs are located in the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/HttpUtils.cs) namespace:
+Most of the APIs are located in the [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/HttpUtils.cs) namespace:
 
 ```csharp
 string GetJsonFromUrl(this string url, Action<HttpWebRequest> requestFilter=null,

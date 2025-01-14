@@ -5,7 +5,7 @@ title: Content Types
 
 ServiceStack supports the following formats:
 
-- [JSON](https://github.com/ServiceStack/ServiceStack.Text)
+- [JSON](json-format)
 - [XML](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.datacontractserializer)
 - [CSV](/csv-format)
 - [JSONL](/jsonl-format)

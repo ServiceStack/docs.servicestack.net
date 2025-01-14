@@ -996,7 +996,7 @@ str.LastRightPart(':') == str.SplitOnLast(':').Last()
 
 ### TypeConstants
 
-We've switched to using the new [TypeConstants](https://github.com/ServiceStack/ServiceStack.Text/blob/master/src/ServiceStack.Text/TypeConstants.cs) which holds static instances of many popular empty collections and `Task<T>` results which you can reuse instead of creating new instances:
+We've switched to using the new [TypeConstants](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/src/ServiceStack.Text/TypeConstants.cs) which holds static instances of many popular empty collections and `Task<T>` results which you can reuse instead of creating new instances:
 
 ```csharp
 TypeConstants.EmptyStringArray == new string[0];

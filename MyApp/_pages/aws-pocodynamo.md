@@ -160,9 +160,9 @@ var db = new PocoDynamo(awsDb);
 Clients are Thread-Safe so you can register them as a singleton and share the same instance throughout your App
 :::
 
-### [Source Code](https://github.com/ServiceStack/ServiceStack.Aws/tree/master/src/ServiceStack.Aws/DynamoDb)
+### [Source Code](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb)
 
-The Source Code for PocoDynamo is maintained in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack.Aws/) repository.
+The Source Code for PocoDynamo is maintained in [ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws) repository.
 
 ### Download Local DynamoDB
 
@@ -399,7 +399,7 @@ public interface ISequenceSource : IRequiresSchema
 #### DynamoDbSequenceGenerator
 
 The default implementation uses 
-[DynamoDbSequenceGenerator](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbSequenceGenerator.cs)
+[DynamoDbSequenceGenerator](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbSequenceGenerator.cs)
 which stores sequences for each table in the `Seq` DynamoDB Table so no additional services are required. To ensure
 unique incrementing sequences in DynamoDB, PocoDynamo uses UpdateItemRequest's `AttributeValueUpdate` feature to perform
 atomic value updates. PocoDynamo sequences are also very efficient and only require a single DynamoDB call to populate a 
@@ -830,7 +830,7 @@ db.InitSchema();
 
 `InitSchema()` will also wait until the tables have been created so they're immediately accessible afterwards. 
 As creating DynamoDB tables can take upwards of a minute in AWS you can use the 
-[alternative Async APIs](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/IPocoDynamoAsync.cs)
+[alternative Async APIs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/IPocoDynamoAsync.cs)
 if you wanted to continue to doing other stuff whilst the tables are being created in AWS, e.g:
 
 ```csharp
@@ -1533,23 +1533,23 @@ public class Table
 
 ## Examples
 
-### [DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
+### [DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
 
 We've been quick to benefit from the productivity advantages of PocoDynamo ourselves where we've used it to rewrite
-[DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
+[DynamoDbCacheClient](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbCacheClient.cs)
 which is now just 2/3 the size and much easier to maintain than the existing 
 [Community-contributed version](https://github.com/ServiceStack/ServiceStack/blob/22aca105d39997a8ea4c9dc20b242f78e07f36e0/src/ServiceStack.Caching.AwsDynamoDb/DynamoDbCacheClient.cs)
 whilst at the same time extending it with even more functionality where it now implements the `ICacheClientExtended` API.
 
-### [DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
+### [DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
 
 PocoDynamo's code-first Typed API made it much easier to implement value-added DynamoDB functionality like the new
-[DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
+[DynamoDbAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/DynamoDbAuthRepository.cs)
 which due sharing a similar code-first POCO approach to OrmLite, ended up being a straight-forward port of the existing
 [OrmLiteAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Server/Auth/OrmLiteAuthRepository.cs)
 where it was able to reuse the existing `UserAuth` and `UserAuthDetails` data models.
 
-### [DynamoDbTests](https://github.com/ServiceStack/ServiceStack.Aws/tree/master/tests/ServiceStack.Aws.DynamoDbTests)
+### [DynamoDbTests](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws/tests/ServiceStack.Aws.DynamoDbTests)
 
 Despite its young age we've added a comprehensive test suite behind PocoDynamo which has become our exclusive client
 for developing DynamoDB-powered Apps.
@@ -1736,7 +1736,7 @@ public interface IPocoDynamoAsync
 ### PocoDynamo Extension helpers
 
 To maintain a minimumal surface area for PocoDynamo, many additional API's used to provide a more DRY typed API's were moved into
-[PocoDynamoExtensions](https://github.com/ServiceStack/ServiceStack.Aws/blob/master/src/ServiceStack.Aws/DynamoDb/PocoDynamoExtensions.cs)
+[PocoDynamoExtensions](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Aws/src/ServiceStack.Aws/DynamoDb/PocoDynamoExtensions.cs)
 
 ```csharp
 class PocoDynamoExtensions
