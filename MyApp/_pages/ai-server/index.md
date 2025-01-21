@@ -52,10 +52,10 @@ AI Server simplifies the integration and management of AI capabilities in your a
 
 ## Getting Started for Developers
 
-1. **Setup**: Follow the [Quick Start guide](/ai-server/install) to deploy AI Server.
-2. **Configuration**: Use the Admin Portal to add your AI providers and generate API keys.
-3. **Integration**: Choose your preferred language and use AI Server's type-safe APIs.
-4. **Development**: Start making API calls to AI Server from your application, leveraging the full suite of AI capabilities.
+1. **Setup**: Follow the [Quick Start guide](/ai-server/quickstart) to deploy AI Server
+2. **Configuration**: Use the Admin Portal to add your AI providers and generate API keys
+3. **Integration**: Choose your preferred language and use AI Server's type-safe APIs
+4. **Development**: Start making API calls to AI Server from your application, leveraging the full suite of AI capabilities
 
 ## Learn More
 
