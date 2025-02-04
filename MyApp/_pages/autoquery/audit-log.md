@@ -27,11 +27,25 @@ provider which will let you persist your events in any data store, but typically
 the same RDBMS that the AutoCrud requests are already writing to, e.g:
 
 ```csharp
-container.AddSingleton<ICrudEvents>(c =>
-    new OrmLiteCrudEvents(c.Resolve<IDbConnectionFactory>()) {
-        // NamedConnections = { SystemDatabases.Reporting }
-    });
-container.Resolve<ICrudEvents>().InitSchema();
+public class ConfigureAutoQuery : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices(services => {
+            // Enable Audit History
+            services.AddSingleton<ICrudEvents>(c =>
+                new OrmLiteCrudEvents(c.GetRequiredService<IDbConnectionFactory>()) {
+                    // NamedConnections = { SystemDatabases.Reporting }
+                });
+           
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                //IncludeTotal = true,
+            });
+        })
+        .ConfigureAppHost(appHost => {
+            appHost.Resolve<ICrudEvents>().InitSchema();
+        });
+}
 ```
 
 If you’re using Multitenancy features or multiple RDBMS’s in your AutoCrud DTOs you can add them to NamedConnections where 
