@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-01-23T08:06:42.1255031Z'>
+    <meta name='date' content='2025-02-04T09:58:34.9208966Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery CRUD Executable Audit Log</title>
@@ -262,11 +262,25 @@ This feature doesn’t require any additional dev overhead as your AutoCrud Requ
 <p>To enable this feature you just need to register an <a href="https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Server/CrudEvents.cs">ICrudEvents</a>
 provider which will let you persist your events in any data store, but typically you’d use OrmLiteCrudEvents to persist it in
 the same RDBMS that the AutoCrud requests are already writing to, e.g:</p>
-<pre><code class="language-csharp">container.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
-    new OrmLiteCrudEvents(c.Resolve&lt;IDbConnectionFactory&gt;()) {
-        // NamedConnections = { SystemDatabases.Reporting }
-    });
-container.Resolve&lt;ICrudEvents&gt;().InitSchema();
+<pre><code class="language-csharp">public class ConfigureAutoQuery : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices(services =&gt; {
+            // Enable Audit History
+            services.AddSingleton&lt;ICrudEvents&gt;(c =&gt;
+                new OrmLiteCrudEvents(c.GetRequiredService&lt;IDbConnectionFactory&gt;()) {
+                    // NamedConnections = { SystemDatabases.Reporting }
+                });
+           
+            services.AddPlugin(new AutoQueryFeature {
+                MaxLimit = 1000,
+                //IncludeTotal = true,
+            });
+        })
+        .ConfigureAppHost(appHost =&gt; {
+            appHost.Resolve&lt;ICrudEvents&gt;().InitSchema();
+        });
+}
 </code></pre>
 <p>If you’re using Multitenancy features or multiple RDBMS’s in your AutoCrud DTOs you can add them to NamedConnections where
 it will create an CrudEvent table in each of the RDBMS’s used.</p>
