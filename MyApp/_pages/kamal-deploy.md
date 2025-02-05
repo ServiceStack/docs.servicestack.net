@@ -39,9 +39,9 @@ x new blazor-vue MyApp
 ssh-keygen -t ed25519 -C "deploy@myapp" -f ./deploy-key
 ```
 
-3. Configure server access:
+3. Copy public key to enable server access:
 ```bash
-cat ~/my-deploy-key.pub | ssh <user>@<your-ip-address> "cat >> ~/.ssh/authorized_keys"
+cat ~/deploy-key.pub | ssh <user>@<your-ip> "cat >> ~/.ssh/authorized_keys"
 ```
 
 ### GitHub Actions
@@ -51,7 +51,7 @@ The template includes a GitHub Actions workflow that is broken up into 3 steps t
 Once you create your GitHub repository, add the `SSH_PRIVATE_KEY` secret to your repository settings with the contents of your private key file.
 
 ```bash
-gh secret set PRIVATE_SSH_KEY < ~/my-deploy-key
+gh secret set PRIVATE_SSH_KEY < ~/deploy-key
 ```
 
 ### Configuration
@@ -127,8 +127,6 @@ Delete the `.<app-name>` file in your deployment user's home directory and re-ru
 
 If you are getting:
 
-```
-Image ghcr.io/netcoreapps/northwindauto:latest is missing the 'service' label
-```
+  Image ghcr.io/netcoreapps/northwindauto:latest is missing the 'service' label
 
 Ensure that your AppHost csproj file has `ContainerLabel` with the value matching the `service` in your `deploy.yml` file.
