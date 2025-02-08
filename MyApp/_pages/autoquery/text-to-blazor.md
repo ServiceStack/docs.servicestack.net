@@ -22,7 +22,7 @@ Whilst the result is a working CRUD App, the approach taken is very different fr
 which uses AI to generate the entire App that ends up with a whole new code-base developers didn't write
 which they'd now need to maintain.
 
-Instead AI is only used to generate the initial Data Models within a **TypeScript Declaration file** 
+Instead AI is only used to **generate the initial Data Models** within a **TypeScript Declaration file** 
 which we've found is the best format supported by AI models that's also the best typed DSL for defining
 data models with minimal syntax that's easy for humans to read and write.
 
@@ -41,9 +41,7 @@ generated Blazor Vue CRUD App:
 
 ### Blazor Vue App
 
-**UI + Admin** - Creates a new [blazor-vue](https://blazor-vue.web-templates.io) template that's ideal 
-for Internet or public facing Apps, sporting a full-featured public facing UI for a Web App's 
-users whilst enabling a back-office CRUD UI for Admin Users to manage their App's data.
+**UI + Admin** - Creates a new [blazor-vue](https://blazor-vue.web-templates.io) template, ideal for Internet or public facing Apps which sports a full-featured content rich UI for a Web App's users whilst providing a back-office Admin UI for Admin Users to manage the App's data.
 
 ![](/img/pages/okai/okai-blazor-vue.webp)
 

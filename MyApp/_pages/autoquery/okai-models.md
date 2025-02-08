@@ -4,7 +4,7 @@ title: Generate CRUD APIs + UI
 
 ## AI powered Rapid App Development Workflow
 
-The `okai` npm tool works similar to the online [Text to Blazor App](/autoquery/text-to-blazor) generator
+The `okai` npm tool works similar to the online [Text to Blazor App](https://servicestack.net/text-to-blazor) creator
 except it's a local tool that can add additional functionality to an existing project:
 
 <ascii-cinema src="/img/pages/okai/okai-prompt-jobs.cast"
@@ -22,11 +22,11 @@ selected feature which you'll see after selecting the LLM Data Models you want t
 ```sh
 Selected 'deepseek-r1:70b' data models
 
-Saved: /home/mythz/src/MyApp/MyApp.ServiceModel/Jobs.d.ts
-Saved: /home/mythz/src/MyApp/MyApp.ServiceModel/Jobs.cs
-Saved: /home/mythz/src/MyApp/wwwroot/admin/sections/Jobs.mjs
-Saved: /home/mythz/src/MyApp/wwwroot/admin/sections/index.mjs
-Saved: /home/mythz/src/MyApp/Migrations/Migration1001.cs
+Saved: /projects/MyApp/MyApp.ServiceModel/Jobs.d.ts
+Saved: /projects/MyApp/MyApp.ServiceModel/Jobs.cs
+Saved: /projects/MyApp/wwwroot/admin/sections/Jobs.mjs
+Saved: /projects/MyApp/wwwroot/admin/sections/index.mjs
+Saved: /projects/MyApp/Migrations/Migration1001.cs
 
 Run 'dotnet run --AppTasks=migrate' to apply new migration and create tables
 
@@ -328,7 +328,7 @@ Which will regenerate its:
 - DB Migration: [MyApp/Migrations/Migration1000.cs](https://github.com/NetCoreTemplates/blazor-admin/blob/main/MyApp/Migrations/Migration1000.cs)
 - Admin UI: [/wwwroot/admin/sections/Bookings.mjs](https://github.com/NetCoreTemplates/blazor-admin/blob/main/MyApp/wwwroot/admin/sections/Bookings.mjs)
 
-What files will be generated is controlled in the `Config` section: 
+What files will be generated is controlled by its `Config` section: 
 
 ```ts
 export type Config = {
@@ -342,7 +342,7 @@ export type Config = {
 So if you no longer want the code regeneration to update the DB Migration for it, you can just remove it
 from the Config.
 
-## Customize Data Models
+## Rerunning Code Generation
 
 The data models defined in the TypeScript Declaration file e.g. `Bookings.d.ts` is what drives the
 generation of the Data Models, APIs, DB Migrations and Admin UIs.
@@ -419,7 +419,7 @@ export class Booking extends AuditBase {
 }
 ```
  
-Which uses the `DateOnly` and `decimal` .NET Types to generate:
+Which uses the `DateOnly` and `decimal` .NET Types in its code generation:
 
 ```csharp
 public class Booking : AuditBase

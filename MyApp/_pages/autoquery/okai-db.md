@@ -1,5 +1,5 @@
 ---
-title: Generate CRUD APIs and UIs from existing DBs
+title: Generate CRUD APIs and UIs for existing DBs
 ---
 
 A core piece of functionality in the [Text to Blazor CRUD App](/autoquery/text-to-blazor) feature is distilling an AI Prompt into TypeScript classes that can be [further customized](/autoquery/okai-models#customize-data-models)
