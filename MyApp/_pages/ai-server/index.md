@@ -5,19 +5,7 @@ description: Introduction to AI Server and its key features
 
 AI Server allows you to orchestrate your systems AI requests through a single self-hosted application to control what AI Providers App's should use without impacting their client integrations. It serves as a private gateway to process LLM, AI, and image transformation requests, dynamically delegating tasks across multiple providers including Ollama, OpenAI, Anthropic, Mistral AI, Google Cloud, OpenRouter, GroqCloud, Replicate, Comfy UI, utilizing models like Whisper, SDXL, Flux, and tools like FFmpeg.
 
-```mermaid{.not-prose}
-flowchart TB
-    A[AI Server] 
-    A --> D{LLM APIs}
-    A --> C{Ollama}
-    A --> E{Media APIs}
-    A --> F{Comfy UI 
-    + 
-    FFmpeg}
-    D --> D1[OpenAI, Anthropic, Mistral, Google, OpenRouter, Groq]  
-    E --> E1[Replicate, dall-e-3, Text to speech]
-    F --> F1[Diffusion, Whisper, TTS]
-```
+[![](/img/pages/ai-server/overview.svg)](https://openai.servicestack.net)
 
 ## Why Use AI Server?
 
