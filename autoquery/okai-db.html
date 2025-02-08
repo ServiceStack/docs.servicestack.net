@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2025-02-08T06:16:01.0074277Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Generate CRUD APIs and UIs from existing DBs</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <link rel="stylesheet" href="/css/app.css">
+    
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white dark:bg-black opacity-90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-indigo-500 text-gray-900">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+                        <a href="/locode/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            Locode
+                        </a>
+                        <a href="/grpc/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200 hidden lg:inline-flex">
+                            gRPC
+                        </a>
+                        <a href="/ai-server/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AI Server
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+                    <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Locode
+                    </a>
+                    <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        gRPC
+                    </a>
+                    <a href="/ai-server/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AI Server
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-16 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/autoquery/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+AutoQuery                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/autoquery/rdbms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery RDBMS
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/data" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/memory" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Memory
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/service" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data Service
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/dynamodb" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Data DynamoDB
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery CRUD
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/audit-log" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery Audit Log
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/autogen" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/bookings-crud" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoQuery CRUD Bookings Demo
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/autoquery/why-not-odata" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Why Not OData
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Generate CRUD APIs and UIs from existing DBs
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p>A core piece of functionality in the <a href="/autoquery/text-to-blazor">Text to Blazor CRUD App</a> feature is distilling an AI Prompt into TypeScript classes that can be <a href="/autoquery/okai-models#customize-data-models">further customized</a>
+to generate AutoQuery CRUD APIs and Admin UIs for managing the underlying RDBMS tables.</p>
+<h2 id="typescript-data-models">TypeScript Data Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-data-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Using TypeScript is an effortless way to define data models, offering a DSL-like minimal boilerplate format that's human-friendly to read and write which can leverage TypeScript's powerful Type System is validated against the referenced <a href="https://okai.servicestack.com/api.d.ts">api.d.ts</a> schema to provide a rich authoring experience
+with strong typing and intellisense - containing all the C# Types, interfaces, and attributes used in defining APIs, DTOs and Data Models.</p>
+<h3 id="blueprint-for-code-generation">Blueprint for Code Generation<a class="header-anchor" href="javascript:;" onclick="location.hash='#blueprint-for-code-generation'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The TypeScript Data Models serve as the blueprint for generating everything needed to support the feature
+in your App, including the AutoQuery <strong>CRUD APIs</strong>, <strong>Admin UIs</strong> and <strong>DB Migrations</strong> that can re-create the necessary tables from scratch.</p>
+<h2 id="generate-rdbms-metadata">1. Generate RDBMS Metadata<a class="header-anchor" href="javascript:;" onclick="location.hash='#generate-rdbms-metadata'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The first step in generating TypeScript Data Models is to capture the metadata from the existing RDBMS tables which
+we can do with the <code>App.json</code> <a href="https://docs.servicestack.net/app-tasks">AppTask</a> below which uses your App's configured
+RDBMS connection to generate the Table Definitions for all tables in the specified RDBMS connection and schema
+to the file of your choice (e.g <code>App_Data/App.json</code>):</p>
+<pre><code class="language-csharp">AppTasks.Register(&quot;App.json&quot;, args =&gt;
+  appHost.VirtualFiles.WriteFile(&quot;App_Data/App.json&quot;,ClientConfig.ToSystemJson(
+      migrator.DbFactory.GetTables(namedConnection:null, schema:null))));
+</code></pre>
+<p>This task can then be run from the command line with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>dotnet run --AppTasks=App.json</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Which generates <code>App_Data/App.json</code> containing the table definition metadata for all tables in
+the specified RDBMS, e.g:</p>
+<pre><code class="language-json">[
+  {
+    &quot;name&quot;: &quot;AspNetUserClaims&quot;,
+    &quot;columns&quot;: [
+      {
+        &quot;columnName&quot;: &quot;Id&quot;,
+        &quot;columnOrdinal&quot;: 0,
+        &quot;columnSize&quot;: -1,
+        &quot;numericPrecision&quot;: 0,
+        &quot;numericScale&quot;: 0,
+        &quot;isUnique&quot;: true,
+        &quot;isKey&quot;: true,
+        &quot;baseCatalogName&quot;: &quot;techstacks&quot;,
+        &quot;baseColumnName&quot;: &quot;Id&quot;,
+        &quot;baseSchemaName&quot;: &quot;public&quot;,
+        &quot;baseTableName&quot;: &quot;AspNetUserClaims&quot;,
+        &quot;dataType&quot;: &quot;System.Int32&quot;,
+        &quot;allowDBNull&quot;: false,
+        &quot;providerType&quot;: 9,
+        &quot;isAliased&quot;: false,
+        &quot;isExpression&quot;: false,
+        &quot;isAutoIncrement&quot;: true,
+        &quot;isRowVersion&quot;: false,
+        &quot;isHidden&quot;: false,
+        &quot;isLong&quot;: false,
+        &quot;isReadOnly&quot;: false,
+        &quot;dataTypeName&quot;: &quot;integer&quot;,
+        &quot;columnDefinition&quot;: &quot;INTEGER PRIMARY KEY AUTOINCREMENT&quot;
+      },
+    ],
+  ...
+]
+</code></pre>
+<h3 id="different-connection-or-db-schema">Different Connection or DB Schema<a class="header-anchor" href="javascript:;" onclick="location.hash='#different-connection-or-db-schema'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you prefer to generate the metadata for a different connection or schema, you can create a new AppTask
+with your preferred <code>namedConnection</code> and/or <code>schema</code>, e.g:</p>
+<pre><code class="language-csharp">AppTasks.Register(&quot;Sales.json&quot;, args =&gt;
+  appHost.VirtualFiles.WriteFile(&quot;Sales.json&quot;, ClientConfig.ToSystemJson(
+    migrator.DbFactory.GetTables(namedConnection:&quot;reports&quot;,schema:&quot;sales&quot;))));
+</code></pre>
+<p>That you could then generate with:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>dotnet run --AppTasks=Sales.json</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h2 id="generate-typescript-data-models">2. Generate TypeScript Data Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#generate-typescript-data-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The next step is to generate TypeScript Data Models from the captured metadata which can be done with the <code>okai</code> tool
+by running the <code>convert</code> command with the path to the <code>App.json</code> JSON table definitions which will generate the
+TypeScript Data Models to stdout which can be redirected to a file in your <strong>ServiceModel</strong> project, e.g:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npx okai convert App_Data/App.json &gt; ../MyApp.ServiceModel/App.d.ts</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<h2 id="generate-crud-apis-and-admin-uis">3. Generate CRUD APIs and Admin UIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#generate-crud-apis-and-admin-uis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The data models defined in the <code>App.d.ts</code> TypeScript Declaration file is what drives the generation of the Data Models, APIs, DB Migrations and Admin UIs. This can be further customized by editing the TypeScript Declaration file and re-running the <code>okai</code> tool with just the filename, e.g:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npx okai App.d.ts</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<p>Which will re-generate the Data Models, APIs, DB Migrations and Admin UIs based on the updated Data Models.</p>
+<p><img src="/img/posts/okai-models/npx-okai-App.png" alt="" /></p>
+<div class="tip custom-block">
+            <p class="custom-block-title">TIP</p><p>You only need to specify the <code>App.d.ts</code> TypeScript filename (i.e. not the filepath) from
+anywhere within your .NET solution</p>
+</div>
+<h2 id="live-code-generation">Live Code Generation<a class="header-anchor" href="javascript:;" onclick="location.hash='#live-code-generation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>If you'd prefer to see the generated code in real-time you can add the <code>--watch</code> flag to watch the
+TypeScript Declaration file for changes and automatically re-generate the generated files on Save:</p>
+<div class="not-prose sh-copy cp flex cursor-pointer mb-3" onclick="copy(this)">
+                <div class="flex-grow bg-gray-800">
+                    <div class="pl-4 py-1 pb-1.5 align-middle whitespace-pre text-base text-gray-100"><p>npx okai App.d.ts --watch</p>
+</div>
+                    </div>
+                <div class="flex">
+                    <div class="bg-green-600 text-white p-1.5 pb-0">
+                        <svg class="copied w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="nocopy w-6 h-6" title="copy" fill='none' stroke='white' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2'></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+<video autoplay="autoplay" loop="loop" controls>
+    <source src="https://media.servicestack.com/videos/okai-watch.mp4" type="video/mp4">
+</video>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/autoquery/okai-db.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#typescript-data-models'" data-id="typescript-data-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            TypeScript Data Models
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="blueprint-for-code-generation" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#blueprint-for-code-generation'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Blueprint for Code Generation
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#generate-rdbms-metadata'" data-id="generate-rdbms-metadata" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            1. Generate RDBMS Metadata
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="different-connection-or-db-schema" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#different-connection-or-db-schema'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Different Connection or DB Schema
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#generate-typescript-data-models'" data-id="generate-typescript-data-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            2. Generate TypeScript Data Models
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#generate-crud-apis-and-admin-uis'" data-id="generate-crud-apis-and-admin-uis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            3. Generate CRUD APIs and Admin UIs
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#live-code-generation'" data-id="live-code-generation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Live Code Generation
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
