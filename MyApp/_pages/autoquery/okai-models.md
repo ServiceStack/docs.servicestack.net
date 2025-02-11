@@ -13,7 +13,7 @@ except it's a local tool that can add additional functionality to an existing pr
 The syntax for adding a new feature to your ServiceStack App is `npx okai <prompt>`, e.g:
 
 :::sh
-npx okai "The type of App you would like to create"
+npx okai "The kind of Feature you would like to add"
 :::
 
 Where it will generate the Data Models, AutoQuery CRUD APIs, DB Migrations and Admin UI for the 

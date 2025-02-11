@@ -6,6 +6,10 @@ title: Free LLM Chat Prompts
 
 As part of the development of [okai](/autoquery/okai-models) for generating [Blazor CRUD Apps from a text prompt](/autoquery/text-to-blazor) using your preferred AI Models, we've also made available a generic **chat** prompt that can be used as a convenient way to conduct personal research against many of the worlds most popular Large Language Models - for Free!
 
+:::{.px-8}
+![](/img/pages/okai/okai-chat.webp)
+:::
+
 You can just start immediately using the `npx okai chat` script to ask LLMs for assistance:
 
 :::sh

@@ -109,7 +109,7 @@ npx okai App.d.ts
 
 Which will re-generate the Data Models, APIs, DB Migrations and Admin UIs based on the updated Data Models.
 
-![](/img/posts/okai-models/npx-okai-App.png)
+![](/img/pages/okai/npx-okai-App.png)
 
 :::tip
 You only need to specify the `App.d.ts` TypeScript filename (i.e. not the filepath) from
