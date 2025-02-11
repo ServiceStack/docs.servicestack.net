@@ -70,7 +70,7 @@ Using AutoQuery CRUD UI in a Text to Blazor App
 The TypeScript Data Models enable a rapid development experience for defining an App's Data Models which are used
 to generate the necessary AutoQuery CRUD APIs to support an Admin UI. 
 
-An example of the producitivity of this approach is the effortless support for maintaining a detailed audit history for changes to select tables by inheriting from the `AuditBase` base class, e.g:
+An example of the productivity of this approach is the effortless support for maintaining a detailed audit history for changes to select tables by inheriting from the `AuditBase` base class, e.g:
 
 ```ts
 export class Job extends AuditBase {
