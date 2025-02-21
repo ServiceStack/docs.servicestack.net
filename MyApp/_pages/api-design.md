@@ -1,6 +1,6 @@
 ---
 slug: api-design
-title: ServiceStack’s API design
+title: ServiceStack API design
 ---
 
 The primary difference between developing RPC vs ServiceStack's [Message-based Services](/what-is-a-message-based-web-service) is that the Services entire contract
