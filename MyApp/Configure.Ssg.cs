@@ -52,6 +52,7 @@ public class ConfigureSsg : IHostingStartup
                 pages.LoadFrom("_pages");
                 videos.LoadFrom("_videos");
                 AppConfig.Instance.GitPagesBaseUrl ??= ResolveGitBlobBaseUrl(appHost.ContentRootDirectory);
+                AppConfig.Instance.GitPagesRawBaseUrl ??= ResolveGitRawBlobBaseUrl(appHost.ContentRootDirectory);
             },
             afterAppHostInit: appHost =>
             {
@@ -95,14 +96,34 @@ public class ConfigureSsg : IHostingStartup
         }
         return null;
     }
+    
+    private string? ResolveGitRawBlobBaseUrl(IVirtualDirectory contentDir)
+    {
+        var srcDir = new DirectoryInfo(contentDir.RealPath);
+        var gitConfig = new FileInfo(Path.Combine(srcDir.Parent!.FullName, ".git", "config"));
+        if (gitConfig.Exists)
+        {
+            var txt = gitConfig.ReadAllText();
+            var pos = txt.IndexOf("url = ", StringComparison.Ordinal);
+            if (pos >= 0)
+            {
+                var url = txt[(pos + "url = ".Length)..].LeftPart(".git").LeftPart('\n').Trim();
+                var gitBaseUrl = url.Replace("github.com","raw.githubusercontent.com").CombineWith($"refs/heads/main/{srcDir.Name}");
+                return gitBaseUrl;
+            }
+        }
+        return null;
+    }
 }
 
 public class AppConfig
 {
     public static AppConfig Instance { get; } = new();
+    public string Title { get; set; }
     public string LocalBaseUrl { get; set; }
     public string PublicBaseUrl { get; set; }
     public string? GitPagesBaseUrl { get; set; }
+    public string? GitPagesRawBaseUrl { get; set; }
 }
 
 // Add additional frontmatter info to include
