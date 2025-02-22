@@ -4,6 +4,7 @@ title: Text to Blazor CRUD App
 
 [Text to Blazor](https://servicestack.net/text-to-blazor) lets you rapidly generate new Blazor Admin CRUD Apps from just a text description.
 
+<lite-youtube class="max-w-7xl aspect-video" videoid="Bd283EYJKxM" style="background-image: url('https://img.youtube.com/vi/Bd283EYJKxM/maxresdefault.jpg')"></lite-youtube>
 
 [![](/img/pages/okai/text-to-blazor-prompt.webp)](https://servicestack.net/text-to-blazor)
 
