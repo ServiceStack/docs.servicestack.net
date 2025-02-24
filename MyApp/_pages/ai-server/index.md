@@ -7,6 +7,10 @@ AI Server allows you to orchestrate your systems AI requests through a single se
 
 [![](/img/pages/ai-server/overview.svg)](https://openai.servicestack.net)
 
+:::youtube Ojo80oFQte8
+Self Hosted AI Server gateway for LLM APIs, Ollama, ComfyUI & FFmpeg servers
+:::
+
 ## Why Use AI Server?
 
 AI Server simplifies the integration and management of AI capabilities in your applications:

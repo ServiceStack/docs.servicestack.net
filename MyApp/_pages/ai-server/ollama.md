@@ -4,6 +4,10 @@ title: Self-hosted AI Providers with Ollama
 
 Ollama can be used as an AI Provider type to process LLM requests in AI Server.
 
+:::youtube S1Xw0iQLa2c
+Using Ollama with AI Server
+:::
+
 ## Setting up Ollama
 
 When using Ollama as an AI Provider, you will need to ensure the models you want to use are available in your Ollama instance.
