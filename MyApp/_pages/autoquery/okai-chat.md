@@ -46,7 +46,7 @@ b) okai -models codestral,llama3.3,flash <prompt>
 c) okai -m flash chat <prompt>
 
 FREE MODELS:
-claude-3-haiku            (alias hakiu)
+claude-3-haiku            (alias haiku)
 codestral:22b             (alias codestral)
 deepseek-r1:32b
 deepseek-r1:70b
