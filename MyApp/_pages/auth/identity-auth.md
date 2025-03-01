@@ -135,7 +135,7 @@ public class ConfigureAuth : IHostingStartup
             appHost.Plugins.Add(new AuthFeature(IdentityAuth.For<ApplicationUser>(
                 // Configure ServiceStack's Integration with Identity Auth
                 options => {
-                    options.SessionFactory = () => new CustomUserSession();
+                    // options.SessionFactory = () => new CustomUserSession(); //optional
                     options.CredentialsAuth();
                 })
             ));

@@ -41,7 +41,7 @@ public class ConfigureAuth : IHostingStartup
         .ConfigureServices(services => {
             services.AddPlugin(new AuthFeature(IdentityAuth.For<ApplicationUser>(
                 options => {
-                    options.SessionFactory = () => new CustomUserSession();
+                    // options.SessionFactory = () => new CustomUserSession(); //optional
                     options.CredentialsAuth();
                     options.JwtAuth(x => {
                         // Enable JWT Auth Features...
