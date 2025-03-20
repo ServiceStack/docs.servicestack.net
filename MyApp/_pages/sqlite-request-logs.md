@@ -98,3 +98,30 @@ As SQLite Requests Logs also makes it efficiently possible to sort and filter th
 Logging UI will switch to using a fully queryable `AutoQueryGrid` when using `SqliteRequestLogger`:
 
 ![](/img/pages/sqlite/sqlite-request-logs.webp)
+
+## Export to CSV
+
+When needed you can export your Request Logs to CSV for easy import into external systems using SQLite's
+`sqlite3` utility, e.g:
+
+:::sh
+sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > output.csv 
+:::
+
+### Custom Exports
+
+For more complex queries, you can also use the `.mode csv` and `.output` commands within the SQLite shell:
+
+:::sh
+sqlite3 requests_<YYYY>-<MM>.db
+:::
+
+Then set export parameters before running the query and exiting:
+
+```sql
+.headers on
+.mode csv
+.output output.csv
+SELECT * FROM RequestLog;
+.quit
+```
