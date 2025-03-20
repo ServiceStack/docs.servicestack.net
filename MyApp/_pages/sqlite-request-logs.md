@@ -105,7 +105,7 @@ When needed you can export your Request Logs to CSV for easy import into externa
 `sqlite3` utility, e.g:
 
 :::sh
-`sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > output.csv `
+`sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > output.csv`
 :::
 
 ### Custom Exports
