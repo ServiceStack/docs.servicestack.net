@@ -112,6 +112,15 @@ ConfigurePlugin<PredefinedRoutesFeature>(feature => feature.JsonApiRoute = null)
 
 You can unset the base path to revert back to using the older `/json/reply/{Request}` pre-defined route, e.g:
 
+#### C# JsonApiClient
+
+```csharp
+client.UseBasePath = "/json/reply/";
+
+// Globally for all JsonApiClient instances
+JsonApiClient.DefaultBasePath = "/json/reply/";
+```
+
 #### JavaScript/TypeScript
 
 ```ts
