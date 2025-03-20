@@ -105,7 +105,7 @@ When needed you can export your Request Logs to CSV for easy import into externa
 `sqlite3` utility, e.g:
 
 :::sh
-sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > output.csv 
+`sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > output.csv `
 :::
 
 ### Custom Exports
@@ -113,7 +113,7 @@ sqlite3 -header -csv requests_<YYYY>-<MM>.db  "SELECT * FROM RequestLog" > outpu
 For more complex queries, you can also use the `.mode csv` and `.output` commands within the SQLite shell:
 
 :::sh
-sqlite3 requests_<YYYY>-<MM>.db
+`sqlite3 requests_<YYYY>-<MM>.db`
 :::
 
 Then set export parameters before running the query and exiting:
