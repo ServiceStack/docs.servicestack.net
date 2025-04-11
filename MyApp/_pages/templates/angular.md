@@ -31,7 +31,7 @@ The default Angular SPA Template can be downloaded below:
     </project-template>
 </project-creator>
 
-Alternatively you can download a custom template from the [Start Page](/start).
+Alternatively you can download a custom template from the [Start Page](https://servicestack.net/start).
 
 The source code for the template is maintained at [NetCoreTemplates/angular-spa](https://github.com/NetCoreTemplates/angular-spa)
 whilst an online live-demo is available from: [angular-spa.web-templates.io](https://angular-spa.web-templates.io)
@@ -254,8 +254,7 @@ export class BookingListComponent implements OnInit {
 }
 ```
 
-Using `provideApiState()` implicitly injects the populated API context containing both the APIs Loading and Error into
-child components saving you from explicitly specifying it in each component.
+Using `provideApiState()` implicitly injects the populated API context containing both the APIs Loading and Error state into child components saving you from having to explicitly inject it into each component.
 
 E.g. the `<form-loading>` component will display when API Requests are in-flight whilst API Error Responses are displayed
 after receiving failed API Responses:

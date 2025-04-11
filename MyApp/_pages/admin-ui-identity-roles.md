@@ -27,7 +27,7 @@ services.AddPlugin(
 
 ### IdentityAuth Role Claims
 
-The Edit Role Admin UI can also be configured to Add/Remove Claims to a Role, e.g:
+The Edit Role Admin UI also supports Adding and Remove Claims for a Role, e.g:
 
 ![](/img/pages/admin-ui/identityauth-role-claims.webp)
 

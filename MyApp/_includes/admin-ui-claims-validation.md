@@ -25,8 +25,8 @@ It will generate that Error Response instead:
 <error-summary :status="{message:`'todos:write' Permission Required`}"></error-summary>
 :::
 
-Which is a good example showing how `HasClaimValidator.ClaimErrorMessages` can be used to add custom error messages
-for your own custom claim validation. 
+This is a good example for how to use `HasClaimValidator.ClaimErrorMessages` to add custom error messages
+for your own custom claim validations.
 
 ### Inspecting Claims inside Services
 

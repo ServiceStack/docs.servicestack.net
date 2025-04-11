@@ -2,7 +2,7 @@
 title: Admin UI Analytics
 ---
 
-Comprehensive API Analytics is available to all ServiceStack Apps configured with [SQLite Request Logging[(/sqlite-request-logs).
+Comprehensive API Analytics is available to all ServiceStack Apps configured with [SQLite Request Logging](/sqlite-request-logs).
 
 ### Benefits of API Analytics
 
@@ -15,21 +15,19 @@ IPs where most traffic generates:
 - **Troubleshooting:** Aids in quickly identifying trends, anomalies, or specific endpoints related to issues.
 - **Resource Planning:** Understanding usage patterns helps in scaling infrastructure appropriately.
 - **Security Insight:** Identifying bot traffic and unusual request patterns can be an early indicator of security concerns.
+- **Interactive Analytics:** Analytics are also interactive where you're able to drill down to monitor the activity of individual APIs, Users, API Keys and IPs with links back to the request logs which the summary analytics are derived from.
 
-### Interactive Analytics
+### Getting Started
 
-Analytics are also interactive where you're able to drill down to monitor the activity of individual APIs, Users, API Keys 
-and IPs which have further links back to the request logs which the summary analytics are derived from.
-
-As they offer significant and valuable insights they're now built into all ASP.NET Core IdentityAuth templates, 
+As they offer significant and valuable insights they're now built into all new ASP.NET Core IdentityAuth templates, 
 existing .NET 8 IdentityAuth templates can enable it with: 
 
 :::sh
 x mix sqlitelogs
 :::
 
-.NET 8 Templates that are not configured to use [Endpoint Routing[(/endpoint-routing)
-and [ASP.NET Core IOC[(/net-ioc) will need to explicitly register `SqliteRequestLogger`
+.NET 8 Templates that are not configured to use [Endpoint Routing](/endpoint-routing)
+and [ASP.NET Core IOC](/net-ioc) will need to explicitly register `SqliteRequestLogger`
 as a singleton dependency in addition to configuring it on the `RequestLogsFeature` plugin:
 
 ```csharp
@@ -56,17 +54,23 @@ public class ConfigureRequestLogs : IHostingStartup
 }
 ```
 
-This will enable a more feature rich Request Logging Admin UI which utilizes the full queryability of an AutoQueryGrid
-to filter, sort and export Request Logs. 
+## Analytics Admin UI
+
+Once configured, [SQLite Request Logs](/sqlite-request-logs) enable a more feature rich Request Logging Admin UI which utilizes the full queryability of an AutoQueryGrid to filter, sort and export Request Logs. 
 
 [![](/img/pages/admin-ui/sqlitelogs.webp)](/img/pages/admin-ui/sqlitelogs.webp)
 
+### Rolling Monthly Request Logs
+
+Benefits of using SQLite includes removing load from your App's primary database and being able to create naturally scalable and isolated Monthly databases on-the-fly which allow requests to be easily archived into managed file storage instead of a singular growing database.
+
 ## Analytics Overview
 
-Utilizing an `SqliteRequestLogger` will also enable the new **Analytics** Admin UI in the sidebar which initially
-displays the API Analytics Dashboard:
+It also enables the new **Analytics** Admin UI in the sidebar which initially displays the API Analytics overview Dashboard:
 
 [![](/img/pages/admin-ui/analytics-apis1.webp)](/img/pages/admin-ui/analytics-apis1.webp)
+
+Different charts displayed on the dashboard include:
 
 ### Distribution Pie Charts
 
@@ -229,3 +233,78 @@ bar chart to view its individual analytics made from that IP Address.
 Provides comprehensive IP Address analytics Similar to User Analytics but limited to the API Usage from a single IP Address:
 
 [![](/img/pages/admin-ui/analytics-ip.webp)](/img/pages/admin-ui/analytics-ip.webp)
+
+## Blocking User Agents
+
+The insights from the Analytics showed us that our [pvq.app](https://pvq.app) was experiencing significant load from
+AI bots and scrapers which was the primary cause of its high resource usage and detrimental load times for normal
+user requests, so much so we've intervened to prevent these bots from scraping our site.
+
+### Disallowing Bots in robots.txt
+
+In an ideal world you would just need to instruct problematic bots not to scrape your site by adding them to [pvq.app/robots.txt](https://pvq.app/robots.txt), e.g:
+
+```txt
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+
+User-agent: bytespider
+Disallow: /
+User-agent: gptbot
+Disallow: /
+User-agent: claudebot
+Disallow: /
+User-agent: amazonbot
+Disallow: /
+User-agent: mj12bot
+Disallow: /
+User-agent: semrushbot
+Disallow: /
+User-agent: dotbot
+Disallow: /
+User-agent: WhatsApp Bot
+Disallow: /
+User-agent: *
+Disallow: /
+```
+
+### Disallowing Bot Requests
+
+As this was not having an immediate effect we took a more forceful approach to implement a middleware to reject all
+requests from disallowed bots from accessing our App which you can add to your own App with:
+
+:::sh
+x mix useragent-blocking
+:::
+
+This will allow you to configure which Bot User Agents you want to reject from accessing your site, e.g:
+
+```csharp
+services.Configure<UserAgentBlockingOptions>(options =>
+{
+    // Add user agents to block
+    options.BlockedUserAgents.AddRange([
+        "bytespider",
+        "gptbot",
+        "gptbot",
+        "claudebot",
+        "amazonbot",
+        "imagesiftbot",
+        "semrushbot",
+        "dotbot",
+        "semrushbot",
+        "dataforseobot",
+        "WhatsApp Bot",
+        "HeadlessChrome",
+        "PetalBot",
+    ]);
+    
+    // Optional: Customize the response status code
+    // options.BlockedStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    // Optional: Customize the blocked message
+    options.BlockedMessage = "This bot is not allowed to access our website";
+});
+```
