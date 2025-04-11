@@ -8,6 +8,8 @@ import VueComponentGallery from "./components/VueComponentGallery.mjs"
 import VueComponentLibrary from "./components/VueComponentLibrary.mjs"
 import { PagingNav, FileLayout } from './components/Docs.mjs'
 import Typesense from "./components/Typesense.mjs"
+import ProjectTemplate from "./components/ProjectTemplate.mjs"
+import ProjectCreator from "./components/ProjectCreator.mjs"
 
 let client = null, Apps = []
 let AppData = {
@@ -53,6 +55,8 @@ const Components = {
     PagingNav,
     FileLayout,
     Typesense,
+    ProjectTemplate,
+    ProjectCreator,
 }
 const CustomElements = [
     'lite-youtube'
