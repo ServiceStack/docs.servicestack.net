@@ -162,3 +162,12 @@ feature.OnBeforeDeleteUser = (request, userId) => { ... };
 feature.OnAfterDeleteUser  = (request, userId) => { ... };
 ```
 
+### IdentityAuth User Claims
+
+The User Claim Management UI can be used to assign Claims to individual Users: 
+
+![](/img/pages/admin-ui/identityauth-user-claims.webp)
+
+## Validating Claims
+
+::include admin-ui-claims-validation.md::
