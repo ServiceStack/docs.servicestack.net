@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-04-11T06:19:13.1300261Z'>
+    <meta name='date' content='2025-04-11T15:39:09.9013494Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Image to Text</title>
@@ -342,6 +342,13 @@ Transform                                    </span>
 </ul>
 
 </div></p>
+<h3 id="ollama-vision-models">Ollama Vision Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#ollama-vision-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If AI Server has access to any Ollama Vision Models (e.g. <strong>gemma3:27b</strong> or <strong>mistral-small</strong>), it can be used
+instead to get information about the uploaded image:</p>
+<ul>
+<li><code>Model</code> - the ollama vision model to use</li>
+<li><code>Prompt</code> - vision model prompt</li>
+</ul>
 <h3 id="image-to-text">Image to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#image-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><div><pre><code class="language-csharp">using var fsImage = File.OpenRead(&quot;files/test_image.jpg&quot;);
 var response = client.PostFileWithRequest(new ImageToText(),
@@ -372,6 +379,47 @@ if (status.Results?.Count &gt; 0)
             <p class="custom-block-title">INFO</p><p>Ensure that the ComfyUI Agent has the Florence 2 model downloaded and installed for the Image-To-Text functionality to work.
 This can be done by setting the <code>DEFAULT_MODELS</code> environment variable in the <code>.env</code> file to include <code>image-to-text</code></p>
 </div>
+<h2 id="support-for-ollama-vision-models">Support for Ollama Vision Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#support-for-ollama-vision-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>By default <a href="/ai-server/image-to-text">ImageToText</a> uses a purpose-specific <strong>Florence 2 Vision model</strong> with ComfyUI for its functionality which is capable of generating a very short description about an image, e.g:</p>
+<blockquote>
+<p>A woman sitting on the edge of a lake with a wolf</p>
+</blockquote>
+<p>But with LLMs gaining multi modal capabilities and Ollama's recent support of Vision Models we can instead use popular
+Open Source models like Google's <strong>gemma3:27b</strong> or Mistral's <strong>mistral-small:24b</strong> to extract information from images.</p>
+<p>Both models are very capable vision models that's can provide rich detail about an image:</p>
+<h3 id="describe-image">Describe Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#describe-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<div class="not-prose mt-8 grid grid-cols-2 gap-4">
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="/img/pages/ai-server/image-to-text/gemma3-describe.png">
+        <img class="p-2" src="/img/pages/ai-server/image-to-text/gemma3-describe.png" />
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="/img/pages/ai-server/image-to-text/mistral-small-describe.png">
+        <img class="p-2" src="/img/pages/ai-server/image-to-text/mistral-small-describe.png" />
+    </a>
+</div>
+<h3 id="caption-image">Caption Image<a class="header-anchor" href="javascript:;" onclick="location.hash='#caption-image'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Although our initial testing sees gemma being better at responding to a wide variety of different prompts, e.g:</p>
+<div class="not-prose mt-8 grid grid-cols-2 gap-4">
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="/img/pages/ai-server/image-to-text/gemma3-caption.png">
+        <img class="p-2" src="/img/pages/ai-server/image-to-text/gemma3-caption.png" />
+    </a>
+    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700 flex flex-col justify-between" href="/img/pages/ai-server/image-to-text/mistral-small-caption.png">
+        <img class="p-2" src="/img/pages/ai-server/image-to-text/mistral-small-caption.png" />
+    </a>
+</div>
+<h2 id="support-ollamagenerate-endpoint">Support OllamaGenerate Endpoint<a class="header-anchor" href="javascript:;" onclick="location.hash='#support-ollamagenerate-endpoint'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>To support Ollama's vision models AI Server added a new feature pipeline around
+<a href="https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-completion">Ollama's generate completion API</a>:</p>
+<ul>
+<li><code>ImageToText</code>
+<ul>
+<li><strong>Model</strong> - Whether to use a Vision Model for the request</li>
+<li><strong>Prompt</strong> - Prompt for the vision model</li>
+</ul>
+</li>
+<li><code>OllamaGeneration</code>: Synchronous invocation of Ollama's Generate API</li>
+<li><code>QueueOllamaGeneration</code>: Asynchronous or Web Callback invocation of Ollama's Generate API</li>
+<li><code>GetOllamaGenerationStatus</code>: Get the generation status of an Ollama Generate API</li>
+</ul>
 </div>
 
                 <div class="not-prose"></div>
@@ -424,6 +472,12 @@ This can be done by setting the <code>DEFAULT_MODELS</code> environment variable
                                             Using Image to Text Endpoints
                                         </span>
                                             <ul class="ml-4">
+                                                    <li data-id="ollama-vision-models" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#ollama-vision-models'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Ollama Vision Models
+                                                        </span>
+                                                    </li>
                                                     <li data-id="image-to-text" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#image-to-text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -437,6 +491,30 @@ This can be done by setting the <code>DEFAULT_MODELS</code> environment variable
                                                         </span>
                                                     </li>
                                             </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#support-for-ollama-vision-models'" data-id="support-for-ollama-vision-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Support for Ollama Vision Models
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="describe-image" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#describe-image'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Describe Image
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="caption-image" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#caption-image'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Caption Image
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#support-ollamagenerate-endpoint'" data-id="support-ollamagenerate-endpoint" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Support OllamaGenerate Endpoint
+                                        </span>
                                     </li>
                             </ul>
                         </div>
