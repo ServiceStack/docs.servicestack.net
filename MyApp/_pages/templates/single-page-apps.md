@@ -291,7 +291,7 @@ $ x new react-spa-netfx ProjectName
 
 Bootstrapped with [Angular CLI](https://cli.angular.io).
 
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa.png)](https://github.com/NetCoreTemplates/angular-spa)
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa-bootstrap.png)](https://github.com/NetCoreTemplates/angular-spa)
 
 Create new Angular Project for .NET 6.0:
 

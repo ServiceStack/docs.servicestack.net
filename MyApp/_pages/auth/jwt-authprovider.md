@@ -838,7 +838,7 @@ E.g. Single Page App can call this when their Web App is first loaded, which is 
 [Signing In via an OAuth Provider](/auth/authentication-and-authorization#oauth-providers) it will convert their OAuth Authenticated Session into a 
 stateless client JWT Token Cookie.
 
-This approach is also used by the old Angular TechStacks [angular.techstacks.io](http://angular.techstacks.io) after signing in via Twitter and Github OAuth to [use JWT with a single jQuery Ajax call](https://github.com/ServiceStackApps/TechStacks/blob/78ecd5e390e585c14f616bb27b24e0072b756040/src/TechStacks/TechStacks/js/user/services.js#L30):
+This approach is also used by the old [Angular TechStacks](https://github.com/ServiceStackApps/TechStacks) after signing in via Twitter and Github OAuth to [use JWT with a single jQuery Ajax call](https://github.com/ServiceStackApps/TechStacks/blob/78ecd5e390e585c14f616bb27b24e0072b756040/src/TechStacks/TechStacks/js/user/services.js#L30):
 
 ```javascript
 $.post("/session-to-token");
