@@ -12,10 +12,9 @@ title: Text to Blazor CRUD App
 <a href="https://servicestack.net/text-to-blazor" class="text-3xl text-indigo-600 hover:text-indigo-800">https://servicestack.net/text-to-blazor</a>
 </div>
 
-This will query 5 different high quality AI models to generate 5 different Data Models, APIs, DB Migrations 
-and Admin UIs which you can browse to find the one that best matches your requirements.
+This will query 5 different leading AI coding models to generate 5x different Data Models, APIs, DB Migrations and Admin UIs which you choose amongst to pick the best one that matches your requirements for your new CRUD App:
 
-[![](/img/pages/okai/text-to-blazor-gen.webp)](https://servicestack.net/text-to-blazor)
+[![](/img/pages/okai/text-to-blazor-premium.webp)](/text-to-blazor)
 
 ### Using AI to only generate Data Models
 
