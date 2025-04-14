@@ -5,6 +5,10 @@ title: API Keys
 As we continue to embrace and natively integrate with ASP.NET Core's .NET 8 platform, we've reimplemented the last major
 feature missing from ServiceStack Auth - support for API Keys that's available from **ServiceStack v8.3**.
 
+:::warning API Key Feature Vulnerability
+**ServiceStack v8.7+** resolves a vulnerability we've discovered in the management APIs of this API Keys feature, if using API Keys please upgrade as soon as possible.
+:::
+
 ### What are API Keys?
 
 API Keys are a simple and effective way to authenticate and authorize access to your APIs, which are typically used 
