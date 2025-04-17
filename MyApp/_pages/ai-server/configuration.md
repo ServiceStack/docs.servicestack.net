@@ -100,3 +100,22 @@ AI Server stores results of the AI operations in a pre-configured paths.
 - **Files**: Cached variants and processed files, default path is `App_Data/files`.
 
 These paths can be configured in the `.env` file by setting the `ARTIFACTS_PATH` and `AI_FILES_PATH` keys.
+
+## Custom Definitions
+
+AI Server's knowledge is limited to the AI Provider and Model types and definitions defined in its 
+[/data](https://github.com/ServiceStack/ai-server/tree/main/AiServer/wwwroot/lib/data) definitions.
+
+These definitions are merged and can be extended with custom definitions you can create in your `/App_Data/overrides/` folder, e.g:
+
+```files
+/App_Data
+  /overrides
+    ai-models.json 
+    ai-types.json 
+    generation-types.json 
+    media-models.json 
+    media-types.json 
+    prompts.json
+    tts-voices.json
+```
