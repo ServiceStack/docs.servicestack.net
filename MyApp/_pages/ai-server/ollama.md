@@ -20,11 +20,11 @@ Once the model is downloaded, and your Ollama instance is running and accessible
 
 Navigating to the Admin Portal in AI Server, select the **AI Providers** menu item on the left sidebar.
 
-![AI Providers](/img/pages/ai-server/admin-dashboard.png)
+![AI Providers](/img/pages/ai-server/admin-dashboard.webp)
 
 Click on the **New Provider** button at the top of the grid.
 
-![New Provider](/img/pages/ai-server/admin-dashboard-providers.png)
+![New Provider](/img/pages/ai-server/admin-dashboard-providers.webp)
 
 Select Ollama as the Provider Type at the top of the form, and fill in the required fields:
 
@@ -33,13 +33,13 @@ Select Ollama as the Provider Type at the top of the form, and fill in the requi
 - **API Key**: Optional API key to authenticate with your Ollama instance.
 - **Priority**: The priority of the provider, used to determine the order of provider selection if multiple provide the same model.
 
-![Ollama Provider](/img/pages/ai-server/admin-dashboard-ollama-provider.png)
+![Ollama Provider](/img/pages/ai-server/admin-dashboard-ollama-provider.webp)
 
 Once the URL (and optional API Key) is set, requests will be made to your Ollama instance to list available models.
 By default, it will look for a locally running Ollama instance on port 11434, but you can change the URL to point to your Ollama instance.
 These will then be displayed as options to enable for the provider you are configuring.
 
-![Ollama Models](/img/pages/ai-server/ollama-models.png)
+![Ollama Models](/img/pages/ai-server/ollama-models.webp)
 
 Select the models you want to enable for this provider, and click **Save** to save the provider configuration.
 
