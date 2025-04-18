@@ -11,7 +11,11 @@ The [Admin UI](/admin-ui) is built into all ServiceStack Apps, accessible to [Ad
     <h3 class="text-4xl text-indigo-800">/admin-ui</h3>
 </div>
 
-## Dashboard
+Which will launch the Admin UI:
+
+<analytics-ui class="not-prose"></analytics-ui>
+
+### Dashboard
 
 On first access you're greeted with the Admin dashboard showing high-level overview stats on the number and type of APIs your App has as well as internal stats counters surfaced right on your Dashboard where they can provide valuable insights into the health of different features at a glance:
 
@@ -21,7 +25,7 @@ On first access you're greeted with the Admin dashboard showing high-level overv
 
 As Admin is a capability-based UI it only shows the stats and features your App has enabled. To aid in discovery the dashboard now includes a light switch of available Admin features with a link to [Admin UI Feature Docs](/admin-ui-features), providing a summary of each Admin UI component and instructions on how to enable them.
 
-## Admin UI Features
+### Admin UI Features
 
 Explore the available Admin UIs to learn more about each of their capabilities:
 
@@ -76,6 +80,6 @@ Leverages the existing Declarative Validation infrastructure to enable dynamical
 </a>
 
 
-## Feedback
+### Feedback
 
 The Admin UI was designed with room to grow. Please let us know what other features you would like to see on our [GitHub Discussions](https://github.com/ServiceStack/Discuss/discussions/2).
