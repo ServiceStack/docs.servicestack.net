@@ -83,8 +83,3 @@ This means you can switch to using typed APIs in your preferred language with yo
 ::include ai-server/cs/open-ai-requests-1.cs.md::
 
 This shows usage of the `OpenAiChat` request DTO directly with OpenAI's API using the ServiceStack `JsonApiClient`, so you get the benefits of using typed APIs in your preferred language with your existing service providers OpenAI compatible APIs.
-
-
-
-
-

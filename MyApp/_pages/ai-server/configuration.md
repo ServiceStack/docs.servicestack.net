@@ -84,13 +84,30 @@ Media Providers can also be configured in the Admin Portal. These include:
   - **Image Generation**
   - **Text-to-Speech**
 
-## Generating AI Server API Keys
+## Register AI Providers 
 
-API keys are used to authenticate requests to AI Server and are generated via the Admin Portal.
+To let AI Server know about your API Providers or self-hosted instances by creating them in the **AI Provider** section where you can use **Custom** AI Provider type to register any OpenAI Chat compatible endpoint, e.g:
 
-Here you can create new API keys, view existing keys, and revoke keys as needed.
+[![](/img/pages/ai-server/custom-openai-provider.webp)](/ai-server/)
 
-Keys can be created with expiration dates, and restrictions to specific API endpoints, along with notes to help identify the key's purpose.
+After registering AI Providers you can try to use them in the [Chat UI](/ai-server/chat):
+
+[![](/img/pages/ai-server/custom-openai-provider-chat.webp)](/ai-server/chat)
+
+## Create API Keys for your Apps
+
+After testing the llama-server instance is working with the Chat UI it's time to create API Keys
+for all your Apps so they can access AI Servers APIs with the [API Keys UI](/auth/admin-apikeys#api-keys-admin-ui):
+
+![](/img/pages/ai-server/admin-apikeys.webp)
+
+Here you can create new API keys, view existing keys, and revoke keys as needed. Keys can be created with expiration dates, 
+and restrictions to specific API endpoints, along with notes to help identify the key's purpose.
+
+It's recommended to use a different API Key per App so they can be monitored and analyzed separately.
+
+With a valid API Key in hand your App's can use AI Server's DTOs with ServiceStack generic
+service clients to enable typed integrations in [11 different languages](/ai-server/openai-chat-all-languages).
 
 ## Stored File Management
 
