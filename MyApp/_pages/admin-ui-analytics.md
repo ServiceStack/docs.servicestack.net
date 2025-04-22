@@ -4,6 +4,10 @@ title: Admin UI Analytics
 
 Comprehensive API Analytics is available to all ServiceStack Apps configured with [SQLite Request Logging](/sqlite-request-logs).
 
+:::youtube kjLcm1llC5Y
+In Depth and Interactive API Analytics available to all ASP .NET Core ServiceStack Apps!
+:::
+
 ### Benefits of API Analytics
 
 They provide deep and invaluable insight into your System API Usage, device distribution, its Users, API Keys and the 
