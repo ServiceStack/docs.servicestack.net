@@ -221,7 +221,7 @@ dotnet add package ServiceStack.Client
 3. Download AI Server's Typed C# DTOs:
 
 :::sh
-npx get-dtos csharp https://openai.servicestack.net
+`npx get-dtos csharp https://openai.servicestack.net`
 :::
 
 4. Call llama-server's OpenAI Chat API from C#: 
@@ -261,7 +261,7 @@ npm install @servicestack/client
 2. Download AI Server's TypeScript DTOs:
 
 :::sh
-npx get-dtos typescript https://openai.servicestack.net
+`npx get-dtos typescript https://openai.servicestack.net`
 :::
 
 Call llama-server with TypeScript DTOs and the generic `JsonServiceClient`
@@ -342,24 +342,24 @@ This will launch a self-hosted instance of AI Server at: `https://localhost:5006
   </h3>
 </div>
 
-![](/img/posts/hosting-llama-server/admin-dashboard.webp)
+![](/img/pages/ai-server/admin-dashboard.webp)
 
 ## Registering llama-server endpoints
 
 To let AI Server know about your new llama-server instances create a new **AI Provider** with the **Custom** AI Provider type to register an OpenAI Chat compatible endpoint, e.g:
 
-[![](/img/posts/ai-server-2025-04/custom-openai-provider.webp)](/ai-server/)
+[![](/img/pages/ai-server/custom-openai-provider.webp)](/ai-server/)
 
 As llama-server is only configured to serve a single model it can configured with any model name as it's ignored by llama-server but used by AI Server to route AI requests for that model to the custom AI Provider instance which you can try in the [Chat UI](/ai-server/chat):
 
-[![](/img/posts/ai-server-2025-04/custom-openai-provider-chat.webp)](/ai-server/chat)
+[![](/img/pages/ai-server/custom-openai-provider-chat.webp)](/ai-server/chat)
 
 ## Create API Keys for your Apps
 
 After testing the llama-server instance is working with the Chat UI it's time to create API Keys
 for all your Apps so they can access AI Servers APIs with the [API Keys UI](/auth/admin-apikeys#api-keys-admin-ui):
 
-![](/img/posts/hosting-llama-server/admin-apikeys.webp)
+![](/img/pages/ai-server/admin-apikeys.webp)
 
 It's recommended to use a different API Key per App so they can be monitored and analyzed separately.
 
