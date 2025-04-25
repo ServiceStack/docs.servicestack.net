@@ -114,6 +114,7 @@ public class AppConfig
 // Add additional frontmatter info to include
 public class MarkdownFileInfo : MarkdownFileBase
 {
+    public DateTime? Released { get; set; }
 }
 
 public static class HtmlHelpers
