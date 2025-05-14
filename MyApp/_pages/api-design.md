@@ -283,7 +283,7 @@ public class WebAndMobileApi : IReturn<MyResponse> {}
 
 Where they'll appear as a tab to additionally filter APIs in metadata pages:
 
-![](/img/pages/metadata/tag-groups.png)
+![](/img/pages/metadata/tag-groups.webp)
 
 They're also supported in [Add ServiceStack Reference](/add-servicestack-reference) where it can be used in the [IncludeTypes](/csharp-add-servicestack-reference#includetypes) DTO customization option where tags can be specified using braces in the format `{tag}` or `{tag1,tag2,tag3}`, e.g:
 

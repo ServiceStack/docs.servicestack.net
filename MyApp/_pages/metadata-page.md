@@ -4,7 +4,7 @@ title: Metadata Pages
 
 ServiceStack will automatically generate a metadata page about the webservice. The metadata can be found under the URL `/metadata`:
 
-![Example](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/metadata-chat.png)
+![](/img/pages/metadata/metadata-chat.webp)
 
 The Metadata page contains:
 
@@ -35,7 +35,7 @@ public class SwaggerTest
 
 If now the detail page of the specific service is inspected, the description configured above will be displayed on both the [Open API](/openapi) and Metadata Detail Page:
 
-![Metadata Detail Page](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/metadata-swagger-api.png)
+![](/img/pages/metadata/metadata-swagger-api.webp)
 
 ### Group Services by Tag
 
@@ -54,8 +54,7 @@ public class WebAndMobileApi : IReturn<MyResponse> {}
 
 Where they'll appear as a tab to additionally filter APIs in metadata pages:
 
-![](/img/pages/metadata/tag-groups.png)
-
+![](/img/pages/metadata/tag-groups.webp)
 
 ## Adding Links to Metadata page
 
@@ -63,7 +62,7 @@ Where they'll appear as a tab to additionally filter APIs in metadata pages:
 
 A good place to provide better visibility of functionality in ServiceStack is with the **Plugin Links** and **Debug Info** links section to the `/metadata` page which add links to any Plugins with Web UI's, e.g:
 
-![Debug Info Links](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/debug-links.png)
+![](/img/pages/metadata/debug-links.webp)
 
 The Debug Links section is only available in **DebugMode** (recap: set by default in Debug builds or explicitly with `Config.DebugMode = true`). In addition, users with the **Admin** role (or if `Config.AdminAuthSecret` is enabled) can also view the debug Plugins UI's in production.
 
@@ -93,7 +92,7 @@ metadata.IndexPageFilter = page => {
 
 The HTML templates for the metadata pages are maintained as [embedded html template resources](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack/Templates). 
 
-The VFS lets you replace built-in ServiceStack templates with your own by simply copying the metadata or [HtmlFormat Template files](http://bit.ly/164YbrQ) you want to customize and placing them in your Website Directory at:
+The VFS lets you replace built-in ServiceStack templates with your own by simply copying the metadata or [HtmlFormat Template files](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack/Templates) you want to customize and placing them in your Website Directory at:
 
 ```
 /Templates/HtmlFormat.html        // The auto HtmlFormat template
