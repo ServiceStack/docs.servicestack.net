@@ -5,6 +5,7 @@ slug: release-notes-history
 
 ## 2025
 
+- [v8.8](/releases/v8_08)
 - [v8.7](/releases/v8_07)
 - [v8.6](/releases/v8_06)
 
