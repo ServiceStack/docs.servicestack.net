@@ -270,7 +270,7 @@ mqServer.DisablePriorityQueues = true;
 Using the `SendOneWay()` Service Client APIs will publish DTO's to the `/oneway` [Pre-defined Route](/routing#pre-defined-routes):
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 client.SendOneWay(new RequestDto { ... }); //POST's to /json/oneway/RequestDto
 ```
 
@@ -481,7 +481,7 @@ new AppHost().Start("http://localhost:1337/");
 Then on the Client we can authenticate using UserName/Password credentials using the HTTP [Service Client](/csharp-client), e.g:
 
 ```csharp
-var client = new JsonServiceClient("http://localhost:1337/");
+var client = new JsonApiClient("http://localhost:1337/");
 
 var response = client.Post(new Authenticate {
     UserName = "mythz",

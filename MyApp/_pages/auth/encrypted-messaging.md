@@ -48,7 +48,7 @@ It's safer instead to download the public key over a trusted `https://` url wher
 Since `GetPublicKey` is just a ServiceStack Service it's easily downloadable using a Service Client:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 string publicKeyXml = client.Get(new GetPublicKey());
 ```
 
@@ -68,7 +68,7 @@ To help with verification the SHA256 Hash of the PublicKey is returned in `X-Pub
 Once they have the Server's Public Key, clients can use it to get an `EncryptedServiceClient` via the `GetEncryptedClient()` extension method on `JsonServiceClient` or new `JsonHttpClient`, e.g:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 IEncryptedClient encryptedClient = client.GetEncryptedClient(publicKeyXml);
 ```
 

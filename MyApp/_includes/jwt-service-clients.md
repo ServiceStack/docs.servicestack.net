@@ -11,7 +11,7 @@ automatically supports fetching new JWT Bearer Tokens & transparently Auto Retry
 #### C#, F# & VB .NET Service Clients
 
 ```csharp
-var client = new JsonServiceClient(baseUrl);
+var client = new JsonApiClient(baseUrl);
 var authRequest = new Authenticate {
     provider = "credentials",
     UserName = userName,

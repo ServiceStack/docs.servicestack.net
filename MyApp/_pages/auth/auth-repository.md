@@ -391,7 +391,7 @@ More examples of this are in [ManageRolesTests.cs](https://github.com/ServiceSta
 Super Users with the **Admin** role or Requests with an [AdminAuthSecret](/debugging#authsecret) can call the built-in `/assignroles` and `/unassignroles` Services to add Roles/Permissions to existing users from an external Request, e.g:
 
 ```csharp
-var client = new JsonServiceClient(baseUrl);
+var client = new JsonApiClient(baseUrl);
 var response = client.Post(new AssignRoles
 {
     UserName = userName,

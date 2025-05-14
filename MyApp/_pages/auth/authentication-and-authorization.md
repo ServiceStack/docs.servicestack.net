@@ -501,7 +501,7 @@ On the client you can use the [C#/.NET Service Clients](/csharp-client) to easil
 To authenticate using your `CustomCredentialsAuthProvider` by POST'ing a `Authenticate` Request, e.g:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 
 var authResponse = client.Post(new Authenticate {
     provider = CredentialsAuthProvider.Name, //= credentials

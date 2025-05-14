@@ -227,7 +227,7 @@ Now after restarting your browser to reset its SSL caches you'll be able to use 
 As .NET has access your OS's trusted certificates you'll be able to access the custom domains without additional configuration:
 
 ```csharp
-var client = new JsonServiceClient("https://dev.servicestack.com:5001"); //.NET HttpWebRequest
+var client = new JsonApiClient("https://dev.servicestack.com:5001"); //.NET HttpWebRequest
 var response = await client.GetAsync(new Hello { Name = "World" });
 
 var client = new JsonHttpClient("https://dev.servicestack.com:5001");    //.NET HttpClient

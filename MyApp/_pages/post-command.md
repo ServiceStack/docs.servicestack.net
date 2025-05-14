@@ -280,7 +280,7 @@ dotnet add package ServiceStack.Client
 Which together with the above C# DTOs enables its optimal end-to-end typed API:
 
 ```csharp
-var client = new JsonServiceClient("https://techstacks.io");
+var client = new JsonApiClient("https://techstacks.io");
 
 client.Send(new LockTechStack { TechnologyStackId = id, IsLocked = true });
 ```

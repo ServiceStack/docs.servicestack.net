@@ -253,7 +253,7 @@ public class CustomerService : Service
 No code-gen required, can re-use above Server DTOs:
 
 ```csharp
-var client = new JsonServiceClient(BaseUri);
+var client = new JsonApiClient(BaseUri);
 
 //GET /customers
 var all = client.Get(new GetCustomers());                         // Count = 0

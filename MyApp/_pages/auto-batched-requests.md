@@ -14,7 +14,7 @@ Thanks to it's [message-based design](/advantages-of-message-based-web-services)
 This is enabled in all [.NET Service Clients](/csharp-client) via the new `SendAll()` and `SendAllOneWay()` API's, e.g:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 var requests = new[]
 {
     new Request { Id = 1, Name = "Foo" },

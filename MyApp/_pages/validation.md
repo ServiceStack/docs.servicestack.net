@@ -68,7 +68,7 @@ All Exceptions gets injected into the ResponseStatus property of your Response D
 ```csharp 
 try 
 {
-    var client = new JsonServiceClient(BaseUri);
+    var client = new JsonApiClient(BaseUri);
     var response = client.Send<UserResponse>(new User());
 } 
 catch (WebServiceException webEx) 

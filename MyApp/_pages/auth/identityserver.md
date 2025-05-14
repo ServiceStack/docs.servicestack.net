@@ -251,7 +251,7 @@ public async Task<IActionResult> CallServiceClient()
 {
     var accessToken = await HttpContext.GetTokenAsync("access_token");
 
-    var client = new JsonServiceClient("https://localhost:5001/") {
+    var client = new JsonApiClient("https://localhost:5001/") {
         BearerToken = accessToken
     };
     var response = await client.GetAsync(new GetIdentity());

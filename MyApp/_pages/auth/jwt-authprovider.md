@@ -117,7 +117,7 @@ The JWT Auth Provider defaults to `RequireSecureConnection=true` which mandates 
 JWT Tokens can be sent using the Bearer Token support in all HTTP and Service Clients:
 
 ```csharp
-var client = new JsonServiceClient(baseUrl) {
+var client = new JsonApiClient(baseUrl) {
     BearerToken = jwtToken
 };
 

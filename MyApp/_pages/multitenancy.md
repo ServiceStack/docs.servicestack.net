@@ -374,7 +374,7 @@ public class MultiTenantService : Service
 Calling this Service with a different `TenantId` value changes which database the Service is configured with:
 
 ```csharp
-var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+var client = new JsonApiClient(Config.AbsoluteBaseUri);
 
 var response = client.Get(new GetTenant()); //= Company: Masters inc. 
 

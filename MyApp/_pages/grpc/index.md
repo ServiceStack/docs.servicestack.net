@@ -122,7 +122,7 @@ code-gen, etc is required to maintain its simple code-first development model ut
 end-to-end Typed API utilizing smart, rich .NET generic Service Clients:
 
 ```csharp
-//IRestServiceClient client = new JsonServiceClient(BaseUrl);
+//IRestServiceClient client = new JsonApiClient(BaseUrl);
 IRestServiceClient client = new GrpcServiceClient(BaseUrl);
 var response = await client.GetAsync(new GetTodos());
 ```

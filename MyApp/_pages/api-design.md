@@ -338,7 +338,7 @@ public class Contact { ... }
 Which can used in any ServiceClient with:
 
 ```csharp
-var client = new JsonServiceClient(BaseUri);
+var client = new JsonApiClient(BaseUri);
 List<Contact> response = client.Get(new GetContacts());
 ```
 
@@ -351,7 +351,7 @@ can alternatively choose to use [Add ServiceStack Reference](/csharp-add-service
 alternative way to get the Services typed DTOs on the client. In both cases the exact same source code is used to call the Services:
 
 ```csharp
-var client = new JsonServiceClient(BaseUri);
+var client = new JsonApiClient(BaseUri);
 var response = client.Get(new GetContacts());
 ```
 

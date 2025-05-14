@@ -126,7 +126,7 @@ public class CustomerRestExample
     [Test]
     public void Run_Customer_REST_Example()
     {
-        var client = new JsonServiceClient(BaseUri);
+        var client = new JsonApiClient(BaseUri);
 
         //GET /customers
         var all = client.Get(new GetCustomers());

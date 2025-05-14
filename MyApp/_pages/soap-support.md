@@ -69,7 +69,7 @@ var response = client.Send(new GetCustomers());
 Although if you could use a generic ServiceClient, you'd typically be better off using the other cleaner and faster endpoints like JSON instead:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 
 var response = client.Get(new GetCustomers());
 ```

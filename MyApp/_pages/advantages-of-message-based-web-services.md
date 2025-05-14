@@ -230,14 +230,14 @@ But even without this, ServiceStack services are just as consumable as any other
 The earlier typed API example of creating a new TODO in C#:
 
 ```csharp
-var client = new JsonServiceClient(baseUrl);
+var client = new JsonApiClient(baseUrl);
 Todo createdTodo = client.Post(new Todo { Content = "New Todo", Order = 1 });
 ```
 
 Is like this in [TypeScript](/typescript-add-servicestack-reference):
 
 ```ts
-var client = new JsonServiceClient(baseUrl);
+var client = new JsonApiClient(baseUrl);
 var request = Todo();
 request.Content = "New Todo";
 request.Order = 1;

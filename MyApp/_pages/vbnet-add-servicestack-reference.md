@@ -33,7 +33,7 @@ If your server has been updated and you want to update to client DTOs, simply ri
 Async Example:
 
 ```vb
-Dim client = New JsonServiceClient("https://techstacks.io")
+Dim client = new JsonApiClient("https://techstacks.io")
 
 Dim response = Await client.SendAsync(New AppOverview())
 response.PrintDump()
@@ -42,7 +42,7 @@ response.PrintDump()
 Sync Example:
 
 ```vb
-Dim client = New JsonServiceClient("https://techstacks.io")
+Dim client = new JsonApiClient("https://techstacks.io")
 
 Dim response = client.Send(New AppOverview())
 response.PrintDump()

@@ -50,13 +50,13 @@ builder.Services.AddBlazorApiClient(builder.Configuration["ApiBaseUrl"] ?? build
 All ServiceStack's C# clients share the same interfaces and are created by passing in the **Base URI** of your ServiceStack service in the clients constructor, e.g. if your ServiceStack instance was hosted on the root path `/` on the **5001** custom port:
 
 ```csharp
-var client = new JsonServiceClient("https://host:5001");
+var client = new JsonApiClient("https://host:5001");
 ```
 
 Or if hosted on the `/custom` custom path:
 
 ```csharp
-var client = new JsonServiceClient("https://host/custom/");
+var client = new JsonApiClient("https://host/custom/");
 ```
 
 ### Recommended ServiceClient for .NET 6+#

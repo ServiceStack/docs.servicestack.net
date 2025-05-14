@@ -43,7 +43,7 @@ x csharp https://external.domain.com/techstacks
 The resulting DTOs can be used with any [.NET Service Client](/csharp-client#built-in-clients), configured with the proxy endpoint as the **BaseUrl**:
  
 ```csharp
-var client = new JsonServiceClient("https://external.domain.com/techstacks");
+var client = new JsonApiClient("https://external.domain.com/techstacks");
  
 var request = new GetTechnology { Slug = "ServiceStack" };
 var response = client.Get(request);
@@ -55,7 +55,7 @@ Another potential use-case is to have the proxy act like a facade to access mult
 ```csharp
 var authRequest = new Authenticate { ... };
  
-var marketingClient = new JsonServiceClient("https://external.domain.com/marketing");
+var marketingClient = new JsonApiClient("https://external.domain.com/marketing");
 var authResponse = marketingClient.Post(authRequest);
  
 var financeClient = new JsonHttpClient("https://external.domain.com/finance");

@@ -53,7 +53,7 @@ public class HelloService : Service
 Thanks to the above `IReturn<T>` interface marker you'll be able to use the terse, typed Service Client APIs, e.g:
 
 ```csharp
-var client = new JsonServiceClient(BaseUri);
+var client = new JsonApiClient(BaseUri);
 
 HelloResponse response = client.Get(new Hello { Name = "World" }); 
 ```

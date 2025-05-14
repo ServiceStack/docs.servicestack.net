@@ -91,7 +91,7 @@ public class CreateRockstarResponse
 When ServiceStack starts it generates the implementation for this Service, which can now insert Rockstars using your populated Request DTO:
 
 ```csharp
-var client = new JsonServiceClient(baseUrl);
+var client = new JsonApiClient(baseUrl);
 
 client.Post(new CreateRockstar {
     FirstName = "Kurt",

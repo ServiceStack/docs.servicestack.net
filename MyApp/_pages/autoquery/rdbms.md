@@ -1445,7 +1445,7 @@ public class CustomAutoQueryServices(IAutoQueryDb autoQuery) : Service
 As AutoQuery Services are normal ServiceStack Services they can re-use the existing Service Client support for [Auto Batched Requests](/auto-batched-requests), e.g:
 
 ```csharp
-var client = new JsonServiceClient(BaseUrl);
+var client = new JsonApiClient(BaseUrl);
 var response = client.SendAll(new CreateItem[] { ... });
 ```
 

@@ -108,7 +108,7 @@ public class CustomerRestExample
     [Test]
     public void Can_GET_and_Create_Customers()
     {
-        var client = new JsonServiceClient(BaseUri);
+        var client = new JsonApiClient(BaseUri);
 
         //GET /customers
         var all = client.Get(new GetCustomers());
