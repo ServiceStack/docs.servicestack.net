@@ -68,7 +68,7 @@ const TypesenseDialog = {
                             let idx = 0
                             const groups = {}
                             const meta = { groups:[], allItems:[] }
-                            //console.log(data)
+                            // console.log(data)
 
                             data.grouped_hits.forEach((gh) => {
                                 let groupName = gh.group_key[0]
@@ -79,8 +79,8 @@ const TypesenseDialog = {
                                     let highlight = hit.highlights.length > 0 ? hit.highlights[0] : null
                                     let item = {
                                         id: ++idx,
-                                        titleHtml: doc.hierarchy.lvl3 ?? doc.hierarchy.lvl2 ?? doc.hierarchy.lvl1 ?? doc.hierarchy.lvl0,
-                                        snippetHtml: highlight?.snippet,
+                                        titleHtml: clean(doc.hierarchy.lvl3 ?? doc.hierarchy.lvl2 ?? doc.hierarchy.lvl1 ?? doc.hierarchy.lvl0),
+                                        snippetHtml: clean(highlight?.snippet),
                                         // search result type for icon
                                         type: highlight?.field === 'content' ? 'content' : 'heading',
                                         // search results have wrong domain, use relative
@@ -189,6 +189,11 @@ const TypesenseDialog = {
             return s && s.replace(/<[^>]*>?/gm, '')
         }
 
+        /** @param {string} s */
+        function clean(s) {
+            return s?.replace(/&ZeroWidthSpace/g,'')
+        }
+
         return { results, query, selectedIndex, search, onHover, go, onKeyDown }
     }
 }
@@ -214,6 +219,7 @@ export default {
     setup() {
         const openSearch = ref(false)
         function showSearch() {
+            console.log('showSearch', openSearch.value, document.querySelector('#docsearch-input'))
             openSearch.value = true
             nextTick(() => {
                 /** @@type {HTMLInputElement} */
