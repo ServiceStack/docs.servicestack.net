@@ -22,7 +22,7 @@ Customize and Download a new Blazor WASM Bootstrap project with your preferred p
 
 <blazor-templates class="not-prose pb-8"></blazor-templates>
 
-Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/templates/dotnet-new):
+Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/dotnet-new):
 
 :::sh
 x new blazor-wasm ProjectName

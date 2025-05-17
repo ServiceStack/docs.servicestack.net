@@ -319,7 +319,7 @@ Authentication, Registration and protected Services.
 
 ## Project Templates
 
-Most of [ServiceStack's Project Templates](/templates/dotnet-new) are configured with Auth out-of-the-box or can be easily added to an empty [web](https://github.com/NetCoreTemplates/web)
+Most of [ServiceStack's Project Templates](/dotnet-new) are configured with Auth out-of-the-box or can be easily added to an empty [web](https://github.com/NetCoreTemplates/web)
 project template:
 
 :::sh

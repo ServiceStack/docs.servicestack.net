@@ -224,7 +224,7 @@ Which will returns the the default `index.html` page using [#Script Pages](https
 
 #### SPA Fallback
 
-This popular behavior is also available using the more convenient configuration (used in all [SPA Project Templates](/templates/dotnet-new)) with:
+This popular behavior is also available using the more convenient configuration (used in all [SPA Project Templates](/dotnet-new)) with:
 
 ```csharp
 Plugins.Add(new SharpPagesFeature {

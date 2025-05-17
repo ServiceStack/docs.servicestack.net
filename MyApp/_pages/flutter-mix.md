@@ -28,7 +28,7 @@ $ dotnet tool install --global x
 
 The Flutter integration works with most ServiceStack templates. It does make the assumption that when working locally, the initial Flutter application will connect to the ServiceStack host via `localhost:5001` or if the client is running on an Android Emulator, `10.0.0.2:5001`.
 
-For example, you could [start with a new](/templates/dotnet-new) `web` ServiceStack project to host your web services, and add a working Flutter client using the mix template.
+For example, you could [start with a new](/dotnet-new) `web` ServiceStack project to host your web services, and add a working Flutter client using the mix template.
 
 ```bash
 $ x new web MyApp

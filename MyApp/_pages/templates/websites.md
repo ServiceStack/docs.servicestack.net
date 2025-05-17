@@ -3,7 +3,7 @@ title: Website Project Templates
 slug: templates-websites
 ---
 
-There are 3 templates for each of the different technologies that can be used with ServiceStack to develop Server HTML Generated Websites and HTTP APIs which can be installed with [dotnet-new](/templates/dotnet-new): 
+There are 3 templates for each of the different technologies that can be used with ServiceStack to develop Server HTML Generated Websites and HTTP APIs which can be installed with [dotnet-new](/dotnet-new): 
 
 ```bash
 $ dotnet tool install --global x 

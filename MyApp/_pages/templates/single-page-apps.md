@@ -5,13 +5,11 @@ slug: templates-single-page-apps
 
 The [ServiceStackVS VS.NET extension](https://github.com/ServiceStack/ServiceStackVS) contains a pre-configured Single Page App VS.NET template for each of the popular JavaScript frameworks:
 
-[![](./img/pages/ssvs/new-spa-project.png)](/create-your-first-webservice#step-1-download-and-install-servicestackvs)
+The Single Page App (SPA) project templates can also be created using the [dotnet-new](/dotnet-new) command line tool:
 
-The Single Page App (SPA) project templates can also be created using the [dotnet-new](/templates/dotnet-new) command line tool:
-
-```bash
-$ npm install -g @servicestack/cli
-```
+:::sh
+dotnet tool install --global x
+:::
 
 ```bash
 $ dotnet-new <template-name> ProjectName
@@ -19,15 +17,14 @@ $ dotnet-new <template-name> ProjectName
 
 Click on the template name below to view a Live Demo and contents of each project template:
 
-| .NET Core C# Templates                                           |                                                              |
-|------------------------------------------------------------------|--------------------------------------------------------------|
-| [angular-spa](https://github.com/NetCoreTemplates/angular-spa)   | .NET 6.0 Angular CLI Bootstrap App                           |
-| [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 6.0 React Create App CLI Bootstrap App                  |
-| [vue-nuxt](https://github.com/NetCoreTemplates/vue-nuxt)         | .NET 6.0 Nuxt.js SPA App with Bootstrap                      |
-| [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 6.0 Vue CLI Bootstrap App                               |
+| .NET C# Templates                                                |                                             |
+|------------------------------------------------------------------|---------------------------------------------|
+| [angular-spa](https://github.com/NetCoreTemplates/angular-spa)   | .NET 8.0 Angular Identity Auth Tailwind SPA |
+| [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 8.0 React Identity Auth Tailwind SPA   |
+| [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 8.0 Vue Identity Auth Tailwind SPA     |
 
 
-The .NET 6.0 project templates utilizes MSBuild's newer and human-friendly format which can be developed using your preferred C# IDE of VS.NET, VS Code or Rider.
+The .NET 8.0 project templates utilizes MSBuild's newer and human-friendly format which can be developed using your preferred C# IDE of VS.NET, VS Code or Rider.
 
 | .NET Framework C# Templates                                                                   |                                                     |
 |-----------------------------------------------------------------------------------------------|-----------------------------------------------------|
@@ -243,7 +240,7 @@ Tools > Options > Projects and Solutions > External Web Tools
  
 ## SPA Project Templates Overview
 
-All templates can be installed using our [dotnet-new](/templates/dotnet-new) tool, which if not already can be installed with:
+All templates can be installed using our [dotnet-new](/dotnet-new) tool, which if not already can be installed with:
 
 ```bash
 $ dotnet tool install --global x 
@@ -257,7 +254,7 @@ Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-spa.png)](https://github.com/NetCoreTemplates/vue-spa)
 
-Create new Vue 2.5 Project for .NET 6.0:
+Create new Vue 2.5 Project for .NET 8.0:
 
 ```bash
 $ x new vue-spa ProjectName
@@ -275,7 +272,7 @@ Bootstrapped with [create-react-app](https://github.com/facebook/create-react-ap
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-spa.png)](https://github.com/NetCoreTemplates/react-spa)
 
-Create new React 16 Project for .NET 6.0:
+Create new React 16 Project for .NET 8.0:
 
 ```bash
 $ x new react-spa ProjectName
@@ -293,7 +290,7 @@ Bootstrapped with [Angular CLI](https://cli.angular.io).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa-bootstrap.png)](https://github.com/NetCoreTemplates/angular-spa)
 
-Create new Angular Project for .NET 6.0:
+Create new Angular Project for .NET 8.0:
 
 ```bash
 $ x new angular-spa ProjectName
@@ -311,7 +308,7 @@ Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/) and the [vuetify cli plugi
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-spa.png)](https://github.com/NetCoreTemplates/vuetify-spa)
 
-Create new Vuetify Project for .NET 6.0:
+Create new Vuetify Project for .NET 8.0:
 
 ```bash
 $ x new vuetify-spa ProjectName
@@ -329,7 +326,7 @@ Bootstrapped with [Nuxt.js starter template](https://nuxtjs.org/guide/installati
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-nuxt.png)](https://github.com/NetCoreTemplates/vue-nuxt)
 
-Create new Nuxt.js v1.4.2 Project for .NET 6.0:
+Create new Nuxt.js v1.4.2 Project for .NET 8.0:
 
 ```bash
 $ x new vue-nuxt ProjectName
@@ -347,7 +344,7 @@ Bootstrapped with [Nuxt.js + Vuetify.js starter template](https://github.com/vue
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-nuxt.png)](https://github.com/NetCoreTemplates/vuetify-nuxt)
 
-Create new Nuxt Vuetify Project for .NET 6.0:
+Create new Nuxt Vuetify Project for .NET 8.0:
 
 ```bash
 $ x new vuetify-nuxt ProjectName
@@ -480,7 +477,7 @@ resulting HTML minification in optimized production builds - enabling simplified
 
 ### Running .NET Core Templates in Visual Studio IIS Express
 
-Currently VS.NET doesn't support .NET 6.0 multiple bindings i.e. `http://localhost:5000/;https://localhost:5001/` which all .NET Core Templates
+Currently VS.NET doesn't support .NET 8.0 multiple bindings i.e. `http://localhost:5000/;https://localhost:5001/` which all .NET Core Templates
 are configured with. To run in IIS Express change it to specify only 1 binding:
 
 ![](https://forums.servicestack.net/uploads/default/931/0a2191581d2774c6.png)

@@ -31,7 +31,7 @@ $ dotnet tool install --global x
 
 The Flutter integration works with most ServiceStack templates. It does make the assumption that when working locally, the initial Flutter application will connect to the ServiceStack host via `localhost:5001` or if the client is running on an Android Emulator, `10.0.0.2:5001`.
 
-For example, you could [start with a new](/templates/dotnet-new) `web` ServiceStack project to host your web services, and add a working Flutter client using the mix template.
+For example, you could [start with a new](/dotnet-new) `web` ServiceStack project to host your web services, and add a working Flutter client using the mix template.
 
 ```bash
 $ x new web MyApp
@@ -394,7 +394,7 @@ for a complete example project.
 The Flutter integration works with ServiceStack `grpc` template that has been *configured to support gRPC services*. It also makes the assumption that when working locally, the initial Flutter application will connect to the ServiceStack gRPC services via `localhost:5054` or if the client is running on an Android Emulator, `10.0.0.2:5054`.
 `5054` is the insecure HTTP port that is used by the `grpc` project template, but if you want to add `grpc` support to your application using `x mix grpc`, be sure to set up the use of the same port for local development, or modify your Flutter client to match your server setup.
 
-For example, you could [start with a new](/templates/dotnet-new) `grpc` ServiceStack project to host your services via gRPC, and add a working Flutter client which connects via gRPC using the mix template.
+For example, you could [start with a new](/dotnet-new) `grpc` ServiceStack project to host your services via gRPC, and add a working Flutter client which connects via gRPC using the mix template.
 
 ```bash
 $ x new grpc MyApp

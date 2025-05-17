@@ -20,7 +20,7 @@ quickly [apply gists](/mix-tool) to your project enabled by ServiceStack's effor
 
 ## Step 2: Selecting a template
 
-Importantly, the dotnet tools lets you create [.NET 6, .NET Framework](/templates/dotnet-new) and [ASP.NET Core on .NET Framework](/templates/corefx) projects.
+Importantly, the dotnet tools lets you create [.NET 6, .NET Framework](/dotnet-new) and [ASP.NET Core on .NET Framework](/templates/corefx) projects.
 Unless you're restricted to working with .NET Framework you'll want to start with a [.NET 6 project template](/templates/dotnet-new#usage), for this example
 we'll start with the Empty [web](https://github.com/NetCoreTemplates/web) template which implicitly uses the folder name for the Project Name:
 

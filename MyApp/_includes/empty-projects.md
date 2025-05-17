@@ -1,5 +1,5 @@
 
-If you don't have the [x dotnet tool](/templates/dotnet-new) installed, the quickest way to create a ServiceStack App is to download your preferred template from:
+If you don't have the [x dotnet tool](/dotnet-new) installed, the quickest way to create a ServiceStack App is to download your preferred template from:
 
 <div class="not-prose">
 <h3 class="m-0 py-8 text-4xl text-center text-blue-600"><a href="https://servicestack.net/start">servicestack.net/start</a></h3>

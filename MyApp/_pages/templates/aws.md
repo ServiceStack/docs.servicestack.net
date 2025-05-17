@@ -22,7 +22,7 @@ slug: templates-aws
 
 This project lets you create a .NET 6 empty ServiceStack web project ready for deployment as a AWS Lambda Function wired with API GateWay and packaged via a Docker image.
 
-Create new project with [x dotnet tool](/templates/dotnet-new):
+Create new project with [x dotnet tool](/dotnet-new):
 
 ```bash
 $ dotnet tool install -g x

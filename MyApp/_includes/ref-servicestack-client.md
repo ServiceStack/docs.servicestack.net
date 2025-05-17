@@ -82,7 +82,7 @@ A CDN hosted version of UMD `@servicestack/client` is available on unpkg.com at:
 
 ### Reference in npm projects
 
-If you started with any of the [SPA Project Templates](/templates/dotnet-new) [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) is already included, other TypeScript or ES6 projects can install `@servicestack/client` from npm with:
+If you started with any of the [SPA Project Templates](/dotnet-new) [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) is already included, other TypeScript or ES6 projects can install `@servicestack/client` from npm with:
 
 ```bash
 $ npm install @servicestack/client

@@ -30,7 +30,7 @@ Instead of using techniques like virtual DOM diffing, Svelte writes code that su
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/svelte-spa.png)
 
-> Browse [source code](https://github.com/NetCoreTemplates/svelte-spa) and install with [dotnet-new](/templates/dotnet-new):
+> Browse [source code](https://github.com/NetCoreTemplates/svelte-spa) and install with [dotnet-new](/dotnet-new):
 
 ```bash
 $ dotnet tool install -g x

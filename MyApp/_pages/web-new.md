@@ -195,7 +195,7 @@ the moment they're created.
 Especially for SPA projects which need to be frequently updated, the existing .NET Project Templates system is a stale solution that doesn't offer 
 much benefit over maintaining individual GitHub projects, which is exactly what the `dotnet-new` npm tool and now `x new` .NET Core are designed around.
 
-Inside [dotnet-new](/templates/dotnet-new) and `x new` is an easier way to create and share any kind of project templates which are easier for developers
+Inside [dotnet-new](/dotnet-new) and `x new` is an easier way to create and share any kind of project templates which are easier for developers
 to create, test, maintain and install. So if you're looking for a simpler way to be able to create and maintain your own value-added project templates 
 with additional bespoke customizations, functionality, dependencies and configuration, using `x new` is a great way to maintain and share them.
 

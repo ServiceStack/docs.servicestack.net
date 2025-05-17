@@ -9,7 +9,7 @@ delivery platform where they can be run as a .NET Core Windows Desktop App with 
 [Live `#Script` playground](https://sharpscript.net/docs/sharp-scripts#live-script-with-web-watch) with `x watch`.
 
 These tools contains all the functionality ServiceStack Developers or API consumers need that can be used 
-[Create ServiceStack projects](/templates/dotnet-new), run [Gist Desktop Apps](https://sharpscript.net/sharp-apps/gist-desktop-apps) 
+[Create ServiceStack projects](/dotnet-new), run [Gist Desktop Apps](https://sharpscript.net/sharp-apps/gist-desktop-apps) 
 or generate typed endpoints for consuming ServiceStack Services by either
 [Add/Update ServiceStack References](/add-servicestack-reference) or by generating [gRPC client proxies](/grpc#grpc-clients).
 

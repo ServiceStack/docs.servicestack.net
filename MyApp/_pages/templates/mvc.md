@@ -8,7 +8,7 @@ All ServiceStack Projects can be created from ServiceStack's Start Page:
 <h3 class="m-0 py-8 text-4xl text-center text-blue-600"><a href="https://servicestack.net/start">servicestack.net/start</a></h3>
 </div>
 
-Or using the .NET [x dotnet tool](/templates/dotnet-new):
+Or using the .NET [x dotnet tool](/dotnet-new):
 
 :::sh
 dotnet tool install --global x

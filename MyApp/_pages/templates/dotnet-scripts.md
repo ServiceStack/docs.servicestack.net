@@ -3,7 +3,7 @@ slug: templates-dotnet-scripts
 title: Cross platform dotnet scripts
 ---
 
-Often most of our [Project Templates](/templates/dotnet-new) need to include scripts to perform different tasks utilized in each project type, e.g. for generating DTOs, running a dev server, publishing release builds, etc. 
+Often most of our [Project Templates](/dotnet-new) need to include scripts to perform different tasks utilized in each project type, e.g. for generating DTOs, running a dev server, publishing release builds, etc. 
 
 To surface these common tasks to the developer we initially used Gulp and Grunt JS Tasks so they would show up in 
 [VS .NET's Task Runner Explorer UI](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.TaskRunnerExplorer) however this has 
