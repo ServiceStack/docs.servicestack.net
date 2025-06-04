@@ -215,6 +215,61 @@ public partial class GetAnswers
 }
 ```
 
+### AddNullableAnnotations
+
+Generate DTOs with nullable reference types, e.g:
+
+```csharp
+public class Data
+{
+    public int Value { get; set; }
+    public int? OptionalValue { get; set; }
+    public string Text { get; set; }
+    public string? OptionalText { get; set; }
+    public List<string> Texts { get; set; }
+    public List<string>? OptionalTexts { get; set; }
+}
+```
+
+Will generate DTOs, preserving properties with nullable reference type annotations:
+
+```csharp
+public class Data
+{
+    public virtual int Value { get; set; }
+    public virtual int? OptionalValue { get; set; }
+    public virtual string Text { get; set; }
+    public virtual string? OptionalText { get; set; }
+    public virtual List<string> Texts { get; set; } = [];
+    public virtual List<string>? OptionalTexts { get; set; }
+}
+```
+
+Optionally if your DTOs do not have nullable reference annotations enabled but you would still like to generate DTOs with them included, you can mark properties as required with the `[Required]` attribute, e.g:
+
+```csharp
+public class Data
+{
+    [Required]
+    public string? Text { get; set; }
+    [Required]
+    public List<string>? Texts { get; set; }
+}
+```
+
+Where it will generate otherwise optional properties as non-nullable reference types:
+
+```csharp
+public class Data
+{
+    [Required]
+    public virtual string Text { get; set; }
+
+    [Required]
+    public virtual List<string> Texts { get; set; } = [];
+}
+```
+
 ### AddReturnMarker
 
 When true, annotates Request DTOs with an `IReturn<TResponse>` marker referencing the Response type ServiceStack infers your Service to return:
@@ -448,37 +503,3 @@ This lets you change the default DataContract XML namespace used for all C# name
 ```
 
 > Requires AddDataContractAttributes=true
-
-## Xamarin Studio
-
-With the new [ServiceStackXS Add-In](http://addins.monodevelop.com/Project/Index/154) your Service Consumers can now generate typed DTOs of your remote ServiceStack Services directly from within Xamarin Studio, which together with the **ServiceStack.Client** NuGet package provides an effortless way to enable an end-to-end Typed API from within Xamarin C# projects.
-
-### Installing ServiceStackXS
-
-Installation is straightforward if you've installed Xamarin Add-ins before, just go to `Xamarin Studio -> Add-In Manager...` from the Menu and then search for `ServiceStack` from the **Gallery**:
-
-![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/servicestackvs/servicestack%20reference/ssxs-mac-install.gif)
-
-#### Install from file
-
-If you are having trouble with the Xamarin Studio gallery version, you can install addins from an `mpack` file from the same menu as shown above. Click `Install from file` and navigate to where you have downloaded the `mpack` file.
-
-### Adding a ServiceStack Reference
-
-Once installed, adding a ServiceStack Reference is very similar to [ServiceStackVS in VS.NET](/csharp-add-servicestack-reference#add-servicestack-reference) where you can just click on `Add -> Add ServiceStack Reference...` on the project's context menu to bring up the familiar Add Reference dialog. After adding the `BaseUrl` of the remote ServiceStack instance, click OK to add the generated DTO's to your project using the name specified:
-
-![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/servicestackvs/servicestack%20reference/ssxs-mac-add-reference.gif)
-
-### Updating the ServiceStack Reference
-
-As file watching isn't supported yet, to refresh the generated DTOs, you'll need to right-click on it in the solution explorer and select `Update ServiceStack Reference` from the items context menu.
-
-### Xamarin Studio for Linux
-
-One of the nice benefits of creating an Xamarin Studio Add-in is that we're also able to bring the same experience to .NET Developers on Linux! Which works similar to OSX where you can install ServiceStackXS from the Add-in Gallery - Here's an example using Ubuntu:
-
-![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/servicestackvs/servicestack%20reference/ssxs-ubuntu-install.gif)
-
-Then **Add ServiceStack Reference** is accessible in the same way:
-
-![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/servicestackvs/servicestack%20reference/ssxs-ubuntu-add-ref.gif)
