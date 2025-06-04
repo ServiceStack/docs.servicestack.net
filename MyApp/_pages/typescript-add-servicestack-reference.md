@@ -273,13 +273,13 @@ This will import the remote Services dtos into your local project which looks si
 
 ```ts
 /* Options:
-Date: 2016-08-11 22:23:24
-Version: 4.061
+Date: 2025-06-04 09:47:09
+Version: 8.71
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://techstacks.io
 
 //GlobalNamespace: 
-//MakePropertiesOptional: True
+//MakePropertiesOptional: False
 //AddServiceStackTypes: True
 //AddResponseStatus: False
 //AddImplicitVersion: 
@@ -290,19 +290,24 @@ BaseUrl: https://techstacks.io
 */
 
 // @Route("/technology/{Slug}")
-export class GetTechnology implements IReturn<GetTechnologyResponse>
+export class GetTechnology implements IReturn<GetTechnologyResponse>, IRegisterStats, IGet
 {
-    Slug: string;
-    createResponse() { return new GetTechnologyResponse(); }
-    getTypeName() { return "GetTechnology"; }
+    public slug: string;
+
+    public constructor(init?: Partial<GetTechnology>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'GetTechnology'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new GetTechnologyResponse(); }
 }
 
 export class GetTechnologyResponse
 {
-    Created: string;
-    Technology: Technology;
-    TechnologyStacks: TechnologyStack[];
-    ResponseStatus: ResponseStatus;
+    public created: string;
+    public technology: Technology;
+    public technologyStacks: TechnologyStack[];
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<GetTechnologyResponse>) { (Object as any).assign(this, init); }
 }
 ```
 

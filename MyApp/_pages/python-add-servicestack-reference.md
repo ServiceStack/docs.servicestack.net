@@ -364,13 +364,12 @@ This will import the remote Services dtos into your local project which looks si
 
 ```python
 """ Options:
-Date: 2021-08-14 15:33:39
-Version: 5.111
-Tip: To override a DTO option, remove "//" prefix before updating
+Date: 2025-06-04 09:49:40
+Version: 8.71
+Tip: To override a DTO option, remove "#" prefix before updating
 BaseUrl: https://techstacks.io
 
 #GlobalNamespace: 
-#MakePropertiesOptional: False
 #AddServiceStackTypes: True
 #AddResponseStatus: False
 #AddImplicitVersion: 

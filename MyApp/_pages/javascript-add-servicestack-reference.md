@@ -155,10 +155,10 @@ to override any server defaults.
 
 ```js
 /* Options:
-Date: 2023-02-08 13:13:28
-Version: 6.60
+Date: 2025-06-04 09:52:13
+Version: 8.80
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor.web-templates.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //AddServiceStackTypes: True
 //AddDocAnnotations: True

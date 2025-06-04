@@ -68,10 +68,12 @@ The header comments in the generated DTO's allows for further customization of h
 
 ```fsharp
 (* Options:
-Date: 2014-10-21 00:45:38
-Version: 1
+Date: 2025-06-04 09:53:35
+Version: 8.80
+Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://blazor-vue.web-templates.io
 
+//GlobalNamespace: 
 //MakeDataContractsExtensible: False
 //AddReturnMarker: True
 //AddDescriptionAsComments: True
@@ -80,9 +82,10 @@ BaseUrl: https://blazor-vue.web-templates.io
 //AddGeneratedCodeAttributes: False
 //AddResponseStatus: False
 //AddImplicitVersion: 
+//ExportValueTypes: False
 //IncludeTypes: 
 //ExcludeTypes: 
-//InitializeCollections: True
+//InitializeCollections: False
 //AddNamespaces: 
 *)
 ```

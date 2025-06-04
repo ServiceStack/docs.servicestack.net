@@ -162,11 +162,11 @@ The header comments in the generated DTO's allows for further customization of h
 
 ```swift
 /* Options:
-Date: 2024-11-28 10:23:42
+Date: 2025-06-04 09:51:09
 SwiftVersion: 6.0
-Version: 8.51
+Version: 8.80
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://techstacks.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //BaseClass: 
 //AddModelExtensions: True

@@ -455,8 +455,8 @@ This will import the remote Services dtos into your local project which looks si
 ```php
 <?php namespace dtos;
 /* Options:
-Date: 2023-10-14 08:05:09
-Version: 6.111
+Date: 2025-06-04 09:50:43
+Version: 8.71
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://techstacks.io
 

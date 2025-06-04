@@ -54,10 +54,12 @@ The header comments in the generated DTO's allows for further customization of h
 
 ```vb
 ' Options:
-'Date: 2014-10-21 00:45:05
-'Version: 1
+'Date: 2025-06-04 09:53:47
+'Version: 8.80
+'Tip: To override a DTO option, remove "''" prefix before updating
 'BaseUrl: https://blazor-vue.web-templates.io
 '
+'''GlobalNamespace: 
 '''MakePartial: True
 '''MakeVirtual: True
 '''MakeDataContractsExtensible: False
@@ -68,7 +70,11 @@ The header comments in the generated DTO's allows for further customization of h
 '''AddGeneratedCodeAttributes: False
 '''AddResponseStatus: False
 '''AddImplicitVersion: 
-'''InitializeCollections: True
+'''InitializeCollections: False
+'''ExportValueTypes: False
+'''IncludeTypes: 
+'''ExcludeTypes: 
+'''AddNamespaces: 
 '''AddDefaultXmlNamespace: http://schemas.servicestack.net/types
 ```
 

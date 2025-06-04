@@ -44,14 +44,17 @@ The header comments in the generated DTOs allows for further customization of ho
 
 ```csharp
 /* Options:
-Date: 2015-10-07 11:01:27
-Version: 4.046
+Date: 2025-06-04 09:45:54
+Version: 8.80
+Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://blazor-vue.web-templates.io
 
 //GlobalNamespace: 
 //MakePartial: True
 //MakeVirtual: True
+//MakeInternal: False
 //MakeDataContractsExtensible: False
+//AddNullableAnnotations: False
 //AddReturnMarker: True
 //AddDescriptionAsComments: True
 //AddDataContractAttributes: False
@@ -59,24 +62,30 @@ BaseUrl: https://blazor-vue.web-templates.io
 //AddGeneratedCodeAttributes: False
 //AddResponseStatus: False
 //AddImplicitVersion: 
-//InitializeCollections: True
+//InitializeCollections: False
+//ExportValueTypes: False
 //IncludeTypes: 
 //ExcludeTypes: 
+//AddNamespaces: 
 //AddDefaultXmlNamespace: http://schemas.servicestack.net/types
 */
 ```
+
 To override these options on the client, the `//` has to be removed. For example, if we did not want our classes to be partial by default for the C# client, our options would look like below:
 
 ```csharp
 /* Options:
-Date: 2015-10-07 11:01:27
-Version: 4.046
+Date: 2025-06-04 09:46:15
+Version: 8.80
+Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://blazor-vue.web-templates.io
 
 //GlobalNamespace: 
 MakePartial: False
 //MakeVirtual: True
+//MakeInternal: False
 //MakeDataContractsExtensible: False
+//AddNullableAnnotations: False
 //AddReturnMarker: True
 //AddDescriptionAsComments: True
 //AddDataContractAttributes: False
@@ -84,12 +93,15 @@ MakePartial: False
 //AddGeneratedCodeAttributes: False
 //AddResponseStatus: False
 //AddImplicitVersion: 
-//InitializeCollections: True
+//InitializeCollections: False
+//ExportValueTypes: False
 //IncludeTypes: 
 //ExcludeTypes: 
+//AddNamespaces: 
 //AddDefaultXmlNamespace: http://schemas.servicestack.net/types
 */
 ```
+
 Options that do not start with a `//` are sent to the server to override any defaults set by the server.
 
 ### Change Default Server Configuration

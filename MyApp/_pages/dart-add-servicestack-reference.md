@@ -887,10 +887,10 @@ to override any server defaults.
 
 ```dart
 /* Options:
-Date: 2018-05-01 08:09:24
-Version: 5.10
+Date: 2025-06-04 09:48:37
+Version: 8.80
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://techstacks.io
+BaseUrl: https://blazor-vue.web-templates.io
 
 //GlobalNamespace: 
 //AddServiceStackTypes: True
@@ -899,7 +899,7 @@ BaseUrl: https://techstacks.io
 //AddDescriptionAsComments: True
 //IncludeTypes: 
 //ExcludeTypes: 
-//DefaultImports: package:servicestack/client.dart
+//DefaultImports: package:servicestack/servicestack.dart
 */
 ```
 

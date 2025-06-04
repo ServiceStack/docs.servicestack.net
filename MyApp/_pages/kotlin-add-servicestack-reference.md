@@ -153,20 +153,21 @@ Like other Native Type languages, the generated DTO's can be further customized 
 
 ```
 /* Options:
-Date: 2015-04-17 15:16:08
-Version: 1
-BaseUrl: https://techstacks.io
+Date: 2025-06-04 09:53:03
+Version: 8.80
+Tip: To override a DTO option, remove "//" prefix before updating
+BaseUrl: https://blazor-vue.web-templates.io
 
-Package: org.layoric.myapplication
-GlobalNamespace: techstackdtos
-//AddPropertyAccessors: True
-//SettersReturnThis: True
+//Package: 
 //AddServiceStackTypes: True
 //AddResponseStatus: False
 //AddImplicitVersion: 
+//AddDescriptionAsComments: True
 //IncludeTypes: 
 //ExcludeTypes: 
-//DefaultImports: java.math.*,java.util.*,net.servicestack.client.*,com.google.gson.annotations.*
+//InitializeCollections: False
+//TreatTypesAsStrings: 
+//DefaultImports: java.math.*,java.util.*,java.io.InputStream,net.servicestack.client.*,com.google.gson.annotations.*,com.google.gson.reflect.*
 */
 ...
 ```
