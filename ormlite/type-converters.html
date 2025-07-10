@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-06-27T01:54:23.6128977Z'>
+    <meta name='date' content='2025-07-10T12:43:49.6461842Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>OrmLite Type Converters</title>
@@ -412,43 +412,53 @@ custom logic for handling different Field Types into individual Type Converters.
 <p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/ormlite-converters.png" alt="OrmLite Converters" /></p>
 <h2 id="encapsulated-reusable-customizable-and-debuggable">Encapsulated, reusable, customizable and debuggable<a class="header-anchor" href="javascript:;" onclick="location.hash='#encapsulated-reusable-customizable-and-debuggable'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Converters allow for great re-use as common functionality to support each type is maintained in the common
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite/Converters">ServiceStack.OrmLite/Converters</a>
+<a href="https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/Converters">ServiceStack.OrmLite/Converters</a>
 whilst any RDBMS-specific functionality can inherit the common converters and provide any specialization
 required to support that type. E.g. SQL Server specific converters are maintained in
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite.SqlServer/Converters">ServiceStack.OrmLite.SqlServer/Converters</a>
-with each converter inheriting shared functionality and only adding custom logic required to support that
+<a href="https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/Converters">ServiceStack.OrmLite.SqlServer/Converters</a> with each converter inheriting shared functionality and only adding custom logic required to support that
 Type in Sql Server.</p>
 <h2 id="creating-converters">Creating Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-converters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Converters also provide good encapsulation as everything relating to handling the field type is contained within
 a single class definition. A Converter is any class implementing
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/IOrmLiteConverter.cs">IOrmLiteConverter</a>
+<a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/IOrmLiteConverter.cs">IOrmLiteConverter</a>
 although, it's instead recommended inheriting from the <code>OrmLiteConverter</code> abstract class which allows
 only the minimum APIs needing to be overridden, namely the <code>ColumnDefinition</code>
 used when creating the Table definition and the ADO.NET <code>DbType</code> it should use in parameterized queries.
 An example of this is in
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/Converters/GuidConverter.cs">GuidConverter</a>:</p>
+<a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/Converters/GuidConverter.cs">GuidConverter</a>:</p>
 <pre><code class="language-csharp">public class GuidConverter : OrmLiteConverter
 {
     public override string ColumnDefinition =&gt; &quot;GUID&quot;;
-
     public override DbType DbType =&gt; DbType.Guid;
+
+    public override object FromDbValue(Type fieldType, object value)
+    {
+        if (value is string s)
+            return Guid.Parse(s);
+        
+        return base.FromDbValue(fieldType, value);
+    }
 }
 </code></pre>
 <p>For this to work in SQL Server the <code>ColumnDefinition</code> should instead be <strong>UniqueIdentifier</strong> which is also
 what it needs to be cast to, to be able to query Guid's within an SQL Statement.
 Therefore, Guids require a custom
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerGuidConverter.cs">SqlServerGuidConverter</a>
+<a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerGuidConverter.cs">SqlServerGuidConverter</a>
 to support Guids in SQL Server which looks like:</p>
 <pre><code class="language-csharp">public class SqlServerGuidConverter : GuidConverter
 {
     public override string ColumnDefinition =&gt; &quot;UniqueIdentifier&quot;;
 
-    public override string ToQuotedString(Type fieldType, object value) =&gt; $&quot;CAST('{(Guid)value}' AS UNIQUEIDENTIFIER)&quot;;
+    public override string ToQuotedString(Type fieldType, object value)
+    {
+        var guidValue = (Guid)value;
+        return $&quot;CAST('{guidValue}' AS UNIQUEIDENTIFIER)&quot;;
+    }
 }
 </code></pre>
 <h2 id="registering-converters">Registering Converters<a class="header-anchor" href="javascript:;" onclick="location.hash='#registering-converters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>To get OrmLite to use this new Custom Converter for SQL Server, the <code>SqlServerOrmLiteDialectProvider</code> just
-<a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/41226795fc12f1b65d6af70c177a5ff57fa70334/src/ServiceStack.OrmLite.SqlServer/SqlServerOrmLiteDialectProvider.cs#L41">registers it in its constructor</a>:</p>
+<a href="https://github.com/ServiceStack/ServiceStack/blob/e764d49a1a0c760bec2c5cb5714a03ea8c39af99/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/SqlServerOrmLiteDialectProvider.cs#L50">registers it in its constructor</a>:</p>
 <pre><code class="language-csharp">base.RegisterConverter&lt;Guid&gt;(new SqlServerGuidConverter());
 </code></pre>
 <p>i.e. overriding the pre-registered <code>GuidConverter</code> to enable its extended functionality in SQL Server.</p>
