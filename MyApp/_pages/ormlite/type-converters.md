@@ -12,37 +12,43 @@ This use of individual decoupled Type Converters makes it possible to enhance or
 ## Encapsulated, reusable, customizable and debuggable
 
 Converters allow for great re-use as common functionality to support each type is maintained in the common
-[ServiceStack.OrmLite/Converters](https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite/Converters)
+[ServiceStack.OrmLite/Converters](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/Converters)
 whilst any RDBMS-specific functionality can inherit the common converters and provide any specialization
 required to support that type. E.g. SQL Server specific converters are maintained in
-[ServiceStack.OrmLite.SqlServer/Converters](https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/ServiceStack.OrmLite.SqlServer/Converters)
-with each converter inheriting shared functionality and only adding custom logic required to support that
+[ServiceStack.OrmLite.SqlServer/Converters](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/Converters) with each converter inheriting shared functionality and only adding custom logic required to support that
 Type in Sql Server.
 
 ## Creating Converters
 
 Converters also provide good encapsulation as everything relating to handling the field type is contained within
 a single class definition. A Converter is any class implementing
-[IOrmLiteConverter](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/IOrmLiteConverter.cs)
+[IOrmLiteConverter](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/IOrmLiteConverter.cs)
 although, it's instead recommended inheriting from the `OrmLiteConverter` abstract class which allows
 only the minimum APIs needing to be overridden, namely the `ColumnDefinition`
 used when creating the Table definition and the ADO.NET `DbType` it should use in parameterized queries.
 An example of this is in
-[GuidConverter](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/Converters/GuidConverter.cs):
+[GuidConverter](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/Converters/GuidConverter.cs):
 
 ```csharp
 public class GuidConverter : OrmLiteConverter
 {
     public override string ColumnDefinition => "GUID";
-
     public override DbType DbType => DbType.Guid;
+
+    public override object FromDbValue(Type fieldType, object value)
+    {
+        if (value is string s)
+            return Guid.Parse(s);
+        
+        return base.FromDbValue(fieldType, value);
+    }
 }
 ```
 
 For this to work in SQL Server the `ColumnDefinition` should instead be **UniqueIdentifier** which is also
 what it needs to be cast to, to be able to query Guid's within an SQL Statement.
 Therefore, Guids require a custom
-[SqlServerGuidConverter](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerGuidConverter.cs)
+[SqlServerGuidConverter](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerGuidConverter.cs)
 to support Guids in SQL Server which looks like:
 
 ```csharp
@@ -50,14 +56,18 @@ public class SqlServerGuidConverter : GuidConverter
 {
     public override string ColumnDefinition => "UniqueIdentifier";
 
-    public override string ToQuotedString(Type fieldType, object value) => $"CAST('{(Guid)value}' AS UNIQUEIDENTIFIER)";
+    public override string ToQuotedString(Type fieldType, object value)
+    {
+        var guidValue = (Guid)value;
+        return $"CAST('{guidValue}' AS UNIQUEIDENTIFIER)";
+    }
 }
 ```
 
 ## Registering Converters
 
 To get OrmLite to use this new Custom Converter for SQL Server, the `SqlServerOrmLiteDialectProvider` just
-[registers it in its constructor](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/41226795fc12f1b65d6af70c177a5ff57fa70334/src/ServiceStack.OrmLite.SqlServer/SqlServerOrmLiteDialectProvider.cs#L41):
+[registers it in its constructor](https://github.com/ServiceStack/ServiceStack/blob/e764d49a1a0c760bec2c5cb5714a03ea8c39af99/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/SqlServerOrmLiteDialectProvider.cs#L50):
 
 ```csharp
 base.RegisterConverter<Guid>(new SqlServerGuidConverter());
