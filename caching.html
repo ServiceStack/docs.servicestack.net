@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-07-10T12:43:50.2177693Z'>
+    <meta name='date' content='2025-07-28T12:28:24.8567745Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Caching Providers</title>
@@ -1451,46 +1451,46 @@ container.Register(c =&gt; c.Resolve&lt;IRedisClientsManager&gt;().GetCacheClien
 <h5 id="nuget-package-servicestack.redis">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Redis">ServiceStack.Redis</a></h5>
 <h3 id="ormlite">OrmLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#ormlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-csharp">//Register OrmLite Db Factory if not already
-container.Register&lt;IDbConnectionFactory&gt;(c =&gt; 
-    new OrmLiteConnectionFactory(connString, SqlServerDialect.Provider)); 
+services.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt; 
+    new OrmLiteConnectionFactory(connString, SqlServerDialect.Provider));
 
-container.RegisterAs&lt;OrmLiteCacheClient, ICacheClient&gt;();
+services.AddSingleton&lt;ICacheClient, OrmLiteCacheClient&gt;();
 
 //Create 'CacheEntry' RDBMS table if it doesn't exist already
-container.Resolve&lt;ICacheClient&gt;().InitSchema(); 
+appHost.Resolve&lt;ICacheClient&gt;().InitSchema(); 
 </code></pre>
 <h4 id="sql-server-memory-optimized-cache">SQL Server Memory Optimized Cache<a class="header-anchor" href="javascript:;" onclick="location.hash='#sql-server-memory-optimized-cache'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
 <p>SQL Server's Memory Optimized support can be used to improve the performance of <code>OrmLiteCacheClient</code>
 by configuring it to use the above In Memory Table Schema instead, e.g:</p>
-<pre><code class="language-csharp">container.Register&lt;ICacheClient&gt;(c =&gt; 
+<pre><code class="language-csharp">services.AddSingleton&lt;ICacheClient&gt;(c =&gt; 
     new OrmLiteCacheClient&lt;SqlServerMemoryOptimizedCacheEntry&gt;());
 </code></pre>
 <h5 id="nuget-package-servicestack.server">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Server">ServiceStack.Server</a></h5>
-<h3 id="memcached">Memcached:<a class="header-anchor" href="javascript:;" onclick="location.hash='#memcached'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-csharp">container.Register&lt;ICacheClient&gt;(
+<h3 id="memcached">Memcached<a class="header-anchor" href="javascript:;" onclick="location.hash='#memcached'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">services.AddSingleton&lt;ICacheClient&gt;(
     new MemcachedClientCache(new[] { &quot;127.0.0.0&quot; }); //Add Memcached hosts
 </code></pre>
 <h5 id="nuget-package-servicestack.caching.memcached">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Caching.Memcached">ServiceStack.Caching.Memcached</a></h5>
-<h3 id="aws-dynamodb">AWS DynamoDB:<a class="header-anchor" href="javascript:;" onclick="location.hash='#aws-dynamodb'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<h3 id="aws-dynamodb">AWS DynamoDB<a class="header-anchor" href="javascript:;" onclick="location.hash='#aws-dynamodb'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-csharp">var awsDb = new AmazonDynamoDBClient(
     AWS_ACCESS_KEY, AWS_SECRET_KEY, RegionEndpoint.USEast1);
 
-container.Register&lt;IPocoDynamo&gt;(new PocoDynamo(awsDb));
-container.Register&lt;ICacheClient&gt;(c =&gt; new DynamoDbCacheClient(c.Resolve&lt;IPocoDynamo&gt;()));
+services.AddSingleton&lt;IPocoDynamo&gt;(new PocoDynamo(awsDb));
+services.AddSingleton&lt;ICacheClient&gt;(c =&gt; new DynamoDbCacheClient(c.Resolve&lt;IPocoDynamo&gt;()));
 
-var cache = container.Resolve&lt;ICacheClient&gt;();
+var cache = appHost.Resolve&lt;ICacheClient&gt;();
 cache.InitSchema();
 </code></pre>
 <h5 id="nuget-package-servicestack.aws">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Aws">ServiceStack.Aws</a></h5>
 <h3 id="azure">Azure:<a class="header-anchor" href="javascript:;" onclick="location.hash='#azure'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-csharp">container.Register&lt;ICacheClient&gt;(new AzureTableCacheClient(cacheConnStr));
+<pre><code class="language-csharp">services.AddSingleton&lt;ICacheClient&gt;(new AzureTableCacheClient(cacheConnStr));
 </code></pre>
 <h5 id="nuget-package-servicestack.azure">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Azure">ServiceStack.Azure</a></h5>
 <h3 id="multi-cacheclient">Multi CacheClient<a class="header-anchor" href="javascript:;" onclick="location.hash='#multi-cacheclient'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <code>MultiCacheClient</code> can be used to utilize a write-through multi-tiered cache client where all &quot;writes&quot; are made to all
 registered cache providers whilst &quot;reads&quot; are only accessed until a value exists. E.g. you can register a local memory
 and redis server backed Cache Client with:</p>
-<pre><code class="language-csharp">container.Register&lt;ICacheClient&gt;(c =&gt; new MultiCacheClient(
+<pre><code class="language-csharp">services.AddSingleton&lt;ICacheClient&gt;(c =&gt; new MultiCacheClient(
     new MemoryCacheClient(),
     c.Resolve&lt;IRedisClientsManager&gt;().GetCacheClient()));
 </code></pre>
@@ -1516,9 +1516,9 @@ and redis server backed Cache Client with:</p>
 <p><code>ToOptimizedResultUsingCache</code> also has an overload which provides a parameter to set the timespan when the cache should be deleted (marked as expired). If now a client calls the same service method a second time and the cache expired, the provided delegate, which returns the response DTO, will be executed a second time.</p>
 <pre><code class="language-csharp">var cacheKey = &quot;some_unique_key&quot;;
 //Cache should be deleted in 1h
-var expireInTimespan = new TimeSpan(1, 0, 0);
+var expireInTimeSpan = new TimeSpan(1, 0, 0);
 return base.Request.ToOptimizedResultUsingCache(
-    base.Cache, cacheKey, expireInTimespan, ...)
+    base.Cache, cacheKey, expireInTimeSpan, ...)
 </code></pre>
 <h2 id="delete-cached-responses">Delete cached responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#delete-cached-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>If now for example an order gets updated and the order was cached before the update, the webservice will still return the same result, because the cache doesn't know that the order has been updated.</p>
@@ -1541,7 +1541,7 @@ return base.Request.ToOptimizedResultUsingCache(
     }
 }
 </code></pre>
-<p>If now the client calls the webservice to request the order, he'll get the latest version.</p>
+<p>If now the client calls the web service to request the order, he'll get the latest version.</p>
 <h3 id="localcache">LocalCache<a class="header-anchor" href="javascript:;" onclick="location.hash='#localcache'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>As it sometimes beneficial to have access to a local in-memory Cache in addition to your registered <code>ICacheClient</code>
 <a href="/caching">Caching Provider</a> we also pre-register a <code>MemoryCacheClient</code> that all your Services now have access to from the <code>LocalCache</code>
@@ -1588,8 +1588,8 @@ var allSessions = Cache.GetAll&lt;IAuthSession&gt;(sessionKeys);
 </code></pre>
 <h3 id="cacheclient-with-prefix">CacheClient with Prefix<a class="header-anchor" href="javascript:;" onclick="location.hash='#cacheclient-with-prefix'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <code>CacheClientWithPrefix</code> class lets you decorate any <code>ICacheClient</code> to prefix all cache keys using the <code>.WithPrefix()</code> extension method. This could be used to easily enable multi-tenant usage of a single redis instance, e.g:</p>
-<pre><code class="language-csharp">container.Register(c =&gt; 
-    c.Resolve&lt;IRedisClientsManager&gt;().GetCacheClient().WithPrefix(&quot;site1&quot;));
+<pre><code class="language-csharp">services.AddSingleton(c =&gt; 
+    c.GetRequiredService&lt;IRedisClientsManager&gt;().GetCacheClient().WithPrefix(&quot;site1&quot;));
 </code></pre>
 <h2 id="live-example-and-code">Live Example and code<a class="header-anchor" href="javascript:;" onclick="location.hash='#live-example-and-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>A live demo of the ICacheClient is available in <a href="https://northwind.netcore.io/">The ServiceStack.Northwind's example project</a>. Here are some requests to cached services:</p>
