@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-07-28T12:28:24.8567745Z'>
+    <meta name='date' content='2025-07-28T12:43:23.0446438Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Caching Providers</title>
@@ -1437,16 +1437,16 @@ var item = await cache.GetAsync&lt;Item&gt;(&quot;key&quot;);
 <p>To configure which cache should be used, the particular client has to be registered in the IoC container against the <code>ICacheClient</code> interface:</p>
 <h3 id="memory-cache">Memory cache:<a class="header-anchor" href="javascript:;" onclick="location.hash='#memory-cache'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>By default ServiceStack registers an MemoryCacheClient by default when no <code>ICacheClient</code> is registered so no registration is necessary.</p>
-<pre><code class="language-csharp">//container.Register&lt;ICacheClient&gt;(new MemoryCacheClient());
+<pre><code class="language-csharp">//services.AddSingleton&lt;ICacheClient&gt;(new MemoryCacheClient());
 </code></pre>
 <p>Even if you have an alternative <code>ICacheClient</code> registered you can still access the in memory cache via the <code>LocalCache</code> property in your Services
 and ServiceStack MVC Controllers or anywhere else via the <code>HostContext.AppHost.GetMemoryCacheClient()</code> singleton as well as
 <code>[CacheResponse(UseLocalCache=true)]</code> when using the <a href="/cacheresponse-attribute">Cache Response Attribute</a>.</p>
 <h3 id="redis">Redis<a class="header-anchor" href="javascript:;" onclick="location.hash='#redis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-csharp">container.Register&lt;IRedisClientsManager&gt;(c =&gt; 
+<pre><code class="language-csharp">services.AddSingleton&lt;IRedisClientsManager&gt;(c =&gt; 
     new RedisManagerPool(&quot;localhost:6379&quot;));
 
-container.Register(c =&gt; c.Resolve&lt;IRedisClientsManager&gt;().GetCacheClient());
+services.AddSingleton(c =&gt; c.GetRequiredService&lt;IRedisClientsManager&gt;().GetCacheClient());
 </code></pre>
 <h5 id="nuget-package-servicestack.redis">NuGet Package: <a href="http://www.nuget.org/packages/ServiceStack.Redis">ServiceStack.Redis</a></h5>
 <h3 id="ormlite">OrmLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#ormlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1476,7 +1476,8 @@ by configuring it to use the above In Memory Table Schema instead, e.g:</p>
     AWS_ACCESS_KEY, AWS_SECRET_KEY, RegionEndpoint.USEast1);
 
 services.AddSingleton&lt;IPocoDynamo&gt;(new PocoDynamo(awsDb));
-services.AddSingleton&lt;ICacheClient&gt;(c =&gt; new DynamoDbCacheClient(c.Resolve&lt;IPocoDynamo&gt;()));
+services.AddSingleton&lt;ICacheClient&gt;(c =&gt; 
+    new DynamoDbCacheClient(c.GetRequiredService&lt;IPocoDynamo&gt;()));
 
 var cache = appHost.Resolve&lt;ICacheClient&gt;();
 cache.InitSchema();
@@ -1492,7 +1493,7 @@ registered cache providers whilst &quot;reads&quot; are only accessed until a va
 and redis server backed Cache Client with:</p>
 <pre><code class="language-csharp">services.AddSingleton&lt;ICacheClient&gt;(c =&gt; new MultiCacheClient(
     new MemoryCacheClient(),
-    c.Resolve&lt;IRedisClientsManager&gt;().GetCacheClient()));
+    c.GetRequiredService&lt;IRedisClientsManager&gt;().GetCacheClient()));
 </code></pre>
 <h2 id="cache-a-response-of-a-service">Cache a response of a service<a class="header-anchor" href="javascript:;" onclick="location.hash='#cache-a-response-of-a-service'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>To cache a response you simply have to call <code>ToOptimizedResultUsingCache</code> which is an extension method existing in <code>ServiceStack.ServiceHost</code>.</p>
