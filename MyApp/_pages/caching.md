@@ -7,12 +7,12 @@ As caching is an essential technology in the development of high-performance web
 [common client interface (ICacheClient)](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Caching/ICacheClient.cs)
 for the following cache providers:
 
-  * [Memory Cache](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Caching/MemoryCacheClient.cs) - Useful for single host web services without needing any infrastructure dependencies.
-  * [Redis](https://github.com/ServiceStack/ServiceStack.Redis) - A fast key-value store with non-volatile persistent storage and support for rich comp-sci data structures.
-  * [OrmLiteCacheClient](https://www.nuget.org/packages/ServiceStack.Server) - Supports all [OrmLite's RDBMS providers](https://github.com/ServiceStack/ServiceStack.OrmLite/#download) for using an existing RDBMS as a distributed cache.
-  * [Memcached](https://nuget.org/packages/ServiceStack.Caching.Memcached) - The original, tried and tested distributed memory caching provider.
-  * [Aws DynamoDB](https://www.nuget.org/packages/ServiceStack.Aws/) - Uses Amazon's Dynamo DB backend hosted on Amazon Web Services
-  * [Azure Table Storage](/azure#virtual-filesystem-backed-by-azure-blob-storage) - Uses Azure Table Storage for when your application is hosted on Azure.
+* [Memory Cache](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Caching/MemoryCacheClient.cs) - Useful for single host web services without needing any infrastructure dependencies.
+* [Redis](https://github.com/ServiceStack/ServiceStack.Redis) - A fast key-value store with non-volatile persistent storage and support for rich comp-sci data structures.
+* [OrmLiteCacheClient](https://www.nuget.org/packages/ServiceStack.Server) - Supports all [OrmLite's RDBMS providers](https://github.com/ServiceStack/ServiceStack.OrmLite/#download) for using an existing RDBMS as a distributed cache.
+* [Memcached](https://nuget.org/packages/ServiceStack.Caching.Memcached) - The original, tried and tested distributed memory caching provider.
+* [Aws DynamoDB](https://www.nuget.org/packages/ServiceStack.Aws/) - Uses Amazon's Dynamo DB backend hosted on Amazon Web Services
+* [Azure Table Storage](/azure#virtual-filesystem-backed-by-azure-blob-storage) - Uses Azure Table Storage for when your application is hosted on Azure.
 
 ### Async Cache Clients
 
@@ -74,16 +74,16 @@ container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
 
 ### OrmLite
 
-```csharp 
+```csharp
 //Register OrmLite Db Factory if not already
-container.Register<IDbConnectionFactory>(c => 
-    new OrmLiteConnectionFactory(connString, SqlServerDialect.Provider)); 
+services.AddSingleton<IDbConnectionFactory>(c => 
+    new OrmLiteConnectionFactory(connString, SqlServerDialect.Provider));
 
-container.RegisterAs<OrmLiteCacheClient, ICacheClient>();
+services.AddSingleton<ICacheClient, OrmLiteCacheClient>();
 
 //Create 'CacheEntry' RDBMS table if it doesn't exist already
-container.Resolve<ICacheClient>().InitSchema(); 
-``` 
+appHost.Resolve<ICacheClient>().InitSchema(); 
+```
 
 #### SQL Server Memory Optimized Cache
 
@@ -91,38 +91,40 @@ SQL Server's Memory Optimized support can be used to improve the performance of 
 by configuring it to use the above In Memory Table Schema instead, e.g:
 
 ```csharp
-container.Register<ICacheClient>(c => 
+services.AddSingleton<ICacheClient>(c => 
     new OrmLiteCacheClient<SqlServerMemoryOptimizedCacheEntry>());
 ```
 
 ##### NuGet Package: [ServiceStack.Server](http://www.nuget.org/packages/ServiceStack.Server)
 
-### Memcached:
-```csharp 
-container.Register<ICacheClient>(
+### Memcached
+
+```csharp
+services.AddSingleton<ICacheClient>(
     new MemcachedClientCache(new[] { "127.0.0.0" }); //Add Memcached hosts
 ```
 
 ##### NuGet Package: [ServiceStack.Caching.Memcached](http://www.nuget.org/packages/ServiceStack.Caching.Memcached)
 
-### AWS DynamoDB:
+### AWS DynamoDB
 
 ```csharp
 var awsDb = new AmazonDynamoDBClient(
     AWS_ACCESS_KEY, AWS_SECRET_KEY, RegionEndpoint.USEast1);
 
-container.Register<IPocoDynamo>(new PocoDynamo(awsDb));
-container.Register<ICacheClient>(c => new DynamoDbCacheClient(c.Resolve<IPocoDynamo>()));
+services.AddSingleton<IPocoDynamo>(new PocoDynamo(awsDb));
+services.AddSingleton<ICacheClient>(c => new DynamoDbCacheClient(c.Resolve<IPocoDynamo>()));
 
-var cache = container.Resolve<ICacheClient>();
+var cache = appHost.Resolve<ICacheClient>();
 cache.InitSchema();
 ```
+
 ##### NuGet Package: [ServiceStack.Aws](http://www.nuget.org/packages/ServiceStack.Aws)
 
 ### Azure:
 
-```csharp 
-container.Register<ICacheClient>(new AzureTableCacheClient(cacheConnStr));
+```csharp
+services.AddSingleton<ICacheClient>(new AzureTableCacheClient(cacheConnStr));
 ```
 
 ##### NuGet Package: [ServiceStack.Azure](http://www.nuget.org/packages/ServiceStack.Azure)
@@ -134,7 +136,7 @@ registered cache providers whilst "reads" are only accessed until a value exists
 and redis server backed Cache Client with:
 
 ```csharp
-container.Register<ICacheClient>(c => new MultiCacheClient(
+services.AddSingleton<ICacheClient>(c => new MultiCacheClient(
     new MemoryCacheClient(),
     c.Resolve<IRedisClientsManager>().GetCacheClient()));
 ```
@@ -169,9 +171,9 @@ There exists a class named [UrnId](https://github.com/ServiceStack/ServiceStack/
 ```csharp
 var cacheKey = "some_unique_key";
 //Cache should be deleted in 1h
-var expireInTimespan = new TimeSpan(1, 0, 0);
+var expireInTimeSpan = new TimeSpan(1, 0, 0);
 return base.Request.ToOptimizedResultUsingCache(
-    base.Cache, cacheKey, expireInTimespan, ...)
+    base.Cache, cacheKey, expireInTimeSpan, ...)
 ```
 
 ## Delete cached responses
@@ -180,8 +182,8 @@ If now for example an order gets updated and the order was cached before the upd
 
 So there are two options:
 
-- Use **time based** caching (and expire cache earlier)
-- Cache on **validity** 
+* Use **time based** caching (and expire cache earlier)
+* Cache on **validity**
 
 ::: info
 When the cache is based on **validity** the caches are invalidated manually (e.g. when a user modified his profile, > clear his cache) which means you always get the latest version and you never need to hit the database again to rehydrate the cache if it hasn't changed, which will save resources
@@ -201,12 +203,12 @@ public class CachedOrdersService : Service
 }
 ```
 
-If now the client calls the webservice to request the order, he'll get the latest version.
+If now the client calls the web service to request the order, he'll get the latest version.
 
-### LocalCache 
+### LocalCache
 
-As it sometimes beneficial to have access to a local in-memory Cache in addition to your registered `ICacheClient` 
-[Caching Provider](/caching) we also pre-register a `MemoryCacheClient` that all your Services now have access to from the `LocalCache` 
+As it sometimes beneficial to have access to a local in-memory Cache in addition to your registered `ICacheClient`
+[Caching Provider](/caching) we also pre-register a `MemoryCacheClient` that all your Services now have access to from the `LocalCache`
 property, i.e:
 
 ```csharp
@@ -241,17 +243,17 @@ The [ICacheClientExtended](https://github.com/ServiceStack/ServiceStack/blob/mas
 API is used to to provide additional non-core functionality to our most popular 
 [Caching providers](/caching):
 
- - Redis
- - OrmLite RDBMS
- - In Memory
- - AWS
- - Azure
- 
-The new API's are added as Extension methods on `ICacheClient` so they're easily accessible without casting, the new API's available include: 
+* Redis
+* OrmLite RDBMS
+* In Memory
+* AWS
+* Azure
+
+The new API's are added as Extension methods on `ICacheClient` so they're easily accessible without casting, the new API's available include:
   
-  - GetKeysByPattern(pattern) - return keys matching a wildcard pattern
-  - GetAllKeys() - return all keys in the caching provider
-  - GetKeysStartingWith() - Streaming API to return all keys Starting with a prefix
+* GetKeysByPattern(pattern) - return keys matching a wildcard pattern
+* GetAllKeys() - return all keys in the caching provider
+* GetKeysStartingWith() - Streaming API to return all keys Starting with a prefix
 
 With these new API's you can now easily get all active User Sessions using any of the supported Caching providers above with:
 
@@ -267,16 +269,16 @@ var allSessions = Cache.GetAll<IAuthSession>(sessionKeys);
 The `CacheClientWithPrefix` class lets you decorate any `ICacheClient` to prefix all cache keys using the `.WithPrefix()` extension method. This could be used to easily enable multi-tenant usage of a single redis instance, e.g:
 
 ```csharp
-container.Register(c => 
-    c.Resolve<IRedisClientsManager>().GetCacheClient().WithPrefix("site1"));
+services.AddSingleton(c => 
+    c.GetRequiredService<IRedisClientsManager>().GetCacheClient().WithPrefix("site1"));
 ```
 
 ## Live Example and code
 
 A live demo of the ICacheClient is available in [The ServiceStack.Northwind's example project](https://northwind.netcore.io/). Here are some requests to cached services:
 
-  * [/customers](https://northwind.netcore.io/cached/customers)
-  * [/customers/ALFKI](https://northwind.netcore.io/cached/customers/ALFKI)
-  * [/customers/ALFKI/orders](https://northwind.netcore.io/cached/customers/ALFKI/orders)
+* [/customers](https://northwind.netcore.io/cached/customers)
+* [/customers/ALFKI](https://northwind.netcore.io/cached/customers/ALFKI)
+* [/customers/ALFKI/orders](https://northwind.netcore.io/cached/customers/ALFKI/orders)
 
 Which are simply existing web services wrapped using **ICacheClient** that are contained in [CachedServices.cs](https://github.com/ServiceStack/ServiceStack.Examples/blob/master/src/ServiceStack.Northwind/ServiceStack.Northwind.ServiceInterface/CachedServices.cs)
