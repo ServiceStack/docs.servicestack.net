@@ -53,8 +53,8 @@ To configure which cache should be used, the particular client has to be registe
 
 By default ServiceStack registers an MemoryCacheClient by default when no `ICacheClient` is registered so no registration is necessary.
 
-```csharp 
-//container.Register<ICacheClient>(new MemoryCacheClient());
+```csharp
+//services.AddSingleton<ICacheClient>(new MemoryCacheClient());
 ```
 
 Even if you have an alternative `ICacheClient` registered you can still access the in memory cache via the `LocalCache` property in your Services
@@ -63,11 +63,11 @@ and ServiceStack MVC Controllers or anywhere else via the `HostContext.AppHost.G
 
 ### Redis
 
-```csharp 
-container.Register<IRedisClientsManager>(c => 
+```csharp
+services.AddSingleton<IRedisClientsManager>(c => 
     new RedisManagerPool("localhost:6379"));
 
-container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
+services.AddSingleton(c => c.GetRequiredService<IRedisClientsManager>().GetCacheClient());
 ```
 
 ##### NuGet Package: [ServiceStack.Redis](http://www.nuget.org/packages/ServiceStack.Redis)
@@ -113,7 +113,8 @@ var awsDb = new AmazonDynamoDBClient(
     AWS_ACCESS_KEY, AWS_SECRET_KEY, RegionEndpoint.USEast1);
 
 services.AddSingleton<IPocoDynamo>(new PocoDynamo(awsDb));
-services.AddSingleton<ICacheClient>(c => new DynamoDbCacheClient(c.Resolve<IPocoDynamo>()));
+services.AddSingleton<ICacheClient>(c => 
+    new DynamoDbCacheClient(c.GetRequiredService<IPocoDynamo>()));
 
 var cache = appHost.Resolve<ICacheClient>();
 cache.InitSchema();
@@ -138,7 +139,7 @@ and redis server backed Cache Client with:
 ```csharp
 services.AddSingleton<ICacheClient>(c => new MultiCacheClient(
     new MemoryCacheClient(),
-    c.Resolve<IRedisClientsManager>().GetCacheClient()));
+    c.GetRequiredService<IRedisClientsManager>().GetCacheClient()));
 ```
 
 ## Cache a response of a service
