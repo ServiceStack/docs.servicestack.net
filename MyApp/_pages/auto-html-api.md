@@ -20,7 +20,7 @@ Lets take a quick tour through each of these features:
 
 ## PREVIEW
 
-Calling our APIs in a browser will greet us with the Preview page which uses the [HtmlFormat](/vue/gallery/formats#htmlformat) to display the API response in a
+Calling our APIs in a browser will greet us with the Preview page which uses the [HtmlFormat](/vue/formats#htmlformat) to display the API response in a
 beautiful Tailwind style with links to different [Content-Type Formats](/formats) and direct links to view it in [API Explorer](/api-explorer) and [Locode](/locode/) for [AutoQuery](/autoquery/rdbms) APIs:
 
 <a href="https://northwind.netcore.io/customers/ALFKI" class="not-prose max-w-4xl">
@@ -41,7 +41,7 @@ Developers who wish to view the actual JSON API Response can click on the **JSON
 
 ## FORM
 
-You don't need to build UIs before non-developers can access your APIs with the **FORM** tab which uses the new [AutoForm](/vue/gallery/autoform) component
+You don't need to build UIs before non-developers can access your APIs with the **FORM** tab which uses the new [AutoForm](/vue/autoform) component
 to render an optimal UI to call an API that you can further customize from your C# Request DTOs:
 
 <a href="https://blazor-gallery.servicestack.net/bookings/1?tab=form" class="not-prose max-w-4xl">

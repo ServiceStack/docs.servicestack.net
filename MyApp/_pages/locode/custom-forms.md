@@ -66,10 +66,10 @@ you can import external 3rd Party packages the same way you import built-in pack
 
 Your components will have full control to implement their desired functionality how they want, which can get a lot of integrated functionality for free by leveraging the [Vue Component library](/vue/), e.g. this custom component uses:
 
- - [ModalDialog](/vue/gallery/modals) - to load our custom Create Albums Form component in a Modal Dialog
- - [ErrorSummary](/vue/gallery/alerts) - to display any non-contextual summary API errors
- - [TextInput](/vue/gallery/form-inputs) - to create a validation bound form for the `CreateAlbums` **Title** property
- - [LookupInput](/vue/gallery/form-inputs) - to create a Lookup input to select an Artist for the `CreateAlbums` **ArtistId** property
+ - [ModalDialog](/vue/modals) - to load our custom Create Albums Form component in a Modal Dialog
+ - [ErrorSummary](/vue/alerts) - to display any non-contextual summary API errors
+ - [TextInput](/vue/form-inputs) - to create a validation bound form for the `CreateAlbums` **Title** property
+ - [LookupInput](/vue/form-inputs) - to create a Lookup input to select an Artist for the `CreateAlbums` **ArtistId** property
 
 Whilst `<SubmitAlbumButton>` is an example of using a shared component in 
 [SubmitAlbumButton.mjs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/SubmitAlbumButton.mjs).
@@ -129,7 +129,7 @@ export const NewAlbums = {
 ```
 
 The only integration needed to communicate back with Locode's
-[AutoQueryGrid component](/vue/gallery/autoquerygrid) is to emit `done` when the form is dismissed without changes or emit `save` if changes are made to
+[AutoQueryGrid component](/vue/autoquerygrid) is to emit `done` when the form is dismissed without changes or emit `save` if changes are made to
 refresh the AutoQueryGrid resultset to see the latest changes.
 
 Invoking APIs with `useClient()` APIs will propagate any error information from any [declarative validation attributes](/locode/declarative#type-validation-attributes) into validation-aware components which alleviates us from needing to perform any manual validation ourselves.

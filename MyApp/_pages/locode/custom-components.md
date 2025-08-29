@@ -48,7 +48,7 @@ export const Welcome = {
 }
 ```
 
-Which uses the [DataGrid](/vue/gallery/datagrid) component to render its [custom Home page](https://chinook.locode.dev/locode):
+Which uses the [DataGrid](/vue/datagrid) component to render its [custom Home page](https://chinook.locode.dev/locode):
 
 [![](/img/pages/locode/chinook/welcome.png)](https://chinook.locode.dev/locode)
 
