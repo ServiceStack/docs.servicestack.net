@@ -12,7 +12,7 @@ This allows us to continue to benefiting rapid development workflow enabled by t
 to deliver the most optimal UX when we need to. 
 
 CreatorKit's [Email Templates](https://servicestack.net/creatorkit/portal-messages) are a good example of this, which instead of utilizing the standard
-[LookupInput](https://servicestack.net/vue/gallery/autoform#edit-form) (inferred from [Reference Fields](/vue/autoquerygrid#reference-fields))
+[LookupInput](/vue/autoform#edit-form) (inferred from [Reference Fields](/vue/autoquerygrid#reference-fields))
 to open a modal to select a contact from a Contacts DataGrid it uses a custom `EmailInput` Component to provide an optimal, user-friendly UX that
 we've come to expect from popular Email clients like gmail to provide a non-modal autocomplete dropdown that automatically searches our contact list 
 as we type.
