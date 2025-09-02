@@ -12,7 +12,7 @@ by [Jezz Santos](https://github.com/jezzsantos) makes it very easy to expose web
 and helps you manage your user's subscriptions to those webhooks.:
 
 :::copy
-`<PackageReference Include="ServiceStack.Webhooks" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Webhooks" Version="3.*" />`
 :::
 
 By adding the `WebhookFeature` to the `AppHost` of your service, 
