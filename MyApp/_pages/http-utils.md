@@ -90,10 +90,8 @@ The HttpClient HttpUtils use a lazy singleton for efficiency however if you're u
 public class AppHost : AppHostBase, IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices(services => services.AddHttpUtilsClient())
-        .Configure(app => {
-            if (!HasInit) 
-                app.UseServiceStack(new AppHost());
+        .ConfigureServices(services => {
+            services.AddHttpUtilsClient();
         });
 }
 ```
