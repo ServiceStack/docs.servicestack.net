@@ -300,8 +300,7 @@ Include `ServiceStack` package in your projects `Package.swift`
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ServiceStack/ServiceStack.Swift.git",
-        Version(6,0,0)..<Version(7,0,0)),
+    .package(url: "https://github.com/ServiceStack/ServiceStack.Swift.git", from: "6.0.5")
 ],
 ```
 
