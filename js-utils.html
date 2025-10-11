@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-09T16:49:31.2788626Z'>
+    <meta name='date' content='2025-10-11T03:41:32.9388307Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>JavaScript Utils</title>
@@ -1426,6 +1426,147 @@ JSON.parse(&quot;{a:1}&quot;)   //= new Dictionary&lt;string, object&gt; { {&quo
 JSON.parse(&quot;[{a:1}]&quot;) //= new List&lt;object&gt; { new Dictionary&lt;string, object&gt; { { &quot;a&quot;, 1 } } }
 </code></pre>
 <p>It can be used to parse dynamic JSON and any primitive JavaScript data type. The inverse API of <code>JSON.stringify()</code> is also available.</p>
+<h2 id="use-c-pattern-matching">Use C# Pattern Matching<a class="header-anchor" href="javascript:;" onclick="location.hash='#use-c-pattern-matching'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="getting-the-client_id-in-a-comfyui-output">Getting the client_id in a ComfyUI Output<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-the-client_id-in-a-comfyui-output'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">var comfyOutput = JSON.parse(json);
+var promptId = comfyOutput.Keys.First();
+var prompt = (Dictionary&lt;string, object?&gt;)comfyOutput[promptId]!;
+if (prompt.TryGetValue(&quot;prompt&quot;, out var oPromptTuple) &amp;&amp; oPromptTuple is List&lt;object&gt; promptTuple)
+{
+    if (promptTuple.Count &gt; 3)
+    {
+        var extraData = promptTuple[3];
+        if (extraData is Dictionary&lt;string, object?&gt; extraDataDict)
+        {
+            if (extraDataDict.TryGetValue(&quot;client_id&quot;, out var oClientId))
+            {
+                return oClientId as string;
+            }
+        }
+    }
+}
+return null;
+</code></pre>
+<p>Equivalent implementation using System.Text.Json:</p>
+<pre><code class="language-csharp">using System.Text.Json;
+
+var jsonDocument = JsonDocument.Parse(json);
+var root = jsonDocument.RootElement;
+
+var promptId = root.EnumerateObject().FirstOrDefault().Name;
+if (!string.IsNullOrEmpty(promptId) &amp;&amp; root.TryGetProperty(promptId, out var promptElement))
+{
+    if (promptElement.TryGetProperty(&quot;prompt&quot;, out var promptTupleElement)
+        &amp;&amp; promptTupleElement.ValueKind == JsonValueKind.Array)
+    {
+        var promptArray = promptTupleElement.EnumerateArray().ToArray();
+        if (promptArray.Length &gt; 3)
+        {
+            var extraDataElement = promptArray[3];
+            if (extraDataElement.ValueKind == JsonValueKind.Object
+                &amp;&amp; extraDataElement.TryGetProperty(&quot;client_id&quot;, out var clientIdElement)
+                &amp;&amp; clientIdElement.ValueKind == JsonValueKind.String)
+            {
+                return clientIdElement.GetString();
+            }
+        }
+    }
+}
+return null;
+</code></pre>
+<h3 id="parsing-a-gemini-api-request">Parsing a Gemini API Request<a class="header-anchor" href="javascript:;" onclick="location.hash='#parsing-a-gemini-api-request'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As JSON Object just stored any JSON into untyped generic collections you can use C# pattern matching to navigate and mutate the JSON Object as done in this example which modifies an Gemini API Request to replace the <code>inline_data.data</code> string with its length to make it suitable for logging:</p>
+<pre><code class="language-csharp">var obj = (Dictionary&lt;string,object&gt;) JSON.parse(json);
+if (obj.TryGetValue(&quot;contents&quot;, out var oContents)
+    &amp;&amp; oContents is List&lt;object&gt; contents)
+{
+    foreach (var oContent in contents)
+    {
+        if (oContent is Dictionary&lt;string, object&gt; content
+            &amp;&amp; content.TryGetValue(&quot;parts&quot;, out var oParts)
+            &amp;&amp; oParts is List&lt;object&gt; parts)
+        {
+            foreach (var oPart in parts)
+            {
+                if (oPart is Dictionary&lt;string, object&gt; part
+                    &amp;&amp; part.TryGetValue(&quot;inline_data&quot;, out var oInlineData)
+                    &amp;&amp; oInlineData is Dictionary&lt;string, object&gt; inlineData
+                    &amp;&amp; inlineData.TryGetValue(&quot;data&quot;, out var oData)
+                    &amp;&amp; oData is string data)
+                {
+                    inlineData[&quot;data&quot;] = $&quot;({data.Length})&quot;;
+                }
+            }
+        }
+    }
+}
+Console.WriteLine(JSON.stringify(obj));
+</code></pre>
+<p>This would be an equivalent implementation using System.Text.Json:</p>
+<pre><code class="language-csharp">using System.Text.Json;
+
+var jsonDocument = JsonDocument.Parse(json);
+var root = jsonDocument.RootElement;
+
+if (root.TryGetProperty(&quot;contents&quot;, out var contentsElement)
+    &amp;&amp; contentsElement.ValueKind == JsonValueKind.Array)
+{
+    foreach (var contentElement in contentsElement.EnumerateArray())
+    {
+        if (contentElement.ValueKind == JsonValueKind.Object
+            &amp;&amp; contentElement.TryGetProperty(&quot;parts&quot;, out var partsElement)
+            &amp;&amp; partsElement.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var partElement in partsElement.EnumerateArray())
+            {
+                if (partElement.ValueKind == JsonValueKind.Object
+                    &amp;&amp; partElement.TryGetProperty(&quot;inline_data&quot;, out var inlineDataElement)
+                    &amp;&amp; inlineDataElement.ValueKind == JsonValueKind.Object
+                    &amp;&amp; inlineDataElement.TryGetProperty(&quot;data&quot;, out var dataElement)
+                    &amp;&amp; dataElement.ValueKind == JsonValueKind.String)
+                {
+                    var data = dataElement.GetString();
+                    // Note: System.Text.Json JsonDocument is read-only
+                    // To modify, you'd need to reconstruct the JSON or use JsonNode
+                    Console.WriteLine($&quot;Data length: {data?.Length}&quot;);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<p>But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you can use <code>JsonNode</code> for mutable operations:</p>
+<pre><code class="language-csharp">using System.Text.Json;
+using System.Text.Json.Nodes;
+
+var jsonNode = JsonNode.Parse(json);
+
+if (jsonNode is JsonObject rootObj
+    &amp;&amp; rootObj[&quot;contents&quot;] is JsonArray contentsArray)
+{
+    foreach (var contentNode in contentsArray)
+    {
+        if (contentNode is JsonObject contentObj
+            &amp;&amp; contentObj[&quot;parts&quot;] is JsonArray partsArray)
+        {
+            foreach (var partNode in partsArray)
+            {
+                if (partNode is JsonObject partObj
+                    &amp;&amp; partObj[&quot;inline_data&quot;] is JsonObject inlineDataObj
+                    &amp;&amp; inlineDataObj[&quot;data&quot;] is JsonValue dataValue
+                    &amp;&amp; dataValue.TryGetValue&lt;string&gt;(out var data))
+                {
+                    // Modify the data for logging
+                    inlineDataObj[&quot;data&quot;] = $&quot;({data.Length})&quot;;
+                }
+            }
+        }
+    }
+}
+
+// Output the modified JSON for logging
+Console.WriteLine(jsonNode.ToJsonString());
+</code></pre>
 <h3 id="register-js-utils-in-servicestack.text">Register JS Utils in ServiceStack.Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#register-js-utils-in-servicestack.text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>JS Utils is already pre-configured in ServiceStack Web Apps to handle serializing &amp; deserializing <code>object</code> types.</p>
 <p>You can also configure to use it in <strong>ServiceStack.Text</strong> Typed JSON Serializers <strong>outside of ServiceStack</strong> with:</p>
@@ -1679,7 +1820,24 @@ var kvps = new List&lt;KeyValuePair&lt;string,object&gt;&gt; {
                                         <span v-hash="'#install'" data-id="install" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Install
                                         </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#use-c-pattern-matching'" data-id="use-c-pattern-matching" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Use C# Pattern Matching
+                                        </span>
                                             <ul class="ml-4">
+                                                    <li data-id="getting-the-client_id-in-a-comfyui-output" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#getting-the-client_id-in-a-comfyui-output'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Getting the client_id in a ComfyUI Output
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="parsing-a-gemini-api-request" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#parsing-a-gemini-api-request'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Parsing a Gemini API Request
+                                                        </span>
+                                                    </li>
                                                     <li data-id="register-js-utils-in-servicestack.text" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#register-js-utils-in-servicestack.text'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
