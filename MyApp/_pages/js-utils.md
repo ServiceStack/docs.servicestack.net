@@ -34,24 +34,19 @@ C# Pattern matching provides a powerful and intuitive approach for introspecting
 ### Getting the client_id in a ComfyUI Output
 
 ```csharp
-var comfyOutput = JSON.parse(json);
-var promptId = comfyOutput.Keys.First();
-var prompt = (Dictionary<string, object?>)comfyOutput[promptId]!;
-if (prompt.TryGetValue("prompt", out var oPromptTuple) && oPromptTuple is List<object> promptTuple)
+var comfyOutput = JSON.ParseObject(json);
+var prompt = (Dictionary<string, object?>)result.Values.First()!;
+if (prompt.TryGetValue("prompt", out List<object> promptTuple) && promptTuple.Count > 3)
 {
-    if (promptTuple.Count > 3)
+    var extraData = promptTuple[3];
+    if (extraData is Dictionary<string, object?> extraDataDict)
     {
-        var extraData = promptTuple[3];
-        if (extraData is Dictionary<string, object?> extraDataDict)
+        if (extraDataDict.TryGetValue("client_id", out string clientId))
         {
-            if (extraDataDict.TryGetValue("client_id", out var oClientId))
-            {
-                return oClientId as string;
-            }
+            ret.ClientId = clientId;
         }
     }
 }
-return null;
 ```
 
 Equivalent implementation using System.Text.Json:
@@ -62,13 +57,16 @@ using System.Text.Json;
 var jsonDocument = JsonDocument.Parse(json);
 var root = jsonDocument.RootElement;
 
-var promptId = root.EnumerateObject().FirstOrDefault().Name;
-if (!string.IsNullOrEmpty(promptId) && root.TryGetProperty(promptId, out var promptElement))
+// Get the first property value (equivalent to result.Values.First())
+var firstProperty = root.EnumerateObject().FirstOrDefault();
+if (firstProperty.Value.ValueKind == JsonValueKind.Object)
 {
-    if (promptElement.TryGetProperty("prompt", out var promptTupleElement)
-        && promptTupleElement.ValueKind == JsonValueKind.Array)
+    var prompt = firstProperty.Value;
+
+    if (prompt.TryGetProperty("prompt", out var promptElement)
+        && promptElement.ValueKind == JsonValueKind.Array)
     {
-        var promptArray = promptTupleElement.EnumerateArray().ToArray();
+        var promptArray = promptElement.EnumerateArray().ToArray();
         if (promptArray.Length > 3)
         {
             var extraDataElement = promptArray[3];
@@ -76,36 +74,30 @@ if (!string.IsNullOrEmpty(promptId) && root.TryGetProperty(promptId, out var pro
                 && extraDataElement.TryGetProperty("client_id", out var clientIdElement)
                 && clientIdElement.ValueKind == JsonValueKind.String)
             {
-                return clientIdElement.GetString();
+                var clientId = clientIdElement.GetString();
+                Console.WriteLine(clientId);
             }
         }
     }
 }
-return null;
 ```
 
-### Parsing a Gemini API Request
+### Parsing and mutating a Gemini API Request
 
 As JSON Object just stored any JSON into untyped generic collections you can use C# pattern matching to navigate and mutate the JSON Object as done in this example which modifies an Gemini API Request to replace the `inline_data.data` string with its length to make it suitable for logging:
 
 ```csharp
-var obj = (Dictionary<string,object>) JSON.parse(json);
-if (obj.TryGetValue("contents", out var oContents)
-    && oContents is List<object> contents)
+var obj = JSON.ParseObject(origJson);
+if (obj.TryGetValue("contents", out List<object> contents))
 {
-    foreach (var oContent in contents)
+    foreach (var content in contents.OfType<Dictionary<string,object>>())
     {
-        if (oContent is Dictionary<string, object> content
-            && content.TryGetValue("parts", out var oParts)
-            && oParts is List<object> parts)
+        if (content.TryGetValue("parts", out List<object> parts))
         {
-            foreach (var oPart in parts)
+            foreach (var part in parts.OfType<Dictionary<string,object>>())
             {
-                if (oPart is Dictionary<string, object> part
-                    && part.TryGetValue("inline_data", out var oInlineData)
-                    && oInlineData is Dictionary<string, object> inlineData
-                    && inlineData.TryGetValue("data", out var oData)
-                    && oData is string data)
+                if (part.TryGetValue("inline_data", out Dictionary<string,object> inlineData)
+                    && inlineData.TryGetValue("data", out string data))
                 {
                     inlineData["data"] = $"({data.Length})";
                 }
@@ -116,7 +108,8 @@ if (obj.TryGetValue("contents", out var oContents)
 Console.WriteLine(JSON.stringify(obj));
 ```
 
-This would be an equivalent implementation using System.Text.Json:
+This would be an equivalent implementation using **System.Text.Json** to parse and navigate the JSON data structure
+with `JsonDocument`:
 
 ```csharp
 using System.Text.Json;
@@ -150,9 +143,10 @@ if (root.TryGetProperty("contents", out var contentsElement)
         }
     }
 }
+Console.WriteLine(jsonDocument.RootElement);
 ```
 
-But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you can use `JsonNode` for mutable operations:
+But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you would use `JsonNode` for mutable operations instead:
 
 ```csharp
 using System.Text.Json;
@@ -186,7 +180,6 @@ if (jsonNode is JsonObject rootObj
 // Output the modified JSON for logging
 Console.WriteLine(jsonNode.ToJsonString());
 ```
-
 
 ### Register JS Utils in ServiceStack.Text
 
