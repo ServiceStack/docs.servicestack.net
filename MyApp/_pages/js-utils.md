@@ -142,7 +142,7 @@ if (root.TryGetProperty("contents", out var contentsElement)
 Console.WriteLine(jsonDocument.RootElement);
 ```
 
-But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you would use `JsonNode` for mutable operations instead:
+But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you could use `JsonNode` for mutable operations instead:
 
 ```csharp
 using System.Text.Json;
