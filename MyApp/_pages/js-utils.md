@@ -29,6 +29,8 @@ It can be used to parse dynamic JSON and any primitive JavaScript data type. The
 
 ## Use C# Pattern Matching
 
+C# Pattern matching provides a powerful and intuitive approach for introspecting JSON objects by leveraging C#'s native type checking and destructuring capabilities which is ideal when working with dynamic JSON data parsed into generic collections like `Dictionary<string, object>` and `List<object>` where it naturally integrates with C#'s control flow, making it easier to handle complex nested JSON structures while maintaining clean, expressive code that clearly communicates the expected data structure and extraction logic.
+
 ### Getting the client_id in a ComfyUI Output
 
 ```csharp
