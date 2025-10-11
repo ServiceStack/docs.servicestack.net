@@ -35,12 +35,10 @@ C# Pattern matching provides a powerful and intuitive approach for introspecting
 
 ```csharp
 var comfyOutput = JSON.ParseObject(json);
-var prompt = (Dictionary<string, object?>)result.Values.First()!;
-if (prompt.TryGetValue("prompt", out List<object> promptTuple) && promptTuple.Count > 3)
+if (prompt.TryGetValue("prompt", out List<object> tuple) && tuple.Count > 3)
 {
-    var extraData = promptTuple[3];
-    if (extraData is Dictionary<string, object?> extraDataDict
-        && extraDataDict.TryGetValue("client_id", out string clientId))
+    if (tuple[3] is Dictionary<string, object?> extraData
+        && extraData.TryGetValue("client_id", out string clientId))
     {
         Console.WriteLine(clientId);
     }
