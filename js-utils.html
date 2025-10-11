@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-11T03:48:29.3330692Z'>
+    <meta name='date' content='2025-10-11T07:01:43.1902454Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>JavaScript Utils</title>
@@ -1429,24 +1429,19 @@ JSON.parse(&quot;[{a:1}]&quot;) //= new List&lt;object&gt; { new Dictionary&lt;s
 <h2 id="use-c-pattern-matching">Use C# Pattern Matching<a class="header-anchor" href="javascript:;" onclick="location.hash='#use-c-pattern-matching'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>C# Pattern matching provides a powerful and intuitive approach for introspecting JSON objects by leveraging C#'s native type checking and destructuring capabilities which is ideal when working with dynamic JSON data parsed into generic collections like <code>Dictionary&lt;string, object&gt;</code> and <code>List&lt;object&gt;</code> where it naturally integrates with C#'s control flow, making it easier to handle complex nested JSON structures while maintaining clean, expressive code that clearly communicates the expected data structure and extraction logic.</p>
 <h3 id="getting-the-client_id-in-a-comfyui-output">Getting the client_id in a ComfyUI Output<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-the-client_id-in-a-comfyui-output'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-csharp">var comfyOutput = JSON.parse(json);
-var promptId = comfyOutput.Keys.First();
-var prompt = (Dictionary&lt;string, object?&gt;)comfyOutput[promptId]!;
-if (prompt.TryGetValue(&quot;prompt&quot;, out var oPromptTuple) &amp;&amp; oPromptTuple is List&lt;object&gt; promptTuple)
+<pre><code class="language-csharp">var comfyOutput = JSON.ParseObject(json);
+var prompt = (Dictionary&lt;string, object?&gt;)result.Values.First()!;
+if (prompt.TryGetValue(&quot;prompt&quot;, out List&lt;object&gt; promptTuple) &amp;&amp; promptTuple.Count &gt; 3)
 {
-    if (promptTuple.Count &gt; 3)
+    var extraData = promptTuple[3];
+    if (extraData is Dictionary&lt;string, object?&gt; extraDataDict)
     {
-        var extraData = promptTuple[3];
-        if (extraData is Dictionary&lt;string, object?&gt; extraDataDict)
+        if (extraDataDict.TryGetValue(&quot;client_id&quot;, out string clientId))
         {
-            if (extraDataDict.TryGetValue(&quot;client_id&quot;, out var oClientId))
-            {
-                return oClientId as string;
-            }
+            ret.ClientId = clientId;
         }
     }
 }
-return null;
 </code></pre>
 <p>Equivalent implementation using System.Text.Json:</p>
 <pre><code class="language-csharp">using System.Text.Json;
@@ -1454,13 +1449,16 @@ return null;
 var jsonDocument = JsonDocument.Parse(json);
 var root = jsonDocument.RootElement;
 
-var promptId = root.EnumerateObject().FirstOrDefault().Name;
-if (!string.IsNullOrEmpty(promptId) &amp;&amp; root.TryGetProperty(promptId, out var promptElement))
+// Get the first property value (equivalent to result.Values.First())
+var firstProperty = root.EnumerateObject().FirstOrDefault();
+if (firstProperty.Value.ValueKind == JsonValueKind.Object)
 {
-    if (promptElement.TryGetProperty(&quot;prompt&quot;, out var promptTupleElement)
-        &amp;&amp; promptTupleElement.ValueKind == JsonValueKind.Array)
+    var prompt = firstProperty.Value;
+
+    if (prompt.TryGetProperty(&quot;prompt&quot;, out var promptElement)
+        &amp;&amp; promptElement.ValueKind == JsonValueKind.Array)
     {
-        var promptArray = promptTupleElement.EnumerateArray().ToArray();
+        var promptArray = promptElement.EnumerateArray().ToArray();
         if (promptArray.Length &gt; 3)
         {
             var extraDataElement = promptArray[3];
@@ -1468,32 +1466,26 @@ if (!string.IsNullOrEmpty(promptId) &amp;&amp; root.TryGetProperty(promptId, out
                 &amp;&amp; extraDataElement.TryGetProperty(&quot;client_id&quot;, out var clientIdElement)
                 &amp;&amp; clientIdElement.ValueKind == JsonValueKind.String)
             {
-                return clientIdElement.GetString();
+                var clientId = clientIdElement.GetString();
+                Console.WriteLine(clientId);
             }
         }
     }
 }
-return null;
 </code></pre>
-<h3 id="parsing-a-gemini-api-request">Parsing a Gemini API Request<a class="header-anchor" href="javascript:;" onclick="location.hash='#parsing-a-gemini-api-request'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<h3 id="parsing-and-mutating-a-gemini-api-request">Parsing and mutating a Gemini API Request<a class="header-anchor" href="javascript:;" onclick="location.hash='#parsing-and-mutating-a-gemini-api-request'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>As JSON Object just stored any JSON into untyped generic collections you can use C# pattern matching to navigate and mutate the JSON Object as done in this example which modifies an Gemini API Request to replace the <code>inline_data.data</code> string with its length to make it suitable for logging:</p>
-<pre><code class="language-csharp">var obj = (Dictionary&lt;string,object&gt;) JSON.parse(json);
-if (obj.TryGetValue(&quot;contents&quot;, out var oContents)
-    &amp;&amp; oContents is List&lt;object&gt; contents)
+<pre><code class="language-csharp">var obj = JSON.ParseObject(origJson);
+if (obj.TryGetValue(&quot;contents&quot;, out List&lt;object&gt; contents))
 {
-    foreach (var oContent in contents)
+    foreach (var content in contents.OfType&lt;Dictionary&lt;string,object&gt;&gt;())
     {
-        if (oContent is Dictionary&lt;string, object&gt; content
-            &amp;&amp; content.TryGetValue(&quot;parts&quot;, out var oParts)
-            &amp;&amp; oParts is List&lt;object&gt; parts)
+        if (content.TryGetValue(&quot;parts&quot;, out List&lt;object&gt; parts))
         {
-            foreach (var oPart in parts)
+            foreach (var part in parts.OfType&lt;Dictionary&lt;string,object&gt;&gt;())
             {
-                if (oPart is Dictionary&lt;string, object&gt; part
-                    &amp;&amp; part.TryGetValue(&quot;inline_data&quot;, out var oInlineData)
-                    &amp;&amp; oInlineData is Dictionary&lt;string, object&gt; inlineData
-                    &amp;&amp; inlineData.TryGetValue(&quot;data&quot;, out var oData)
-                    &amp;&amp; oData is string data)
+                if (part.TryGetValue(&quot;inline_data&quot;, out Dictionary&lt;string,object&gt; inlineData)
+                    &amp;&amp; inlineData.TryGetValue(&quot;data&quot;, out string data))
                 {
                     inlineData[&quot;data&quot;] = $&quot;({data.Length})&quot;;
                 }
@@ -1503,7 +1495,8 @@ if (obj.TryGetValue(&quot;contents&quot;, out var oContents)
 }
 Console.WriteLine(JSON.stringify(obj));
 </code></pre>
-<p>This would be an equivalent implementation using System.Text.Json:</p>
+<p>This would be an equivalent implementation using <strong>System.Text.Json</strong> to parse and navigate the JSON data structure
+with <code>JsonDocument</code>:</p>
 <pre><code class="language-csharp">using System.Text.Json;
 
 var jsonDocument = JsonDocument.Parse(json);
@@ -1535,8 +1528,9 @@ if (root.TryGetProperty(&quot;contents&quot;, out var contentsElement)
         }
     }
 }
+Console.WriteLine(jsonDocument.RootElement);
 </code></pre>
-<p>But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you can use <code>JsonNode</code> for mutable operations:</p>
+<p>But as it's a read-only data structure you'd need to reconstruct the JSON to modify it. To create an equivalent modified JSON for logging, you would use <code>JsonNode</code> for mutable operations instead:</p>
 <pre><code class="language-csharp">using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -1833,10 +1827,10 @@ var kvps = new List&lt;KeyValuePair&lt;string,object&gt;&gt; {
                                                             Getting the client_id in a ComfyUI Output
                                                         </span>
                                                     </li>
-                                                    <li data-id="parsing-a-gemini-api-request" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#parsing-a-gemini-api-request'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="parsing-and-mutating-a-gemini-api-request" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#parsing-and-mutating-a-gemini-api-request'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Parsing a Gemini API Request
+                                                            Parsing and mutating a Gemini API Request
                                                         </span>
                                                     </li>
                                                     <li data-id="register-js-utils-in-servicestack.text" class="text-gray-500 hover:text-gray-900">
