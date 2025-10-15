@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-15T05:09:55.3359429Z'>
+    <meta name='date' content='2025-10-15T07:20:01.3373079Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v8.9</title>
@@ -3245,6 +3245,20 @@ component by adding it to your local <code>/wwwroot</code> folder:</p>
 customizations see the <a href="https://docs.servicestack.net/api-explorer">API Explorer Docs</a>.</p>
 <h2 id="xss-vulnerability-fixed-in-htmlformat.html">XSS Vulnerability fixed in HtmlFormat.html<a class="header-anchor" href="javascript:;" onclick="location.hash='#xss-vulnerability-fixed-in-htmlformat.html'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Late in this release cycle a Customer has reported a DOM XSS vulnerability in ServiceStack's built-in HtmlFormat.html page which has been fixed in <a href="https://github.com/ServiceStack/ServiceStack/commit/76df4609410f7b440c3fb153371a1d29b9c06ac0">this commit</a> and available from this ServiceStack v8.9+ release.</p>
+<p>Alternatively it can also be prevented by rejecting requests with <code>&quot;</code> in its path:</p>
+<pre><code class="language-csharp">GlobalRequestFilters.Add((req, res, dto) =&gt; {
+    if (req.OriginalPathInfo.IndexOf('&quot;') &gt;= 0)
+        throw HttpError.Forbidden(&quot;Illegal characters in path&quot;);
+});
+</code></pre>
+<p>By reverting to the use old HTML Format:</p>
+<pre><code class="language-csharp">ServiceStack.Templates.HtmlTemplates.HtmlFormatName = &quot;HtmlFormatLegacy.html&quot;;
+</code></pre>
+<p>Or by disabling the auto rendering of HTML API responses:</p>
+<pre><code class="language-csharp">SetConfig(new HostConfig {
+    EnableAutoHtmlResponses = false
+})
+</code></pre>
 </div>
 
                 <div class="not-prose"></div>
