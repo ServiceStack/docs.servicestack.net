@@ -6,7 +6,202 @@ title: Getting started with OrmLite
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
 </div>
 
-After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to. Most NuGet OrmLite packages only contain a single provider listed below:
+After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to. 
+
+## Fluent Configuration Model
+
+OrmLite's new Fluent Configuration Model is available from [ServiceStack v8.9](/releases/v8_09) which is modelled after 
+ASP.NET Core's familiar `services.Add*()` pattern and provides a more intuitive and discoverable way to configure your 
+database connections, with strongly-typed options for each RDBMS provider.
+
+It starts with the `AddOrmLite()` extension method to configure the default `IDbConnectionFactory` 
+dependency by combining it with RDBMS provider-specific methods for the RDBMS you wish to use:
+
+ - `UseSqlite()` in **ServiceStack.OrmLite.Sqlite.Data** 
+ - `UsePostgres()` in **ServiceStack.OrmLite.PostgreSQL**
+ - `UseSqlServer()` in **ServiceStack.OrmLite.SqlServer.Data**
+ - `UseMySql()`  in **ServiceStack.OrmLite.MySql**
+ - `UseMySqlConnector()`  in **ServiceStack.OrmLite.MySqlConnector**
+ - `UseOracle()`  in **ServiceStack.OrmLite.Oracle** (community supported)
+ - `UseFirebird()`  in **ServiceStack.OrmLite.Firebird** (community supported)
+
+Each provider method accepts a connection string and an optional configuration callback that lets you customize the dialect's behavior with IntelliSense support.
+
+### SQLite
+
+```csharp
+services.AddOrmLite(options => options.UseSqlite(connectionString));
+```
+
+Each RDBMS provider can be further customized to change its defaults with:
+
+```csharp
+services.AddOrmLite(options => options.UseSqlite(connectionString, dialect => {
+        // Default SQLite Configuration:
+        dialect.UseJson = true;
+        dialect.UseUtc = true;
+        dialect.EnableWal = true;
+        dialect.EnableForeignKeys = true;
+        dialect.BusyTimeout = TimeSpan.FromSeconds(30);
+    })
+);
+```
+
+### PostgreSQL
+
+```csharp
+services.AddOrmLite(options => options.UsePostgres(connectionString));
+```
+
+With Dialect Configuration:
+
+```csharp
+services.AddOrmLite(options => options.UsePostgres(connString, dialect => {
+        // Default PostgreSQL Configuration:
+        dialect.UseJson = true;
+        // Use snake_case PostgreSQL Naming Strategy
+        // dialect.NamingStrategy = new PostgreSqlNamingStrategy();
+    })
+);
+```
+
+### SQL Server
+
+```csharp
+services.AddOrmLite(options => options.UseSqlServer(connectionString));
+```
+
+With Dialect Configuration:
+
+```csharp
+services.AddOrmLite(options => options.UseSqlServer(connString, dialect => {
+        // Default SQL Server Configuration:
+        dialect.UseJson = true;
+    })
+);
+```
+
+### Uses Latest SQL Server at each .NET LTS Release
+
+To keep it modern and predictable, this will use the latest SQL Server Dialect that was released at the time of each 
+major .NET LTS versions, currently `SqlServer2022OrmLiteDialectProvider`, which we'll keep until the next .NET LTS release.
+Although the **2022** dialect is also compatible with every SQL Server version from **2016+**.
+
+To use an explicit version of SQL Server you can use the generic overload that best matches your version:
+
+```csharp
+services.AddOrmLite(options => 
+    options.UseSqlServer<SqlServer2014OrmLiteDialectProvider>(connString));
+```
+
+### MySQL
+
+```csharp
+services.AddOrmLite(options => options.UseMySql(connectionString));
+```
+
+With Dialect Configuration:
+
+```csharp
+services.AddOrmLite(options => options.UseMySql(connectionString, dialect => {
+        // Default MySql Configuration:
+        dialect.UseJson = true;
+    })
+);
+```
+
+For MySqlConnector use:
+
+```csharp
+services.AddOrmLite(options => options.AddMySqlConnector(connectionString));
+```
+
+### Named Connections
+
+The new OrmLite configuration model also streamlines support for named connections, allowing you to register 
+multiple database connections with unique identifiers in a single fluent configuration chain, e.g:
+
+```csharp
+services.AddOrmLite(options => {
+        options.UseSqlite(":memory:")
+            .ConfigureJson(json => {
+                json.DefaultSerializer = JsonSerializerType.ServiceStackJson;
+            });
+    })
+    .AddSqlite("db1", "db1.sqlite")
+    .AddSqlite("db2", "db2.sqlite")
+    .AddPostgres("reporting", PostgreSqlDb.Connection)
+    .AddSqlServer("analytics", SqlServerDb.Connection)
+    .AddSqlServer<SqlServer2014OrmLiteDialectProvider>(
+        "legacy-analytics", SqlServerDb.Connection)
+    .AddMySql("wordpress", MySqlDb.Connection)
+    .AddMySqlConnector("drupal", MySqlDb.Connection)
+    .AddOracle("enterprise", OracleDb.Connection)
+    .AddFirebird("firebird", FirebirdDb.Connection);
+```
+
+### Complex Type JSON Serialization
+
+The new configuration model uses a configurable `JsonComplexTypeSerializer` where you can change the default 
+JSON Serializer OrmLite should use for serializing Complex Types as well as fine-grain control over which types should
+use which serializer by using the `ConfigureJson()` extension method on each provider.
+
+```csharp
+services.AddOrmLite(options => {
+        options.UsePostgres(connectionString)
+            .ConfigureJson(json => {
+                // Default JSON Complex Type Serializer Configuration
+                json.DefaultSerializer = JsonSerializerType.ServiceStackJson;
+                json.JsonObjectTypes = [
+                    typeof(object),
+                    typeof(List<object>),
+                    typeof(Dictionary<string, object?>),
+                ];
+                json.SystemJsonTypes = [];
+                json.ServiceStackJsonTypes = [];
+            });
+    })
+```
+
+By default OrmLite uses **ServiceStack.Text** JSON Serializer which is less strict and more resilient than 
+**System.Text.Json** for handling versioning of Types, e.g. an `int` Property later changed to `string`.
+
+You can also configure exceptions to the default serialaizer, e.g. this configures OrmLite to use **System.Text.Json** 
+for all types except for `ChatCompletion` which we want to use **ServiceStack.Text** JSON for:
+
+```csharp
+services.AddOrmLite(options => {
+        options.UsePostgres(connectionString)
+            .ConfigureJson(json => {
+                json.DefaultSerializer = JsonSerializerType.SystemJson;
+                json.ServiceStackJsonTypes = [
+                    typeof(ChatCompletion)
+                ];
+            });
+    })
+```
+
+
+## OrmLite Connection Factory
+
+To configure OrmLite you'll need your App's DB Connection string along the above RDBMS Dialect Provider, e.g:
+
+```csharp
+var dbFactory = new OrmLiteConnectionFactory(
+    connectionString,  
+    SqlServerDialect.Provider);
+```
+
+If you're using an IOC register `OrmLiteConnectionFactory` as a **singleton**:
+
+```csharp
+services.AddSingleton<IDbConnectionFactory>(
+    new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider)); //InMemory Sqlite DB
+```
+
+Which can then be used to open DB Connections to your RDBMS.
+
+Most NuGet OrmLite packages only contain a single provider listed below:
 
 ```csharp
 SqlServerDialect.Provider      // SQL Server Version 2012+
@@ -28,25 +223,6 @@ SqlServer2014Dialect.Provider  // SQL Server 2014
 SqlServer2016Dialect.Provider  // SQL Server 2016
 SqlServer2017Dialect.Provider  // SQL Server 2017+
 ```
-
-## OrmLite Connection Factory
-
-To configure OrmLite you'll need your App's DB Connection string along the above RDBMS Dialect Provider, e.g:
-
-```csharp
-var dbFactory = new OrmLiteConnectionFactory(
-    connectionString,  
-    SqlServerDialect.Provider);
-```
-
-If you're using an IOC register `OrmLiteConnectionFactory` as a **singleton**:
-
-```csharp
-services.AddSingleton<IDbConnectionFactory>(
-    new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider)); //InMemory Sqlite DB
-```
-
-Which can then be used to open DB Connections to your RDBMS.
 
 ### Creating Table and Seed Data Example
 

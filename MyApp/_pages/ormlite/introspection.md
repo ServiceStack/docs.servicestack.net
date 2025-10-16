@@ -44,6 +44,50 @@ To later disable logging use:
 OrmLiteUtils.UnPrintSql();
 ```
 
+### Tagging Connections
+
+OrmLite's DB Connections can be tagged to make them easier to track in hooks, logs and traces.
+
+To achieve this a new `Action<IDbConnection>` configuration callbacks are available on all OrmLite Open Connection APIs
+which is invoked before a DB Connection is opened, e.g:
+
+```csharp
+using var db = dbFactory.Open(configure: db => db.WithTag("MyTag"));
+using var db = dbFactory.Open(namedConnection, configure: db => db.WithTag("MyTag"));
+
+using var db = HostContext.AppHost.GetDbConnection(req, configure: db => db.WithTag("MyTag"));
+```
+
+Which ServiceStack uses internally to tag DB Connections with the feature executing it, or for `Db` connections used in 
+Services it will tag it with the Request DTO Name.
+
+:::{.wideshot}
+![](/img/pages/release-notes/v8.9/ormlite-tags.webp)
+:::
+
+If a tag is configured, it's also included in OrmLite's Debug Logging output, e.g:
+
+```txt
+dbug: ServiceStack.OrmLiteLog[0]
+      [PostgresDbJobsProvider] SQL: SELECT "Id", "ParentId", "RefId", "Worker", "Tag", "BatchId", "Callback", "DependsOn", "RunAfter", "CreatedDate", "CreatedBy", "RequestId", "RequestType", "Command", "Request", "RequestBody", "UserId", "Response", "ResponseBody", "State", "StartedDate", "CompletedDate", "NotifiedDate", "RetryLimit", "Attempts", "DurationMs", "TimeoutSecs", "Progress", "Status", "Logs", "LastActivityDate", "ReplyTo", "ErrorCode", "Error", "Args", "Meta" 
+      FROM "BackgroundJob"
+      WHERE ("State" = :0)
+      PARAMS: :0=Cancelled
+dbug: ServiceStack.OrmLiteLog[0]
+      TIME: 1.818m
+```
+
+### DB Command Execution Timing
+
+OrmLite's debug logging also includes the elapsed time it took to execute the command which is also available on the `IDbCommand` `GetTag()` and `GetElapsedTime()` APIs, e.g:
+
+```csharp
+OrmLiteConfig.AfterExecFilter = cmd =>
+{
+    Console.WriteLine($"[{cmd.GetTag()}] {cmd.GetElapsedTime()}");
+};
+```
+
 ## Exec, Result and String Filters
 
 OrmLite's core Exec filters makes it possible to inject your own behavior, tracing, profiling, etc.
