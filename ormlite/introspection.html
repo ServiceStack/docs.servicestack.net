@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-16T11:28:42.5270820Z'>
+    <meta name='date' content='2025-10-16T15:03:55.7380155Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>OrmLite Logging and Introspection</title>
@@ -263,6 +263,11 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
+                                    <a href="/ormlite/async-tasks-builder" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Async Tasks Builder
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/ormlite/reference-support" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Reference Support
                                     </a>
@@ -430,6 +435,35 @@ OrmLite                                    </span>
 <p>To later disable logging use:</p>
 <pre><code class="language-csharp">OrmLiteUtils.UnPrintSql();
 </code></pre>
+<h3 id="tagging-connections">Tagging Connections<a class="header-anchor" href="javascript:;" onclick="location.hash='#tagging-connections'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>OrmLite's DB Connections can be tagged to make them easier to track in hooks, logs and traces.</p>
+<p>To achieve this a new <code>Action&lt;IDbConnection&gt;</code> configuration callbacks are available on all OrmLite Open Connection APIs
+which is invoked before a DB Connection is opened, e.g:</p>
+<pre><code class="language-csharp">using var db = dbFactory.Open(configure: db =&gt; db.WithTag(&quot;MyTag&quot;));
+using var db = dbFactory.Open(namedConnection, configure: db =&gt; db.WithTag(&quot;MyTag&quot;));
+
+using var db = HostContext.AppHost.GetDbConnection(req, configure: db =&gt; db.WithTag(&quot;MyTag&quot;));
+</code></pre>
+<p>Which ServiceStack uses internally to tag DB Connections with the feature executing it, or for <code>Db</code> connections used in
+Services it will tag it with the Request DTO Name.</p>
+<div class="wideshot"><p><img src="/img/pages/release-notes/v8.9/ormlite-tags.webp" alt="" /></p>
+</div>
+<p>If a tag is configured, it's also included in OrmLite's Debug Logging output, e.g:</p>
+<pre><code class="language-txt">dbug: ServiceStack.OrmLiteLog[0]
+      [PostgresDbJobsProvider] SQL: SELECT &quot;Id&quot;, &quot;ParentId&quot;, &quot;RefId&quot;, &quot;Worker&quot;, &quot;Tag&quot;, &quot;BatchId&quot;, &quot;Callback&quot;, &quot;DependsOn&quot;, &quot;RunAfter&quot;, &quot;CreatedDate&quot;, &quot;CreatedBy&quot;, &quot;RequestId&quot;, &quot;RequestType&quot;, &quot;Command&quot;, &quot;Request&quot;, &quot;RequestBody&quot;, &quot;UserId&quot;, &quot;Response&quot;, &quot;ResponseBody&quot;, &quot;State&quot;, &quot;StartedDate&quot;, &quot;CompletedDate&quot;, &quot;NotifiedDate&quot;, &quot;RetryLimit&quot;, &quot;Attempts&quot;, &quot;DurationMs&quot;, &quot;TimeoutSecs&quot;, &quot;Progress&quot;, &quot;Status&quot;, &quot;Logs&quot;, &quot;LastActivityDate&quot;, &quot;ReplyTo&quot;, &quot;ErrorCode&quot;, &quot;Error&quot;, &quot;Args&quot;, &quot;Meta&quot; 
+      FROM &quot;BackgroundJob&quot;
+      WHERE (&quot;State&quot; = :0)
+      PARAMS: :0=Cancelled
+dbug: ServiceStack.OrmLiteLog[0]
+      TIME: 1.818m
+</code></pre>
+<h3 id="db-command-execution-timing">DB Command Execution Timing<a class="header-anchor" href="javascript:;" onclick="location.hash='#db-command-execution-timing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>OrmLite's debug logging also includes the elapsed time it took to execute the command which is also available on the <code>IDbCommand</code> <code>GetTag()</code> and <code>GetElapsedTime()</code> APIs, e.g:</p>
+<pre><code class="language-csharp">OrmLiteConfig.AfterExecFilter = cmd =&gt;
+{
+    Console.WriteLine($&quot;[{cmd.GetTag()}] {cmd.GetElapsedTime()}&quot;);
+};
+</code></pre>
 <h2 id="exec-result-and-string-filters">Exec, Result and String Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#exec-result-and-string-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>OrmLite's core Exec filters makes it possible to inject your own behavior, tracing, profiling, etc.</p>
 <p>It's useful in situations like wanting to use SqlServer in production but use an <code>in-memory</code> Sqlite database in tests and being able to emulate any missing SQL Server Stored Procedures in code:</p>
@@ -592,6 +626,20 @@ db.Select&lt;Poco&gt;().First().Name // &quot;Value with trailing&quot;
                                         <span v-hash="'#output-generated-sql'" data-id="output-generated-sql" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Output Generated SQL
                                         </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="tagging-connections" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#tagging-connections'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Tagging Connections
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="db-command-execution-timing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#db-command-execution-timing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            DB Command Execution Timing
+                                                        </span>
+                                                    </li>
+                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#exec-result-and-string-filters'" data-id="exec-result-and-string-filters" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">

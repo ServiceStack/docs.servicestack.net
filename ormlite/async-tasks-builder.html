@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-16T15:03:55.7691575Z'>
+    <meta name='date' content='2025-10-16T15:03:55.7036114Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Typed SqlExpression support for JOINs</title>
+    <title>RDBMS Async Tasks Builder</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -263,7 +263,7 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/ormlite/async-tasks-builder" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/ormlite/async-tasks-builder" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
                                         Async Tasks Builder
                                     </a>
                                 </li>
@@ -273,7 +273,7 @@ OrmLite                                    </span>
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/ormlite/typed-joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/ormlite/typed-joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Typed Join Expressions
                                     </a>
                                 </li>
@@ -406,228 +406,133 @@ OrmLite                                    </span>
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Typed SqlExpression support for JOINs
+                            RDBMS Async Tasks Builder
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>Whilst OrmLite aims to provide a light-weight typed wrapper around SQL, it offers a number of convenient features that makes working with relational databases a clean and enjoyable experience.</p>
-<p>Starting with the most basic example you can simply specify the table you want to join with:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Customer&gt;()
-          .Join&lt;CustomerAddress&gt;();
+                <div class="content"><h3 id="sequential-async-db-access">Sequential Async DB Access<a class="header-anchor" href="javascript:;" onclick="location.hash='#sequential-async-db-access'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Async improves I/O thread utilization in multi-threaded apps like Web Servers. However, it doesn't improve the performance
+of individual API Requests that need to execute multiple independent DB Requests. These are often written to run async
+db access sequentially like this:</p>
+<pre><code class="language-csharp">var rockstars = await Db.SelectAsync&lt;Rockstar&gt;();
+var albums = await Db.SelectAsync&lt;Album&gt;();
+var departments = await Db.SelectAsync&lt;Department&gt;();
+var employees = await Db.SelectAsync&lt;Employee&gt;();
+</code></pre>
+<p>The issue being that it's not running them in parallel as each DB Request is executed sequentially with the Request for
+Albums not starting until the Request for Rockstars has completed.</p>
+<p>To run them in parallel you would need to open multiple scoped DB Connections, await them concurrently then do the
+syntax boilerplate gymnastics required to extract the generic typed results, e.g:</p>
+<pre><code class="language-csharp">var connections = await Task.WhenAll(
+    DbFactory.OpenDbConnectionAsync(),
+    DbFactory.OpenDbConnectionAsync(),
+    DbFactory.OpenDbConnectionAsync(),
+    DbFactory.OpenDbConnectionAsync()
+);
 
-var dbCustomers = db.Select&lt;Customer&gt;(q);
-</code></pre>
-<p>This query roughly maps to the following SQL:</p>
-<pre><code class="language-sql">SELECT Customer.* 
-  FROM Customer 
-       INNER JOIN 
-       CustomerAddress ON (Customer.Id == CustomerAddress.CustomerId)
-</code></pre>
-<p>Just like before <code>q</code> is an instance of <code>SqlExpression&lt;Customer&gt;</code> which is bounded to the base <code>Customer</code> type (and what any subsequent implicit API's apply to).</p>
-<p>To better illustrate the above query, lets expand it to the equivalent explicit query:</p>
-<pre><code class="language-csharp">SqlExpression&lt;Customer&gt; q = db.From&lt;Customer&gt;();
-q.Join&lt;Customer,CustomerAddress&gt;((cust,address) =&gt; cust.Id == address.CustomerId);
+using var dbRockstars = connections[0];
+using var dbAlbums = connections[1];
+using var dbDepartments = connections[2];
+using var dbEmployees = connections[3];
 
-List&lt;Customer&gt; dbCustomers = db.Select(q);
-</code></pre>
-<h2 id="reference-conventions">Reference Conventions<a class="header-anchor" href="javascript:;" onclick="location.hash='#reference-conventions'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The above query implicitly joins together the <code>Customer</code> and <code>CustomerAddress</code> POCO's using the same <code>{ParentType}Id</code> property convention used in <a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/tests/ServiceStack.OrmLite.Tests/LoadReferencesTests.cs">OrmLite's support for References</a>, e.g:</p>
-<pre><code class="language-csharp">class Customer {
-    public int Id { get; set; }
-    ...
-}
-class CustomerAddress {
-    public int Id { get; set; }
-    public int CustomerId { get; set; }  // Reference based on Property name convention
-}
-</code></pre>
-<p>References based on matching alias names is also supported, e.g:</p>
-<pre><code class="language-csharp">[Alias(&quot;LegacyCustomer&quot;)]
-class Customer {
-    public int Id { get; set; }
-    ...
-}
-class CustomerAddress {
-    public int Id { get; set; }
-
-    [Alias(&quot;LegacyCustomerId&quot;)]             // Matches `LegacyCustomer` Alias
-    public int RenamedCustomerId { get; set; }  // Reference based on Alias Convention
-}
-</code></pre>
-<h2 id="self-references">Self References<a class="header-anchor" href="javascript:;" onclick="location.hash='#self-references'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Self References are also supported for <strong>1:1</strong> relations where the Foreign Key can instead be on the parent table:</p>
-<pre><code class="language-csharp">public class Customer
+var tasks = new List&lt;Task&gt;
 {
-    ...
-    public int CustomerAddressId { get; set; }
-
-    [Reference]
-    public CustomerAddress PrimaryAddress { get; set; }
-}
-</code></pre>
-<h2 id="foreign-key-and-references-attributes">Foreign Key and References Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#foreign-key-and-references-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>References that don't follow the above naming conventions can be declared explicitly using
-the <code>[References]</code> and <code>[ForeignKey]</code> attributes:</p>
-<pre><code class="language-csharp">public class Customer
-{
-    [References(typeof(CustomerAddress))]
-    public int PrimaryAddressId { get; set; }
-
-    [Reference]
-    public CustomerAddress PrimaryAddress { get; set; }
-}
-</code></pre>
-<div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>Reference Attributes take precedence over naming conventions</p>
-</div>
-<h3 id="multiple-self-references">Multiple Self References<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-self-references'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The example below shows a customer with multiple <code>CustomerAddress</code> references which are able to be matched with
-the <code>{PropertyReference}Id</code> naming convention, e.g:</p>
-<pre><code class="language-csharp">public class Customer
-{
-    [AutoIncrement]
-    public int Id { get; set; }
-    public string Name { get; set; }
-
-    [References(typeof(CustomerAddress))]
-    public int? HomeAddressId { get; set; }
-
-    [References(typeof(CustomerAddress))]
-    public int? WorkAddressId { get; set; }
-
-    [Reference]
-    public CustomerAddress HomeAddress { get; set; }
-
-    [Reference]
-    public CustomerAddress WorkAddress { get; set; }
-}
-</code></pre>
-<p>Once defined, it can be saved and loaded via OrmLite's normal Reference and Select API's, e.g:</p>
-<pre><code class="language-csharp">var customer = new Customer
-{
-    Name = &quot;The Customer&quot;,
-    HomeAddress = new CustomerAddress {
-        Address = &quot;1 Home Street&quot;,
-        Country = &quot;US&quot;
-    },
-    WorkAddress = new CustomerAddress {
-        Address = &quot;2 Work Road&quot;,
-        Country = &quot;UK&quot;
-    },
+    dbRockstars.SelectAsync&lt;Rockstar&gt;(),
+    dbAlbums.SelectAsync&lt;Album&gt;(),
+    dbDepartments.SelectAsync&lt;Department&gt;(),
+    dbEmployees.SelectAsync&lt;Employee&gt;()
 };
+await Task.WhenAll(tasks);
 
-db.Save(customer, references:true);
-
-var c = db.LoadSelect&lt;Customer&gt;(x =&gt; x.Name == &quot;The Customer&quot;);
-c.WorkAddress.Address.Print(); // 2 Work Road
-
-var ukAddress = db.Single&lt;CustomerAddress&gt;(x =&gt; x.Country == &quot;UK&quot;);
-ukAddress.Address.Print();     // 2 Work Road
+var rockstars = ((Task&lt;List&lt;Rockstar&gt;&gt;)tasks[0]).Result;
+var albums = ((Task&lt;List&lt;Album&gt;&gt;)tasks[1]).Result;
+var departments = ((Task&lt;List&lt;Department&gt;&gt;)tasks[2]).Result;
+var employees = ((Task&lt;List&lt;Employee&gt;&gt;)tasks[3]).Result;
 </code></pre>
-<h2 id="implicit-reference-conventions-are-applied-by-default">Implicit Reference Conventions are applied by default<a class="header-anchor" href="javascript:;" onclick="location.hash='#implicit-reference-conventions-are-applied-by-default'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The implicit relationship above allows you to use any of these equivalent APIs to JOIN tables:</p>
-<pre><code class="language-csharp">q.Join&lt;CustomerAddress&gt;();
-q.Join&lt;Customer,CustomerAddress&gt;();
-q.Join&lt;Customer,CustomerAddress&gt;((cust,address) =&gt; cust.Id == address.CustomerId);
+<p>Even without Error handling, writing coding like this can quickly become tedious, less readable and error prone that
+as a result is rarely done.</p>
+<h3 id="parallel-db-requests-in-typescript">Parallel DB Requests in TypeScript<a class="header-anchor" href="javascript:;" onclick="location.hash='#parallel-db-requests-in-typescript'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>This is easier to achieve in languages like TypeScript where typed ORMs like <a href="https://litdb.dev">litdb.dev</a>
+can run multiple DB Requests in parallel with just:</p>
+<pre><code class="language-csharp">const [rockstars, albums, departments, employees] = await Promise.all([
+    db.all&lt;Rockstar&gt;($.from(Rockstar)),     //= Rockstar[]
+    db.all&lt;Album&gt;($.from(Album)),           //= Album[]
+    db.all&lt;Department&gt;($.from(Department)), //= Department[]
+    db.all&lt;Employee&gt;($.from(Employee)),     //= Employee[]
+])
 </code></pre>
-<h2 id="selecting-multiple-columns-across-joined-tables">Selecting multiple columns across joined tables<a class="header-anchor" href="javascript:;" onclick="location.hash='#selecting-multiple-columns-across-joined-tables'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The <code>SelectMulti</code> API lets you select from multiple joined tables into a typed tuple</p>
-<pre><code class="language-csharp">var q = db.From&lt;Customer&gt;()
-    .Join&lt;Customer, CustomerAddress&gt;()
-    .Join&lt;Customer, Order&gt;()
-    .Where(x =&gt; x.CreatedDate &gt;= new DateTime(2016,01,01))
-    .And&lt;CustomerAddress&gt;(x =&gt; x.Country == &quot;Australia&quot;);
+<p>Which benefits from TypeScript's powerful type system that allows destructuring arrays whilst preserving their positional types, whilst its single threaded event loop lets you reuse the same DB Connection to run DB Requests
+in parallel without multi-threading issues.</p>
+<h2 id="ormlites-async-tasks-builder">OrmLite's Async Tasks Builder<a class="header-anchor" href="javascript:;" onclick="location.hash='#ormlites-async-tasks-builder'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>OrmLite's <code>AsyncDbTasksBuilder</code> provides a similar benefit of making it effortless to run multiple async DB Requests
+in parallel, which looks like:</p>
+<pre><code class="language-csharp">var results = await DbFactory.AsyncDbTasksBuilder()
+    .Add(db =&gt; db.SelectAsync&lt;Rockstar&gt;())
+    .Add(db =&gt; db.SelectAsync&lt;Album&gt;())
+    .Add(db =&gt; db.SelectAsync&lt;Department&gt;())
+    .Add(db =&gt; db.SelectAsync&lt;Employee&gt;())
+    .RunAsync();
+var (rockstars, albums, departments, employees) = results;
+</code></pre>
+<p>Which just like TypeScript's destructuring returns a positionally typed tuple of the results which can be
+destructured back into their typed variables, e.g:</p>
+<pre><code class="language-csharp">(List&lt;Rockstar&gt; rockstars, 
+ List&lt;Album&gt; albums,
+ List&lt;Department&gt; departments,
+ List&lt;Employee&gt; employees) = results;
+</code></pre>
+<h3 id="supports-up-to-8-tasks">Supports up to 8 Tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#supports-up-to-8-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>It allows chaining up to <strong>8 async Tasks in parallel</strong> as C#'s Type System doesn't allow for preserving different
+positional generic types in an unbounded collection. Instead each Task returns a new Generic Type builder which preserves
+the positional types before it.</p>
+<h3 id="supports-both-async-taskt-and-task-apis">Supports both Async <code>Task&lt;T&gt;</code> and <code>Task</code> APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#supports-both-async-taskt-and-task-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Where <code>Task&lt;T&gt;</code> and <code>Task</code> APIs can be mixed and matched interchangeably:</p>
+<pre><code class="language-csharp">var builder = DbFactory.AsyncDbTasksBuilder()
+    .Add(db =&gt; db.InsertAsync(rockstars[0],rockstars[1]))
+    .Add(db =&gt; db.SelectAsync&lt;Rockstar&gt;())
+    .Add(db =&gt; db.InsertAsync(albums[2],albums[3]))
+    .Add(db =&gt; db.SelectAsync&lt;Album&gt;())
+    .Add(db =&gt; db.InsertAsync([department]))
+    .Add(db =&gt; db.SelectAsync&lt;Department&gt;())
+    .Add(db =&gt; db.InsertAsync([employee]))
+    .Add(db =&gt; db.SelectAsync&lt;Employee&gt;());
+</code></pre>
+<p>Where to preserve the results chain, <code>Task</code> APIs return <code>bool</code> results, e.g:</p>
+<pre><code class="language-csharp">(bool r1, 
+ List&lt;Rockstar&gt; r2, 
+ bool r3, 
+ List&lt;RockstarAlbum&gt; r4, 
+ bool r5, 
+ List&lt;Department&gt; r6, 
+ bool r7, 
+ List&lt;Employee&gt; r8) = await builder.RunAsync();
+</code></pre>
+<h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Whilst tasks are executed in parallel when added, any Exceptions are only thrown when the task is awaited:</p>
+<pre><code class="language-csharp">using var Db = await OpenDbConnectionAsync();
 
-var results = db.SelectMulti&lt;Customer, CustomerAddress, Order&gt;(q);
+var builder = DbFactory.AsyncDbTasksBuilder()
+    .Add(db =&gt; db.InsertAsync(rockstars[0]))
+    .Add(db =&gt; db.InsertAsync(rockstars[0])); // &lt;-- Duplicate PK Exception
 
-foreach (var tuple in results)
+// Exceptions are not thrown until the task is awaited
+try
 {
-    Customer customer = tuple.Item1;
-    CustomerAddress custAddress = tuple.Item2;
-    Order custOrder = tuple.Item3;
+    var task = builder.RunAsync();
+}
+catch (Exception e)
+{
+    throw;
 }
 </code></pre>
-<p>Thanks to Micro ORM's lightweight abstractions over ADO.NET that maps to clean POCOs, we can also use
-OrmLite's embedded version of <a href="http://stackoverflow.com/a/37420341/85785">Dapper's QueryMultiple</a>:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Customer&gt;()
-    .Join&lt;Customer, CustomerAddress&gt;()
-    .Join&lt;Customer, Order&gt;()
-    .Select(&quot;*&quot;);
-
-using (var multi = db.QueryMultiple(q.ToSelectStatement()))
-{
-    var results = multi.Read&lt;Customer, CustomerAddress, Order, 
-        Tuple&lt;Customer,CustomerAddress,Order&gt;&gt;(Tuple.Create).ToList();
-
-    foreach (var tuple in results)
-    {
-        Customer customer = tuple.Item1;
-        CustomerAddress custAddress = tuple.Item2;
-        Order custOrder = tuple.Item3;
-    }
-}
-</code></pre>
-<h2 id="select-distinct-in-selectmulti">SELECT DISTINCT in SelectMulti<a class="header-anchor" href="javascript:;" onclick="location.hash='#select-distinct-in-selectmulti'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><a href="typed-joins">SelectMulti</a> APIs for populating
-multiple tables now supports <strong>SELECT DISTINCT</strong> with:</p>
-<pre><code class="language-csharp">var tuples = db.SelectMulti&lt;Customer, CustomerAddress&gt;(q.SelectDistinct());
-</code></pre>
-<h2 id="select-data-from-multiple-tables-into-a-custom-poco">Select data from multiple tables into a Custom POCO<a class="header-anchor" href="javascript:;" onclick="location.hash='#select-data-from-multiple-tables-into-a-custom-poco'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Another implicit behaviour when selecting from a typed SqlExpression is that results are mapped to the
-<code>Customer</code> POCO. To change this default we just need to explicitly specify what POCO it should map to instead:</p>
-<pre><code class="language-csharp">List&lt;FullCustomerInfo&gt; customers = db.Select&lt;FullCustomerInfo&gt;(
-    db.From&lt;Customer&gt;().Join&lt;CustomerAddress&gt;());
-</code></pre>
-<p>Where <code>FullCustomerInfo</code> is any POCO that contains a combination of properties matching any of the joined
-tables in the query.</p>
-<p>The above example is also equivalent to the shorthand <code>db.Select&lt;Into,From&gt;()</code> API:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Customer&gt;()
-          .Join&lt;CustomerAddress&gt;();
-
-var customers = db.Select&lt;FullCustomerInfo,Customer&gt;(q);
-</code></pre>
-<p>Rules for how results are mapped is simply each property on <code>FullCustomerInfo</code> is mapped to the first matching property in any of the tables in the order they were added to the SqlExpression.</p>
-<p>The mapping also includes a fallback for referencing fully-qualified names in the format: <code>{TableName}{FieldName}</code> allowing you to reference ambiguous fields, e.g:</p>
-<ul>
-<li><code>CustomerId</code> =&gt; <strong>&quot;Customer&quot;.&quot;Id&quot;</strong></li>
-<li><code>OrderId</code> =&gt; <strong>&quot;Order&quot;.&quot;Id&quot;</strong></li>
-<li><code>CustomerName</code> =&gt; <strong>&quot;Customer&quot;.&quot;Name&quot;</strong></li>
-<li><code>OrderCost</code> =&gt; <strong>&quot;Order&quot;.&quot;Cost&quot;</strong></li>
-</ul>
-<h3 id="select-join-examples">SELECT JOIN examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#select-join-examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>You can SELECT all fields for a table by returning the entire instance in the custom anonymous type, e.g:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Table&gt;()
-    .Join&lt;JoinedTable&gt;()
-    .OrderBy(x =&gt; x.Id)
-    .Select&lt;Table, JoinedTable&gt;((a, b) =&gt; new { a, b.TableId });
-
-var rows = db.Select&lt;CombinedResult&gt;(q);
-</code></pre>
-<p>Which selects all columns from the primary <code>Table</code> as well as <code>TableId</code> from <code>JoinedTable</code>.</p>
-<p>You can also specify SQL Aliases for ambiguous columns using anonymous properties, e.g:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Table&gt;()
-    .Join&lt;JoinedTable&gt;()
-    .Select&lt;Table, JoinedTable&gt;((a, b) =&gt; new { a, JoinId = b.Id, JoinName = b.Name });
-</code></pre>
-<p>Which is roughly equivalent to:</p>
-<pre><code>SELECT a.*, b.Id AS JoinId, b.Name AS JoinName
-</code></pre>
-<p>Where it selects all columns from the primary <code>Table</code> as well as <code>Id</code> and <code>Name</code> columns from <code>JoinedTable,</code>
-returning them in the <code>JoinId</code> and <code>JoinName</code> custom aliases.</p>
-<p>Being able to select all columns works in other areas as well, e.g. you can <strong>GROUP BY</strong> all columns of
-a table with:</p>
-<pre><code class="language-csharp">var q = db.From&lt;Table&gt;()
-    .GroupBy(x =&gt; new { x });
-</code></pre>
-<p>Which would return the same results as a <strong>SELECT DISTINCT</strong> on all columns of <code>Table</code>.</p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/typed-joins.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/async-tasks-builder.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
@@ -635,18 +540,18 @@ a table with:</p>
                     <div class="not-prose my-20">
                                 <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
                                     <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/ormlite/reference-support" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                            <a href="/ormlite/bulk-inserts" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
                                                 <!-- Heroicon name: mini/arrow-long-left -->
                                                 <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                Reference Support
+                                                Bulk Inserts
                                             </a>
                                     </div>
                                     <div class="hidden md:-mt-px md:flex"></div>
                                     <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/ormlite/dynamic-result-sets" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                Dynamic Result Sets
+                                            <a href="/ormlite/reference-support" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Reference Support
                                                 <!-- Heroicon name: mini/arrow-long-right -->
                                                 <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
@@ -665,52 +570,26 @@ a table with:</p>
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#reference-conventions'" data-id="reference-conventions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Reference Conventions
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#self-references'" data-id="self-references" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Self References
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#foreign-key-and-references-attributes'" data-id="foreign-key-and-references-attributes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Foreign Key and References Attributes
+                                        <span v-hash="'#ormlites-async-tasks-builder'" data-id="ormlites-async-tasks-builder" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            OrmLite&#x27;s Async Tasks Builder
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="multiple-self-references" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#multiple-self-references'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="supports-up-to-8-tasks" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#supports-up-to-8-tasks'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Multiple Self References
+                                                            Supports up to 8 Tasks
                                                         </span>
                                                     </li>
-                                            </ul>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#implicit-reference-conventions-are-applied-by-default'" data-id="implicit-reference-conventions-are-applied-by-default" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Implicit Reference Conventions are applied by default
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#selecting-multiple-columns-across-joined-tables'" data-id="selecting-multiple-columns-across-joined-tables" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Selecting multiple columns across joined tables
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#select-distinct-in-selectmulti'" data-id="select-distinct-in-selectmulti" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            SELECT DISTINCT in SelectMulti
-                                        </span>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#select-data-from-multiple-tables-into-a-custom-poco'" data-id="select-data-from-multiple-tables-into-a-custom-poco" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Select data from multiple tables into a Custom POCO
-                                        </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="select-join-examples" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#select-join-examples'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="supports-both-async-taskt-and-task-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#supports-both-async-taskt-and-task-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            SELECT JOIN examples
+                                                            Supports both Async 
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="error-handling" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#error-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Error Handling
                                                         </span>
                                                     </li>
                                             </ul>
