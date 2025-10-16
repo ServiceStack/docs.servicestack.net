@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-15T08:18:01.4386719Z'>
+    <meta name='date' content='2025-10-16T11:28:40.1632106Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>API Keys</title>
@@ -287,8 +287,8 @@ Auth                                    </span>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>As we continue to embrace and natively integrate with ASP.NET Core's .NET 8 platform, we've reimplemented the last major
-feature missing from ServiceStack Auth - support for API Keys that's available from <strong>ServiceStack v8.3</strong>.</p>
+                <div class="content"><p>As we continue to embrace and natively integrate with ASP.NET Core's .NET 8 platform, we've reimplemented the last
+major feature missing from ServiceStack Auth - support for API Keys that's available from <strong>ServiceStack v8.3</strong>.</p>
 <div class="warning custom-block">
             <p class="custom-block-title">API Key Feature Vulnerability</p><p><strong>ServiceStack v8.7+</strong> resolves a vulnerability we've discovered in the management APIs of this API Keys feature, if using API Keys please upgrade as soon as possible.</p>
 </div>
@@ -414,6 +414,101 @@ different behavior, e.g. a <strong>Paid</strong> feature could be used to increa
         // return premium content
     }
 }
+</code></pre>
+<h2 id="protect-same-apis-with-api-keys-or-identity-auth">Protect same APIs with API Keys or Identity Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#protect-same-apis-with-api-keys-or-identity-auth'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Modern APIs need to serve different types of clients with distinct authentication requirements.
+<strong>Identity Auth</strong> is designed for interactive user workflows with sessions, roles, and permissions,
+while <strong>API Keys</strong> excel at machine-to-machine communication with simple token-based authentication,
+superior performance, and fine-grained scope-based access control.</p>
+<h3 id="supporting-both-auth-models-with-2-apis">Supporting both Auth Models with 2 APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#supporting-both-auth-models-with-2-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Previously, supporting both auth models required maintaining two separate APIs—one protected
+with <code>[ValidateIsAuthenticated]</code> and another with <code>[ValidateApiKey]</code> — resulting in duplicate endpoints
+and docs.</p>
+<pre><code class="language-csharp">// For authenticated users
+[ValidateIsAuthenticated]
+public class QueryOrders : QueryDb&lt;Order&gt; { }
+
+// For API key access
+[ValidateApiKey]
+public class QueryOrdersApiKey : QueryDb&lt;Order&gt; { }
+
+public class OrderService : Service
+{
+    public List&lt;Order&gt; Get(GetOrders request)
+    {
+        var userId = Request.GetRequiredUserId();
+        // Shared business logic
+    }
+    
+    public List&lt;Order&gt; Get(GetOrdersViaApiKey request) =&gt; 
+        Get(request.ConvertTo&lt;GetOrders&gt;());
+}
+
+public static class MyExtensions
+{
+    public static string GetRequiredUserId(this IRequest? req) =&gt;
+        req.GetApiKey()?.UserAuthId ??
+        req.GetClaimsPrincipal().GetUserId() ?? 
+        throw HttpError.Unauthorized(&quot;API Key must be associated with a user&quot;);
+}
+</code></pre>
+<p>Whilst easy to implement, the biggest draw back with this approach is that it requires maintaining 2x APIs,
+2x API endpoints, and 2x API docs.</p>
+<h3 id="allow-api-key-apis-to-authenticated-users">Allow API Key APIs to Authenticated Users<a class="header-anchor" href="javascript:;" onclick="location.hash='#allow-api-key-apis-to-authenticated-users'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>From <a href="/releases/v8_09">ServiceStack v8.9</a> you can protect the <strong>same APIs and UIs</strong> with both authentication models.
+By adding a user's API Key to the <code>apikey</code> claim in their Identity Auth Cookie, authenticated users can seamlessly access <code>[ValidateApiKey]</code> protected APIs without sending the key explicitly.
+This unified approach eliminates API duplication while maintaining all the benefits of both authentication paradigms:</p>
+<ul>
+<li>Maintain a single API surface for all clients</li>
+<li>Serve the same interactive UIs protected with Identity Auth or API Keys</li>
+<li>Provide programmatic access via API Keys</li>
+<li>Maintain all the benefits of API Keys</li>
+</ul>
+<p>To achieve this, users will need to have a valid API Key generated for them which would then need to be added
+to the <code>apikey</code> Claim in the <code>UserClaimsPrincipalFactory</code> to be included in their Identity Auth Cookie:</p>
+<pre><code class="language-csharp">// Program.cs
+services.AddScoped&lt;IUserClaimsPrincipalFactory&lt;ApplicationUser&gt;, 
+    AdditionalUserClaimsPrincipalFactory&gt;();
+
+// Add additional claims to the Identity Auth Cookie
+public class AdditionalUserClaimsPrincipalFactory(
+    UserManager&lt;ApplicationUser&gt; userManager,
+    RoleManager&lt;IdentityRole&gt; roleManager,
+    IApiKeySource apiKeySource,
+    IOptions&lt;IdentityOptions&gt; optionsAccessor)
+    : UserClaimsPrincipalFactory&lt;ApplicationUser,IdentityRole&gt;(
+        userManager, roleManager, optionsAccessor)
+{
+  public override async Task&lt;ClaimsPrincipal&gt; CreateAsync(ApplicationUser user)
+  {
+      var principal = await base.CreateAsync(user);
+      var identity = (ClaimsIdentity)principal.Identity!;
+      
+      var claims = new List&lt;Claim&gt;();
+      if (user.ProfileUrl != null)
+      {
+          claims.Add(new Claim(JwtClaimTypes.Picture, user.ProfileUrl));
+      }
+      
+      // Add Users latest valid API Key to their Auth Cookie's 'apikey' claim
+      var latestKey = (await apiKeySource.GetApiKeysByUserIdAsync(user.Id))
+          .OrderByDescending(x =&gt; x.CreatedDate)
+          .FirstOrDefault();
+      if (latestKey != null)
+      {
+          claims.Add(new Claim(JwtClaimTypes.ApiKey, latestKey.Key));
+      }
+      
+      identity.AddClaims(claims);
+      return principal;
+  }
+}
+</code></pre>
+<p>After which Authenticated Users will be able to access <code>[ValidateApiKey]</code> protected APIs where it attaches the
+API Key in the <code>apikey</code> Claim to the request - resulting in the same behavior had they sent their API Key with the request.</p>
+<pre><code class="language-csharp">// For authenticated users or API Keys
+[ValidateApiKey]
+public class QueryOrders : QueryDb&lt;Order&gt; { }
 </code></pre>
 <h2 id="integrated-uis">Integrated UIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#integrated-uis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Like many of ServiceStack's other premium features, API Keys are fully integrated into <a href="https://servicestack.net/auto-ui">ServiceStack's built-in UIs</a>
@@ -672,6 +767,25 @@ client.headers.set('X-Api-Key', apiKey)
                                                         <span v-hash="'#features'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Features
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#protect-same-apis-with-api-keys-or-identity-auth'" data-id="protect-same-apis-with-api-keys-or-identity-auth" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Protect same APIs with API Keys or Identity Auth
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="supporting-both-auth-models-with-2-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#supporting-both-auth-models-with-2-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Supporting both Auth Models with 2 APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="allow-api-key-apis-to-authenticated-users" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#allow-api-key-apis-to-authenticated-users'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Allow API Key APIs to Authenticated Users
                                                         </span>
                                                     </li>
                                             </ul>
