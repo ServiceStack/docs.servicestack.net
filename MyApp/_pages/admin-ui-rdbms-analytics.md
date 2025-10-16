@@ -1,8 +1,13 @@
 ---
-title: Admin UI Analytics for SQLite
+title: Admin UI Analytics for RDBMS
 ---
 
-Comprehensive API Analytics is available to all ServiceStack Apps configured with [SQLite Request Logging](/sqlite-request-logs).
+[ServiceStack v8.9](/releases/v8_09) restores parity to **PostgreSQL**, **SQL Server** & **MySQL** RDBMS's for our previous 
+SQLite-only features with the new `DbRequestLogger` which is a drop-in replacement for 
+[SQLite Request Logging](/sqlite-request-logs) for persisting API Request Logs to a RDBMS.
+
+Whilst maintaining an archive of API Requests is nice, the real value of DB Request Logging is that it unlocks the 
+comprehensive API Analytics and querying Logging available that was previously limited to SQLite Request Logs. 
 
 :::youtube kjLcm1llC5Y
 In Depth and Interactive API Analytics available to all ASP .NET Core ServiceStack Apps!
@@ -19,32 +24,43 @@ IPs where most traffic generates:
 - **Troubleshooting:** Aids in quickly identifying trends, anomalies, or specific endpoints related to issues.
 - **Resource Planning:** Understanding usage patterns helps in scaling infrastructure appropriately.
 - **Security Insight:** Identifying bot traffic and unusual request patterns can be an early indicator of security concerns.
-- **Interactive Analytics:** Analytics are also interactive where you're able to drill down to monitor the activity of individual APIs, Users, API Keys and IPs with links back to the request logs which the summary analytics are derived from.
 
-### Getting Started
+### Interactive Analytics
 
-As they offer significant and valuable insights they're now built into all new ASP.NET Core IdentityAuth templates, 
-existing .NET 8 IdentityAuth templates can enable it with: 
+Analytics are also interactive where you're able to drill down to monitor the activity of individual APIs, Users, API Keys 
+and IPs which have further links back to the request logs which the summary analytics are derived from.
+
+As they offer significant and valuable insights the `SqliteRequestLogger` is built into all ASP.NET Core 
+IdentityAuth templates, to switch it over to use a RDBMS we recommend installing `db-identity` mix gist to
+also replace SQLite BackgroundJobs with the RDBMS `DatabaseJobFeature`:
 
 :::sh
-x mix sqlitelogs
+x mix db-identity
 :::
 
-.NET 8 Templates that are not configured to use [Endpoint Routing](/endpoint-routing)
-and [ASP.NET Core IOC](/net-ioc) will need to explicitly register `SqliteRequestLogger`
-as a singleton dependency in addition to configuring it on the `RequestLogsFeature` plugin:
+Or if you just want to replace SQLite Request Logs with a RDBMS use: 
+
+:::sh
+x mix db-requestlogs
+:::
+
+Or you can copy the [Modular Startup](/modular-startup) script below: 
 
 ```csharp
+[assembly: HostingStartup(typeof(MyApp.ConfigureRequestLogs))]
+
+namespace MyApp;
+
 public class ConfigureRequestLogs : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices((context, services) =>
-        {
-            var logger = new SqliteRequestLogger();
-            services.AddSingleton<IRequestLogger>(logger);
-            
+        .ConfigureServices((context, services) => {
+
             services.AddPlugin(new RequestLogsFeature {
-                RequestLogger = logger,
+                RequestLogger = new DbRequestLogger {
+                    // NamedConnection = "<alternative db>"
+                },
+                EnableResponseTracking = true,
                 EnableRequestBodyTracking = true,
                 EnableErrorTracking = true
             });
@@ -56,25 +72,96 @@ public class ConfigureRequestLogs : IHostingStartup
             }
         });
 }
+
+public class RequestLogsHostedService(ILogger<RequestLogsHostedService> log, IRequestLogger requestLogger) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+        if (requestLogger is IRequireAnalytics logger)
+        {
+            while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await logger.TickAsync(log, stoppingToken);
+            }
+        }
+    }
+}
 ```
 
-## Analytics Admin UI
+### RDBMS Provider
 
-Once configured, [SQLite Request Logs](/sqlite-request-logs) enable a more feature rich Request Logging Admin UI which utilizes the full queryability of an AutoQueryGrid to filter, sort and export Request Logs. 
+When using a remote RDBMS, network latency becomes a primary concern that any solution needs to be designed around, 
+as such the API Request Logs are initially maintained in an in memory collection before being flushed to the database 
+**every 3 seconds** — configurable in the `PeriodicTimer` interval above.
+
+To reduce the number of round-trips to the database, the `DbRequestLogger` batches all pending logs into a single 
+request using [OrmLite's Bulk Inserts](/ormlite/bulk-inserts) which is supported by all 
+major RDBMS's.
+
+### PostgreSQL Table Partitioning
+
+PostgreSQL provides native support for table partitioning, allowing us to automatically create monthly partitions using 
+`PARTITION BY RANGE` on the `CreatedDate` column. The `DbRequestLogger` automatically creates new monthly partitions 
+as needed, maintaining the same logical separation as SQLite's monthly .db's while keeping everything within a single 
+Postgres DB:
+
+```sql
+CREATE TABLE "RequestLog" (
+    -- columns...
+    "CreatedDate" TIMESTAMP NOT NULL,
+    PRIMARY KEY ("Id","CreatedDate")
+) PARTITION BY RANGE ("CreatedDate");
+
+-- Monthly partitions are automatically created, e.g.:
+CREATE TABLE "RequestLog_2025_01" PARTITION OF "RequestLog"
+    FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+```
+
+### SQLServer / MySQL - Manual Partition Management
+
+For **SQL Server** and **MySQL**, monthly partitioned tables need to be created **out-of-band**
+(either manually or via cronjob scripts) since they don't support the same level of automatic
+partition management as PostgreSQL. However, this still works well in practice as because `RequestLog` is an 
+**Append Only** table with all querying from the Admin UIs being filtered by its indexed `CreatedDate`
+in monthly viewable snapshots like it was with SQLite.
+
+### Separate RequestLog Database
+
+Or if preferred, you can maintain request logs in a **separate database** from your main application database.
+This separation keeps the write-heavy logging load off your primary database, allowing you to optimize 
+each database independently for its specific workload patterns like maintaining different backup strategies
+for your critical application data vs. log history.
+
+```csharp
+// Configure.Db.cs
+services.AddOrmLite(options => options.UsePostgres(connectionString))
+        .AddPostgres("logs", logsConnectionString);
+
+// Configure.RequestLogs.cs
+services.AddPlugin(new RequestLogsFeature {
+    RequestLogger = new DbRequestLogger {
+        NamedConnection = "logs"
+    },
+    //...
+});
+```
+
+## Queryable Admin Logging UI
+
+This will enable a more feature rich Request Logging Admin UI which utilizes the full queryability of the 
+[AutoQueryGrid](/vue/autoquerygrid) component to filter, sort and export Request Logs. 
 
 [![](/img/pages/admin-ui/sqlitelogs.webp)](/img/pages/admin-ui/sqlitelogs.webp)
 
-### Rolling Monthly Request Logs
-
-Benefits of using SQLite includes removing load from your App's primary database and being able to create naturally scalable and isolated Monthly databases on-the-fly which allow requests to be easily archived into managed file storage instead of a singular growing database.
-
 ## Analytics Overview
 
-It also enables the new **Analytics** Admin UI in the sidebar which initially displays the API Analytics overview Dashboard:
+Utilizing an `DbRequestLogger` also enables the **Analytics** Admin UI in the sidebar which initially
+displays the API Analytics Dashboard:
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-apis1.webp)](/img/pages/admin-ui/analytics-apis1.webp)
-
-Different charts displayed on the dashboard include:
+:::
 
 ### Distribution Pie Charts
 
@@ -103,7 +190,9 @@ the number of requests they receive. This helps pinpoint:
 - **Underutilized Endpoints:** APIs that might be candidates for deprecation or require promotion.
 - **Troubleshooting:** If performance issues arise (seen in the line chart), this helps narrow down which specific endpoint might be responsible.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-apis2.webp)](/img/pages/admin-ui/analytics-apis2.webp)
+:::
 
 ### Total Duration Bar Chart
 
@@ -126,7 +215,9 @@ This chart shows how many requests fall into different speed buckets and helps y
 Clicking on an API's bar chart displays a dedicated, detailed view of a single API endpoint's behavior, isolating its performance 
 and usage patterns from the overall system metrics offering immediate insight into the endpoint's traffic volume and reliability.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-api.webp)](/img/pages/admin-ui/analytics-api.webp)
+:::
 
 ### Total Requests
 
@@ -164,14 +255,18 @@ Useful for identifying high-volume clients, specific servers interacting with th
 The **Users** tab will display the top 100 Users who make the most API Requests and lets you click on a Users bar chart
 to view their individual User analytics.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-users.webp)](/img/pages/admin-ui/analytics-users.webp)
+:::
 
 ### Individual User Analytics
 
 Provides a comprehensive view of a single user's complete interaction history and behavior across all APIs they've accessed, 
 shifting the focus from API performance to user experience and activity.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-user.webp)](/img/pages/admin-ui/analytics-user.webp)
+:::
 
 ### User Info & Total Requests
 
@@ -217,98 +312,31 @@ Clicking on **View User Analytics** takes you to the Users Analytics page to acc
 The **API Keys** tab will display the top 100 API Keys who make the most API Requests and lets you click on an API Key 
 bar chart to view its individual API Key analytics.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-apikeys.webp)](/img/pages/admin-ui/analytics-apikeys.webp)
+:::
 
 ### Individual API Key Analytics
 
 Provides comprehensive API Key analytics Similar to User Analytics but limited to the API Usage of a single API Key:
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-apikey.webp)](/img/pages/admin-ui/analytics-apikey.webp)
+:::
 
 ## IPs
 
 The **IP Addresses** tab will display the top 100 IPs that make the most API Requests. Click on an IP's
 bar chart to view its individual analytics made from that IP Address.
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-ips.webp)](/img/pages/admin-ui/analytics-ips.webp)
+:::
 
 ### Individual IP Analytics
 
 Provides comprehensive IP Address analytics Similar to User Analytics but limited to the API Usage from a single IP Address:
 
+:::{.wideshot}
 [![](/img/pages/admin-ui/analytics-ip.webp)](/img/pages/admin-ui/analytics-ip.webp)
-
-## Blocking User Agents
-
-The insights from the Analytics showed us that our [pvq.app](https://pvq.app) was experiencing significant load from
-AI bots and scrapers which was the primary cause of its high resource usage and detrimental load times for normal
-user requests, so much so we've intervened to prevent these bots from scraping our site.
-
-### Disallowing Bots in robots.txt
-
-In an ideal world you would just need to instruct problematic bots not to scrape your site by adding them to [pvq.app/robots.txt](https://pvq.app/robots.txt), e.g:
-
-```txt
-User-agent: Googlebot
-Allow: /
-User-agent: Bingbot
-Allow: /
-
-User-agent: bytespider
-Disallow: /
-User-agent: gptbot
-Disallow: /
-User-agent: claudebot
-Disallow: /
-User-agent: amazonbot
-Disallow: /
-User-agent: mj12bot
-Disallow: /
-User-agent: semrushbot
-Disallow: /
-User-agent: dotbot
-Disallow: /
-User-agent: WhatsApp Bot
-Disallow: /
-User-agent: *
-Disallow: /
-```
-
-### Disallowing Bot Requests
-
-As this was not having an immediate effect we took a more forceful approach to implement a middleware to reject all
-requests from disallowed bots from accessing our App which you can add to your own App with:
-
-:::sh
-x mix useragent-blocking
 :::
-
-This will allow you to configure which Bot User Agents you want to reject from accessing your site, e.g:
-
-```csharp
-services.Configure<UserAgentBlockingOptions>(options =>
-{
-    // Add user agents to block
-    options.BlockedUserAgents.AddRange([
-        "bytespider",
-        "gptbot",
-        "gptbot",
-        "claudebot",
-        "amazonbot",
-        "imagesiftbot",
-        "semrushbot",
-        "dotbot",
-        "semrushbot",
-        "dataforseobot",
-        "WhatsApp Bot",
-        "HeadlessChrome",
-        "PetalBot",
-    ]);
-    
-    // Optional: Customize the response status code
-    // options.BlockedStatusCode = StatusCodes.Status429TooManyRequests;
-    
-    // Optional: Customize the blocked message
-    options.BlockedMessage = "This bot is not allowed to access our website";
-});
-```
