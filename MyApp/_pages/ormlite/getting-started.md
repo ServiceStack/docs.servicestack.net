@@ -184,7 +184,8 @@ services.AddOrmLite(options => {
 
 ## OrmLite Connection Factory
 
-To configure OrmLite you'll need your App's DB Connection string along the above RDBMS Dialect Provider, e.g:
+Alternatively to configure OrmLite outside of an ASP .NET 8+ App you can use the `OrmLiteConnectionFactory` 
+directly using your App's DB Connection string along the RDBMS Dialect Provider of your choice, e.g:
 
 ```csharp
 var dbFactory = new OrmLiteConnectionFactory(
@@ -224,7 +225,7 @@ SqlServer2016Dialect.Provider  // SQL Server 2016
 SqlServer2017Dialect.Provider  // SQL Server 2017+
 ```
 
-### Creating Table and Seed Data Example
+## Creating Table and Seed Data Example
 
 If connecting to an empty database you can use OrmLite's Create Table APIs to create any missing tables you need, which OrmLite creates
 based solely on the Schema definition of your POCO data models.
