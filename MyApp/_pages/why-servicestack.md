@@ -9,7 +9,7 @@ Developed in the modern age, ServiceStack provides an alternate, cleaner POCO-dr
 
 ### Features Overview
 
-ServiceStack is a simple, fast, versatile and highly-productive full-featured [Web](https://razor.netcore.io) and 
+ServiceStack is a simple, fast, versatile and highly-productive full-featured [Web](https://blazor-vue.web-templates.io) and 
 [Web Services](/web-services) Framework that's 
 thoughtfully-architected to [reduce artificial complexity](/autoquery/why-not-odata#why-not-complexity) and promote 
 [remote services best-practices](/advantages-of-message-based-web-services) 
@@ -78,7 +78,7 @@ the most productive development experience for developing .NET to .NET Web Servi
 
 ### Generate Instant Typed APIs from within all Major IDEs!
 
-ServiceStack now [integrates with all Major IDE's](/add-servicestack-reference.html) used for creating the best native experiences 
+ServiceStack now [integrates with all Major IDE's](/add-servicestack-reference) used for creating the best native experiences 
 on the most popular platforms to enable a highly productive dev workflow for consuming Web Services, making ServiceStack the ideal 
 back-end choice for powering rich, native iPhone and iPad Apps on iOS with Swift, Mobile and Tablet Apps on the Android platform 
 with Java, OSX Desktop Applications as well as targeting the most popular .NET PCL platforms including Xamarin.iOS, Xamarin.Android, 
@@ -93,10 +93,10 @@ The **ServiceStack** Rider plugin is installable directly from JetBrains Marketp
 #### [VS.NET integration with ServiceStackVS](/create-your-first-webservice#step-1-download-and-install-servicestackvs)
 
 Providing instant Native Typed API's for 
-[C#](/csharp-add-servicestack-reference.html), 
-[TypeScript](/typescript-add-servicestack-reference.html),
-[F#](/fsharp-add-servicestack-reference.html) and 
-[VB.NET](/vbnet-add-servicestack-reference.html) 
+[C#](/csharp-add-servicestack-reference), 
+[TypeScript](/typescript-add-servicestack-reference),
+[F#](/fsharp-add-servicestack-reference) and 
+[VB.NET](/vbnet-add-servicestack-reference) 
 directly in Visual Studio for the 
 [most popular .NET platforms](https://github.com/ServiceStackApps/HelloMobile) including iOS and Android using 
 [Xamarin.iOS](https://github.com/ServiceStackApps/HelloMobile#xamarinios-client) and 
@@ -104,7 +104,7 @@ directly in Visual Studio for the
 
 #### [Xamarin Studio integration with ServiceStackXS](/csharp-add-servicestack-reference.html#xamarin-studio)
 
-Providing [C# Native Types](/csharp-add-servicestack-reference.html) 
+Providing [C# Native Types](/csharp-add-servicestack-reference) 
 support for developing iOS and Android mobile Apps using 
 [Xamarin.iOS](https://github.com/ServiceStackApps/HelloMobile#xamarinios-client) and 
 [Xamarin.Android](https://github.com/ServiceStackApps/HelloMobile#xamarinandroid-client) with 
@@ -112,10 +112,10 @@ support for developing iOS and Android mobile Apps using
 development experience developing Client applications with 
 [Mono Develop on Linux](/csharp-add-servicestack-reference.html#xamarin-studio-for-linux)
 
-#### [Android Studio integration with ServiceStack Plugin](/java-add-servicestack-reference.html)
+#### [Android Studio integration with ServiceStack Plugin](/java-add-servicestack-reference)
 
-Providing [an instant Native Typed API in Java](/java-add-servicestack-reference.html) 
-and [Kotlin](/kotlin-add-servicestack-reference.html)
+Providing [an instant Native Typed API in Java](/java-add-servicestack-reference) 
+and [Kotlin](/kotlin-add-servicestack-reference)
 including idiomatic Java Generic Service Clients supporting Sync and Async Requests by leveraging Android's AsyncTasks to enable the creation of services-rich and responsive native Java or Kotlin Mobile Apps on the Android platform - directly from within Android Studio!
 
 #### [JetBrains IDEs integration with ServiceStack IDEA plugin](/java-add-servicestack-reference.html#install-servicestack-idea-from-the-plugin-repository)
@@ -124,7 +124,7 @@ The ServiceStack IDEA plugin is installable directly from IntelliJ's Plugin repo
 
 #### [Eclipse integration with ServiceStackEclipse](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/ServiceStackEclipse#eclipse-integration-with-servicestack)
 
-The unmatched productivity offered by [Java Add ServiceStack Reference](/java-add-servicestack-reference.html) is also available in the 
+The unmatched productivity offered by [Java Add ServiceStack Reference](/java-add-servicestack-reference) is also available in the 
 [ServiceStackEclipse IDE Plugin](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/ServiceStackEclipse#eclipse-integration-with-servicestack) that's installable 
 from the [Eclipse MarketPlace](https://marketplace.eclipse.org/content/servicestackeclipse) to provide deep integration of Add ServiceStack Reference with Eclipse Java Maven Projects
 enabling Java Developers to effortlessly Add and Update the references of their evolving remote ServiceStack Web Services.
@@ -248,7 +248,7 @@ public class CustomerService : Service
 
 ```
 
-### [Calling the above REST Service from any C#/.NET Client](/csharp-add-servicestack-reference.html)
+### [Calling the above REST Service from any C#/.NET Client](/csharp-add-servicestack-reference)
 
 No code-gen required, can re-use above Server DTOs:
 
@@ -281,9 +281,9 @@ all = client.Get(new GetCustomers());                             // Count = 0
 Same code also works with [Android, iOS, Xamarin.Forms, UWP and WPF clients](https://github.com/ServiceStackApps/HelloMobile).
 
 ::: info
-[F#](/fsharp-add-servicestack-reference.html) and 
-[VB.NET](/vbnet-add-servicestack-reference.html) can re-use same 
-[.NET Service Clients](/csharp-client.html) and DTOs
+[F#](/fsharp-add-servicestack-reference) and 
+[VB.NET](/vbnet-add-servicestack-reference) can re-use same 
+[.NET Service Clients](/csharp-client) and DTOs
 :::
 
 ### [Calling from TypeScript](/typescript-add-servicestack-reference.html#ideal-typed-message-based-api)
@@ -429,9 +429,10 @@ of different formats, including:
  - [gRPC](/grpc/)
  - [SOAP 1.1/1.2](/soap-support)
  - HTML
-   - [HTML5 Report Format](/html5reportformat)
-   - [Sharp Pages](https://sharpscript.net/docs/script-pages)
+   - [Auto HTML API](/auto-html-api)
+   - [Blazor](https://blazor-vue.web-templates.io)
    - [Razor](https://razor.netcore.io/)
+   - [Sharp Pages](https://sharpscript.net/docs/script-pages)
    - [Markdown Razor](/markdown-razor)
 
 ### Multiple Endpoints
@@ -449,12 +450,16 @@ Whilst ServiceStack is fundamentally a premier HTTP Framework, its Services can 
 In addition to supporting multiple formats and endpoints, ServiceStack can also be hosted within a multitude of different hosting options:
 
 #### Windows, OSX or Linux
+- **.NET 8+**
+  - [ASP .NET Identity Auth Templates](https://servicestack.net/start)
+  - [ServiceStack Auth Templates](https://servicestack.net/start-auth#projects)
+
  - **.NET Core 2.1+**
    - [Web App or SelfHost](https://github.com/NetCoreApps/LiveDemos#servicestack-net-core-live-demos)
    - [Worker Service](/messaging#worker-service-templates)
 
 #### Windows
- - **.NET Framework 4.5+**
+ - **.NET Framework 4.7.2+**
    - [ASP.NET Core 2.1 LTS](/templates/corefx)
    - [Classic ASP.NET System.Web](https://github.com/ServiceStackApps/LiveDemos#live-servicestack-demos)
    - [Stand-alone, Self-Hosted HttpListener](/self-hosting)
