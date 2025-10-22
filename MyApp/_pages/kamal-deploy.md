@@ -54,6 +54,26 @@ Once you create your GitHub repository, add the `SSH_PRIVATE_KEY` secret to your
 gh secret set PRIVATE_SSH_KEY < ~/deploy-key
 ```
 
+### Structure
+
+The deployment scripts are embedded in the templates [/.github/workflows](https://github.com/NetCoreTemplates/blazor-vue/tree/main/.github/workflows):
+
+```files
+/.github/workflows
+  build.yml
+  build-container.yml
+  release.yml
+/.kamal
+```
+
+Which is triggered after a commit to main:
+
+- **build.yml** - Builds and tests the application, triggered on push to main
+- **build-container.yml** - Builds a Docker image from the application and pushes it to GitHub Container Registry
+- **release.yml** - Runs any pending DB Migrations, if successful Deploys the Docker image to server
+
+You can customize your App's Kamal deployment by editing the hooks and configuratoin in the `/.kamal` folder, see [Kamal documentation](https://kamal-deploy.org/docs/configuration/) for more information.
+
 ### Configuration
 
 Update `config/deploy.yml` with your deployment settings:
