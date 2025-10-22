@@ -74,7 +74,9 @@ Which is triggered after a commit to main:
 - **build-container.yml** - Builds a Docker image from the application and pushes it to GitHub Container Registry
 - **release.yml** - Runs any pending DB Migrations, if successful Deploys the Docker image to server
 
-You can customize your App's Kamal deployment in your [config/deploy.yml](https://github.com/NetCoreTemplates/blazor-vue/blob/main/config/deploy.yml) with additional hooks and configuratoin in the `/.kamal` folder, see [Kamal documentation](https://kamal-deploy.org/docs/configuration/) for more information.
+Your App's Kamal deployment is configured in [config/deploy.yml](https://github.com/NetCoreTemplates/blazor-vue/blob/main/config/deploy.yml) with additional Kamal hooks and configuration in 
+[.kamal](https://github.com/NetCoreTemplates/blazor-vue/tree/main/.kamal), see 
+[Kamal documentation](https://kamal-deploy.org/docs/configuration/) for more information.
 
 ### Configuration
 
