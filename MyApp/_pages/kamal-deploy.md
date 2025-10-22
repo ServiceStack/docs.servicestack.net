@@ -64,6 +64,8 @@ The deployment scripts are embedded in the templates [/.github/workflows](https:
   build-container.yml
   release.yml
 /.kamal
+/config
+  deploy.yml
 ```
 
 Which is triggered after a commit to main:
@@ -72,7 +74,7 @@ Which is triggered after a commit to main:
 - **build-container.yml** - Builds a Docker image from the application and pushes it to GitHub Container Registry
 - **release.yml** - Runs any pending DB Migrations, if successful Deploys the Docker image to server
 
-You can customize your App's Kamal deployment by editing the hooks and configuratoin in the `/.kamal` folder, see [Kamal documentation](https://kamal-deploy.org/docs/configuration/) for more information.
+You can customize your App's Kamal deployment in your [config/deploy.yml](https://github.com/NetCoreTemplates/blazor-vue/blob/main/config/deploy.yml) with additional hooks and configuratoin in the `/.kamal` folder, see [Kamal documentation](https://kamal-deploy.org/docs/configuration/) for more information.
 
 ### Configuration
 
