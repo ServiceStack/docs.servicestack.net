@@ -60,7 +60,7 @@ jobs:
           cp ./search-server/typesense-server/Dockerfile ${GITHUB_WORKSPACE}/typesense-data/Dockerfile
           cp ./search-server/typesense-scraper/typesense-scraper-config.json typesense-scraper-config.json
           envsubst < "./search-server/typesense-scraper/typesense-scraper.env" > "typesense-scraper-updated.env"
-          docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data:/data typesense/typesense:29.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
+          docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data:/data typesense/typesense:30.0.rc27 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
           sleep 5
           docker run -i --env-file typesense-scraper-updated.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
           curl 'http://172.17.0.2:8108/keys' -X POST -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -H 'Content-Type: application/json' -d '{"value": "N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo","description": "Search only","actions": ["documents:search"],"collections":["*"]}'
