@@ -1,3 +1,3 @@
-FROM typesense/typesense:0.23.1
+FROM typesense/typesense:29.0
 
 COPY ./data /data

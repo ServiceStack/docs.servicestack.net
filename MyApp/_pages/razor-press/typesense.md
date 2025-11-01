@@ -33,13 +33,13 @@ Trying it locally, we used the following commands to spin up a local Typesense s
 
 ```sh
 mkdir /tmp/typesense-data
-docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:0.21.0 \
+docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:29.0 \
     --data-dir /data --api-key=<temp-admin-api-key> --enable-cors
 ```
 
 To check that the server is running, we can open a browser at `/health` and we get back 200 OK with `ok: true`.
 
-The Typesense server has a [REST API](https://typesense.org/docs/0.21.0/api) which can be used to manage the indexes you create. 
+The Typesense server has a [REST API](https://typesense.org/docs/29.0/api/) which can be used to manage the indexes you create. 
 Or if you use their cloud offering, you can use their web dashboard to monitor and manage your index data.
 
 ## Populating the index
@@ -265,7 +265,7 @@ cp ./search-server/typesense-server/Dockerfile ${GITHUB_WORKSPACE}/typesense-dat
 cp ./search-server/typesense-scraper/typesense-scraper-config.json typesense-scraper-config.json
 envsubst < "./search-server/typesense-scraper/typesense-scraper.env" > "typesense-scraper-updated.env"
 docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data:/data \
-    typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
+    typesense/typesense:29.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &
 # wait for typesense initialization
 sleep 5
 docker run -i --env-file typesense-scraper-updated.env \
@@ -275,7 +275,7 @@ docker run -i --env-file typesense-scraper-updated.env \
 Our `Dockerfile` then takes this data from the `data` folder during build.
 
 ```Dockerfile
-FROM typesense/typesense:0.21.0
+FROM typesense/typesense:29.0
 
 COPY ./data /data
 ```
