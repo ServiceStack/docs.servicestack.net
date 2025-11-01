@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-10-22T03:42:16.7002725Z'>
+    <meta name='date' content='2025-11-01T13:04:06.5700302Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Typesense Real-Time Search</title>
@@ -274,11 +274,11 @@ an instance of their Typesense server, which you can run in a <strong>t2.small</
 <a href="https://www.hetzner.com/cloud">Hetzner Cloud</a> VM for a more cost effective option.</p>
 <p>Trying it locally, we used the following commands to spin up a local Typesense server ready to scrape out docs site.</p>
 <pre><code class="language-sh">mkdir /tmp/typesense-data
-docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:0.21.0 \
+docker run -p 8108:8108 -v/tmp/data:/data typesense/typesense:29.0 \
     --data-dir /data --api-key=&lt;temp-admin-api-key&gt; --enable-cors
 </code></pre>
 <p>To check that the server is running, we can open a browser at <code>/health</code> and we get back 200 OK with <code>ok: true</code>.</p>
-<p>The Typesense server has a <a href="https://typesense.org/docs/0.21.0/api">REST API</a> which can be used to manage the indexes you create.
+<p>The Typesense server has a <a href="https://typesense.org/docs/29.0/api/">REST API</a> which can be used to manage the indexes you create.
 Or if you use their cloud offering, you can use their web dashboard to monitor and manage your index data.</p>
 <h2 id="populating-the-index">Populating the index<a class="header-anchor" href="javascript:;" onclick="location.hash='#populating-the-index'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>With your local server is running, you can scrape your docs site using the
@@ -453,14 +453,14 @@ cp ./search-server/typesense-server/Dockerfile ${GITHUB_WORKSPACE}/typesense-dat
 cp ./search-server/typesense-scraper/typesense-scraper-config.json typesense-scraper-config.json
 envsubst &lt; &quot;./search-server/typesense-scraper/typesense-scraper.env&quot; &gt; &quot;typesense-scraper-updated.env&quot;
 docker run -d -p 8108:8108 -v ${GITHUB_WORKSPACE}/typesense-data/data:/data \
-    typesense/typesense:0.21.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &amp;
+    typesense/typesense:29.0 --data-dir /data --api-key=${TYPESENSE_API_KEY} --enable-cors &amp;
 # wait for typesense initialization
 sleep 5
 docker run -i --env-file typesense-scraper-updated.env \
     -e &quot;CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)&quot; typesense/docsearch-scraper
 </code></pre>
 <p>Our <code>Dockerfile</code> then takes this data from the <code>data</code> folder during build.</p>
-<pre><code class="language-Dockerfile">FROM typesense/typesense:0.21.0
+<pre><code class="language-Dockerfile">FROM typesense/typesense:29.0
 
 COPY ./data /data
 </code></pre>
