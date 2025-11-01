@@ -193,10 +193,10 @@ jobs:
       # Checkout latest or specific tag
       - name: checkout
         if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: checkout tag
         if: ${{ github.event.inputs.version != '' && github.event.inputs.version != 'latest' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ github.event.inputs.version }}
           
@@ -239,10 +239,10 @@ jobs:
       # Checkout latest or specific tag
       - name: checkout
         if: ${{ github.event.inputs.version == '' || github.event.inputs.version == 'latest' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: checkout tag
         if: ${{ github.event.inputs.version != '' && github.event.inputs.version != 'latest' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ github.event.inputs.version }}
 
@@ -557,12 +557,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
