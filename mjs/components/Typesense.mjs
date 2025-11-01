@@ -1,7 +1,8 @@
 import { ref, nextTick, onMounted } from 'vue'
+import TypesenseConversation from './TypesenseConversation.mjs'
 
 const TypesenseDialog = {
-    template:`<div class="search-dialog hidden flex bg-black bg-opacity-25 items-center" :class="{ open }" 
+    template:`<div class="search-dialog hidden flex bg-black/25 items-center" :class="{ open }" 
        @click="$emit('hide')">
     <div class="dialog absolute w-full flex flex-col bg-white dark:bg-gray-800" style="max-height:70vh;" @click.stop="">
       <div class="p-2 flex flex-col" style="max-height: 70vh;">
@@ -201,19 +202,23 @@ const TypesenseDialog = {
 export default {
     components: {
         TypesenseDialog,
+        TypesenseConversation,
     },
     template:`<div>
         <TypesenseDialog :open="openSearch" @hide="hideSearch" />
-        <button class="flex rounded-full p-0 bg-gray-100 dark:bg-gray-800 border-2 border-solid border-gray-100 dark:border-gray-700 text-gray-400 cursor-pointer
-                       hover:border-green-400 dark:hover:border-green-400 hover:bg-white hover:text-gray-600" @click="showSearch">
-          <svg class="w-7 h-7 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span class="hidden xl:inline text-lg mr-1">Search</span>
-          <span style="opacity:1;" class="hidden md:block text-gray-400 text-sm leading-5 py-0 px-1.5 my-0.5 mr-1.5 border border-gray-300 border-solid rounded-md">
-            <span class="sr-only">Press </span><kbd class="font-sans">/</kbd><span class="sr-only"> to search</span>
-          </span>
-      </button>
+        <div class="flex space-x-2">
+            <TypesenseConversation />
+            <button class="flex rounded-full p-0 bg-gray-100 dark:bg-gray-800 border-2 border-solid border-gray-100 dark:border-gray-700 text-gray-400 cursor-pointer
+                        hover:border-green-400 dark:hover:border-green-400 hover:bg-white dark:hover:bg-gray-700 hover:text-gray-600" @click="showSearch">
+                <svg class="w-7 h-7 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="hidden xl:inline text-lg mr-1">Search</span>
+                <span style="opacity:1;" class="hidden md:block text-gray-400 text-sm leading-5 py-0 px-1.5 my-0.5 mr-1.5 border border-gray-300 border-solid rounded-md">
+                    <span class="sr-only">Press </span><kbd class="font-sans">/</kbd><span class="sr-only"> to search</span>
+                </span>
+            </button>
+        </div>
     </div>
     `,
     setup() {
