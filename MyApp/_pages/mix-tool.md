@@ -12,13 +12,13 @@ dotnet tool install --global x
 
 The same functionality is also built into the Windows [app](/netcore-windows-desktop) dotnet tool, both can be updated to the latest version with:
 
-.NET 6.0 (Windows/macOS/Linux):
+.NET 8.0 (Windows/macOS/Linux):
 
 :::sh
 dotnet tool update -g x
 :::
 
-.NET 6.0 (Windows x64):
+.NET 8.0 (Windows x64):
 
 :::sh
 dotnet tool update -g app

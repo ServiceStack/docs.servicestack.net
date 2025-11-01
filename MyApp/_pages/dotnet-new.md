@@ -101,7 +101,7 @@ Vue CLI Bootstrap App
 
 [![](/img/pages/auth/signin/vue-spa.png)](https://github.com/NetCoreTemplates/vue-spa)
 
-.NET 6+
+.NET 8+
 :::sh
 x new vue-spa ProjectName
 :::
@@ -118,7 +118,7 @@ React Create App CLI Bootstrap App
 [![](/img/pages/auth/signin/react-spa.png)](https://github.com/NetCoreTemplates/react-spa)
 
 
-.NET 6+
+.NET 8+
 :::sh
 x new react-spa ProjectName
 :::
@@ -134,7 +134,7 @@ Svelte SPA App with Bootstrap
 
 [![](/img/pages/auth/signin/svelte-spa.png)](https://github.com/NetCoreTemplates/svelte-spa)
 
-.NET 6+
+.NET 8+
 :::sh
 x new svelte-spa ProjectName
 :::
@@ -145,7 +145,7 @@ Angular 12 CLI Bootstrap App
 
 [![](/img/pages/auth/signin/angular-spa.png)](https://github.com/NetCoreTemplates/angular-spa)
 
-.NET 6+
+.NET 8+
 :::sh
 x new angular-spa ProjectName
 :::
@@ -157,22 +157,22 @@ x new angular-spa-netfx ProjectName
 
 ### mvcauth
 
-.NET 6.0 MVC Website integrated with ServiceStack Auth
+.NET 8.0 MVC Website integrated with ServiceStack Auth
 
 [![](/img/pages/auth/signin/mvcauth.png)](https://github.com/NetCoreTemplates/mvcauth)
 
-.NET 6+
+.NET 8+
 :::sh
 x new mvcauth ProjectName
 :::
 
 ### mvcidentityserver
 
-.NET 6.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
+.NET 8.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
 
 [![](/img/pages/auth/signin/mvcidentityserver.png)](https://github.com/NetCoreTemplates/mvcidentityserver)
 
-.NET 6+
+.NET 8+
 :::sh
 x new mvcidentityserver ProjectName
 :::
@@ -183,7 +183,7 @@ Nuxt.js SPA App with Bootstrap
 
 [![](/img/pages/auth/signin/vue-nuxt.png)](https://github.com/NetCoreTemplates/vue-nuxt)
 
-.NET 6+
+.NET 8+
 :::sh
 x new vue-nuxt ProjectName
 :::
@@ -199,7 +199,7 @@ x new vue-nuxt-netfx ProjectName
 
 [![](/img/pages/auth/signin/script.png)](https://github.com/NetCoreTemplates/script)
 
-.NET 6+
+.NET 8+
 :::sh
 x new script ProjectName
 :::
@@ -220,7 +220,7 @@ ServiceStack.Razor Bootstrap Website
 
 [![](/img/pages/auth/signin/razor.png)](https://github.com/NetCoreTemplates/razor)
 
-.NET 6+
+.NET 8+
 :::sh
 x new razor ProjectName
 :::
@@ -241,7 +241,7 @@ All new projects can be further customized with [mix](/mix-tool) dotnet tool to 
 
 ## Creating new .NET 5 projects
 
-If you're not yet ready to move to .NET 6 you can still create new projects of older versions of
+If you're not yet ready to move to .NET 8 you can still create new projects of older versions of
 the [.NET Core templates](https://github.com/NetCoreTemplates/).
 
 Which can also be created from our online Project builder at: **servicestack.net/start?tag=net5**
@@ -280,7 +280,7 @@ Then either rename the project and folder names manually or copy over the origin
 
 ### Using older mix features
 
-All [mix features](/mix-tool) have been rewritten to use .NET 6's new `HostingStartup` model going forward,
+All [mix features](/mix-tool) have been rewritten to use .NET 8's new `HostingStartup` model going forward,
 to help with migration please refer to the [mix diff](https://github.com/ServiceStack/mix/commit/b56746622aa1879e3e6a8cbf835e634f05db30db) 
 showing how each of the existing mix configurations were converted to the new model.
 

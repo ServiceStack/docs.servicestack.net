@@ -15,7 +15,7 @@ dotnet tool install --global x
 
 There are a few different ways you can create empty ServiceStack projects ordered by their level of emptiness.
 
-To write a minimal .NET 6 Web App to your current directory, [mix](/mix-tool) in the **[init](https://gist.github.com/gistlyn/8026c4c2a7202b99885539109145e12b)** gist files to your current directory:
+To write a minimal .NET 8 Web App to your current directory, [mix](/mix-tool) in the **[init](https://gist.github.com/gistlyn/8026c4c2a7202b99885539109145e12b)** gist files to your current directory:
 
 :::sh
 x mix init

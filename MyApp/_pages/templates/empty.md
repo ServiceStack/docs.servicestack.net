@@ -1,7 +1,7 @@
 ---
 title: Empty Project Templates
 ---
-## Create Empty .NET 6 Web Apps
+## Create Empty .NET 8 Web Apps
 
 ::include empty-projects.md::
 
@@ -11,7 +11,7 @@ The templates below follow our recommended [physical project layout](/physical-p
 
 <table class="table">
 <tr>
-    <th>.NET 6.0</th>
+    <th>.NET 8.0</th>
     <th>.NET Framework</th>
     <th>ASP .NET Core on FX</th>
     <th>Empty Project Templates</th>

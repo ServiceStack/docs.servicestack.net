@@ -33,7 +33,7 @@ Ultimately, it's hosting your App's pre-rendered static UI assets on Content Del
 
 ### $0.40 /month
 
-Other by-products of generating pre-computed CDN hostable assets, is interchangeable cost-effective hosting and great SEO - characteristics our Jamstack Demos take advantage of with free **UI** hosting on GitHub Pages CDN leaving their only cost to host its **.NET 6 API** back-ends, deployed with SSH in Docker compose containers to a vanilla [Digital Ocean](https://www.digitalocean.com) droplet costing only **[$0.40 /month each](https://vue-ssg.jamstacks.net/hosting)**.
+Other by-products of generating pre-computed CDN hostable assets, is interchangeable cost-effective hosting and great SEO - characteristics our Jamstack Demos take advantage of with free **UI** hosting on GitHub Pages CDN leaving their only cost to host its **.NET 8 API** back-ends, deployed with SSH in Docker compose containers to a vanilla [Digital Ocean](https://www.digitalocean.com) droplet costing only **[$0.40 /month each](https://vue-ssg.jamstacks.net/hosting)**.
 
 ### Recommended Templates
 

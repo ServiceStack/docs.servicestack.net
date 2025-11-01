@@ -17,7 +17,7 @@ dotnet tool install --global x
 
 ## mvc
 
-.NET 6.0 MVC Website with ServiceStack APIs
+.NET 8.0 MVC Website with ServiceStack APIs
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc.png)](https://github.com/NetCoreTemplates/mvc)
 
@@ -29,7 +29,7 @@ x new mvc ProjectName
 
 ### mvcauth
 
-.NET 6.0 MVC Website integrated with ServiceStack Auth
+.NET 8.0 MVC Website integrated with ServiceStack Auth
 
 [![](/img/pages/auth/signin/mvcauth.png)](https://github.com/NetCoreTemplates/mvcauth)
 
@@ -44,7 +44,7 @@ Learn about [using ServiceStack Auth in MVC](/auth/identity-servicestack)
 
 ### mvcidentityserver
 
-.NET 6.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
+.NET 8.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
 
 [![](/img/pages/auth/signin/mvcidentityserver.png)](https://github.com/NetCoreTemplates/mvcidentityserver)
 

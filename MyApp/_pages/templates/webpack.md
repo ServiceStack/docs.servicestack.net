@@ -280,7 +280,7 @@ Which creates a production build of your App where the `.css` files are written 
 
 In the .NET Framework templates you can deploy to any [MS WebDeploy](https://www.iis.net/downloads/microsoft/web-deploy) enabled Server by clicking **Publish...** in the ASP.NET's project Context Menu item which makes use of the existing [/PublishProfiles/PublishToIIS.pubxml](https://github.com/NetFrameworkTemplates/vue-spa-netfx/blob/master/MyApp/Properties/PublishProfiles/PublishToIIS.pubxml) which [includes an instruction](https://github.com/NetFrameworkTemplates/vue-spa-netfx/blob/2e8c208982561695275b451a9ece35522d9739d9/MyApp/Properties/PublishProfiles/PublishToIIS.pubxml#L23-L36) to include the `/wwwroot` folder in deployments.
 
-In .NET 6.0 projects the `publish` npm script runs `dotnet publish -c Release` to Publish a Release build of your App in the `/bin/netcoreapp3.1/publish` folder which can then copied to remote server or an included in a Docker container to deploy your App.
+In .NET 8.0 projects the `publish` npm script runs `dotnet publish -c Release` to Publish a Release build of your App in the `/bin/netcoreapp3.1/publish` folder which can then copied to remote server or an included in a Docker container to deploy your App.
  
 ### Loading Dependencies
  

@@ -158,7 +158,7 @@ All [ServiceStack Single Page App templates](/templates/single-page-apps) are po
 
 ### [AWS Lambda Template](https://github.com/NetCoreTemplates/aws-lambda)
 
-This project lets you create a .NET 6 empty ServiceStack web project ready for deployment as a AWS Lambda Function wired with API GateWay and packaged via a Docker image.
+This project lets you create a .NET 8 empty ServiceStack web project ready for deployment as a AWS Lambda Function wired with API GateWay and packaged via a Docker image.
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="8mpGNTsSlvE" style="background-image: url('https://img.youtube.com/vi/8mpGNTsSlvE/maxresdefault.jpg')"></lite-youtube>
 

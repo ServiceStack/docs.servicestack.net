@@ -7,7 +7,7 @@ title: Modular Startup
 For more information on the earlier Modular Startup in ServiceStack **v5.x** see our [Legacy Modular Startup](/modular-startup-legacy) docs
 :::
 
-Taking advantage of C# 9 top level statements and .NET 6 [WebApplication Hosting Model](https://gist.github.com/davidfowl/0e0372c3c1d895c3ce195ba983b1e03d), ServiceStack templates by utilize both these features to simplify configuring your AppHost in a modular way.
+Taking advantage of C# 9 top level statements and .NET 8 [WebApplication Hosting Model](https://gist.github.com/davidfowl/0e0372c3c1d895c3ce195ba983b1e03d), ServiceStack templates by utilize both these features to simplify configuring your AppHost in a modular way.
 
 `Program.cs` becomes a script-like file since C# 9 top level statements are generating application entry point implicitly.
 
@@ -73,7 +73,7 @@ you can view all available mix gists that can be added to projects with:
 x mix
 :::
 
-.NET 6's idiom is incorporated into the [mix gist config files](https://gist.github.com/gistlyn/9b32b03f207a191099137429051ebde8) to adopt its `HostingStartup` which is better able to load modular Startup configuration without assembly scanning.
+.NET 8's idiom is incorporated into the [mix gist config files](https://gist.github.com/gistlyn/9b32b03f207a191099137429051ebde8) to adopt its `HostingStartup` which is better able to load modular Startup configuration without assembly scanning.
 
 This is a standard ASP .NET Core feature that we can use to configure Mongo DB in any ASP .NET Core App with:
 

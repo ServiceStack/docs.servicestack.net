@@ -8,7 +8,7 @@ Often most of our [Project Templates](/dotnet-new) need to include scripts to pe
 To surface these common tasks to the developer we initially used Gulp and Grunt JS Tasks so they would show up in 
 [VS .NET's Task Runner Explorer UI](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.TaskRunnerExplorer) however this has 
 become dated over time with both Grunt & Gulp.js seeing their usage decline in favor of more advanced build systems like 
-[Webpack](https://webpack.js.org) and [rollup.js](https://rollupjs.org) and at the other end targeting to a single IDE like VS.NET no longer makes sense in a post .NET 6 world which needs to support for multiple platforms and IDEs.
+[Webpack](https://webpack.js.org) and [rollup.js](https://rollupjs.org) and at the other end targeting to a single IDE like VS.NET no longer makes sense in a post .NET 8 world which needs to support for multiple platforms and IDEs.
 
 ## No formal task solution in dotnet projects
 
