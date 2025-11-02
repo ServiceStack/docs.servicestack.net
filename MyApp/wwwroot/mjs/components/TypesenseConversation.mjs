@@ -120,13 +120,16 @@ const AISearchDialog = {
                 v-html="renderMarkdown(msg.content)"></div>
               <!-- Search Results -->
               <div v-if="getUniqueHits(msg.hits).length > 0" class="space-y-3 mt-3">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between gap-2">
                   <p class="text-sm text-gray-600 dark:text-gray-400 font-semibold">{{ getUniqueHits(msg.hits).length }} Result{{ getUniqueHits(msg.hits).length !== 1 ? 's' : '' }} Found</p>
+                  <button type="button" @click="clearConversation" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline font-semibold">
+                    clear
+                  </button>
                 </div>
-                <a v-for="(hit, hitIdx) in getUniqueHits(msg.hits)" :key="hitIdx" :href="hit.url" :class="[hit.type === 
-                    'lvl0' || hit.type === 'lvl1' ? 
-                    'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600' : 
-                    'bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600', 
+                <a v-for="(hit, hitIdx) in getUniqueHits(msg.hits)" :key="hitIdx" :href="hit.url" :class="[hit.type ===
+                    'lvl0' || hit.type === 'lvl1' ?
+                    'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600' :
+                    'bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600',
                     'rounded-lg p-4 border hover:shadow-md transition-shadow cursor-pointer block']">
                   <div :class="[hit.type === 'lvl0' || hit.type === 'lvl1' ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-base' : 'text-blue-600 dark:text-indigo-400 hover:text-blue-800 dark:hover:text-indigo-300 text-sm', 'font-semibold']">
                     {{ hit.title }}
@@ -138,6 +141,12 @@ const AISearchDialog = {
                     {{ hit.content }}
                   </p>
                 </a>
+                <!-- Clear Button After Results -->
+                <div class="flex justify-center pt-2">
+                  <button type="button" @click="clearConversation" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline font-semibold">
+                    clear
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -180,9 +189,20 @@ const AISearchDialog = {
             if (!hits) return []
             const seen = new Set()
             return hits.filter(hit => {
-                if (seen.has(hit.url)) return false
-                seen.add(hit.url)
+                const normalizedUrl = hit.url.replace(/\.html(#|$)/, '$1')
+                if (seen.has(normalizedUrl)) return false
+                seen.add(normalizedUrl)
                 return true
+            })
+        }
+
+        function clearConversation() {
+            messages.value = []
+            inputMessage.value = ''
+            conversationId.value = null
+            loading.value = false
+            nextTick(() => {
+                refMessage.value?.focus()
             })
         }
 
@@ -234,6 +254,7 @@ const AISearchDialog = {
             inputMessage,
             loading,
             sendMessage,
+            clearConversation,
             renderMarkdown,
             getUniqueHits,
         }
