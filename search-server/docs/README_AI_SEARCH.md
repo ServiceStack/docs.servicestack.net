@@ -206,7 +206,6 @@ node MyApp/wwwroot/mjs/components/TypesenseConversation.test.mjs
 - **AI_SEARCH_FEATURE_GUIDE.md** - Detailed feature guide
 
 ### For Developers
-- **IMPLEMENTATION_SUMMARY.md** - Technical details
 - **QUICK_START.md** - Developer quick reference
 - **TypesenseConversation.mjs** - Inline code comments
 - **TypesenseConversation.test.mjs** - Test examples
