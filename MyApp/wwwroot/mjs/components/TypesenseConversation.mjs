@@ -1,5 +1,5 @@
 import { ref, nextTick, onMounted, watch } from 'vue'
-import { renderMarkdown } from "../../lib/mjs/markdown.mjs" 
+import { renderMarkdown, htmlEncode } from "../../lib/mjs/markdown.mjs" 
 
 const collection = 'typesense_docs'
 const BaseUrl = "https://search.docs.servicestack.net";
@@ -65,6 +65,7 @@ async function multiSearch(message, conversationId = null) {
             exclude_fields: "embedding"
         }]
     })
+    
     const result = response.results[0]
     const { answer, conversation_id, query } = response.conversation
     const { found, out_of, page, request_params, search_cutoff, search_time_ms } = result
@@ -80,6 +81,8 @@ async function multiSearch(message, conversationId = null) {
         search_time_ms,
         results: response.results.length,
         hits: result.hits.map((x) => ({
+            id: x.document.id,
+            objectID: x.document.objectID,
             url: x.document.url,
             anchor: x.document.anchor,
             content: clean(x.document.content),
@@ -94,21 +97,40 @@ async function multiSearch(message, conversationId = null) {
 }
 
 const AISearchDialog = {
-    template: `<div v-if="open" class="search-dialog fixed inset-0 z-50 flex bg-black/25 items-center justify-center" @click="$emit('hide')">
+    template: `<div v-if="open" class="search-dialog fixed inset-0 z-50 flex bg-black/25 items-center justify-center" @click="$emit('hide')" @keydown.escape="$emit('hide')">
     <div class="dialog absolute w-full max-w-2xl flex flex-col bg-indigo-50 dark:bg-indigo-900 rounded-lg shadow-lg" style="max-height:80vh;" @click.stop="">
       <div class="p-4 flex flex-col" style="max-height: 80vh;">
         <!-- Header -->
         <div class="flex items-center justify-between mb-4 bg-indigo-900 dark:bg-indigo-950 p-4 -m-4 mb-4 rounded-t-lg">
-          <h2 class="text-xl font-semibold text-white">Ask ServiceStack Docs</h2>
-          <button type="button" @click="$emit('hide')" class="text-gray-400 hover:text-white dark:hover:text-white">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-semibold text-white">Ask ServiceStack Docs</h2>
+          </div>
+          <div class="flex space-x-3">
+            <button type="button" v-if="messages.length > 0" @click="clearConversation" 
+              class="text-xs text-gray-300 hover:text-white dark:hover:text-white font-semibold">
+              <svg class="inline-block size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M14 11v6m-4-6v6M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7M4 7h16M7 7l2-4h6l2 4" stroke-width="1"/></svg>
+              clear
+            </button>
+            <button type="button" @click="$emit('hide')" class="text-gray-400 hover:text-white dark:hover:text-white">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div v-if="messages.length === 0" class="mb-4">
+          <p class="text-xs text-gray-600 dark:text-gray-400 font-semibold mb-2">Suggestions:</p>
+          <div class="flex flex-wrap gap-2">
+            <button v-for="suggestion in suggestions" :key="suggestion" type="button" @click="inputMessage = suggestion; sendMessage()" class="text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900 border border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full transition-colors">
+              {{ suggestion }}
+            </button>
+          </div>
         </div>
 
         <!-- Messages Area -->
-        <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-4" style="max-height: calc(80vh - 180px);">
+        <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-4 border-b border-gray-300 dark:border-gray-600" style="max-height: calc(80vh - 180px);">
           <div v-for="(msg, idx) in messages" :key="idx" :class="['message', msg.role === 'user' ? 'user-message' : 'assistant-message']">
             <div v-if="msg.role === 'user'" class="flex justify-end">
               <div class="bg-indigo-900 dark:bg-indigo-950 text-white rounded-lg px-4 py-2 max-w-xs">
@@ -117,14 +139,11 @@ const AISearchDialog = {
             </div>
             <div v-else class="flex flex-col">
               <div class="shadow prose bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg px-4 py-2 mb-3"
-                v-html="renderMarkdown(msg.content)"></div>
+                v-html="renderContent(msg)"></div>
               <!-- Search Results -->
               <div v-if="getUniqueHits(msg.hits).length > 0" class="space-y-3 mt-3">
                 <div class="flex items-center justify-between gap-2">
                   <p class="text-sm text-gray-600 dark:text-gray-400 font-semibold">{{ getUniqueHits(msg.hits).length }} Result{{ getUniqueHits(msg.hits).length !== 1 ? 's' : '' }} Found</p>
-                  <button type="button" @click="clearConversation" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline font-semibold">
-                    clear
-                  </button>
                 </div>
                 <a v-for="(hit, hitIdx) in getUniqueHits(msg.hits)" :key="hitIdx" :href="hit.url" :class="[hit.type ===
                     'lvl0' || hit.type === 'lvl1' ?
@@ -141,22 +160,16 @@ const AISearchDialog = {
                     {{ hit.content }}
                   </p>
                 </a>
-                <!-- Clear Button After Results -->
-                <div class="flex justify-center pt-2">
-                  <button type="button" @click="clearConversation" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline font-semibold">
-                    clear
-                  </button>
-                </div>
               </div>
             </div>
           </div>
-          <div v-if="loading" class="flex justify-center min-h-10">
+          <div v-if="loading" class="mb-2 flex justify-center min-h-10">
             <div class="absolute animate-spin rounded-full size-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
           </div>
         </div>
 
         <!-- Input Area -->
-        <div class="flex gap-2 pt-4">
+        <div class="flex gap-2">
           <input ref="refMessage"
             v-model="inputMessage"
             @keyup.enter="sendMessage"
@@ -184,6 +197,11 @@ const AISearchDialog = {
         const inputMessage = ref('')
         const loading = ref(false)
         const conversationId = ref(null)
+        const suggestions = [
+            "What is AutoQuery?",
+            "How do I Authenticate?",
+            "What Add ServiceStack Reference languages are supported?"
+        ]
 
         function getUniqueHits(hits) {
             if (!hits) return []
@@ -234,7 +252,12 @@ const AISearchDialog = {
                 nextTick(() => {
                     const messagesArea = document.querySelector('.search-dialog .overflow-y-auto')
                     if (messagesArea) {
-                        messagesArea.scrollTop = messagesArea.scrollHeight
+                        // Scroll to the user message (second to last message)
+                        const messages = messagesArea.querySelectorAll('.message')
+                        if (messages.length >= 2) {
+                            const userMessage = messages[messages.length - 2]
+                            userMessage.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        }
                     }
                 })
             }
@@ -248,6 +271,23 @@ const AISearchDialog = {
             }
         })
 
+        function renderContent(msg) {
+          console.log('msg', JSON.stringify(msg, null, 2))
+
+          let content = msg.content
+          if (content.includes('${[')) {
+            content = content.replaceAll(/\$\{(\[.*?\])\}/g, (match, group) => {
+                const ids = extractAllReferenceIds(group)
+                return ids.join(', ')
+            })
+          }
+
+          content = parseAndReplaceReferences(msg.content, msg.hits)
+
+          const html = renderMarkdown(content)
+          return html
+        }
+
         return {
             refMessage,
             messages,
@@ -255,8 +295,9 @@ const AISearchDialog = {
             loading,
             sendMessage,
             clearConversation,
-            renderMarkdown,
+            renderContent,
             getUniqueHits,
+            suggestions,
         }
     }
 }
@@ -302,4 +343,99 @@ export default {
             collection
         }
     }
+}
+
+function getHit(hits, id) {
+    return id && hits.find((x) => x.id == id || x.objectID == id)
+}
+
+function refHtml(hit) {
+    return `<a href="${hit.url}" target="_blank" class="svg-external" title="${htmlEncode(hit.title)}">${hit.id}</a>`
+}
+
+/**
+ * Parses markdown for reference patterns and replaces them with formatted links.
+ * Supports patterns like: (Ref: 1234), (Ref. 1234), (id: 1234), (1234), [ref: 1234], [1234], [[1234]], etc.
+ * Also supports 40-character UUIDs like [33ffd70e82ebd01b19dadc908ea097844c6fb013]
+ *
+ * @param {string} markdown - The markdown content to parse
+ * @param {Object.<string, {id: string, title: string}>} hits - Dictionary of search results keyed by id
+ * @param {Function} [replaceFn] - Optional callback function that receives the search result and returns HTML.
+ *                                 If not provided, uses default formatting: <a class="svg-external" title="{title}">{id}</a>
+ *                                 Signature: (searchResult) => string
+ * @returns {string} Markdown with references replaced by formatted links
+ */
+export function parseAndReplaceReferences(markdown, hits, replaceFn) {
+    if (!markdown || !hits || hits.length === 0) {
+        return markdown
+    }
+
+    // Regex pattern to match various reference formats:
+    // - (Ref: 1234), (Ref. 1234), (Reference: 1234), (References: 1234), (id: 1234), (1234)
+    // - [ref: 1234], [1234], [[1234]]
+    // - [40-char-uuid] like [33ffd70e82ebd01b19dadc908ea097844c6fb013]
+    // - Multiple references: (Ref. 1234, 1235) - extracts the first id
+    const referencePattern = /\((?:(?:Ref(?:erence)?s?\.?|id):\s*)?(\d+)(?:\s*,\s*\d+)*\)|\[(?:ref:\s*)?(\d+)\]|\[\[(\d+)\]\]|\[([a-f0-9]{40})(?:\s*,\s*[a-f0-9]{40})*\]/gi
+
+    return markdown.replace(referencePattern, (match, group1, group2, group3, group4) => {
+        // Extract the first captured group that matched
+        const id = group1 || group2 || group3 || group4
+
+        // If we found an id and it exists in search results, replace with formatted link
+        const hit = getHit(hits, id)
+        if (hit) {
+            console.log('found', id, hit)
+
+            // Use custom replaceFn if provided, otherwise use default formatting
+            if (replaceFn && typeof replaceFn === 'function') {
+                return replaceFn(hit)
+            }
+
+            // Default formatting
+            return refHtml(hit)
+        } else {
+            console.log('not found', id)
+        }
+
+        // Return original match if no search result found
+        return match
+    })
+}
+
+/**
+ * Extracts the first reference id from markdown content.
+ *
+ * @param {string} markdown - The markdown content to parse
+ * @returns {string|null} The first reference id found, or null if none found
+ */
+export function extractFirstReferenceId(markdown) {
+    if (!markdown) return null
+
+    const referencePattern = /\((?:(?:Ref(?:erence)?s?\.?|id):\s*)?(\d+)(?:\s*,\s*\d+)*\)|\[(?:ref:\s*)?(\d+)\]|\[\[(\d+)\]\]|\[([a-f0-9]{40})\]/i
+    const match = markdown.match(referencePattern)
+
+    if (!match) return null
+
+    return match[1] || match[2] || match[3] || match[4]
+}
+
+/**
+ * Extracts all reference ids from markdown content.
+ *
+ * @param {string} markdown - The markdown content to parse
+ * @returns {string[]} List of all unique reference ids found
+ */
+export function extractAllReferenceIds(markdown) {
+    if (!markdown) return []
+
+    const referencePattern = /\((?:(?:Ref(?:erence)?s?\.?|id):\s*)?(\d+)(?:\s*,\s*\d+)*\)|\[(?:ref:\s*)?(\d+)\]|\[\[(\d+)\]\]|\[([a-f0-9]{40})\]/gi
+    const ids = new Set()
+    let match
+
+    while ((match = referencePattern.exec(markdown)) !== null) {
+        const id = match[1] || match[2] || match[3] || match[4]
+        if (id) ids.add(id)
+    }
+
+    return Array.from(ids)
 }
