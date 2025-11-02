@@ -66,53 +66,6 @@ jobs:
           docker run -i --env-file typesense-scraper-updated.env -e "CONFIG=$(cat typesense-scraper-config.json | jq -r tostring)" typesense/docsearch-scraper
           curl 'http://172.17.0.2:8108/keys' -X POST -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" -H 'Content-Type: application/json' -d '{"value": "N4N8bF0XwyvzwCGwm3CKB0QcnwyWtygo","description": "Search only","actions": ["documents:search"],"collections":["*"]}'
 
-          # Create conversation store collection
-          curl 'http://172.17.0.2:8108/collections' \
-            -X POST \
-            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "name": "conversation_store",
-              "fields": [
-                {
-                  "name": "conversation_id",
-                  "type": "string"
-                },
-                {
-                  "name": "model_id",
-                  "type": "string"
-                },
-                {
-                  "name": "timestamp",
-                  "type": "int32"
-                },
-                {
-                  "name": "role",
-                  "type": "string",
-                  "index": false
-                },
-                {
-                  "name": "message",
-                  "type": "string",
-                  "index": false
-                }
-              ]
-            }'
-
-          # Create or update conversation model
-          curl 'http://172.17.0.2:8108/conversations/models' \
-            -X POST \
-            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "id": "conv-model-1",
-              "model_name": "google/gemini-flash-latest",
-              "history_collection": "conversation_store",
-              "api_key": "'"${GOOGLE_API_KEY}"'",
-              "system_prompt": "You are an intelligent assistant for question-answering about ServiceStack Software. Try to answer questions using the provided context. If a response has no references in the provided context, politely say you do not have knowledge about that topic.",
-              "max_bytes": 16384
-            }'
-
       - name: repository name fix and env
         run: |
           echo "letsencrypt_email=${{ secrets.LETSENCRYPT_EMAIL }}" >> $GITHUB_ENV

@@ -1,0 +1,68 @@
+name: Setup Search Index
+
+on:
+  workflow_run:
+    workflows: ["Build Search Index"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  init-conversation-store:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create conversation store collection
+        env:
+          TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          curl 'https://search.docs.servicestack.net/collections' \
+            -X POST \
+            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "name": "conversation_store",
+              "fields": [
+                {
+                  "name": "conversation_id",
+                  "type": "string"
+                },
+                {
+                  "name": "model_id",
+                  "type": "string"
+                },
+                {
+                  "name": "timestamp",
+                  "type": "int32"
+                },
+                {
+                  "name": "role",
+                  "type": "string",
+                  "index": false
+                },
+                {
+                  "name": "message",
+                  "type": "string",
+                  "index": false
+                }
+              ]
+            }'
+
+      - name: Create or update conversation model
+        env:
+          TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          curl 'https://search.docs.servicestack.net/conversations/models' \
+            -X POST \
+            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "id": "conv-model-1",
+              "model_name": "google/gemini-flash-latest",
+              "history_collection": "conversation_store",
+              "api_key": "'"${GOOGLE_API_KEY}"'",
+              "system_prompt": "You are an intelligent assistant for question-answering about ServiceStack Software. Try to answer questions using the provided context. If a response has no references in the provided context, politely say you do not have knowledge about that topic.",
+              "max_bytes": 16384
+            }'
+
