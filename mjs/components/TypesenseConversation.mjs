@@ -44,7 +44,7 @@ async function get(url, opt=null) {
 function clean(s) {
     if (s == null) return null
     return s.replace(/&ZeroWidthSpace/g, '')
-        .replace(/\s+/g, ' ')
+        //.replace(/\s+/g, ' ')
         .trim()
 }
 
@@ -95,10 +95,10 @@ async function multiSearch(message, conversationId = null) {
 
 const AISearchDialog = {
     template: `<div v-if="open" class="search-dialog fixed inset-0 z-50 flex bg-black/25 items-center justify-center" @click="$emit('hide')">
-    <div class="dialog absolute w-full max-w-2xl flex flex-col bg-white/100 dark:bg-gray-800/100 rounded-lg shadow-lg" style="max-height:80vh;" @click.stop="">
+    <div class="dialog absolute w-full max-w-2xl flex flex-col bg-indigo-50 dark:bg-indigo-900 rounded-lg shadow-lg" style="max-height:80vh;" @click.stop="">
       <div class="p-4 flex flex-col" style="max-height: 80vh;">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-4 bg-gradient-to-r from-slate-700 to-slate-600 dark:from-slate-800 dark:to-slate-700 p-4 -m-4 mb-4 rounded-t-lg">
+        <div class="flex items-center justify-between mb-4 bg-indigo-900 dark:bg-indigo-950 p-4 -m-4 mb-4 rounded-t-lg">
           <h2 class="text-xl font-semibold text-white">Ask ServiceStack Docs</h2>
           <button type="button" @click="$emit('hide')" class="text-gray-400 hover:text-white dark:hover:text-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,20 +111,24 @@ const AISearchDialog = {
         <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-4" style="max-height: calc(80vh - 180px);">
           <div v-for="(msg, idx) in messages" :key="idx" :class="['message', msg.role === 'user' ? 'user-message' : 'assistant-message']">
             <div v-if="msg.role === 'user'" class="flex justify-end">
-              <div class="bg-blue-500 text-white rounded-lg px-4 py-2 max-w-xs">
+              <div class="bg-indigo-900 dark:bg-indigo-950 text-white rounded-lg px-4 py-2 max-w-xs">
                 {{ msg.content }}
               </div>
             </div>
             <div v-else class="flex flex-col">
-              <div class="prose bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 mb-3"
+              <div class="shadow prose bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg px-4 py-2 mb-3"
                 v-html="renderMarkdown(msg.content)"></div>
               <!-- Search Results -->
               <div v-if="getUniqueHits(msg.hits).length > 0" class="space-y-3 mt-3">
                 <div class="flex items-center gap-2">
                   <p class="text-sm text-gray-600 dark:text-gray-400 font-semibold">{{ getUniqueHits(msg.hits).length }} Result{{ getUniqueHits(msg.hits).length !== 1 ? 's' : '' }} Found</p>
                 </div>
-                <a v-for="(hit, hitIdx) in getUniqueHits(msg.hits)" :key="hitIdx" :href="hit.url" :class="[hit.type === 'lvl0' || hit.type === 'lvl1' ? 'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 border-indigo-300 dark:border-indigo-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 border-blue-200 dark:border-gray-700', 'rounded-lg p-4 border hover:shadow-md transition-shadow cursor-pointer block']">
-                  <div :class="[hit.type === 'lvl0' || hit.type === 'lvl1' ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-base' : 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm', 'font-semibold']">
+                <a v-for="(hit, hitIdx) in getUniqueHits(msg.hits)" :key="hitIdx" :href="hit.url" :class="[hit.type === 
+                    'lvl0' || hit.type === 'lvl1' ? 
+                    'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600' : 
+                    'bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-900 dark:to-blue-800 border-blue-300 dark:border-blue-600', 
+                    'rounded-lg p-4 border hover:shadow-md transition-shadow cursor-pointer block']">
+                  <div :class="[hit.type === 'lvl0' || hit.type === 'lvl1' ? 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-base' : 'text-blue-600 dark:text-indigo-400 hover:text-blue-800 dark:hover:text-indigo-300 text-sm', 'font-semibold']">
                     {{ hit.title }}
                   </div>
                   <p v-if="hit.snippet" class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-3 leading-relaxed">
@@ -137,8 +141,8 @@ const AISearchDialog = {
               </div>
             </div>
           </div>
-          <div v-if="loading" class="flex justify-center">
-            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <div v-if="loading" class="flex justify-center min-h-10">
+            <div class="absolute animate-spin rounded-full size-8 border-b-2 border-blue-500 dark:border-blue-400"></div>
           </div>
         </div>
 
@@ -150,12 +154,12 @@ const AISearchDialog = {
             :disabled="loading"
             type="text"
             placeholder="Ask a question..."
-            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
           />
-          <button
+          <button type="button"
             @click="sendMessage"
             :disabled="loading || !inputMessage.trim()"
-            class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-400 text-white rounded-lg font-semibold transition-colors"
+            class="px-4 py-2 bg-indigo-500 dark:bg-indigo-700 hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white rounded-lg font-semibold transition-colors"
           >
             Send
           </button>
