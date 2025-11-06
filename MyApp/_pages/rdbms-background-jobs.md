@@ -220,26 +220,6 @@ APIs are executed via the [MQ Request Pipeline](/order-of-operations)
 and commands executed using the [Commands Feature](/commands) where
 they'll also be visible in the [Commands Admin UI](/commands#command-admin-ui).
 
-### Background Job Options
-
-The behavior for each `Enqueue*` method for executing background jobs can be customized with
-the following options:
-
-- `Worker` - Serially process job using a named worker thread
-- `Callback` - Invoke another command with the result of a successful job
-- `DependsOn` - Execute jobs after successful completion of a dependent job
-    - If parent job fails all dependent jobs are cancelled
-- `UserId` - Execute within an Authenticated User Context
-- `RunAfter` - Queue jobs that are only run after a specified date
-- `RetryLimit` - Override default retry limit for how many attempts should be made to execute a job
-- `TimeoutSecs` - Override default timeout for how long a job should run before being cancelled
-- `RefId` - Allow clients to specify a unique Id (e.g Guid) to track job
-- `Tag` - Group related jobs under a user specified tag
-- `CreatedBy` - Optional field for capturing the owner of a job
-- `BatchId` - Group multiple jobs with the same Id
-- `ReplyTo` - Optional field for capturing where to send notification for completion of a Job
-- `Args` - Optional String Dictionary of Arguments that can be attached to a Job
-
 ### Feature Overview
 
 It packs most features needed in a Background Jobs solution including:
@@ -262,3 +242,6 @@ It packs most features needed in a Background Jobs solution including:
 - Execute transitive (i.e. non-durable) jobs using named workers
 - Attach optional `Tag`, `BatchId`, `CreatedBy`, `ReplyTo` and `Args` with Jobs
 
+::include jobs-shared.md::
+
+::include command-types.md::
