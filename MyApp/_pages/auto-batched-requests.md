@@ -7,6 +7,20 @@ One of the best ways to improve performance, efficiency and reduce latency is to
 
 A common use-case that can be improved are clients making multiple requests to the same API, but due to the lack of a better alternative batched API or control over the server implementation, will default to making multiple N+1 web service requests. 
 
+### Pre-defined Routes
+
+For [Endpoint Routing](/endpoint-routing), the pre-defined route for Auto Batched Requests is:
+
+<div class="not-prose">
+<h3 class="text-4xl text-center text-indigo-800 pb-3">/api/{Request}[]</h3>
+</div>
+
+For [Leegacy Routing](/routing), the pre-defined route for Auto Batched Requests is:
+
+<div class="not-prose">
+<h3 class="text-4xl text-center text-indigo-800 pb-3">/json/reply/{Request}[]</h3>
+</div>
+
 ## All Services support Batching
 
 Thanks to it's [message-based design](/advantages-of-message-based-web-services), ServiceStack is able to enable high-level generic functionality like Request Batching which is now implicitly available for all Services, without any additional effort - where multiple requests of the same type can be sent together in a single HTTP Request.
