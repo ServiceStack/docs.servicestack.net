@@ -2,7 +2,7 @@ name: Setup Search Index
 
 on:
   workflow_run:
-    workflows: ["Build Search Index"]
+    workflows: ["Build Search Index", "pages-build-deployment"]
     types:
       - completed
   workflow_dispatch:
@@ -11,58 +11,95 @@ jobs:
   init-conversation-store:
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for deployment to be ready
+        run: |
+          echo "Waiting for search service to be ready..."
+          for i in {1..30}; do
+            if curl -s -f -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" https://search.docs.servicestack.net/health > /dev/null 2>&1; then
+              echo "Search service is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Service not ready yet, waiting..."
+            sleep 10
+          done
+          echo "Warning: Service may not be fully ready, proceeding anyway..."
+        env:
+          TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
+
       - name: Create conversation store collection
         env:
           TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          curl 'https://search.docs.servicestack.net/collections' \
-            -X POST \
-            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "name": "conversation_store",
-              "fields": [
-                {
-                  "name": "conversation_id",
-                  "type": "string"
-                },
-                {
-                  "name": "model_id",
-                  "type": "string"
-                },
-                {
-                  "name": "timestamp",
-                  "type": "int32"
-                },
-                {
-                  "name": "role",
-                  "type": "string",
-                  "index": false
-                },
-                {
-                  "name": "message",
-                  "type": "string",
-                  "index": false
-                }
-              ]
-            }'
+          # Retry logic for creating conversation store collection
+          for attempt in {1..5}; do
+            echo "Attempt $attempt/5: Creating conversation store collection..."
+            if curl -s -X POST 'https://search.docs.servicestack.net/collections' \
+              -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+              -H 'Content-Type: application/json' \
+              -d '{
+                "name": "conversation_store",
+                "fields": [
+                  {
+                    "name": "conversation_id",
+                    "type": "string"
+                  },
+                  {
+                    "name": "model_id",
+                    "type": "string"
+                  },
+                  {
+                    "name": "timestamp",
+                    "type": "int32"
+                  },
+                  {
+                    "name": "role",
+                    "type": "string",
+                    "index": false
+                  },
+                  {
+                    "name": "message",
+                    "type": "string",
+                    "index": false
+                  }
+                ]
+              }' | grep -q "conversation_store"; then
+              echo "Successfully created conversation store collection"
+              exit 0
+            fi
+            if [ $attempt -lt 5 ]; then
+              echo "Failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
+          echo "Warning: Could not create conversation store collection after 5 attempts"
 
       - name: Create or update conversation model
         env:
           TYPESENSE_API_KEY: ${{ secrets.TYPESENSE_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: |
-          curl 'https://search.docs.servicestack.net/conversations/models' \
-            -X POST \
-            -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
-            -H 'Content-Type: application/json' \
-            -d '{
-              "id": "conv-model-1",
-              "model_name": "google/gemini-flash-latest",
-              "history_collection": "conversation_store",
-              "api_key": "'"${GOOGLE_API_KEY}"'",
-              "system_prompt": "You are an intelligent assistant for question-answering about ServiceStack Software. Try to answer questions using the provided context. If a response has no references in the provided context, politely say you do not have knowledge about that topic.",
-              "max_bytes": 16384
-            }'
+          # Retry logic for creating/updating conversation model
+          for attempt in {1..5}; do
+            echo "Attempt $attempt/5: Creating/updating conversation model..."
+            if curl -s -X POST 'https://search.docs.servicestack.net/conversations/models' \
+              -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
+              -H 'Content-Type: application/json' \
+              -d '{
+                "id": "conv-model-1",
+                "model_name": "google/gemini-flash-latest",
+                "history_collection": "conversation_store",
+                "api_key": "'"${GOOGLE_API_KEY}"'",
+                "system_prompt": "You are an intelligent assistant for question-answering about ServiceStack Software. Try to answer questions using the provided context. If a response has no references in the provided context, politely say you do not have knowledge about that topic.",
+                "max_bytes": 16384
+              }' | grep -q "conv-model-1"; then
+              echo "Successfully created/updated conversation model"
+              exit 0
+            fi
+            if [ $attempt -lt 5 ]; then
+              echo "Failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
+          echo "Warning: Could not create/update conversation model after 5 attempts"
 
