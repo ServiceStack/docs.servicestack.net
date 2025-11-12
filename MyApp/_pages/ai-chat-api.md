@@ -235,12 +235,11 @@ services.AddPlugin(new ChatFeature {
     // Specify which providers you want to enable
     EnableProviders =
     [
-        "openrouter_free",
         "groq",
         "google_free",
         "codestral",
+        "openrouter_free",
         "ollama",
-        "openrouter",
         "google",
         "anthropic",
         "openai",
@@ -248,6 +247,8 @@ services.AddPlugin(new ChatFeature {
         "qwen",
         "z.ai",
         "mistral",
+        "openrouter",
+        "servicestack",
     ],
 
     // Use custom llms.json configuration
