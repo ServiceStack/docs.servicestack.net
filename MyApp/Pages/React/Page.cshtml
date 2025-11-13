@@ -1,0 +1,25 @@
+﻿@page "/react/{Slug}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("react").Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "ServiceStack React",
+   Slug = Model.Slug,
+   Folder = "react",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "React",
+       Link = "/react/",
+   },
+}.Init(this, Markdown))
+
+<script type="module">
+import { setMetadata } from "/pages/vue/data.mjs"
+setMetadata()
+</script>
