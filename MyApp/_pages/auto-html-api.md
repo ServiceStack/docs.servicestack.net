@@ -65,16 +65,27 @@ A nice benefit of ServiceStack's API Design is that consuming APIs are fundament
 dependency containing a generic ServiceClient which can be used to call any ServiceStack API using the typed DTOs copied directly from the API docs page
 to enable an end-to-end typed API without any external tooling or build steps.
 
+## Overriding Auto HTML API
+
+Like most of ServiceStack's built-in UIs, the Auto HTML API can be customized the same way by providing a local 
+[HtmlFormat.html](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack/Templates/HtmlFormat.html)
+at the same path in your AppHost Project's `/wwwroot/Templates` folder:
+
+```files
+/wwwroot/Templates
+  HtmlFormat.html
+```
+
 ## API Fallback HTML Page
 
 The Auto HTML API is the fallback HTML page returned for APIs when calling user-defined routes from a browser (i.e. **Accept: text/html**):
 
-### [https://northwind.netcore.io/customers/ALFKI](https://northwind.netcore.io/customers/ALFKI)
+### [/bookings/1](https://blazor-vue.web-templates.io/bookings/1)
 
 When calling the [/api pre-defined route](/routing#json-api-pre-defined-route) with the `.html` extension:
 
-### [https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI](https://northwind.netcore.io/api/GetCustomerDetails.html?Id=ALFKI)
+### [/api/QueryBookings.html?Id=1](https://blazor-vue.web-templates.io/api/QueryBookings.html?Id=1)
 
 When calling the [/api pre-defined route](/routing#json-api-pre-defined-route) with `?format=html`:
 
-### [https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html](https://northwind.netcore.io/api/GetCustomerDetails?Id=ALFKI&format=html)
+### [/api/QueryBookings?Id=1&format=html](https://blazor-vue.web-templates.io/api/QueryBookings?Id=1&format=html)
