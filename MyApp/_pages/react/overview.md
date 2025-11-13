@@ -1,5 +1,5 @@
 ---
-title: React Templates
+title: .NET React Templates
 ---
 
 ## First-Class React + Tailwind for AI-First Development
