@@ -478,3 +478,74 @@ Incidentally as [llms.py UI](https://servicestack.net/posts/llms-py-ui) and AI C
 use its **import/export** features to transfer your AI Chat History between them.
 
 Checkout the [llms.py GitHub repo](https://github.com/ServiceStack/llms) for even more features.
+
+## FREE Gemini, Minimax M2, GLM 4.6, Kimi K2 in AI Chat
+
+To give AI Chat instant utility, we're making available a free `servicestack` OpenAI Chat provider that can be enabled with:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    EnableProviders = [
+        "servicestack",
+        // "groq",
+        // "google_free",
+        // "openrouter_free",
+        // "ollama",
+        // "google",
+        // "anthropic",
+        // "openai",
+        // "grok",
+        // "qwen",
+        // "z.ai",
+        // "mistral",
+        // "openrouter",
+    ]
+});
+```
+
+The `servicestack` provider is configured with a default `llms.json` which enables access to Gemini and the
+best value OSS models for FREE:
+
+```json
+{
+  "providers": {
+    "servicestack": {
+      "enabled": false,
+      "type": "OpenAiProvider",
+      "base_url": "http://okai.servicestack.com",
+      "api_key": "$SERVICESTACK_LICENSE",
+      "models": {
+        "gemini-flash-latest": "gemini-flash-latest",
+        "gemini-flash-lite-latest": "gemini-flash-lite-latest",
+        "kimi-k2": "kimi-k2",
+        "kimi-k2-thinking": "kimi-k2-thinking",
+        "minimax-m2": "minimax-m2",
+        "glm-4.6": "glm-4.6",
+        "gpt-oss:20b": "gpt-oss:20b",
+        "gpt-oss:120b": "gpt-oss:120b",
+        "llama4:400b": "llama4:400b",
+        "mistral-small3.2:24b": "mistral-small3.2:24b"
+      }
+    }
+  }
+}
+```
+
+The `servicestack` provider requires the `SERVICESTACK_LICENSE` Environment Variable, although any ServiceStack License Key can be used, including expired and Free ones.
+
+:::{.not-prose}
+:::{.my-8 .max-w-3xl .mx-auto .rounded-lg .overflow-hidden .shadow .hover:shadow-xl}
+[![](/img/pages/ai-chat/llms-syntax.webp)](/ai-chat-ui)
+:::
+:::
+
+### FREE for Personal Usage
+
+To be able to maintain this as a free service we're limiting usage for development or personal assistance and research 
+by limiting usage to **60 requests /hour** which should be more than enough for most personal usage and research whilst 
+deterring usage in automated tools or usage in production.
+
+:::tip info
+Rate limiting is implemented with a sliding [Token Bucket algorithm](https://en.wikipedia.org/wiki/Token_bucket) 
+that replenishes 1 additional request every 60s
+:::
