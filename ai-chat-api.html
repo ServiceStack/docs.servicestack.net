@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-11-14T13:31:59.3410844Z'>
+    <meta name='date' content='2025-11-15T05:34:45.6335795Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AI Chat</title>
@@ -1808,35 +1808,6 @@ to resolve the provider then calling <code>ChatAsync</code> will only use that p
     }
 }
 </code></pre>
-<h2 id="persist-ai-chat-history">Persist AI Chat History<a class="header-anchor" href="javascript:;" onclick="location.hash='#persist-ai-chat-history'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>By default AI Chat is designed to be minimally invasive and doesn't require anything other than the API Keys
-needed to access the AI Models it should use.</p>
-<p>If preferred you can choose to persist AI Chat History made through the external ChatCompletion API with the
-<code>OnChatCompletionSuccessAsync</code> and <code>OnChatCompletionFailedAsync</code> callbacks which can be used to store successful
-and failed requests in your preferred data store using the included
-<a href="https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.AI.Chat/ChatCompletionLog.cs">ChatCompletionLog</a>
-or your own data model:</p>
-<pre><code class="language-csharp">public class ConfigureAiChat : IHostingStartup
-{
-    public void Configure(IWebHostBuilder builder) =&gt; builder
-        .ConfigureServices(services =&gt; {
-            services.AddPlugin(new ChatFeature
-            {
-                OnChatCompletionSuccessAsync = async (request, response, req) =&gt; {
-                    using var db = await req.Resolve&lt;IDbConnectionFactory&gt;().OpenAsync();
-                    await db.InsertAsync(req.ToChatCompletionLog(request, response));
-                },
-                OnChatCompletionFailedAsync = async (request, exception, req) =&gt; {
-                    using var db = await req.Resolve&lt;IDbConnectionFactory&gt;().OpenAsync();
-                    await db.InsertAsync(req.ToChatCompletionLog(request, exception));
-                },
-            });
-       }).ConfigureAppHost(appHost =&gt; {
-            using var db = appHost.Resolve&lt;IDbConnectionFactory&gt;().Open();
-            db.CreateTableIfNotExists&lt;ChatCompletionLog&gt;();
-       });
-}
-</code></pre>
 <h3 id="compatible-with-llms.py">Compatible with llms.py<a class="header-anchor" href="javascript:;" onclick="location.hash='#compatible-with-llms.py'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The other benefit of simple configuration and simple solutions, is that they're easy to implement. A perfect example
 of this being that this is the 2nd implementation done using this configuration. The same configuration, UI, APIs
@@ -2034,13 +2005,6 @@ that replenishes 1 additional request every 60s</p>
                                                             Model Routing and Failover
                                                         </span>
                                                     </li>
-                                            </ul>
-                                    </li>
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#persist-ai-chat-history'" data-id="persist-ai-chat-history" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Persist AI Chat History
-                                        </span>
-                                            <ul class="ml-4">
                                                     <li data-id="compatible-with-llms.py" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#compatible-with-llms.py'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
