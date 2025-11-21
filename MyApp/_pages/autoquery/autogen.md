@@ -6,7 +6,7 @@ Long time users of ServiceStack will know it's a staunch proponent of **code-fir
 
 ### AutoGen vs TypeScript Data Models
 
-AutoGen's approach relies on runtime C# reflection to inspect your RDBMS schema and dynamically register AutoQuery CRUD Services; if you prefer an alternative flow based on generating source code from exported DB metadata and TypeScript Data Models instead, see [Generate CRUD APIs and UIs for existing DBs](/autoquery/okai-db) which uses the `okai` tool.
+This AutoGen-based approach uses runtime C# reflection and IL generation to inspect your RDBMS schema at startup and dynamically register AutoQuery CRUD Services for your existing tables. By contrast, the [`okai` TypeScript Data Models](/autoquery/okai-db) approach first exports DB metadata and converts it into TypeScript Data Models, then generates the AutoQuery CRUD APIs, RDBMS Data Models and DB migrations from those definitions.
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NaJ7TW-Q_pU" style="background-image: url('https://img.youtube.com/vi/NaJ7TW-Q_pU/maxresdefault.jpg')"></lite-youtube>
 

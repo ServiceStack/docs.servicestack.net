@@ -2,9 +2,9 @@
 title: Generate CRUD APIs and UIs for existing DBs
 ---
 
-### AutoGen vs TypeScript Data Models
+### TypeScript Data Models vs AutoGen
 
-AutoGen's approach relies on runtime C# reflection to inspect your RDBMS schema and dynamically register AutoQuery CRUD Services; this page instead documents an alternative flow based on generating source code from exported DB metadata and TypeScript Data Models using the `okai` tool. If you prefer the reflection-based approach, see [AutoQuery AutoGen CRUD Services](/autoquery/autogen).
+This TypeScript Data Models approach starts by exporting your existing RDBMS schema to JSON, converting it into TypeScript Data Models, then generating the AutoQuery CRUD APIs, RDBMS Data Models and DB migrations from those TypeScript definitions. By contrast, the [AutoQuery AutoGen CRUD Services](/autoquery/autogen) approach uses runtime C# reflection at startup to inspect your DB schema and dynamically register AutoQuery CRUD Services for your tables.
 
 ## Generate CRUD APIs from TypeScript Data Models
 
