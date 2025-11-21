@@ -2,17 +2,28 @@
 title: Generate CRUD APIs and UIs for existing DBs
 ---
 
-A core piece of functionality in the [Text to Blazor CRUD App](/autoquery/text-to-blazor) feature is distilling an AI Prompt into TypeScript classes that can be [further customized](/autoquery/okai-models#customize-data-models)
-to generate AutoQuery CRUD APIs and Admin UIs for managing the underlying RDBMS tables.
+### AutoGen vs TypeScript Data Models
 
-## TypeScript Data Models
+AutoGen's approach relies on runtime C# reflection to inspect your RDBMS schema and dynamically register AutoQuery CRUD Services; this page instead documents an alternative flow based on generating source code from exported DB metadata and TypeScript Data Models using the `okai` tool. If you prefer the reflection-based approach, see [AutoQuery AutoGen CRUD Services](/autoquery/autogen).
 
-Using TypeScript is an effortless way to define data models, offering a DSL-like minimal boilerplate format that's human-friendly to read and write which can leverage TypeScript's powerful Type System is validated against the referenced [api.d.ts](https://okai.servicestack.com/api.d.ts) schema to provide a rich authoring experience 
-with strong typing and intellisense - containing all the C# Types, interfaces, and attributes used in defining APIs, DTOs and Data Models.
+## Generate CRUD APIs from TypeScript Data Models
+
+A core feature of the [okai](/autoquery/okai-models) tool is the ability to convert [customized TypeScript Data Models](/autoquery/okai-models#customize-data-models) into C# AutoQuery CRUD APIs, RDBMS DataModel tables and DB Migrations.
+
+This enables a flexible way to generate AutoQuery CRUD APIs for existing RDBMS tables, by:
+
+1. Exporting the existing RDBMS metadata to json
+2. Use `okai` to convert the json metadata into TypeScript Data Models
+3. Perform any customizations to the TypeScript Data Model as needed
+4. Use `okai` to generate the AutoQuery CRUD APIs, RDBMS DataModel tables and DB Migrations
+
+### Why TypeScript?
+
+Using TypeScript is an effortless way to define data models, offering a DSL-like minimal boilerplate format that's human-friendly to read and write which can leverage TypeScript's powerful Type System is validated against the referenced [api.d.ts](https://okai.servicestack.com/api.d.ts) schema to provide a rich authoring experience with strong typing and intellisense - containing all the C# Types, interfaces, and attributes used in defining APIs, DTOs and Data Models.
 
 ### Blueprint for Code Generation
 
-The TypeScript Data Models serve as the blueprint for generating everything needed to support the feature 
+The TypeScript Data Models serve as the blueprint for generating everything needed to support the feature
 in your App, including the AutoQuery **CRUD APIs**, **Admin UIs** and **DB Migrations** that can re-create the necessary tables from scratch.
 
 ## 1. Generate RDBMS Metadata
@@ -34,7 +45,7 @@ This task can then be run from the command line with:
 dotnet run --AppTasks=App.json
 :::
 
-Which generates `App_Data/App.json` containing the table definition metadata for all tables in 
+Which generates `App_Data/App.json` containing the table definition metadata for all tables in
 the specified RDBMS, e.g:
 
 ```json
@@ -74,7 +85,7 @@ the specified RDBMS, e.g:
 
 ### Different Connection or DB Schema
 
-If you prefer to generate the metadata for a different connection or schema, you can create a new AppTask 
+If you prefer to generate the metadata for a different connection or schema, you can create a new AppTask
 with your preferred `namedConnection` and/or `schema`, e.g:
 
 ```csharp
@@ -92,11 +103,11 @@ dotnet run --AppTasks=Sales.json
 ## 2. Generate TypeScript Data Models
 
 The next step is to generate TypeScript Data Models from the captured metadata which can be done with the `okai` tool
-by running the `convert` command with the path to the `App.json` JSON table definitions which will generate the 
+by running the `convert` command with the path to the `App.json` JSON table definitions which will generate the
 TypeScript Data Models to stdout which can be redirected to a file in your **ServiceModel** project, e.g:
 
 :::sh
-npx okai convert App_Data/App.json > ../MyApp.ServiceModel/App.d.ts  
+npx okai convert App_Data/App.json > ../MyApp.ServiceModel/App.d.ts
 :::
 
 ## 3. Generate CRUD APIs and Admin UIs
