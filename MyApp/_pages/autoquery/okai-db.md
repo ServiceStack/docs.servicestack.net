@@ -19,7 +19,7 @@ This enables a flexible way to generate AutoQuery CRUD APIs for existing RDBMS t
 
 ### Why TypeScript?
 
-Using TypeScript is an effortless way to define data models, offering a DSL-like minimal boilerplate format that's human-friendly to read and write which can leverage TypeScript's powerful Type System is validated against the referenced [api.d.ts](https://okai.servicestack.com/api.d.ts) schema to provide a rich authoring experience with strong typing and intellisense - containing all the C# Types, interfaces, and attributes used in defining APIs, DTOs and Data Models.
+Using TypeScript is an effortless way to define data models, offering a DSL-like minimal boilerplate format that's human-friendly to read and write which can leverage TypeScript's powerful Type System that's validated against the referenced [api.d.ts](https://okai.servicestack.com/api.d.ts) schema to provide a rich authoring experience with strong typing and intellisense - containing all the C# Types, interfaces, and attributes used in defining APIs, DTOs and Data Models.
 
 ### Blueprint for Code Generation
 
