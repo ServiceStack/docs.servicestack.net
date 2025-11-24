@@ -33,7 +33,7 @@ Explore the available Admin UIs to learn more about each of their capabilities:
 
 Containing user management functionality for creating & modifying users, assigning Roles & Permissions, locking or updating passwords:
 
-<a href="/admin-ui-users">
+<a href="/admin-ui-users" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/users.png">
     </div>
@@ -43,7 +43,7 @@ Containing user management functionality for creating & modifying users, assigni
 
 Enables invaluable observability into your App, from being able to quickly inspect and browse incoming requests, to tracing their behavior:
 
-<a href="/admin-ui-profiling">
+<a href="/admin-ui-profiling" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/admin-ui-logging.png">
     </div>
@@ -53,7 +53,7 @@ Enables invaluable observability into your App, from being able to quickly inspe
 
 Manage your App's configured Redis Server, query & edit core Redis data types and execute custom redis commands:
 
-<a href="/admin-ui-redis">
+<a href="/admin-ui-redis" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/admin-ui-redis.png">
     </div>
@@ -63,7 +63,7 @@ Manage your App's configured Redis Server, query & edit core Redis data types an
 
 Quickly browse and navigate your App's configured RDBMS schemas and tables:
 
-<a href="/admin-ui-database">
+<a href="/admin-ui-database" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/admin-ui-database.png">
     </div>
@@ -73,7 +73,7 @@ Quickly browse and navigate your App's configured RDBMS schemas and tables:
 
 Leverages the existing Declarative Validation infrastructure to enable dynamically managing Request DTO Type and Property Validators from a RDBMS data source
 
-<a href="/admin-ui-validation">
+<a href="/admin-ui-validation" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
         <img src="/img/pages/admin-ui/admin-ui-validation.png">
     </div>
