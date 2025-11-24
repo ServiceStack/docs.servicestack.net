@@ -36,12 +36,17 @@ Whilst Request Logs can be added with:
 x mix requestlogs
 :::
 
-Or if you prefer to store Request Logs in an SQLite database then use the following command:
+Or if you prefer to store Request Logs in an SQLite database:
 
 ::: sh 
 x mix sqlitelogs
 :::
 
+Or to store Request Logs in PostgreSQL, SQL Server or MySql:
+
+::: sh 
+x mix db-requestlogs
+:::
 
 The default configuration looks at providing useful information during development, where the response request bodies are captured in the Request Logger and the StackTrace is captured on the important events where they can be useful.
 
