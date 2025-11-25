@@ -2,24 +2,13 @@
 title: API Keys
 ---
 
-As we continue to embrace and natively integrate with ASP.NET Core's .NET 8 platform, we've reimplemented the last 
-major feature missing from ServiceStack Auth - support for API Keys that's available from **ServiceStack v8.3**.
-
-:::warning API Key Feature Vulnerability
-**ServiceStack v8.7+** resolves a vulnerability we've discovered in the management APIs of this API Keys feature, if using API Keys please upgrade as soon as possible.
-:::
-
-### What are API Keys?
-
-API Keys are a simple and effective way to authenticate and authorize access to your APIs, which are typically used 
-for machine-to-machine communication, where a client application needs to access an API without user intervention. 
+API Keys are a simple and effective way to authenticate and authorize access to your APIs, which are typically used for machine-to-machine communication, where a client application needs to access an API without user intervention. 
 API Keys are often used to control access to specific resources or features in your API, providing a simple way 
 to manage access control.
 
 ### Redesigning API Keys
 
-Building on our experience with API Keys in previous versions of ServiceStack, we've taken the opportunity to redesign
-how API Keys work to provide a more flexible and powerful way to manage access control for your APIs.
+Building on our experience with API Keys in previous versions of ServiceStack, we've taken the opportunity to redesign how API Keys work to provide a more flexible and powerful way to manage access control for your APIs.
 
 The existing [API Key Auth Provider](https://docs.servicestack.net/auth/api-key-authprovider) was implemented as 
 another Auth Provider that provided another way to authenticate a single user. The consequences of this was:
@@ -43,7 +32,7 @@ where the new `ApiKeysFeature` is now just a plugin instead of an Auth Provider,
 Auth Apps with:
 
 :::sh
-x mix apikeys
+npx add-in apikeys
 :::
 
 Which will add the API Keys [Modular Startup](https://docs.servicestack.net/modular-startup) to your Host project, a minimal example of which looks like:
@@ -91,8 +80,7 @@ if (feature.ApiKeyCount(db) == 0)
 
 ### Basic Usage
 
-With the plugin registered, you can now use the `ValidateApiKey` attribute to limit APIs to only be accessible with a 
-valid API Key, e.g:
+With the plugin registered, you can now use the `ValidateApiKey` attribute to limit APIs to only be accessible with a valid API Key, e.g:
 
 ```csharp
 [ValidateApiKey]
@@ -101,15 +89,11 @@ public class MyRequest {}
 
 ### Use API Keys with our without Users and Authentication
 
-API Keys can optionally be associated with a User, but they don't have to be, nor do they run in the context of a User
-or are able to invoke any Authenticated APIs on their own. Users who create them can also limit their scope to only
-call APIs they have access to, which can be done with user-defined scopes:
+API Keys can optionally be associated with a User, but they don't have to be, nor do they run in the context of a User or are able to invoke any Authenticated APIs on their own. Users who create them can also limit their scope to only call APIs they have access to, which can be done with user-defined scopes:
 
 ### Scopes
 
-Scopes are user-defined strings that can be used to limit APIs from only being accessible with API Keys that have the 
-required scope. For example, we could create generate API Keys that have **read only**, **write only** or **read/write** 
-access to APIs by assigning them different scopes, e.g: 
+Scopes are user-defined strings that can be used to limit APIs from only being accessible with API Keys that have the required scope. For example, we could create generate API Keys that have **read only**, **write only** or **read/write** access to APIs by assigning them different scopes, e.g: 
 
 ```csharp
 public static class Scopes
