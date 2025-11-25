@@ -8,12 +8,6 @@ ServiceStack's [AI Chat](/ai-chat-api) feature provides a unified API for integr
 npx add-in chat
 :::
 
-Prerequisite: AI Chat Requires [API Keys](/auth/apikeys):
-
-:::copy
-npx add-in apikeys
-:::
-
 Or by referencing the **ServiceStack.AI.Chat** NuGet package and adding the `ChatFeature` plugin:
 
 ```csharp

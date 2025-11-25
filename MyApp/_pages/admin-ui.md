@@ -135,12 +135,6 @@ Quick start:
 npx add-in chat
 :::
 
-Prerequisite: AI Chat Requires [API Keys](/auth/apikeys):
-
-:::copy
-npx add-in apikeys
-:::
-
 ### Feedback
 
 The Admin UI was designed with room to grow. Please let us know what other features you would like to see on our [GitHub Discussions](https://github.com/ServiceStack/Discuss/discussions/2).

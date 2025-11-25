@@ -17,12 +17,6 @@ configuration with:
 npx add-in chat
 :::
 
-Prerequisite: AI Chat Requires [API Keys](/auth/apikeys):
-
-:::copy
-npx add-in apikeys
-:::
-
 Which drops this simple [Modular Startup](/modular-startup) that adds the `ChatFeature`
 and registers a link to its UI on the [Metadata Page](/metadata-page) if you want it:
 
