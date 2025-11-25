@@ -9,7 +9,7 @@ The Redis Admin UI lets you manage your App's configured Redis Server with a use
 To add Redis support to your project:
 
 :::sh
-x mix redis
+npx add-in redis
 :::
 
 Or if you already have Redis configured, enable it by registering the `AdminRedisFeature` plugin:

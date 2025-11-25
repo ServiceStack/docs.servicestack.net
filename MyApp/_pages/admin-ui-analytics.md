@@ -27,7 +27,7 @@ As they offer significant and valuable insights they're now built into all new A
 existing .NET 8 IdentityAuth templates can enable it with: 
 
 :::sh
-x mix sqlitelogs
+npx add-in sqlitelogs
 :::
 
 .NET 8 Templates that are not configured to use [Endpoint Routing](/endpoint-routing)
@@ -280,7 +280,7 @@ As this was not having an immediate effect we took a more forceful approach to i
 requests from disallowed bots from accessing our App which you can add to your own App with:
 
 :::sh
-x mix useragent-blocking
+npx add-in useragent-blocking
 :::
 
 This will allow you to configure which Bot User Agents you want to reject from accessing your site, e.g:

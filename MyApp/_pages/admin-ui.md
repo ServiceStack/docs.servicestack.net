@@ -56,19 +56,19 @@ Enables invaluable observability into your App, from being able to quickly inspe
 Enable Profiling:
 
 :::copy
-x mix profiling
+npx add-in profiling
 :::
 
 Enable RDBMS Request Logging:
 
 :::copy
-x mix db-requestlogs
+npx add-in db-requestlogs
 :::
 
 Enable SQLite Request Logging:
 
 :::copy
-x mix sqlitelogs
+npx add-in sqlitelogs
 :::
 
 ### [Redis Admin](/admin-ui-redis)
@@ -84,7 +84,7 @@ Manage your App's configured Redis Server, query & edit core Redis data types an
 Quick start:
 
 :::copy
-x mix redis
+npx add-in redis
 :::
 
 ### [Database Admin](/admin-ui-database)
@@ -116,7 +116,7 @@ Leverages the existing Declarative Validation infrastructure to enable dynamical
 Quick start:
 
 :::copy
-x mix validation-source
+npx add-in validation-source
 :::
 
 ### [AI Chat UI](/ai-chat-analytics)
@@ -132,7 +132,13 @@ A unified API for integrating multiple local and cloud LLMs into your applicatio
 Quick start:
 
 :::copy
-x mix chat
+npx add-in chat
+:::
+
+Prerequisite: AI Chat Requires [API Keys](/auth/apikeys):
+
+:::copy
+npx add-in apikeys
 :::
 
 ### Feedback

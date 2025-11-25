@@ -6,10 +6,10 @@ The DB Validation feature leverages the existing [Declarative Validation](/decla
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="W5OJAlOxH98" style="background-image: url('https://img.youtube.com/vi/W5OJAlOxH98/maxresdefault.jpg')"></lite-youtube>
 
-This feature can be easily added to existing host projects with the [mix](/mix-tool) command:
+This feature can be easily added to existing host projects with:
 
 :::sh
-x mix validation-source
+npx add-in validation-source
 :::
 
 Which will add the [Modular Startup](/modular-startup) validation configuration to your project, utilizing your existing configured database:
