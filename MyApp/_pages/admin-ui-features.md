@@ -51,7 +51,7 @@ The [Redis Admin UI](/admin-ui-redis) lets you manage your App's configured Redi
 It can be enabled by registering the `AdminRedisFeature` plugin:
 
 ```csharp
-Plugins.Add(new AdminRedisFeature());
+services.AddPlugin(new AdminRedisFeature());
 ```
 
 Which will enable the **Redis** Admin UI:
@@ -71,7 +71,7 @@ The [Database Admin UI](/admin-ui-database) lets you quickly browse and navigate
 It can be enabled by registering the `AdminDatabaseFeature` plugin from [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server):
 
 ```csharp
-Plugins.Add(new AdminDatabaseFeature());
+services.AddPlugin(new AdminDatabaseFeature());
 ```
 
 Which will enable the **Database** Admin UI:

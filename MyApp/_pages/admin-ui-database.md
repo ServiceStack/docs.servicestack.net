@@ -9,7 +9,7 @@ The Database Admin UI lets you quickly browse and navigate your App's configured
 It can be enabled by registering the `AdminDatabaseFeature` plugin from [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server):
 
 ```csharp
-Plugins.Add(new AdminDatabaseFeature());
+services.AddPlugin(new AdminDatabaseFeature());
 ```
 
 Which without any additional configuration your App's configured databases will be listed on the home page, including their schemas, tables and any registered [named connections](/ormlite/getting-started#multiple-database-connections):

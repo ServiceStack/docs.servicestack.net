@@ -33,11 +33,15 @@ Explore the available Admin UIs to learn more about each of their capabilities:
 
 Containing user management functionality for creating & modifying users, assigning Roles & Permissions, locking or updating passwords:
 
-<a href="/admin-ui-users" class="not-prose">
+<a href="/admin-ui-identity-roles" class="not-prose">
     <div class="block p-4 rounded shadow hover:shadow-lg">
-        <img src="/img/pages/admin-ui/users.png">
+        <img src="/img/pages/admin-ui/identityauth-roles.webp">
     </div>
 </a>
+
+Quick start:
+
+Create a new [ASP.NET Identity Auth Template](https://servicestack.net/start).
 
 ### [Profiling & Logging UI](/admin-ui-profiling)
 
@@ -49,6 +53,24 @@ Enables invaluable observability into your App, from being able to quickly inspe
     </div>
 </a>
 
+Enable Profiling:
+
+:::copy
+x mix profiling
+:::
+
+Enable RDBMS Request Logging:
+
+:::copy
+x mix db-requestlogs
+:::
+
+Enable SQLite Request Logging:
+
+:::copy
+x mix sqlitelogs
+:::
+
 ### [Redis Admin](/admin-ui-redis)
 
 Manage your App's configured Redis Server, query & edit core Redis data types and execute custom redis commands:
@@ -58,6 +80,12 @@ Manage your App's configured Redis Server, query & edit core Redis data types an
         <img src="/img/pages/admin-ui/admin-ui-redis.png">
     </div>
 </a>
+
+Quick start:
+
+:::copy
+x mix redis
+:::
 
 ### [Database Admin](/admin-ui-database)
 
@@ -69,6 +97,12 @@ Quickly browse and navigate your App's configured RDBMS schemas and tables:
     </div>
 </a>
 
+Quick start:
+
+```csharp
+services.AddPlugin(new AdminDatabaseFeature());
+```
+
 ### [DB Validation UI](/admin-ui-validation)
 
 Leverages the existing Declarative Validation infrastructure to enable dynamically managing Request DTO Type and Property Validators from a RDBMS data source
@@ -79,6 +113,27 @@ Leverages the existing Declarative Validation infrastructure to enable dynamical
     </div>
 </a>
 
+Quick start:
+
+:::copy
+x mix validation-source
+:::
+
+### [AI Chat UI](/ai-chat-analytics)
+
+A unified API for integrating multiple local and cloud LLMs into your applications providing financial visibility into your AI operations with interactive visualizations showing spending distribution across providers and models.
+
+<a href="/ai-chat-analytics" class="not-prose">
+    <div class="block p-4 rounded shadow hover:shadow-lg">
+        <img src="/img/pages/ai-chat/admin-chat-costs.webp">
+    </div>
+</a>
+
+Quick start:
+
+:::copy
+x mix chat
+:::
 
 ### Feedback
 

@@ -6,10 +6,16 @@ The Redis Admin UI lets you manage your App's configured Redis Server with a use
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="AACZtTOcQbg" style="background-image: url('https://img.youtube.com/vi/AACZtTOcQbg/maxresdefault.jpg')"></lite-youtube>
 
-It can be enabled by registering the `AdminRedisFeature` plugin:
+To add Redis support to your project:
+
+:::sh
+x mix redis
+:::
+
+Or if you already have Redis configured, enable it by registering the `AdminRedisFeature` plugin:
 
 ```csharp
-Plugins.Add(new AdminRedisFeature());
+services.AddPlugin(new AdminRedisFeature());
 ```
 
 ### Redis Stats on Dashboard
