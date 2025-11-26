@@ -52,16 +52,18 @@ flowchart LR
  subgraph PRODUCTION["PRODUCTION"]
     direction LR
         DevServer[(".NET PROJECT<br>(localhost:5001)")]
-        Endpoints(".NET Endpoint Routing")
         Identity("ASP.NET Core Identity<br>Razor Pages")
+        Endpoints(".NET Endpoint Routing")
         StaticFiles[/"/wwwroot<br>Serves static files<br>(HTML, CSS, JS)"/]
   end
     DevServer -- /Identity/* --> Identity
     DevServer -- /* --> Endpoints
     DevServer <-- /* Static Files --> StaticFiles
 
-     DevServer:::netHost
-     StaticFiles:::static
+    DevServer:::netHost
+    Identity:::static
+    Endpoints:::static
+    StaticFiles:::static
 
     classDef netHost fill:#dbeafe,stroke:#1e3a8a,stroke-width:2px,color:#1e3a8a
     classDef nextApp fill:#f3e8ff,stroke:#6b21a8,stroke-width:2px,color:#6b21a8
@@ -121,16 +123,18 @@ flowchart LR
  subgraph PRODUCTION["PRODUCTION"]
     direction LR
         DevServer[(".NET PROJECT<br>(localhost:5001)")]
-        Endpoints(".NET Endpoint Routing")
         Identity("ASP.NET Core Identity<br>Razor Pages")
+        Endpoints(".NET Endpoint Routing")
         StaticFiles[/"/wwwroot<br>Serves static files<br>(HTML, CSS, JS)"/]
   end
     DevServer -- /Identity/* --> Identity
     DevServer -- /* --> Endpoints
     DevServer <-- /* Static Files --> StaticFiles
 
-     DevServer:::netHost
-     StaticFiles:::static
+    DevServer:::netHost
+    Identity:::static
+    Endpoints:::static
+    StaticFiles:::static
 
     classDef netHost fill:#dbeafe,stroke:#1e3a8a,stroke-width:2px,color:#1e3a8a
     classDef nextApp fill:#f3e8ff,stroke:#6b21a8,stroke-width:2px,color:#6b21a8
