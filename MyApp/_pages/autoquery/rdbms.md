@@ -59,7 +59,9 @@ That's all the code needed! Which we can now call using the ideal route:
 and because it's a just regular Request DTO, we also get an end-to-end typed API for free with:
 
 ```csharp
-var movies = client.Get(new FindMovies { Ratings = new[]{"G","PG-13"} })
+var movies = client.Get(new FindMovies { 
+    Ratings = ["G","PG-13"]
+})
 ```
 
 Whilst that gives us the ideal API we want, the minimum code required is to just declare a new Request DTO with the table you wish to query:
@@ -858,7 +860,7 @@ With the richer semantics available in queries, we've been able to enhance the S
 
 ```csharp
 var results = client.GetLazy(new QueryMovies { 
-    Ratings = new[]{"G","PG-13"}
+    Ratings = ["G","PG-13"]
 }).ToList();
 ```
 
@@ -866,7 +868,7 @@ Since GetLazy returns a lazy `IEnumerable<T>` sequence it can also be used withi
 
 ```csharp
 var top250 = client.GetLazy(new QueryMovies { 
-        Ratings = new[]{ "G", "PG-13" } 
+        Ratings = ["G","PG-13"]
     })
     .Take(250)
     .ConvertTo(x => x.Title);
