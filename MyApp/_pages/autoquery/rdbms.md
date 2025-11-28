@@ -24,11 +24,10 @@ Which is all that's needed to enable the AutoQuery feature. The AutoQueryFeature
 `<PackageReference Include="ServiceStack.Server" Version="8.*" />`
 :::
 
-If you don't have OrmLite configured it can be registered with a 1-liner by specifying your preferred DialectProvider and Connection String:
+If you don't have OrmLite configured it can be registered with a 1-liner by specifying your preferred provider and Connection String:
 
 ```csharp
-container.Register<IDbConnectionFactory>(
-    new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
+services.AddOrmLite(options => options.UseSqlite(connString));
 ```
 
 The above config registers an In Memory Sqlite database although as the AutoQuery test suite works in all [supported RDBMS providers](https://github.com/ServiceStack/ServiceStack.OrmLite/#download) you're free to use your registered DB of choice.
@@ -447,7 +446,7 @@ const string NotEqualFormat =           "{Field} <> {Value}";
 const string IsNull =                   "{Field} IS NULL";
 const string IsNotNull =                "{Field} IS NOT NULL";
 
-ImplicitConventions = new Dictionary<string, string> 
+ImplicitConventions = new()
 {
     {"%Above%",         GreaterThanFormat},
     {"Begin%",          GreaterThanFormat},
