@@ -438,51 +438,55 @@ public class QueryRockstars : QueryDb<Rockstar> {}
 The built-in conventions allow using convention-based naming to query fields with expected behavior using self-describing properties. To explore this in more detail lets look at what built-in conventions are defined:
 
 ```csharp
-const string GreaterThanOrEqualFormat = "{Field} >= {Value}";
-const string GreaterThanFormat =        "{Field} >  {Value}";
-const string LessThanFormat =           "{Field} <  {Value}";
-const string LessThanOrEqualFormat =    "{Field} <= {Value}";
-const string NotEqualFormat =           "{Field} <> {Value}";
-const string IsNull =                   "{Field} IS NULL";
-const string IsNotNull =                "{Field} IS NOT NULL";
+GreaterThanOrEqual = "{Field} >= {Value}";
+GreaterThan =        "{Field} >  {Value}";
+LessThan =           "{Field} <  {Value}";
+LessThanOrEqual =    "{Field} <= {Value}";
+NotEqual =           "{Field} <> {Value}";
+IsNull =             "{Field} IS NULL";
+IsNotNull =          "{Field} IS NOT NULL";
 
 ImplicitConventions = new()
 {
-    {"%Above%",         GreaterThanFormat},
-    {"Begin%",          GreaterThanFormat},
-    {"%Beyond%",        GreaterThanFormat},
-    {"%Over%",          GreaterThanFormat},
-    {"%OlderThan",      GreaterThanFormat},
-    {"%After%",         GreaterThanFormat},
-    {"OnOrAfter%",      GreaterThanOrEqualFormat},
-    {"%From%",          GreaterThanOrEqualFormat},
-    {"Since%",          GreaterThanOrEqualFormat},
-    {"Start%",          GreaterThanOrEqualFormat},
-    {"%Higher%",        GreaterThanOrEqualFormat},
-    {">%",              GreaterThanOrEqualFormat},
-    {"%>",              GreaterThanFormat},
-    {"%!",              NotEqualFormat},
-    {"<>%",             NotEqualFormat},
+    {"%Above%",         GreaterThan},
+    {"Begin%",          GreaterThan},
+    {"%Beyond%",        GreaterThan},
+    {"%Over%",          GreaterThan},
+    {"%OlderThan",      GreaterThan},
+    {"%After%",         GreaterThan},
+    {"OnOrAfter%",      GreaterThanOrEqual},
+    {"%From%",          GreaterThanOrEqual},
+    {"Since%",          GreaterThanOrEqual},
+    {"Start%",          GreaterThanOrEqual},
+    {"%Higher%",        GreaterThanOrEqual},
+    {"Min%",            GreaterThanOrEqual},
+    {"Minimum%",        GreaterThanOrEqual},
+    {">%",              GreaterThanOrEqual},
+    {"%>",              GreaterThan},
+    {"%!",              NotEqual},
+    {"<>%",             NotEqual},
 
-    {"%GreaterThanOrEqualTo%", GreaterThanOrEqualFormat},
-    {"%GreaterThan%",          GreaterThanFormat},
-    {"%LessThan%",             LessThanFormat},
-    {"%LessThanOrEqualTo%",    LessThanOrEqualFormat},
-    {"%NotEqualTo",            NotEqualFormat},
+    {"Behind%",         LessThan},
+    {"%Below%",         LessThan},
+    {"%Under%",         LessThan},
+    {"%Lower%",         LessThan},
+    {"%Before%",        LessThan},
+    {"%YoungerThan",    LessThan},
+    {"OnOrBefore%",     LessThanOrEqual},
+    {"End%",            LessThanOrEqual},
+    {"Stop%",           LessThanOrEqual},
+    {"To%",             LessThanOrEqual},
+    {"Until%",          LessThanOrEqual},
+    {"Max%",            LessThanOrEqual},
+    {"Maximum%",        LessThanOrEqual},
+    {"%<",              LessThanOrEqual},
+    {"<%",              LessThan},
 
-    {"Behind%",         LessThanFormat},
-    {"%Below%",         LessThanFormat},
-    {"%Under%",         LessThanFormat},
-    {"%Lower%",         LessThanFormat},
-    {"%Before%",        LessThanFormat},
-    {"%YoungerThan",    LessThanFormat},
-    {"OnOrBefore%",     LessThanOrEqualFormat},
-    {"End%",            LessThanOrEqualFormat},
-    {"Stop%",           LessThanOrEqualFormat},
-    {"To%",             LessThanOrEqualFormat},
-    {"Until%",          LessThanOrEqualFormat},
-    {"%<",              LessThanOrEqualFormat},
-    {"<%",              LessThanFormat},
+    {"%GreaterThanOrEqualTo%", GreaterThanOrEqual},
+    {"%GreaterThan%",          GreaterThan},
+    {"%LessThan%",             LessThan},
+    {"%LessThanOrEqualTo%",    LessThanOrEqual},
+    {"%NotEqualTo",            NotEqual},
 
     {"Like%",           "UPPER({Field}) LIKE UPPER({Value})"},
     {"%In",             "{Field} IN ({Values})"},
@@ -496,7 +500,7 @@ ImplicitConventions = new()
     {"%IsNotNull",      IsNotNull},
 };
 
-EndsWithConventions = new Dictionary<string, QueryDbFieldAttribute>
+EndsWithConventions = new()
 {
     { "StartsWith", new QueryDbFieldAttribute { 
           Template= "UPPER({Field}) LIKE UPPER({Value})", 
