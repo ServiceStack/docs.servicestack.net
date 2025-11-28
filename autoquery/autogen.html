@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-11-27T16:22:44.3587399Z'>
+    <meta name='date' content='2025-11-28T08:48:24.9282576Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery AutoGen CRUD Services</title>
@@ -278,7 +278,7 @@ AutoQuery                                    </span>
 <p>You can then add the generated DTOs to your ServiceModel's to quickly enable AutoQuery Services for your existing databases.</p>
 <img src="/img/pages/svg/servicify.svg" width="100%">
 <p>To enable this feature you you just need to initialize <code>GenerateCrudServices</code> in your <code>AutoQueryFeature</code> plugin, e.g:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     GenerateCrudServices = new GenerateCrudServices {}
 });
@@ -323,15 +323,12 @@ AutoQuery                                    </span>
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
         .ConfigureServices((context, services) =&gt; {
-            var dbFactory = new OrmLiteConnectionFactory(
-                context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
-                SqliteDialect.Provider);
-            container.AddSingleton&lt;IDbConnectionFactory&gt;(c =&gt; dbFactory);
+            var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
 
             services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
                 GenerateCrudServices = new GenerateCrudServices {
-                    DbFactory = dbFactory,
+                    DbFactory = ormLite.DbFactory,
                 }
             });
             // ...
@@ -412,7 +409,7 @@ Multiple schema support requires the AutoQueryFeature to be configured with <a h
 <p>i.e. the same experience as updating normal DTOs.</p>
 <h3 id="switch-to-code-first-dev-model">Switch to code-first dev model<a class="header-anchor" href="javascript:;" onclick="location.hash='#switch-to-code-first-dev-model'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>After generating <code>dtos.cs</code> AutoGen is no longer needed and can now be removed by removing <code>GenerateCrudServices</code></p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     // GenerateCrudServices = new GenerateCrudServices {}
 });
@@ -543,9 +540,11 @@ Schema: custom
 <p>To recap we've now got an integrated scaffolding solution where we can quickly generate code-first AutoQuery Services and integrate them into our App to quickly build an AutoQuery Service layer around our existing database.</p>
 <p>But we can raise the productivity level even higher by instead of manually importing the code-generated Services into our project we just tell ServiceStack to do it for us.</p>
 <p>This is what the magical <code>AutoRegister</code> flag does for us:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
-        DbFactory = dbFactory,
+        DbFactory = ormLite.DbFactory,
         AutoRegister = true,
         //....
     }
@@ -598,16 +597,12 @@ x mix autocrudgen sqlite northwind.sqlite</p>
     {
         builder.ConfigureServices((context,services) =&gt;
         {
-            var dbFactory = new OrmLiteConnectionFactory(
-                context.Configuration.GetConnectionString(&quot;DefaultConnection&quot;),
-                SqliteDialect.Provider);
-
-            services.AddSingleton&lt;IDbConnectionFactory&gt;(dbFactory);
+            var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
 
             services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
                 GenerateCrudServices = new GenerateCrudServices {
-                    DbFactory = dbFactory,
+                    DbFactory = ormLite.DbFactory,
                     AutoRegister = true
                 }
             });
@@ -786,8 +781,11 @@ void main(List&lt;String&gt; args) async {
 <p>The primary difference is that they only exist in a .NET Assembly in memory created on Startup, not in code so they're not &quot;statically visible&quot; to a C# compiler, IDE, tools, etc. But otherwise they're regular typed ServiceStack Services and can take advantage of the ecosystem around Services including <a href="/add-servicestack-reference">Add ServiceStack Reference</a> &amp; other Metadata Pages and Services, etc.</p>
 <h3 id="createcrudservices-instructions">CreateCrudServices Instructions<a class="header-anchor" href="javascript:;" onclick="location.hash='#createcrudservices-instructions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Peeking deeper behind the <code>AutoRegister</code> flag will reveal that it's a helper for adding an empty <code>CreateCrudServices</code> instance, i.e. it's equivalent to:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = ormLite.DbFactory,
         CreateServices = {
             new CreateCrudServices()
         }
@@ -799,9 +797,11 @@ void main(List&lt;String&gt; args) async {
 <p>This instructs ServiceStack to generate Services for the default option, i.e. all tables in the Database of the default registered Database connection and default schema.</p>
 <p>Although should you wish to, you can also generate Services for multiple Databases and RDBMS Schemas within the same App.</p>
 <p>With this you could have a single API Gateway Servicifying access to multiple System RDBMS Tables &amp; Schemas, e.g:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     GenerateCrudServices = new GenerateCrudServices {
-        DbFactory = dbFactory,
+        DbFactory = ormlite.DbFactory,
         CreateServices = {
             new CreateCrudServices(),
             new CreateCrudServices { Schema = &quot;AltSchema&quot; },
@@ -848,7 +848,7 @@ var tableRequiredFields = new Dictionary&lt;string,string[]&gt; {
     [&quot;Shipper&quot;] = new[]{ &quot;CompanyName&quot;, &quot;Phone&quot; },
 };
 
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 100,
     GenerateCrudServices = new GenerateCrudServices
     {
@@ -895,13 +895,13 @@ Plugins.Add(new AutoQueryFeature {
         IncludeType = type =&gt; !ignoreTables.Contains(type.Name),
     }
 });
-
-Plugins.Add(new ValidationFeature()); // Enable Validation
 </code></pre>
 <p>Additionally, the <code>TableSchemasFilter</code> can be used to modify the schema used by AutoGen to generate the types associated with your AutoQuery APIs.
 This gives you the opportunity to filter or modify the schema after they are pulled from the database.
 For example, we could <code>Remove</code> tables based on naming, or alter column definitions to assist with any schema issues.</p>
-<pre><code class="language-csharp">GenerateCrudServices = new GenerateCrudServices {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+GenerateCrudServices = new GenerateCrudServices {
+    DbFactory = ormLite.DbFactory,
     AutoRegister = true,
     AddDataContractAttributes = false,
     TableSchemasFilter = tableSchemas =&gt;
@@ -1007,10 +1007,12 @@ EnsureUser(&quot;manager@gmail.com&quot;,  name:&quot;The Manager&quot;,  roles:
 <li>Route: <code>/applications</code>, <code>/applications/{Id}</code></li>
 </ul>
 <p>You can change each of these default conventions with the new <code>GenerateOperationsFilter</code>, e.g:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     GenerateCrudServices = new GenerateCrudServices {
-        DbFactory = dbFactory,
+        DbFactory = ormLite.DbFactory,
         AutoRegister = true,
         GenerateOperationsFilter = ctx =&gt; {
             if (ctx.TableName == &quot;applications&quot;)

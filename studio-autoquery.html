@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-11-27T16:22:43.4907510Z'>
+    <meta name='date' content='2025-11-28T08:48:24.0718568Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Studio - AutoQuery UI</title>
@@ -1448,8 +1448,11 @@ Last supported versions: <strong>ServiceStack v6.1</strong> with <strong>app v6.
 <p>What UI features &amp; tables are visible is reflected by whether the AutoQuery Service for that type exists and whether the currently authenticated User has access to them (i.e. Have the role required by each Service). So an unauthenticated user will see Northwind Crud's read-only <strong>Region</strong> table with no ability to update it &amp; the <strong>Territory</strong> table, which as it isn't protected by a role will be visible to everyone,
 but as all CRUD Write operations require authentication, all edit controls require authentication - as shown in the screenshot above where they're replaced with auth <strong>Sign In</strong> buttons.</p>
 <p>Here are the relevant <a href="https://github.com/NetCoreApps/NorthwindCrud/blob/master/Startup.cs">NorthwindCrud auto-generation rules</a> which defines this behavior:</p>
-<pre><code class="language-csharp">var readOnlyTables = new[] { &quot;Region&quot; };
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+var readOnlyTables = new[] { &quot;Region&quot; };
 GenerateCrudServices = new GenerateCrudServices {
+    DbFactory = ormLite.DbFactory,
     ServiceFilter = (op,req) =&gt; {
         // Require all Write Access to Tables to be limited to Authenticated Users
         if (op.IsCrudWrite())

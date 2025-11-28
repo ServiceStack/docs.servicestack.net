@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-11-27T16:22:44.3746202Z'>
+    <meta name='date' content='2025-11-28T08:48:24.9551776Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery RDBMS</title>
@@ -275,7 +275,7 @@ AutoQuery                                    </span>
 <p>In addition to leveraging ServiceStack's existing functionality, maximizing re-use in this way reduces the cognitive overhead required for developers who can re-use their existing knowledge in implementing, customizing, introspecting and consuming ServiceStack services.</p>
 <h3 id="getting-started">Getting Started<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-started'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Like ServiceStack's <a href="/plugins">other composable features</a>, the AutoQuery Feature is enabled by registering a Plugin, e.g:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature { MaxLimit = 100 });
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature { MaxLimit = 100 });
 </code></pre>
 <p>Which is all that's needed to enable the AutoQuery feature. The AutoQueryFeature is inside <a href="https://servicestack.net/download#get-started">ServiceStack.Server</a> NuGet package which contains value-added features that utilize either OrmLite and Redis which can be added to your project with:</p>
 <div class="not-prose copy cp flex cursor-pointer mb-3" onclick="copy(this)">
@@ -753,13 +753,13 @@ EndsWithConventions = new Dictionary&lt;string, QueryDbFieldAttribute&gt;
 </ul>
 <p>Which is why we recommend formalizing your conventions you want to allow before deploying your API to production.</p>
 <p>When publishing your API, you can also assert that only explicit conventions are ever used by disabling untyped implicit conventions support with:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature { EnableUntypedQueries = false });
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature { EnableUntypedQueries = false });
 </code></pre>
 <h2 id="raw-sql-filters">Raw SQL Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-sql-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>It's also possible to specify Raw SQL Filters. Whilst offering greater flexibility they also suffer from many of the problems that OData's expressions have.</p>
 <p>Raw SQL Filters also don't benefit from limiting matching to declared fields and auto-escaping and quoting of values although they're still validated against OrmLite's <a href="https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/OrmLiteUtilExtensions.cs#L172">IllegalSqlFragmentTokens</a> to protect against SQL Injection attacks. But as they still allow calling SQL Functions, Raw SqlFilters shouldn't be enabled when accessible by untrusted parties unless they've been configured to use a <a href="https://github.com/ServiceStack/ServiceStack.OrmLite/#multi-nested-database-connections">Named OrmLite DB Connection</a> which is read-only and locked-down so that it only has access to what it's allowed to.</p>
 <p>If safe to do so, RawSqlFilters can be enabled with:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature { 
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature { 
     EnableRawSqlFilters = true,
     UseNamedConnection = &quot;readonly&quot;,
     IllegalSqlFragmentTokens = { &quot;ProtectedSqlFunction&quot; },
@@ -847,7 +847,7 @@ public class QueryCustomers : QueryDb&lt;Customer&gt; { }
 <pre><code class="language-csharp">client.Get(new QueryRockstars { Skip=10, Take=20, OrderByDesc=&quot;Id&quot; });
 </code></pre>
 <p>Or remove the default behavior with:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature { 
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature { 
     OrderByPrimaryKeyOnPagedQuery = false 
 });
 </code></pre>
@@ -939,7 +939,7 @@ public class QuerySales : QueryDb&lt;Sales&gt; {}
 <pre><code>AVG, COUNT, FIRST, LAST, MAX, MIN, SUM
 </code></pre>
 <p>Which can be added to or removed from by modifying <code>SqlAggregateFunctions</code> collection, e.g, you can allow usage of a <code>CustomAggregate</code> SQL Function with:</p>
-<pre><code class="language-cs">Plugins.Add(new AutoQueryFeature { 
+<pre><code class="language-cs">services.AddPlugin(new AutoQueryFeature { 
     SqlAggregateFunctions = { &quot;CustomAggregate&quot; }
 })
 </code></pre>
@@ -980,7 +980,7 @@ response.Meta[&quot;AverageAge&quot;]
 <pre><code class="language-csharp">var response = client.Get(new MyQuery { Include = &quot;Total&quot; });
 </code></pre>
 <p>Alternatively you can always have the Total returned in every request with:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     IncludeTotal = true
 })
 </code></pre>
@@ -1123,7 +1123,7 @@ public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 </code></pre>
 <h3 id="autoquery-response-filters">AutoQuery Response Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-response-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The Aggregate functions feature is built on the new <code>ResponseFilters</code> support in AutoQuery which provides a new extensibility option enabling customization and additional metadata to be attached to AutoQuery Responses. As the Aggregate Functions support is itself a Response Filter in can disabled by clearing them:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     ResponseFilters = new List&lt;Action&lt;QueryFilterContext&gt;&gt;()
 })
 </code></pre>
@@ -1146,7 +1146,7 @@ public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 }
 </code></pre>
 <p>With this we could add basic calculator functionality to AutoQuery with the custom Response Filter below:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     ResponseFilters = {
         ctx =&gt; {
             var supportedFns = new Dictionary&lt;string, Func&lt;int, int, int&gt;&gt;(StringComparer.OrdinalIgnoreCase)
@@ -1236,7 +1236,7 @@ public class Person
       q.And(x =&gt; x.LastName.EndsWith(&quot;son&quot;))
   );
 
-Plugins.Add(autoQuery);
+services.AddPlugin(autoQuery);
 </code></pre>
 <p>Registering an interface like <code>IFilterRockstars</code> is especially useful as it enables applying custom logic to a number of different Query Services sharing the same interface.</p>
 <h2 id="intercept-and-introspect-every-query">Intercept and Introspect Every Query<a class="header-anchor" href="javascript:;" onclick="location.hash='#intercept-and-introspect-every-query'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
@@ -1258,7 +1258,7 @@ Plugins.Add(autoQuery);
 }
 </code></pre>
 <p>Then tell AutoQuery to use your base class instead, e.g:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature { 
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature { 
     AutoQueryServiceBaseType = typeof(MyAutoQueryServiceBase)
 });
 </code></pre>
@@ -1277,7 +1277,7 @@ initialized allowing them to use the shorthand collection initializer syntax, e.
 <h2 id="autoquery-crud-batch-requests">AutoQuery CRUD Batch Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-crud-batch-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>All AutoQuery CRUD operations support auto batch implementations which will by default execute all AutoQuery CRUD Requests within a DB transaction.</p>
 <p>By default it will generate AutoBatch implementations for all CRUD operations and can be changed to only generate implementations for specific CRUD operations by changing:</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     GenerateAutoBatchImplementationsFor = new() { AutoCrudOperation.Create }
 });
 </code></pre>

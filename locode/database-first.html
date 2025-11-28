@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-11-27T16:22:46.1634411Z'>
+    <meta name='date' content='2025-11-28T08:48:26.5884835Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Locode - Database-First</title>
@@ -423,14 +423,16 @@ This feature is known as <code>AutoGen</code> and can be enabled by instantiatin
 <pre><code class="language-csharp">public class ConfigureAutoQuery : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
-        .ConfigureAppHost(appHost =&gt; {
-            appHost.Plugins.Add(new AutoQueryFeature {
+        .ConfigureServices((context, services) =&gt; {
+            var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+            // Configure ASP.NET Core IOC Dependencies
+            services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
-                
                 // Add this line, Configures Generated CRUD services with defaults
-                GenerateCrudServices = new GenerateCrudServices()
-                {
-                    AutoRegister = true
+                GenerateCrudServices = new GenerateCrudServices {
+                    AutoRegister = true,
+                    DbFactory = ormLite.DbFactory,
                 }
             });
         });
@@ -443,7 +445,7 @@ for the <code>public</code> schema. Running the application after these changes,
 <p>By default, <code>GenerateCrudServices</code> with <code>AutoRegister</code> will create services for each table in the <code>public</code> schema.
 If you want to enable services for tables in other schemas, you can use the <code>CreateServices</code> option. For example, if
 you have a schema by the name of <code>dbo</code> and <code>public</code>, you would use the following options.</p>
-<pre><code class="language-csharp">appHost.Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -467,7 +469,7 @@ container.Register&lt;IDbConnectionFactory&gt;(dbFactory);
 dbFactory.RegisterConnection(&quot;Reporting&quot;, pgConnString, PostgreSqlDialect.Provider);
 </code></pre>
 <p>The string name provided to <code>RegisterConnection</code> must match that provided to the <code>NamedConnection</code> property on <code>CreateCrudServices</code>.</p>
-<pre><code class="language-csharp">appHost.Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -483,7 +485,7 @@ dbFactory.RegisterConnection(&quot;Reporting&quot;, pgConnString, PostgreSqlDial
 </code></pre>
 <h3 id="multiple-schemas-with-named-connections">Multiple Schemas with Named Connections<a class="header-anchor" href="javascript:;" onclick="location.hash='#multiple-schemas-with-named-connections'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>These options can be combined so that specific schemas on named connections can also be used.</p>
-<pre><code class="language-csharp">appHost.Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -534,9 +536,12 @@ that was used to create the custom <a href="https://northwind.locode.dev">northw
 <code>GenerateCrudServices</code> instructions when registering the <code>AutoQueryFeature</code>.</p>
 <p>The <code>ServiceFilter</code> is called for every Service Operation whilst the <code>TypesFilter</code> is called for every code-gen Type
 including Request &amp; Response DTOs.</p>
-<pre><code class="language-csharp">Plugins.Add(new AutoQueryFeature {
+<pre><code class="language-csharp">var ormLite = services.AddOrmLite(options =&gt; options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 100,
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = ormLite.DbFactory,
         AutoRegister = true,
         ServiceFilter = (op, req) =&gt; {
             // Annotate all Auto generated Request DTOs with [Tag(&quot;Northwind&quot;)] attribute
