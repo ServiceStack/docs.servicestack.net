@@ -126,11 +126,11 @@ Since it promotes clean, re-usable code, ServiceStack has always encouraged the 
 
   - In Request and Response DTO's (on client and server) 
   - In [JSON, JSV and CSV Text Serializers](/formats)
-  - As the data model in [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite), [db4o](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.Db4oProvider) and [NHibernate](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.NHibernateProvider%253Fstate%253Dclosed)
-  - As the entities stored in [Redis](https://github.com/ServiceStack/ServiceStack.Redis)
+  - As the data model in [OrmLite](/ormlite/), [db4o](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.Db4oProvider) and [NHibernate](http://code.google.com/p/servicestack/source/browse/#svn%2Ftrunk%2FCommon%2FServiceStack.DataAccess%2FServiceStack.DataAccess.NHibernateProvider%253Fstate%253Dclosed)
+  - As the entities stored in [Redis](/redis/)
   - As blobs stored in [Caches](/caching) and [Sessions](/auth/sessions)
   - Dropped and executed in [MQ's services](/redis-mq)
-  - Dehydrating [complex configurations](http://www.servicestack.net/mvc-powerpack/) into
+  - Dehydrating complex configurations into
 
 Leveraging different technologies whose functionality is built around POCO's offer un-precedented levels of re-use, reduces friction, promotes consistent, more usable and easier to rationale code-bases.
 

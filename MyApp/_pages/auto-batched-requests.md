@@ -89,7 +89,7 @@ public class MyServices : Service
 
 So with this custom implementation we've gone from **100 HTTP Requests + 100 Redis Operations** to **1 HTTP Request + 1 Redis Operation**.
 
-Another scenario where you may consider using a **Custom Batched Implementation** is if you wanted to execute all requests within a single RDBMS transaction, which with [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) would look something like:
+Another scenario where you may consider using a **Custom Batched Implementation** is if you wanted to execute all requests within a single RDBMS transaction, which with [OrmLite](/ormlite/) would look something like:
 
 ```csharp
 public class MyServices : Service

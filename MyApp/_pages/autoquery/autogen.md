@@ -261,7 +261,7 @@ public class ConfigureDb : IHostingStartup
 ```
 
 The [sqlite](https://gist.github.com/gistlyn/768d7b330b8c977f43310b954ceea668) gist registers an
-[OrmLite.Sqlite](https://github.com/ServiceStack/ServiceStack.OrmLite) RDBMS connection with our App which we want to configure to connect to a **northwind.sqlite** database:
+[OrmLite.Sqlite](/ormlite/) RDBMS connection with our App which we want to configure to connect to a **northwind.sqlite** database:
 
 ```csharp
 public void Configure(IServiceCollection services)

@@ -2,7 +2,7 @@
 title: AutoQuery RDBMS
 ---
 
-AutoQuery RDBMS enables the rapid development of high-performance, fully-queryable typed RDBMS data-driven services with just a POCO Request DTO class definition and [supports most major RDBMS](/ormlite/#ormlite-rdbms-providers) courtesy of building on [OrmLite's high-performance RDBMS-agnostic API's](https://github.com/ServiceStack/ServiceStack.OrmLite).
+AutoQuery RDBMS enables the rapid development of high-performance, fully-queryable typed RDBMS data-driven services with just a POCO Request DTO class definition and [supports most major RDBMS](/ormlite/#ormlite-rdbms-providers).
 
 ### AutoQuery Services are ServiceStack Services
 
@@ -30,7 +30,7 @@ If you don't have OrmLite configured it can be registered with a 1-liner by spec
 services.AddOrmLite(options => options.UseSqlite(connString));
 ```
 
-The above config registers an In Memory Sqlite database although as the AutoQuery test suite works in all [supported RDBMS providers](https://github.com/ServiceStack/ServiceStack.OrmLite/#download) you're free to use your registered DB of choice.
+The above config registers an In Memory Sqlite database although as the AutoQuery test suite works in all [supported RDBMS providers](/ormlite/) you're free to use your registered DB of choice.
 
 The `MaxLimit` option ensures each query returns a maximum limit of **100** rows.
 
@@ -145,7 +145,7 @@ Dictionary<string,string> queryArgs = Request.GetRequestParams();
 var q = AutoQuery.CreateQuery(dto, queryArgs, Request, db);
 ```
 
-Which constructs an [OrmLite SqlExpression](https://github.com/ServiceStack/ServiceStack.OrmLite/#examples) 
+Which constructs an [OrmLite SqlExpression](/ormlite/) 
 from typed properties on the Request DTO as well as any untyped key/value pairs on the HTTP Requests 
 **QueryString** or **FormData**.
 
@@ -202,7 +202,7 @@ In the example above we're returning only a subset of results. Unmatched propert
 
 ## Returning Nested Related Results
 
-AutoQuery also takes advantage of [OrmLite's References Support](https://github.com/ServiceStack/ServiceStack.OrmLite/#reference-support-poco-style) which lets you return related child records that are annotated with `[Reference]` attribute, e.g:
+AutoQuery also takes advantage of [OrmLite's References Support](/ormlite/reference-support) which lets you return related child records that are annotated with `[Reference]` attribute, e.g:
 
 ```csharp
 public class QueryRockstars : QueryDb<Rockstar> {}
@@ -221,7 +221,7 @@ public class Rockstar
 
 ## Joining Tables
 
-AutoQuery lets us take advantage of OrmLite's recent [support for JOINs in typed SqlExpressions](https://github.com/ServiceStack/ServiceStack.OrmLite/#typed-sqlexpression-support-for-joins) 
+AutoQuery lets us take advantage of OrmLite's recent [support for JOINs in typed SqlExpressions](/ormlite/typed-joins) 
 
 We can tell AutoQuery to join on multiple tables using the `IJoin<T1,T2>` interface marker:
 
@@ -234,9 +234,9 @@ public class QueryRockstarAlbums
 }
 ```
 
-The above example tells AutoQuery to query against an **INNER JOIN** of the `Rockstar` and `RockstarAlbum` tables using [OrmLite's reference conventions](https://github.com/ServiceStack/ServiceStack.OrmLite/#reference-conventionst) that's implicit between both tables.
+The above example tells AutoQuery to query against an **INNER JOIN** of the `Rockstar` and `RockstarAlbum` tables using [OrmLite's reference conventions](/ormlite/reference-support) that's implicit between both tables.
 
-The Request DTO lets us query against fields across the joined tables where each field is matched with the [first table containing the field](https://github.com/ServiceStack/ServiceStack.OrmLite/#selecting-multiple-columns-across-joined-tables). You can match against fields using the fully qualified `{Table}{Field}` convention, e.g. `RockstarAlbumName` queries against the `RockstarAlbum`.`Name` column.
+The Request DTO lets us query against fields across the joined tables where each field is matched with the [first table containing the field](/ormlite/dynamic-result-sets). You can match against fields using the fully qualified `{Table}{Field}` convention, e.g. `RockstarAlbumName` queries against the `RockstarAlbum`.`Name` column.
 
 This mapping of fields also applies to the Response DTO where now `RockstarAlbumName` from the above `CustomRockstar` type will be populated:
 
@@ -670,7 +670,7 @@ services.AddPlugin(new AutoQueryFeature { EnableUntypedQueries = false });
 
 It's also possible to specify Raw SQL Filters. Whilst offering greater flexibility they also suffer from many of the problems that OData's expressions have. 
 
-Raw SQL Filters also don't benefit from limiting matching to declared fields and auto-escaping and quoting of values although they're still validated against OrmLite's [IllegalSqlFragmentTokens](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/OrmLiteUtilExtensions.cs#L172) to protect against SQL Injection attacks. But as they still allow calling SQL Functions, Raw SqlFilters shouldn't be enabled when accessible by untrusted parties unless they've been configured to use a [Named OrmLite DB Connection](https://github.com/ServiceStack/ServiceStack.OrmLite/#multi-nested-database-connections) which is read-only and locked-down so that it only has access to what it's allowed to.
+Raw SQL Filters also don't benefit from limiting matching to declared fields and auto-escaping and quoting of values although they're still validated against OrmLite's [IllegalSqlFragmentTokens](https://github.com/ServiceStack/ServiceStack/blob/d0b6acf38cc45c16d229df66b82183644e0aee3c/ServiceStack.OrmLite/src/ServiceStack.OrmLite/OrmLiteUtils.cs#L501) to protect against SQL Injection attacks. But as they still allow calling SQL Functions, Raw SqlFilters shouldn't be enabled when accessible by untrusted parties unless they've been configured to use a [Named OrmLite DB Connection](/ormlite/multi-database-connections) which is read-only and locked-down so that it only has access to what it's allowed to.
 
 If safe to do so, RawSqlFilters can be enabled with:
 

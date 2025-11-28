@@ -80,7 +80,7 @@ DTOs that your Services can return so they're serializable without issue.
 ### Clean POCOs
 
 The complex Data Models stored in 
-[OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) or 
+[OrmLite](/ormlite/) or 
 [Redis](https://github.com/ServiceStack/ServiceStack.Redis) doesn't suffer from any of these issues which are able to use 
 clean, disconnected POCOs. They're loosely-coupled, where only the "Shape" of the POCO is significant, i.e. 
 moving projects and changing namespaces won't impact serialization, how it's stored in RDBMS tables, 

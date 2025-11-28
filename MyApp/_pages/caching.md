@@ -9,7 +9,7 @@ for the following cache providers:
 
 * [Memory Cache](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Caching/MemoryCacheClient.cs) - Useful for single host web services without needing any infrastructure dependencies.
 * [Redis](https://github.com/ServiceStack/ServiceStack.Redis) - A fast key-value store with non-volatile persistent storage and support for rich comp-sci data structures.
-* [OrmLiteCacheClient](https://www.nuget.org/packages/ServiceStack.Server) - Supports all [OrmLite's RDBMS providers](https://github.com/ServiceStack/ServiceStack.OrmLite/#download) for using an existing RDBMS as a distributed cache.
+* [OrmLiteCacheClient](https://www.nuget.org/packages/ServiceStack.Server) - Supports all [OrmLite's RDBMS providers](/ormlite/) for using an existing RDBMS as a distributed cache.
 * [Memcached](https://nuget.org/packages/ServiceStack.Caching.Memcached) - The original, tried and tested distributed memory caching provider.
 * [Aws DynamoDB](https://www.nuget.org/packages/ServiceStack.Aws/) - Uses Amazon's Dynamo DB backend hosted on Amazon Web Services
 * [Azure Table Storage](/azure#virtual-filesystem-backed-by-azure-blob-storage) - Uses Azure Table Storage for when your application is hosted on Azure.

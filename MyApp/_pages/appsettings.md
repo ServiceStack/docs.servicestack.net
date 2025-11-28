@@ -87,7 +87,7 @@ AppSettings = new MultiAppSettingsBuilder()
 
 ## OrmLite AppSettings
 
-`OrmLiteAppSettings` provides an alternative read/write API that lets you maintain your applications configuration in any [RDBMS back-end OrmLite supports](https://github.com/ServiceStack/ServiceStack.OrmLite/#download). It works like a mini Key/Value database in which can store any serializable value against any key which is maintained into the simple Id/Value `ConfigSettings` table.
+`OrmLiteAppSettings` provides an alternative read/write API that lets you maintain your applications configuration in any [RDBMS back-end OrmLite supports](/ormlite/). It works like a mini Key/Value database in which can store any serializable value against any key which is maintained into the simple Id/Value `ConfigSettings` table.
 
 ### Usage
 

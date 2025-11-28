@@ -13,7 +13,7 @@ Repos you want to use:
  - [ServiceStack/ServiceStack](https://github.com/ServiceStack/ServiceStack)
  - [ServiceStack/ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text)
  - [ServiceStack/ServiceStack.Redis](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text)
- - [ServiceStack/ServiceStack.OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
+ - [ServiceStack/ServiceStack.OrmLite](/ormlite/)
  - [ServiceStack/ServiceStack.Aws](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws)
  - [ServiceStack/ServiceStack.Azure](https://github.com/ServiceStack/ServiceStack.Azure)
 

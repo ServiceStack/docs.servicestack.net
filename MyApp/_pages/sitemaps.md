@@ -19,7 +19,7 @@ Plugins.Add(new SitemapFeature
 });
 ```
 
-The above example uses [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) to generate a collection of `SitemapUrl` entries containing Absolute Urls for all [techstacks.io Technology Pages](https://techstacks.io/tech). This is another good showcase for the [Reverse Routing available on Request DTO's](/routing#reverse-routing) which provides a Typed API for generating Urls without any additional effort.
+The above example uses [OrmLite](/ormlite/) to generate a collection of `SitemapUrl` entries containing Absolute Urls for all [techstacks.io Technology Pages](https://techstacks.io/tech). This is another good showcase for the [Reverse Routing available on Request DTO's](/routing#reverse-routing) which provides a Typed API for generating Urls without any additional effort.
 
 Once populated your sitemap will be available at `/sitemap.xml` which looks like:
 

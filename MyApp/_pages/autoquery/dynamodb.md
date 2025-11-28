@@ -85,7 +85,7 @@ or `DynamoDbSource` and the only thing that would need to change to have it quer
 `QueryDb<T>` base class.
 
 The text in comments highlight that when the `RockstarAlbum` POCO is stored in an RDBMS 
-[OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) 
+[OrmLite](/ormlite/) 
 creates the table with the `Id` as the Primary Key and `RockstarId` as a Foreign Key to the `Rockstar` table. 
 This is different in DynamoDB where 
 [PocoDynamo](/aws-pocodynamo) behavior is to keep related records together so

@@ -132,7 +132,7 @@ Another popular Use Case now enabled with Converters is being able to override b
 
 E.g. SQL Server's **TIME** data type can't store Times greater than 24 hours or with less precision than **3ms**.
 But if using a **TIME** column was preferred it can now be enabled by registering to use the new
-[SqlServerTimeConverter](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerTimeConverter.cs)
+[SqlServerTimeConverter](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.SqlServer/Converters/SqlServerTimeConverter.cs)
 instead:
 
 ```csharp

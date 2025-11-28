@@ -55,7 +55,7 @@ To improve reuse of OrmLite's Data Models in Dapper, OrmLite also supports `byte
 ## Conflict Resolution using commandFilter
 
 An optional `Func<IDbCommand> commandFilter` is available in all `INSERT` and `UPDATE` APIs to allow customization and inspection of the populated `IDbCommand` before it's run.
-This feature is utilized in the [Conflict Resolution Extension methods](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/OrmLiteConflictResolutions.cs)
+This feature is utilized in the [Conflict Resolution Extension methods](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/OrmLiteConflictResolutions.cs)
 where you can specify the conflict resolution strategy when a Primary Key or Unique constraint violation occurs:
 
 ```csharp

@@ -31,7 +31,7 @@ $ mkdir ProjectName && cd ProjectName
 $ x mix init-vb
 ```
 
-Configured with [OrmLite + SQL Server](https://github.com/ServiceStack/ServiceStack.OrmLite), 
+Configured with [OrmLite + SQL Server](/ormlite/), 
 [ServiceStack Auth](/auth/authentication-and-authorization) including Login & Registration UIs
 & integrated [JWT Auth](/auth/jwt-authprovider) showing how to manage file uploads for authenticated users.
 

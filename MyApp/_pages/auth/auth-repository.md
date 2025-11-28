@@ -309,7 +309,7 @@ If you need finer-grained access than the shared APIs above, you can update the 
 in your preferred persistence provider directly.
 
 E.g. if you're using the `OrmLiteAuthRepository` to store your Users in an RDBMS back-end you can use 
-[OrmLite APIs](https://github.com/ServiceStack/ServiceStack.OrmLite) to update the user details stored in the `UserAuth` and `UserAuthDetails`
+[OrmLite APIs](/ormlite/) to update the user details stored in the `UserAuth` and `UserAuthDetails`
 tables, e.g:
 
 ```csharp

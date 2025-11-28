@@ -1182,7 +1182,7 @@ interface IVirtualFiles
 }
 ```
 
-## [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
+## [OrmLite](/ormlite/)
 
 New `UpdateAdd` API's provides several Typed API's for updating existing values:
 
@@ -1838,7 +1838,7 @@ AuthenticateResponse authResponse = client.post(new Authenticate()
 TestAuthResponse response = client.get(new TestAuth());
 ``` 
 
-## [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
+## [OrmLite](/ormlite/)
 
 ### Async PostgreSQL Support
 

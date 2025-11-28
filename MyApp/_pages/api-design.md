@@ -50,7 +50,7 @@ Which your C# clients will still be able to call with:
 List<Contact> response = client.Get(new GetContacts());
 ```
 
-This will make a **GET** call to the custom `/contacts` URL and returns all rows from the `Contact` Table in the configured RDBMS using [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
+This will make a **GET** call to the custom `/contacts` URL and returns all rows from the `Contact` Table in the configured RDBMS using [OrmLite](/ormlite/)
 `Select()` extension method on the `base.Db` ADO.NET `IDbConnection` property on ServiceStack's convenience `Service` base class. 
 
 Using `Get()` limits access to this service from HTTP **GET** requests only, all other HTTP Verbs requests to `/contacts` will return a **404 NotFound** HTTP Error Response.
@@ -309,7 +309,7 @@ IncludeTypes: WebApi.*,WebAndMobileApi.*
 
 ### Micro ORMs and ADO.NET's IDbConnection
 
-Code-First Micro ORMS like [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) and 
+Code-First Micro ORMS like [OrmLite](/ormlite/) and 
 [Dapper](https://github.com/StackExchange/Dapper) provides a pleasant high-level experience whilst working directly against ADO.NET's low-level `IDbConnection`. They both support all major databases so you immediately have access to a flexible RDBMS option out-of-the-box. At the same time you're not limited to using the providers contained in the `Service` class and can continue to use your own register IOC dependencies (inc. an alternate IOC itself). 
 
 ### Micro ORM POCOs make good DTOs

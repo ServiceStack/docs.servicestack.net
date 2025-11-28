@@ -84,7 +84,7 @@ and some of TechStacks back-end features include:
  - Page-level Locking
  - Record and Restore Page Content Versioning
  - [Twitter and GitHub OAuth Providers](/auth/authentication-and-authorization)
- - Substitutable [OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite) RDBMS [PostgreSQL and Sqlite](https://github.com/ServiceStackApps/TechStacks/blob/875e78910e43d2230f0925b71d5990497216511e/src/TechStacks/TechStacks/AppHost.cs#L49-L56) back-ends
+ - Substitutable [OrmLite](/ormlite/) RDBMS [PostgreSQL and Sqlite](https://github.com/ServiceStackApps/TechStacks/blob/875e78910e43d2230f0925b71d5990497216511e/src/TechStacks/TechStacks/AppHost.cs#L49-L56) back-ends
  - [Auto Query](/autoquery/) for automatic services of RDBMS tables
  - [RDBMS Sessions and In Memory Caching](/caching)
  - [Fluent Validation](/validation)

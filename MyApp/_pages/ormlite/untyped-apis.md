@@ -2,7 +2,7 @@
 title: OrmLite Untyped API and T4 Templates
 ---
 
-The [IUntypedApi](https://github.com/ServiceStack/ServiceStack.OrmLite/blob/master/src/ServiceStack.OrmLite/IUntypedApi.cs) interface is useful for when you only have access to a late-bound object runtime type which is accessible via `db.CreateTypedApi`, e.g:
+The [IUntypedApi](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/IUntypedApi.cs) interface is useful for when you only have access to a late-bound object runtime type which is accessible via `db.CreateTypedApi`, e.g:
 
 ```csharp
 public class BaseClass
@@ -41,7 +41,7 @@ typedRow = db.SingleById<Target>(1); //= null
 
 ## T4 Template Support
 
-[OrmLite's T4 Template](https://github.com/ServiceStack/ServiceStack.OrmLite/tree/master/src/T4)
+[OrmLite's T4 Template](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite.T4)
 are useful in database-first development or when wanting to use OrmLite with an existing
 RDBMS by automatically generating POCO's and strong-typed wrappers
 for executing stored procedures.

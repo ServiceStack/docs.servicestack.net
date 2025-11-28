@@ -873,7 +873,7 @@ Significant contributions have also been made on ServiceStack's sub projects:
 
   - [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text)
   - [ServiceStack.Redis](https://github.com/ServiceStack/ServiceStack.Redis) and the built-in [Redis MQ Server](/redis-mq)
-  - [ServiceStack.OrmLite](https://github.com/ServiceStack/ServiceStack.OrmLite)
+  - [ServiceStack.OrmLite](/ormlite/)
 
 but they each deserve their own Release notes, which we hope to draft up soon.
 
@@ -1610,7 +1610,7 @@ To help visualize the dependencies between the various components, here is a tre
           * [ServiceStack.ServiceInterface.dll](https://github.com/ServiceStack/ServiceStack.Contrib/tree/master/src/ServiceStack.ServiceInterface)
 
         * [ServiceStack.Redis.dll](https://github.com/ServiceStack/ServiceStack.Redis)
-        * [ServiceStack.OrmLite.dll](https://github.com/ServiceStack/ServiceStack.OrmLite)
+        * [ServiceStack.OrmLite.dll](/ormlite/)
 
 *****
 
