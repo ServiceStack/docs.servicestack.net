@@ -26,13 +26,13 @@ public class ConfigureAutoQuery : IHostingStartup
             // Enable Audit History
             services.AddSingleton<ICrudEvents>(c =>
                 new OrmLiteCrudEvents(c.Resolve<IDbConnectionFactory>()));
-        })
-        .ConfigureAppHost(appHost => {
-            appHost.Plugins.Add(new AutoQueryFeature {
+
+            services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
                 //IncludeTotal = true,
-            });
-            
+            });            
+        })
+        .ConfigureAppHost(appHost => {
             // Create CrudEvent if it doesn't exist
             appHost.Resolve<ICrudEvents>().InitSchema();
         });

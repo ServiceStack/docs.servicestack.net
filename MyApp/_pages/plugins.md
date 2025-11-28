@@ -219,7 +219,7 @@ The rest of ServiceStack's plugins are not enabled by default by can easily be a
 AutoQuery enables instant querying support on RDBMS tables behind clean self-describing APIs by enhancing the ideal API the developer would naturally write and completing their implementation for them! This is essentially the philosophy behind AutoQuery which utilizes conventions to automate creation of intent-based self-descriptive APIs that are able to specify configurable conventions and leverage extensibility options to maximize the utility of AutoQuery services.
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { MaxLimit = 100 });
+services.AddPlugin(new AutoQueryFeature { MaxLimit = 100 });
 ```
 
 ::: info
@@ -231,7 +231,7 @@ Requires ServiceStack.Server
 Server Events enables server push notifications to create real-time responsive web apps with its support for [Server Sent Events](http://www.html5rocks.com/en/tutorials/eventsource/basics/). It offers a number of different API's for sending notifications to select users at different levels of granularity, letting you interact and modify live-running web apps. 
 
 ```csharp
-Plugins.Add(new ServerEventsFeature());
+services.AddPlugin(new ServerEventsFeature());
 ```
 
 ## [Postman](/postman)
@@ -239,8 +239,8 @@ Plugins.Add(new ServerEventsFeature());
 The [Postman Rest Client](http://www.getpostman.com/) is a very popular and easy to use HTTP Request composer that makes it easy to call web services, similar to [Fiddler's Composer](https://www.blackbaud.com/files/support/guides/infinitydevguide/Subsystems/inwebapi-developer-help/Content/InfinityWebAPI/coUsingFiddlerCreateHTTPRequest.htm). It also provides as an alternative for auto-generating API documentation to [ServiceStack's Open API support](/openapi) that makes it easier to call existing services but does require users to install the [Postman Rest Client](http://www.getpostman.com/).
 
 ```csharp
-Plugins.Add(new PostmanFeature());
-Plugins.Add(new CorsFeature());
+services.AddPlugin(new PostmanFeature());
+services.AddPlugin(new CorsFeature());
 ```
 
 ### [Open API support](/openapi)
@@ -250,7 +250,7 @@ Swagger support an optional add-on available in the [ServiceStack.Api.OpenApi](h
 After installing the NuGet package enable the Swagger with:
 
 ```csharp
-Plugins.Add(new OpenApiFeature());
+services.AddPlugin(new OpenApiFeature());
 ```
 
 Now you can enjoy your shiny new Swagger UI at: `http://yoursite/swagger-ui/index.html`
@@ -275,7 +275,7 @@ public class MyRequestDto
 Provides ServiceStack's primary HTML story with support for the MVC Razor view engine.
 
 ```csharp
-Plugins.Add(new RazorFormat()); 
+services.AddPlugin(new RazorFormat()); 
 ```
 
 It's an optional .NET 4.0 plugin that is available in the [ServiceStack.Razor](https://nuget.org/packages/ServiceStack.Razor) NuGet package.
@@ -287,7 +287,7 @@ The Authentication Feature enables the [Authentication and Authorization](/auth/
 An example AuthFeature registration (taken from the [SocialBootstrapApi](https://github.com/ServiceStackApps/SocialBootstrapApi/blob/master/src/SocialBootstrapApi/AppHost.cs#L154) project):
 
 ```csharp
-Plugins.Add(new AuthFeature(
+services.AddPlugin(new AuthFeature(
     () => new CustomUserSession(), //Use your own typed Custom UserSession type
     new IAuthProvider[] {
         new CredentialsAuthProvider(),         //HTML Form post of UserName/Password
@@ -304,7 +304,7 @@ This registers and provides your ServiceStack host a myriad of different Authent
 If you're **not** using the AuthFeature above and you still want Session support you need to enable it explicitly with:
 
 ```csharp
-Plugins.Add(new SessionFeature());
+services.AddPlugin(new SessionFeature());
 ```
 
 This will add a [Request Filter](/request-and-response-filters) to instruct any HTTP client calling a ServiceStack web service to create a Temporary (ss-id) and Permanent (ss-pid) cookie if not already done so.
@@ -314,7 +314,7 @@ This will add a [Request Filter](/request-and-response-filters) to instruct any 
 Related to Authentication is Registration which enables the Registration Service at the default route `/register` which lets new Users to be registered and validated with the Credentials and Basic AuthProviders.
 
 ```csharp
-Plugins.Add(new RegistrationFeature());
+services.AddPlugin(new RegistrationFeature());
 ```
 
 See the [SocialBootstrapApi](https://github.com/ServiceStack/SocialBootstrapApi) project for a working example of Registration and Authentication.
@@ -323,14 +323,14 @@ See the [SocialBootstrapApi](https://github.com/ServiceStack/SocialBootstrapApi)
 To add fast binary [MessagePack support](/messagepack-format) to ServiceStack install the **[ServiceStack.MsgPack](https://nuget.org/packages/ServiceStack.MsgPack)** NuGet package and register the plugin with:
 
 ```csharp
-Plugins.Add(new MsgPackFormat());
+services.AddPlugin(new MsgPackFormat());
 ```
 
 ### [ProtoBuf format](/protobuf-format)
 To enable [ProtoBuf support](/protobuf-format) install the **[ServiceStack.ProtoBuf](https://nuget.org/packages/ServiceStack.ProtoBuf)** NuGet package and register the plugin with:
 
 ```csharp
-Plugins.Add(new ProtoBufFormat());
+services.AddPlugin(new ProtoBufFormat());
 ```
 
 ### [Proxy Feature](/proxy-feature)
@@ -339,7 +339,7 @@ The `ProxyFeature` plugin is an application-level proxy that can be used to tran
 downstream servers whose behavior can be customized with custom C# hooks to control how requests are proxied.
 
 ```csharp
-Plugins.Add(new ProxyFeature(
+services.AddPlugin(new ProxyFeature(
     matchingRequests: req => req.PathInfo.StartsWith("/sales"),
     resolveUrl:req => "http://sales.domain.com" + req.RawUrl.Replace("/sales", "/")))
 ```
@@ -349,7 +349,7 @@ Plugins.Add(new ProxyFeature(
 Add an In-Memory `IRequestLogger` and service with the default route at `/requestlogs` which maintains a live log of the most recent requests (and their responses). Supports multiple config options incl. Rolling-size capacity, error and session tracking, hidden request bodies for sensitive services, etc.
 
 ```csharp
-Plugins.Add(new RequestLogsFeature());
+services.AddPlugin(new RequestLogsFeature());
 ```
 
 The `IRequestLogger` is a great way to introspect and analyze your service requests in real-time, e.g:
@@ -367,7 +367,7 @@ The [RequestLogsService](https://github.com/ServiceStack/ServiceStack/blob/maste
 The Encrypted Messaging feature enables a secure channel for all Services to offer protection to clients who can now easily send and receive encrypted messages over unsecured HTTP by registering the EncryptedMessagesFeature plugin:
 
 ```csharp
-Plugins.Add(new EncryptedMessagesFeature {
+services.AddPlugin(new EncryptedMessagesFeature {
     PrivateKeyXml = ServerRsaPrivateKeyXml
 });
 ```
@@ -380,7 +380,7 @@ Where `PrivateKeyXml` is the Servers RSA Private Key Serialized as XML. See the 
 This provides ServiceStack's [Razor Markdown Format](/markdown-razor) and also enables ServiceStack to serve static **.md** or **.markdown** files in either plain text, rendered as HTML (partial), or rendered in HTML inside a static **_Layout.shtml** HTML template. 
 
 ```csharp
-Plugins.Add(new MarkdownFormat()); 
+services.AddPlugin(new MarkdownFormat()); 
 ```
   - [Introduction to Markdown Razor](/markdown-razor)
   - [Markdown Razor Features](/markdown-razor)
@@ -391,7 +391,7 @@ Plugins.Add(new MarkdownFormat());
 The Cancellable Requests Feature makes it easy to design long-running Services that are cancellable with an external Web Service Request. To enable this feature, register the CancellableRequestsFeature plugin:
 
 ```csharp
-Plugins.Add(new CancellableRequestsFeature());
+services.AddPlugin(new CancellableRequestsFeature());
 ```
 
 ### Web Sudo
@@ -401,7 +401,7 @@ A common UX in some websites is to add an extra layer of protection for **super 
 **WebSudo** is a new feature similar in spirit requiring users to re-authenticate when accessing Services annotated with the `[WebSudoRequired]` attribute. To make use of WebSudo, first register the plugin:
 
 ```csharp
-Plugins.Add(new WebSudoFeature());
+services.AddPlugin(new WebSudoFeature());
 ```
 
 Your Custom AuthUserSession would need to either inherit `WebSudoAuthUserSession` or implement `IWebSudoAuthSession`, e.g:
@@ -413,7 +413,7 @@ public class CustomUserSession : WebSudoAuthUserSession {}
 Then tell ServiceStack to use your CustomUserSession by registering it with the `AuthFeature`, e.g:
 
 ```csharp
-Plugins.Add(new AuthFeature(() => new CustomUserSession(), ...);
+services.AddPlugin(new AuthFeature(() => new CustomUserSession(), ...);
 ```
 
 You can then apply WebSudo behavior to existing services by annotating them with `[WebSudoRequired]`:
@@ -467,11 +467,8 @@ Install [ServiceStack.Webhooks](https://www.nuget.org/packages/ServiceStack.Webh
 Register the `WebhookFeature` plugin in your AppHost:
 
 ```csharp
-public override void Configure(Container container)
-{
-    // Add ValidationFeature and AuthFeature plugins first
-    Plugins.Add(new WebhookFeature());
-}
+// Add ValidationFeature and AuthFeature plugins first
+services.AddPlugin(new WebhookFeature());
 ```
 
 Then [configure the plugin](https://github.com/jezzsantos/ServiceStack.Webhooks/wiki/Getting-Started) to suit your needs.

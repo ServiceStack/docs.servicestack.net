@@ -14,28 +14,25 @@ title: AppHost Configuration
 All ServiceStack App's are configured within an AppHost which typically consists of the following elements:
 
 ```csharp
-public class AppHost 
-  : AppHostBase                       // Type of AppHost used, normally AppHostBase
+// Service Name in Metadata Pages
+public class AppHost() : AppHostBase("MyApp"), IHostingStartup
 {
-    public AppHost() : base(
-      "MyApp",                        // Service Name in Metadata Pages
-      typeof(MyServices).Assembly) {} // The ServiceInterfaces Assemblies where all Services are located
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            // Configure ASP.NET Core IOC Dependencies
+            services.AddSingleton<IRedisClientsManager>(c => new RedisManagerPool());
 
-    // Configure your AppHost with the necessary configuration and dependencies your App needs
-    public override void Configure(Container container)
-    {
-        // Set Global AppHost Configuration
-        base.SetConfig(new HostConfig
-        {
-            DebugMode = AppSettings.Get(nameof(HostConfig.DebugMode), false)
+            // Add Plugins to extend your App with additional functionality
+            services.AddPlugin(new AutoQueryFeature { 
+                MaxLimit = 100  // Feature specific configuration
+            });
         });
 
-        //Register IOC Dependencies
-        container.Register<IRedisClientsManager>(c => new RedisManagerPool());
-
-        // Add Plugins to extend your App with additional functionality
-        Plugins.Add(new AutoQueryFeature { 
-            MaxLimit = 100  // Feature specific configuration
+    // Configure your AppHost with the necessary configuration and dependencies your App needs
+    public override void Configure()
+    {
+        // Set Global AppHost Configuration
+        base.SetConfig(new HostConfig {
         });
     }
 }

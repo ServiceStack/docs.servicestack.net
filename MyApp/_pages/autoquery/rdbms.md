@@ -15,7 +15,7 @@ In addition to leveraging ServiceStack's existing functionality, maximizing re-u
 Like ServiceStack's [other composable features](/plugins), the AutoQuery Feature is enabled by registering a Plugin, e.g:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { MaxLimit = 100 });
+services.AddPlugin(new AutoQueryFeature { MaxLimit = 100 });
 ```
 
 Which is all that's needed to enable the AutoQuery feature. The AutoQueryFeature is inside [ServiceStack.Server](https://servicestack.net/download#get-started) NuGet package which contains value-added features that utilize either OrmLite and Redis which can be added to your project with:
@@ -658,7 +658,7 @@ Which is why we recommend formalizing your conventions you want to allow before 
 When publishing your API, you can also assert that only explicit conventions are ever used by disabling untyped implicit conventions support with:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { EnableUntypedQueries = false });
+services.AddPlugin(new AutoQueryFeature { EnableUntypedQueries = false });
 ```
 
 ## Raw SQL Filters
@@ -670,7 +670,7 @@ Raw SQL Filters also don't benefit from limiting matching to declared fields and
 If safe to do so, RawSqlFilters can be enabled with:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { 
+services.AddPlugin(new AutoQueryFeature { 
     EnableRawSqlFilters = true,
     UseNamedConnection = "readonly",
     IllegalSqlFragmentTokens = { "ProtectedSqlFunction" },
@@ -805,7 +805,7 @@ client.Get(new QueryRockstars { Skip=10, Take=20, OrderByDesc="Id" });
 Or remove the default behavior with:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { 
+services.AddPlugin(new AutoQueryFeature { 
     OrderByPrimaryKeyOnPagedQuery = false 
 });
 ```
@@ -961,7 +961,7 @@ AVG, COUNT, FIRST, LAST, MAX, MIN, SUM
 Which can be added to or removed from by modifying `SqlAggregateFunctions` collection, e.g, you can allow usage of a `CustomAggregate` SQL Function with:
 
 ```cs
-Plugins.Add(new AutoQueryFeature { 
+services.AddPlugin(new AutoQueryFeature { 
     SqlAggregateFunctions = { "CustomAggregate" }
 })
 ```
@@ -1038,7 +1038,7 @@ var response = client.Get(new MyQuery { Include = "Total" });
 Alternatively you can always have the Total returned in every request with:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     IncludeTotal = true
 })
 ```
@@ -1204,7 +1204,7 @@ public class MyReportingServices(IAutoQueryDb autoQuery) : Service
 The Aggregate functions feature is built on the new `ResponseFilters` support in AutoQuery which provides a new extensibility option enabling customization and additional metadata to be attached to AutoQuery Responses. As the Aggregate Functions support is itself a Response Filter in can disabled by clearing them:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     ResponseFilters = new List<Action<QueryFilterContext>>()
 })
 ```
@@ -1236,7 +1236,7 @@ class Command
 With this we could add basic calculator functionality to AutoQuery with the custom Response Filter below:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     ResponseFilters = {
         ctx => {
             var supportedFns = new Dictionary<string, Func<int, int, int>>(StringComparer.OrdinalIgnoreCase)
@@ -1354,7 +1354,7 @@ var autoQuery = new AutoQueryFeature()
       q.And(x => x.LastName.EndsWith("son"))
   );
 
-Plugins.Add(autoQuery);
+services.AddPlugin(autoQuery);
 ```
 
 Registering an interface like `IFilterRockstars` is especially useful as it enables applying custom logic to a number of different Query Services sharing the same interface. 
@@ -1385,7 +1385,7 @@ public abstract class MyAutoQueryServiceBase : AutoQueryServiceBase
 Then tell AutoQuery to use your base class instead, e.g:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature { 
+services.AddPlugin(new AutoQueryFeature { 
     AutoQueryServiceBaseType = typeof(MyAutoQueryServiceBase)
 });
 ```
@@ -1414,7 +1414,7 @@ All AutoQuery CRUD operations support auto batch implementations which will by d
 By default it will generate AutoBatch implementations for all CRUD operations and can be changed to only generate implementations for specific CRUD operations by changing:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     GenerateAutoBatchImplementationsFor = new() { AutoCrudOperation.Create }
 });
 ```

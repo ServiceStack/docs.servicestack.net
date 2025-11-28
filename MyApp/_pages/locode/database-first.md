@@ -113,14 +113,16 @@ This feature is known as `AutoGen` and can be enabled by instantiating the `Gene
 public class ConfigureAutoQuery : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureAppHost(appHost => {
-            appHost.Plugins.Add(new AutoQueryFeature {
+        .ConfigureServices((context, services) => {
+            var ormLite = services.AddOrmLite(options => options.UseSqlite(connString));
+
+            // Configure ASP.NET Core IOC Dependencies
+            services.AddPlugin(new AutoQueryFeature {
                 MaxLimit = 1000,
-                
                 // Add this line, Configures Generated CRUD services with defaults
-                GenerateCrudServices = new GenerateCrudServices()
-                {
-                    AutoRegister = true
+                GenerateCrudServices = new GenerateCrudServices {
+                    AutoRegister = true,
+                    DbFactory = ormLite.DbFactory,
                 }
             });
         });
@@ -139,7 +141,7 @@ If you want to enable services for tables in other schemas, you can use the `Cre
 you have a schema by the name of `dbo` and `public`, you would use the following options.
 
 ```csharp
-appHost.Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -170,7 +172,7 @@ dbFactory.RegisterConnection("Reporting", pgConnString, PostgreSqlDialect.Provid
 The string name provided to `RegisterConnection` must match that provided to the `NamedConnection` property on `CreateCrudServices`.
 
 ```csharp
-appHost.Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -190,7 +192,7 @@ appHost.Plugins.Add(new AutoQueryFeature {
 These options can be combined so that specific schemas on named connections can also be used.
 
 ```csharp
-appHost.Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     //IncludeTotal = true,
     GenerateCrudServices = new GenerateCrudServices()
@@ -245,9 +247,12 @@ The `ServiceFilter` is called for every Service Operation whilst the `TypesFilte
 including Request & Response DTOs.
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+var ormLite = services.AddOrmLite(options => options.UseSqlite(connString));
+
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 100,
     GenerateCrudServices = new GenerateCrudServices {
+        DbFactory = ormLite.DbFactory,
         AutoRegister = true,
         ServiceFilter = (op, req) => {
             // Annotate all Auto generated Request DTOs with [Tag("Northwind")] attribute

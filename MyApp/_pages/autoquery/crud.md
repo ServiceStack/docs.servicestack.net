@@ -550,11 +550,7 @@ public class QueryRockstarAudit : QueryDbTenant<RockstarAuditTenant, Rockstar>
 }
 ```
 
-To coincide with AutoCRUD there's also support for [declarative validation](https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.Validate.cs) which thanks to [#Script](https://sharpscript.net/) lets you define your Fluent Validation Rules by annotating your Request DTO properties. As it's essentially a different way to define Fluent Validation Rules, it still [needs Validation enabled](/validation#validation-feature) to run:
-
-```csharp
-Plugins.Add(new ValidationFeature());
-```
+To coincide with AutoCRUD there's also support for [declarative validation](https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/AutoQueryCrudTests.Validate.cs) which thanks to [#Script](https://sharpscript.net/) lets you define your Fluent Validation Rules by annotating your Request DTO properties. As it's essentially a different way to define Fluent Validation Rules, it still [needs Validation enabled](/validation#validation-feature).
 
 ### AutoMap and AutoDefault Attributes
 
@@ -735,7 +731,7 @@ void MyAuditFilter(AutoCrudMetadata meta)
     }
 }
 
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     AutoCrudMetadataFilters = { MyAuditFilter },
 });
 ```
@@ -745,7 +741,7 @@ Plugins.Add(new AutoQueryFeature {
 AutoQuery includes `OnBefore*` and `OnAfter*` (sync & async) events for `Create`, `Update`, `Patch` & `Delete` that can be used to execute custom logic before or after each AutoQuery CRUD operation. E.g. if your system implements their own Audit history via RDBMS triggers, you can use the `OnBefore` **Delete** event to update the record with deleted info before the AutoQuery CRUD operation deletes it:
 
 ```csharp
-Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     OnBeforeDeleteAsync = async ctx => {
         if (ctx.Dto is DeleteBooking deleteBooking)
         {

@@ -789,7 +789,7 @@ public class QueryOrders : QueryDb<Order>
 ServiceStack also supports a database-first approach, especially useful when working with an existing database. In this scenario, you can leverage AutoQuery's `GeneratedServices` feature. It allows you to create ready-to-use services based on your database schema.
 
 ```csharp
-appHost.Plugins.Add(new AutoQueryFeature {
+services.AddPlugin(new AutoQueryFeature {
     MaxLimit = 1000,
     GenerateCrudServices = new GenerateCrudServices
     {

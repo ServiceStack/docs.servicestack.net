@@ -167,6 +167,7 @@ We can add the `[Tag]` attribute to all our Database-First Request DTOs using [A
 
 ```cs
 GenerateCrudServices = new GenerateCrudServices {
+    DbFactory = dbFactory,
     AutoRegister = true,
     ServiceFilter = (op, req) => {
         // Annotate all Auto generated Request DTOs with [Tag("Northwind")] attribute

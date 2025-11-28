@@ -20,8 +20,11 @@ but as all CRUD Write operations require authentication, all edit controls requi
 Here are the relevant [NorthwindCrud auto-generation rules](https://github.com/NetCoreApps/NorthwindCrud/blob/master/Startup.cs) which defines this behavior:
 
 ```csharp
+var ormLite = services.AddOrmLite(options => options.UseSqlite(connString));
+
 var readOnlyTables = new[] { "Region" };
 GenerateCrudServices = new GenerateCrudServices {
+    DbFactory = ormLite.DbFactory,
     ServiceFilter = (op,req) => {
         // Require all Write Access to Tables to be limited to Authenticated Users
         if (op.IsCrudWrite())
