@@ -4,7 +4,7 @@ title: React SPA Project Template
 
 ## ServiceStack React SPA Template
 
-The new TypeScript [Vite React SPA template](https://react-spa.web-templates.io) is an enhanced version of .NET's
+The new TypeScript [Vite React SPA template](https://react-spa.react-templates.net) is an enhanced version of .NET's
 built-in ASP.NET Core React SPA template with many new value-added and high-productivity features.
 
 <div class="not-prose mt-16 flex flex-col items-center">
@@ -30,7 +30,7 @@ built-in ASP.NET Core React SPA template with many new value-added and high-prod
 :::
 
 :::{.shadow .pb-1}
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-spa.png)](https://react-spa.web-templates.io)
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-spa.png)](https://react-spa.react-templates.net)
 :::
 
 ## ASP.NET Core React SPA Template 
@@ -202,10 +202,10 @@ return (<LayoutPage title="Weather">
 </LayoutPage>)
 ```
 
-To render the [/weather](https://react-spa.web-templates.io/weather) customized Data Table:
+To render the [/weather](https://react-spa.react-templates.net/weather) customized Data Table:
 
 :::{.mx-auto .max-w-lg .shadow .rounded}
-[![](/img/pages/release-notes/v8.2/data-table.png)](https://react-spa.web-templates.io/weather)
+[![](/img/pages/release-notes/v8.2/data-table.png)](https://react-spa.react-templates.net/weather)
 :::
 
 The template also includes customizable [Form.tsx](https://github.com/NetCoreTemplates/react-spa/blob/main/MyApp.Client/src/components/Form.tsx)
@@ -262,7 +262,7 @@ So that you're immediately productive out-of-the-box, the template includes a ri
 
 ### Bookings CRUD Pages
 
-The [Bookings CRUD example](https://react-spa.web-templates.io/bookings-crud) shows how you can utilize a customized 
+The [Bookings CRUD example](https://react-spa.react-templates.net/bookings-crud) shows how you can utilize a customized 
 Data Table and templates Form components to create a beautifully styled CRUD UI with minimal effort.
 
 ## Vite Press Plugin
@@ -306,4 +306,4 @@ It also supports an enhanced version of markdown for embedding richer UI markup 
 
 At the cost of reduced portability, you’re also able to embed richer Interactive Vue components directly in markdown:
 
-- [React Components in Markdown](https://react-spa.web-templates.io/posts/markdown-components-in-react)
+- [React Components in Markdown](https://react-spa.react-templates.net/posts/markdown-components-in-react)
