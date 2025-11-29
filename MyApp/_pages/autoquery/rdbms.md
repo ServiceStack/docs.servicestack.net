@@ -1055,7 +1055,7 @@ AutoQuery combines all other aggregate functions like `Total` and executes them 
 ### Hybrid AutoQuery Services
 
 AutoQuery Services can be easily enhanced by creating a custom Service implementation that modifies the `SqlExpression` Query that AutoQuery auto populates from the incoming request. In addition to using OrmLite's typed API to perform standard DB queries you can also take advantage of advanced RDBMS features with custom SQL fragments. As an example we'll look at the implementation of [techstacks.io](https://github.com/NetCoreApps/TechStacks) fundamental 
-[QueryPosts Service](https://github.com/NetCoreApps/TechStacks/blob/master/src/TechStacks.ServiceInterface/PostPublicServices.cs) 
+[QueryPosts Service](https://github.com/NetCoreApps/TechStacks/blob/master/TechStacks.ServiceInterface/PostPublicServices.cs) 
 which powers every Post feed in TechStacks where its custom implementation inherits all queryable functionality of its `QueryDb<Post>` AutoQuery Service and adds high-level functionality for `AnyTechnologyIds` and `Is` custom high-level properties that's used to query multiple columns behind-the-scenes.
 
 In addition to inheriting all default Querying functionality in a `QueryDb<Post>` AutoQuery Service, the custom implementation also:
@@ -1090,7 +1090,7 @@ public class PostPublicServices(IAutoQueryDb autoQuery) : Service
 
         q.Where(x => x.Deleted == null);
         
-        var states = request.Is ?? TypeConstants.EmptyStringArray;
+        var states = request.Is ?? [];
         if (states.Contains("closed") || states.Contains("completed") || states.Contains("declined"))
             q.And(x => x.Status == "closed");
         else

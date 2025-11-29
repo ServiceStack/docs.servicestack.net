@@ -51,7 +51,7 @@ The template includes a GitHub Actions workflow that is broken up into 3 steps t
 Once you create your GitHub repository, add the `SSH_PRIVATE_KEY` secret to your repository settings with the contents of your private key file.
 
 ```bash
-gh secret set PRIVATE_SSH_KEY < ~/deploy-key
+gh secret set SSH_PRIVATE_KEY < ~/deploy-key
 ```
 
 ### Structure

@@ -134,7 +134,7 @@ and to Query the Rockstar table you have the [full featureset of AutoQuery](/aut
 
 ## Custom AutoQuery CRUD Implementation
 
-Just as you can create [Custom AutoQuery Implementations](/autoquery/rdbms.html#custom-autoquery-implementations) to override the default AutoQuery behavior
+Just as you can create [Custom AutoQuery Implementations](/autoquery/rdbms#custom-autoquery-implementations) to override the default AutoQuery behavior
 you can also override AutoQuery CRUD implementations by creating implementations with AutoQuery CRUD Request DTOs and calling the relevate `IAutoQueryDb` method, e.g:
 
 ```csharp
