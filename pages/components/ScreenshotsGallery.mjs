@@ -4,7 +4,7 @@ export default {
         gridClass: String,
     },
     template:`
-        <div class="not-prose my-16">
+        <div class="not-prose my-8">
             <!-- Gallery Grid -->
             <div :class="gridClass || 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'">
                 <div v-for="(imageUrl, title) in images" :key="title"
