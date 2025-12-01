@@ -22,7 +22,7 @@ export const Index = [
     template('mvcauth', 'MVC', 'Windows',['bootstrap']),
     template('script', 'MVC', 'Windows',['bootstrap']),
     template('vue-spa', 'Vue SPA', 'Vue',['tailwind']),
-    template('react-vite', 'React Vite', 'React',['tailwind','autoquery']),
+    template('react-static', 'React Static', 'React',['tailwind','autoquery']),
     template('react-spa', 'React SPA', 'React',['tailwind','autoquery']),
     template('angular-spa', 'Angular SPA', 'Angular',['tailwind']),
     template('svelte-spa', 'Svelte SPA', 'Angular',['bootstrap']),
