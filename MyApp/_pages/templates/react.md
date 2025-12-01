@@ -68,7 +68,7 @@ We're introducing three production-ready React templates, each optimized for dif
 
 
 <react-template 
-  name="react-vite" 
+  name="react-static" 
   description="A lightweight foundation built with React + Vite + TypeScript + Tailwind CSS—the ideal blank slate starting point for AI-generated UIs."></react-template>
 
 <react-template 
@@ -107,7 +107,7 @@ As AI Models are not as adept at generating C# APIs or Migrations yet, they exce
 
 With just a TypeScript Definition:
 
-- [Bookings.d.ts](https://github.com/NetCoreTemplates/react-vite/blob/main/MyApp.ServiceModel/Bookings.d.ts)
+- [Bookings.d.ts](https://github.com/NetCoreTemplates/react-static/blob/main/MyApp.ServiceModel/Bookings.d.ts)
 
 We can generate all the AutoQuery CRUD APIs and DB Migrations needed to enable a CRUD UI with:
 
@@ -185,11 +185,11 @@ There are a number of options for starting with an AI generated Application, wit
 ### Use GitHub Copilot when creating a new Repository
 
 If you're using [GitHub Copilot](https://copilot.github.com/) you can also use it to generate a new App 
-[from the Vite React template ](https://github.com/new?template_name=react-vite&template_owner=NetCoreTemplates):
+[from the Vite React template ](https://github.com/new?template_name=react-static&template_owner=NetCoreTemplates):
 
 :::{.not-prose}
 :::{.my-8 .max-w-3xl .mx-auto .rounded-lg .overflow-hidden .shadow .hover:shadow-xl}
-[![](/img/pages/react/react-new-repo.webp)](https://github.com/new?template_name=react-vite&template_owner=NetCoreTemplates)
+[![](/img/pages/react/react-new-repo.webp)](https://github.com/new?template_name=react-static&template_owner=NetCoreTemplates)
 :::
 :::
 
