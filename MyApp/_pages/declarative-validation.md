@@ -29,6 +29,7 @@ The Validator attributes are decoupled from any implementation and can be safely
 | `[ValidateIsAdmin]`            | Protect access to this API to Admin Users only                          |
 | `[ValidateHasPermission]`      | Protect access to this API to only Users assigned with ALL Permissions  |
 | `[ValidateHasRole]`            | Protect access to this API to only Users assigned with ALL Roles        |
+| `[ValidateApiKey]`             | Protect access to this API to only Users with a valid API Key           |
 
 ### Property Validation Attributes
 
