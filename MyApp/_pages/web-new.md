@@ -94,14 +94,6 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
     $ x new mvcauth ProjectName                # .NET Core
 
-#### mvcidentityserver
-
-> .NET 8.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
-
-![](/img/pages/auth/signin/mvcidentityserver.png)
-
-    $ x new mvcidentityserver ProjectName      # .NET Core
-
 #### razor
 
 > ServiceStack.Razor Bootstrap Website

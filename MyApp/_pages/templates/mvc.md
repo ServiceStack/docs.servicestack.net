@@ -40,18 +40,3 @@ x new mvcauth ProjectName
 ::: tip
 Learn about [using ServiceStack Auth in MVC](/auth/identity-servicestack)
 :::
-
-
-### mvcidentityserver
-
-.NET 8.0 MVC Website integrated with ServiceStack using IdentityServer4 Auth
-
-[![](/img/pages/auth/signin/mvcidentityserver.png)](https://github.com/NetCoreTemplates/mvcidentityserver)
-
-:::sh
-x new mvcidentityserver ProjectName
-:::
-
-::: tip
-Learn about [using IdentityServer4 Auth in ServiceStack](/auth/identity-aspnet)
-:::

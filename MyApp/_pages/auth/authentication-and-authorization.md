@@ -145,14 +145,11 @@ The `NetCoreIdentityAuthProvider` is a bi-directional Authentication adapter tha
 rest of your ASP.NET Core and MVC Application where it enables the following popular scenarios:
 
  - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - Use ServiceStack Auth to power ASP.NET Identity Auth, pre-configured in the [mvcauth](https://github.com/NetCoreTemplates/mvcauth) project template. 
- - [Using IdentityServer4 Auth in ServiceStack](/auth/identityserver) - Use IdentityServer4 to Authenticate ASP.NET Core and ServiceStack Services, 
-pre-configured in the [mvcidentityserver](https://github.com/NetCoreTemplates/mvcidentityserver) project template.
 
 ### Community Auth Providers
 
   - [Azure Active Directory](https://github.com/jfoshee/ServiceStack.Authentication.Aad) - Allow Custom App to login with Azure Active Directory
   - [Azure Active Directory via Azure Graph for ServiceStack](https://github.com/ticky74/ServiceStack.Authentication.Azure)
-  - [ServiceStack.Authentication.IdentityServer](https://github.com/MacLeanElectrical/servicestack-authentication-identityserver) - Integration with ASP.NET IdentityServer and provides OpenIDConnect / OAuth 2.0 Single Sign-On Authentication
 
 ### Basic Configuration
 
@@ -1114,7 +1111,6 @@ Otherwise you can use the `IRequest req` parameter to check against a white list
 # Community Resources
 
   - [Simple Web Service Authentication with ServiceStack](https://steveellwoodnlc.medium.com/simple-web-service-authentication-with-servicestack-7294fe5493a2) by [@steveellwood](https://steveellwoodnlc.medium.com)
-  - [Using IdentityServer 4 with ServiceStack and Angular](http://estynedwards.com/blog/2016/01/30/ServiceStack-IdentityServer-Angular/) by [@estynedwards](https://twitter.com/estynedwards)
   - [Adding Facebook Authentication using ServiceStack](http://buildclassifieds.com/2016/01/14/facebookauth/) by [@markholdt](https://twitter.com/markholdt)
   - [How to return JSV formatted collection types from SQL Server in OrmLite](http://blog.falafel.com/Blogs/adam-anderson/2013/10/28/how-to-return-jsv-formatted-collection-types-from-sql-server-to-servicestack.ormlite) by [AdamAnderson](http://blog.falafel.com/blogs/AdamAnderson)
   - [How to migrate ASP.NET Membership users to ServiceStack](http://blog.falafel.com/Blogs/adam-anderson/2013/10/23/how-to-migrate-asp.net-membership-users-to-servicestack) by [AdamAnderson](http://blog.falafel.com/blogs/AdamAnderson)
