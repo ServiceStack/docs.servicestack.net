@@ -128,17 +128,6 @@ x new react-spa ProjectName
 x new react-spa-netfx ProjectName
 :::
 
-### svelte-spa
-
-Svelte SPA App with Bootstrap
-
-[![](/img/pages/auth/signin/svelte-spa.png)](https://github.com/NetCoreTemplates/svelte-spa)
-
-.NET 10+
-:::sh
-x new svelte-spa ProjectName
-:::
-
 ### angular-spa
 
 Angular 12 CLI Bootstrap App

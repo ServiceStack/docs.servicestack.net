@@ -25,7 +25,6 @@ export const Index = [
     template('react-static', 'React Static', 'React',['tailwind','autoquery']),
     template('react-spa', 'React SPA', 'React',['tailwind','autoquery']),
     template('angular-spa', 'Angular SPA', 'Angular',['tailwind']),
-    template('svelte-spa', 'Svelte SPA', 'Angular',['bootstrap']),
     template('kmp-desktop', 'Compose Desktop', 'Compose',['kotlin','desktop']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
 

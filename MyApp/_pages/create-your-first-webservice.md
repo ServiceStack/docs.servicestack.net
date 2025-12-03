@@ -248,7 +248,6 @@ Compare and contrast with other major SPA JavaScript Frameworks:
  - [Next.js with swrClient](https://github.com/NetCoreTemplates/nextjs/blob/main/ui/components/intro.tsx)
  - [React HelloApi.tsx](https://github.com/NetCoreTemplates/react-spa/blob/master/MyApp/src/components/Home/HelloApi.tsx)
  - [Angular HelloApi.ts](https://github.com/NetCoreTemplates/angular-spa/blob/master/MyApp/src/app/home/HelloApi.ts)
- - [Svelte Home.svelte](https://github.com/NetCoreTemplates/svelte-spa/blob/master/MyApp/src/components/Home.svelte)
 
 ### Web, Mobile and Desktop Apps
 

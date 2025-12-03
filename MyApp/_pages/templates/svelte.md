@@ -3,6 +3,10 @@ slug: templates-svelte
 title: Svelte Project Templates
 ---
 
+::: warning DEPRECATED
+The Svelte .NET Core SPA template is no longer being actively maintained 
+:::
+
 <div class="not-prose my-8 ml-20 flex justify-center"><svg style="max-width:200px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 98.1 118" xml:space="preserve">
 <path fill="#FF3E00" d="M91.8,15.6C80.9-0.1,59.2-4.7,43.6,5.2L16.1,22.8C8.6,27.5,3.4,35.2,1.9,43.9c-1.3,7.3-0.2,14.8,3.3,21.3
@@ -30,14 +34,10 @@ Instead of using techniques like virtual DOM diffing, Svelte writes code that su
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/svelte-spa.png)
 
-> Browse [source code](https://github.com/NetCoreTemplates/svelte-spa) and install with [dotnet-new](/dotnet-new):
+> Browse [source code](https://github.com/LegacyTemplates/svelte-spa) and install with [dotnet-new](/dotnet-new):
 
 ```bash
 $ dotnet tool install -g x
-```
-
-```bash
-$ x new svelte-spa ProjectName
 ```
 
 ## Development workflow

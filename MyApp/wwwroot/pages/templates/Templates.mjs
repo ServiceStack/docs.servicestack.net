@@ -8,7 +8,6 @@ export function template(repo, name, icon, tags, demo) {
 export const Index = [
     template('blazor', 'Blazor', 'Blazor', ['tailwind']),
     template('blazor-vue', 'Blazor Vue', 'Blazor',['tailwind']),
-    template('blazor-wasm', 'Blazor WASM', 'Blazor',['tailwind']),
     template('mvc', 'MVC', 'Windows',['tailwind']),
     template('razor', 'Razor Pages', 'Razor',['tailwind']),
     template('mvc-bootstrap', 'MVC', 'Windows',['bootstrap']),
@@ -23,7 +22,6 @@ export const Index = [
     template('vue-spa', 'Vue SPA', 'Vue',['bootstrap']),
     template('react-spa', 'React SPA', 'React',['bootstrap']),
     template('angular-spa', 'Angular SPA', 'Angular',['bootstrap']),
-    template('svelte-spa', 'Svelte SPA', 'Angular',['bootstrap']),
     template('kmp-desktop', 'Compose Desktop', 'Compose',['kotlin','desktop']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
 
