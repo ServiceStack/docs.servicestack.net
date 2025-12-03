@@ -3,7 +3,7 @@ slug: authentication-identityserver
 title: Using IdentityServer4 Auth in ServiceStack
 ---
 
-:::warning
+:::warning DEPRECATED
 This article refers to IdentityServer4 which is no longer actively maintained.
 :::
 

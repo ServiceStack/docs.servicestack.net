@@ -23,26 +23,6 @@ Click on the template name below to view a Live Demo and contents of each projec
 | [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 8.0 React Identity Auth Tailwind SPA   |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 8.0 Vue Identity Auth Tailwind SPA     |
 
-
-The .NET 8.0 project templates utilizes MSBuild's newer and human-friendly format which can be developed using your preferred C# IDE of VS.NET, VS Code or Rider.
-
-| .NET Framework C# Templates                                                                   |                                                     |
-|-----------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| [angular-spa-netfx](https://github.com/NetFrameworkTemplates/angular-spa-netfx)               | .NET Framework Angular Bootstrap cli.angular.io App |
-| [aurelia-spa-netfx](https://github.com/NetFrameworkTemplates/aurelia-spa-netfx)               | .NET Framework Aurelia Bootstrap Webpack App        |
-| [react-desktop-apps-netfx](https://github.com/NetFrameworkTemplates/react-desktop-apps-netfx) | .NET Framework React Desktop Apps                   |
-| [react-spa-netfx](https://github.com/NetFrameworkTemplates/react-spa-netfx)                   | .NET Framework React Bootstrap Webpack App          |
-| [vue-nuxt-netfx](https://github.com/NetFrameworkTemplates/vue-nuxt-netfx)                     | .NET Framework Vue Nuxt.js SPA Web App              |
-| [vue-spa-netfx](https://github.com/NetFrameworkTemplates/vue-spa-netfx)                       | .NET Framework Vue Bootstrap Webpack App            |
-| [vuetify-nuxt-netfx](https://github.com/NetFrameworkTemplates/vuetify-nuxt-netfx)             | .NET Framework Vuetify Material Nuxt.js SPA Web App |
-| [vuetify-spa-netfx](https://github.com/NetFrameworkTemplates/vuetify-spa-netfx)               | .NET Framework Vuetify Material Webpack App         |
-
-| ASP.NET Core Framework Templates                                                    |                                                                        |
-|-------------------------------------------------------------------------------------|------------------------------------------------------------------------|
-| [react-lite-corefx](https://github.com/NetFrameworkCoreTemplates/react-lite-corefx) | .NET Framework ASP.NET Core lite (npm-free) React SPA using TypeScript |
-| [vue-lite-corefx](https://github.com/NetFrameworkCoreTemplates/vue-lite-corefx)     | .NET Framework ASP.NET Core lite (npm-free) Vue SPA using TypeScript   |
-
-
 .NET Framework Templates utilize MSBuild's classic project format which can be developed using either VS.NET or Rider.
 
 [![](/img/pages/ssvs/spa-templates-overview.png)](/img/pages/ssvs/spa-templates-overview.png)
@@ -300,60 +280,6 @@ Create new Angular Project for .NET Framework:
 
 ```bash
 $ x new angular-spa-netfx ProjectName
-```
-
-### [vuetify-spa](https://github.com/NetCoreTemplates/vuetify-spa)
-
-Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/) and the [vuetify cli plugin](https://github.com/vuetifyjs/vue-cli-plugin-vuetify).
-
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-spa.png)](https://github.com/NetCoreTemplates/vuetify-spa)
-
-Create new Vuetify Project for .NET 8.0:
-
-```bash
-$ x new vuetify-spa ProjectName
-```
-
-Create new Vuetify Project for .NET Framework:
-
-```bash
-$ x new vuetify-spa-netfx ProjectName
-```
-
-### [vue-nuxt](https://github.com/NetCoreTemplates/vue-nuxt)
-
-Bootstrapped with [Nuxt.js starter template](https://nuxtjs.org/guide/installation).
-
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-nuxt.png)](https://github.com/NetCoreTemplates/vue-nuxt)
-
-Create new Nuxt.js v1.4.2 Project for .NET 8.0:
-
-```bash
-$ x new vue-nuxt ProjectName
-```
-
-Create new Nuxt.js v1.4.2 Project for .NET Framework:
-
-```bash
-$ x new vue-nuxt-netfx ProjectName
-```
-
-### [vuetify-nuxt](https://github.com/NetCoreTemplates/vuetify-nuxt)
-
-Bootstrapped with [Nuxt.js + Vuetify.js starter template](https://github.com/vuetifyjs/nuxt).
-
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vuetify-nuxt.png)](https://github.com/NetCoreTemplates/vuetify-nuxt)
-
-Create new Nuxt Vuetify Project for .NET 8.0:
-
-```bash
-$ x new vuetify-nuxt ProjectName
-```
-
-Create new Nuxt Vuetify Project for .NET Framework:
-
-```bash
-$ x new vuetify-nuxt-netfx ProjectName
 ```
 
 ### SPA Project Templates Dev Workflow 

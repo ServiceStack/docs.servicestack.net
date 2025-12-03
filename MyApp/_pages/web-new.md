@@ -111,17 +111,8 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 ![](/img/pages/auth/signin/react-spa.png)
 
     $ x new react-spa ProjectName              # .NET Core
-    $ x new react-spa-netfx ProjectName        # Classic ASP.NET on .NET Framework
-
-#### react-lite
-
-> ASP.NET Core Simple + lite (npm-free) React SPA using TypeScript
-
-![](/img/pages/auth/signin/react-lite.png)
-
-    $ x new react-lite ProjectName             # .NET Core
-    $ x new react-lite-corefx ProjectName      # ASP.NET Core on .NET Framework
-
+    $ x new react-spa-netfx ProjectName        # Classic ASP.NET on .NET Framew
+    
 #### script
 
 > #Script Pages Bootstrap Website
@@ -140,25 +131,6 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
     $ x new vue-spa ProjectName                # .NET Core
     $ x new vue-spa-netfx ProjectName          # Classic ASP.NET on .NET Framework
-
-#### vue-lite
-
-> ASP.NET Core Simple + lite (npm-free) Vue SPA using TypeScript
-
-![](/img/pages/auth/signin/vue-lite.png)
-
-    $ x new vue-lite ProjectName               # .NET Core
-    $ x new vue-lite-corefx ProjectName        # ASP.NET Core on .NET Framework
-
-#### vue-nuxt
-
-> Nuxt.js SPA App with Bootstrap
-
-![](/img/pages/auth/signin/vue-nuxt.png)
-
-    $ x new vue-nuxt ProjectName               # .NET Core
-    $ x new vue-nuxt-netfx ProjectName         # Classic ASP.NET on .NET Framework
-
 
 ### Create Customized Projects with mix
 

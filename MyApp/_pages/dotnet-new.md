@@ -155,23 +155,6 @@ x new angular-spa-netfx ProjectName
 x new mvcauth ProjectName
 :::
 
-
-### vue-nuxt
-
-Nuxt.js SPA App with Bootstrap
-
-[![](/img/pages/auth/signin/vue-nuxt.png)](https://github.com/NetCoreTemplates/vue-nuxt)
-
-.NET 10+
-:::sh
-x new vue-nuxt ProjectName
-:::
-
-.NET Framework
-:::sh
-x new vue-nuxt-netfx ProjectName
-:::
-
 ### script
 
 `#Script` Pages Bootstrap Website
