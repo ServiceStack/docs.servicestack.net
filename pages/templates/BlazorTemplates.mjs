@@ -33,7 +33,7 @@ export default {
    </div>
    <div class="mb-2">
       <div class="flex justify-center text-center">
-         <a class="archive-url hover:no-underline" :href="zipUrl('NetCoreTemplates/blazor-wasm')">
+         <a class="archive-url hover:no-underline" :href="zipUrl('LegacyTemplates/blazor-wasm')">
             <div class="bg-white dark:bg-gray-800 px-4 py-4 mr-4 mb-4 rounded-lg shadow-lg text-center items-center justify-center hover:shadow-2xl dark:border-2 dark:border-pink-600 dark:hover:border-blue-600 dark:border-2 dark:border-pink-600 dark:hover:border-blue-600" style="min-width:150px">
                <div class="text-center font-extrabold flex items-center justify-center mb-2">
                   <div class="text-4xl text-blue-400 my-3">
