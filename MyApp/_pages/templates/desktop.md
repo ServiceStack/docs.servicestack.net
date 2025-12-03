@@ -142,9 +142,9 @@ But as it's the latest technology developed & promoted by .NET PR it's going to 
 so this project template is based on the UI of an empty Blazor WASM project, rewritten to use Vue SPA UI & a back-end 
 .NET Core App. It's an enhanced version that also includes examples of commonly useful features: 
 
-  1. [Home page](https://github.com/NetCoreTemplates/vue-desktop/blob/master/src/components/Home.ts) includes example of using 
+  1. [Home page](https://github.com/LegacyTemplates/vue-desktop/blob/master/src/components/Home.ts) includes example of using 
 [TypeScript Service Reference](/typescript-add-servicestack-reference) to consume typed APIs  
-  2. [Fetch data page](https://github.com/NetCoreTemplates/vue-desktop/blob/master/src/components/FetchData.ts) sources it's
+  2. [Fetch data page](https://github.com/LegacyTemplates/vue-desktop/blob/master/src/components/FetchData.ts) sources it's
 data from an embedded SQLite database querying an [AutoQuery Service](/autoquery/rdbms)
   3. Utilizes [built-in SVG support](/svg) for using Material Design & Custom SVG Icons 
   4. Utilizes [Win 32 Integration](https://sharpscript.net/sharp-apps/win32) showcasing how to call Win32 APIs from the UI
@@ -374,9 +374,9 @@ $ app run vuedesktop
 As [#Script](https://sharpscript.net/) is a scripting language utilizing JS syntax to invoke .NET APIs, the 
 [Win 32 support](https://sharpscript.net/sharp-apps/win32) ends up being both simple & intuitive.
 
-Where it calls the [CustomMethods.cs](https://github.com/NetCoreTemplates/vue-desktop/blob/master/CustomMethods.cs) .NET Win 32 APIs
+Where it calls the [CustomMethods.cs](https://github.com/LegacyTemplates/vue-desktop/blob/master/CustomMethods.cs) .NET Win 32 APIs
 (wrapped in a [#Script method](https://sharpscript.net/docs/methods)) directly from JS as done in 
-[App.ts](https://github.com/NetCoreTemplates/vue-desktop/blob/master/src/App.ts) which can be invoked using JS syntax
+[App.ts](https://github.com/LegacyTemplates/vue-desktop/blob/master/src/App.ts) which can be invoked using JS syntax
 using the `evaluateCode` TypeScript API, e.g:
 
 ```ts
@@ -481,16 +481,16 @@ Vue's integration with TypeScript is set to improve in Vue 3 which will be writt
 ### Typed DTOs
 
 The typing benefits of C# is also available when using TypeScript with 
-[type definitions](https://github.com/NetCoreTemplates/vue-desktop/tree/master/typings) available for all libraries
+[type definitions](https://github.com/LegacyTemplates/vue-desktop/tree/master/typings) available for all libraries
 which provides rich intelli-sense & type checking during development. 
 
 Thanks to ServiceStack's [Add TypeScript Reference](/typescript-add-servicestack-reference)
 feature, Types are also available for your C# Services which can be updated by running 
-[npm run dtos](https://github.com/NetCoreTemplates/vue-desktop/blob/master/package.json#L4) or `app ts` directly, e.g: 
+[npm run dtos](https://github.com/LegacyTemplates/vue-desktop/blob/master/package.json#L4) or `app ts` directly, e.g: 
 
     $ app ts
 
-Which will update all [dtos.ts](https://github.com/NetCoreTemplates/vue-desktop/blob/master/src/shared/dtos.ts) TypeScript
+Which will update all [dtos.ts](https://github.com/LegacyTemplates/vue-desktop/blob/master/src/shared/dtos.ts) TypeScript
 Reference DTOs with the latest changes which can be used together with the [@servicestack/client](https://github.com/ServiceStack/servicestack-client)
 generic Service Client to provide both a terse & typed API for consuming back-end end-to-end Typed C# APIs: 
 
@@ -566,7 +566,7 @@ like being included in the generated TypeScript client DTOs:
 $ npm run dtos 
 ```
 
-Which [FetchData.ts](https://github.com/NetCoreTemplates/vue-desktop/blob/master/src/components/FetchData.ts) uses to power its 
+Which [FetchData.ts](https://github.com/LegacyTemplates/vue-desktop/blob/master/src/components/FetchData.ts) uses to power its 
 dynamic Queryable UI by sending a populated `QueryWeatherForecasts` Request DTO configured with any filters and re-executed 
 on every input change:
 

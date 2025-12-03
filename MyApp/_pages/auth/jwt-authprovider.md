@@ -1096,7 +1096,7 @@ new AuthFeature {
 }
 ```
 
-Where if using a custom [SavePhotoSize](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/appsettings.Development.json#L30) will be resized using Microsoft Graph APIs, if the resized image size still exceeds the max allowable size in JWT Cookies it's swapped out for a URL reference to the image which ImageHandler stores in memory. The trade-off of this default is when your Docker App is re-deployed, whilst their stateless authentication keeps them authenticated, the original high-res photo saved in ImageHandler's memory will be lost, which will be replaced with the fallback `Svg.Icons.DefaultProfile` image.
+Where if using a custom [SavePhotoSize](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp/appsettings.Development.json#L30) will be resized using Microsoft Graph APIs, if the resized image size still exceeds the max allowable size in JWT Cookies it's swapped out for a URL reference to the image which ImageHandler stores in memory. The trade-off of this default is when your Docker App is re-deployed, whilst their stateless authentication keeps them authenticated, the original high-res photo saved in ImageHandler's memory will be lost, which will be replaced with the fallback `Svg.Icons.DefaultProfile` image.
 
 Using an MD5 hash does allow us to maintain URLs that's both predictable in that it will result in the same hash after every sign in, while also preventing information leakage that using a predictable User Id would do. A client-only solution that could retain their avatar across deployments is saving it to localStorage however that pushes the burden down to every client App using your APIs, which could be manageable if you control all of them.
 

@@ -153,7 +153,7 @@ The [Blazor WASM](/templates/blazor-bootstrap) template includes example App cus
 
 <ul class="list-none">
     <li>
-        <a href="https://github.com/NetCoreTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
+        <a href="https://github.com/LegacyTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
         <ul class="list-none">
             <li>
                 <span class="font-medium">/ui/docs</span>

@@ -55,11 +55,11 @@ Still not sure? familiarize yourself with their respective dev models by compari
 <jamstack-todos class="not-prose my-8 pb-8"></jamstack-todos>
 
 All projects utilize the same back-end ServiceStack Services with **TODOs MVC** implemented in
-[TodosServices.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceInterface/TodosServices.cs).
+[TodosServices.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceInterface/TodosServices.cs).
 
 
 As **Bookings CRUD** is an [AutoQuery CRUD](/autoquery/crud) API, it defines [all its functionality](/autoquery/crud-bookings) in its declarative
-[Bookings.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) DTOs and serves as a good example for the minimal dev model effort required to implement a typical Authenticated CRUD UI in each framework:
+[Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) DTOs and serves as a good example for the minimal dev model effort required to implement a typical Authenticated CRUD UI in each framework:
 
 ### Bookings CRUD
 
@@ -87,7 +87,6 @@ The optional `DEPLOY_CDN` secret lets you control whether to deploy your App's s
 | [vue-ssg](https://github.com/NetCoreTemplates/vue-ssg)                 | vue-ssg.jamstacks.net         | vue-ssg-api.jamstacks.net         |
 | [blazor](https://github.com/NetCoreTemplates/blazor)                   | blazor.web-templates.io       | blazor.web-templates.io           |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)                 | vue-spa.jamstacks.net         | vue-spa-api.jamstacks.net         |
-| [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm)         | blazor-wasm.web-templates.io  | blazor-wasm.web-templates.io      |
 
 ## Blazor WebAssembly
 
@@ -98,13 +97,6 @@ The [Blazor WebAssembly (WASM)](/templates/blazor-tailwind) template offers a pu
 ### Great Perceived Performance and SEO
 
 Typically the **large download sizes** & slow initial load times of Blazor WASM Apps would make it a poor choice for Internet hosted sites. However, our Blazor WASM template has largely mitigated this with easily maintainable built-in pre-rendering techniques to make every page appear to load quickly, including **instant loading** of its Markdown Pages courtesy of the GitHub Actions publish task generating & deploying pre-rendered content pages.
-
-<p class="pt-3 text-center">You can see the results of this in its live demo when loading the home page, which only has a slight delay:</p>
-
-<a class="flex flex-col justify-center items-center hover:no-underline mb-8" href="https://blazor-wasm.web-templates.io">
-    <h3 class="mb-3">blazor-wasm.web-templates.io</h3>
-    <img src="/img/pages/jamstack/blazor-wasm/home.png" class="border border-solid border-gray-200 max-w-screen-sm">
-</a>
 
 ### Learn more
 

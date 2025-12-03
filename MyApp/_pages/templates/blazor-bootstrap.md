@@ -25,7 +25,7 @@ Customize and Download a new Blazor WASM Bootstrap project with your preferred p
 Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/dotnet-new):
 
 :::sh
-x new blazor-wasm ProjectName
+x new LegacyTemplates/blazor-wasm ProjectName
 :::
 
 ## Optimal Development Workflow
@@ -79,7 +79,7 @@ If you're deploying your Blazor WASM UI to a CDN you'll need to specify the URL 
 
 ### Public Pages & Components
 
-To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` which gets injected with the `JsonApiClient` and provides short-hand access to its most common APIs:
+To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` which gets injected with the `JsonApiClient` and provides short-hand access to its most common APIs:
 
 ```csharp
 public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
@@ -95,7 +95,7 @@ public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
 
 ### Protected Pages & Components
 
-Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
+Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
 
 ```csharp
 public abstract class AppAuthComponentBase : AppComponentBase
@@ -230,7 +230,7 @@ All Input controls support contextual validation of ServiceStack's existing [str
 
 ### Themable
 
-Should it be needed, all components are themable by running the included [README.ss](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/Components/README.ss) executable documentation that copies its **Razor** UI markup locally into your project enabling customization of UI including controls.
+Should it be needed, all components are themable by running the included [README.ss](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/Components/README.ss) executable documentation that copies its **Razor** UI markup locally into your project enabling customization of UI including controls.
 
 ### Bookings CRUD
 
@@ -332,7 +332,7 @@ Below is an example of a CRUD Booking form [BookingsCrud/Create.razor](https://g
 }
 ```
 
-Which binds directly to the [CreateBooking](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) Request DTO:
+Which binds directly to the [CreateBooking](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) Request DTO:
 
 ```csharp
 [Tag("bookings"), Description("Create a new Booking")]
@@ -379,7 +379,7 @@ Validation errors use the standard `<form>` element and `api.Error` responses th
 
 #### Integrated Auth
 
-It uses the templates included [AppComponentBase](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which integrates with Blazor's Auth model allowing it to use its standard `[Authorize(Roles="Employee")]` attributes and provides access to the Authenticated User's info populated from Secure; HttpOnly JWT Cookies for secure stateless client Authentication that works across App deployments and without any server infrastructure.
+It uses the templates included [AppComponentBase](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which integrates with Blazor's Auth model allowing it to use its standard `[Authorize(Roles="Employee")]` attributes and provides access to the Authenticated User's info populated from Secure; HttpOnly JWT Cookies for secure stateless client Authentication that works across App deployments and without any server infrastructure.
 
 Public pages can inherit `AppComponentBase` to access ServiceStack.Blazor's [BlazorComponentBase](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Blazor/BlazorComponentBase.cs) and get access to `JsonApiClient` dependency and related functionality.
 
@@ -418,7 +418,7 @@ complexity of maintaining your Apps dependencies in both client and server proje
 optimal result since prerendering is typically used so Apps can host their SSG content on static file hosts, instead SSR does the 
 opposite whose forced runtime coupling to the .NET Server Host prohibits Blazor WASM Apps from being served from a CDN.
 
-As this defeats [many of the benefits](https://blazor-wasm.web-templates.io/docs/hosting) of a Blazor WASM Jamstack App in the first place, 
+As this defeats [many of the benefits](https://blazor.web-templates.io/docs/hosting) of a Blazor WASM Jamstack App in the first place, 
 we've instead opted for a more optimal solution that doesn't compromise its CDN hostability.
 
 ### Increasing Perceived Performance
@@ -443,12 +443,12 @@ But we can do even better than an inert content placeholder, and load a temporar
 before Blazor has loaded we need to implement this with a sprinkling of HTML + JS.
 
 First thing we need to do is move the scoped styles of our Apps
-[MainLayout](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/MainLayout.razor) and
-[NavMenu](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/NavMenu.razor) into an external
-[main-layout.css](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/wwwroot/css/main-layout.css) so our temp
+[MainLayout](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/MainLayout.razor) and
+[NavMenu](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/NavMenu.razor) into an external
+[main-layout.css](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/wwwroot/css/main-layout.css) so our temp
 App chrome can use it.
 
-Then in our [/wwwroot/index.html](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/wwwroot/index.html) anything
+Then in our [/wwwroot/index.html](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/wwwroot/index.html) anything
 between `<div id="app"></div>` is displayed whilst our Blazor App is loading, before it's replaced with the real App.
 
 So Here we just paste in the **MainLayout** markup:
@@ -542,11 +542,11 @@ which you'll see initially before being reverting to a flat border when the Blaz
 ```
 
 With just this, every page now benefits from an instant App chrome to give the perception that our App has loaded instantly
-before any C# in our Blazor App is run. E.g. here's what the [Blazor Counter](https://blazor-wasm.web-templates.io/counter) page looks like while it's loading:
+before any C# in our Blazor App is run. E.g. here's what the [Blazor Counter](https://blazor.web-templates.io/counter) page looks like while it's loading:
 
 ![](/img/pages/jamstack/blazor-wasm/loading.png)
 
-If you click refresh the [/counter](https://blazor-wasm.web-templates.io/counter) page a few times you'll see the new loading screen prior to the Counter page being available.
+If you click refresh the [/counter](https://blazor.web-templates.io/counter) page a few times you'll see the new loading screen prior to the Counter page being available.
 
 Our App is now in a pretty shippable state with decent UX of a loading page that looks like it loaded instantly instead
 of the "under construction" Loading... page from the default Blazor WASM project template.
@@ -556,12 +556,12 @@ need updating when add/removing menu items.
 
 ### Improving UX with Prerendering
 
-We'll now turn our focus to the most important page in our App, the [Home Page](https://blazor-wasm.web-templates.io) which is the page most people will see
+We'll now turn our focus to the most important page in our App, the [Home Page](https://blazor.web-templates.io) which is the page most people will see
 when loading the App from the first time.
 
 With the above temp App chrome already in place, a simple generic pre-rendering solution to be able to load any prerendered
 page is to check if any prerendered content exists in the
-[/prerender](https://github.com/NetCoreTemplates/blazor-wasm/tree/gh-pages/prerender)
+[/prerender](https://github.com/LegacyTemplates/blazor-wasm/tree/gh-pages/prerender)
 folder for the current path, then if it does replace the default index.html `Loading...` page with it:
 
 ```js
@@ -604,9 +604,9 @@ can easily be run from the command-line and importantly is supported by the [bUn
 be using to render component fragments in isolation.
 
 To distinguish prerendering tasks from our other Tests we've tagged
-[PrerenderTasks.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Tests/PrerenderTasks.cs)
+[PrerenderTasks.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Tests/PrerenderTasks.cs)
 with the `prerender` Test category. The only configuration the tasks require is the location of the `ClientDir` WASM Project
-defined in [appsettings.json](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Tests/appsettings.json)
+defined in [appsettings.json](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Tests/appsettings.json)
 that's setup in the constructor.
 
 The `Render<T>()` method renders the Blazor Page inside a `Bunit.TestContext` which it saves at the location
@@ -676,7 +676,7 @@ To have CI automatically run it when it creates a production build of our App we
 </Target>
 ```
 
-Which allows [GitHub Actions to run it](https://github.com/NetCoreTemplates/blazor-wasm/blob/9460ebf57d3e46af1680eb3a2ff5080e59d33a54/.github/workflows/release.yml#L80)
+Which allows [GitHub Actions to run it](https://github.com/LegacyTemplates/blazor-wasm/blob/9460ebf57d3e46af1680eb3a2ff5080e59d33a54/.github/workflows/release.yml#L80)
 when it publishes the App with:
 
 ```bash
@@ -684,14 +684,14 @@ $ dotnet publish -c Release /p:APP_TASKS=prerender
 ```
 
 Now when we next commit code, the GitHub CI Action will run the above task to generate our
-[/prerender/index.html](https://github.com/NetCoreTemplates/blazor-wasm/blob/gh-pages/prerender/index.html) page
-that now loads our [Home Page](https://blazor-wasm.web-templates.io) instantly!
+[/prerender/index.html](https://github.com/LegacyTemplates/blazor-wasm/blob/gh-pages/prerender/index.html) page
+that now loads our [Home Page](https://blazor.web-templates.io) instantly!
 
 [![](/img/pages/jamstack/blazor-wasm/home-prerendered.png)](/)
 
 The only issue now is that the default Blazor template behavior will yank our pre-rendered page, once during loading
 and another during Authorization. To stop the unwanted yanking we've updated the
-[`<Loading/>`](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/Loading.razor) component
+[`<Loading/>`](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Shared/Loading.razor) component
 to instead load the prerendered page content if it's **for the current path**:
 
 ```html
@@ -751,7 +751,7 @@ instead of the C# Blazor version.
 ### Prerendering Markdown Content
 
 The other pages that would greatly benefit from prerendering are the Markdown `/docs/*` pages (like this one) that's implemented in
-[Docs.razor](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/Docs.razor).
+[Docs.razor](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/Docs.razor).
 
 However to enable SEO friendly content our `fetch(/prerender/*)` solution isn't good enough as the initial page download
 needs to contain the prerendered content, i.e. instead of being downloaded in after.
@@ -759,10 +759,10 @@ needs to contain the prerendered content, i.e. instead of being downloaded in af
 ### PrerenderMarkdown Task
 
 To do this our `PrerenderMarkdown` Task scans all `*.md` pages in the
-[content](https://github.com/NetCoreTemplates/blazor-wasm/tree/main/MyApp.Client/wwwroot/content)
+[content](https://github.com/LegacyTemplates/blazor-wasm/tree/main/MyApp.Client/wwwroot/content)
 directory and uses the same
-[/MyApp.Client/MarkdownUtils.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/MarkdownUtils.cs)
-implementation [Docs.razor](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/Docs.razor)
+[/MyApp.Client/MarkdownUtils.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/MarkdownUtils.cs)
+implementation [Docs.razor](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/Docs.razor)
 uses to generate the markdown and embeds it into the `index.html` loading page to generate the pre-rendered page:
 
 ```csharp
@@ -868,7 +868,7 @@ Whilst the `wwwroot/index.html` is parsed with `PageTemplate` above who uses the
 within `<!--PAGE--><!--/PAGE-->` markers.
 
 After it's also executed by the same MSBuild task run by GitHub Actions it prerenders all `/wwwroot/content/*.md` pages
-which are written to the [/wwwroot/docs/*.html](https://github.com/NetCoreTemplates/blazor-wasm/tree/gh-pages/docs) folder.
+which are written to the [/wwwroot/docs/*.html](https://github.com/LegacyTemplates/blazor-wasm/tree/gh-pages/docs) folder.
 
 This results in the path to the pre-generated markdown docs i.e. [/docs/prerender](https://github.com/LegacyTemplates/blazor-tailwind/blob/main/MyApp.Client/wwwroot/content/prerender.md) having the **exact same path**
 as its route in the Blazor App, which when exists, CDNs give priority to over the SPA fallback the Blazor App is loaded with.

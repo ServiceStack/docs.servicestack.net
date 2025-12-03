@@ -25,7 +25,7 @@ The entire API Explorer UI is driven by the **rich metadata** around your APIs t
 
 If your AppHost has the ServiceStack [AuthFeature](/auth/authentication-and-authorization) plugin registered, the home page will display a **Sign In** dialog based on the its **configured Auth Providers**. 
 
-This is what you'll see in a new [Vue Vite](https://vue-vite-api.jamstacks.net/ui) project which has **Credentials** Auth, **JWT** as well as **Facebook**, **Google** and **Microsoft** OAuth providers registered in [Configure.Auth.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/Configure.Auth.cs)
+This is what you'll see in a new [Vue Vite](https://vue-vite-api.jamstacks.net/ui) project which has **Credentials** Auth, **JWT** as well as **Facebook**, **Google** and **Microsoft** OAuth providers registered in [Configure.Auth.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp/Configure.Auth.cs)
 
 ```csharp
 Plugins.Add(new AuthFeature(() => new CustomUserSession(),
@@ -150,7 +150,7 @@ Control types are based on the property types in your DTOs.
 | `<input type=checkbox>` | Boolean |
 | `<input type=text>`     | default |
 
-Where the `CreateBooking` Request DTO defined in [Bookings.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
+Where the `CreateBooking` Request DTO defined in [Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
 
 ```csharp
 [Tag("bookings"), Description("Create a new Booking")]
@@ -300,7 +300,7 @@ To become the preferred solution to document APIs, API Explorer was designed fro
 ### API Annotations
 
 Whilst the capability of adding rich API Docs is essential when needed, we expect plain C# attributes will often be used to document APIs where `[Description]` can be used to provide a short summary on a **Type** and its **Properties** whilst richer HTML markup can be added to any Type using `[Notes]` 
-as done in [Bookings.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
+as done in [Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
 
 ```csharp
 [Tag("bookings"), Description("Find Bookings")]
@@ -336,7 +336,7 @@ We can further enhance API Explorer with our own custom **HTML Components** by a
 
 <ul class="list-none">
     <li>
-        <a href="https://github.com/NetCoreTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
+        <a href="https://github.com/LegacyTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
         <ul class="list-none">
             <li>
                 <span class="font-medium">/ui</span>
@@ -345,12 +345,12 @@ We can further enhance API Explorer with our own custom **HTML Components** by a
                         <span class="font-medium">/docs</span>
                         <ul class="list-none">
                             <li>
-                                <a href="https://github.com/NetCoreTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/ui/docs/CreateBookingsDocs.html">
+                                <a href="https://github.com/LegacyTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/ui/docs/CreateBookingsDocs.html">
                                     CreateBookingsDocs.html
                                 </a>
                             </li>
                             <li>
-                                <a href="https://github.com/NetCoreTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/ui/docs/TodosDocs.html">
+                                <a href="https://github.com/LegacyTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/ui/docs/TodosDocs.html">
                                     TodosDocs.html
                                 </a>
                             </li>
@@ -362,7 +362,7 @@ We can further enhance API Explorer with our own custom **HTML Components** by a
                 <span class="font-medium">/shared</span>
                 <ul class="list-none">
                     <li>
-                        <a href="https://github.com/NetCoreTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/shared/Brand.html">
+                        <a href="https://github.com/LegacyTemplates/blazor-wasm/blob/dd71c4ee8eac0536ae8a3c4b70b515348d8daf85/MyApp/wwwroot/modules/shared/Brand.html">
                             Brand.html
                         </a>
                     </li>
@@ -375,7 +375,7 @@ We can further enhance API Explorer with our own custom **HTML Components** by a
 Where you can enhance any of your APIs or DTOs with rich API docs by adding **HTML Components** to `/modules/ui/docs/*.html` which gets included together with API Explorers own components in its single file download. API Explorer is built using [petite-vue](https://github.com/vuejs/petite-vue) which is a **6kb** subset of Vue optimized for progressive enhancement your components can also take advantage of to enhance it with rich dynamic UIs. 
 
 The `*.html` file names aren't important, to create an API doc component it just needs to be named `{Type}Docs`. Here's the simple component example 
-[CreateBookingsDocs.html](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/wwwroot/modules/ui/docs/CreateBookingsDocs.html) uses to generate its custom UI that just references the id of its `<template>` UI:
+[CreateBookingsDocs.html](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp/wwwroot/modules/ui/docs/CreateBookingsDocs.html) uses to generate its custom UI that just references the id of its `<template>` UI:
 
 ```html
 <script>App.components({ CreateBookingDocs: '#create-booking-docs' })</script>
@@ -521,7 +521,7 @@ Which results in being more productive then using C# attributes as changes are i
 ## Override built-in Components
 
 You're also able to completely replace **any of API Explorers built-in components** by adding a local file with the same path used in [/ServiceStack/modules](https://github.com/ServiceStack/ServiceStack/tree/master/src/ServiceStack/modules). The Blazor WASM template does with its local 
-[/modules/shared/Brand.html](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp/wwwroot/modules/shared/Brand.html) which overrides the top-right branding navigation for all API Explorer and Admin UIs:
+[/modules/shared/Brand.html](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp/wwwroot/modules/shared/Brand.html) which overrides the top-right branding navigation for all API Explorer and Admin UIs:
 
 <div class="flex justify-center py-8">
     <a href="https://vue-vite-api.jamstacks.net/ui/">

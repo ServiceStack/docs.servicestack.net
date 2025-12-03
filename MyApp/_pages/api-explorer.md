@@ -152,7 +152,7 @@ Control types are based on the property types in your DTOs.
 | `<input type=checkbox>` | Boolean |
 | `<input type=text>`     | default |
 
-Where the `CreateBooking` Request DTO defined in [Bookings.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
+Where the `CreateBooking` Request DTO defined in [Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
 
 ```csharp
 [Tag("bookings"), Description("Create a new Booking")]
@@ -302,7 +302,7 @@ To become the preferred solution to document APIs, API Explorer was designed fro
 ### API Annotations
 
 Whilst the capability of adding rich API Docs is essential when needed, we expect plain C# attributes will often be used to document APIs where `[Description]` can be used to provide a short summary on a **Type** and its **Properties** whilst richer HTML markup can be added to any Type using `[Notes]` 
-as done in [Bookings.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
+as done in [Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs):
 
 ```csharp
 [Tag("bookings"), Description("Find Bookings")]
@@ -338,7 +338,7 @@ We can further enhance API Explorer with our own custom [Vue.js Components](http
 
 <ul class="list-none">
     <li>
-        <a href="https://github.com/NetCoreTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
+        <a href="https://github.com/LegacyTemplates/blazor-wasm/tree/main/MyApp/wwwroot/modules" class="font-medium">/modules</a>
         <ul class="list-none">
             <li>
                 <span class="font-medium">/ui/docs</span>

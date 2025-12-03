@@ -32,21 +32,21 @@ title: Blazor Tailwind
 Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/dotnet-new):
 
 :::sh
-x new blazor-wasm ProjectName
+x new blazor ProjectName
 :::
 
 The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.
 
-<a href="https://blazor-wasm.web-templates.io">
+<a href="https://blazor.web-templates.io">
     <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
         <img class="" src="/img/pages/blazor/blazor-tailwind-splash.png">
     </div>
     <div class="pt-4 text-center">
-        blazor-wasm.web-templates.io
+        blazor.web-templates.io
     </div>
 </a>
 
-Since the release of .NET 8, we have been upgrading our [Blazor Templates](https://servicestack.net/start) and example applications to take advantage of some of the new features, including making use of static Server Side Rendering (SSR) for Blazor, which allows for faster initial page loads and better SEO, and our [blazor-wasm](https://github.com/NetCoreTemplates/blazor-wasm) template uses `InteractiveAuto` by default to provide a more Responsive UI.
+Since the release of .NET 8, we have been upgrading our [Blazor Templates](https://servicestack.net/start) and example applications to take advantage of some of the new features, including making use of static Server Side Rendering (SSR) for Blazor, which allows for faster initial page loads and better SEO, and our [blazor-wasm](https://github.com/LegacyTemplates/blazor-wasm) template uses `InteractiveAuto` by default to provide a more Responsive UI.
 
 ## What is InteractiveAuto?
 
@@ -564,7 +564,7 @@ If you're deploying your Blazor WASM UI to a CDN you'll need to specify the URL 
 
 ### Public Pages & Components
 
-To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` which gets injected with the `JsonApiClient` and provides short-hand access to its most common APIs:
+To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` which gets injected with the `JsonApiClient` and provides short-hand access to its most common APIs:
 
 ```csharp
 public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
@@ -580,7 +580,7 @@ public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
 
 ### Protected Pages & Components
 
-Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
+Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
 
 ```csharp
 public abstract class AppAuthComponentBase : AppComponentBase

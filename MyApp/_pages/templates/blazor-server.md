@@ -195,7 +195,7 @@ Upon **failure** the error response is populated in `api.Error` which binds to t
 
 ### Public Pages & Components
 
-To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` that gets injected with the `IClientFactory` and provides convenient access to most common APIs:
+To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` that gets injected with the `IClientFactory` and provides convenient access to most common APIs:
 
 ```csharp
 public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
@@ -217,7 +217,7 @@ public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
 
 ### Protected Pages & Components
 
-Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/NetCoreTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
+Pages and Components requiring Authentication should inherit from [AppAuthComponentBase](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) instead which integrates with Blazor's Authentication Model to provide access to the currently authenticated user:
 
 ```csharp
 public abstract class AppAuthComponentBase : AppComponentBase

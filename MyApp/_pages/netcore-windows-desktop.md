@@ -948,7 +948,7 @@ xapp://spirals
 
 ### Vue Desktop Template
 
-To simplify the development UX we've created the [vue-desktop](https://github.com/NetCoreTemplates/vue-desktop) .NET Core Desktop Project Template with integrated scripts for building, bundling and publishing Windows Desktop Apps:
+To simplify the development UX we've created the [vue-desktop](https://github.com/LegacyTemplates/vue-desktop) .NET Core Desktop Project Template with integrated scripts for building, bundling and publishing Windows Desktop Apps:
 
 > YouTube [youtu.be/kRnQSWdqH6U](https://youtu.be/kRnQSWdqH6U)
 
@@ -1168,7 +1168,7 @@ This will generate 2 files:
 
 ![](/img/pages/app/vue-desktop/vuedesktop-publish-exe.png)
 
-The `*.zip` contains both the `/dist` of your App and the `app` Chromium runtime as well as a convenience [install.ps1](https://github.com/NetCoreTemplates/vue-desktop/blob/master/scripts/install.ps1) script that users can use to effortlessly install the App with the `Win+R` shortcut to bring up Windows **Run** dialog then pasting this powershell cmd-let with the URL of your `install.ps1` script:
+The `*.zip` contains both the `/dist` of your App and the `app` Chromium runtime as well as a convenience [install.ps1](https://github.com/LegacyTemplates/vue-desktop/blob/master/scripts/install.ps1) script that users can use to effortlessly install the App with the `Win+R` shortcut to bring up Windows **Run** dialog then pasting this powershell cmd-let with the URL of your `install.ps1` script:
 
 ```bash
 powershell Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://org.example/install.ps1'))

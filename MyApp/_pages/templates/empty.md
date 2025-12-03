@@ -27,7 +27,7 @@ The templates below follow our recommended [physical project layout](/physical-p
     </td>
 </tr>
 <tr>
-    <td><a href="https://github.com/NetCoreTemplates/selfhost">selfhost</a></td>
+    <td><a href="https://github.com/LegacyTemplates/selfhost">selfhost</a></td>
     <td><a href="https://github.com/NetFrameworkTemplates/selfhost-netfx">selfhost-netfx</a></td>
     <td><a href="https://github.com/NetFrameworkCoreTemplates/web-corefx">selfhost-corefx</a></td>
     <td align="center">

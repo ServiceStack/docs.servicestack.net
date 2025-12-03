@@ -369,7 +369,7 @@ Both `razor` and `templates` project enjoy Hot Reloading where in development a 
 
 ### Empty Web and SelfHost Templates
 
-Those who prefer starting from an Empty slate can use the `web` template to create the minimal configuration for a Web Application whilst the `selfhost` template can be used to develop Self-Hosting Console Apps. Both templates still follow our recommended physical project layout but are configured with the minimum number of dependencies, e.g. the `selfhost` Console App just has a dependency on [Microsoft.AspNetCore.Server.Kestrel and ServiceStack](https://github.com/NetCoreTemplates/selfhost/blob/f11b25e80752d1fee96ac904a8df07fb150ee746/MyApp/MyApp.csproj#L11-L12), in contrast most templates have a dependency on the all-encompasing `Microsoft.AspNetCore.All` meta package.
+Those who prefer starting from an Empty slate can use the `web` template to create the minimal configuration for a Web Application whilst the `selfhost` template can be used to develop Self-Hosting Console Apps. Both templates still follow our recommended physical project layout but are configured with the minimum number of dependencies, e.g. the `selfhost` Console App just has a dependency on [Microsoft.AspNetCore.Server.Kestrel and ServiceStack](https://github.com/LegacyTemplates/selfhost/blob/f11b25e80752d1fee96ac904a8df07fb150ee746/MyApp/MyApp.csproj#L11-L12), in contrast most templates have a dependency on the all-encompasing `Microsoft.AspNetCore.All` meta package.
 
 #### Empty Web Template
 
@@ -379,7 +379,7 @@ Those who prefer starting from an Empty slate can use the `web` template to crea
  
 #### Empty SelfHost Console App Template
 
- - .NET Core: [selfhost](https://github.com/NetCoreTemplates/selfhost)
+ - .NET Core: [selfhost](https://github.com/LegacyTemplates/selfhost)
  - .NET Framework: [selfhost-netfx](https://github.com/NetFrameworkTemplates/selfhost-netfx)
 
 ### .NET Core 2.0 ServiceStack WebApp Template
