@@ -2,6 +2,8 @@
 title: React Templates
 ---
 
+::include react-templates.md::
+
 ## First-Class React + Tailwind for AI-First Development
 
 We're witnessing a fundamental shift in how applications are built. AI code generation has evolved from a novelty to a productivity multiplier that's become too significant to ignore. While AI models still require oversight for production backend systems, they excel at generating frontend UIs—compressing development timelines that once took months into days.
