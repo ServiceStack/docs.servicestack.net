@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-12-04T15:22:08.9742101Z'>
+    <meta name='date' content='2025-12-04T16:39:42.1740713Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v10</title>
@@ -1028,23 +1028,22 @@ AI models are only going to get better at understanding codebases and generating
 <pre><code class="language-csharp">public partial class CreateBooking
     : IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
 {
-    [Validate(&quot;NotEmpty&quot;)]
-    public virtual string Name { get; set; }
+    [ValidateNotEmpty]
+    public string Name { get; set; }
 
-    public virtual RoomType RoomType { get; set; }
+    public RoomType RoomType { get; set; }
 
-    [Validate(&quot;GreaterThan(0)&quot;)]
-    public virtual int RoomNumber { get; set; }
+    [ValidateGreaterThan(0)]
+    public int RoomNumber { get; set; }
 
-    [Validate(&quot;GreaterThan(0)&quot;)]
-    public virtual decimal Cost { get; set; }
+    public DateTime BookingStartDate { get; set; }
+    public DateTime? BookingEndDate { get; set; }
 
-    [Required]
-    public virtual DateTime BookingStartDate { get; set; }
+    [ValidateGreaterThan(0)]
+    public decimal Cost { get; set; }
 
-    public virtual DateTime? BookingEndDate { get; set; }
-    public virtual string Notes { get; set; }
-    public virtual string CouponId { get; set; }
+    public string? Notes { get; set; }
+    public bool? Cancelled { get; set; }
 }
 </code></pre>
 <p>They're now being generated for optional (i.e. non-required) nullable Reference Types as well:</p>
@@ -1055,42 +1054,36 @@ AI models are only going to get better at understanding codebases and generating
     public virtual string Name { get; set; }
 
     public virtual RoomType RoomType { get; set; }
-
     [Validate(&quot;GreaterThan(0)&quot;)]
     public virtual int RoomNumber { get; set; }
 
+    public virtual DateTime BookingStartDate { get; set; }
+    public virtual DateTime? BookingEndDate { get; set; }
     [Validate(&quot;GreaterThan(0)&quot;)]
     public virtual decimal Cost { get; set; }
 
-    [Required]
-    public virtual DateTime BookingStartDate { get; set; }
-
-    public virtual DateTime? BookingEndDate { get; set; }
     public virtual string? Notes { get; set; }
-    public virtual string? CouponId { get; set; }
+    public virtual bool? Cancelled { get; set; }
 }
 </code></pre>
 <p>This is also reflected in generated TypeScript DTOs where required reference properties like <code>name</code> are no longer optional and optional reference properties like <code>notes</code> are now correctly annotated as optional:</p>
 <pre><code class="language-ts">export class CreateBooking implements IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
 {
-    /** @description Name this Booking is for */
     // @Validate(Validator=&quot;NotEmpty&quot;)
     public name: string;
 
-    public roomType?: RoomType;
+    public roomType: RoomType;
     // @Validate(Validator=&quot;GreaterThan(0)&quot;)
-    public roomNumber?: number;
+    public roomNumber: number;
 
-    // @Validate(Validator=&quot;GreaterThan(0)&quot;)
-    public cost?: number;
-
-    // @Required()
     public bookingStartDate: string;
-
     public bookingEndDate?: string;
-    public notes?: string;
-    public couponId?: string;
+    // @Validate(Validator=&quot;GreaterThan(0)&quot;)
+    public cost: number;
 
+    public notes?: string;
+    public cancelled?: boolean;
+    
     public constructor(init?: Partial&lt;CreateBooking&gt;) { (Object as any).assign(this, init); }
     public getTypeName() { return 'CreateBooking'; }
     public getMethod() { return 'POST'; }
