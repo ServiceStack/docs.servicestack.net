@@ -5,7 +5,7 @@ slug: templates-overview
 
 ServiceStack accelerates .NET development with battle-tested templates for building modern applications - from high-performance Web APIs and backend services to full-stack web apps, microservices, and cloud-native solutions. Whether you're building a Jamstack site, a Blazor application, or a serverless API, ServiceStack provides the foundation to ship faster.
 
-:::copy
+:::sh
 npx create-net ls
 :::
 
@@ -23,10 +23,10 @@ Where it will display all repositories in [.NET 10](https://github.com/NetCoreTe
 $ npx create-net `<template>` `<name>`
 ```
 
-For example to create a new **Vue Single Page App**, run:
+For example to create a new **Next.js statically generated React App**, run:
 
 :::sh
-npx create-net vue-spa ProjectName
+npx create-net next-static ProjectName
 :::
 
 Or download a customized project template from our Getting Started Page:

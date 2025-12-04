@@ -25,13 +25,12 @@ built-in ASP.NET Core React SPA template with many new value-added and high-prod
 </div>
 </div>
 
-:::{.text-center}
-## Live Demo
-:::
-
-:::{.shadow .pb-1}
-[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-spa.png)](https://react-spa.react-templates.net)
-:::
+<vibe-template
+  template="react-spa"
+  title="React SPA"
+  description="A feature-rich React Single Page Application powered by Vite. Includes Blog functionality, Todos, shadcn/ui components, API Keys management, AI Chat capabilities, and Swagger UI - all integrated with a robust .NET backend."
+  href="https://react-templates.net/docs/templates/react-spa"
+  screenshot="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/wwwroot/img/pages/react/react-spa.webp?raw=true"></vibe-template>
 
 ## ASP.NET Core React SPA Template 
 
