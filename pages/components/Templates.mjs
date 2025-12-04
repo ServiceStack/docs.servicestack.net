@@ -8,6 +8,11 @@ export function template(repo, name, icon, tags, demo, mix) {
 
 export const Index = [
     template('web', 'Web', 'ServiceStack', ['empty']),
+    template('nextjs', 'Next.js', 'Nextjs',['next','featured']),
+    template('next-rsc', 'Next.js RSC', 'Nextjs',['next','rsc']),
+    template('next-static', 'Next.js Static', 'Nextjs',['next','static']),
+    template('react-static', 'React Static', 'React',['react','static']),
+    template('react-spa', 'React SPA', 'React',['react','featured']),
     template('blazor', 'Blazor', 'Blazor', ['tailwind']),
     template('blazor-vue', 'Blazor Vue', 'Blazor',['tailwind']),
     template('mvc', 'MVC', 'Windows',['tailwind']),
@@ -15,15 +20,12 @@ export const Index = [
     template('mvc-bootstrap', 'MVC', 'Windows',['bootstrap']),
     template('razor-bootstrap', 'Razor Pages', 'Razor',['bootstrap']),
     template('vue-mjs', 'Razor Pages', 'Razor',['tailwind','autoquery']),
-    template('nextjs', 'Next.js', 'Nextjs',['tailwind','autoquery']),
     template('vue-vite', 'Vue Vite', 'Vue',['tailwind','autoquery']),
     template('vue-ssg', 'Vue SSG', 'Vue',['tailwind','autoquery']),
     template('razor-pages', 'Razor Pages', 'Razor',['bootstrap']),
     template('mvcauth', 'MVC', 'Windows',['bootstrap']),
     template('script', 'MVC', 'Windows',['bootstrap']),
     template('vue-spa', 'Vue SPA', 'Vue',['tailwind']),
-    template('react-static', 'React Static', 'React',['tailwind','autoquery']),
-    template('react-spa', 'React SPA', 'React',['tailwind','autoquery']),
     template('angular-spa', 'Angular SPA', 'Angular',['tailwind']),
     template('kmp-desktop', 'Compose Desktop', 'Compose',['kotlin','desktop']),
 ].reduce((acc, template) => { acc[template.repo] = template; return acc}, {})
