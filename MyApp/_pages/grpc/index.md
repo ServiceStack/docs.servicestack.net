@@ -17,7 +17,7 @@ The easiest way to get started is to start from a new [grpc](https://github.com/
 empty [web](https://github.com/NetCoreTemplates/web) project template pre-configured with gRPC support:
 
 :::sh
-x new grpc MyGrpcProject
+npx create-net grpc MyGrpcProject
 :::
 
 ### ServiceStack Services are gRPC Services

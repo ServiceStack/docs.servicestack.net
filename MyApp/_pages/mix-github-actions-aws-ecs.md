@@ -47,12 +47,12 @@ Once created, follow the GitHub wizard and clone it to your local machine.
 
 Then you can use the following commands to get your new ServiceStack application setup in GitHub with GitHub Actions.
 > Choose the appropriate web template from `x new` for your needs as most templates are compatible GitHub Actions `x mix` templates.
-> `x new web` will create a project in an existing directory, `x new web WebApp` will create the project in a new `WebApp` folder.
+> `npx create-net web` will create a project in an existing directory, `npx create-net web WebApp` will create the project in a new `WebApp` folder.
 
 ```
 git clone <Git URL>
 cd WebApp
-x new web
+npx create-net web
 git add -A
 git commit -m "Initial commit"
 git branch -M main

@@ -16,7 +16,7 @@ For new projects we recommend starting with the new [ASP.NET Core Identity Auth]
 Create new `mvcidentity` project with:
 
 :::sh
-x new mvcidentity ProjectName
+npx create-net mvcidentity ProjectName
 :::
 
 [mvcidentity](https://github.com/LegacyTemplates/mvcidentity) is essentially the same App with the same functionality as [mvcauth](https://github.com/NetCoreTemplates/mvcauth)

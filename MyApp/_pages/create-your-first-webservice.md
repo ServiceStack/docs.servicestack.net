@@ -25,7 +25,7 @@ Unless you're restricted to working with .NET Framework you'll want to start wit
 we'll start with the Empty [web](https://github.com/NetCoreTemplates/web) template which implicitly uses the folder name for the Project Name:
 
 :::sh
-x new web WebApp
+npx create-net web WebApp
 :::
 
 ## Step 3: Run your project

@@ -33,7 +33,7 @@ The Flutter integration works with ServiceStack `grpc` template that has been *c
 For example, you could [start with a new](/dotnet-new) `grpc` ServiceStack project to host your services via gRPC, and add a working Flutter client which connects via gRPC using the mix template.
 
 ```bash
-$ x new grpc MyApp
+$ npx create-net grpc MyApp
 ```
 
 Then from your new solution directory `MyApp`, mix in the Flutter application using:

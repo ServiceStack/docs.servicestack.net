@@ -22,7 +22,7 @@ dotnet tool install --global x
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc.png)](https://github.com/NetCoreTemplates/mvc)
 
 :::sh
-x new mvc ProjectName
+npx create-net mvc ProjectName
 :::
 
 ## MVC with Integrated Auth
@@ -34,7 +34,7 @@ x new mvc ProjectName
 [![](/img/pages/auth/signin/mvcauth.png)](https://github.com/NetCoreTemplates/mvcauth)
 
 :::sh
-x new mvcauth ProjectName
+npx create-net mvcauth ProjectName
 :::
 
 ::: tip

@@ -237,13 +237,13 @@ Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/).
 Create new Vue 2.5 Project for .NET 8.0:
 
 ```bash
-$ x new vue-spa ProjectName
+$ npx create-net vue-spa ProjectName
 ```
 
 Create new Vue 2.5 Project for .NET Framework:
 
 ```bash
-$ x new vue-spa-netfx ProjectName
+$ npx create-net vue-spa-netfx ProjectName
 ```
 
 ### [react-spa](https://github.com/NetCoreTemplates/react-spa)
@@ -255,13 +255,13 @@ Bootstrapped with [create-react-app](https://github.com/facebook/create-react-ap
 Create new React 16 Project for .NET 8.0:
 
 ```bash
-$ x new react-spa ProjectName
+$ npx create-net react-spa ProjectName
 ```
 
 Create new React 16 Project for .NET Framework:
 
 ```bash
-$ x new react-spa-netfx ProjectName
+$ npx create-net react-spa-netfx ProjectName
 ```
 
 ### [angular-spa](https://github.com/NetCoreTemplates/angular-spa)
@@ -273,13 +273,13 @@ Bootstrapped with [Angular CLI](https://cli.angular.io).
 Create new Angular Project for .NET 8.0:
 
 ```bash
-$ x new angular-spa ProjectName
+$ npx create-net angular-spa ProjectName
 ```
 
 Create new Angular Project for .NET Framework:
 
 ```bash
-$ x new angular-spa-netfx ProjectName
+$ npx create-net angular-spa-netfx ProjectName
 ```
 
 ### SPA Project Templates Dev Workflow 
@@ -342,7 +342,7 @@ This also highlights one of the benefits of utilizing npm's vibrant ecosystem wh
 Create new Parcel Template:
 
 ```bash
-$ x new parcel ProjectName
+$ npx create-net parcel ProjectName
 ```
 
 [Parcel](https://parceljs.org) aims to provide the simplest out-of-the-box development experience for creating modern npm-powered 

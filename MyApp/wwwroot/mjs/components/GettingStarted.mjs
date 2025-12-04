@@ -13,7 +13,7 @@ export default {
              class="mb-8 sm:text-lg rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 dark:bg-gray-800"/>
 
       <ShellCommand class="mb-2">dotnet tool install -g x</ShellCommand>
-      <ShellCommand class="mb-2">x new {{template}} {{project}}</ShellCommand>
+      <ShellCommand class="mb-2">npx create-net {{template}} {{project}}</ShellCommand>
 
       <h4 class="py-6 text-center text-xl">In <span class="font-semibold text-indigo-700">/MyApp</span>, Run Tailwind</h4>
       <ShellCommand class="mb-2">npm run ui:dev</ShellCommand>

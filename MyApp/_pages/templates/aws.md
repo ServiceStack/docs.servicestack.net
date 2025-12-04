@@ -26,7 +26,7 @@ Create new project with [x dotnet tool](/dotnet-new):
 
 ```bash
 $ dotnet tool install -g x
-$ x new aws-lambda ProjectName
+$ npx create-net aws-lambda ProjectName
 ```
 
 ### Prerequisites

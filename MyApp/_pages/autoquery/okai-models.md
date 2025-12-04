@@ -170,7 +170,7 @@ To generate a CRUD Admin UI you'll need to use okai within a new Blazor Admin pr
 Blazor Vue ([blazor-vue](https://blazor-vue.web-templates.io)) project:
 
 :::sh
-x new blazor-admin Acme
+npx create-net blazor-admin Acme
 :::
 
 Which support a "Modular no-touch" Admin UI that will appear under a new group in the Admin Sidebar:

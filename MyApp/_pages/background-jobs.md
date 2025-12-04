@@ -94,7 +94,7 @@ Emails when SMTP is enabled. So the easiest way to get started with ServiceStack
 [create a new Identity Auth Project](https://servicestack.net/start), e.g:
 
 :::sh
-x new blazor-vue MyApp
+npx create-net blazor-vue MyApp
 :::
 
 ### Exiting .NET 8 Templates

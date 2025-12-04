@@ -226,7 +226,7 @@ See the annotated guide below to follow along:
 Create a new [grpc](https://github.com/NetCoreTemplates/grpc) .NET Core project and open it in VS Code:
 
 :::sh
-x new grpc NorthwindApi
+npx create-net grpc NorthwindApi
 code NorthwindApi
 :::
 

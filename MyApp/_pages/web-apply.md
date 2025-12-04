@@ -171,7 +171,7 @@ If we decided later we wanted to switch to use **SQL Server** instead we can jus
 
 This isn't just limited to gist projects, you can also apply gists when **creating new projects**:
 
-    $ x new script+postgres+auth-db
+    $ npx create-net script+postgres+auth-db
 
 Which will create a [script](https://github.com/NetCoreTemplates/script) project configured to use **PostgreSQL Auth**.
 

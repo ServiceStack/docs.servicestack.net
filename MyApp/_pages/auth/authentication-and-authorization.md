@@ -320,7 +320,7 @@ Most of [ServiceStack's Project Templates](/dotnet-new) are configured with Auth
 project template:
 
 :::sh
-x new web ProjectName
+npx create-net web ProjectName
 :::
 
 By [mixing in your desired auth](/mix-tool#mix-in-auth-repository) features, e.g. to configure your App to enable auth & maintain in SQL Server run:

@@ -515,7 +515,7 @@ The following step-by-step guide will show you how to create, prepare, and deplo
 
 ### 1. Building Blocks: Creating Your .NET Application
 
-Kick-off your development process by creating your .NET application. In this example, we use the ServiceStack's `x` tool to create our web app from a template with the command `x new web MyApp`.
+Kick-off your development process by creating your .NET application. In this example, we use the ServiceStack's `x` tool to create our web app from a template with the command `npx create-net web MyApp`.
 
 Your application will have a structure that may look something like this:
 

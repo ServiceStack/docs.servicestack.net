@@ -49,7 +49,7 @@ Where it will display all repositories in [.NET Core](https://github.com/NetCore
 
 #### Usage
 
-x new `<template>` `<name>`
+npx create-net `<template>` `<name>`
 
 For example to create a new **Vue Single Page App**, run:
 

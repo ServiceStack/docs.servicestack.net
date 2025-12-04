@@ -32,7 +32,7 @@ title: Blazor Tailwind
 Alternatively you can create & download a new Blazor Project with the [x dotnet tool](/dotnet-new):
 
 :::sh
-x new blazor ProjectName
+npx create-net blazor ProjectName
 :::
 
 The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.

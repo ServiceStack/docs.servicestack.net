@@ -548,7 +548,7 @@ Authentication integration allowing each authenticated user to manage their own 
 To follow video's example, start with a new **Acme** project from `sharp` .NET Core Template:
 
 :::sh
-x new script Acme
+npx create-net script Acme
 :::
 
 Add the `example-validation` mix:

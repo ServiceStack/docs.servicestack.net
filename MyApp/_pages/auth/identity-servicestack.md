@@ -12,7 +12,7 @@ title: Using ServiceStack Auth in MVC
 Create new `mvcauth` project with:
 
 :::sh
-x new mvcauth ProjectName
+npx create-net mvcauth ProjectName
 :::
 
 The ServiceStack Auth is pre-configured to persist users in an OrmLite Auth Repository (default SQLite) and enables both local

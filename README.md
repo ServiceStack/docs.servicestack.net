@@ -8,13 +8,13 @@
 
     $ dotnet tool install -g x
 
-    $ x new razor-ssg ProjectName
+    $ npx create-net razor-ssg ProjectName
 
 Alternatively write new project files directly into an razor-ssg repository, using the Directory Name as the ProjectName:
 
     $ git clone https://github.com/<User>/<ProjectName>.git
     $ cd <ProjectName>
-    $ x new razor-ssg
+    $ npx create-net razor-ssg
 
 ## Documentation
 

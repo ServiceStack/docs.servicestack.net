@@ -166,7 +166,7 @@ Download a new Razor Press Project with you preferred Project name below:
 Alternatively you can install a new project template using the [x dotnet tool](https://docs.servicestack.net/dotnet-tool):
 
 :::sh
-x new razor-press ProjectName
+npx create-net razor-press ProjectName
 :::
 
 ### Use Cases

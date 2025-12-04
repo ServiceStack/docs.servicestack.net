@@ -10,7 +10,7 @@ $ dotnet tool install --global x
 ```
 
 ```bash
-$ x new mvc AcmeMvc
+$ npx create-net mvc AcmeMvc
 ```
 
 Which will create a new .NET 8.0 MVC Project called **AcmeMvc**. The Template Names, Source Code and Live Demos for each Website Template is available below:

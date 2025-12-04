@@ -43,5 +43,5 @@ export SSL_CERT_DIR=/dev/null
 Finally you can try running the `x` tool with the `--ignore-ssl-errors` switch, e.g:
 
 ```bash
-$ x new vue-lite VueLite --ignore-ssl-errors
+$ npx create-net vue-lite VueLite --ignore-ssl-errors
 ```

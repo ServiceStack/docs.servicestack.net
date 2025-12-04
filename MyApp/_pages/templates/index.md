@@ -50,13 +50,13 @@ Where it will display all repositories in [.NET Core](https://github.com/NetCore
 #### Usage
 
 ```bash
-$ x new `<template>` `<name>`
+$ npx create-net `<template>` `<name>`
 ```
 
 For example to create a new **Vue Single Page App**, run:
 
 :::sh
-x new vue-spa ProjectName
+npx create-net vue-spa ProjectName
 :::
 
 Alternatively you can write new project files directly into an empty repository using the Directory Name as the ProjectName:
@@ -64,7 +64,7 @@ Alternatively you can write new project files directly into an empty repository 
 ```bash
 $ git clone https://github.com/<User>/<ProjectName>.git
 $ cd <ProjectName>
-$ x new vue-spa
+$ npx create-net vue-spa
 ```
 
 Or download a customized project template from our Getting Started Page:

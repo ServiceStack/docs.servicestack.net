@@ -283,13 +283,13 @@ The easiest way to include the Identity Auth UI Pages to your App is to copy you
 that already includes them, you can create a new Blazor App with:
 
 :::sh
-x new blazor ProjectNamespace
+npx create-net blazor ProjectNamespace
 :::
 
 Or create a new MVC App with:
 
 :::sh
-x new mvc ProjectNamespace
+npx create-net mvc ProjectNamespace
 :::
 
 Alternatively you can manually copy the pages from the project template repositories, for Blazor most of the Identity Auth

@@ -116,7 +116,7 @@ dotnet tool install --global x
 This tool allows you to create new projects and add (mix in) functionality quickly and easily. To create a new web project, you can use the following command:
 
 ```bash
-x new web ProjectName
+npx create-net web ProjectName
 ```
 
 To add Redis support to your project, navigate to your project directory and then use the `mix` command:

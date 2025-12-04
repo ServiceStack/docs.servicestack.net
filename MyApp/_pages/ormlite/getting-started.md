@@ -348,7 +348,7 @@ If you're planning on using OrmLite within a ServiceStack project, you can strea
 
 ```bash
 # Create new project
-x new web MyApp
+npx create-net web MyApp
 # Navigate into new project
 cd MyApp
 # Mix in OrmLite SQLite support

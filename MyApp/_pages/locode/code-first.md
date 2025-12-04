@@ -57,7 +57,7 @@ dotnet tool install --global x
 Once installed, a new `web` template can be created using:
 
 :::sh
-x new web MyProjectName
+npx create-net web MyProjectName
 :::
 
 ### Mix in a database and AutoQuery

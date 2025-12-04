@@ -20,7 +20,7 @@ dotnet tool install --global x
 This will let you create any [ServiceStack Project Template](/start) with your preferred Project Name from the command-line, e.g:
 
 :::sh
-x new blazor-vue DatabaseTest
+npx create-net blazor-vue DatabaseTest
 :::
 
 Which creates a new .NET App that you can open with your preferred .NET IDE or text editor, e.g:

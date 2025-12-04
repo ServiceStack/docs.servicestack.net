@@ -31,7 +31,7 @@ The Flutter integration works with most ServiceStack templates. It does make the
 For example, you could [start with a new](/dotnet-new) `web` ServiceStack project to host your web services, and add a working Flutter client using the mix template.
 
 ```bash
-$ x new web MyApp
+$ npx create-net web MyApp
 ```
 
 Then from your new solution directory `MyApp`, mix in the Flutter application using:

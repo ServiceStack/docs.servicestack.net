@@ -31,7 +31,7 @@ Kamal is built by the BaseCamp team, developers of Hey email service and BaseCam
 
 1. Create a new ServiceStack application:
 ```bash
-x new blazor-vue MyApp
+npx create-net blazor-vue MyApp
 ```
 
 2. Generate deployment SSH key:
