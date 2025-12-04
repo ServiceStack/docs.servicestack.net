@@ -57,9 +57,9 @@ export default {
         </a>
       </div>
         <div class="mt-6 not-prose flex flex-col items-center gap-3">
-            <span class="text-sm text-muted-foreground font-mono">{{ template }}.react-templates.net</span>
+            <a :href="liveDemoHref" class="text-sm text-muted-foreground font-mono">{{ liveDemoHref.substring(8) }}</a>
             <div class="flex flex-wrap justify-center gap-4">
-            <a :href="'https://' + template + '.react-templates.net'"
+            <a :href="liveDemoHref"
                class="group inline-flex items-center gap-2 px-4 py-2 bg-[#61DAFB] hover:bg-[#4fa8c7] text-gray-900 font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -96,8 +96,23 @@ export default {
     },
     setup(props) {
         const command = computed(() => `npx create-net ${props.template} MyProject`)
+
+        const reactTemplates = [
+          'react-static',
+          'react-spa',
+          'nextjs',
+          'next-rsc',
+          'next-static',
+        ]
+
+        const liveDemoHref = computed(() => 
+          'https://' + props.template + (reactTemplates.includes(props.template) 
+            ? '.react-templates.net' 
+            : '.web-templates.io'))
+
         return { 
-            command
+            command,
+            liveDemoHref,
         }
     }
 }

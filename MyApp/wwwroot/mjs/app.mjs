@@ -10,6 +10,7 @@ import { PagingNav, FileLayout } from './components/Docs.mjs'
 import Typesense from "./components/Typesense.mjs"
 import ProjectTemplate from "./components/ProjectTemplate.mjs"
 import ProjectCreator from "./components/ProjectCreator.mjs"
+import VibeTemplate from "../pages/components/VibeTemplate.mjs"
 
 let client = null, Apps = []
 let AppData = {
@@ -57,6 +58,7 @@ const Components = {
     Typesense,
     ProjectTemplate,
     ProjectCreator,
+    VibeTemplate,
 }
 const CustomElements = [
     'lite-youtube'
