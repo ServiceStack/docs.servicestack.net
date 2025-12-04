@@ -2,6 +2,12 @@
 title: Angular Bootstrap Project Template
 ---
 
+:::warning DEPRECATED
+The Angular Bootstrap Template has been deprecated in favor of the
+[Angular SPA Project Template](/templates/angular)
+:::
+
+
 <div class="not-prose my-8 ml-20 flex justify-center"><svg style="max-width:200px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 250 250" xml:space="preserve">
 <g>

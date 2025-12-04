@@ -3,6 +3,10 @@ title: Run ASP.NET Core Apps on the .NET Framework
 slug: templates-corefx
 ---
 
+:::warning DEPRECATED
+The ASP.NET Core on .NET Framework Project Templates have been deprecated in favor of using [.NET 10 Templates](/templates/)
+:::
+
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/web.png)
 
 ### Status of ASP.NET Core on .NET Framework

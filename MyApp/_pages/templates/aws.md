@@ -3,6 +3,10 @@ title: AWS Project Templates
 slug: templates-aws
 ---
 
+:::warning DEPRECATED
+The AWS Lambda Template has been deprecated in ServiceStack v10
+:::
+
 <div class="not-prose my-8 ml-20 flex justify-center"><svg style="max-width:200px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 364.707 364.707" enable-background="new 0 0 364.707 364.707"
 	 xml:space="preserve">

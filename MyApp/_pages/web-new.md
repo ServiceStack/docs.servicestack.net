@@ -83,7 +83,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/angular-spa.png)
 
-    $ x new angular-spa ProjectName            # .NET Core
+    $ x new angular-spa ProjectName            # .NET 10
     $ x new angular-spa-netfx ProjectName      # Classic ASP.NET on .NET Framework
 
 #### mvcauth
@@ -92,7 +92,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/mvcauth.png)
 
-    $ x new mvcauth ProjectName                # .NET Core
+    $ x new mvcauth ProjectName                # .NET 10
 
 #### razor
 
@@ -100,8 +100,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/razor.png)
 
-    $ x new razor ProjectName                  # .NET Core
-    $ x new razor-corefx ProjectName           # ASP.NET Core on .NET Framework
+    $ x new razor ProjectName                  # .NET 10
     $ x new razor-netfx ProjectName            # Classic ASP.NET on .NET Framework
 
 #### react-spa
@@ -110,7 +109,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/react-spa.png)
 
-    $ x new react-spa ProjectName              # .NET Core
+    $ x new react-spa ProjectName              # .NET 10
     $ x new react-spa-netfx ProjectName        # Classic ASP.NET on .NET Framew
     
 #### script
@@ -119,8 +118,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/script.png)
 
-    $ x new script ProjectName                 # .NET Core
-    $ x new script-corefx ProjectName          # ASP.NET Core on .NET Framework
+    $ x new script ProjectName                 # .NET 10
     $ x new script-netfx ProjectName           # Classic ASP.NET on .NET Framework
 
 #### vue-spa
@@ -129,7 +127,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 ![](/img/pages/auth/signin/vue-spa.png)
 
-    $ x new vue-spa ProjectName                # .NET Core
+    $ x new vue-spa ProjectName                # .NET 10
     $ x new vue-spa-netfx ProjectName          # Classic ASP.NET on .NET Framework
 
 ### Create Customized Projects with mix
@@ -139,18 +137,10 @@ All new projects can be further customized with [mix](/mix-tool) dotnet tool to 
 
 ## Why a new project template system?
 
-It's not often that a tool causes enough friction that it ends up requiring less effort to develop a replacement than 
-it is to continue using the tool. But this has been our experience with maintaining our VS.NET Templates in the 
-[ServiceStackVS](https://github.com/ServiceStack/ServiceStackVS) VS.NET Extension which has been the biggest time sink of all our
-3rd Party Integrations where the iteration time to check in a change, wait for CI build, uninstall/re-install the VS.NET extension 
-and create and test new projects is measured in hours not minutes. To top off the poor development experience we've now appeared to have 
-reached the limits of the number of Project Templates we can bundle in our 5MB **ServiceStackVS.vsix** VS.NET Extension as a 
-number of Customers have reported seeing VS.NET warning messages that ServiceStackVS is taking too long to load.
+It's not often that a tool causes enough friction that it ends up requiring less effort to develop a replacement than it is to continue using the tool. But this has been our experience with maintaining our VS.NET Templates in the [ServiceStackVS](https://github.com/ServiceStack/ServiceStackVS) VS.NET Extension which has been the biggest time sink of all our 3rd Party Integrations where the iteration time to check in a change, wait for CI build, uninstall/re-install the VS.NET extension and create and test new projects is measured in hours not minutes. To top off the poor development experience we've now appeared to have reached the limits of the number of Project Templates we can bundle in our 5MB **ServiceStackVS.vsix** VS.NET Extension as a number of Customers have reported seeing VS.NET warning messages that ServiceStackVS is taking too long to load.
 
 Given all the scenarios ServiceStack can be used in, we needed a quicker way to create, update and test our growing **47 starting project templates**. 
-In the age of simple command-line dev tools like git and .NET Core's light weight text/human friendly projects, maintaining and creating 
-new .NET project templates still feels archaic & legacy requiring packaging projects as binary blobs in NuGet packages which become stale 
-the moment they're created.
+In the age of simple command-line dev tools like git and .NET Core's light weight text/human friendly projects, maintaining and creating new .NET project templates still feels archaic & legacy requiring packaging projects as binary blobs in NuGet packages which become stale the moment they're created.
 
 ## How it works
 
@@ -185,7 +175,7 @@ Best of all creating and testing projects are now much easier since project temp
 that when a new project is created with:
 
 ```shell
-    $ x new <template> ProjectName
+$ x new <template> ProjectName
 ```
 
 Replaces all occurrences in all text files, file and directory names, where:
