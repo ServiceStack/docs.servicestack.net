@@ -3,47 +3,17 @@ title: .NET Project Templates
 slug: templates-overview
 ---
 
-ServiceStack has its strong foundations as a Web and MQ Services framework whose [easy and versatile HTML support](https://razor.netcore.io/) makes it the ideal services framework to create Backend Systems and Web APIs, Websites, Single Page Apps, Windows Services, Self-Hosting Console Apps and Rich OSX and Winforms Desktop Apps.
+ServiceStack accelerates .NET development with battle-tested templates for building modern applications - from high-performance Web APIs and backend services to full-stack web apps, microservices, and cloud-native solutions. Whether you're building a Jamstack site, a Blazor application, or a serverless API, ServiceStack provides the foundation to ship faster.
 
-## x new
-
-All ServiceStack Project Templates can be found and installed using the [x new](/web-new) .NET Core tool that can be installed with:
-
-:::sh
-dotnet tool install --global x 
+:::copy
+npx create-net ls
 :::
 
-### Update
+Where it will display all repositories in [.NET 10](https://github.com/NetCoreTemplates) GitHub Organization:
 
-Or if you had a previous version installed, update with:
-
-:::sh
-dotnet tool update -g x
-:::
-
-## Explore available templates
-
-Then run `x new` to view the list of available project templates:
-
-:::sh
-x new
-:::
-
-Where it will display all repositories in [.NET Core](https://github.com/NetCoreTemplates),
-[.NET Framework](https://github.com/NetFrameworkTemplates) and
-[ASP.NET Core Framework](https://github.com/NetFrameworkCoreTemplates) GitHub Orgs:
-
-:::{class="not-prose table table-striped"}
+:::{class="table table-striped w-full"}
 
 ::include web-new-netcore.md::
-
-<p>&nbsp;</p>
-
-::include web-new-corefx.md::
-
-<p>&nbsp;</p>
-
-::include web-new-netfx.md::
 
 :::
 
@@ -59,19 +29,13 @@ For example to create a new **Vue Single Page App**, run:
 npx create-net vue-spa ProjectName
 :::
 
-Alternatively you can write new project files directly into an empty repository using the Directory Name as the ProjectName:
-
-```bash
-$ git clone https://github.com/<User>/<ProjectName>.git
-$ cd <ProjectName>
-$ npx create-net vue-spa
-```
-
 Or download a customized project template from our Getting Started Page:
 
 <div class="not-prose">
 <h3 class="m-0 py-8 text-4xl text-center text-blue-600"><a href="https://servicestack.net/start">servicestack.net/start</a></h3>
 </div>
+
+::include react-templates.md::
 
 ## Available Project Templates
 
