@@ -64,8 +64,15 @@ These components are ideal for rapidly building backend management interfaces, f
 
 ## Modern React Project Templates
 
-We're introducing three production-ready React templates, each optimized for different use cases:
+We're introducing production-ready React templates, each optimized for different use cases:
 
+<react-template 
+  name="next-rsc" 
+  description="The cutting edge of React. Leverage the full uncompromising power of Next.js React Server Components to access .NET APIs directly on the server, reducing bundle size and improving performance."></react-template>
+
+<react-template 
+  name="next-static" 
+  description="The ultimate solution for public-facing websites. Combines the SEO and performance of Static Site Generation (SSG) with a dynamic .NET API. Ideal for marketing sites, landing pages, blogs, and content-focused sites that benefit from SEO."></react-template>
 
 <react-template 
   name="react-static" 
