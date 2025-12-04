@@ -108,21 +108,6 @@ To help quickly scaffold your data models and features, use ServiceStack's AI as
 npx okai "Manage products price and inventory"
 :::
 
-### 🤖 AI Chat Integration
-
-Built-in AI Chat API support with multiple provider options:
-- ServiceStack AI
-- OpenAI, Anthropic, Google, Groq
-- Ollama for local models
-- OpenRouter and more
-
-### 🔑 API Keys Management
-
-Secure API key authentication with:
-- Admin-managed API keys
-- User self-service key generation
-- Scopes and features configuration
-
 ### 📊 Background Jobs
 
 Durable background job processing with:
