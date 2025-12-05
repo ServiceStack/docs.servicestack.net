@@ -13,6 +13,7 @@ The `{MAJOR}` is reserved for Major releases like [v5 containing structural chan
  - `v5.*` - Support for .NET 5.0 and .NET Framework v4.5
  - `v6.*` - Support for .NET 6.0 and .NET Framework v4.7.2
  - `v8.*` - Support for .NET 8.0 and .NET Framework v4.7.2
+ - `v10.*` - Support for .NET 10.0 and .NET Framework v4.7.2
 
 ### Minor versions
 

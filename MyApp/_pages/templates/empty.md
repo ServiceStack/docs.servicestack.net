@@ -11,7 +11,7 @@ The templates below follow our recommended [physical project layout](/physical-p
 
 <table class="table">
 <tr>
-    <th>.NET 8.0</th>
+    <th>.NET 10.0</th>
     <th>.NET Framework</th>
     <th>Empty Project Templates</th>
 </tr>
