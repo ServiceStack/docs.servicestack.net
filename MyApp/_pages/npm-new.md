@@ -1,11 +1,11 @@
 ---
 slug: npm-new
-title: .NET 8.0 and ASP.NET Project Templates
+title: .NET 10.0 and ASP.NET Project Templates
 ---
 
 There are a number of the most popular starting ServiceStack v5 Project Templates available in the GitHub organizations:
 
- - **.NET 8.0 C# Templates** - [github.com/NetCoreTemplates](https://github.com/NetCoreTemplates)
+ - **.NET 10.0 C# Templates** - [github.com/NetCoreTemplates](https://github.com/NetCoreTemplates)
  - **.NET Framework C# Templates** - [github.com/NetFrameworkTemplates](https://github.com/NetFrameworkTemplates)
  - **ASP.NET Core .NET Framework C# Templates** - [github.com/NetFrameworkCoreTemplates](https://github.com/NetFrameworkCoreTemplates)
 

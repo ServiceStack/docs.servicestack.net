@@ -398,7 +398,7 @@ In addition to being able to execute **Commands** with the `ICommandExecutor` or
 their progress in real-time.
 
 Background Jobs is already configured in all new [Identity Auth Templates](https://servicestack.net/start)
-in order to send all Identity Auth Emails. Whilst existing Projects can enable it in their .NET 8 Apps with:
+in order to send all Identity Auth Emails. Whilst existing Projects can enable it in their .NET 10 Apps with:
 
 :::sh
 npx add-in jobs

@@ -3,7 +3,7 @@ title: Endpoint Routing
 ---
 
 ::: info
-For docs on routing with ServiceStack prior to .NET 8 and v8.1 [ServiceStack Routing](/routing)
+For docs on routing with ServiceStack prior to .NET 10 and v8.1 [ServiceStack Routing](/routing)
 :::
 
 
@@ -95,7 +95,7 @@ That continues to support specifying the Mime Type via the `?format` query strin
 
 ### Endpoint Routing
 
-From [ServiceStack v8.1](/releases/v8_01) ServiceStack **.NET 8** Apps support an integrated way to run all of ServiceStack 
+From [ServiceStack v8.1](/releases/v8_01) ServiceStack **.NET 10** Apps support an integrated way to run all of ServiceStack 
 requests including all APIs, metadata and built-in UIs with support for 
 [ASP.NET Core Endpoint Routing](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing) -
 enabled by calling `MapEndpoints()` when configuring ServiceStack:

@@ -19,9 +19,9 @@ Click on the template name below to view a Live Demo and contents of each projec
 
 | .NET C# Templates                                                |                                             |
 |------------------------------------------------------------------|---------------------------------------------|
-| [angular-spa](https://github.com/NetCoreTemplates/angular-spa)   | .NET 8.0 Angular Identity Auth Tailwind SPA |
-| [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 8.0 React Identity Auth Tailwind SPA   |
-| [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 8.0 Vue Identity Auth Tailwind SPA     |
+| [angular-spa](https://github.com/NetCoreTemplates/angular-spa)   | .NET 10.0 Angular Identity Auth Tailwind SPA |
+| [react-spa](https://github.com/NetCoreTemplates/react-spa)       | .NET 10.0 React Identity Auth Tailwind SPA   |
+| [vue-spa](https://github.com/NetCoreTemplates/vue-spa)           | .NET 10.0 Vue Identity Auth Tailwind SPA     |
 
 .NET Framework Templates utilize MSBuild's classic project format which can be developed using either VS.NET or Rider.
 
@@ -234,7 +234,7 @@ Bootstrapped with [Vue CLI 3](https://cli.vuejs.org/).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/vue-spa.png)](https://github.com/NetCoreTemplates/vue-spa)
 
-Create new Vue 2.5 Project for .NET 8.0:
+Create new Vue 2.5 Project for .NET 10.0:
 
 ```bash
 $ npx create-net vue-spa ProjectName
@@ -252,7 +252,7 @@ Bootstrapped with [create-react-app](https://github.com/facebook/create-react-ap
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/react-spa.png)](https://github.com/NetCoreTemplates/react-spa)
 
-Create new React 16 Project for .NET 8.0:
+Create new React 16 Project for .NET 10.0:
 
 ```bash
 $ npx create-net react-spa ProjectName
@@ -270,7 +270,7 @@ Bootstrapped with [Angular CLI](https://cli.angular.io).
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/angular-spa-bootstrap.png)](https://github.com/NetCoreTemplates/angular-spa)
 
-Create new Angular Project for .NET 8.0:
+Create new Angular Project for .NET 10.0:
 
 ```bash
 $ npx create-net angular-spa ProjectName
@@ -403,7 +403,7 @@ resulting HTML minification in optimized production builds - enabling simplified
 
 ### Running .NET Core Templates in Visual Studio IIS Express
 
-Currently VS.NET doesn't support .NET 8.0 multiple bindings i.e. `http://localhost:5000/;https://localhost:5001/` which all .NET Core Templates
+Currently VS.NET doesn't support .NET 10.0 multiple bindings i.e. `http://localhost:5000/;https://localhost:5001/` which all .NET Core Templates
 are configured with. To run in IIS Express change it to specify only 1 binding:
 
 ![](https://forums.servicestack.net/uploads/default/931/0a2191581d2774c6.png)

@@ -6,7 +6,7 @@ title: Authentication Overview
 
 As of [ServiceStack v8](/releases/v8_00) there are 2 main Authentication Models available to ServiceStack Apps:
 
- - [ASP .NET Core Identity](/auth/identity-auth) - Recommended for .NET 8+ Apps
+ - [ASP .NET Core Identity](/auth/identity-auth) - Recommended for .NET 10+ Apps
  - [ServiceStack Auth](/auth/authentication-and-authorization) - Universal Auth Model compatible with all ServiceStack Apps  (e.g. .NET or .NET Framework)
 
 ### ASP.NET Core Identity Auth now default from ServiceStack v8
@@ -28,10 +28,10 @@ providing flexible options for [extending UserAuth tables](https://docs.services
 
 Although the multi-platform support of the unified Authentication model has been vital for Organizations migrating their systems
 to .NET (Core) where ServiceStack Customers have been able to enjoy [Exceptional Code reuse](https://docs.servicestack.net/netcore#exceptional-code-reuse),
-it's become clear that the .NET platform (e.g. .NET 8) is the only platform that should be considered for new projects and
+it's become clear that the .NET platform (e.g. .NET 10) is the only platform that should be considered for new projects and
 that .NET Framework should only be considered a stable legacy platform for running existing systems on.
 
-Given Microsoft has committed to [Authentication Improvements in .NET 8](https://devblogs.microsoft.com/dotnet/whats-new-with-identity-in-dotnet-8/)
+Given Microsoft has committed to [Authentication Improvements in .NET 10](https://devblogs.microsoft.com/dotnet/whats-new-with-identity-in-dotnet-8/)
 it's become more important to easily integrate ServiceStack with new and existing .NET projects to access these new features
 than to continue recommending ServiceStack's unified Auth Providers as the default option for new projects.
 

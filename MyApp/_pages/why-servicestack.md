@@ -450,7 +450,7 @@ Whilst ServiceStack is fundamentally a premier HTTP Framework, its Services can 
 In addition to supporting multiple formats and endpoints, ServiceStack can also be hosted within a multitude of different hosting options:
 
 #### Windows, OSX or Linux
-- **.NET 8+**
+- **.NET 10+**
   - [ASP .NET Identity Auth Templates](https://servicestack.net/start)
   - [ServiceStack Auth Templates](https://servicestack.net/start-auth#projects)
 

@@ -88,7 +88,7 @@ protected Pages and Services and auth redirect flow to Sign In and Forbidden pag
 
 #### mvcauth
 
-> .NET 8.0 MVC Website integrated with ServiceStack Auth
+> .NET 10.0 MVC Website integrated with ServiceStack Auth
 
 ![](/img/pages/auth/signin/mvcauth.png)
 

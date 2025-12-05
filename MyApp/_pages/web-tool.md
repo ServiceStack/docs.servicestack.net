@@ -23,7 +23,7 @@ Or if you had a previous version installed, update with:
 
 > The Windows-only `app` tool has better integration with Windows that can power [.NET Core Windows Desktop Apps](/netcore-windows-desktop).
 
-If you have **.NET 8.0 LTS** installed use the `x` dotnet tool:
+If you have **.NET 10.0 LTS** installed use the `x` dotnet tool:
 
     $ dotnet tool install --global x
 

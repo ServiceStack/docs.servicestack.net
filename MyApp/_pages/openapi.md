@@ -101,7 +101,7 @@ public class ConfigureOpenApi : IHostingStartup
 }
 ```
 
-All this setup is done for you in our updated [Identity Auth .NET 8 Templates](https://servicestack.net/start).
+All this setup is done for you in our updated [Identity Auth .NET 10 Templates](https://servicestack.net/start).
 
 ## Open API Attributes
 

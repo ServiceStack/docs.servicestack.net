@@ -24,13 +24,13 @@ IPs where most traffic generates:
 ### Getting Started
 
 As they offer significant and valuable insights they're now built into all new ASP.NET Core IdentityAuth templates, 
-existing .NET 8 IdentityAuth templates can enable it with: 
+existing .NET 10 IdentityAuth templates can enable it with: 
 
 :::sh
 npx add-in sqlitelogs
 :::
 
-.NET 8 Templates that are not configured to use [Endpoint Routing](/endpoint-routing)
+.NET 10 Templates that are not configured to use [Endpoint Routing](/endpoint-routing)
 and [ASP.NET Core IOC](/net-ioc) will need to explicitly register `SqliteRequestLogger`
 as a singleton dependency in addition to configuring it on the `RequestLogsFeature` plugin:
 

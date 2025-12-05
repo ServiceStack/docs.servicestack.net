@@ -16,7 +16,7 @@ The AWS Lambda Template has been deprecated in ServiceStack v10
 	c-85.571,0-154.936-69.354-154.936-154.934c0-85.569,69.363-154.933,154.936-154.933C268.259,27.265,337.623,96.629,337.623,182.198 z"/>
 </svg></div>
 
-.NET 8.0 Amazon AWS Lambda Container Project Template
+.NET 10.0 Amazon AWS Lambda Container Project Template
 
 ## aws-lambda
 
@@ -24,7 +24,7 @@ The AWS Lambda Template has been deprecated in ServiceStack v10
 
 > YouTube: [https://youtu.be/8mpGNTsSlvE](https://youtu.be/8mpGNTsSlvE)
 
-This project lets you create a .NET 8 empty ServiceStack web project ready for deployment as a AWS Lambda Function wired with API GateWay and packaged via a Docker image.
+This project lets you create a .NET 10 empty ServiceStack web project ready for deployment as a AWS Lambda Function wired with API GateWay and packaged via a Docker image.
 
 Create new project with [x dotnet tool](/dotnet-new):
 

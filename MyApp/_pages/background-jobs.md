@@ -2,10 +2,10 @@
 title: Background Jobs
 ---
 
-ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 8 Apps. It's a easy to use library that seamlessly integrates into existing ServiceStack Apps with a built-in Management UI to provide real-time monitoring, inspection and management of background jobs.
+ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It's a easy to use library that seamlessly integrates into existing ServiceStack Apps with a built-in Management UI to provide real-time monitoring, inspection and management of background jobs.
 
 :::youtube 2Cza_a_rrjA
-Durable Background Jobs and Scheduled Tasks for .NET 8 Apps
+Durable Background Jobs and Scheduled Tasks for .NET 10 Apps
 :::
 
 ### Durable and Infrastructure-Free
@@ -89,7 +89,7 @@ you would love to see implemented.
 ## Install
 
 As it's more versatile and better suited, we've replaced the usage of Background MQ with
-ServiceStack.Jobs in all **.NET 8 Identity Auth Templates** for sending Identity Auth Confirmation 
+ServiceStack.Jobs in all **.NET 10 Identity Auth Templates** for sending Identity Auth Confirmation 
 Emails when SMTP is enabled. So the easiest way to get started with ServiceStack.Jobs is to 
 [create a new Identity Auth Project](https://servicestack.net/start), e.g:
 
@@ -97,9 +97,9 @@ Emails when SMTP is enabled. So the easiest way to get started with ServiceStack
 npx create-net blazor-vue MyApp
 :::
 
-### Exiting .NET 8 Templates
+### Exiting .NET 10 Templates
 
-Existing .NET 8 Projects can configure their app to use **ServiceStack.Jobs** by mixing in:
+Existing .NET 10 Projects can configure their app to use **ServiceStack.Jobs** by mixing in:
 
 :::sh
 npx add-in jobs

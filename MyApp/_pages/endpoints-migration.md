@@ -1,6 +1,6 @@
 ---
 slug: endpoints-migration
-title: Migrating to .NET 8 Endpoints
+title: Migrating to .NET 10 Endpoints
 ---
 
 In the ServiceStack v8.1 release, we have introduced a way to better incorporate your ServiceStack APIs into the larger ASP.NET Core ecosystem by mapping your ServiceStack APIs to the [standard ASP.NET Core Endpoints](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-8.0#endpoints). This enables you to have your ServiceStack APIs integrate with your larger ASP.NET Core application in the same way other middle ware does, opening up more opportunities for reuse of your ServiceStack APIs.

@@ -184,7 +184,7 @@ services.AddOrmLite(options => {
 
 ## OrmLite Connection Factory
 
-Alternatively to configure OrmLite outside of an ASP .NET 8+ App you can use the `OrmLiteConnectionFactory` 
+Alternatively to configure OrmLite outside of an ASP .NET 10+ App you can use the `OrmLiteConnectionFactory` 
 directly using your App's DB Connection string along the RDBMS Dialect Provider of your choice, e.g:
 
 ```csharp

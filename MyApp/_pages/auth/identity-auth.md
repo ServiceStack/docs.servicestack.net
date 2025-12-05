@@ -5,7 +5,7 @@ title: ASP.NET Core Identity Auth
 ### ASP.NET Core Identity Auth now used in new Integrated Auth projects
 
 ASP.NET Core Identity Auth is the default Auth Model adopted in new ServiceStack projects which closely follows the same 
-approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the .NET 8
+approach as the Microsoft Project Template it integrates ServiceStack with, e.g. the .NET 10
 **Blazor** and **Blazor Vue** project templates adopts the exact same Auth configuration as Microsoft's default Blazor Project 
 Template configured with **Individual** Identity Auth, likewise with the **Bootstrap** and **Tailwind** styled **MVC** and 
 **Razor Pages** templates.
@@ -241,7 +241,7 @@ public class ConfigureAuth : IHostingStartup
 }
 ```
 
-Which the new .NET 8 BlazorDiffusion App does in [Configure.Auth.cs](https://github.com/NetCoreApps/BlazorDiffusionVue/blob/main/BlazorDiffusion/Configure.Auth.cs)
+Which the new .NET 10 BlazorDiffusion App does in [Configure.Auth.cs](https://github.com/NetCoreApps/BlazorDiffusionVue/blob/main/BlazorDiffusion/Configure.Auth.cs)
 to be compatible with its existing ServiceStack `UserAuth` tables which used an `int` primary key.
 
 ## Using Identity Auth in ServiceStack Apps
@@ -307,7 +307,7 @@ This transparent re-implementation of ServiceStack Auth Providers and endpoints 
 
 ### SMTP IEmailSender
 
-The .NET 8 Templates also include a nice solution for sending Identity Auth emails through the `IEmailSender` interface
+The .NET 10 Templates also include a nice solution for sending Identity Auth emails through the `IEmailSender` interface
 which drops the Email Request in the registered Background MQ in
 [Configure.Mq.cs](https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Configure.Mq.cs)
 which uses it to invoke the `SendEmail` API in

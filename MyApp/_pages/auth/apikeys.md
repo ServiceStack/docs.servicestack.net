@@ -19,12 +19,12 @@ another Auth Provider that provided another way to authenticate a single user. T
 
 Given the primary use-case for API Keys is for machine-to-machine communication where the client is not a User,
 nor do they want systems they give out their API Keys to, to have access to their User Account, we've changed
-how API Keys work in .NET 8.
+how API Keys work in .NET 10.
 
-## .NET 8 API Keys Feature
+## .NET 10 API Keys Feature
 
 :::youtube U4vqOIHOs_Q
-New .NET 8 API Keys Feature with Built-In UIs!
+New .NET 10 API Keys Feature with Built-In UIs!
 :::
 
 The first design decision to overcome the above issues was to separate API Keys from Users and Authentication itself,

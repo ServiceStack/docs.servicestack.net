@@ -3,7 +3,7 @@ title: Routing
 ---
 
 ::: info
-For docs on routing with ServiceStack's latest .NET 8 Templates see [Endpoint Routing](/endpoint-routing)
+For docs on routing with ServiceStack's latest .NET 10 Templates see [Endpoint Routing](/endpoint-routing)
 :::
 
 ## Pre-defined Routes
@@ -52,7 +52,7 @@ The `/api` route is particularly useful in Jamstack Apps as the 2 ways to call b
 
 #### Configuring in .NET
 
-No configuration is necessary for the new **.NET 8+** [JsonApiClient](#jsonapiclient) that's pre-configured to use `/api` fallback by default:
+No configuration is necessary for the new **.NET 10+** [JsonApiClient](#jsonapiclient) that's pre-configured to use `/api` fallback by default:
 
 ```csharp
 var client = new JsonApiClient(baseUri);

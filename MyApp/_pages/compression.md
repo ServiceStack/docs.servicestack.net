@@ -86,7 +86,7 @@ No compression is added when running ServiceStack in a self-host, which will ben
 
 ## Brotli Compression
 
-**.NET 8+** Apps have access to is .NET Core's `BrotliStream` which is fully supported throughout ServiceStack, e.g. in Cached & Compressed Responses as well as sending compressed Request payloads in Service Clients.
+**.NET 10+** Apps have access to is .NET Core's `BrotliStream` which is fully supported throughout ServiceStack, e.g. in Cached & Compressed Responses as well as sending compressed Request payloads in Service Clients.
 
 The Brotli implementation is encapsulated within ServiceStack's compression abstractions whose implementations are contained within:
 

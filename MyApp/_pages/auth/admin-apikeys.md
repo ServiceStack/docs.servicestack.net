@@ -1,9 +1,9 @@
 ---
-title: Simple Auth for .NET 8 Apps
+title: Simple Auth for .NET 10 Apps
 ---
 
 With ServiceStack now fully [integrated with ASP.NET Identity Auth](/auth/identity-auth),
-our latest [.NET 8 Tailwind Templates](/start) offer a full-featured Auth Configuration complete with User Registration, 
+our latest [.NET 10 Tailwind Templates](/start) offer a full-featured Auth Configuration complete with User Registration, 
 Login, Password Recovery, Two Factory Auth, and more.
 
 Whilst great for Web Applications that need it, it neglects the class of Apps which don't need User Auth and
@@ -12,11 +12,11 @@ the additional complexity it brings inc. Identity and Password Management, EF Mi
 For these stand-alone Apps, Microservices and Docker Appliances that would still like to restrict Access to their APIs
 but don't need the complexity of ASP .NET Core's Authentication machinery, a simpler Auth Story would be preferred.
 
-With the introduction of API Keys in this release we're able to provide a simpler Auth Story for .NET 8 Microservices 
+With the introduction of API Keys in this release we're able to provide a simpler Auth Story for .NET 10 Microservices 
 that's easy for **Admin** Users to manage and control which trusted clients and B2B Integrations can access their functionality.
 
 :::youtube 0ceU91ZBhTQ
-Simple Auth Story with API Keys ideal for .NET 8 Microservices
+Simple Auth Story with API Keys ideal for .NET 10 Microservices
 :::
 
 The easiest way to get started is by creating a new Empty project with API Keys enabled with your preferred database to store the API Keys in. SQLite is a good choice for stand-alone Apps as it doesn't require any infrastructure dependencies.
@@ -353,6 +353,6 @@ PreRequestFilters.Add((req, res) =>
 
 ### Summary
 
-We hope this shows how stand-alone .NET 8 Microservices and self-contained Docker Apps can use the 
+We hope this shows how stand-alone .NET 10 Microservices and self-contained Docker Apps can use the 
 simple **Admin** and **API Keys** configuration to easily secure their APIs, complete with **Management UI** 
 and **typed Service Client** integrations.

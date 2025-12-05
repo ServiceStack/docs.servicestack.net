@@ -10,7 +10,7 @@ i.e. the primary API used to access Large Language Models (LLMs).
 
 ## Install
 
-AI Chat can be added to any .NET 8+ project by installing the **ServiceStack.AI.Chat** NuGet package and 
+AI Chat can be added to any .NET 10+ project by installing the **ServiceStack.AI.Chat** NuGet package and 
 configuration with:
 
 :::copy

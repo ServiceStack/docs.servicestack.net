@@ -548,7 +548,7 @@ namespace MyApp
 
 ::: info
 The above code can be imported into your ServiceStack project by using `npx add-in validation-source` 
-if you are using .NET 8 modular startup.
+if you are using .NET 10 modular startup.
 :::
 
 DB Validation rules can be added programmatically, this example below adds 1x Type Validator and 2x Property Validators to the 

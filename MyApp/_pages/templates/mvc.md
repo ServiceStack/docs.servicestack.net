@@ -17,7 +17,7 @@ dotnet tool install --global x
 
 ## mvc
 
-.NET 8.0 MVC Website with ServiceStack APIs
+.NET 10.0 MVC Website with ServiceStack APIs
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc.png)](https://github.com/NetCoreTemplates/mvc)
 
@@ -29,7 +29,7 @@ npx create-net mvc ProjectName
 
 ### mvcauth
 
-.NET 8.0 MVC Website integrated with ServiceStack Auth
+.NET 10.0 MVC Website integrated with ServiceStack Auth
 
 [![](/img/pages/auth/signin/mvcauth.png)](https://github.com/NetCoreTemplates/mvcauth)
 

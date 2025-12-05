@@ -13,4 +13,4 @@ current limitations of being able to use Blazor SSR to develop an entire App wit
 The new [blazor-vue](https://servicestack.net/posts/net8-best-blazor) template implements all the features of the [blazor](https://servicestack.net/posts/net8-blazor-template) 
 template but reimplements all its interactive features with **Vue.js** to and the 
 [Vue Components library](https://docs.servicestack.net/vue/), with both templates combining the latest advancements in 
-Blazor .NET 8 with **Tailwind CSS** styling for creating beautiful Responsive Websites with support for Dark Mode.
+Blazor .NET 10 with **Tailwind CSS** styling for creating beautiful Responsive Websites with support for Dark Mode.

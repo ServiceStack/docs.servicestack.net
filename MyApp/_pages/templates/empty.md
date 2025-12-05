@@ -1,7 +1,7 @@
 ---
 title: Empty Project Templates
 ---
-## Create Empty .NET 8 Web Apps
+## Create Empty .NET 10 Web Apps
 
 ::include empty-projects.md::
 

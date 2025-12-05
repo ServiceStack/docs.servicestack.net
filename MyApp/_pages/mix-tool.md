@@ -12,13 +12,13 @@ dotnet tool install --global x
 
 The same functionality is also built into the Windows [app](/netcore-windows-desktop) dotnet tool, both can be updated to the latest version with:
 
-.NET 8.0 (Windows/macOS/Linux):
+.NET 10.0 (Windows/macOS/Linux):
 
 :::sh
 dotnet tool update -g x
 :::
 
-.NET 8.0 (Windows x64):
+.NET 10.0 (Windows x64):
 
 :::sh
 dotnet tool update -g app
@@ -75,19 +75,19 @@ x mix
 Where it displays different features that can be added to your App, where they're added to and the author of the Gist:
 
 ```
-   1. console-cs                 C# .NET 8 Console App                                                             to: .                            by @ServiceStack    [project,C#]
-   2. console-fs                 F# .NET 8 Console App                                                             to: .                            by @ServiceStack    [project,F#]
-   3. console-vb                 VB .NET 8 Console App                                                             to: .                            by @ServiceStack    [project,VB]
+   1. console-cs                 C# .NET 10 Console App                                                             to: .                            by @ServiceStack    [project,C#]
+   2. console-fs                 F# .NET 10 Console App                                                             to: .                            by @ServiceStack    [project,F#]
+   3. console-vb                 VB .NET 10 Console App                                                             to: .                            by @ServiceStack    [project,VB]
    4. console-ss                 #Script Console App                                                               to: .                            by @ServiceStack    [project,S#]
    5. console-lisp               #Script Lisp Console App                                                          to: .                            by @ServiceStack    [project,Lisp]
-   6. init                       Empty .NET 8 ServiceStack App                                                     to: .                            by @ServiceStack    [project,C#]
-   7. init-lts                   Empty .NET 8 LTS ServiceStack App                                                 to: .                            by @ServiceStack    [project,C#]
-   8. init-vb                    VB.NET Empty .NET 8 ServiceStack App                                              to: .                            by @ServiceStack    [project,VB]
-   9. init-fsharp                F# Empty .NET 8 ServiceStack App                                                  to: .                            by @ServiceStack    [project,F#]
+   6. init                       Empty .NET 10 ServiceStack App                                                     to: .                            by @ServiceStack    [project,C#]
+   7. init-lts                   Empty .NET 10 LTS ServiceStack App                                                 to: .                            by @ServiceStack    [project,C#]
+   8. init-vb                    VB.NET Empty .NET 10 ServiceStack App                                              to: .                            by @ServiceStack    [project,VB]
+   9. init-fsharp                F# Empty .NET 10 ServiceStack App                                                  to: .                            by @ServiceStack    [project,F#]
   10. init-corefx                Empty ASP.NET Core 2.1 LTS on .NET Framework                                      to: .                            by @ServiceStack    [project,C#]
   11. init-sharp-app             Empty ServiceStack Sharp App                                                      to: .                            by @ServiceStack    [project,S#]
-  12. init-test                  .NET 8 Integration Test                                                           to: .                            by @ServiceStack    [project,C#]
-  13. init-test2                 .NET 8 and .NET v4.72 Integration Test                                            to: .                            by @ServiceStack    [project,C#]
+  12. init-test                  .NET 10 Integration Test                                                           to: .                            by @ServiceStack    [project,C#]
+  13. init-test2                 .NET 10 and .NET v4.72 Integration Test                                            to: .                            by @ServiceStack    [project,C#]
   14. redis                      Use ServiceStack.Redis                                                            to: $HOST                        by @ServiceStack    [db]
   15. sqlserver                  Use OrmLite with SQL Server                                                       to: $HOST                        by @ServiceStack    [db]
   16. sqlite                     Use OrmLite with SQLite                                                           to: $HOST                        by @ServiceStack    [db]

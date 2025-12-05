@@ -13,11 +13,11 @@ $ dotnet tool install --global x
 $ npx create-net mvc AcmeMvc
 ```
 
-Which will create a new .NET 8.0 MVC Project called **AcmeMvc**. The Template Names, Source Code and Live Demos for each Website Template is available below:
+Which will create a new .NET 10.0 MVC Project called **AcmeMvc**. The Template Names, Source Code and Live Demos for each Website Template is available below:
 
 <table class="not-prose table tpl">
 <tr>
-    <th>.NET 8.0</th>
+    <th>.NET 10.0</th>
     <th>.NET Framework</th>
     <th>Single Page App Templates</th>
 </tr>
@@ -82,13 +82,13 @@ Both `razor` and `script` project enjoy Hot Reloading where in development a lon
 $ dotnet watch run
 ```
 
-### .NET 8.0 ServiceStack WebApp Template
+### .NET 10.0 ServiceStack WebApp Template
 
-The .NET 8.0 [bare-app](https://github.com/sharp-apps/bare-app) project template is a pre-built .NET 8.0 App that dramatically simplifies .NET Wep App development by enabling Websites and APIs to be developed instantly without compilation.
+The .NET 10.0 [bare-app](https://github.com/sharp-apps/bare-app) project template is a pre-built .NET 10.0 App that dramatically simplifies .NET Wep App development by enabling Websites and APIs to be developed instantly without compilation.
 
 <table class="not-prose table">
 <tr>
-    <th>.NET 8.0</th>
+    <th>.NET 10.0</th>
     <th>Sharp App</th>
 </tr>
 <tr>

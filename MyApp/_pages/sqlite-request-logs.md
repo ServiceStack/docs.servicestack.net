@@ -13,9 +13,9 @@ it ideal for self-managing isolated appliance backends like Background Jobs and 
 benefit from integrating with your existing RDBMS.
 
 The new [ServiceStack.Jobs](https://nuget.org/packages/ServiceStack.Jobs) NuGet package allows us
-to deliver plug and play SQLite backed features into .NET 8 Apps that are configured with any RDBMS
+to deliver plug and play SQLite backed features into .NET 10 Apps that are configured with any RDBMS
 or without one. The next feature added is a SQLite backed provider for [Request Logs](/request-logger) 
-with the new `SqliteRequestLogger` which can be added to existing .NET 8 Apps with the
+with the new `SqliteRequestLogger` which can be added to existing .NET 10 Apps with the
 [mix tool](/mix-tool):
 
 :::sh

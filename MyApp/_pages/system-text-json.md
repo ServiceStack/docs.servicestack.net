@@ -2,7 +2,7 @@
 title: System.Text.Json APIs
 ---
 
-From [ServiceStack v8.1](/releases/v8_01), ASP.NET Core .NET 8 Project Templates are configured to use [Endpoint Routing](/endpoint-routing)
+From [ServiceStack v8.1](/releases/v8_01), ASP.NET Core .NET 10 Project Templates are configured to use [Endpoint Routing](/endpoint-routing)
 that by default utilizes the default high-performance **System.Text.Json** JSON serializer to serialize and deserialize its JSON API Responses:
 
 ### Enabled by Default when using Endpoint Routing

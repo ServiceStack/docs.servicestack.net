@@ -94,7 +94,7 @@ public class ConfigureAuth : IHostingStartup
 
 You'll need to configure Entity Framework and add your desired ASP.NET Identity Auth configuration to your **Program.cs**.
 
-We recommend copying from a new Microsoft or ServiceStack .NET 8 Project which closely matches the Authentication
+We recommend copying from a new Microsoft or ServiceStack .NET 10 Project which closely matches the Authentication
 options you want to enable.
 
 #### Using Identity Auth Application Cookie
@@ -279,7 +279,7 @@ dotnet run --AppTasks=migrate.users
 After successfully migrating all your users you should check the new `IdentityUser` table to verify all the User data
 you want has been migrated as well as verifying they can sign in with their existing credentials.
 
-The easiest way to include the Identity Auth UI Pages to your App is to copy your Application into a new .NET 8 Project
+The easiest way to include the Identity Auth UI Pages to your App is to copy your Application into a new .NET 10 Project
 that already includes them, you can create a new Blazor App with:
 
 :::sh
@@ -306,7 +306,7 @@ as well as their
 
 ### SMTP IEmailSender
 
-The .NET 8 Templates include a nice solution for sending Identity Auth emails through the `IEmailSender` interface
+The .NET 10 Templates include a nice solution for sending Identity Auth emails through the `IEmailSender` interface
 which drops the Email Request in the registered Background MQ in
 [Configure.Mq.cs](https://github.com/NetCoreTemplates/blazor/blob/main/MyApp/Configure.Mq.cs)
 which uses it to invoke the `SendEmail` API in

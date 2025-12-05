@@ -170,7 +170,7 @@ HttpClient profiling is implemented a little differently then other events in th
 
 ### JsonApiClient Profiling
 
-Although we're able to provide richer profiling for our .NET 8+ [JsonApiClient](/csharp-client#jsonapiclient) which has access to typed Request DTOs for submitting API Requests:
+Although we're able to provide richer profiling for our .NET 10+ [JsonApiClient](/csharp-client#jsonapiclient) which has access to typed Request DTOs for submitting API Requests:
 
 <div class="block flex justify-center items-center">
     <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling-client-api-request.png">
