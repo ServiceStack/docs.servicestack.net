@@ -188,7 +188,7 @@ We'll quickly cover the common dev workflow for this feature.
 
 To create a new Table use `init <Table>`, e.g:
 
-:::copy
+:::sh
 npx okai init Transaction
 :::
 
@@ -199,13 +199,13 @@ This will generate an empty `MyApp.ServiceModel/<Table>.d.ts` file along with st
 After modifying the TypeScript Data Model to include the desired fields, you can re-run the `okai` tool to generate the AutoQuery APIs and DB Migrations 
 (which can be run anywhere within your Solution):
 
-:::copy
+:::sh
 npx okai Transaction.d.ts
 :::
 
 After you're happy with your Data Model you can run DB Migrations to run the DB Migration and create your RDBMS Table:
 
-:::copy
+:::sh
 npm run migrate
 :::
 
@@ -213,7 +213,7 @@ npm run migrate
 
 If you want to make further changes to your Data Model, you can re-run the `okai` tool to update the AutoQuery APIs and DB Migrations, then run the `rerun:last` npm script to drop and re-run the last migration:
 
-:::copy
+:::sh
 npm run rerun:last
 :::
 
@@ -221,13 +221,13 @@ npm run rerun:last
 
 If you changed your mind and want to get rid of the RDBMS Table you can revert the last migration:
 
-:::copy
+:::sh
 npm run revert:last
 :::
 
 Which will drop the table and then you can get rid of the AutoQuery APIs, DB Migrations and TypeScript Data model with:
 
-:::copy
+:::sh
 npx okai rm Transaction.d.ts
 :::
 
