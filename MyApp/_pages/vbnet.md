@@ -12,7 +12,7 @@ You can create a new VB .NET Core project in a new empty directory using the [x 
 ```bash
 $ dotnet tool install --global x 
 $ mkdir ProjectName && cd ProjectName
-$ x mix init-vb
+$ npx add-in init-vb
 $ dotnet run
 ```
 
@@ -28,7 +28,7 @@ The [vb-auth](https://github.com/NetCoreApps/vb-auth) VB.NET .NET Core project c
 
 ```bash
 $ mkdir ProjectName && cd ProjectName
-$ x mix init-vb
+$ npx add-in init-vb
 ```
 
 Configured with [OrmLite + SQL Server](/ormlite/), 

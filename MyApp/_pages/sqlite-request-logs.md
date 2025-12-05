@@ -19,7 +19,7 @@ with the new `SqliteRequestLogger` which can be added to existing .NET 8 Apps wi
 [mix tool](/mix-tool):
 
 :::sh
-x mix sqlitelogs
+npx add-in sqlitelogs
 :::
 
 Which adds a reference to **ServiceStack.Jobs** and the [Modular Startup](/modular-startup) config below:

@@ -40,7 +40,7 @@ Your `packageSources` `key` needs to match the `packageSourceCredentials` elemen
 If you have the [dotnet x tool](/dotnet-tool) installed, you can configure your projects by downloading `NuGet.Config` in the same folder as your **.sln**
 
 :::sh
-x mix gh-nuget
+npx add-in gh-nuget
 :::
 
 

@@ -388,7 +388,7 @@ To do this we've added support for **AppTasks** which let you define tasks in yo
 You can add DB Migration support to existing projects by applying the [migrations](https://gist.github.com/gistlyn/50df00df4b3b9faa94a73d32ab4b2484) gist to your project with:
 
 :::sh
-x mix migrations
+npx add-in migrations
 :::
 
 This will register the Migration **AppTasks** with your App via a [Modular Startup](/modular-startup) configuration:

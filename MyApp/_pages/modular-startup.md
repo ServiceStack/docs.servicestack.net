@@ -78,7 +78,7 @@ x mix
 This is a standard ASP .NET Core feature that we can use to configure Mongo DB in any ASP .NET Core App with:
 
 :::sh
-x mix mongodb
+npx add-in mongodb
 :::
 
 Which adds the `mongodb` gist file contents to your ASP .NET Core Host project:
@@ -107,7 +107,7 @@ As it's not a ServiceStack feature it can be used to configure ASP .NET Core App
 e.g. we could also easily configure [Marten](https://martendb.io) in an ASP .NET Core App with:
 
 :::sh
-x mix marten
+npx add-in marten
 :::
 
 The benefit of this approach is entire modules of features can be configured in a single command, e.g. An empty
@@ -115,13 +115,13 @@ ServiceStack App can be configured with MongoDB, ServiceStack Auth and a MongoDB
 
 
 :::sh
-x mix auth auth-mongodb mongodb
+npx add-in auth auth-mongodb mongodb
 :::
 
 Likewise, you can replace MongoDB with a completely different PostgreSQL RDBMS implementation by running:
 
 :::sh
-x mix auth auth-db postgres
+npx add-in auth auth-db postgres
 :::
 
 ### Services and App Customizations
@@ -130,7 +130,7 @@ Modular Startup configurations are flexible enough to encapsulate customizing AS
 by registering a `IStartupFilter` which is required by the Open API v3 Modular Configuration:
 
 :::sh
-x mix openapi3
+npx add-in openapi3
 :::
 
 ```csharp
@@ -230,7 +230,7 @@ Or easier to permanently replace or remove features by either directly deleting 
 using `mix -delete`, e.g:
 
 :::sh
-x mix -delete auth auth-db postgres
+npx add-in -delete auth auth-db postgres
 :::
 
 Which works similar to package managers where it removes all files contained within each mix gist.

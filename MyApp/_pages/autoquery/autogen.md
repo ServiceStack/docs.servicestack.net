@@ -234,7 +234,7 @@ Inside VS Code open a Terminal Window and [mix in](/mix-tool) the required confi
 
 :::sh
 cd NorthwindApi
-x mix autocrudgen sqlite northwind.sqlite
+npx add-in autocrudgen sqlite northwind.sqlite
 :::
 
 Which will mix in the [autocrudgen](https://gist.github.com/gistlyn/464a80c15cb3af4f41db7810082dc00c) gist to enable AutoQuery and tell it to Auto Generate AutoQuery and CRUD Services for all tables in the registered RDBMS (default schema):

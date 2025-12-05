@@ -10,7 +10,7 @@ backends that's a drop-in replacement for [SQLite's BackgroundsJobFeature](/back
 For [ServiceStack ASP.NET Identity Auth](https://servicestack.net/start) Projects:
 
 :::sh
-x mix db-identity
+npx add-in db-identity
 :::
 
 Which replaces `Configure.BackgroundJobs.cs` and `Configure.RequestLogs.cs` with an equivalent
@@ -20,7 +20,7 @@ for API Request Logging.
 All other .NET 8+ ServiceStack Apps should instead use:
 
 :::sh
-x mix db-jobs
+npx add-in db-jobs
 :::
 
 Which replaces `Configure.BackgroundJobs.cs` to use `DatabaseJobFeature`:

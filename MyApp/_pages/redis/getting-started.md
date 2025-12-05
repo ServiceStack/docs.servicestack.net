@@ -123,7 +123,7 @@ To add Redis support to your project, navigate to your project directory and the
 
 ```bash
 cd ProjectName
-x mix redis
+npx add-in redis
 ```
 
 This automatically adds the ServiceStack.Redis library to your project and sets up a basic Redis configuration.

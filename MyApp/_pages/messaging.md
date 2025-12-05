@@ -26,7 +26,7 @@ In ASP.NET Core Apps we recommend using [mix](/mix-tool) to configure your prefe
 it proposes adopting a naming convention in app settings and file names that other `mix` features can also make use of:
 
 :::sh
-x mix [mq]
+npx add-in [mq]
 :::
 
 Currently available list of MQ Services:
@@ -578,7 +578,7 @@ or configure your App to use the In Memory `BackgroundMqService` implementation.
 Add `feature-mq` to your project with:
 
 :::sh
-x mix feature-mq
+npx add-in feature-mq
 :::
 
 ![](/img/pages/nav/feature-mq.png)

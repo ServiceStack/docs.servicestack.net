@@ -80,7 +80,7 @@ namespace TodoWorld
 Override `Program.cs` with the above C# Example: 
 
 :::sh
-x mix todoworld-csharp-smart
+npx add-in todoworld-csharp-smart
 :::
 
 Run example:
@@ -130,7 +130,7 @@ namespace TodoWorld
 Override `Program.cs` with the above C# Example: 
 
 :::sh
-x mix todoworld-csharp
+npx add-in todoworld-csharp
 :::
 
 Run example:
@@ -178,7 +178,7 @@ namespace TodoWorld
 Override `Program.cs` with the above C# Example: 
 
 :::sh
-x mix todoworld-csharp-ssl
+npx add-in todoworld-csharp-ssl
 :::
 
 Run example:

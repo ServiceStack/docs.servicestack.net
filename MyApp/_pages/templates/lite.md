@@ -463,7 +463,7 @@ Then deploy as normal, e.g. via [rsync deployments to Linux](/netcore-deploy-rsy
 You can configure your ServiceStack App to use Nuglify's Advanced HTML, CSS, JS Minifiers using [mix](/mix-tool) with:
 
 ```bash
-$ x mix nuglify 
+$ npx add-in nuglify 
 ```
 
 Which will write [Configure.Nuglify.cs](https://gist.github.com/gistlyn/4bdb79d21f199c22b8a86f032c186e2d) to your **HOST** project.

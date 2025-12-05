@@ -12,7 +12,7 @@ You can create a new .NET Core F# project in a new empty directory using the [x 
 ```bash
 $ dotnet tool install --global x 
 $ mkdir ProjectName && cd ProjectName
-$ x mix init-fsharp
+$ npx add-in init-fsharp
 $ dotnet run
 ```
 

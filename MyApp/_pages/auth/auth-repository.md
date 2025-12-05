@@ -50,13 +50,13 @@ The easiest way to configure a User Auth Repository in your [Modular Startup](/m
 is to [mix them in](/mix-tool#composable-features), e.g. you can configure to use an OrmLiteAuthRepository using SQL Server with:
 
 :::sh
-x mix auth-db sqlserver
+npx add-in auth-db sqlserver
 :::
 
 You can view other Auth Repository "mix ins" available with:
 
 :::sh
-x mix [auth]
+npx add-in [auth]
 :::
 
 Which displays the current list of available Auth Repositories:
@@ -78,7 +78,7 @@ Results matching tag [auth]:
 and search the available RDBMS's and NoSQL Data Stores:
 
 :::sh
-x mix [db]
+npx add-in [db]
 :::
 
 That can be easily configured by a mix in:

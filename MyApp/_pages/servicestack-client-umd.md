@@ -19,7 +19,7 @@ This is used by the updated [mix init](/mix-tool#mix-usage) gists when generatin
 
 ```bash
 mkdir web && cd web
-x mix init
+npx add-in init
 dotnet run
 ```
 

@@ -82,7 +82,7 @@ For private repositories to work, you will need to host and run your own infrast
 Clone your newly created *public* GitHub repository locally and run the following command in the root directory of the repository.
 
 :::sh
-x mix docker-jupyter-reports
+npx add-in docker-jupyter-reports
 :::
 
 Commit the generated `Dockerfile` and push your changes to GitHub.

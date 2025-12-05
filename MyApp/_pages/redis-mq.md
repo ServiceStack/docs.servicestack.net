@@ -8,7 +8,7 @@ title: Redis MQ
 Use the `redismq` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
 
 :::sh
-x mix redismq
+npx add-in redismq
 :::
 
 ## Worker Service Template

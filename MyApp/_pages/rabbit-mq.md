@@ -7,7 +7,7 @@ title: Rabbit MQ
 Use the `rabbitmq` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
 
 :::sh
-x mix rabbitmq
+npx add-in rabbitmq
 :::
 
 ## Worker Service Template

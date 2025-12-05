@@ -373,7 +373,7 @@ As creating svg bundles just involves dropping SVG images inside your `/svg/{gro
 to import SVG image-sets into your App with a single command. You can view the current list of all SVG image-sets on `mix` with:
 
 :::sh
-x mix [svg]
+npx add-in [svg]
 :::
 
 Currently all [Material Design Icons](https://material.io/resources/icons/?style=baseline) are available separately by their logical group names:

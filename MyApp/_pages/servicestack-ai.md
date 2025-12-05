@@ -152,7 +152,7 @@ the .NET process invokes to utilize TypeChat, located in the Content Directory r
 [x mix](/mix-tool):
 
 :::sh
-x mix typechat.mjs
+npx add-in typechat.mjs
 :::
 
 ### Using Microsoft Semantic Kernel

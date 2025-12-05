@@ -40,7 +40,7 @@ $ npx create-net web MyApp
 Then from your new solution directory `MyApp`, mix in the Flutter application using:
 
 ```bash
-$ x mix flutter
+$ npx add-in flutter
 ```
 
 ### Flutter Setup with gRPC
@@ -54,12 +54,12 @@ $ npx create-net grpc MyApp
 With the `flutter-grpc` mix template to get a gRPC equivalent setup just as quickly.
 
 ```bash
-$ x mix flutter-grpc
+$ npx add-in flutter-grpc
 ```
 
 ## Project Structure
 
-The `x mix flutter` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command.
+The `npx add-in flutter` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command.
 It then overrides some source files, and adds some required Dart dependencies to facilitate the integration with your web services.
 
 ![](./img/pages/mix/flutter-mix-project-structure.png)
@@ -94,7 +94,7 @@ And since ServiceStack can generate client [Data Transfer Objects](http://msdn.m
 
 ### Flutter `main.dart`
 
-The `x mix flutter` command provides a customized `main.dart` with a built-in integration of the `Hello` API service of your local ServiceStack application.
+The `npx add-in flutter` command provides a customized `main.dart` with a built-in integration of the `Hello` API service of your local ServiceStack application.
 
 This uses the `servicestack` Dart package which contains a supported [Service Client](./clients-overview). To support both web and non-web client targets, a `ClientFactory` is used with a conditional import of the platform specific service client from `servicestack/web_client.dart` for web, and `servicestack/client.dart` for all native platforms.
 
@@ -392,7 +392,7 @@ for a complete example project.
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="fgts6sQ2Ags" style="background-image: url('https://img.youtube.com/vi/fgts6sQ2Ags/maxresdefault.jpg')"></lite-youtube>
 
 The Flutter integration works with ServiceStack `grpc` template that has been *configured to support gRPC services*. It also makes the assumption that when working locally, the initial Flutter application will connect to the ServiceStack gRPC services via `localhost:5054` or if the client is running on an Android Emulator, `10.0.0.2:5054`.
-`5054` is the insecure HTTP port that is used by the `grpc` project template, but if you want to add `grpc` support to your application using `x mix grpc`, be sure to set up the use of the same port for local development, or modify your Flutter client to match your server setup.
+`5054` is the insecure HTTP port that is used by the `grpc` project template, but if you want to add `grpc` support to your application using `npx add-in grpc`, be sure to set up the use of the same port for local development, or modify your Flutter client to match your server setup.
 
 For example, you could [start with a new](/dotnet-new) `grpc` ServiceStack project to host your services via gRPC, and add a working Flutter client which connects via gRPC using the mix template.
 
@@ -403,12 +403,12 @@ $ npx create-net grpc MyApp
 Then from your new solution directory `MyApp`, mix in the Flutter application using:
 
 ```bash
-$ x mix flutter-grpc
+$ npx add-in flutter-grpc
 ```
 
 ## Project Structure
 
-The `x mix flutter-grpc` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command.
+The `npx add-in flutter-grpc` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command.
 It then overrides some source files, and adds some required Dart dependencies to facilitate the integration with your gRPC services.
 
 ![](./img/pages/mix/flutter-mix-project-structure.png)
@@ -479,7 +479,7 @@ This command updates the `services.proto` file first, and then uses our [hosted 
 
 The initial `services.*.dart` files contain a basic gRPC client for working with the default `Hello` service, but if other web services are running on your host application, using `x proto-dart` will then sync your client and generated client as you make changes.
 
-For example, if you use one of our [Jamstack templates](https://jamstacks.net), and configure gRPC using `x mix grpc`, there is also a Todo service.
+For example, if you use one of our [Jamstack templates](https://jamstacks.net), and configure gRPC using `npx add-in grpc`, there is also a Todo service.
 
 ### Make your service support gRPC
 

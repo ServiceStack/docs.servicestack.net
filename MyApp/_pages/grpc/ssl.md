@@ -46,7 +46,7 @@ Should you prefer, you can create and use your own self-signed certificate using
 A quick way to download them is using the [mix tool](/mix-tool):
 
 :::sh
-x mix -name ProjectName gen.https.sh
+npx add-in -name ProjectName gen.https.sh
 :::
 
 Otherwise you can create local text files and manually copy them with the contents below:

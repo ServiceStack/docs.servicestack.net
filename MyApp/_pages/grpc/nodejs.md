@@ -91,7 +91,7 @@ main();
 Create `index.js` with the above Node.js Example: 
 
 ```bash
-$ x mix todoworld-node
+$ npx add-in todoworld-node
 ```
 
 Run example:
@@ -146,7 +146,7 @@ main();
 Override `index.js` with the above Node.js Example: 
 
 ```bash
-$ x mix todoworld-node-ssl
+$ npx add-in todoworld-node-ssl
 ```
 
 Run example:

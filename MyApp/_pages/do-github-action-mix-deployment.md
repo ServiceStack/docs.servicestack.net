@@ -10,13 +10,13 @@ We've created a mix template for building and deploying your ServiceStack app wi
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="0PvzcnxlBvc" style="background-image: url('https://img.youtube.com/vi/0PvzcnxlBvc/maxresdefault.jpg')"></lite-youtube>
 
-Specifically, we'll be using `x mix build release-ghr-vanilla` which has GitHub actions configured ready to deploy your ServiceStack application when a new GitHub release is created. This can be run at the root of your local repository folder, for example if you wanted to create an empty web application you would run:
+Specifically, we'll be using `npx add-in build release-ghr-vanilla` which has GitHub actions configured ready to deploy your ServiceStack application when a new GitHub release is created. This can be run at the root of your local repository folder, for example if you wanted to create an empty web application you would run:
 
 ```
 git clone git@github.com:<your user or org>/DropletApp.git
 cd DropletApp
 npx create-net web
-x mix build release-ghr-vanilla
+npx add-in build release-ghr-vanilla
 # 'y' to process with writing files from x mix.
 git add -A
 git commit -m "New ServiceStack project"
@@ -26,7 +26,7 @@ git push
 Pushing your new application to GitHub, the `build.yml` will run a `dotnet build` and `dotnet test` within the CI environment. For deployments, we want to get a server setup for hosting the new application.
 
 ::: info
-`x mix release-*` are designed to be used with ServiceStack applications that were created with most `x new` project templates that follow the ServiceStack recommended project structure. They are designed to be a starting point that you can edit once created to suit your needs.
+`npx add-in release-*` are designed to be used with ServiceStack applications that were created with most `x new` project templates that follow the ServiceStack recommended project structure. They are designed to be a starting point that you can edit once created to suit your needs.
 :::
 
 ## Digital Ocean Droplets Host
@@ -107,7 +107,7 @@ A compatibility script can be used for `docker-compose` via the following script
 ### Get nginx reverse proxy and letsencrypt companion running
 Now we have Docker and Docker Compose installed on our new Droplet, we want to setup an nginx reverse proxy running in Docker. This will handle mapping requests to specific domain/subdomain requests to specific docker applications that have matching configuration as well as TLS registration via LetEncrypt. When a new docker container starts up and joins the bridge network, the nginx and letsencrypt companion detect the new application and look to see if routing and TLS certificate is needed.
 
-In the `x mix release-ghr-vanilla` template, we include `deploy/nginx-proxy-compose.yml` file which can be copied to the droplet and run.
+In the `npx add-in release-ghr-vanilla` template, we include `deploy/nginx-proxy-compose.yml` file which can be copied to the droplet and run.
 
 Here is the nginx Docker Compose file in full.
 
@@ -198,7 +198,7 @@ The `x new` command gives us a working ServiceStack project from a template, `x 
 Now our project is created, you can mix in our GitHub Action templates in the local repository folder by running:
 
 ```
-x mix build release-ghr-vanilla
+npx add-in build release-ghr-vanilla
 ```
 
 The `build` mix template provides a GitHub Action that builds and tests our dotnet project. The `release-ghr-vanilla` provides a GitHub Action that uses Docker to package the application, pushes the Docker image to GitHub Container Registry (ghcr.io) and deploys the application via SSH + `docker compose` to our new Droplet.
@@ -243,7 +243,7 @@ Once these steps are done, our GitHub Actions will be able to push Docker images
 git clone git@github.com:<your user or org>/WebApp.git # Where "WebApp" is the name of your repository
 cd WebApp
 npx create-net web
-x mix build release-ghr-vanilla
+npx add-in build release-ghr-vanilla
 git add -A
 git commit -m "Add new ServiceStack project with GitHub Action files"
 git push

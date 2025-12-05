@@ -81,7 +81,7 @@ By default this Service is available in [all of ServiceStack's supported formats
 gRPC Endpoints you can [mix it](/mix-tool) into [Modular Startup](/modular-startup) projects with:
 
 :::sh
-x mix grpc
+npx add-in grpc
 :::
 
 Which applies this [modular ConfigureGrpc configuration](https://gist.github.com/gistlyn/656c29a7257dc374d22d4aa709ba7244) to your project.

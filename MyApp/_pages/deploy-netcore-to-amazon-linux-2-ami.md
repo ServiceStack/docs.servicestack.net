@@ -121,7 +121,7 @@ sudo yum install supervisor
 You'll also need to create a `supervisord.service` systemd script which you can install with:
 
 :::sh
-sudo x mix supervisord.service
+sudo npx add-in supervisord.service
 :::
 
 Which will write this [supervisord.service](https://gist.github.com/gistlyn/18dbaa471ea09f744493d5866ede599e) gist to `/usr/lib/systemd/system`.
@@ -161,13 +161,13 @@ stopsignal=INT
 We can use [x mix](/mix-tool) to simplify this by downloading & renaming the `supervisor` configuration template above:
 
 :::sh
-sudo x mix supervisor -name acme
+sudo npx add-in supervisor -name acme
 :::
 
 You can further customize the template by adding any number of `-replace term=with` switches, e.g. you can replace the `port` with:
 
 :::sh
-sudo x mix supervisor -name acme -replace 5000=5002
+sudo npx add-in supervisor -name acme -replace 5000=5002
 :::
 
 Then tell supervisor to register our App configuration:
@@ -223,7 +223,7 @@ server {
 Or use [x mix](/mix-tool) to write the above template using your preferred **port** and **TLD** with:
 
 :::sh
-sudo x mix nginx-yum -name acme -replace 5000=5002 -replace org=io
+sudo npx add-in nginx-yum -name acme -replace 5000=5002 -replace org=io
 :::
 
 After this we can tell nginx to reload its configuration, as there's nothing listening to `http://localhost:5002` yet nginx will return a 502 Bad Gateway response but will start working as soon as our deployed .NET Core Apps are up and running.

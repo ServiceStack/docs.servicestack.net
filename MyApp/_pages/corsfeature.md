@@ -8,7 +8,7 @@ title: CORS Feature
 Optionally .NET Apps can utilize the built-in [ASP.NET CORS Support](https://learn.microsoft.com/en-us/aspnet/core/security/cors) with the mix in:
 
 :::sh
-x mix cors
+npx add-in cors
 :::
 
 This will add the `Configure.Cors.cs` [Modular Startup](/modular-startup) to your Host project which

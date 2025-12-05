@@ -7,7 +7,7 @@ title: Azure Service Bus MQ
 Use the `servicebus` mixin to register an [MQ Server](/messaging) for Azure Service Bus with an existing .NET App:
 
 :::sh
-x mix servicebus
+npx add-in servicebus
 :::
 
 ## Worker Service Template

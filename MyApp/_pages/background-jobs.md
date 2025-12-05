@@ -102,7 +102,7 @@ npx create-net blazor-vue MyApp
 Existing .NET 8 Projects can configure their app to use **ServiceStack.Jobs** by mixing in:
 
 :::sh
-x mix jobs
+npx add-in jobs
 :::
 
 Which adds the `Configure.BackgroundJobs.cs` [Modular Startup](https://docs.servicestack.net/modular-startup)

@@ -104,7 +104,7 @@ echo $reply->getResult();
 Override `main.php` with the above PHP Example: 
 
 ```bash
-$ x mix todoworld-php
+$ npx add-in todoworld-php
 ```
 
 Run example:
@@ -150,7 +150,7 @@ echo $reply->getResult();
 Override `main.php` with the above PHP Example: 
 
 ```bash
-$ x mix todoworld-php-ssl
+$ npx add-in todoworld-php-ssl
 ```
 
 Run example:

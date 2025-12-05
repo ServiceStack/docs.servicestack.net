@@ -234,7 +234,7 @@ The beauty of Litestream is that it happily runs in the background transparent t
 Alternatively as the [Docker compose](/github-action-templates) configurations are delivered as [mix](/mix-tool) configurations, they can also be applied to existing projects, e.g:
 
 ::: sh
-x mix litestream-aws
+npx add-in litestream-aws
 :::
 
 Since Litestream is tied to deployment, hosting environment & preferred configured storage, we've had to create a matrix of configurations to integrate with each of the above templates.

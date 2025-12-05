@@ -8,7 +8,7 @@ title: Amazon SQS MQ
 Use the `sqs` mixin to register an [MQ Server](/messaging) for Amazon SQS with an existing .NET App:
 
 :::sh
-x mix sqs
+npx add-in sqs
 :::
 
 ## Worker Service Template

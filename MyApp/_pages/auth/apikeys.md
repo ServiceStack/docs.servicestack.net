@@ -389,7 +389,7 @@ selecting the **API Keys** feature on the [Start Page](/start):
 Or by mixing the `apikeys` project in your host project:
 
 :::sh
-x mix apikeys
+npx add-in apikeys
 :::
 
 Which add the `Configure.ApiKeys.cs` modular startup to your Host project, which registers the `ApiKeysFeature` plugin

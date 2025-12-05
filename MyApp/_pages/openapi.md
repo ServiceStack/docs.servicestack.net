@@ -50,7 +50,7 @@ Once configured to use Endpoint Routing we can then use the [mix](https://docs.s
 [openapi3](https://gist.github.com/gistlyn/dac47b68e77796902cde0f0b7b9c6ac2) Startup Configuration with:
 
 :::sh
-x mix openapi3
+npx add-in openapi3
 :::
 
 ### Manually Configure OpenAPI v3 and Swagger UI 

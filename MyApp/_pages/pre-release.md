@@ -15,7 +15,7 @@ If preferred, the pre-release packages are also available in our [MyGet](/myget)
 If you have the [dotnet x tool](/dotnet-tool) installed, you can configure your projects by downloading `NuGet.Config` in the same folder as your **.sln**
 
 :::sh
-x mix feedz
+npx add-in feedz
 :::
 
 ### Add using VS .NET

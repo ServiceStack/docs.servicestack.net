@@ -65,7 +65,7 @@ npx create-net web MyProjectName
 We can use the dotnet `x` tool to `mix` in specific database support and AutoQuery quickly using the command run from the project directory.
 
 :::sh
-x mix sqlite autoquery
+npx add-in sqlite autoquery
 :::
 
 ::: tip

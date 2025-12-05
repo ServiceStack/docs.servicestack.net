@@ -96,7 +96,7 @@ public class Program {
 Create `Program.java` from the above Java Example: 
 
 ```bash
-$ x mix todoworld-java
+$ npx add-in todoworld-java
 ```
 
 Run example with `Shift+F10`:
@@ -140,7 +140,7 @@ public class Program {
 Override `Program.java` with the above Java Example: 
 
 ```bash
-$ x mix todoworld-java-ssl
+$ npx add-in todoworld-java-ssl
 ```
 
 Run example with `Shift+F10`:

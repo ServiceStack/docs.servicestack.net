@@ -57,7 +57,7 @@ This can be used directly below to create a new Blazor Tailwind project directly
 Alternatively as the [Docker compose](/github-action-templates) configurations are delivered as [mix](/mix-tool) configurations, they can also be applied to existing projects, e.g:
 
 ::: sh
-x mix blazor-litestream-aws
+npx add-in blazor-litestream-aws
 :::
 
 Since Litestream is tied to deployment, hosting environment & preferred configured storage, we've created a matrix of configurations to cover each of the supported templates and storage preferences.

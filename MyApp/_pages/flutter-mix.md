@@ -37,12 +37,12 @@ $ npx create-net web MyApp
 Then from your new solution directory `MyApp`, mix in the Flutter application using:
 
 ```bash
-$ x mix flutter
+$ npx add-in flutter
 ```
 
 ## Project Structure
 
-The `x mix flutter` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command. 
+The `npx add-in flutter` template uses your locally installed Flutter SDK to create the initial Flutter application via the `flutter create` command. 
 It then overrides some source files, and adds some required Dart dependencies to facilitate the integration with your web services.
 
 ![](./img/pages/mix/flutter-mix-project-structure.png)
@@ -77,7 +77,7 @@ And since ServiceStack can generate client [Data Transfer Objects](http://msdn.m
 
 ### Flutter `main.dart`
 
-The `x mix flutter` command provides a customized `main.dart` with a built-in integration of the `Hello` API service of your local ServiceStack application.
+The `npx add-in flutter` command provides a customized `main.dart` with a built-in integration of the `Hello` API service of your local ServiceStack application.
 
 This uses the `servicestack` Dart package which contains a supported [Service Client](./clients-overview). To support both web and non-web client targets, a `ClientFactory` is used with a conditional import of the platform specific service client from `servicestack/web_client.dart` for web, and `servicestack/client.dart` for all native platforms. 
 

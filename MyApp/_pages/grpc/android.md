@@ -123,7 +123,7 @@ so we'll include a [ChannelBuilder.java](https://gist.github.com/gistlyn/0a3311c
 to wrap up the boiler plate:
 
 :::sh
-x mix grpc-android
+npx add-in grpc-android
 :::
 
 This simplifies the configuration required down to just the `grpc.crt` certificate loaded from the 

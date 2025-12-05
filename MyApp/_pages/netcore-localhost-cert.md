@@ -140,7 +140,7 @@ To simplify creation of self-signed certificate for `*.servicestack.com` you can
 to download the openssl script and running it:
 
 ```bash
-x mix gen-dev-crt.sh
+npx add-in gen-dev-crt.sh
 bash gen-dev-crt.sh
 ```
 

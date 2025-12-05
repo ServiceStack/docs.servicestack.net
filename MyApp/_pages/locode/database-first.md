@@ -65,7 +65,7 @@ Once you have the new web project open, you will need to configure the following
 We can use the dotnet `x` tool to `mix` in specific database support and AutoQuery quickly using the command run from the project directory.
 
 :::sh
-x mix sqlite autoquery
+npx add-in sqlite autoquery
 :::
 
 ::: tip
@@ -99,7 +99,7 @@ To use the Northwind sample database, we can download and copy it into the AppHo
 command run from the AppHost directory.
 
 :::sh
-x mix northwind.sqlite
+npx add-in northwind.sqlite
 :::
 
 Now our application can communicate with the Northwind sample database, we will need to configure AutoQuery to use AutoGen to generate our CRUD services from our database schema.

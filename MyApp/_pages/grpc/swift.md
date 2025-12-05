@@ -87,7 +87,7 @@ do {
 Override `main.swift` with the above Swift Example: 
 
 :::sh
-x mix todoworld-swift
+npx add-in todoworld-swift
 :::
 
 Run example:
@@ -136,7 +136,7 @@ do {
 Override `main.swift` with the above Swift Example: 
 
 :::sh
-x mix todoworld-swift-ssl
+npx add-in todoworld-swift-ssl
 :::
 
 Run example:

@@ -344,7 +344,7 @@ This snippet establishes an in-memory SQLite database connection. In a real-worl
 
 OrmLite supports multiple database types, including MS SQL Server, MySQL, and PostgreSQL. To use these, simply install the corresponding NuGet package and replace `SqliteDialect.Provider` with the appropriate provider (i.e., `SqlServerDialect.Provider`, `MySqlDialect.Provider`, or `PostgreSqlDialect.Provider`).
 
-If you're planning on using OrmLite within a ServiceStack project, you can streamline the setup process with the ServiceStack .NET tool `x` and the command `x mix <database technology>`. For SQLite, use `x mix sqlite`.
+If you're planning on using OrmLite within a ServiceStack project, you can streamline the setup process with the ServiceStack .NET tool `x` and the command `npx add-in <database technology>`. For SQLite, use `npx add-in sqlite`.
 
 ```bash
 # Create new project
@@ -352,7 +352,7 @@ npx create-net web MyApp
 # Navigate into new project
 cd MyApp
 # Mix in OrmLite SQLite support
-x mix sqlite
+npx add-in sqlite
 ```
 
 After setup, you're now ready to establish a database connection and execute queries from your project.

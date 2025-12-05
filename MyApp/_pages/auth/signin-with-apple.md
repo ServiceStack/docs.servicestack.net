@@ -38,7 +38,7 @@ A quick way to can create a working project from scratch with your preferred con
 
 ```bash
 mkdir web && cd web
-x mix init auth-ext auth-db sqlite
+npx add-in init auth-ext auth-db sqlite
 ```
 
 This creates an empty project, with Auth Enabled, adds the **ServiceStack.Extensions** NuGet package, registers OrmLite, SQLite and the `OrmLiteAuthRepository`.

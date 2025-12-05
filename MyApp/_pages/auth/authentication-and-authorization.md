@@ -326,7 +326,7 @@ npx create-net web ProjectName
 By [mixing in your desired auth](/mix-tool#mix-in-auth-repository) features, e.g. to configure your App to enable auth & maintain in SQL Server run:
 
 :::sh
-x mix auth auth-db sqlserver
+npx add-in auth auth-db sqlserver
 :::
 
 Checkout the [Bookings CRUD YouTube demo](https://youtu.be/XpHAaCTV7jE) for a quick preview of this in action.

@@ -401,7 +401,7 @@ Background Jobs is already configured in all new [Identity Auth Templates](https
 in order to send all Identity Auth Emails. Whilst existing Projects can enable it in their .NET 8 Apps with:
 
 :::sh
-x mix jobs
+npx add-in jobs
 :::
 
 Which adds a reference to the [ServiceStack.Jobs](https://www.nuget.org/packages/ServiceStack.Jobs) NuGet package

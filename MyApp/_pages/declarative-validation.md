@@ -547,7 +547,7 @@ namespace MyApp
 ```
 
 ::: info
-The above code can be imported into your ServiceStack project by using `x mix validation-source` 
+The above code can be imported into your ServiceStack project by using `npx add-in validation-source` 
 if you are using .NET 8 modular startup.
 :::
 

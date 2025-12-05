@@ -65,7 +65,7 @@ namespace TodoWorld
 Override `Program.cs` with the above C# Example: 
 
 :::sh
-x mix todoworld-cs
+npx add-in todoworld-cs
 :::
 
 Run example:
@@ -104,7 +104,7 @@ namespace TodoWorld
 Override `Program.cs` with the above C# Example: 
 
 :::sh
-x mix todoworld-cs-ssl
+npx add-in todoworld-cs-ssl
 :::
 
 Run example:
@@ -242,7 +242,7 @@ End Module
 Override `Program.vb` with the above VB.NET Example: 
 
 :::sh
-x mix todoworld-vb
+npx add-in todoworld-vb
 :::
 
 Run example:
@@ -283,7 +283,7 @@ End Module
 Override `Program.vb` with the above VB.NET Example: 
 
 :::sh
-x mix todoworld-vb-ssl
+npx add-in todoworld-vb-ssl
 :::
 
 Run example:
@@ -431,7 +431,7 @@ let main argv =
 
 Override `Program.fs` with the above F# Example: 
 
-    $ x mix todoworld-fs
+    $ npx add-in todoworld-fs
 
 Run example:
 
@@ -467,7 +467,7 @@ let main argv =
 Override `Program.fs` with the above F# Example:
 
 :::sh
-x mix todoworld-fs-ssl
+npx add-in todoworld-fs-ssl
 :::
 
 Run example:

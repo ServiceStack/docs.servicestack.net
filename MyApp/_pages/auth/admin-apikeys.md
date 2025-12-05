@@ -33,7 +33,7 @@ The easiest way to get started is by creating a new Empty project with API Keys 
 Existing projects not configured with Authentication can enable this simple Auth configuration by running:
 
 :::sh
-x mix apikeys-auth
+npx add-in apikeys-auth
 :::
 
 Which will add the [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server) dependency and the [Modular Startup](/modular-startup) configuration below:
