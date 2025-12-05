@@ -219,7 +219,16 @@ All new [angular-spa.web-templates.io](https://angular-spa.web-templates.io) inc
 
 ## Feature Tour
 
-We'll take a quick tour to explore the templates features
+Angular's structured approach to modern web development is ideal for large complex Applications that stitches together various technologies, handling authentication, designing responsive UIs, and managing complex state which the new Angular SPA template embraces to provide a productive starting point with a robust foundation packed with essential features right out of the box.
+
+1. **Built-in Identity Authentication:** Secured out-of-the-box, this template integrates seamlessly with ASP.NET Core Identity, providing ready-to-use registration, login, and User Admin management features.
+2. **Tailwind v4 CSS:** Rewritten to use Tailwind v4 CSS, allowing you to rapidly build beautiful, responsive designs directly in your markup.
+3. **Dark Mode Support:** Cater to user preferences with built-in, easily toggleable dark mode support, styled elegantly with Tailwind.
+4. **Customizable DataGrid Component:** Effortlessly display tabular data with the included customizable DataGrid. Easily adapt it for sorting, filtering and displaying your specific data structures.
+5. **Reusable Input Components with Validation:** The template includes reusable, pre-styled input components (e.g., text input, selects) with built-in support for validation bound forms and contextual displaying of validation errors.
+6. **RxJS & Signals Support:** Modern Angular reactivity: whether you prefer the established power of **RxJS Observables** or the new granular reactivity of **Angular Signals**, our template is structured to support *both* programming models.
+
+We'll take a quick tour to explore the templates features:
 
 ### Home Page
 
