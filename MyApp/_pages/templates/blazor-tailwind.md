@@ -1,31 +1,35 @@
 ---
-title: Blazor Tailwind
+title: Blazor Tailwind Templates
 ---
 
-
-<div class="not-prose mt-16 flex flex-col items-center">
-   <div class="flex">
-      <svg class="w-28 h-28 text-purple-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"></path></svg>
-   </div>
+<div class="not-prose">
+    <div id="blazor-server" class="hide-title mt-12 ml-20 flex flex-col items-center">
+        <div class="flex">
+            <svg class="w-24 h-24 text-purple-600 mr-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"/></svg>
+            <svg class="w-28 h-28" xmlns="http://www.w3.org/2000/svg" width="256" height="154" viewBox="0 0 256 154"><defs><linearGradient id="logosTailwindcssIcon0" x1="-2.778%" x2="100%" y1="32%" y2="67.556%"><stop offset="0%" stop-color="#2298BD"/><stop offset="100%" stop-color="#0ED7B5"/></linearGradient></defs><path fill="url(#logosTailwindcssIcon0)" d="M128 0C93.867 0 72.533 17.067 64 51.2C76.8 34.133 91.733 27.733 108.8 32c9.737 2.434 16.697 9.499 24.401 17.318C145.751 62.057 160.275 76.8 192 76.8c34.133 0 55.467-17.067 64-51.2c-12.8 17.067-27.733 23.467-44.8 19.2c-9.737-2.434-16.697-9.499-24.401-17.318C174.249 14.743 159.725 0 128 0ZM64 76.8C29.867 76.8 8.533 93.867 0 128c12.8-17.067 27.733-23.467 44.8-19.2c9.737 2.434 16.697 9.499 24.401 17.318C81.751 138.857 96.275 153.6 128 153.6c34.133 0 55.467-17.067 64-51.2c-12.8 17.067-27.733 23.467-44.8 19.2c-9.737-2.434-16.697-9.499-24.401-17.318C110.249 91.543 95.725 76.8 64 76.8Z"/></svg>
+        </div>
+    </div>
+    <div class="relative bg-white dark:bg-black py-4">
+      <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-5xl">Blazor Tailwind Templates</p>
+        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500">
+          Rich Blazor templates with Tailwind CSS for building beautiful, responsive Apps
+        </p>
+      </div>
+    </div>
 </div>
-<div class="not-prose mt-4 px-4 sm:px-6">
-<div class="text-center"><h3 id="blazor-template" class="text-4xl sm:text-5xl md:text-6xl tracking-tight font-extrabold text-gray-900">
-    Blazor WASM Tailwind
-</h3></div>
+
+The feature-rich Blazor Tailwind templates are ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor Apps.
+
+[ServiceStack.Blazor's Tailwind Components](/templates/blazor-components) work seamlessly across both [Blazor Server](https://learn.microsoft.com/en-us/aspnet/core/blazor/hosting-models?view=aspnetcore-6.0#blazor-server) and Blazor WASM hosting models, allowing you to choose the best approach for your use case.
+
 <div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="BXjcKkaK-nM" style="background-image: url('https://img.youtube.com/vi/BXjcKkaK-nM/maxresdefault.jpg')"></lite-youtube>
 </div>
-</div>
 
-<div class="relative bg-white dark:bg-black py-4">
-    <div class="mx-auto max-w-md px-4 text-center sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 class="text-base font-semibold uppercase tracking-wider text-indigo-600">Getting Started</h2>
-        <p class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">Create a new Blazor WASM Tailwind App</p>
-        <p class="mx-auto mt-5 max-w-prose text-xl text-gray-500"> 
-            Create a new Blazor WASM Tailwind project with your preferred project name:
-        </p>
-    </div>
-</div>
+## Getting Started
+
+Customize and Download a new Blazor Tailwind project with your preferred project name:
 
 <blazor-templates class="not-prose pb-8"></blazor-templates>
 
@@ -35,22 +39,36 @@ Alternatively you can create & download a new Blazor Project with the [x dotnet 
 npx create-net blazor ProjectName
 :::
 
-The feature-rich Blazor WASM Tailwind template is ideal for teams with strong C# skills building Line Of Business (LOB) applications who prefer utilizing Tailwind's modern utility-first CSS design system to create beautiful, instant-loading Blazor WASM Apps.
-
 <a href="https://blazor.web-templates.io">
     <div class="block flex justify-center shadow hover:shadow-lg rounded py-1">
-        <img class="" src="/img/pages/blazor/blazor-tailwind-splash.png">
+        <img class="p-4" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/blazor.png">
     </div>
     <div class="pt-4 text-center">
         blazor.web-templates.io
     </div>
 </a>
 
-Since the release of .NET 8, we have been upgrading our [Blazor Templates](https://servicestack.net/start) and example applications to take advantage of some of the new features, including making use of static Server Side Rendering (SSR) for Blazor, which allows for faster initial page loads and better SEO, and our [blazor-wasm](https://github.com/LegacyTemplates/blazor-wasm) template uses `InteractiveAuto` by default to provide a more Responsive UI.
+## Blazor Rendering Modes
 
-## What is InteractiveAuto?
+### Blazor Server
 
-Blazor for .NET 8 has [four different rendering modes](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes) you can take advantage of:
+Blazor Server has become the preferred platform for Interactive **Intranet** Apps which excels in **low-latency environments** to enable a best-in-class responsive end-user UX. It offers several compelling advantages:
+
+- A superior dev model and debugging experience
+- Improved live-reload and faster iterative dev cycles
+- Full access to .NET Server functionality
+- Better start times & UI responsiveness
+- Less complexity from unnecessary client project or pre-rendering solutions
+
+Although [the limitations](https://learn.microsoft.com/en-us/aspnet/core/blazor/hosting-models?view=aspnetcore-6.0#blazor-server) of its highly-coupled stateful server rendering session architecture does make it a poor fit for most high latency Internet sites.
+
+### Blazor WASM with InteractiveAuto
+
+For Internet-facing applications, Blazor WASM with the `InteractiveAuto` render mode provides the best user experience. Our [blazor](https://github.com/NetCoreTemplates/blazor) template uses `InteractiveAuto` by default to provide a more responsive UI with static Server Side Rendering (SSR) for faster initial page loads and better SEO.
+
+### Render Modes
+
+Blazor for .NET 10 has [four different rendering modes](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0#render-modes) you can take advantage of:
 
 - Static Server (static SSR)
 - Interactive Server
@@ -60,7 +78,7 @@ Blazor for .NET 8 has [four different rendering modes](https://learn.microsoft.c
 For non-interactive pages, the static SSR mode is the fastest, as it renders the page on the server and sends the HTML to the client.
 However, when your page needs to be interactive, you need to use one of the interactive modes.
 
-Prior to .NET 8, there was a trade-off between the two available render modes (static server rendering wasn't yet available).
+Prior to .NET 10, there was a trade-off between the two available render modes (static server rendering wasn't yet available).
 The `Interactive Server` mode was faster to load, but the `Interactive WASM` mode was more responsive.
 
 The initial load times for `Interactive WASM` could be quite slow, as the entire application and all its dependencies needed to be downloaded before the page could render most of the content.
@@ -71,7 +89,7 @@ The initial load times for `Interactive WASM` could be quite slow, as the entire
 
 Our templates previously worked around this limitation with a custom Pre-Rendering solution, as the wait times were too long for a good user experience.
 
-.NET 8's new `Interactive Auto` mode provides the best of both worlds as pre-rendering is now enabled by default.
+.NET 10's new `Interactive Auto` mode provides the best of both worlds as pre-rendering is now enabled by default.
 
 <img class="border-gray-800 border-r" src="/img/pages/blazor/wasm/blazor-wasm-8-fast.gif">
 
@@ -82,7 +100,7 @@ In the background, the WASM resources are downloaded which can then be used to r
 
 ## Using InteractiveAuto in your Blazor application
 
-In Blazor for .NET 8, render modes can be set on both a per-page and per-component basis.
+In Blazor for .NET 10, render modes can be set on both a per-page and per-component basis.
 
 ```html
 @page "/counter"
@@ -95,9 +113,75 @@ In Blazor for .NET 8, render modes can be set on both a per-page and per-compone
 <Counter @rendermode="RenderMode.InteractiveAuto" />
 ```
 
+---
+
+## Universal Blazor Components
+
+A fantastic property of Blazor is its support for multiple hosting modes which allows the same components to run in the Browser with Blazor WASM or rendered on the Server with Blazor Server. But whilst Blazor is capable of it, this trait is typically conceded in most Apps with database access where it recommends using
+[EF Core directly in Blazor components](https://learn.microsoft.com/en-us/aspnet/core/blazor/blazor-server-ef-core?view=aspnetcore-7.0) - effectively prohibiting reuse in Blazor WASM should you ever want to utilize Blazor's preferred hosting model for hosting your Blazor App's on the Internet.
+
+<div class="my-8 flex justify-center">
+    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="66DgLHExC9E" style="background-image: url('https://img.youtube.com/vi/66DgLHExC9E/maxresdefault.jpg')"></lite-youtube>
+</div>
+
+### Blazing Fast Networkless APIs
+
+Whilst better performing, having Blazor components access DB's directly encourages a more tightly-coupled and less reusable & testable architecture than the traditional well-defined API dev model used in client/server Mobile & Desktop Apps or Web SPA Apps like WASM.
+
+To achieve the best of both worlds, we've enabled support for utilizing the In Process [Service Gateway](/service-gateway) in Blazor Server Apps which lets you retain the traditional client/server dev model for invoking your Server APIs **In Process** - avoiding any serialization, HTTP networking or even Kestrel middleware overhead to invoke your APIs directly!
+
+This enables using the **exact same source code** to call APIs in Blazor Server and WASM which allows us to develop reusable Blazor Components to invoke the same Server APIs that serve Web, Mobile and Desktop Apps in Blazor Server Apps. Where instead of using HttpClient to invoke your APIs, they're invoked directly from a C# method which will preserve its StackTrace where you'll be able to track the API call down to the Blazor UI component calling it.
+
+ServiceStack's [Message-based API Design](/api-design) makes it possible for all API calls in ServiceStack.Blazor components and project templates to be routed through these 2 methods:
+
+```csharp
+public interface IServiceGatewayAsync
+{
+  Task<TResponse> SendAsync<TResponse>(object dto, CancellationToken ct=default);
+  //...
+}
+
+public interface IServiceGatewayFormAsync
+{
+  Task<TResponse> SendFormAsync<TResponse>(object dto, MultipartFormDataContent form, CancellationToken ct);
+}
+```
+
+::: info
+The `SendFormAsync` API is a new method added to support multi-part API requests with File Uploads
+:::
+
+Which allows the HTTP `JsonApiClient` and networkless `InProcessGateway` clients to be used interchangeably. By default Blazor Server Apps now use the InProcess Gateway but can be switched over to invoke APIs using the HTTP `JsonApiClient` with:
+
+```csharp
+BlazorConfig.Set(new() {
+    UseInProcessClient = false
+});
+```
+
+Which changes all `Api*` methods in Blazor components and Pages inheriting ServiceStack.Blazor's [BlazorComponentBase](https://reference.servicestack.net/api/ServiceStack.Blazor/BlazorComponentBase) to use the registered `JsonApiClient` client.
+
+Other components can access both the InProcess Gateway or `JsonApiClient` by injecting the `IClientFactory` dependency into their components, e.g:
+
+```csharp
+public class MyComponent : ComponentBase
+{
+    [Inject] public IClientFactory? ClientFactory { get; set; }
+
+    public IServiceGateway Gateway => ClientFactory!.GetGateway();
+    public JsonApiClient Client => ClientFactory!.GetClient();
+}
+```
+
+This capability is what has made it possible for high-level "API-enabled" components like [AutoQuery Grids](https://blazor-gallery.jamstacks.net/grid) and [AutoForm](https://blazor-gallery.jamstacks.net/gallery/autoform) to support both Blazor Server and Blazor WASM utilizing the most efficient API client available to its platform.
+
+The Blazor Gallery websites themselves are also good demonstrations of being able to run **entire Web Apps** in both Blazor Server and WASM, with all development being done with Blazor Server to take advantage of its superior iterative dev model then a script is used to "export" all pages to an identical Blazor WASM project.
+
+---
+
 ## ServiceStack.Blazor Components
 
-The [ServiceStack.Blazor Components](https://blazor-gallery.jamstacks.net) have been updated for .NET 8 and work with the new `InteractiveAuto` render mode.
+The [ServiceStack.Blazor Components](https://blazor-gallery.jamstacks.net) have been updated for .NET 10 and work with the new `InteractiveAuto` render mode.
 
 This means you can focus more on your application logic and less on the UI, as the components provide a high-productivity UI for common tasks such as CRUD operations.
 
@@ -111,17 +195,19 @@ By integrating your admin screens into your application, you can optimize the us
 <AutoQueryGrid Model="Modifier" Apis="Apis.AutoQuery<QueryModifiers,CreateModifier,UpdateModifier,DeleteModifier>()" />
 ```
 
+:::{.wideshot}
 ![](/img/pages/blazor/wasm/autoquerygrid.png)
+:::
 
 For [BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto), our StableDiffusion example application, we used the AutoQueryGrid to create a custom admin page for managing the modifiers in the application.
-
-![](/img/pages/blazor/wasm/stablediffusion-modifiers.png)
 
 This is the simplest and fastest use of the AutoQueryGrid component, but it can also be heavily customized for lots of different use cases.
 
 In [BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto) we customize the grid to enable easy navigation contextually between separate customized admin screens for each Creative, linking to related table data.
 
+:::{.wideshot}
 ![](/img/pages/blazor/wasm/blazordiffusion-creatives.png)
+:::
 
 ```html
 <AutoQueryGrid @ref=@grid Model="Creative" Apis="Apis.AutoQuery<QueryCreatives,UpdateCreative,HardDeleteCreative>()"
@@ -209,19 +295,6 @@ We also use the `EditForm` parameter to customize the edit form for the AutoQuer
     </EditForm>
 ```
 
-## Upgrading to .NET 8
-
-[BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto) was an example application we originally developed for .NET 8.
-We upgraded the production release of this application to use our [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue) template, which can be perfect for public-facing web applications and teams that don't mind including a JavaScript framework in their application.
-
-However, to show the flexibility of Blazor for .NET 8, we also upgraded the whole application from our updated `blazor-wasm` template to take advantage of the new `InteractiveAuto` mode.
-
-### Component Compatibility
-
-Since the ServiceStack.Blazor library has been updated for .NET 8, we just needed to bring over the shared components from the original application and update the references to the new library.
-
-When upgrading your application pages and components, you will need to avoid any JavaScript interop that runs during the `InitializeAsync` lifecycle method, as this is not supported in the `InteractiveAuto` mode.
-
 ### Running on both Server vs Client
 
 When using the `InteractiveAuto` mode, first visits will be running on the server, so your pages and components need to be available to both projects, as well as have any required dependencies registered in both projects `Program.cs` files.
@@ -240,10 +313,10 @@ The source code for the upgraded `BlazorDiffusionAuto` application is [available
 
 ### Conclusion
 
-The new `InteractiveAuto` mode in Blazor for .NET 8 provides the best of both worlds for Blazor applications.
+The new `InteractiveAuto` mode in Blazor for .NET 10 provides the best of both worlds for Blazor applications.
 A built in pre-rendering solution means that you can have a fast initial load time, but still have a responsive UI for subsequent visits.
 
-And since the ServiceStack.Blazor components have been updated for .NET 8, you can take advantage of the high-productivity UI components to quickly create customizable and professional-looking admin pages in a Blazor application.
+And since the ServiceStack.Blazor components have been updated for .NET 10, you can take advantage of the high-productivity UI components to quickly create customizable and professional-looking admin pages in a Blazor application.
 
 ---
 
@@ -312,6 +385,10 @@ For a closer look at ServiceStack.Blazor Components in action, download & run th
   <a href="https://github.com/NetCoreApps/BlazorGalleryWasm" class="flex mt-2 text-xl text-gray-800">
     <svg class="w-6 h-6 mr-2 align-text-bottom" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
     <span>NetCoreApps/BlazorGalleryWasm</span>
+  </a>
+  <a href="https://docs.servicestack.net/vue/" class="flex mt-2 text-xl text-gray-800">
+    <svg class="w-6 h-6 mr-2 align-text-bottom" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="w-28 h-28 sm:w-44 sm:h-44 iconify iconify--vscode-icons" width="1em" height="1em" viewBox="0 0 32 32"><path fill="#41b883" d="M24.4 3.925H30l-14 24.15L2 3.925h10.71l3.29 5.6l3.22-5.6Z"></path><path fill="#41b883" d="m2 3.925l14 24.15l14-24.15h-5.6L16 18.415L7.53 3.925Z"></path><path fill="#35495e" d="M7.53 3.925L16 18.485l8.4-14.56h-5.18L16 9.525l-3.29-5.6Z"></path></svg>
+    <span>Vue Component Gallery</span>
   </a>
 </div>
 
@@ -407,7 +484,7 @@ Where we make use of [Declarative Validation](/declarative-validation) attribute
 The `[Tag]`, `[Description]` and `[Input]` attributes are optional to markup how this API appears in ServiceStack's built-in [API Explorer](/api-explorer.html#details-tab) and [Locode UIs](/locode/declarative)
 :::
 
-### Blazor WASM App
+### Blazor App
 
 Thanks to ServiceStack's [Recommended Project Structure](/physical-project-structure) no any additional classes are needed as we're able to bind UI Controls directly to our typed server `CreateBooking` Request DTO used to define the API in 
 [BookingsCrud/Create.razor](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/Pages/BookingsCrud/Create.razor):
@@ -564,17 +641,23 @@ If you're deploying your Blazor WASM UI to a CDN you'll need to specify the URL 
 
 ### Public Pages & Components
 
-To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` which gets injected with the `JsonApiClient` and provides short-hand access to its most common APIs:
+To reduce boiler plate, your Blazor Pages & components can inherit the templates local [AppComponentBase.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.Client/AppComponentBase.cs) which inherits `BlazorComponentBase` that gets injected with the `IClientFactory` and provides convenient access to most common APIs:
 
 ```csharp
 public class BlazorComponentBase : ComponentBase, IHasJsonApiClient
 {
-    [Inject]
-    public JsonApiClient? Client { get; set; }
+    [Inject] public IClientFactory? ClientFactory { get; set; }
+    public IServiceGateway Gateway => ClientFactory!.GetGateway();
+    public JsonApiClient Client => ClientFactory!.GetClient();
 
-    public virtual Task<ApiResult<TResponse>> ApiAsync<TResponse>(IReturn<TResponse> request)  => Client!.ApiAsync(this, request);
-    public virtual Task<ApiResult<EmptyResponse>> ApiAsync(IReturnVoid request) => Client!.ApiAsync(this, request);
-    public virtual Task<TResponse> SendAsync<TResponse>(IReturn<TResponse> request) => Client!.SendAsync(this, request);
+    public virtual Task<ApiResult<TResponse>> ApiAsync<TResponse>(IReturn<TResponse> request) => UseGateway
+        ? Gateway.ManagedApiAsync(request)
+        : Client.ManagedApiAsync(request);
+
+    public virtual Task<ApiResult<EmptyResponse>> ApiAsync(IReturnVoid request); /*...*/
+    public virtual Task<TResponse> SendAsync<TResponse>(IReturn<TResponse> request);
+    public virtual Task<IHasErrorStatus> ApiAsync<Model>(object request);
+    public virtual Task<ApiResult<Model>> ApiFormAsync<Model>(object requestDto, MultipartFormDataContent request);
 }
 ```
 
@@ -649,9 +732,9 @@ export class HelloResponse
 
 When Request or Response DTOs changes during development, the client DTOs need to be regenerated using a command like [`x csharp`](./add-servicestack-reference.md#simple-command-line-utilities).
 
-### Blazor WASM Example
+### Blazor Example
 
-Developing your Blazor WASM UI however, you just change your shared request/response DTO in the shared `ServiceModel` project, and both your client and server compile against the same request/response DTO classes.
+Developing your Blazor UI however, you just change your shared request/response DTO in the shared `ServiceModel` project, and both your client and server compile against the same request/response DTO classes.
 This eliminates the need for any additional step.
 
 In the `ServiceModel` project, we still have:
@@ -675,7 +758,7 @@ Which the Blazor C# App can use directly in its **.razor** pages:
 @code {
     Hello request = new()
     {
-        Name = "Blazor WASM"
+        Name = "Blazor"
     };
 
     ApiResult<HelloResponse> api = new();

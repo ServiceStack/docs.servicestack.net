@@ -1,5 +1,5 @@
 ---
-title: Blazor Server Tailwind Template
+title: .NET 10 Blazor Tailwind Templates
 ---
 
 <div class="not-prose">
