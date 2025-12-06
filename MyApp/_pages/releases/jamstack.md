@@ -46,6 +46,7 @@ We've put together a quick check list to help decide which templates we'd recomm
 | [Next.js](https://github.com/NetCoreTemplates/nextjs)        | If you prefer React with Next.js                                                |
 | [React SPA](https://github.com/NetCoreTemplates/react-spa)   | If you prefer React                                                             |
 | [Blazor Tailwind](/templates/blazor-tailwind)                | If you prefer a full C# Stack or are developing Line of Business (LOB) Apps     |
+| [Vue SPA](https://github.com/NetCoreTemplates/vue-vite)      | If you prefer Vue and happy to trade SEO benefits of SSG for a simpler template |
 
 Still not sure? familiarize yourself with their respective dev models by comparing their functionality equivalent TODOs MVC Examples:
 
@@ -171,7 +172,7 @@ Ultimately its architectural choices allows Vite to deliver Lightning Fast **Hot
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="D-rU0lU_B4I" style="background-image: url('https://img.youtube.com/vi/D-rU0lU_B4I/maxresdefault.jpg')"></lite-youtube>
 
-### Vue SSG or SPA
+### Vue SPA
 
 Both Vue & Vite being led by [Evan You](https://github.com/yyx990803), which ensures both have stellar integration and delivers a well-supported & productive development experience making it the clear choice for any new Vue project.
 

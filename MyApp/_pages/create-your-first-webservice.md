@@ -244,7 +244,7 @@ const api = client.api(new Hello({ name: props.name }))
 Compare and contrast with other major SPA JavaScript Frameworks:
 
  - [Vue 3 HelloApi.mjs](https://github.com/NetCoreTemplates/blazor-vue/blob/main/MyApp/wwwroot/posts/components/HelloApi.mjs)
- - [Vue SSG using swrClient](https://github.com/NetCoreTemplates/vue-ssg/blob/main/ui/src/components/HelloApi.vue)
+ - [Vue HelloApi.vue](https://github.com/NetCoreTemplates/vue-spa/blob/main/MyApp.Client/src/_posts/components/HelloApi.vue)
  - [Next.js with swrClient](https://github.com/NetCoreTemplates/nextjs/blob/main/ui/components/intro.tsx)
  - [React HelloApi.tsx](https://github.com/NetCoreTemplates/react-spa/blob/master/MyApp/src/components/Home/HelloApi.tsx)
  - [Angular HelloApi.ts](https://github.com/NetCoreTemplates/angular-spa/blob/master/MyApp/src/app/home/HelloApi.ts)
