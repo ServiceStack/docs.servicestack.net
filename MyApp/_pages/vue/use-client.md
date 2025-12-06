@@ -54,7 +54,7 @@ let api = await client.api(new Hello(unRefs({ name })))
 ### setError
 
 `setError` can be used to populate client-side validation errors which the 
-[SignUp.mjs](https://github.com/NetCoreTemplates/vue-mjs/blob/main/MyApp/wwwroot/Pages/SignUp.mjs)
+[SignUp.mjs](https://github.com/LegacyTemplates/vue-mjs/blob/main/MyApp/wwwroot/Pages/SignUp.mjs)
 component uses to report an invalid submissions when passwords don't match:
 
 ```js
@@ -190,7 +190,7 @@ Input Components are able to automatically apply contextual validation errors ne
 
 An alternative method of invoking APIs is to submit a HTML Form Post which can be achieved with Ajax by sending a populated `FormData` 
 with `client.apiForm()` as done in vue-mjs's 
-[SignUp.mjs](https://github.com/NetCoreTemplates/vue-mjs/blob/main/MyApp/wwwroot/Pages/SignUp.mjs) for its 
+[SignUp.mjs](https://github.com/LegacyTemplates/vue-mjs/blob/main/MyApp/wwwroot/Pages/SignUp.mjs) for its 
 [/signup](https://vue-mjs.web-templates.io/signup) page:
 
 ```js

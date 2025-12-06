@@ -12,7 +12,7 @@
 | [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)               | .NET 10 Blazor Vue App with Tailwind                                |
 | [vue-vite](https://github.com/NetCoreTemplates/vue-vite)                   | .NET 10 Jamstack Vue Vite App with Tailwind                         |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)                     | .NET 10 Vue Vite TypeScript SPA with Tailwind                       |
-| [vue-mjs](https://github.com/NetCoreTemplates/vue-mjs)                     | .NET 10 Simple, Modern Vue ServiceStack Auth App with Tailwind      |
+| [vue-mjs](https://github.com/LegacyTemplates/vue-mjs)                      | .NET 10 Simple, Modern Vue ServiceStack Auth App with Tailwind      |
 | [razor-ssg](https://github.com/NetCoreTemplates/razor-ssg)                 | .NET 10 Razor SSG App with Tailwind                                 |
 | [razor-press](https://github.com/NetCoreTemplates/razor-press)             | .NET 10 Razor Press Documentation Site with Tailwind                |
 | [razor-pages](https://github.com/NetCoreTemplates/razor-pages)             | .NET 10 Razor Pages App with Tailwind                               |
