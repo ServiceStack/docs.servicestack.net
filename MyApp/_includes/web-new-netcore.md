@@ -15,10 +15,10 @@
 | [vue-mjs](https://github.com/LegacyTemplates/vue-mjs)                      | .NET 10 Simple, Modern Vue ServiceStack Auth App with Tailwind      |
 | [razor-ssg](https://github.com/NetCoreTemplates/razor-ssg)                 | .NET 10 Razor SSG App with Tailwind                                 |
 | [razor-press](https://github.com/NetCoreTemplates/razor-press)             | .NET 10 Razor Press Documentation Site with Tailwind                |
-| [razor-pages](https://github.com/NetCoreTemplates/razor-pages)             | .NET 10 Razor Pages App with Tailwind                               |
+| [razor-pages](https://github.com/LegacyTemplates/razor-pages)              | .NET 10 Razor Pages App with Tailwind                               |
 | [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)     | .NET 10 Razor Pages App with Bootstrap                              |
 | [razor](https://github.com/NetCoreTemplates/razor)                         | .NET 10 Razor Pages App                                             |
-| [mvcauth](https://github.com/LegacyTemplates/mvcauth)                     | .NET 10 MVC Auth App                                                |
+| [mvcauth](https://github.com/LegacyTemplates/mvcauth)                      | .NET 10 MVC Auth App                                                |
 | [mvc-bootstrap](https://github.com/NetCoreTemplates/mvc-bootstrap)         | .NET 10 MVC Identity Auth App with Bootstrap                        |
 | [mvc](https://github.com/NetCoreTemplates/mvc)                             | .NET 10 MVC Identity Auth App with Tailwind                         |
 | [script](https://github.com/NetCoreTemplates/script)                       | .NET 10 #Script Pages App with Bootstrap                            |

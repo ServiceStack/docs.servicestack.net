@@ -293,7 +293,7 @@ public class Program
 
 
 Alternatively you can start with any of the [.NET Core Templates](https://github.com/NetCoreTemplates/) which 
-uses ASP .NET Core's recommended [Top-level statements](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/program-structure/top-level-statements) for its [Program.cs](https://github.com/NetCoreTemplates/razor-pages/blob/main/MyApp/Program.cs) Startup class, e.g:
+uses ASP .NET Core's recommended [Top-level statements](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/program-structure/top-level-statements) for its [Program.cs](https://github.com/LegacyTemplates/razor-pages/blob/main/MyApp/Program.cs) Startup class, e.g:
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
