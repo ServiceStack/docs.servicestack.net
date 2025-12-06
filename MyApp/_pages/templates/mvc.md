@@ -31,7 +31,7 @@ npx create-net mvc ProjectName
 
 .NET 10.0 MVC Website integrated with ServiceStack Auth
 
-[![](/img/pages/auth/signin/mvcauth.png)](https://github.com/NetCoreTemplates/mvcauth)
+[![](/img/pages/auth/signin/mvcauth.png)](https://github.com/LegacyTemplates/mvcauth)
 
 :::sh
 npx create-net mvcauth ProjectName

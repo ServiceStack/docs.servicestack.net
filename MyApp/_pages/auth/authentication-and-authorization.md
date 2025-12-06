@@ -144,7 +144,7 @@ Some other special Auth Providers that Authenticate per-request include:
 The `NetCoreIdentityAuthProvider` is a bi-directional Authentication adapter that enables ServiceStack to use the same Authentication as the 
 rest of your ASP.NET Core and MVC Application where it enables the following popular scenarios:
 
- - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - Use ServiceStack Auth to power ASP.NET Identity Auth, pre-configured in the [mvcauth](https://github.com/NetCoreTemplates/mvcauth) project template. 
+ - [Using ServiceStack Auth in MVC](/auth/identity-servicestack) - Use ServiceStack Auth to power ASP.NET Identity Auth, pre-configured in the [mvcauth](https://github.com/LegacyTemplates/mvcauth) project template. 
 
 ### Community Auth Providers
 

@@ -19,7 +19,7 @@ Create new `mvcidentity` project with:
 npx create-net mvcidentity ProjectName
 :::
 
-[mvcidentity](https://github.com/LegacyTemplates/mvcidentity) is essentially the same App with the same functionality as [mvcauth](https://github.com/NetCoreTemplates/mvcauth)
+[mvcidentity](https://github.com/LegacyTemplates/mvcidentity) is essentially the same App with the same functionality as [mvcauth](https://github.com/LegacyTemplates/mvcauth)
 but rewritten to use ASP.NET Identity Auth instead of ServiceStack Auth, including the registration options which are handled implemented
 using MVC Controllers instead of ServiceStack's built-in Services:
 
