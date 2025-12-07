@@ -14,7 +14,7 @@ export const Index = [
     template('razor-bootstrap', 'Razor Pages', 'Razor',['bootstrap']),
     template('vue-mjs', 'Razor Pages', 'Razor',['tailwind','autoquery']),
     template('nextjs', 'Next.js', 'Nextjs',['tailwind','autoquery']),
-    template('vue-vite', 'Vue Vite', 'Vue',['tailwind','autoquery']),
+    template('vue-static', 'Vue Static', 'Vue',['tailwind','autoquery']),
     template('razor-pages', 'Razor Pages', 'Razor',['bootstrap']),
     template('mvcauth', 'MVC', 'Windows',['bootstrap']),
     template('script', 'MVC', 'Windows',['bootstrap']),
