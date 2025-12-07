@@ -1,5 +1,5 @@
 ---
-title: .NET 10 Angular 21 Template with Tailwind
+title: .NET 10 Angular 21 Tailwind Template
 ---
 
 We're excited to announce the release of our new **Angular 21 SPA Template** - a modern, full-stack template combining the latest Angular 21 frontend with a powerful .NET 10 backend powered by ServiceStack.

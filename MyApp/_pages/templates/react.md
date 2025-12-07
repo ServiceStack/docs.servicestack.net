@@ -29,8 +29,7 @@ Whilst TypeScript is often excluded in one-prompt solutions catering to non-deve
 
 ## How ServiceStack Excels in AI-First Development
 
-Context is king when developing with AI models. The better the context, the higher the quality of generated code
-and ServiceStack's architecture is uniquely suited for AI-assisted development:
+Context is king when developing with AI models. The better the context, the higher the quality of generated code and ServiceStack's architecture is uniquely suited for AI-assisted development:
 
 ### Declarative Typed APIs
 
