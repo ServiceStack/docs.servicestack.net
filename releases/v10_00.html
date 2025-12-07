@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-12-07T00:46:07.0488997Z'>
+    <meta name='date' content='2025-12-07T01:01:37.2752090Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v10</title>
@@ -1049,7 +1049,8 @@ AI models are only going to get better at understanding codebases and generating
 <p>For organizations with legacy applications, it means <strong>modernization is now economically viable</strong>. Barriers that made UI rewrites prohibitively expensive have eroded. What was once a multi-month project requiring dedicated teams is now achievable in days with AI assistance.</p>
 <hr />
 <h2 id="add-servicestack-reference">Add ServiceStack Reference<a class="header-anchor" href="javascript:;" onclick="location.hash='#add-servicestack-reference'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Other disruptive changes in this release include nullable reference type annotations are now enabled by default, where previously DTOs would only include nullable annotations for Nullable Value Type properties:</p>
+<p>Other disruptive changes in this release include nullable reference type annotations are now enabled by default, where it's now assumed ServiceModel projects have <code>&lt;Nullable&gt;enable&lt;/Nullable&gt;</code>.</p>
+<p>Previously DTOs would only include nullable annotations for Nullable Value Type properties, now nullable reference types like <code>string? Notes</code>:</p>
 <pre><code class="language-csharp">public partial class CreateBooking
     : IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
 {
@@ -1071,8 +1072,9 @@ AI models are only going to get better at understanding codebases and generating
     public bool? Cancelled { get; set; }
 }
 </code></pre>
-<p>They're now being generated for optional (i.e. non-required) nullable Reference Types as well:</p>
-<pre><code class="language-csharp">public partial class CreateBooking
+<p>Will be reflected in the generated DTOs for languages that support nullable annotations. Required reference properties like <code>Name</code> are required and optional reference properties like <code>Notes</code> are correctly annotated as optional:</p>
+<pre><code class="language-csharp">// C# Geenrated DTOs
+public partial class CreateBooking
     : IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
 {
     [Validate(&quot;NotEmpty&quot;)]
@@ -1091,8 +1093,9 @@ AI models are only going to get better at understanding codebases and generating
     public virtual bool? Cancelled { get; set; }
 }
 </code></pre>
-<p>This is also reflected in generated TypeScript DTOs where required reference properties like <code>name</code> are no longer optional and optional reference properties like <code>notes</code> are now correctly annotated as optional:</p>
-<pre><code class="language-ts">export class CreateBooking implements IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
+<p>The same type annotations are also applied to TypeScript DTOs:</p>
+<pre><code class="language-ts">// TypeScript Geenrated DTOs
+export class CreateBooking implements IReturn&lt;IdResponse&gt;, ICreateDb&lt;Booking&gt;
 {
     // @Validate(Validator=&quot;NotEmpty&quot;)
     public name: string;
