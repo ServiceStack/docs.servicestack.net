@@ -99,9 +99,9 @@ Where it provides ThreadSafe CRUD operations to manage a collection of In Memory
 
 The `QueryTodos` implementation utilizes an [AutoQuery Memory Source](/autoquery/memory) with the full capabilities of AutoQuery's [Implicit Conventions](/autoquery/rdbms#implicit-conventions):
 
- - [/api/QueryTodos?Id>=1](https://vue-vite-api.jamstacks.net/api/QueryTodos?Id>=1)
- - [/api/QueryTodos?TextContains=Blazor](https://vue-vite-api.jamstacks.net/api/QueryTodos?TextContains=Blazor)
- - [/api/QueryTodos?IsFinished=false](https://vue-vite-api.jamstacks.net/api/QueryTodos?IsFinished=false)
+ - [/api/QueryTodos?Id>=1](https://vue-spa.web-templates.io/api/QueryTodos?Id>=1)
+ - [/api/QueryTodos?TextContains=Blazor](https://vue-spa.web-templates.io/api/QueryTodos?TextContains=Blazor)
+ - [/api/QueryTodos?IsFinished=false](https://vue-spa.web-templates.io/api/QueryTodos?IsFinished=false)
 
 Where it can be used to iteratively prototype new data models under a productive **dotnet watch** workflow until it satisfies all your requirements where it could be easily converted to [AutoQuery CRUD](/autoquery/crud) APIs and integrated with your Systems configured RDBMS - which would require even less code.
 

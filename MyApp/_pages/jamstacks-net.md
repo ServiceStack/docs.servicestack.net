@@ -37,13 +37,13 @@ making use of your API server more efficient and a better experience for your us
 
 ![](/img/pages/jamstack/cdn-world-view.png)
 
-## [Vue3 + Vite](https://vue-vite.jamstacks.net)
+## [Vue3 + Vite](https://vue-static.web-templates.io)
 
 The Vue + Vite template uses the new JavaScript build tool Vite (pronounced Veet) which provides unmatched speed when it comes to hot reload and iteration.
 
 This template provides all the config for using Tailwind, TypeScript, Vue3 and Vite together along with routing, Markdown, static site generation and loads more.
 
-Vue-vite provides a productive Single Page Application template with the added advantage of being out to statically generate the pages to be deployed on a CDN.
+**vue-static** provides a productive Single Page Application template with the added advantage of being out to statically generate the pages to be deployed on a CDN.
 
 ![](/img/pages/jamstack/vue-vite-tech.png)
 

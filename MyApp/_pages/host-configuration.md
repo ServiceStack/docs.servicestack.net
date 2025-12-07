@@ -93,7 +93,7 @@ appHost.ConfigureOperation<Register>(op => op.FormLayout = new()
 Which overrides the default Auto UI Form to use its custom layout:
 
 <div class="flex justify-center py-8">
-    <a href="https://vue-vite-api.jamstacks.net/ui/Register">
+    <a href="https://blazor-vue.web-templates.io/ui/Register">
         <img src="/img/pages/apiexplorer/api-form-Register.png" style="max-width:850px;">
     </a>
 </div>

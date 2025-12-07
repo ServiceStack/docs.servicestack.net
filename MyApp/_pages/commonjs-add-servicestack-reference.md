@@ -59,7 +59,7 @@ to override any server defaults.
 Date: 2022-01-28 02:10:26
 Version: 6.00
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://vue-vite-api.jamstacks.net
+BaseUrl: https://vue-static.web-templates.io
 
 //AddServiceStackTypes: True
 //AddDescriptionAsComments: True

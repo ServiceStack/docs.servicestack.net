@@ -332,7 +332,7 @@ Below is an example of a CRUD Booking form [BookingsCrud/Create.razor](https://g
 }
 ```
 
-Which binds directly to the [CreateBooking](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) Request DTO:
+Which binds directly to the [CreateBooking](https://github.com/NetCoreTemplates/blazor-vue/blob/main/MyApp.ServiceModel/Bookings.cs) Request DTO:
 
 ```csharp
 [Tag("bookings"), Description("Create a new Booking")]
@@ -357,19 +357,19 @@ public class CreateBooking : ICreateDb<Booking>, IReturn<IdResponse>
 
 To initially render this form:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-static.web-templates.io/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new.png" class="max-w-screen-md" />
 </a>
 
 Whose `[ValidateNotEmpty]` [declarative validator](/declarative-validation) filters down to the **client Input** UI to prevent unnecessary invalid API requests:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-static.web-templates.io/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new-validation-client.png" class="max-w-screen-md" />
 </a>
 
 Validation of server error responses looks like:
 
-<a class="flex flex-col justify-center items-center my-8" href="https://vue-vite.jamstacks.net/bookings-crud">
+<a class="flex flex-col justify-center items-center my-8" href="https://vue-static.web-templates.io/bookings-crud">
     <img src="/img/pages/jamstack/blazor-wasm/booking-new-validation-server.png" class="max-w-screen-md" />
 </a>
 

@@ -58,7 +58,7 @@ All projects utilize the same back-end ServiceStack Services with **TODOs MVC** 
 
 
 As **Bookings CRUD** is an [AutoQuery CRUD](/autoquery/crud) API, it defines [all its functionality](/autoquery/crud-bookings) in its declarative
-[Bookings.cs](https://github.com/LegacyTemplates/blazor-wasm/blob/main/MyApp.ServiceModel/Bookings.cs) DTOs and serves as a good example for the minimal dev model effort required to implement a typical Authenticated CRUD UI in each framework:
+[Bookings.cs](https://github.com/NetCoreTemplates/blazor-vue/blob/main/MyApp.ServiceModel/Bookings.cs) DTOs and serves as a good example for the minimal dev model effort required to implement a typical Authenticated CRUD UI in each framework:
 
 ### Bookings CRUD
 
@@ -175,11 +175,11 @@ Ultimately its architectural choices allows Vite to deliver Lightning Fast **Hot
 
 Both Vue & Vite being led by [Evan You](https://github.com/yyx990803), which ensures both have stellar integration and delivers a well-supported & productive development experience making it the clear choice for any new Vue project.
 
-vue-vite.jamstacks.net utilizes the same high-end Vue3, TypeScript and Tailwind components means their included pages like **TODOs MVC**, **Bookings** and **Sign In** contain **identical source code**, the choice on which to use effectively becomes if you need advanced features like [Static Site Generation](https://www.cloudflare.com/en-au/learning/performance/static-site-generator/) **(SSG)** and **Dark Mode** or would otherwise prefer to start with a simpler template.
+vue-static.web-templates.io utilizes the same high-end Vue3, TypeScript and Tailwind components means their included pages like **TODOs MVC**, **Bookings** and **Sign In** contain **identical source code**, the choice on which to use effectively becomes if you need advanced features like [Static Site Generation](https://www.cloudflare.com/en-au/learning/performance/static-site-generator/) **(SSG)** and **Dark Mode** or would otherwise prefer to start with a simpler template.
 
 #### Features list comparison
 
- - vue-vite.jamstacks.net/features
+ - vue-static.web-templates.io/features
 
 ### Stale-while-revalidate in Vue3
 
@@ -208,7 +208,7 @@ Where it yields the same optimal UX with cached API responses rendered instantly
 
 Don't need SSG or Dark mode? Try the simpler **SPA** template instead:
 
-<a class="flex flex-col justify-center items-center my-8 pb-8" href="https://vue-vite.jamstacks.net">
+<a class="flex flex-col justify-center items-center my-8 pb-8" href="https://vue-static.web-templates.io">
     <img src="/img/pages/jamstack/vue-vite-home.png" class="max-w-screen-md">
 </a>
 

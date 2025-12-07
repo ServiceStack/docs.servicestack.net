@@ -72,7 +72,7 @@ Below is a table matching project templates to mix templates including different
 | **blazor**           | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **blazor-vue**       | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
 | **blazor-wasm**      | blazor-litestream-aws   | blazor-litestream-azure   | blazor-litestream-sftp   |
-| **vue-vite**         | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
+| **vue-static**       | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
 | **nextjs**           | jamstack-litestream-aws | jamstack-litestream-azure | jamstack-litestream-sftp |
 
 ## GitHub Action Workflow
