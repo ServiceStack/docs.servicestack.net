@@ -17,7 +17,7 @@ dotnet tool install --global x
 
 ## mvc
 
-.NET 10.0 MVC Website with ServiceStack APIs
+.NET 10.0 MVC Identity Auth Tailwind Websites
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc.png)](https://github.com/NetCoreTemplates/mvc)
 
@@ -25,18 +25,11 @@ dotnet tool install --global x
 npx create-net mvc ProjectName
 :::
 
-## MVC with Integrated Auth
+## mvc-bootstrap
 
-### mvcauth
-
-.NET 10.0 MVC Website integrated with ServiceStack Auth
-
-[![](/img/pages/auth/signin/mvcauth.png)](https://github.com/LegacyTemplates/mvcauth)
+[![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvc-bootstrap.png)](https://github.com/NetCoreTemplates/mvc-bootstrap)
 
 :::sh
-npx create-net mvcauth ProjectName
+npx create-net mvc-bootstrap ProjectName
 :::
 
-::: tip
-Learn about [using ServiceStack Auth in MVC](/auth/identity-servicestack)
-:::
