@@ -12,18 +12,14 @@
 | [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)               | .NET 10 Blazor Vue App with Tailwind                                |
 | [vue-static](https://github.com/NetCoreTemplates/vue-static)               | .NET 10 Jamstack Vue Vite App with Tailwind                         |
 | [vue-spa](https://github.com/NetCoreTemplates/vue-spa)                     | .NET 10 Vue Vite TypeScript SPA with Tailwind                       |
-| [vue-mjs](https://github.com/LegacyTemplates/vue-mjs)                      | .NET 10 Simple, Modern Vue ServiceStack Auth App with Tailwind      |
+| [razor](https://github.com/NetCoreTemplates/razor)                         | .NET 10 Razor Pages App                                             |
+| [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)     | .NET 10 Razor Pages App with Bootstrap                              |
 | [razor-ssg](https://github.com/NetCoreTemplates/razor-ssg)                 | .NET 10 Razor SSG App with Tailwind                                 |
 | [razor-press](https://github.com/NetCoreTemplates/razor-press)             | .NET 10 Razor Press Documentation Site with Tailwind                |
-| [razor-pages](https://github.com/LegacyTemplates/razor-pages)              | .NET 10 Razor Pages App with Tailwind                               |
-| [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)     | .NET 10 Razor Pages App with Bootstrap                              |
-| [razor](https://github.com/NetCoreTemplates/razor)                         | .NET 10 Razor Pages App                                             |
-| [mvcauth](https://github.com/LegacyTemplates/mvcauth)                      | .NET 10 MVC Auth App                                                |
-| [mvc-bootstrap](https://github.com/NetCoreTemplates/mvc-bootstrap)         | .NET 10 MVC Identity Auth App with Bootstrap                        |
 | [mvc](https://github.com/NetCoreTemplates/mvc)                             | .NET 10 MVC Identity Auth App with Tailwind                         |
-| [script](https://github.com/NetCoreTemplates/script)                       | .NET 10 #Script Pages App with Bootstrap                            |
-| [grpc](https://github.com/NetCoreTemplates/grpc)                           | .NET 10 gRPC Service with Identity Auth                             |
+| [mvc-bootstrap](https://github.com/NetCoreTemplates/mvc-bootstrap)         | .NET 10 MVC Identity Auth App with Bootstrap                        |
 | [empty](https://github.com/NetCoreTemplates/empty)                         | .NET 10 Empty Single Project App                                    |
+| [grpc](https://github.com/NetCoreTemplates/grpc)                           | .NET 10 gRPC Service with Identity Auth                             |
 | [web-tailwind](https://github.com/NetCoreTemplates/web-tailwind)           | .NET 10 Empty App with Tailwind                                     |
 | [worker-sqs](https://github.com/NetCoreTemplates/worker-sqs)               | .NET 10 AWS SQS MQ Worker Service                                   |
 | [worker-servicebus](https://github.com/NetCoreTemplates/worker-servicebus) | .NET 10 Azure Service Bus MQ Worker Service                         |
