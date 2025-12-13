@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2025-12-13T11:37:57.6372726Z'>
+    <meta name='date' content='2025-12-13T18:14:03.9521378Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Deploying with Kamal</title>
@@ -1692,56 +1692,52 @@ enable deploying all your Repositories to the same server.</p>
                     </div>
                 </div>
 </div>
-<p>You could register any App-specific secrets here, although our preference is instead of polluting each
-GitHub Repository with multiple App-specific GitHub Action Secrets, you can save all your secrets in a single
-<code>APPSETTINGS_PATCH</code> GitHub Action Secret to patch <code>appsettings.json</code> with environment-specific configuration
-using <a href="https://jsonpatch.com">JSON Patch</a>. E.g:</p>
-<p>JSON Patch to apply to appsettings.json:</p>
-<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
-                <!-- Background pattern -->
-                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
-
-                <div class="relative flex items-center justify-between px-4 py-3">
-                    <!-- Left side - Terminal icon and command -->
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>gh secret set APPSETTINGS_PATCH [json-patch]</p>
-</code>
-                            </div>
-                        </div>
-
-                        <!-- Right side - Copy button -->
-                        <div class="flex items-center gap-2 ml-4">
-                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
-                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-</div>
-<p>JSON Patch example:</p>
-<pre><code class="language-json">[
-    {
-        &quot;op&quot;:&quot;replace&quot;,
-        &quot;path&quot;:&quot;/ConnectionStrings/DefaultConnection&quot;,
-        &quot;value&quot;:&quot;Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname&quot;
-    },
-    { &quot;op&quot;:&quot;add&quot;, &quot;path&quot;:&quot;/SmtpConfig&quot;, &quot;value&quot;:{
-        &quot;UserName&quot;: &quot;SmptUser&quot;,
-        &quot;Password&quot;: &quot;SmptPass&quot;,
-        &quot;Host&quot;: &quot;email-smtp.us-east-1.amazonaws.com&quot;,
-        &quot;Port&quot;: 587,
-        &quot;From&quot;: &quot;noreply@example.org&quot;,
-        &quot;FromName&quot;: &quot;MyApp&quot;,
-        &quot;Bcc&quot;: &quot;copy@example.org&quot;
-      }
-    },
-    { &quot;op&quot;:&quot;add&quot;, &quot;path&quot;:&quot;/Admins&quot;, &quot;value&quot;: [&quot;admin1@email.com&quot;,&quot;admin2@email.com&quot;] },
-    { &quot;op&quot;:&quot;add&quot;, &quot;path&quot;:&quot;/CorsFeature/allowOriginWhitelist/-&quot;, &quot;value&quot;:&quot;https://example.org&quot; }
-]
+<h3 id="app-settings-secrets">App Settings Secrets<a class="header-anchor" href="javascript:;" onclick="location.hash='#app-settings-secrets'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You could register any App-specific secrets here, although our preference is to instead save all your secrets in a single <code>APPSETTINGS_JSON</code> GitHub Action Secret which will get written inside the Docker container <code>appsettings.Production.json</code>, e.g:</p>
+<pre><code class="language-json">{
+  &quot;ConnectionStrings&quot;: {
+    &quot;DefaultConnection&quot;: &quot;Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname;Pooling=true;&quot;
+  },
+  &quot;SmtpConfig&quot;: {
+      &quot;UserName&quot;: &quot;SmtpUser&quot;,
+      &quot;Password&quot;: &quot;SmtpPass&quot;,
+      &quot;Host&quot;: &quot;email-smtp.us-east-1.amazonaws.com&quot;,
+      &quot;Port&quot;: 587,
+      &quot;From&quot;: &quot;noreply@example.org&quot;,
+      &quot;FromName&quot;: &quot;MyApp&quot;,
+      &quot;Bcc&quot;: &quot;copy@example.org&quot;
+    } 
+  },
+  &quot;Admins&quot;: [&quot;admin1@email.com&quot;,&quot;admin2@email.com&quot;]
+}
 </code></pre>
+<p>After changing <code>appsettings.Production.json</code> update your <code>APPSETTINGS_JSON</code> GitHub Action Secret with:</p>
+<pre><code class="language-bash">npm run secret:prod
+</code></pre>
+<p>This uses the GitHub CLI to add your <code>appsettings.Production.json</code> to your GitHub repository's Action secrets:</p>
+<pre><code class="language-bash">gh secret set APPSETTINGS_JSON &lt; appsettings.Production.json
+</code></pre>
+<p><strong>How It Works:</strong></p>
+<ol>
+<li><strong>Development</strong> - Create <code>appsettings.Production.json</code> locally with your production configuration</li>
+<li><strong>Upload</strong> - Run <code>npm run secret:prod</code> to store it as a GitHub Action secret (never committed to git)</li>
+<li><strong>Deployment</strong> - GitHub Actions injects the secret as the <code>APPSETTINGS_JSON_BASE64</code> environment variable</li>
+<li><strong>Runtime</strong> - The container startup script decodes and writes it to <code>/app/dotnet/appsettings.Production.json</code></li>
+<li><strong>Isolation</strong> - The file is written with root-only permissions, preventing Node.js access</li>
+</ol>
+<p>Configuration in <a href="https://github.com/NetCoreTemplates/next-rsc/blob/main/config/deploy.yml">config/deploy.yml</a>:</p>
+<pre><code class="language-yaml"># config/deploy.yml
+env:
+  secret:
+    - APPSETTINGS_JSON_BASE64  # Base64-encoded production config
+</code></pre>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>Secrets never committed to git repository</li>
+<li>Secrets never baked into Docker image layers</li>
+<li>Same Docker image can be used across all environments</li>
+<li>Production configuration remains isolated from Node.js process</li>
+</ul>
 <h3 id="inferred-variables">Inferred Variables<a class="header-anchor" href="javascript:;" onclick="location.hash='#inferred-variables'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>These variables are inferred from the GitHub Action context and don't need to be configured.</p>
 <table>
@@ -2118,6 +2114,12 @@ Delete the <code>.&lt;app-name&gt;</code> file in your deployment user's home di
                                                         <span v-hash="'#initial-setup'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Initial Setup
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="app-settings-secrets" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#app-settings-secrets'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            App Settings Secrets
                                                         </span>
                                                     </li>
                                                     <li data-id="inferred-variables" class="text-gray-500 hover:text-gray-900">
