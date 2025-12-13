@@ -92,39 +92,63 @@ Hostname used for SSL certificate and Kamal proxy: www.example.org
 gh secret set KAMAL_DEPLOY_HOST [www.example.org]
 :::
 
-You could register any App-specific secrets here, although our preference is instead of polluting each
-GitHub Repository with multiple App-specific GitHub Action Secrets, you can save all your secrets in a single
-`APPSETTINGS_PATCH` GitHub Action Secret to patch `appsettings.json` with environment-specific configuration
-using [JSON Patch](https://jsonpatch.com). E.g:
+### App Settings Secrets
 
-JSON Patch to apply to appsettings.json:
-:::sh
-gh secret set APPSETTINGS_PATCH [json-patch]
-:::
-
-JSON Patch example:
+You could register any App-specific secrets here, although our preference is to instead save all your secrets in a single `APPSETTINGS_JSON` GitHub Action Secret which will get written inside the Docker container `appsettings.Production.json`, e.g:
 
 ```json
-[
-    {
-        "op":"replace",
-        "path":"/ConnectionStrings/DefaultConnection",
-        "value":"Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname"
-    },
-    { "op":"add", "path":"/SmtpConfig", "value":{
-        "UserName": "SmptUser",
-        "Password": "SmptPass",
-        "Host": "email-smtp.us-east-1.amazonaws.com",
-        "Port": 587,
-        "From": "noreply@example.org",
-        "FromName": "MyApp",
-        "Bcc": "copy@example.org"
-      }
-    },
-    { "op":"add", "path":"/Admins", "value": ["admin1@email.com","admin2@email.com"] },
-    { "op":"add", "path":"/CorsFeature/allowOriginWhitelist/-", "value":"https://example.org" }
-]
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname;Pooling=true;"
+  },
+  "SmtpConfig": {
+      "UserName": "SmtpUser",
+      "Password": "SmtpPass",
+      "Host": "email-smtp.us-east-1.amazonaws.com",
+      "Port": 587,
+      "From": "noreply@example.org",
+      "FromName": "MyApp",
+      "Bcc": "copy@example.org"
+    } 
+  },
+  "Admins": ["admin1@email.com","admin2@email.com"]
+}
 ```
+
+After changing `appsettings.Production.json` update your `APPSETTINGS_JSON` GitHub Action Secret with:
+
+```bash
+npm run secret:prod
+```
+
+This uses the GitHub CLI to add your `appsettings.Production.json` to your GitHub repository's Action secrets:
+
+```bash
+gh secret set APPSETTINGS_JSON < appsettings.Production.json
+```
+
+**How It Works:**
+
+1. **Development** - Create `appsettings.Production.json` locally with your production configuration
+2. **Upload** - Run `npm run secret:prod` to store it as a GitHub Action secret (never committed to git)
+3. **Deployment** - GitHub Actions injects the secret as the `APPSETTINGS_JSON_BASE64` environment variable
+4. **Runtime** - The container startup script decodes and writes it to `/app/dotnet/appsettings.Production.json`
+5. **Isolation** - The file is written with root-only permissions, preventing Node.js access
+
+Configuration in [config/deploy.yml](https://github.com/NetCoreTemplates/next-rsc/blob/main/config/deploy.yml):
+
+```yaml
+# config/deploy.yml
+env:
+  secret:
+    - APPSETTINGS_JSON_BASE64  # Base64-encoded production config
+```
+
+**Benefits:**
+- Secrets never committed to git repository
+- Secrets never baked into Docker image layers
+- Same Docker image can be used across all environments
+- Production configuration remains isolated from Node.js process
 
 ### Inferred Variables
 

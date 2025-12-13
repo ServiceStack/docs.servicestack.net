@@ -30,28 +30,20 @@ Configure in `appsettings.json` or environment:
 
 ### App Settings Secrets
 
-Instead of polluting each GitHub Reposity with multiple App-specific GitHub Action Secrets, you can save all your secrets in a single `APPSETTINGS_PATCH` GitHub Action Secret to patch `appsettings.json` with environment-specific configuration using [JSON Patch](https://jsonpatch.com). E.g:
+Instead of polluting each GitHub Repository with multiple App-specific GitHub Action Secrets, all templates includes built-in support in its GitHub Action workflows for updating an App's entire `appsettings.Production.json` inside a single `APPSETTINGS_JSON` GitHub Action Secret.
 
-```json
-[
-    {
-        "op":"replace",
-        "path":"/ConnectionStrings/DefaultConnection",
-        "value":"Server=service-postgres;Port=5432;User Id=dbuser;Password=dbpass;Database=dbname;Pooling=true;"
-    },
-    { "op":"add", "path":"/SmtpConfig", "value":{
-        "UserName": "SmptUser",
-        "Password": "SmptPass",
-        "Host": "email-smtp.us-east-1.amazonaws.com",
-        "Port": 587,
-        "From": "noreply@example.org",
-        "FromName": "MyApp",
-        "Bcc": "copy@example.org"
-      } 
-    },
-    { "op":"add", "path":"/Admins", "value": ["admin1@email.com","admin2@email.com"] },
-    { "op":"add", "path":"/CorsFeature/allowOriginWhitelist/-", "value":"https://servicestack.net" }
-]
+### Workflow: Development to Production
+
+Run the `secret:prod` npm script to securely store your production configuration in GitHub Actions:
+
+```bash
+npm run secret:prod
+```
+
+This uses the GitHub CLI to add your `appsettings.Production.json` to your GitHub repository's Action secrets:
+
+```bash
+gh secret set APPSETTINGS_JSON < appsettings.Production.json
 ```
 
 ### SMTP Email
