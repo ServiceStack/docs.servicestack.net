@@ -321,3 +321,37 @@ flowchart LR
     classDef nextApp fill:#f3e8ff,stroke:#6b21a8,stroke-width:2px,color:#6b21a8
     classDef static fill:#ecfdf5,stroke:#047857,stroke-width:2px
 ```
+
+### Security
+
+```mermaid
+---
+config:
+  layout: dagre
+  look: neo
+  theme: redux
+  themeVariables:
+    edgeLabelBackground: '#ffffff'
+---
+flowchart TB
+ subgraph NET[".NET Process (port 8080)<br>(root user)"]
+        NETAPI["/app/dotnet/<br>rwx------ root<br><br>💾 App_Data/<br>📄 appsettings<br>📦 *.dll<br>"]
+  end
+ subgraph NODE["Node.js Process (port 3000)<br>(nextjs user)"]
+        NODECLIENT["/app/nextjs/<br>r-x--- nextjs<br><br>📁 node_modules/<br>📦 dist/<br>🎨 public/<br>📄 package.json"]
+  end
+ subgraph Docker["🐳 Docker Container"]
+        NET
+        NODE
+  end
+    NET <-- (Proxy) --> NODE
+    BLOCK["✅ Only .NET CAN access /app/dotnet/<br><br>🚫 Node.js CAN ONLY access /tmp + /app/nextjs"]
+
+     BLOCK:::security
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
+    style NETAPI fill:#bbdefb,stroke:#1976d2
+    style NODECLIENT fill:#ffe0b2,stroke:#f57c00
+    style NET fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NODE fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Docker fill:#f0f0f0,stroke:#333,stroke-width:3px
+```
