@@ -50,7 +50,7 @@ the state of the Rabbit MQ server instance:
 To use Rabbit MQ from .NET get Rabbit MQ's [.NET client bindings from NuGet](https://www.nuget.org/packages/RabbitMQ.Client):
 
 :::copy
-`<PackageReference Include="RabbitMQ.Client" Version="8.*" />`
+`<PackageReference Include="RabbitMQ.Client" Version="10.*" />`
 :::
 
 With the package installed, we can go through a common scenario of sending and receiving durable messages with Rabbit MQ.

@@ -58,9 +58,9 @@ npx add-in openapi3
 This will install the required ASP.NET Core Microsoft, Swashbuckle and ServiceStack Open API NuGet packages:
 
 ```xml
-<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.*" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" />
 <PackageReference Include="Swashbuckle.AspNetCore" Version="7.*" />
-<PackageReference Include="ServiceStack.AspNetCore.OpenApi" Version="8.*" />
+<PackageReference Include="ServiceStack.AspNetCore.OpenApi" Version="10.*" />
 ```
 
 Then add the `Configure.OpenApi.cs` [Modular Startup](https://docs.servicestack.net/modular-startup) class to your project:

@@ -10,13 +10,13 @@ Using DTOs to define your web service interface makes it possible to provide str
  **ServiceStack.Client** is the primary NuGet package containing ServiceStack's client libraries that can be included in your `.csproj` with:
 
 :::copy
-`<PackageReference Include="ServiceStack.Client" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Client" Version="10.*" />`
 :::
 
 Earlier **.NET 6.0** can use the [HttpClient-based JsonHttpClient](/csharp-client#jsonhttpclient) in:
 
 :::copy
-`<PackageReference Include="ServiceStack.HttpClient" Version="8.*" />`
+`<PackageReference Include="ServiceStack.HttpClient" Version="10.*" />`
 :::
 
 ### JsonApiClient
@@ -1120,7 +1120,7 @@ As .NET's HttpClient only supports async APIs it needs to use "sync over async" 
 JsonHttpClient can be downloaded from NuGet at:
 
 :::copy
-`<PackageReference Include="ServiceStack.HttpClient" Version="8.*" />`
+`<PackageReference Include="ServiceStack.HttpClient" Version="10.*" />`
 :::
 
 ### Xamarin Native HttpClient
@@ -1200,7 +1200,7 @@ Whilst the list below contain the built-in clients based on .NET's built-in `Htt
 The HttpWebRequest clients above are available in:
 
 :::copy
-`<PackageReference Include="ServiceStack.Client" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Client" Version="10.*" />`
 :::
 
 # Community Resources

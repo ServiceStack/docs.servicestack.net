@@ -75,7 +75,7 @@ The HTTP Request logs can also be configured to persist to a distributed [Redis]
 To use `RedisRequestLogger` first install the **ServiceStack.Server** NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Server" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Server" Version="10.*" />`
 :::
 
 Then configure `RequestLogsFeature` to use the `RedisRequestLogger` which can make use of your existing `IRedisClientsManager` registered IOC dependency, e.g:

@@ -8,14 +8,7 @@ Documentation for ServiceStack.Redis can be found on [ServiceStack.Redis Project
 The [ServiceStack.Redis](https://www.nuget.org/packages/ServiceStack.Redis) NuGet package supports both .NET Framework and .NET Core Applications:
 
 :::copy
-`<PackageReference Include="ServiceStack.Redis" Version="8.*" />`
-:::
-
-Use [ServiceStack.Redis.Core](https://www.nuget.org/packages/ServiceStack.Redis.Core) instead if you're running 
-[ASP.NET Core Apps on the .NET Framework](/templates/corefx)
-
-:::copy
-`<PackageReference Include="ServiceStack.Redis.Core" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Redis" Version="10.*" />`
 :::
 
 ### Basic Example

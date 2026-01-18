@@ -22,7 +22,7 @@ To start using Amazon SQS in stand-alone MQ Servers (i.e. without HTTP access) i
 Support for registering Amazon Simple Queue Service (SQS) as an [MQ Server](/messaging) is available in [ServiceStack.Aws](https://www.nuget.org/packages/ServiceStack.Aws) NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Aws" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Aws" Version="10.*" />`
 :::
 
 Once installed SQS can be configured the same way as any other [MQ Servers](/messaging), by first registering the ServiceBus `IMessageService` provider followed by registering all ServiceStack Services you want to be able to invoke via MQ’s:

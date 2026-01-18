@@ -24,7 +24,7 @@ In this example of integrating AWS S3, we initialize the AWS SDK AmazonS3Client,
 To use the `S3VirtualFiles` you will need the `ServiceStack.Aws` NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Aws" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Aws" Version="10.*" />`
 :::
 
 ## Using File Upload Locations in APIs

@@ -21,7 +21,7 @@ services.AddPlugin(new AutoQueryFeature { MaxLimit = 100 });
 Which is all that's needed to enable the AutoQuery feature. The AutoQueryFeature is inside [ServiceStack.Server](https://servicestack.net/download#get-started) NuGet package which contains value-added features that utilize either OrmLite and Redis which can be added to your project with:
 
 :::copy
-`<PackageReference Include="ServiceStack.Server" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Server" Version="10.*" />`
 :::
 
 If you don't have OrmLite configured it can be registered with a 1-liner by specifying your preferred provider and Connection String:

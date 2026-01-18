@@ -24,7 +24,7 @@ We'll use this to show how to call Open AI Chat APIs in 11 different languages:
 Install the `ServiceStack.Client` NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Client" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Client" Version="10.*" />`
 :::
 
 Download AI Server's C# DTOs with [x dotnet tool](/dotnet-tool):
@@ -335,7 +335,7 @@ let result:OpenAiChatResponse = try await client.postAsync(
 Install the `ServiceStack.Client` NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Client" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Client" Version="10.*" />`
 :::
 
 Download AI Server's F# DTOs with [x dotnet tool](/dotnet-tool):
@@ -369,7 +369,7 @@ let result = client.Post<OpenAiChatCompletionResponse>("/v1/chat/completions",
 Install the `ServiceStack.Client` NuGet package:
 
 :::copy
-`<PackageReference Include="ServiceStack.Client" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Client" Version="10.*" />`
 :::
 
 Download AI Server's VB.NET DTOs with [x dotnet tool](/dotnet-tool):

@@ -55,7 +55,7 @@ requests when deployed to production
 To Get Started Install [ServiceStack's AWS Support package](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Aws) from NuGet:
 
 :::copy
-`<PackageReference Include="ServiceStack.Aws" Version="8.*" />`
+`<PackageReference Include="ServiceStack.Aws" Version="10.*" />`
 :::
 
 ## Simple AutoQuery Data Example

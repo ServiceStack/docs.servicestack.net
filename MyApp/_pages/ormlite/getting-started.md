@@ -319,19 +319,19 @@ dotnet add package ServiceStack.OrmLite.MySql       // MySql
 Or you can add the following to your `csproj` file.
 
 :::copy
-`<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="8.*" />`
+`<PackageReference Include="ServiceStack.OrmLite.SqlServer" Version="10.*" />`
 :::
 
 :::copy
-`<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="8.*" />`
+`<PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="10.*" />`
 :::
 
 :::copy
-`<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="8.*" />`
+`<PackageReference Include="ServiceStack.OrmLite.PostgreSQL" Version="10.*" />`
 :::
 
 :::copy
-`<PackageReference Include="ServiceStack.OrmLite.MySql" Version="8.*" />`
+`<PackageReference Include="ServiceStack.OrmLite.MySql" Version="10.*" />`
 :::
 
 The next step is creating a connection to your database. Here's how you do it for SQLite:
