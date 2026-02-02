@@ -138,11 +138,11 @@ Options:
 ### Add/Update ServiceStack References
 
 This shows us we can Add a ServiceStack Reference with `x <lang> <baseurl>` which will let us create a TypeScript Reference 
-to the new [World Validation](/world-validation) App using its `ts` file extension alias:
+to the new [Blazor Vue App](https://blazor-vue.web-templates.io) using its `ts` file extension alias:
 
 
 :::sh
-x ts http://validation.web-app.io
+x ts https://blazor-vue.web-templates.io
 :::
 
 Output:
@@ -153,7 +153,7 @@ Saved to: dtos.ts
 Or create a C# ServiceStack Reference with:
 
 :::sh
-x cs http://validation.web-app.io
+x cs https://blazor-vue.web-templates.io
 :::
 
 Output:

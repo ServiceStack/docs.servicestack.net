@@ -82,7 +82,7 @@ With this feature we can use a `_id` directory name to declare an `id` variable 
 
 This will let you navigate to the `edit.cshtml` page directly to edit a contact using the ideal "pretty url" we want:
 
- - [/contacts/1/edit](http://validation.web-app.io/server-razor/contacts/1/edit)
+ - /contacts/1/edit
 
 Placeholders can be on both directory or file names, e.g:
 

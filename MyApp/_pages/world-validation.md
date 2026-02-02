@@ -17,7 +17,6 @@ As of this writing there **4 different server HTML** generated strategies that u
 
 <h4 class="mt-8 text-center">
   View Source on GitHub <a href="https://github.com/NetCoreApps/Validation">NetCoreApps/Validation</a> - 
-  Live Demo <a href="http://validation.web-app.io">validation.web-app.io</a>
 </h4>
 
 ### Server Rendered HTML UIs
@@ -66,10 +65,10 @@ Typed Request/Response Service Contracts including Data and DTO models that util
 
 Each UI implements 4 different screens which are linked from:
 
- - [Login Page](http://validation.web-app.io/login-links) - Sign In to ServiceStack's built-in Username/Password Credentials Auth Provider
- - [Registration Page](http://validation.web-app.io/register-links) - Calling ServiceStack's built-in `/register` Service to register a new User
- - [Contacts Page](http://validation.web-app.io/contact-links) - Contacts Form to Add a new Contact and view list of existing contacts
- - [Edit Contact Page](http://validation.web-app.io/contact-edit-links) - Edit Contact Form
+ - [Login Page](https://github.com/NetCoreApps/Validation/blob/master/world/wwwroot/login-links.html) - Sign In to ServiceStack's built-in Username/Password Credentials Auth Provider
+ - [Registration Page](https://github.com/NetCoreApps/Validation/blob/master/world/wwwroot/register-links.html) - Calling ServiceStack's built-in `/register` Service to register a new User
+ - [Contacts Page](https://github.com/NetCoreApps/Validation/blob/master/world/wwwroot/contact-links.html) - Contacts Form to Add a new Contact and view list of existing contacts
+ - [Edit Contact Page](https://github.com/NetCoreApps/Validation/blob/master/world/wwwroot/contact-edit-links.html) - Edit Contact Form
 
 ### Shared Error Handling Concepts
 
@@ -218,7 +217,7 @@ that remains consistent is the way to call ServiceStack Services and handle erro
 The remaining client implementations show that whilst the server controls require the least code, if you need custom markup it's much easier 
 to render the initial markup once, then use `bootstrapForm()` to bind any validation errors and handle the ajax form submissions. It's especially 
 valuable when you need to update a form where the same markup can be populated by just assigning the `model` property as done in the 
-[Edit Contact Pages](http://validation.web-app.io/contact-edit-links):
+[Edit Contact Pages](https://github.com/NetCoreApps/Validation/blob/master/world/wwwroot/contact-edit-links.html):
 
 ```ts
 const form = document.querySelector("form")!;
