@@ -57,7 +57,6 @@ Identity Auth in your own projects:
 
 - [blazor](https://github.com/NetCoreTemplates/blazor)
 - [blazor-vue](https://github.com/NetCoreTemplates/blazor-vue)
-- [blazor-wasm](https://github.com/LegacyTemplates/blazor-wasm)
 - [razor](https://github.com/NetCoreTemplates/razor)
 - [mvc](https://github.com/NetCoreTemplates/mvc)
 - [razor-bootstrap](https://github.com/NetCoreTemplates/razor-bootstrap)
