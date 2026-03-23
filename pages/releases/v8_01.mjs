@@ -9,14 +9,6 @@ const BlazorTemplate = {
     }
 }
 
-const BlazorWasmTemplate = {
-    components: { Templates },
-    template:`<Templates :templates="[Index['blazor-wasm']]" />`,
-    setup() {
-        return { Index }
-    }
-}
-
 const BlazorVueTemplate = {
     components: { Templates },
     template:`<Templates :templates="[Index['blazor-vue']]" />`,
@@ -31,7 +23,6 @@ export default {
     components: {
         AudioPlayer,
         BlazorTemplate,
-        BlazorWasmTemplate,
         BlazorVueTemplate,
     },
     setup() {
