@@ -78,8 +78,20 @@ real-time communications to all clients subscribed to the same ServiceStack Inst
 Like most other [modular functionality](/plugins) in ServiceStack, Server Sent Events is encapsulated in a single Plugin that can be registered in your AppHost with:
 
 ```csharp
-Plugins.Add(new ServerEventsFeature());
+public class ConfigureServerEvents : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices(services => {
+            services.AddPlugin(new ServerEventsFeature());
+        });
+}
 ```
+
+This can be added to your Project with:
+
+:::sh
+npx add-in serverevents
+:::
 
 The registration above is all that's needed for most use-cases which just uses the defaults below:
 
