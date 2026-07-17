@@ -126,12 +126,12 @@ public class MyRequest
 }
 ```
 
-Or from a [#Script Expression](https://sharpscript.net) in `EvalEvalAllowableValues` where it can be populated from a static list, e.g:
+Or from a [#Script Expression](https://sharpscript.net) in `EvalAllowableValues` where it can be populated from a static list, e.g:
 
 ```csharp
 public class MyRequest
 {
-    [Input(Type = "tag", EvalEvalAllowableValues="['c#','servicestack','vue']")]
+    [Input(Type = "tag", EvalAllowableValues="['c#','servicestack','vue']")]
     public List<string>? Skills { get; set; }
 }
 ```
@@ -141,7 +141,7 @@ Or sourced from a C# Expression, e.g:
 ```csharp
 public class MyRequest
 {
-    [Input(Type = "tag", EvalEvalAllowableValues="AppData.Tags")]
+    [Input(Type = "tag", EvalAllowableValues="AppData.Tags")]
     public List<string>? Skills { get; set; }
 }
 ```
