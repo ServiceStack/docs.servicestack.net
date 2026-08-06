@@ -173,7 +173,7 @@ class ServiceStack::JsonServiceClient
   attr_accessor :base_url, :reply_base_url, :oneway_base_url, :headers,
                 :bearer_token, :refresh_token, :refresh_token_uri,
                 :user_name, :password, :request_filter, :response_filter,
-                :timeout, :cookies
+                :timeout, :cookies, :on_authentication_required
 
   # Filters applied to every Request and Response of all clients
   self.global_request_filter
@@ -209,6 +209,11 @@ class ServiceStack::JsonServiceClient
   def send_url(path, method: HttpMethods::GET, body: nil, response_as: nil, args: nil)
   def send_url_string(path, method: HttpMethods::GET, body: nil, args: nil)
   def to_absolute_url(path_or_url)
+
+  # File Uploads
+  def post_file_with_request(request, file, args: nil)
+  def post_files_with_request(request, files, args: nil)
+  def post_files_with_request_url(path, request, files, response_as: nil, args: nil)
 end
 ```
 
@@ -494,6 +499,26 @@ Use the `bearer_token` property to Authenticate with an [API Key](/auth/api-key-
 client.set_bearer_token(api_key)
 ```
 
+### Transparently handle 401 Unauthorized Responses
+
+If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the `on_authentication_required` callback to re-configure the client before automatically retrying the original request, e.g:
+
+```ruby
+auth_client = ServiceStack::JsonServiceClient.new(AUTH_URL)
+
+client.on_authentication_required = lambda { |c|
+  auth = auth_client.authenticate(user_name, password)
+  c.set_bearer_token(auth.bearer_token)
+}
+
+# Automatically retries requests returning 401 Responses with new bearerToken
+response = client.send(Secured.new)
+```
+
+The callback also accepts a zero-arity lambda when it doesn't need the client. A configured Refresh Token takes precedence over the callback, which is only used when no Refresh Token is set or refreshing it failed. If the callback raises, the original 401 Response is returned.
+
+Requires **servicestack v0.1.2+**.
+
 ### Automatically refresh Access Tokens
 
 With the [Refresh Token support in JWT](/auth/jwt-authprovider#refresh-tokens) you can use the `refresh_token` property to instruct the Service Client to automatically fetch new JWT Tokens behind the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:
@@ -516,6 +541,29 @@ Use the `refresh_token_uri` property when refresh tokens need to be sent to a di
 client.set_refresh_token(refresh_token)
 client.refresh_token_uri = AUTH_URL + '/access-token'
 ```
+
+### Uploading Files
+
+Use `post_file_with_request` to upload a file with an API Request, whose contents can be supplied as a String or any IO that responds to `read`:
+
+```ruby
+res = File.open('photo.png', 'rb') do |file|
+  client.post_file_with_request(UploadPhoto.new(album: 'Holiday'),
+    ServiceStack::UploadFile.new(field_name: 'file', file_name: 'photo.png',
+                                 content_type: 'image/png', stream: file))
+end
+```
+
+The Request DTO's populated properties are sent as form fields alongside the file. To upload multiple files use `post_files_with_request`:
+
+```ruby
+client.post_files_with_request(UploadPhoto.new(album: 'Holiday'), [
+  ServiceStack::UploadFile.new(field_name: 'file1', file_name: 'a.png', stream: a),
+  ServiceStack::UploadFile.new(field_name: 'file2', file_name: 'b.png', stream: b)
+])
+```
+
+Requires **servicestack v0.1.1+**.
 
 ### Inspecting Requests and Responses
 

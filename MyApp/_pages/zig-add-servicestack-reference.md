@@ -64,7 +64,7 @@ The generated `ss_name`, `ss_verb` and `Response` declarations are what enable t
 The only requirements for Zig Apps to perform typed API Requests are the generated Zig DTOs and the generic `JsonServiceClient` in the [servicestack-zig](https://github.com/ServiceStack/servicestack-zig) module, which only uses the Zig standard library:
 
 :::sh
-zig fetch --save https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.0.tar.gz
+zig fetch --save https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.2.tar.gz
 :::
 
 Then add the module to your `build.zig`:
@@ -153,7 +153,7 @@ x zig
 
 The generic `JsonServiceClient` is a 1st class client with the same rich featureset of the smart ServiceClients in other [1st class supported languages](/add-servicestack-reference#supported-languages) sporting a terse, typed flexible API with support for custom URLs and HTTP Methods and raw Response bodies.
 
-It includes built-in support for a number of [ServiceStack Auth options](/auth/authentication-and-authorization) including [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) and stateless Bearer Token Auth Providers like [API Key](/auth/api-key-authprovider) and [JWT Auth](/auth/jwt-authprovider) as well as [stateful Sessions](/auth/sessions) used by the popular **credentials** Auth Provider, whose Session Cookies are retained by the client's built-in `CookieJar` which `std.http.Client` doesn't provide.
+It includes built-in support for a number of [ServiceStack Auth options](/auth/authentication-and-authorization) including [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) and stateless Bearer Token Auth Providers like [API Key](/auth/api-key-authprovider) and [JWT Auth](/auth/jwt-authprovider) as well as [stateful Sessions](/auth/sessions) used by the popular **credentials** Auth Provider, whose Session Cookies are retained by the client's built-in `CookieJar` which `std.http.Client` doesn't provide. [Refresh Tokens](/auth/jwt-authprovider#refresh-tokens) are also supported, where expired JWT Bearer Tokens are transparently refreshed behind-the-scenes before automatically retrying the failed Request.
 
 ```zig
 pub const JsonServiceClient = struct {
@@ -177,6 +177,12 @@ pub const JsonServiceClient = struct {
     pub fn sendAs(self: *Self, comptime ResponseType: type, request: anytype) !std.json.Parsed(ResponseType)
     pub fn api(self: *Self, request: anytype) !ApiResult(...)
     pub fn authenticate(self: *Self, user_name: []const u8, password: []const u8) !std.json.Parsed(AuthenticateResponse)
+    pub fn setRefreshToken(self: *Self, token: []const u8) void
+    on_authentication_required: ?*const fn (client: *Self) anyerror!void
+
+    // File Uploads
+    pub fn postFileWithRequest(self: *Self, request: anytype, file: UploadFile) !std.json.Parsed(...)
+    pub fn postFilesWithRequest(self: *Self, request: anytype, files: []const UploadFile) !std.json.Parsed(...)
 
     // Batched and one-way Requests
     pub fn sendAll(self: *Self, comptime ResponseType: type, requests: anytype) !std.json.Parsed([]const ResponseType)
@@ -337,6 +343,14 @@ Use `setBearerToken` to Authenticate with a [ServiceStack JWT Provider](/auth/jw
 client.setBearerToken(jwt);
 ```
 
+Alternatively you can use just a [Refresh Token](/auth/jwt-authprovider#refresh-tokens) instead:
+
+```zig
+client.setRefreshToken(refresh_token);
+```
+
+Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token before retrying requests that returned 401 Unauthorized (**v0.1.2+**).
+
 ### Authenticating using an API Key
 
 Use `setBearerToken` to Authenticate with an [API Key](/auth/api-key-authprovider):
@@ -344,6 +358,58 @@ Use `setBearerToken` to Authenticate with an [API Key](/auth/api-key-authprovide
 ```zig
 client.setBearerToken("ak-87949de37e894627a9f6173154e7cafa");
 ```
+
+### Uploading Files
+
+Use `postFileWithRequest` to upload a file with an API Request:
+
+```zig
+var res = try client.postFileWithRequest(dtos.UploadPhoto{ .album = "Holiday" }, .{
+    .field_name = "file",
+    .file_name = "photo.png",
+    .content_type = "image/png",
+    .contents = bytes,
+});
+defer res.deinit();
+```
+
+The Request DTO's populated properties are sent as form fields alongside the file. To upload multiple files use `postFilesWithRequest`:
+
+```zig
+const files = [_]ss.UploadFile{
+    .{ .field_name = "file1", .file_name = "a.png", .contents = a },
+    .{ .field_name = "file2", .file_name = "b.png", .contents = b },
+};
+var res = try client.postFilesWithRequest(dtos.UploadPhoto{ .album = "Holiday" }, files[0..]);
+defer res.deinit();
+```
+
+Requires **servicestack v0.1.2+**.
+
+### Transparently handle 401 Unauthorized Responses
+
+If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the `on_authentication_required` callback to re-authenticate before automatically retrying the original request, e.g:
+
+```zig
+fn signIn(client: *ss.JsonServiceClient) anyerror!void {
+    var auth = try client.authenticate("username", "password");
+    auth.deinit();
+}
+
+client.on_authentication_required = signIn;
+
+// Automatically retries requests returning 401 Responses
+var res = try client.send(dtos.Secured{});
+defer res.deinit();
+```
+
+Alternatively configure a [Refresh Token](/auth/jwt-authprovider#refresh-tokens), which takes precedence over the callback and is used to transparently fetch a new JWT Bearer Token before retrying:
+
+```zig
+client.setRefreshToken(refresh_token);
+```
+
+Requires **servicestack v0.1.2+**.
 
 ### Client Configuration
 

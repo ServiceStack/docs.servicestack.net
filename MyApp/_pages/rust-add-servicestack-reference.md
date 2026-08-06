@@ -193,6 +193,7 @@ impl JsonServiceClient {
     pub async fn send_void<T: IReturnVoid>(&self, request: &T) -> Result<()>
     pub async fn api<T: IReturn>(&self, request: &T) -> ApiResult<T::Response>
     pub async fn authenticate(&self, user_name: &str, password: &str) -> Result<AuthenticateResponse>
+    pub fn set_on_authentication_required<F>(&mut self, callback: F) -> &mut Self
 
     // Batched and one-way Requests
     pub async fn send_all<T: IReturn>(&self, requests: &[T]) -> Result<Vec<T::Response>>
@@ -245,6 +246,10 @@ use servicestack::blocking::JsonServiceClient;
 let client = JsonServiceClient::new("https://blazor-vue.web-templates.io");
 let res = client.send(&Hello { name: Some("World".into()) })?;
 ```
+
+::: warning
+As it creates its own runtime, the blocking client can't be used from within an async context, e.g. inside a `#[tokio::main]` fn - use the async client there instead.
+:::
 
 ### AutoQuery Requests
 
@@ -383,6 +388,35 @@ Use `set_bearer_token` to Authenticate with an [API Key](/auth/api-key-authprovi
 ```rust
 client.set_bearer_token("ak-87949de37e894627a9f6173154e7cafa");
 ```
+
+### Transparently handle 401 Unauthorized Responses
+
+If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use `set_on_authentication_required` to re-configure the client before automatically retrying the original request, e.g:
+
+```rust,ignore
+client.set_on_authentication_required(|client| {
+    Box::pin(async move {
+        client.authenticate("username", "password").await?;
+        Ok(())
+    })
+});
+
+// Automatically retries requests returning 401 Responses
+let res = client.send(&Secured::default()).await?;
+```
+
+The client is cheap to clone, so the callback receives its own handle sharing the same cookie store and auth tokens. The `blocking` client uses the same API without the boxed future:
+
+```rust,ignore
+client.set_on_authentication_required(|client| {
+    client.authenticate("username", "password")?;
+    Ok(())
+});
+```
+
+A configured Refresh Token takes precedence over the callback, which is only used when no Refresh Token is set or refreshing it failed.
+
+Requires **servicestack v0.1.1+**.
 
 ### Uploading Files
 
