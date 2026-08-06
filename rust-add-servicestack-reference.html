@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-06T08:03:40.9254159Z'>
+    <meta name='date' content='2026-08-06T08:43:28.1796657Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Rust Add ServiceStack Reference</title>
@@ -1725,6 +1725,7 @@ serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
     pub async fn send_void&lt;T: IReturnVoid&gt;(&amp;self, request: &amp;T) -&gt; Result&lt;()&gt;
     pub async fn api&lt;T: IReturn&gt;(&amp;self, request: &amp;T) -&gt; ApiResult&lt;T::Response&gt;
     pub async fn authenticate(&amp;self, user_name: &amp;str, password: &amp;str) -&gt; Result&lt;AuthenticateResponse&gt;
+    pub fn set_on_authentication_required&lt;F&gt;(&amp;mut self, callback: F) -&gt; &amp;mut Self
 
     // Batched and one-way Requests
     pub async fn send_all&lt;T: IReturn&gt;(&amp;self, requests: &amp;[T]) -&gt; Result&lt;Vec&lt;T::Response&gt;&gt;
@@ -1763,6 +1764,9 @@ async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 let client = JsonServiceClient::new(&quot;https://blazor-vue.web-templates.io&quot;);
 let res = client.send(&amp;Hello { name: Some(&quot;World&quot;.into()) })?;
 </code></pre>
+<div class="warning custom-block">
+            <p class="custom-block-title">WARNING</p><p>As it creates its own runtime, the blocking client can't be used from within an async context, e.g. inside a <code>#[tokio::main]</code> fn - use the async client there instead.</p>
+</div>
 <h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>AutoQuery APIs return a typed <code>QueryResponse&lt;T&gt;</code>, with the query params of their base type flattened into the Request DTO:</p>
 <pre><code class="language-rust">use servicestack::QueryDb;
@@ -1848,6 +1852,26 @@ let res = client.send(&amp;SecureRequest::default()).await?;
 <p>Use <code>set_bearer_token</code> to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-rust">client.set_bearer_token(&quot;ak-87949de37e894627a9f6173154e7cafa&quot;);
 </code></pre>
+<h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use <code>set_on_authentication_required</code> to re-configure the client before automatically retrying the original request, e.g:</p>
+<pre><code class="language-rust,ignore">client.set_on_authentication_required(|client| {
+    Box::pin(async move {
+        client.authenticate(&quot;username&quot;, &quot;password&quot;).await?;
+        Ok(())
+    })
+});
+
+// Automatically retries requests returning 401 Responses
+let res = client.send(&amp;Secured::default()).await?;
+</code></pre>
+<p>The client is cheap to clone, so the callback receives its own handle sharing the same cookie store and auth tokens. The <code>blocking</code> client uses the same API without the boxed future:</p>
+<pre><code class="language-rust,ignore">client.set_on_authentication_required(|client| {
+    client.authenticate(&quot;username&quot;, &quot;password&quot;)?;
+    Ok(())
+});
+</code></pre>
+<p>A configured Refresh Token takes precedence over the callback, which is only used when no Refresh Token is set or refreshing it failed.</p>
+<p>Requires <strong>servicestack v0.1.1+</strong>.</p>
 <h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Enable the <code>multipart</code> feature to upload files with an API Request:</p>
 <pre><code class="language-rust">use servicestack::UploadFile;
@@ -2072,6 +2096,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                         <span v-hash="'#authenticating-using-an-api-key'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Authenticating using an API Key
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Transparently handle 401 Unauthorized Responses
                                                         </span>
                                                     </li>
                                                     <li data-id="uploading-files" class="text-gray-500 hover:text-gray-900">

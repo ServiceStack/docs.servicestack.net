@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-06T08:03:40.9219386Z'>
+    <meta name='date' content='2026-08-06T08:43:28.1742748Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Ruby Add ServiceStack Reference</title>
@@ -1693,7 +1693,7 @@ Updated: dtos.rb
   attr_accessor :base_url, :reply_base_url, :oneway_base_url, :headers,
                 :bearer_token, :refresh_token, :refresh_token_uri,
                 :user_name, :password, :request_filter, :response_filter,
-                :timeout, :cookies
+                :timeout, :cookies, :on_authentication_required
 
   # Filters applied to every Request and Response of all clients
   self.global_request_filter
@@ -1729,6 +1729,11 @@ Updated: dtos.rb
   def send_url(path, method: HttpMethods::GET, body: nil, response_as: nil, args: nil)
   def send_url_string(path, method: HttpMethods::GET, body: nil, args: nil)
   def to_absolute_url(path_or_url)
+
+  # File Uploads
+  def post_file_with_request(request, file, args: nil)
+  def post_files_with_request(request, files, args: nil)
+  def post_files_with_request_url(path, request, files, response_as: nil, args: nil)
 end
 </code></pre>
 <div class="info custom-block">
@@ -1946,6 +1951,20 @@ response = client.send(SecureRequest.new)
 <p>Use the <code>bearer_token</code> property to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-ruby">client.set_bearer_token(api_key)
 </code></pre>
+<h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the <code>on_authentication_required</code> callback to re-configure the client before automatically retrying the original request, e.g:</p>
+<pre><code class="language-ruby">auth_client = ServiceStack::JsonServiceClient.new(AUTH_URL)
+
+client.on_authentication_required = lambda { |c|
+  auth = auth_client.authenticate(user_name, password)
+  c.set_bearer_token(auth.bearer_token)
+}
+
+# Automatically retries requests returning 401 Responses with new bearerToken
+response = client.send(Secured.new)
+</code></pre>
+<p>The callback also accepts a zero-arity lambda when it doesn't need the client. A configured Refresh Token takes precedence over the callback, which is only used when no Refresh Token is set or refreshing it failed. If the callback raises, the original 401 Response is returned.</p>
+<p>Requires <strong>servicestack v0.1.2+</strong>.</p>
 <h3 id="automatically-refresh-access-tokens">Automatically refresh Access Tokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-refresh-access-tokens'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>With the <a href="/auth/jwt-authprovider#refresh-tokens">Refresh Token support in JWT</a> you can use the <code>refresh_token</code> property to instruct the Service Client to automatically fetch new JWT Tokens behind the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:</p>
 <pre><code class="language-ruby"># Authenticate to get new Refresh Token
@@ -1962,6 +1981,21 @@ response = client.send(Secured.new)
 <pre><code class="language-ruby">client.set_refresh_token(refresh_token)
 client.refresh_token_uri = AUTH_URL + '/access-token'
 </code></pre>
+<h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use <code>post_file_with_request</code> to upload a file with an API Request, whose contents can be supplied as a String or any IO that responds to <code>read</code>:</p>
+<pre><code class="language-ruby">res = File.open('photo.png', 'rb') do |file|
+  client.post_file_with_request(UploadPhoto.new(album: 'Holiday'),
+    ServiceStack::UploadFile.new(field_name: 'file', file_name: 'photo.png',
+                                 content_type: 'image/png', stream: file))
+end
+</code></pre>
+<p>The Request DTO's populated properties are sent as form fields alongside the file. To upload multiple files use <code>post_files_with_request</code>:</p>
+<pre><code class="language-ruby">client.post_files_with_request(UploadPhoto.new(album: 'Holiday'), [
+  ServiceStack::UploadFile.new(field_name: 'file1', file_name: 'a.png', stream: a),
+  ServiceStack::UploadFile.new(field_name: 'file2', file_name: 'b.png', stream: b)
+])
+</code></pre>
+<p>Requires <strong>servicestack v0.1.1+</strong>.</p>
 <h3 id="inspecting-requests-and-responses">Inspecting Requests and Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#inspecting-requests-and-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Requests and Responses can be inspected or modified with instance and static filters:</p>
 <pre><code class="language-ruby">client.request_filter = -&gt;(req) { puts &quot;#{req.method} #{req.path}&quot; }
@@ -2206,10 +2240,22 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Authenticating using an API Key
                                                         </span>
                                                     </li>
+                                                    <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Transparently handle 401 Unauthorized Responses
+                                                        </span>
+                                                    </li>
                                                     <li data-id="automatically-refresh-access-tokens" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#automatically-refresh-access-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Automatically refresh Access Tokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="uploading-files" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#uploading-files'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Uploading Files
                                                         </span>
                                                     </li>
                                                     <li data-id="inspecting-requests-and-responses" class="text-gray-500 hover:text-gray-900">
