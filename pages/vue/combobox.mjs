@@ -3,7 +3,7 @@ import { JsonServiceClient } from "@servicestack/client"
 
 export default {
     install(app) {
-        app.provide('client', new JsonServiceClient('https://blazor-gallery.jamstacks.net'))
+        app.provide('client', new JsonServiceClient('https://blazor-gallery.servicestack.net'))
     },
     setup() {
         const strings = ref()
