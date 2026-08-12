@@ -10,6 +10,7 @@ import { PagingNav, FileLayout } from './components/Docs.mjs'
 import Typesense from "./components/Typesense.mjs"
 import ProjectTemplate from "./components/ProjectTemplate.mjs"
 import ProjectCreator from "./components/ProjectCreator.mjs"
+import TextBlock from "./components/TextBlock.mjs"
 import VibeTemplate from "../pages/components/VibeTemplate.mjs"
 import ScreenshotsGallery from "../pages/components/ScreenshotsGallery.mjs"
 
@@ -59,6 +60,7 @@ const Components = {
     Typesense,
     ProjectTemplate,
     ProjectCreator,
+    TextBlock,
     VibeTemplate,
     ScreenshotsGallery,
 }
