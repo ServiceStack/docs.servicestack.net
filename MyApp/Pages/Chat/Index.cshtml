@@ -1,0 +1,693 @@
+@page "/chat/"
+@attribute [RenderStatic]
+@{
+    ViewData["Title"] = "AI Chat";
+    ViewData["Brand"] = "ServiceStack.AI.Chat";
+}
+
+<style>
+    /* Rails on the gateway board - a travelling packet along the request's path.
+       Disabled under reduced motion. */
+    .rail { position: relative; overflow: hidden }
+    .rail::before {
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent, rgb(56 189 248 / .55), transparent);
+        background-size: 200% 100%;
+        animation: rail-flow 3.2s linear infinite;
+    }
+    .rail-2::before { animation-delay: .55s }
+    @@keyframes rail-flow {
+        from { background-position: 200% 0 }
+        to   { background-position: -100% 0 }
+    }
+    @@media (max-width: 1023px) {
+        .rail::before {
+            background: linear-gradient(180deg, transparent, rgb(56 189 248 / .55), transparent);
+            background-size: 100% 200%;
+            animation-name: rail-flow-y;
+        }
+        @@keyframes rail-flow-y {
+            from { background-position: 0 200% }
+            to   { background-position: 0 -100% }
+        }
+    }
+    @@media (prefers-reduced-motion: reduce) {
+        .rail::before { animation: none; background: rgb(56 189 248 / .35) }
+    }
+    /* Deny row reads as struck-through as well as red, so it survives a colour-blind read */
+    .denied { text-decoration: line-through; text-decoration-thickness: 1px }
+</style>
+
+<!-- ───────────────────────── Hero ───────────────────────── -->
+<div class="relative isolate overflow-hidden border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+
+    <svg class="absolute inset-0 -z-10 h-full w-full stroke-slate-200 [mask-image:radial-gradient(90%_70%_at_top,white,transparent)] dark:stroke-slate-800/60" aria-hidden="true">
+        <defs>
+            <pattern id="chat-grid" width="120" height="120" x="50%" y="-1" patternUnits="userSpaceOnUse">
+                <path d="M60 120V.5M.5 .5H120" fill="none" />
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" stroke-width="0" fill="url(#chat-grid)" />
+    </svg>
+
+    <div class="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:pt-20 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <div class="flex justify-center">
+                <div class="rounded-full px-3 py-1 font-mono text-xs tracking-tight text-slate-600 ring-1 ring-slate-900/10 dark:text-slate-400 dark:ring-white/10">
+                    ServiceStack.AI.Chat
+                </div>
+            </div>
+
+            <h1 class="mt-6 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl dark:text-white">
+                <span class="mb-4 block">A complete AI Assistant</span>
+                <span class="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent dark:from-sky-400 dark:to-indigo-400">inside your .NET App</span>
+            </h1>
+
+            <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+                One plugin gives your users a multi-provider Chat UI, RAG over your documents, a PDF designer and
+                safe AI access to your own APIs &mdash; using the accounts, database and security boundary your App
+                already has.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+                <a href="/chat/install" class="rounded-md bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-500">
+                    Get Started
+                </a>
+                <a href="/chat/overview" class="text-sm font-semibold leading-6 text-slate-900 transition-colors hover:text-sky-600 dark:text-white dark:hover:text-sky-400">
+                    Read the docs <span aria-hidden="true">&rarr;</span>
+                </a>
+            </div>
+
+            <div class="my-8 mx-auto max-w-lg" data-component="ShellCommand" data-props="{text:'npx add-in chat'}"></div>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-7xl px-6 pb-16 lg:px-8">
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-2xl dark:border-slate-700">
+            <img src="/img/pages/chat/chat-ui.webp" alt="AI Chat running at /chat" class="h-auto w-full" loading="lazy">
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Identity Auth ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Governed by your App</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            It's already your users
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            <code class="font-mono text-base text-sky-700 dark:text-sky-400">ChatFeature</code> authenticates against the
+            App it's hosted in. Signing in, roles, locking an account, revoking a key &mdash; all of it keeps working
+            exactly as it does everywhere else in your App.
+        </p>
+    </div>
+
+    <!-- The gateway board -->
+    <div class="mt-14 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 sm:p-10 dark:border-slate-800 dark:bg-slate-900/40">
+        <div class="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr_auto_1fr]">
+
+            <div>
+                <div class="mb-3 font-mono text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Your users</div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
+                        <span class="font-mono text-xs text-slate-700 dark:text-slate-300">alex</span>
+                        <span class="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">Admin</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
+                        <span class="font-mono text-xs text-slate-700 dark:text-slate-300">sam</span>
+                        <span class="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">Staff</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 opacity-60 dark:border-slate-700 dark:bg-slate-900">
+                        <span class="denied font-mono text-xs text-slate-500 dark:text-slate-500">contractor</span>
+                        <span class="rounded bg-rose-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-rose-700 dark:text-rose-400">no role</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rail mx-auto h-8 w-px bg-slate-200 lg:h-px lg:w-16 dark:bg-slate-700" aria-hidden="true"></div>
+
+            <div class="rounded-xl border-2 border-sky-500/30 bg-white p-4 shadow-sm dark:bg-slate-900">
+                <div class="mb-3 flex items-center gap-2">
+                    <svg class="h-4 w-4 text-sky-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span class="font-mono text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Your existing auth</span>
+                </div>
+                <div class="space-y-1.5 font-mono text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400 dark:text-slate-500">RequireAuth</span>
+                        <span class="text-emerald-600 dark:text-emerald-400">true</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400 dark:text-slate-500">RequiredRole</span>
+                        <span class="text-emerald-600 dark:text-emerald-400">"Staff"</span>
+                    </div>
+                </div>
+                <div class="mt-3 border-t border-slate-200 pt-3 font-mono text-[11px] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    2 allowed &middot; 1 rejected
+                </div>
+            </div>
+
+            <div class="rail rail-2 mx-auto h-8 w-px bg-slate-200 lg:h-px lg:w-16 dark:bg-slate-700" aria-hidden="true"></div>
+
+            <div>
+                <div class="mb-3 font-mono text-[11px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Approved models</div>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="rounded border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">anthropic</span>
+                    <span class="rounded border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">openai</span>
+                    <span class="rounded border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">google</span>
+                    <span class="rounded border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">ollama</span>
+                    <span class="rounded border border-slate-200 bg-white px-2 py-1 font-mono text-[11px] text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">+20 more</span>
+                </div>
+                <div class="mt-4 flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2">
+                    <svg class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 9v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-mono text-[11px] text-amber-800 dark:text-amber-300">centralized provider keys &amp; billing</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="mt-8 border-t border-slate-200 pt-5 text-center text-sm text-slate-600 dark:border-slate-800 dark:text-slate-400">
+            No second user directory. No SSO integration project. The people who can already sign into your App
+            are the people who can use it &mdash; and the ones who can't, can't.
+        </p>
+    </div>
+
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="font-semibold text-slate-900 dark:text-white">Restrict who gets in</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Set <code class="font-mono text-xs text-sky-700 dark:text-sky-400">RequiredRole</code> and only users
+                holding that role reach the UI or any of its APIs. Everyone else is rejected at the door.
+            </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="font-semibold text-slate-900 dark:text-white">Keys for programmatic clients</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                With <a href="/auth/apikeys" class="text-sky-700 hover:underline dark:text-sky-400">ApiKeysFeature</a>
+                registered, <code class="font-mono text-xs text-sky-700 dark:text-sky-400">/v1/chat/completions</code>
+                also accepts a Bearer key &mdash; so scripts and MCP clients work alongside browser sign-in.
+            </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="font-semibold text-slate-900 dark:text-white">Multi-user from the start</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Everyone gets their own workspace. Chat history, uploads and gallery, agent profiles, projects,
+                skills, themes and PDF templates are all partitioned per user.
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-12 grid gap-8 lg:grid-cols-2">
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/auth/signin.webp" alt="Signing in to the Chat UI with an existing account" class="h-auto w-full" loading="lazy">
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/auth/manage-users.webp" alt="Managing users from the Admin UI" class="h-auto w-full" loading="lazy">
+        </div>
+    </div>
+
+    <div class="mx-auto mt-12 max-w-3xl overflow-hidden rounded-xl bg-slate-900 shadow-2xl ring-1 ring-white/10">
+        <div class="flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
+            <div class="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-amber-500"></div>
+            <div class="h-2.5 w-2.5 rounded-full bg-green-500"></div>
+            <div class="ml-2 font-mono text-xs text-slate-500">Configure.AI.Chat.cs</div>
+        </div>
+        <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-sm leading-6 text-slate-300"><code>services.<span class="text-sky-400">AddPlugin</span>(<span class="text-purple-400">new</span> <span class="text-emerald-300">ChatFeature</span> {
+    RequireAuth  = <span class="text-purple-400">true</span>,
+    RequiredRole = <span class="text-amber-300">"Staff"</span>,       <span class="text-slate-500">// only Staff can use it</span>
+    RoutePrefix  = <span class="text-amber-300">"/chat"</span>,
+    EnableProviders = [<span class="text-amber-300">"openai"</span>, <span class="text-amber-300">"anthropic"</span>, <span class="text-amber-300">"google"</span>],
+});</code></pre>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="/chat/auth" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Integrated Auth reference <span aria-hidden="true">&rarr;</span></a>
+    </div>
+</div>
+
+<!-- ───────────────────────── Models ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">One interface, every provider</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Never bet the organization on one model vendor
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                OpenAI, Anthropic, Google, Groq, xAI, Mistral, OpenRouter, Fireworks, Cerebras, a local Ollama or
+                LM Studio endpoint &mdash; all behind one model selector, with search, capability filters, context
+                sizes, pricing and favorites.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-8 lg:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/models/model-selector.webp" alt="AI Chat model selector" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/models/model-selector-providers.webp" alt="Filtering models by provider" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="font-semibold text-slate-900 dark:text-white">Route work to the right model</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Fast and cheap for triage, frontier reasoning for hard problems, a local model for anything
+                    that mustn't leave the network.
+                </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="font-semibold text-slate-900 dark:text-white">Consistent streaming</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    History, attachments, system prompts, tool calls and usage records stay in the same UI when
+                    users switch providers mid-conversation.
+                </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="font-semibold text-slate-900 dark:text-white">Fully self-hosted, if you want</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Point AI Chat at Ollama or LM Studio and nothing leaves your network. Which providers see your
+                    prompts is entirely your decision.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/chat/providers" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Providers &amp; Models reference <span aria-hidden="true">&rarr;</span></a>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── API Tools ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Your APIs become AI capabilities</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            No parallel AI backend
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Models progressively discover and call the ServiceStack APIs you already have &mdash; as the signed-in
+            user, through the same validation, authorization and business logic as every other client.
+        </p>
+    </div>
+
+    <div class="mt-14 grid gap-8 lg:grid-cols-2">
+        <div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Three tools, not one per API</h3>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
+                An App's whole API surface is far too large to keep in context. Only a compact search index is loaded
+                eagerly, and a Model pays for an API's schema only when it actually uses it.
+            </p>
+            <ul class="mt-6 space-y-3">
+                <li class="flex items-start gap-3">
+                    <code class="mt-0.5 shrink-0 rounded bg-sky-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-sky-700 dark:text-sky-400">api_search</code>
+                    <span class="text-sm leading-6 text-slate-600 dark:text-slate-400">Finds APIs relevant to the user's intent</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="mt-0.5 shrink-0 rounded bg-sky-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-sky-700 dark:text-sky-400">api_describe</code>
+                    <span class="text-sm leading-6 text-slate-600 dark:text-slate-400">Returns full schemas and workflow metadata</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="mt-0.5 shrink-0 rounded bg-sky-500/10 px-2 py-0.5 font-mono text-xs font-semibold text-sky-700 dark:text-sky-400">api_call</code>
+                    <span class="text-sm leading-6 text-slate-600 dark:text-slate-400">Invokes the typed Request DTO as the current user</span>
+                </li>
+            </ul>
+
+            <div class="mt-8 overflow-hidden rounded-xl bg-slate-900 shadow-2xl ring-1 ring-white/10">
+                <div class="border-b border-white/5 px-4 py-2.5 font-mono text-xs text-slate-500">Opt an API in</div>
+                <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-sm leading-6 text-slate-300"><code>[<span class="text-emerald-300">Tag</span>(<span class="text-amber-300">"CoffeeShop"</span>)]
+[<span class="text-emerald-300">Tool</span>(<span class="text-amber-300">"the user wants to place an order"</span>,
+    Safety = <span class="text-emerald-300">ToolSafety</span>.Write,
+    RequiresApproval = <span class="text-purple-400">true</span>)]
+<span class="text-purple-400">public class</span> <span class="text-emerald-300">CreateCoffeeShopOrder</span> : IPost { }</code></pre>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Consequential calls need a human</h3>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
+                Reads execute immediately. Writes and destructive operations pause and render an editable form
+                generated from the API's own schema &mdash; so the user sees exactly what will be sent, and can fix it
+                before approving. No per-API Chat component to write.
+            </p>
+            <div class="mt-6 overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/api-tools/chat-coffeeshop-approval.webp" alt="Schema-generated approval form" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-14 grid gap-8 lg:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Inside the Chat UI</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Enable API Tools and name the tags you want Models to reach. Your users get a natural-language
+                operations console over the APIs they're already authorized to call.
+            </p>
+            <a href="/chat/api-tools" class="mt-4 inline-block text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">API Tools reference &rarr;</a>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">From any MCP client</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                The built-in MCP Server at <code class="font-mono text-xs text-sky-700 dark:text-sky-400">/chat/mcp</code>
+                exposes the same tools to Claude Code, Cursor, VS Code and OpenCode &mdash; authenticated with a
+                ServiceStack API key, so tools run as that key's user.
+            </p>
+            <a href="/chat/mcp" class="mt-4 inline-block text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">MCP Server reference &rarr;</a>
+        </div>
+    </div>
+
+    <div class="mt-12 overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+        <img src="/img/pages/chat/api-tools/opencode-mcp.webp" alt="An external AI Assistant using ServiceStack API Tools over MCP" class="h-auto w-full" loading="lazy">
+    </div>
+</div>
+
+<!-- ───────────────────────── Gemini RAG ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Grounded answers</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                RAG over your documents, without building a pipeline
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Drag a folder of PDFs into a File Store and ask questions about it. No chunking pipeline, no vector
+                database to operate, no indexer to write.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-8 lg:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/gemini/gemini-filestores.webp" alt="Gemini File Search stores" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/gemini/gemini-search-category.webp" alt="Asking a question scoped to a document category" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-4">
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Drop in a folder</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    PDFs, Markdown, text and business documents, deduplicated by SHA-256 and indexed by a background
+                    worker so the UI never blocks.
+                </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Narrow the question</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Ask the whole store, one category, or a single document &mdash; whichever scope actually contains
+                    the answer.
+                </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Kept honest</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Grounding sources are retained with responses, so a user can verify where an answer came from
+                    instead of trusting fluent output.
+                </p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Same front door</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Stores are scoped per user behind the same auth as everything else, with a sync report when the
+                    local catalog and remote drift.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/chat/gemini" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Gemini File Search reference <span aria-hidden="true">&rarr;</span></a>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── PDF Studio ───────────────────────── -->
+<div id="pdf-studio" class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Design with AI, render without it</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            PDF Studio
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Describe the document you want &mdash; or hand a vision model a screenshot of the one you're replacing &mdash;
+            and iterate on a live preview. Then publish it and render production PDFs with no LLM in the path.
+        </p>
+    </div>
+
+    <div class="mt-14 overflow-hidden rounded-xl border border-slate-200 shadow-2xl dark:border-slate-700 dark:bg-white">
+        <img src="/img/pages/chat/pdf/designer-overview.webp" alt="PDF Studio designer" class="h-auto w-full" loading="lazy">
+    </div>
+
+    <div class="mt-12 grid gap-6 md:grid-cols-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Rendered by typst</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Plain-text templates that compile fast and express precise typography, tables and page structure.
+            </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Data-driven, not baked in</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                A JSON Schema contract sits beside every template, with named fixtures that must render before it
+                can be published.
+            </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Typed end to end</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Generate strongly typed C# models from the schema, so document design and application code share a
+                compile-time contract.
+            </p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">A versioned design system</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Shared fonts, colors and components live in <code class="font-mono text-xs">lib/v1.typ</code>, so a
+                redesign can't reflow every historical document.
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-12 grid gap-8 lg:grid-cols-2">
+        <div>
+            <h3 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Edit with AI</h3>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
+                Describe the change in English. The model gets the current template, its data and any referenced
+                partials, and Studio compiles what it returns immediately &mdash; with a repair pass if it doesn't
+                compile the first time.
+            </p>
+            <blockquote class="mt-6 space-y-3 border-l-2 border-sky-500/40 pl-4 text-sm italic leading-6 text-slate-600 dark:text-slate-400">
+                <p>Add a Paid watermark when the outstanding balance is zero.</p>
+                <p>Move the totals into a bordered box and show tax on a separate row.</p>
+                <p>Reformat this as a 4&times;6 shipping label with no page margins.</p>
+            </blockquote>
+            <p class="mt-6 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                AI edits update editor buffers rather than committing files, so experimentation stays reversible.
+            </p>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/pdf/edit-with-ai-after.webp" alt="A template after an AI edit" class="h-auto w-full" loading="lazy">
+        </div>
+    </div>
+
+    <div class="mt-14 grid gap-8 lg:grid-cols-2">
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/pdf/saved-pdfs.webp" alt="Published templates in the Admin UI" class="h-auto w-full" loading="lazy">
+        </div>
+        <div>
+            <h3 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">From template to inbox</h3>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
+                Publishing validates the template and every fixture, generates the typed model, compiles it all and
+                saves an immutable revision &mdash; rolling back if anything fails. Production rendering then needs
+                nothing but typst and the published files.
+            </p>
+            <div class="mt-6 overflow-hidden rounded-xl bg-slate-900 shadow-2xl ring-1 ring-white/10">
+                <div class="border-b border-white/5 px-4 py-2.5 font-mono text-xs text-slate-500">InvoiceServices.cs</div>
+                <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-sm leading-6 text-slate-300"><code><span class="text-purple-400">public class</span> <span class="text-emerald-300">InvoiceServices</span>(<span class="text-emerald-300">IPdfRenderer</span> pdf) : Service
+{
+    <span class="text-purple-400">public async</span> Task&lt;<span class="text-purple-400">object</span>&gt; <span class="text-sky-400">Any</span>(<span class="text-emerald-300">GetOrderInvoice</span> request)
+    {
+        <span class="text-purple-400">var</span> order = <span class="text-purple-400">await</span> Db.LoadSingleByIdAsync&lt;<span class="text-emerald-300">Order</span>&gt;(request.Id);
+        <span class="text-purple-400">return await</span> pdf.<span class="text-sky-400">PdfResultAsync</span>(<span class="text-sky-400">MapToInvoice</span>(order),
+            <span class="text-amber-300">$"Invoice-{order.InvoiceNo}.pdf"</span>);
+    }
+}</code></pre>
+            </div>
+            <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                <a href="/chat/pdf-studio" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">PDF Studio reference &rarr;</a>
+                <a href="/chat/pdf" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Rendering PDFs reference &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Agents, Skills, Projects ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Specialization</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Profiles, skills and safe working boundaries
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                One system prompt can't be right for every task. Package a model, prompt, theme, allowed tools and
+                allowed skills into a named assistant &mdash; then give it a workspace it can't escape.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-8 lg:grid-cols-3">
+            <div>
+                <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                    <img src="/img/pages/chat/profiles/profiles-menu.webp" alt="Agent Profiles" class="h-auto w-full" loading="lazy">
+                </div>
+                <h3 class="mt-5 text-lg font-bold text-slate-900 dark:text-white">Agent Profiles</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Support Assistant, Policy Analyst, Release Planner &mdash; governed job descriptions, each with only
+                    the context and capabilities its role needs.
+                </p>
+                <a href="/chat/agents" class="mt-3 inline-block text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Reference &rarr;</a>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                    <img src="/img/pages/chat/skills.webp" alt="Skills" class="h-auto w-full" loading="lazy">
+                </div>
+                <h3 class="mt-5 text-lg font-bold text-slate-900 dark:text-white">Skills</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Procedures a Model loads only when relevant &mdash; incident response, onboarding, code review &mdash;
+                    keeping prompts small and specialists specialized.
+                </p>
+                <a href="/chat/skills" class="mt-3 inline-block text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Reference &rarr;</a>
+            </div>
+            <div>
+                <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                    <img src="/img/pages/chat/projects.webp" alt="Projects" class="h-auto w-full" loading="lazy">
+                </div>
+                <h3 class="mt-5 text-lg font-bold text-slate-900 dark:text-white">Projects</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    A per-user workspace that defines exactly which directories filesystem and code tools may touch.
+                    Capable Agents, without ambient server access.
+                </p>
+                <a href="/chat/projects" class="mt-3 inline-block text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Reference &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Analytics ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Operated, not just installed</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            Know what it costs before the invoice does
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Every completion records provider, model, tokens, duration and cost into your own database &mdash; queryable
+            with OrmLite, reportable from the Admin UI, and enforceable as a quota.
+        </p>
+    </div>
+
+    <div class="mt-14 grid gap-8 lg:grid-cols-2">
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/analytics/analytics-costs.webp" alt="AI usage and cost analytics" class="h-auto w-full" loading="lazy">
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/analytics/analytics-users-page.webp" alt="Per-user activity analytics" class="h-auto w-full" loading="lazy">
+        </div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="/chat/analytics" class="text-sm font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Analytics &amp; Admin reference <span aria-hidden="true">&rarr;</span></a>
+    </div>
+</div>
+
+<!-- ───────────────────────── And the rest ───────────────────────── -->
+<div class="border-t border-slate-200 bg-white py-20 dark:border-slate-800 dark:bg-slate-950">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">And the rest of it</h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Everything below ships as a separately installable extension you can disable from one line of config.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">Text, image &amp; audio</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Image and audio generation, speech synthesis and voice-to-text, with everything generated recorded
+                    in a browsable media gallery. <a href="/chat/media" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">Modular by design</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    19 built-in extensions, each owning its own routes, tools, tables and UI components &mdash; and
+                    replaceable by your own. <a href="/chat/extensions" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">Your own tools</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Register a ServiceStack Command as a tool and its request type becomes the JSON Schema the Model
+                    reads. <a href="/chat/custom-extensions" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">Code execution, opt-in</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Filesystem and <code class="font-mono text-xs">run_bash</code> tools stay off until you turn them
+                    on, and only reach configured directories. <a href="/chat/tools" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">OpenAI-compatible API</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    <code class="font-mono text-xs">POST /v1/chat/completions</code> plus an in-process
+                    <code class="font-mono text-xs">IChatClient</code> running the same pipeline.
+                    <a href="/chat/api" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-900 dark:text-white">Your database</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Threads, requests and media are ordinary OrmLite tables in your App's database. Nothing is held
+                    by a vendor. <a href="/chat/data" class="text-sky-700 hover:underline dark:text-sky-400">Reference</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Get Started ───────────────────────── -->
+<div class="border-t border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-3xl px-6 text-center lg:px-8">
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            Add it to an App you already have
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            One command adds the package, registers <code class="font-mono text-base">ChatFeature</code> and
+            <code class="font-mono text-base">PdfFeature</code>, and writes a starting configuration you can edit.
+        </p>
+
+        <div class="my-8 mx-auto max-w-lg" data-component="ShellCommand" data-props="{text:'npx add-in chat'}"></div>
+
+        <p class="text-sm leading-6 text-slate-600 dark:text-slate-400">
+            Set an API key for at least one provider, run your App and open <code class="font-mono text-xs">/chat</code>.
+            Your existing users can sign in immediately.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <a href="/chat/install" class="rounded-md bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-500">
+                Installation guide
+            </a>
+            <a href="/chat/configuration" class="text-sm font-semibold leading-6 text-slate-900 transition-colors hover:text-sky-600 dark:text-white dark:hover:text-sky-400">
+                Configuration reference <span aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
+    </div>
+</div>

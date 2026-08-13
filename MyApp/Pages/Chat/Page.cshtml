@@ -1,0 +1,21 @@
+﻿@page "/chat/{Slug}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("chat", allDirectories:true)
+            .Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+   Brand = "AI Chat",
+   Slug = Model.Slug,
+   Folder = "chat",
+   DefaultMenu = new MarkdownMenu {
+       Icon = Markdown.DefaultMenuIcon,
+       Text = "AI Chat",
+       Link = "/chat/",
+   },
+}.Init(this, Markdown))

@@ -8,7 +8,11 @@ if (builder.Environment.IsDevelopment())
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
-services.AddServiceStack(typeof(MyServices).Assembly);
+services.AddServiceStack(typeof(MyServices).Assembly, options => {
+    var metadata = options.Plugins.OfType<MetadataFeature>().First();
+    metadata.DisableApiSchema = true;
+    metadata.DisableAutoQuerySchema = true;
+});
 
 var app = builder.Build();
 

@@ -13,6 +13,7 @@ import ProjectCreator from "./components/ProjectCreator.mjs"
 import TextBlock from "./components/TextBlock.mjs"
 import VibeTemplate from "../pages/components/VibeTemplate.mjs"
 import ScreenshotsGallery from "../pages/components/ScreenshotsGallery.mjs"
+import Screenshot from "../pages/components/Screenshot.mjs"
 
 let client = null, Apps = []
 let AppData = {
@@ -63,6 +64,7 @@ const Components = {
     TextBlock,
     VibeTemplate,
     ScreenshotsGallery,
+    Screenshot,
 }
 const CustomElements = [
     'lite-youtube'
