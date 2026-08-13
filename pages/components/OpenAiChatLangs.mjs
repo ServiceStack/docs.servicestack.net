@@ -1,6 +1,5 @@
 
 import { ref, computed } from "vue"
-import { marked } from "/lib/mjs/markdown.mjs"
 import hljs from "highlight.js"
 
 /*! `dart` grammar compiled for Highlight.js 11.10.0 */
@@ -470,10 +469,17 @@ export const openAi = (() => {
     }
 
     Object.keys(ret.code).forEach(lang => {
-        ret.html[lang] = marked.parse(
-        '```' + lang + '\n'
-            + ret.code[lang]
-        + '\n```')
+        const language = lang === 'mjs' ? 'javascript' : lang
+        const code = ret.code[lang].replace(/^\n|\n$/g, '')
+        const html = hljs.getLanguage(language)
+            ? hljs.highlight(code, { language }).value
+            : code.replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[ch])
+
+        // Highlight each example up front instead of relying on the page-level
+        // highlightAll() pass, which only runs for the initially selected language.
+        ret.html[lang] = `<pre><code class="hljs language-${language}">${html}\n</code></pre>`
     })
 
     return ret
