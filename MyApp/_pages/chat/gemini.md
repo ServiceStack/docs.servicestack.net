@@ -2,7 +2,7 @@
 title: Gemini File Search (RAG)
 ---
 
-The `gemini` extension provides a complete UI for managing **Google Gemini File Search Stores** and using them as managed Retrieval Augmented Generation knowledge bases — without asking your team to design a chunking pipeline, vector database, background indexer, retrieval tool and administration UI from scratch.
+The `gemini` extension provides a complete UI for managing **Google Gemini File Search Stores** and using them as managed Retrieval Augmented Generation knowledge bases - without asking your team to design a chunking pipeline, vector database, background indexer, retrieval tool and administration UI from scratch.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Gemini File Search stores': '/img/pages/chat/gemini/gemini-filestores.webp',
@@ -13,7 +13,7 @@ The `gemini` extension provides a complete UI for managing **Google Gemini File 
 
 The extension self-enables when both of these are available:
 
-1. A Gemini API key — `GEMINI_API_KEY`, or whatever the `google` provider resolved.
+1. A Gemini API key - `GEMINI_API_KEY`, or whatever the `google` provider resolved.
 2. A registered `IDbConnectionFactory`, since the document catalog is an OrmLite table.
 
 ```bash
@@ -30,7 +30,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-Without either prerequisite the extension logs why and disables itself — no routes, no tools, no UI.
+Without either prerequisite the extension logs why and disables itself - no routes, no tools, no UI.
 
 To turn it off explicitly:
 
@@ -46,9 +46,9 @@ Teams create separate stores for departments, customers, products or projects, t
 
 Uploads are:
 
-- **Content-addressed** — written into `App_Data/chat/cache` under their SHA-256
-- **Deduplicated** — the same document uploaded twice is stored once
-- **Asynchronous** — a background worker performs the Gemini upload, so indexing never blocks the UI
+- **Content-addressed** - written into `App_Data/chat/cache` under their SHA-256
+- **Deduplicated** - the same document uploaded twice is stored once
+- **Asynchronous** - a background worker performs the Gemini upload, so indexing never blocks the UI
 
 Queued uploads are resumed on startup if the App shut down mid-upload.
 
@@ -72,7 +72,7 @@ Grounding is implemented by including an OpenAI-shaped `file_search` tool in the
 
 ## Synchronization
 
-The local catalog and Gemini's view of a store can drift — an upload failed, a document was removed remotely, metadata changed. **Sync** reconciles them:
+The local catalog and Gemini's view of a store can drift - an upload failed, a document was removed remotely, metadata changed. **Sync** reconciles them:
 
 - Matches by the SHA-256 hash Gemini keeps in each document's custom metadata, falling back to the document name
 - Refreshes stale local fields
@@ -84,7 +84,7 @@ The local catalog and Gemini's view of a store can drift — an upload failed, a
 
 Google currently charges for embeddings when documents are **indexed**, whilst **file storage and query-time embeddings are free**. Retrieved document tokens are billed as normal model context, and stores persist until deleted with project capacity scaling by usage tier.
 
-That removes the recurring vector-storage charge common in managed RAG architectures — an organization can maintain durable knowledge bases and pay primarily when content is indexed and when users actually query it.
+That removes the recurring vector-storage charge common in managed RAG architectures - an organization can maintain durable knowledge bases and pay primarily when content is indexed and when users actually query it.
 
 :::info
 Pricing and limits are Google's and can change. Check the current [Gemini File Search pricing and limits](https://ai.google.dev/gemini-api/docs/file-search) before deployment.
@@ -125,4 +125,4 @@ For a genuinely shared organizational knowledge base, create it under a shared a
 
 - The document catalog tables are created when `AutoInitSchema` is true.
 - The upload worker is stopped cleanly on AppHost disposal via a registered shutdown handler.
-- Cached document bytes live under `App_Data/chat/cache` and should be included in your backups — see [Data & Storage](/chat/data).
+- Cached document bytes live under `App_Data/chat/cache` and should be included in your backups - see [Data & Storage](/chat/data).

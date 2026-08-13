@@ -4,11 +4,11 @@ title: .NET React Templates
 
 ## First-Class React + Tailwind for AI-First Development
 
-We're witnessing a fundamental shift in how applications are built. AI code generation has evolved from a novelty to a productivity multiplier that's become too significant to ignore. While AI models still require oversight for production backend systems, they excel at generating frontend UIs—compressing development timelines that once took months into days.
+We're witnessing a fundamental shift in how applications are built. AI code generation has evolved from a novelty to a productivity multiplier that's become too significant to ignore. While AI models still require oversight for production backend systems, they excel at generating frontend UIs-compressing development timelines that once took months into days.
 
 ## The Rise of Vibe Coding
 
-AI can now generate complete, production-ready UI code. This enables an entirely new development workflow that [Andrej Karpathy](https://en.wikipedia.org/wiki/Andrej_Karpathy) has termed ["Vibe Coding"](https://en.wikipedia.org/wiki/Vibe_coding)—where developers iteratively guide AI agents to implement features through natural language instructions, where features can be iteratively prototyped, refined and improved within seconds instead of hours.
+AI can now generate complete, production-ready UI code. This enables an entirely new development workflow that [Andrej Karpathy](https://en.wikipedia.org/wiki/Andrej_Karpathy) has termed ["Vibe Coding"](https://en.wikipedia.org/wiki/Vibe_coding)-where developers iteratively guide AI agents to implement features through natural language instructions, where features can be iteratively prototyped, refined and improved within seconds instead of hours.
 
 This AI-first approach is rapidly maturing, with tools like [Cursor](https://cursor.com), [Claude Code](https://www.claude.com/product/claude-code), and [Codex](https://chatgpt.com/features/codex/) becoming the preferred platforms for this new paradigm with new tools designed to get maximum effectiveness of AI models with sophisticated planning
 tools, focused models optimized for code generation and edits and agentic workflows that's able to solidifying each new feature iteration with tests, along with detailed documentation, planning, migrations and usage guides.
@@ -23,7 +23,7 @@ React and Tailwind have emerged as the de facto standards for AI-generated UIs. 
 
 ### TypeScript
 
-Whilst TypeScript is often excluded in one-prompt solutions catering to non-developers, it's still a critical part of the AI development workflow. It provides a type system that helps AI models generate more accurate and maintainable code and TypeScript's static analysis also helps identify errors in the generated code which AI Models have have become really good at correcting—as such it's an integral part in all our React templates.
+Whilst TypeScript is often excluded in one-prompt solutions catering to non-developers, it's still a critical part of the AI development workflow. It provides a type system that helps AI models generate more accurate and maintainable code and TypeScript's static analysis also helps identify errors in the generated code which AI Models have have become really good at correcting-as such it's an integral part in all our React templates.
 
 ## How ServiceStack Excels in AI-First Development
 
@@ -32,11 +32,11 @@ and ServiceStack's architecture is uniquely suited for AI-assisted development:
 
 ### Declarative Typed APIs
 
-All ServiceStack APIs follow a flat, declarative structure—The contract is explicit and consistent and LLMs don't need to guess what APIs accept or return.
+All ServiceStack APIs follow a flat, declarative structure-The contract is explicit and consistent and LLMs don't need to guess what APIs accept or return.
 
 ### End-to-End Type Safety
 
-Context quality directly impacts generated code quality. ServiceStack's TypeScript integration provides complete static analysis of what APIs accept, return, and how to bind responses—giving AI models the full context they need.
+Context quality directly impacts generated code quality. ServiceStack's TypeScript integration provides complete static analysis of what APIs accept, return, and how to bind responses-giving AI models the full context they need.
 The static analysis feedback also directs models to identify and correct any errors in the generated code.
 
 ### Zero-Ambiguity Integration
@@ -49,7 +49,7 @@ AI models thrive on consistency. ServiceStack removes guesswork with a single pa
 
 ### Intuitive Project Structure
 
-ServiceStack's [physical project structure](/physical-project-structure) provides clear separation of concerns, with the entire API surface area contained in [the ServiceModel project](/physical-project-structure#servicemodel-project)—making codebases easy for AI models to navigate and understand.
+ServiceStack's [physical project structure](/physical-project-structure) provides clear separation of concerns, with the entire API surface area contained in [the ServiceModel project](/physical-project-structure#servicemodel-project)-making codebases easy for AI models to navigate and understand.
 
 ### Minimal Code Surface
 
@@ -76,7 +76,7 @@ We're introducing production-ready React templates, each optimized for different
 
 <react-template 
   name="react-static" 
-  description="A lightweight foundation built with React + Vite + TypeScript + Tailwind CSS—the ideal blank slate starting point for AI-generated UIs."></react-template>
+  description="A lightweight foundation built with React + Vite + TypeScript + Tailwind CSS-the ideal blank slate starting point for AI-generated UIs."></react-template>
 
 <react-template 
   name="react-spa" 
@@ -89,7 +89,7 @@ We're introducing production-ready React templates, each optimized for different
 
 ## Comprehensive React Component Library
 
-All three templates leverage our new [React Component Gallery](https://react.servicestack.net)—a high-fidelity port of our proven [Vue Component Library](/vue/) and [Blazor Component Library](https://blazor.servicestack.net). This comprehensive collection provides everything needed to build highly productive, modern and responsive web applications.
+All three templates leverage our new [React Component Gallery](https://react.servicestack.net)-a high-fidelity port of our proven [Vue Component Library](/vue/) and [Blazor Component Library](https://blazor.servicestack.net). This comprehensive collection provides everything needed to build highly productive, modern and responsive web applications.
 
 :::{.not-prose}
 :::{.my-8 .max-w-3xl .mx-auto .rounded-lg .overflow-hidden .shadow .hover:shadow-xl}

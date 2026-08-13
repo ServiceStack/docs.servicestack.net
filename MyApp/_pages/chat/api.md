@@ -23,10 +23,10 @@ curl https://your-app.example.com/v1/chat/completions \
 Authentication is an Identity cookie **or** a Bearer API Key when [`ApiKeysFeature`](/auth/apikeys) is registered. `ValidateRequest` runs before the completion, so quotas and policy apply here too.
 
 :::info
-OpenAI's wire format is richer than any typed DTO can express — message content may be a plain string *or* an array of parts. AI Chat therefore treats the **raw request JSON as the source of truth**, and writes the provider's response back verbatim so provider-specific fields aren't lost in a round-trip.
+OpenAI's wire format is richer than any typed DTO can express - message content may be a plain string *or* an array of parts. AI Chat therefore treats the **raw request JSON as the source of truth**, and writes the provider's response back verbatim so provider-specific fields aren't lost in a round-trip.
 :::
 
-Because the endpoint is OpenAI-compatible, any OpenAI SDK works against it by changing the base URL — including [typed clients in 15 languages](/add-servicestack-reference) generated from your App's own metadata.
+Because the endpoint is OpenAI-compatible, any OpenAI SDK works against it by changing the base URL - including [typed clients in 15 languages](/add-servicestack-reference) generated from your App's own metadata.
 
 ## IChatClient
 
@@ -146,10 +146,10 @@ The Chat UI can set a whitelisted set of per-thread request arguments, which are
 6. Streamed responses are checkpointed every `Limits.StreamCheckpointInterval` into `ChatThread.StreamingMessage`, kept out of the durable `Messages` so a failed stream can't damage the conversation.
 7. Chat response filters run, and usage and cost are recorded as a `ChatRequest` row.
 
-Cancellation is cooperative — `ShouldCancelThread` consults the thread's state, so cancelling in the UI stops the loop.
+Cancellation is cooperative - `ShouldCancelThread` consults the thread's state, so cancelling in the UI stops the loop.
 
 ## Related
 
-- [Providers & Models](/chat/providers) — what `model` names resolve to
-- [Tools](/chat/tools) — the registry the tool loop draws from
-- [Data & Storage](/chat/data) — what a completion persists
+- [Providers & Models](/chat/providers) - what `model` names resolve to
+- [Tools](/chat/tools) - the registry the tool loop draws from
+- [Data & Storage](/chat/data) - what a completion persists

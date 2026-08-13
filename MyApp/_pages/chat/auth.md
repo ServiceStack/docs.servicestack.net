@@ -23,7 +23,7 @@ services.AddPlugin(new ChatFeature {
 
 ### Credentials
 
-The `credentials` extension replaces the stock sign-in component with a username/password form that authenticates through ServiceStack's `Authenticate` API — so it signs in against your existing ASP.NET Identity users and shares the App's auth cookie. User management stays with the host (Identity's [Admin Users](/admin-ui-identity-users) UI), not a separate users file.
+The `credentials` extension replaces the stock sign-in component with a username/password form that authenticates through ServiceStack's `Authenticate` API - so it signs in against your existing ASP.NET Identity users and shares the App's auth cookie. User management stays with the host (Identity's [Admin Users](/admin-ui-identity-users) UI), not a separate users file.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Manage users in the host App': '/img/pages/chat/auth/manage-users.webp',
@@ -52,7 +52,7 @@ services.AddPlugin(new ApiKeysFeature());
 services.AddPlugin(new ChatFeature { AuthType = ChatAuthType.ApiKey });
 ```
 
-API keys are resolved on every Chat request regardless of `AuthType`, because Chat UI routes bypass the `ApiKeysFeature` request filter — so an API key is always a valid way in, including to `/chat/mcp`. Each key carries its own roles, permissions and expiry. See [API Keys](/auth/apikeys).
+API keys are resolved on every Chat request regardless of `AuthType`, because Chat UI routes bypass the `ApiKeysFeature` request filter - so an API key is always a valid way in, including to `/chat/mcp`. Each key carries its own roles, permissions and expiry. See [API Keys](/auth/apikeys).
 
 ## Restricting access
 
@@ -132,7 +132,7 @@ A small number of routes answer anonymously because the UI needs them **before**
   ['GET /chat/auth','Returns 401 until signed in'],
   ['GET /chat/ui/**','Static UI assets']]"></text-block>
 
-`/chat/config` exposes provider ids, their enabled/disabled state and default model names to anonymous callers. Everything else — threads, media, tools, API discovery — requires an authenticated request that satisfies `RequireAuth` and `RequiredRole`.
+`/chat/config` exposes provider ids, their enabled/disabled state and default model names to anonymous callers. Everything else - threads, media, tools, API discovery - requires an authenticated request that satisfies `RequireAuth` and `RequiredRole`.
 
 ## Administration
 
@@ -140,18 +140,18 @@ Admin users get system-wide visibility through role-protected Admin UIs at `/adm
 
 <screenshot src="/img/pages/chat/auth/lock-user.webp" title="Locking a user in the host App's Admin UI"></screenshot>
 
-Because AI Chat has no user store of its own, account lifecycle — password policy, lockouts, roles, deactivation — remains owned by your App and applies to AI Chat immediately.
+Because AI Chat has no user store of its own, account lifecycle - password policy, lockouts, roles, deactivation - remains owned by your App and applies to AI Chat immediately.
 
 ## The boundaries, stated plainly
 
 | Question | Answer |
 | --- | --- |
 | Where does conversation data live? | Your App's database via OrmLite, and `App_Data/chat` on your server |
-| Who can reach `/chat`? | Whoever `RequireAuth` and `RequiredRole` allow — enforced by your existing auth |
+| Who can reach `/chat`? | Whoever `RequireAuth` and `RequiredRole` allow - enforced by your existing auth |
 | Can one user see another's threads, media or projects? | No. Admin cross-user access is explicit and role-gated |
 | What can an Agent call? | Only APIs the *signed-in user* is authorized to call |
 | Can it write to the filesystem or run code? | Only if you enable those tools, and only within configured project directories |
 | What is exposed over MCP? | Nothing until you name tool groups; tools needing interactive approval are rejected by default |
 | Does any of it require an outbound AI provider? | Only the providers you configure |
 
-Which providers see your prompts is entirely your decision — including *"none outside this network"* if you point AI Chat at a local Ollama or LM Studio endpoint.
+Which providers see your prompts is entirely your decision - including *"none outside this network"* if you point AI Chat at a local Ollama or LM Studio endpoint.

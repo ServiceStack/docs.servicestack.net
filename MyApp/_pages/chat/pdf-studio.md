@@ -47,7 +47,7 @@ Each user's templates live under:
 
 Developers and designers experiment independently, and nothing becomes a shared runtime template until an administrator explicitly publishes it. PDF Studio inherits [Integrated Auth](/chat/auth), so existing application users enter with their current identity while their drafts, assets and experiments stay isolated.
 
-Publishing is a separate Admin-authorized boundary — access to the designer does not imply permission to change the templates production uses.
+Publishing is a separate Admin-authorized boundary - access to the designer does not imply permission to change the templates production uses.
 
 ## Anatomy of a document
 
@@ -64,14 +64,14 @@ This separation makes templates easier to design, test, review and integrate tha
 
 ## Editing document data
 
-The JSON data can be edited directly in **Code View**, or through a **Form View** generated from `invoice.ui.json` — labels, date inputs, enum selections and add/remove controls for line items, without requiring anyone to edit JSON.
+The JSON data can be edited directly in **Code View**, or through a **Form View** generated from `invoice.ui.json` - labels, date inputs, enum selections and add/remove controls for line items, without requiring anyone to edit JSON.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
-    'Form View — generated from the data contract': '/img/pages/chat/pdf/data-form.webp',
-    'Code View — edit the raw JSON payload': '/img/pages/chat/pdf/data-code.webp',
+    'Form View - generated from the data contract': '/img/pages/chat/pdf/data-form.webp',
+    'Code View - edit the raw JSON payload': '/img/pages/chat/pdf/data-code.webp',
 }"></screenshots-gallery>
 
-Every edit uses the same data contract that later generates the application's C# model, so the preview isn't a disconnected design mock-up — it's an executable example of the production template.
+Every edit uses the same data contract that later generates the application's C# model, so the preview isn't a disconnected design mock-up - it's an executable example of the production template.
 
 ## Edit with AI
 
@@ -90,7 +90,7 @@ The **Edit with AI** panel gives the Model the current template, its data and an
 
 If the first edit fails to compile, the Model gets a repair pass with the compiler error.
 
-AI edits update **editor buffers** rather than silently committing files — unsaved changes stay visible and the previous contents can be restored, which makes experimentation fast and reversible.
+AI edits update **editor buffers** rather than silently committing files - unsaved changes stay visible and the previous contents can be restored, which makes experimentation fast and reversible.
 
 ## Recreate a document with vision
 
@@ -102,7 +102,7 @@ Starting from a blank page is rarely necessary. Attach screenshots, photos or ra
 }"></screenshots-gallery>
 
 :::info
-This is **visual reconstruction**, not structural PDF conversion. The original document's text objects, fonts, forms, annotations and metadata are not preserved — but it's an extraordinarily fast way to turn a legacy document into maintainable source.
+This is **visual reconstruction**, not structural PDF conversion. The original document's text objects, fonts, forms, annotations and metadata are not preserved - but it's an extraordinarily fast way to turn a legacy document into maintainable source.
 :::
 
 ## Visual formatting controls
@@ -122,7 +122,7 @@ For authors who don't want to memorize Typst:
     'Page size and orientation': '/img/pages/chat/pdf/page-setup.webp',
 }"></screenshots-gallery>
 
-The controls **modify source rather than hiding it** — developers keep a readable Typst template whilst less experienced authors can make common visual changes confidently.
+The controls **modify source rather than hiding it** - developers keep a readable Typst template whilst less experienced authors can make common visual changes confidently.
 
 ## Versioned design systems
 
@@ -138,7 +138,7 @@ PDF Studio tracks direct and transitive dependencies: a referenced library **can
 
 ## Assets
 
-Images a template can `#image()` are limited to what Typst reads — `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp` — and uploads are checked against their magic bytes rather than trusted by extension.
+Images a template can `#image()` are limited to what Typst reads - `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp` - and uploads are checked against their magic bytes rather than trusted by extension.
 
 | Setting | Default |
 | --- | --- |

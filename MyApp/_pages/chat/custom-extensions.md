@@ -2,7 +2,7 @@
 title: Custom Extensions
 ---
 
-Adding your own capability to AI Chat means writing a `ChatExtension`. It's the same API the built-in extensions use — routes, tools, filters, providers, UI and background workers all register through the `ExtensionContext` passed to `Install`.
+Adding your own capability to AI Chat means writing a `ChatExtension`. It's the same API the built-in extensions use - routes, tools, filters, providers, UI and background workers all register through the `ExtensionContext` passed to `Install`.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -40,7 +40,7 @@ The constructor argument is the extension **name**, which becomes:
 - the key used in `DisableExtensions`
 - the folder its static UI assets are served from
 
-Any public properties you add are its configuration, set where the extension is added and readable from `Install` — see [Configuring your own extensions](/chat/configuration#configuring-your-own-extensions).
+Any public properties you add are its configuration, set where the extension is added and readable from `Install` - see [Configuring your own extensions](/chat/configuration#configuring-your-own-extensions).
 
 ## Registering tools
 
@@ -70,7 +70,7 @@ ctx.RegisterTool<BookingSummaryCommand>("bookings");
 ctx.RegisterTool(typeof(BookingSummaryCommand), "bookings");  // runtime type
 ```
 
-Document the request type **for the Model**, not for a developer — `[Description]` on each property becomes that argument's schema description, and an enum property becomes its allowed values:
+Document the request type **for the Model**, not for a developer - `[Description]` on each property becomes that argument's schema description, and an enum property becomes its allowed values:
 
 ```csharp
 public class BookingSummary
@@ -120,7 +120,7 @@ Tool handlers receive the arguments the Model chose plus the context it's runnin
 async Task<object?> BookingSummaryAsync(JsonObject args, ChatContext context)
 {
     // context.User is the signed-in user this tool acts for, and context.Request the
-    // request it's running under — pass it to a Service Gateway to call APIs as that user
+    // request it's running under - pass it to a Service Gateway to call APIs as that user
     using var db = await dbFactory.OpenAsync();
 
     var q = db.From<Booking>().Where(x => x.Cancelled == null || x.Cancelled == false);
@@ -153,7 +153,7 @@ ctx.AddGet("/transcribe", handler);      // /chat/transcribe
 ctx.AddGet("public", handler, allowAnon: true);
 ```
 
-`AddGet`, `AddPost`, `AddPut`, `AddDelete` and `AddPatch` are available. Routes require an authenticated request satisfying `RequireAuth` + `RequiredRole` unless they opt out with `allowAnon` — which should only be used for what the UI genuinely needs before sign-in.
+`AddGet`, `AddPost`, `AddPut`, `AddDelete` and `AddPatch` are available. Routes require an authenticated request satisfying `RequireAuth` + `RequiredRole` unless they opt out with `allowAnon` - which should only be used for what the UI genuinely needs before sign-in.
 
 Handlers receive a `ChatRequestContext`:
 
@@ -253,9 +253,9 @@ ctx.NextLoadingMessage();
 Extensions publish pluggable interfaces so others don't need a direct reference:
 
 ```csharp
-ctx.Threads;    // IThreadApi   — provided by the app extension
-ctx.Media;      // IMediaApi    — provided by the gallery extension
-ctx.Projects;   // IProjectsApi — provided by the projects extension
+ctx.Threads;    // IThreadApi   - provided by the app extension
+ctx.Media;      // IMediaApi    - provided by the gallery extension
+ctx.Projects;   // IProjectsApi - provided by the projects extension
 ```
 
 Assigning to them installs your own implementation, which is exactly how `GalleryExtension` registers itself as `IMediaApi`.
@@ -266,7 +266,7 @@ Two options:
 
 **1. Embedded resources.** Ship a `chat/ext/{name}/` folder of embedded files. AI Chat serves them at `/{RoutePrefix}/ext/{name}/{path}` automatically, and if the folder contains an `index.mjs` it's registered in `/ext` so the Chat UI imports it on load.
 
-**2. The `custom` folder.** `chat/custom/**` is served at `/{RoutePrefix}/custom/**` and is never touched by an upstream UI sync — the intended home for an App's own Chat UI code.
+**2. The `custom` folder.** `chat/custom/**` is served at `/{RoutePrefix}/custom/**` and is never touched by an upstream UI sync - the intended home for an App's own Chat UI code.
 
 ```csharp
 ctx.RegisterUiExtension();                     // imports /ext/{name}/index.mjs
@@ -280,7 +280,7 @@ ctx.AddIndexHeader("""<link rel="stylesheet" href="/chat/custom/app.css">""");
 ctx.AddIndexFooter("<!-- analytics -->");
 ```
 
-Because the UI is assembled from registered Vue components, registering a component under an existing name replaces that building block — which is how an App rebrands or specializes the experience without forking.
+Because the UI is assembled from registered Vue components, registering a component under an existing name replaces that building block - which is how an App rebrands or specializes the experience without forking.
 
 ## Disabling from inside Install
 

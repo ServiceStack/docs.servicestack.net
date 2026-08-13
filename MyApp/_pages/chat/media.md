@@ -25,7 +25,7 @@ It picks the first available option from the `LLMS_VOICE` environment variable, 
 export LLMS_VOICE=voxtral-mini-latest
 ```
 
-When none are available the extension **disables itself** — no route, no microphone button. To turn it off explicitly:
+When none are available the extension **disables itself** - no route, no microphone button. To turn it off explicitly:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -126,7 +126,7 @@ services.AddPlugin(new ChatFeature {
 
 ## Rendering
 
-The conversation view supports rich Markdown, syntax highlighting and — via the `katex` extension — LaTeX mathematical typesetting. Tool calls render as compact expandable blocks so machine output doesn't overwhelm the thread.
+The conversation view supports rich Markdown, syntax highlighting and - via the `katex` extension - LaTeX mathematical typesetting. Tool calls render as compact expandable blocks so machine output doesn't overwhelm the thread.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -134,7 +134,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-The look of all of this is controlled by the active theme — see [Themes](/chat/themes).
+The look of all of this is controlled by the active theme - see [Themes](/chat/themes).
 
 ## Controlling what's available
 

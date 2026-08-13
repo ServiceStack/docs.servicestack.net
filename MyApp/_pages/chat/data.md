@@ -6,7 +6,7 @@ AI Chat stores everything inside your application: structured data in your App's
 
 ## Database tables
 
-Tables are created on startup when `AutoInitSchema` is true (the default), using the host's `IDbConnectionFactory` — or a named connection if you'd rather keep chat data separate:
+Tables are created on startup when `AutoInitSchema` is true (the default), using the host's `IDbConnectionFactory` - or a named connection if you'd rather keep chat data separate:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -22,12 +22,12 @@ One conversation. Complex fields are stored as raw JSON strings so the wire shap
 | Column | Notes |
 | --- | --- |
 | `Id` | Auto-increment |
-| `User` | **Data partition key** — the authenticated username, or `default` |
+| `User` | **Data partition key** - the authenticated username, or `default` |
 | `CreatedAt`, `UpdatedAt` | Indexed |
 | `Title`, `SystemPrompt`, `Model` | |
 | `ModelInfo`, `Modalities`, `Args` | JSON |
-| `Messages` | JSON — the durable conversation |
-| `StreamingMessage` | JSON — in-flight assistant message while streaming |
+| `Messages` | JSON - the durable conversation |
+| `StreamingMessage` | JSON - in-flight assistant message while streaming |
 | `Tools`, `ToolHistory` | JSON |
 | `Cost`, `InputTokens`, `OutputTokens`, `Stats` | Thread rollup |
 | `Provider`, `ProviderModel` | |
@@ -38,11 +38,11 @@ One conversation. Complex fields are stored as raw JSON strings so the wire shap
 
 ### ChatRequest
 
-Per-completion accounting behind the [Analytics](/chat/analytics) dashboards — user, thread, model, provider, duration, token counts, prices, cost, finish reason, and `Error`/`StackTrace` when a completion fails.
+Per-completion accounting behind the [Analytics](/chat/analytics) dashboards - user, thread, model, provider, duration, token counts, prices, cost, finish reason, and `Error`/`StackTrace` when a completion fails.
 
 ### ChatMedia
 
-The generated and uploaded media catalog — name, type, prompt, model, cost, seed, dimensions, size, duration, aspect ratio, content hash, reactions, caption, tags, rating and publish state. Written by the `gallery` extension from a cache-saved filter. See [Voice & Media](/chat/media).
+The generated and uploaded media catalog - name, type, prompt, model, cost, seed, dimensions, size, duration, aspect ratio, content hash, reactions, caption, tags, rating and publish state. Written by the `gallery` extension from a cache-saved filter. See [Voice & Media](/chat/media).
 
 ### Gemini tables
 
@@ -107,7 +107,7 @@ Cached files are served at `{RoutePrefix}/~cache/{path}` to authenticated users.
 
 ### Seeded config files
 
-`llms.json`, `providers.json` and `providers-extra.json` are seeded from embedded defaults on first run and then belong to you — edit them, check them into source control, or bypass them entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
+`llms.json`, `providers.json` and `providers-extra.json` are seeded from embedded defaults on first run and then belong to you - edit them, check them into source control, or bypass them entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
 
 ## PDF storage
 
@@ -129,15 +129,15 @@ See [Rendering PDFs](/chat/pdf).
 **Back up together:**
 
 - Your App's database (threads, requests, media, Gemini catalog)
-- `App_Data/chat` — config, cache and every user's workspace
-- `App_Data/pdf` — including `.published.json` and `.versions`
+- `App_Data/chat` - config, cache and every user's workspace
+- `App_Data/pdf` - including `.published.json` and `.versions`
 
 A database backup on its own is not sufficient: media rows reference cache files by hash, and Gemini document rows reference cached bytes.
 
 **Deployment notes:**
 
 - `App_Data` must be on durable storage. On an ephemeral filesystem, mount a volume or set `AppDataPath` to one.
-- In a multi-instance deployment, `App_Data/chat` and `App_Data/pdf` need to be a **shared** volume — user workspaces, the cache and published templates are all filesystem state.
+- In a multi-instance deployment, `App_Data/chat` and `App_Data/pdf` need to be a **shared** volume - user workspaces, the cache and published templates are all filesystem state.
 - Pin the Typst version and deploy the same fonts used during template validation.
 - Consider a disk quota on `App_Data/chat/user` so a runaway Agent can't fill the disk.
 

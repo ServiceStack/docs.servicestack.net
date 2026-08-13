@@ -28,13 +28,13 @@ const ReleaseHighlights = {
     setup() {
         const items = [
             { icon:'15', eyebrow:'Add ServiceStack Reference', title:'Go, Rust, Ruby & Zig', href:'#typed-apis-in-15-languages',
-              text:'End-to-end typed APIs and idiomatic Service Clients now span 15 languages — from websites and mobile Apps to cloud services and systems software.' },
+              text:'End-to-end typed APIs and idiomatic Service Clients now span 15 languages - from websites and mobile Apps to cloud services and systems software.' },
             { icon:'AI', eyebrow:'ChatFeature', title:'AI Chat v4', href:'#ai-chat-v4',
-              text:'A complete, modular AI application at /chat using your App’s existing users, database and security boundary — multi-provider chat, RAG, agents, skills and analytics.' },
+              text:'A complete, modular AI application at /chat using your App’s existing users, database and security boundary - multi-provider chat, RAG, agents, skills and analytics.' },
             { icon:'⚡', eyebrow:'API Tools + MCP', title:'Your APIs become AI Tools', href:'#api-tools',
               text:'Models discover and call your existing ServiceStack APIs as the signed-in user, with editable approval forms and a built-in MCP Server for external Assistants.' },
             { icon:'{}', eyebrow:'Metadata feature', title:'API Schemas', href:'#api-schemas',
-              text:'Every API now publishes a portable JSON Schema at /schema/{RequestDto}.json — and a complete executable UI at the adjacent URL.' },
+              text:'Every API now publishes a portable JSON Schema at /schema/{RequestDto}.json - and a complete executable UI at the adjacent URL.' },
             { icon:'▦', eyebrow:'Metadata feature', title:'AutoQuery Schemas', href:'#autoquery-schemas',
               text:'One /auto/{Model}.json document renders an entire authorized CRUD App: grid, filters, paging, forms, reference lookups and guarded deletes.' },
             { icon:'📄', eyebrow:'PdfFeature', title:'PDF Studio', href:'#pdf-studio',
@@ -81,7 +81,7 @@ const ApiToolsJourney = {
     setup() {
         const steps = [
             { name:'Ask', caption:'Natural language intent', title:'The user describes an outcome', tags:['User intent','Authenticated'],
-              description:'The model starts with intent—not a route name, DTO or hand-written tool definition. It can ask for a coffee order, a booking, a report or any workflow exposed by the application.' },
+              description:'The model starts with intent-not a route name, DTO or hand-written tool definition. It can ask for a coffee order, a booking, a report or any workflow exposed by the application.' },
             { name:'Search', caption:'api_search', title:'Find only the APIs relevant to the task', tags:['Low context','Ranked results'],
               description:'api_search returns compact candidates ranked from ServiceStack metadata, tags, descriptions, keywords and tool guidance. The model avoids loading the application’s entire API surface into context.' },
             { name:'Learn', caption:'api_describe', title:'Load the exact contract just in time', tags:['JSON Schema','Validation'],

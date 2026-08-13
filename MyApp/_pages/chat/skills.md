@@ -8,7 +8,7 @@ title: Skills
 
 ## Progressive disclosure
 
-A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it. This keeps prompts small and helps specialists remain specialists — a Model with fifty available skills pays for fifty one-line descriptions, not fifty procedure documents.
+A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it. This keeps prompts small and helps specialists remain specialists - a Model with fifty available skills pays for fifty one-line descriptions, not fifty procedure documents.
 
 ## Anatomy of a skill
 
@@ -53,7 +53,7 @@ asks how to run an incident.
 | `allowed-tools` | Tools this skill expects to be available |
 | `metadata.*` | Arbitrary additional properties |
 
-The `description` is doing the selection work — write it as the situation the skill applies to, the same way you'd write `[Tool(WhenToUse)]`.
+The `description` is doing the selection work - write it as the situation the skill applies to, the same way you'd write `[Tool(WhenToUse)]`.
 
 ## Where skills live
 
@@ -90,7 +90,7 @@ Every file path is validated against the resolving skill's own folder, so a skil
 
 Skills are surfaced to Models as a single `skill` tool. The Model calls it with a skill name to load that skill's instructions into the conversation, then proceeds with the procedure it describes.
 
-This means skills work with **any** provider and model — there's no provider-specific skills feature involved, just a tool call.
+This means skills work with **any** provider and model - there's no provider-specific skills feature involved, just a tool call.
 
 ## Restricting skills per profile
 
@@ -109,15 +109,15 @@ A Support Assistant profile that can only load support procedures won't wander i
 
 | | Loaded | Best for |
 | --- | --- | --- |
-| **Agent Profile** | Chosen up front | Who the assistant *is* — model, persona, standing context, allowed capabilities |
+| **Agent Profile** | Chosen up front | Who the assistant *is* - model, persona, standing context, allowed capabilities |
 | **Skill** | On demand, when relevant | A *procedure* that only some conversations need |
-| **API Tool** | Discovered on demand | A *capability* — reading or changing real application data |
+| **API Tool** | Discovered on demand | A *capability* - reading or changing real application data |
 
 They compose: a profile restricted to a handful of skills and one tool group is a tightly-scoped assistant that can still do real work.
 
 ## Writing effective skills
 
 - Lead with the situation the skill applies to, in the `description`.
-- Keep `SKILL.md` to the decision-making — push reference material into supporting files the Model can read when it needs them.
+- Keep `SKILL.md` to the decision-making - push reference material into supporting files the Model can read when it needs them.
 - Name the tools the procedure depends on in `allowed-tools`.
 - Prefer several narrow skills over one that covers everything; selection is the hard part, and narrow descriptions select better.

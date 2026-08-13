@@ -2,7 +2,7 @@
 title: Rendering PDFs
 ---
 
-`PdfFeature` owns the published [Typst](https://typst.app) templates in `App_Data/pdf` that your App renders PDFs from — returned by an API, attached to an email or written to a stream from a background job.
+`PdfFeature` owns the published [Typst](https://typst.app) templates in `App_Data/pdf` that your App renders PDFs from - returned by an API, attached to an email or written to a stream from a background job.
 
 Here's the end state: an ordinary ServiceStack API returning a real invoice, with **no LLM anywhere near it**.
 
@@ -24,7 +24,7 @@ public class InvoiceServices(IPdfRenderer pdf) : Service
 | AI-assisted authoring and live preview | `ChatFeature` PDF extension | Typst + an AI provider |
 | Published template management and rendering | `PdfFeature` | Typst |
 
-Rendering has **no dependency on `ChatFeature`** — only publishing does, since that's what reads the designer's folder. An organization can design documents in development with [PDF Studio](/chat/pdf-studio), then deploy only `PdfFeature`, Typst and the published artifacts.
+Rendering has **no dependency on `ChatFeature`** - only publishing does, since that's what reads the designer's folder. An organization can design documents in development with [PDF Studio](/chat/pdf-studio), then deploy only `PdfFeature`, Typst and the published artifacts.
 
 ```csharp
 services.AddPlugin(new PdfFeature());
@@ -48,7 +48,7 @@ services.AddPlugin(new PdfFeature());
 | `Renderer` | `PdfRenderer` | Replaceable `IPdfRenderer` implementation |
 | `PdfCodeGen` | `null` | Code generation config |
 
-`IsAvailable` is `false` when typst isn't installed — templates can still be listed and unpublished, but not rendered.
+`IsAvailable` is `false` when typst isn't installed - templates can still be listed and unpublished, but not rendered.
 
 `ModelsPath` and `ModelsNamespace` are resolved automatically to a `Pdf/` subfolder of the App's ServiceModel, covering both layouts ServiceStack Apps use: a `ServiceModel` folder in the host project, or the sibling `MyApp.ServiceModel` project the templates create.
 
@@ -93,7 +93,7 @@ Every successful publish creates a revision:
 
 <text-block text="App_Data/pdf/.versions/{template}/{revision}/"></text-block>
 
-Each revision holds the complete published artifact set, its preview and publishing metadata. Restoring a revision **never edits or deletes history** — it creates a new revision recording which version was restored, so rollback is itself auditable and reversible.
+Each revision holds the complete published artifact set, its preview and publishing metadata. Restoring a revision **never edits or deletes history** - it creates a new revision recording which version was restored, so rollback is itself auditable and reversible.
 
 Unpublishing removes the live template but retains its history, giving a lightweight, database-free release history that backs up with the rest of `App_Data/pdf`.
 
@@ -120,7 +120,7 @@ The preview uses pdf.js with live rendering, zoom, fit, page count and download.
     'Generated C# models': '/img/pages/chat/pdf/generated-types-csharp.webp',
 }"></screenshots-gallery>
 
-**Edit** opens the published document back in PDF Studio — copying the published files into the current administrator's workspace first if another user created it. **Unpublish** removes the live runtime files whilst preserving revision history.
+**Edit** opens the published document back in PDF Studio - copying the published files into the current administrator's workspace first if another user created it. **Unpublish** removes the live runtime files whilst preserving revision history.
 
 Admin PDF is the handoff between document authors and application developers, answering three questions with the real deployed artifact:
 
@@ -147,7 +147,7 @@ Every Admin PDF API requires the `Admin` role:
 
 ## Generate typed C# contracts
 
-The `.ui.json` schema generates strongly typed C# models — the same source `dotnet run --AppTasks=pdf` writes, so what you copy from the browser matches what lands in your project.
+The `.ui.json` schema generates strongly typed C# models - the same source `dotnet run --AppTasks=pdf` writes, so what you copy from the browser matches what lands in your project.
 
 ```csharp
 public class LineItem
@@ -216,7 +216,7 @@ dotnet run --AppTasks=pdf
 Generated files contain content hashes, so if a developer adopts and edits one, later generation skips it instead of destroying their work.
 
 :::info
-Nothing is ever written outside `GeneratePdfs()` — code generation is an explicit task the App runs, in the same spirit as OrmLite Migrations, not something the server does behind your back.
+Nothing is ever written outside `GeneratePdfs()` - code generation is an explicit task the App runs, in the same spirit as OrmLite Migrations, not something the server does behind your back.
 :::
 
 ## Rendering from an API
@@ -297,7 +297,7 @@ var bytes = await pdf.RenderPdfAsync(invoice, new PdfRenderOptions {
 
 ### How data reaches the template
 
-Data rides Typst's `--input data=<json>`, which the shared library's `load-data()` reads before falling back to the template's `.json` sidecar. Nothing is written to disk, so concurrent renders of the same template can't clobber each other — which is also why `MaxDataBytes` stays conservative at 64 KB: argv is capped well below 128 KB once the environment is counted.
+Data rides Typst's `--input data=<json>`, which the shared library's `load-data()` reads before falling back to the template's `.json` sidecar. Nothing is written to disk, so concurrent renders of the same template can't clobber each other - which is also why `MaxDataBytes` stays conservative at 64 KB: argv is capped well below 128 KB once the environment is counted.
 
 ### Errors
 
@@ -338,7 +338,7 @@ public class SendInvoiceEmailCommand(
 }
 ```
 
-Queue an **identifier, not rendered PDF bytes** — the worker loads current data and renders inside the job, keeping persisted job messages small and retryable. This pattern suits scheduled statements, order confirmations, certificates and reports.
+Queue an **identifier, not rendered PDF bytes** - the worker loads current data and renders inside the job, keeping persisted job messages small and retryable. This pattern suits scheduled statements, order confirmations, certificates and reports.
 
 ## Deterministic by construction
 
@@ -365,7 +365,7 @@ Typst's root restriction limits document file access but is **not** an operating
 
 The built-in feature generates PDFs from Typst templates: authoring, AI editing, compilation, publishing, revisions, schema validation, code generation, PDF/PNG rendering and delivery.
 
-It is **not** a general PDF manipulation library. Merging, splitting, encryption, digital signatures, PDF/A, AcroForm filling, OCR and structural import belong in a dedicated PDF library or a custom `IPdfRenderer` pipeline — which you can substitute wholesale:
+It is **not** a general PDF manipulation library. Merging, splitting, encryption, digital signatures, PDF/A, AcroForm filling, OCR and structural import belong in a dedicated PDF library or a custom `IPdfRenderer` pipeline - which you can substitute wholesale:
 
 ```csharp
 services.AddPlugin(new PdfFeature {

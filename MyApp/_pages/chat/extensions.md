@@ -16,7 +16,7 @@ AI Chat solves this with a shared extension architecture spanning the server and
 | `agents` | [Agent Profiles](/chat/agents) and the Profile Manager |
 | `analytics` | [Cost, token and activity reporting](/chat/analytics) for admins |
 | `api_tools` | [Discovery and invocation](/chat/api-tools) of the App's own ServiceStack APIs |
-| `computer` | Filesystem tools and `run_bash` — **off by default** |
+| `computer` | Filesystem tools and `run_bash` - **off by default** |
 | `core_tools` | Utilities, math and code execution tools |
 | `credentials` | Username/password sign-in for the Chat UI |
 | `custom` | Your App's own UI + routes, served from `chat/custom/**` |
@@ -27,7 +27,7 @@ AI Chat solves this with a shared extension architecture spanning the server and
 | `mcp` | The built-in [MCP Server](/chat/mcp) at `/chat/mcp` |
 | `pdf` | [PDF Studio](/chat/pdf-studio) at `/chat/pdf` |
 | `projects` | [Per-user workspaces](/chat/projects) and directory boundaries |
-| `publish` | Sharing threads, projects and media — **off by default** |
+| `publish` | Sharing threads, projects and media - **off by default** |
 | `skills` | [Skill](/chat/skills) management, search, install and authoring |
 | `system_prompts` | The system prompt library |
 | `tools` | The shared [Tool Registry](/chat/tools) and tools panel |
@@ -57,7 +57,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-`DisableExtensions` removes the capability from the server **and** the UI together — a disabled extension registers no routes, no tools and no components.
+`DisableExtensions` removes the capability from the server **and** the UI together - a disabled extension registers no routes, no tools and no components.
 
 The same list can be set in `App_Data/chat/llms.json`, which is merged with the programmatic list:
 
@@ -117,7 +117,7 @@ var bookings = feature.AssertExtension<BookingToolsExtension>();
 
 ## Install order
 
-Extensions install in the order they appear in `ChatFeature.Extensions`. The built-in list ends with `CustomExtension`, so your App's own extension sees everything the built-ins registered — letting it override a tool, replace a UI component or reconfigure a group after the fact.
+Extensions install in the order they appear in `ChatFeature.Extensions`. The built-in list ends with `CustomExtension`, so your App's own extension sees everything the built-ins registered - letting it override a tool, replace a UI component or reconfigure a group after the fact.
 
 Adding your own extension appends it before that final `custom` extension:
 
@@ -140,7 +140,7 @@ To run before a built-in instead, replace the list outright or insert at an inde
 | `ctx.RegisterSetupUserHandler` | First request from each user |
 | `ctx.RegisterShutdownHandler` | AppHost disposal |
 
-An `Install` that throws logs the failure and skips that extension rather than failing App startup. Shutdown handlers are independent — one throwing doesn't skip the rest.
+An `Install` that throws logs the failure and skips that extension rather than failing App startup. Shutdown handlers are independent - one throwing doesn't skip the rest.
 
 ## Static assets
 

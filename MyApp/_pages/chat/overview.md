@@ -2,7 +2,7 @@
 title: AI Chat Overview
 ---
 
-**AI Chat** is a complete, modular AI application delivered as a single ServiceStack plugin. Registering `ChatFeature` mounts a full multi-provider Chat UI at `/chat` that runs inside your App's existing security boundary — using your App's users, your App's database and your App's file system.
+**AI Chat** is a complete, modular AI application delivered as a single ServiceStack plugin. Registering `ChatFeature` mounts a full multi-provider Chat UI at `/chat` that runs inside your App's existing security boundary - using your App's users, your App's database and your App's file system.
 
 <screenshot src="/img/pages/chat/chat-ui.webp" title="AI Chat mounted at /chat"></screenshot>
 
@@ -29,7 +29,7 @@ AI Chat ships as two independent plugins in the **ServiceStack.AI.Chat** package
 | `ChatFeature` | Chat UI, providers, tools, API Tools, MCP, RAG, PDF Studio | An AI provider API key |
 | `PdfFeature` | Published PDF template management + rendering | The `typst` CLI |
 
-`PdfFeature` has no dependency on `ChatFeature` — an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/pdf).
+`PdfFeature` has no dependency on `ChatFeature` - an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/pdf).
 
 ## Architecture
 
@@ -68,7 +68,7 @@ Nothing is stored outside your application. See [Data & Storage](/chat/data).
 | Question | Answer |
 | --- | --- |
 | Who can reach `/chat`? | Whoever `RequireAuth` and `RequiredRole` allow, enforced by your existing auth |
-| Can one user see another's threads, media or projects? | No — state is scoped to the authenticated identity |
+| Can one user see another's threads, media or projects? | No - state is scoped to the authenticated identity |
 | What can an Agent call? | Only APIs the **signed-in user** is authorized to call |
 | Can it write files or run code? | Only if you enable those tools, and only within configured directories |
 | What is exposed over MCP? | Nothing until you name tool groups |

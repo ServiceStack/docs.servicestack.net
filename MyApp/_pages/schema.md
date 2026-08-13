@@ -222,7 +222,7 @@ An API Schema describes one Request DTO. An [AutoQuery Schema](/auto) groups the
 
 ## Related documentation
 
-- [API Schema overview](/api-schema) — architecture, schema-driven components and AI approvals
-- [AutoQuery CRUD UI](/auto) — model-level query and CRUD pages
-- [API Explorer](/api-explorer) — full metadata-driven API Explorer at `/ui`
-- [Metadata page](/metadata-page) — ServiceStack API metadata configuration
+- [API Schema overview](/api-schema) - architecture, schema-driven components and AI approvals
+- [AutoQuery CRUD UI](/auto) - model-level query and CRUD pages
+- [API Explorer](/api-explorer) - full metadata-driven API Explorer at `/ui`
+- [Metadata page](/metadata-page) - ServiceStack API metadata configuration

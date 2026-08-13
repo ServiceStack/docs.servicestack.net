@@ -26,7 +26,7 @@ export default {
         </div>
         <iframe :src="uiUrl" :title="title" :style="{ height: height + 'px' }" class="block w-full border-0 bg-white" allow="clipboard-write"></iframe>
         <div class="border-t border-slate-200 bg-slate-50 px-5 py-3 text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-400 sm:px-7">
-          Live from blazor-gallery.servicestack.net — this is the schema-generated UI, not a screenshot.
+          Live from blazor-gallery.servicestack.net - this is the schema-generated UI, not a screenshot.
         </div>
       </section>`,
 }

@@ -154,8 +154,8 @@ superior performance, and fine-grained scope-based access control.
 
 ### Supporting both Auth Models with 2 APIs
 
-Previously, supporting both auth models required maintaining two separate APIs—one protected
-with `[ValidateIsAuthenticated]` and another with `[ValidateApiKey]` — resulting in duplicate endpoints
+Previously, supporting both auth models required maintaining two separate APIs-one protected
+with `[ValidateIsAuthenticated]` and another with `[ValidateApiKey]` - resulting in duplicate endpoints
 and docs.
 
 ```csharp

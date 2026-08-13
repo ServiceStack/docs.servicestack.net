@@ -2,7 +2,7 @@
 title: MCP Server
 ---
 
-AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants — Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
+AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
 
 <text-block text="https://your-app.example.com/chat/mcp"></text-block>
 
@@ -41,7 +41,7 @@ Mcp = {
 
 ## Transport
 
-Streamable HTTP, run **stateless**: every request is a self-contained JSON-RPC POST answered with JSON. There's no SSE stream and no `Mcp-Session-Id`, which a tools-only server doesn't need — there's no server-initiated message to deliver and nothing to keep between calls.
+Streamable HTTP, run **stateless**: every request is a self-contained JSON-RPC POST answered with JSON. There's no SSE stream and no `Mcp-Session-Id`, which a tools-only server doesn't need - there's no server-initiated message to deliver and nothing to keep between calls.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ For each exposed tool the server publishes:
 - Structured results
 - Safety annotations derived from `ToolSafety`
 
-Images and audio are inlined as base64 when small enough — an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above `MaxInlineResourceBytes` is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.
+Images and audio are inlined as base64 when small enough - an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above `MaxInlineResourceBytes` is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.
 
 ## Approval across the MCP boundary
 
@@ -149,5 +149,5 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 - Register `ApiKeysFeature` and issue a scoped key per client or per user.
 - Name only the tool groups external Assistants should reach.
 - Leave `RejectToolsRequiringApproval = true` unless the client has its own confirmation UI.
-- Keep `[Tool(Safety)]` accurate — it's what an MCP client uses to decide whether to prompt.
+- Keep `[Tool(Safety)]` accurate - it's what an MCP client uses to decide whether to prompt.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.

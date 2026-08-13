@@ -97,7 +97,7 @@ If no `SYSTEM.template` exists, `SYSTEM.md` is returned as-is.
 
 ## Actions
 
-A profile can declare workflow actions the UI offers, optionally conditional on the user's workspace. Only `file` conditions are evaluated — a glob match within the user's allowed directories — and unconditional actions always show:
+A profile can declare workflow actions the UI offers, optionally conditional on the user's workspace. Only `file` conditions are evaluated - a glob match within the user's allowed directories - and unconditional actions always show:
 
 ```json
 {
@@ -118,7 +118,7 @@ This is what drives the built-in **Planner → Coder** handoff: the Planner writ
 
 ## The Profile Manager
 
-The Chat UI can inspect built-in profiles, override their default model and theme, and create new profiles entirely from the browser — editing prompt files, uploading an avatar and choosing which tools and skills a profile may use.
+The Chat UI can inspect built-in profiles, override their default model and theme, and create new profiles entirely from the browser - editing prompt files, uploading an avatar and choosing which tools and skills a profile may use.
 
 Profiles created in the UI are written to the signed-in user's own `profiles/` folder, so a user can never modify a shared profile by accident. To publish a profile to everyone, put it in `App_Data/chat/user/default/profiles/`.
 
@@ -140,7 +140,7 @@ Profile routes live under the `agents` extension:
 
 ## Profiles as governed job descriptions
 
-For an organization, profiles become the unit of AI governance — Support Assistant, Policy Analyst, Release Planner, Sales Researcher, Finance Reviewer — each with only the context and capabilities its role needs:
+For an organization, profiles become the unit of AI governance - Support Assistant, Policy Analyst, Release Planner, Sales Researcher, Finance Reviewer - each with only the context and capabilities its role needs:
 
 ```json
 {
@@ -150,11 +150,11 @@ For an organization, profiles become the unit of AI governance — Support Assis
 }
 ```
 
-Combined with [API Tools](/chat/api-tools), a profile restricted to `api_tools` can operate your business systems and nothing else — no filesystem, no code execution, no web access — whilst still running as the signed-in user with their existing permissions.
+Combined with [API Tools](/chat/api-tools), a profile restricted to `api_tools` can operate your business systems and nothing else - no filesystem, no code execution, no web access - whilst still running as the signed-in user with their existing permissions.
 
 ## Related
 
-- [Skills](/chat/skills) — reusable procedures a profile can be restricted to
-- [Projects](/chat/projects) — the directory boundary a profile's tools operate in
-- [Tools](/chat/tools) — the registry `onlyTools` selects from
-- [Themes](/chat/themes) — the themes `theme` selects from, and how to add your own
+- [Skills](/chat/skills) - reusable procedures a profile can be restricted to
+- [Projects](/chat/projects) - the directory boundary a profile's tools operate in
+- [Tools](/chat/tools) - the registry `onlyTools` selects from
+- [Themes](/chat/themes) - the themes `theme` selects from, and how to add your own

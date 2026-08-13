@@ -60,7 +60,7 @@ var tools = feature.Tools.SelectTools("api_tools,booking_summary");
 | `calc` | Arithmetic and expression evaluation |
 | `skill` | Load a [Skill](/chat/skills)'s detailed instructions on demand |
 
-### Filesystem tools — opt-in
+### Filesystem tools - opt-in
 
 Ported from Anthropic's Filesystem MCP server. Every path is validated against the user's resolved allowed directories before use, and `edit_file` returns a unified diff of what changed.
 
@@ -71,9 +71,9 @@ Tools = {
 }
 ```
 
-The desktop-only tools (screen control, window management) aren't ported — they don't apply to a web host.
+The desktop-only tools (screen control, window management) aren't ported - they don't apply to a web host.
 
-### Code execution — opt-in
+### Code execution - opt-in
 
 ```csharp
 Tools = {
@@ -84,12 +84,12 @@ Tools = {
 Enables `run_bash` (a fresh shell per invocation, running in the first allowed directory) and the `core_tools` `run_*` language runners. Execution is bounded by `ulimit -t` CPU seconds and an address-space cap.
 
 :::info
-When [Projects](/chat/projects) is installed, the active project's folder **replaces** the user's allowed directories — so filesystem and code tools operate inside a per-user workspace rather than anywhere on the server.
+When [Projects](/chat/projects) is installed, the active project's folder **replaces** the user's allowed directories - so filesystem and code tools operate inside a per-user workspace rather than anywhere on the server.
 :::
 
 ### Provider-hosted server tools
 
-Some providers expose their own capabilities — web search, web fetch, code execution. AI Chat surfaces whichever the selected provider advertises, generating the configuration UI from the tool's JSON Schema and passing the resulting definitions to the Model.
+Some providers expose their own capabilities - web search, web fetch, code execution. AI Chat surfaces whichever the selected provider advertises, generating the configuration UI from the tool's JSON Schema and passing the resulting definitions to the Model.
 
 ## Registering your own tools
 
@@ -116,7 +116,7 @@ public class BookingToolsExtension() : ChatExtension("booking_tools")
 
 | Value | Meaning |
 | --- | --- |
-| `Auto` *(default)* | Inferred from the API's HTTP verb — GET/HEAD is read-only, DELETE is destructive, everything else is a write |
+| `Auto` *(default)* | Inferred from the API's HTTP verb - GET/HEAD is read-only, DELETE is destructive, everything else is a write |
 | `ReadOnly` | Only reads data. Safe to call unattended and safe to retry |
 | `Write` | Creates or updates data. Recoverable, but retrying may duplicate the change |
 | `Destructive` | Deletes data or triggers a real-world side effect. Should require approval |
@@ -128,7 +128,7 @@ public class BookingToolsExtension() : ChatExtension("booking_tools")
 public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderResponse> { }
 ```
 
-Set `Safety` explicitly when the verb lies about the consequences — a POST that only runs a report is `ReadOnly`; a POST that emails every customer is `Destructive`.
+Set `Safety` explicitly when the verb lies about the consequences - a POST that only runs a report is `ReadOnly`; a POST that emails every customer is `Destructive`.
 
 ## Human approval
 
@@ -136,7 +136,7 @@ Reads execute immediately. Writes and destructive operations pause and render an
 
 <screenshot src="/img/pages/chat/api-approval.webp" title="Schema-generated approval form for a proposed tool call"></screenshot>
 
-No tool-specific Chat component has to be written — the form comes from the tool's own JSON Schema, so every tool you add later gets the same treatment. See [API Schemas](/releases/v10_01#api-schemas) for how that rendering works.
+No tool-specific Chat component has to be written - the form comes from the tool's own JSON Schema, so every tool you add later gets the same treatment. See [API Schemas](/releases/v10_01#api-schemas) for how that rendering works.
 
 Approvals are durable: a paused call survives a page reload, and the Model is told afterwards whether the user approved the proposal as-is or modified it.
 

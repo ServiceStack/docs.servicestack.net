@@ -62,8 +62,8 @@ services.AddPlugin(new ChatFeature());
 | `IDbConnectionFactory` | Threads, analytics, media, Gemini | Registered by every ServiceStack App template |
 | At least one provider API key | Talking to a model | See [Providers & Models](/chat/providers) |
 | `AuthFeature` or Identity Auth | `RequireAuth = true` | See [Integrated Auth](/chat/auth) |
-| `typst` CLI | PDF Studio + PDF rendering | Optional — self-disables when missing |
-| `ffmpeg` or Mistral | Voice transcription | Optional — self-disables when missing |
+| `typst` CLI | PDF Studio + PDF rendering | Optional - self-disables when missing |
+| `ffmpeg` or Mistral | Voice transcription | Optional - self-disables when missing |
 
 :::info
 AI Chat resolves its OrmLite connection from the host's `IDbConnectionFactory` and creates its tables when `AutoInitSchema` is true (the default). Without a registered `IDbConnectionFactory`, threads aren't persisted and the `gemini` extension disables itself.
@@ -92,7 +92,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-A local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) endpoint needs no key at all — see [Providers & Models](/chat/providers).
+A local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) endpoint needs no key at all - see [Providers & Models](/chat/providers).
 
 ## Run it
 
@@ -143,7 +143,7 @@ These files are yours to edit and check in. See [Data & Storage](/chat/data).
 
 ## What's next
 
-- [Configuration](/chat/configuration) — every `ChatFeature` option
-- [Providers & Models](/chat/providers) — enabling providers and refreshing the model catalog
-- [Integrated Auth](/chat/auth) — choosing an `AuthType` and restricting access
-- [API Tools](/chat/api-tools) — exposing your own APIs to AI Models
+- [Configuration](/chat/configuration) - every `ChatFeature` option
+- [Providers & Models](/chat/providers) - enabling providers and refreshing the model catalog
+- [Integrated Auth](/chat/auth) - choosing an `AuthType` and restricting access
+- [API Tools](/chat/api-tools) - exposing your own APIs to AI Models

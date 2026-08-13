@@ -231,7 +231,7 @@ Install the required packages with:
 
 ## Related documentation
 
-- [AutoQuery Schema overview](/autoquery-schema) — architecture, components and broader use cases
-- [API Schema](/schema) — per-Request DTO schemas used by every CRUD operation
-- [AutoQuery RDBMS](/autoquery/rdbms) — defining Query and CRUD APIs
-- [Locode](/locode/) — standalone metadata-driven data management UI
+- [AutoQuery Schema overview](/autoquery-schema) - architecture, components and broader use cases
+- [API Schema](/schema) - per-Request DTO schemas used by every CRUD operation
+- [AutoQuery RDBMS](/autoquery/rdbms) - defining Query and CRUD APIs
+- [Locode](/locode/) - standalone metadata-driven data management UI

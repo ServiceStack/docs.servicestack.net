@@ -37,7 +37,7 @@ services.AddPlugin(new ChatFeature {
 | `RoutePrefix` | `"/chat"` | Path the Chat UI + APIs are mounted at. `""` mounts at the site root |
 | `RequireAuth` | `true` | When false everything runs as the `"default"` user without authentication |
 | `RequiredRole` | `null` | Only users in this role can access the Chat UI + APIs |
-| `AuthType` | `Credentials` | How the UI signs users in — see [Integrated Auth](/chat/auth) |
+| `AuthType` | `Credentials` | How the UI signs users in - see [Integrated Auth](/chat/auth) |
 | `SignInUrl` | `"/Account/Login"` | Identity login page the UI redirects to when `AuthType = OAuth` |
 | `AppDataPath` | `~/App_Data/chat` | Root of AI Chat's file storage |
 | `AutoInitSchema` | `true` | Create the OrmLite tables on startup |
@@ -47,7 +47,7 @@ services.AddPlugin(new ChatFeature {
 
 ### Mounting at the site root
 
-`RoutePrefix = ""` gives full [llms.py](https://llmspy.org) fidelity, serving the Chat UI from `/` — appropriate for a dedicated AI host rather than an App with its own pages:
+`RoutePrefix = ""` gives full [llms.py](https://llmspy.org) fidelity, serving the Chat UI from `/` - appropriate for a dedicated AI host rather than an App with its own pages:
 
 ```csharp
 services.AddPlugin(new ChatFeature { RoutePrefix = "" });
@@ -58,8 +58,8 @@ services.AddPlugin(new ChatFeature { RoutePrefix = "" });
 | Property | Default | Description |
 | --- | --- | --- |
 | `DisableExtensions` | `[]` | Extension names to remove entirely, from server **and** UI |
-| `Extensions` | built-ins | The extension list itself — add your own or reorder |
-| `InstalledExtensionNames` | — | Read-only list of what actually installed |
+| `Extensions` | built-ins | The extension list itself - add your own or reorder |
+| `InstalledExtensionNames` | - | Read-only list of what actually installed |
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -77,7 +77,7 @@ services.AddPlugin(new ChatFeature {
 
 ### Configuring your own extensions
 
-An extension's configuration is just its own properties, so your extensions are configured **where they're added** — the same object-initializer syntax the built-ins use, one level deeper:
+An extension's configuration is just its own properties, so your extensions are configured **where they're added** - the same object-initializer syntax the built-ins use, one level deeper:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -131,12 +131,12 @@ See [Custom Extensions](/chat/custom-extensions) for the full `ExtensionContext`
 | Property | Default | Description |
 | --- | --- | --- |
 | `Config` | seeded `llms.json` | The parsed `llms.json` document |
-| `ConfigJson` | — | Write-only setter that parses a JSON string into `Config` |
+| `ConfigJson` | - | Write-only setter that parses a JSON string into `Config` |
 | `ProviderModels` | seeded `providers.json` | The models.dev model catalog |
 | `EnableProviders` | `[]` | Force-enable **only** these providers, overriding `llms.json` |
 | `Variables` | `[]` | `$VAR` substitutions checked **before** environment variables |
 | `ProviderTypes` | built-ins | npm sdk id → provider factory |
-| `Providers` | — | The live (enabled + configured) providers |
+| `Providers` | - | The live (enabled + configured) providers |
 | `LoadingMessages` | `["Computing", …]` | Words shown while a response streams |
 
 ### Update Provider Models
@@ -222,11 +222,11 @@ Tools = {
 }
 ```
 
-Higher-risk capabilities are opt-in. Filesystem and code execution tools stay unregistered unless the host turns them on — and even then, [Projects](/chat/projects) further narrows each user's reachable directories. See [Tools](/chat/tools).
+Higher-risk capabilities are opt-in. Filesystem and code execution tools stay unregistered unless the host turns them on - and even then, [Projects](/chat/projects) further narrows each user's reachable directories. See [Tools](/chat/tools).
 
 ## AI Chat and the OpenAI API
 
-`ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline — provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
+`ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
 
 ## Full configuration reference
 

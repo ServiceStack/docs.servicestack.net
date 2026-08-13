@@ -16,7 +16,7 @@ Each project is a dedicated folder under the signed-in user's own storage:
 
 When a project is active, that folder **replaces** the user's allowed directories. Every path a filesystem tool receives is normalized to a full path and checked against it, so `..` segments and absolute paths can't escape.
 
-With no active project, AI Chat falls back to the explicitly configured `Tools.AllowedDirectories` — which is empty by default, and is the only thing that enables filesystem tools in the first place:
+With no active project, AI Chat falls back to the explicitly configured `Tools.AllowedDirectories` - which is empty by default, and is the only thing that enables filesystem tools in the first place:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -48,7 +48,7 @@ Projects narrow access; they don't grant it. `EnableFilesystemTools` and `Enable
 | `folder` | Folder name, defaulting to a kebab-case slug of `name` |
 | `publish` | Build output directory, relative to the project folder |
 
-`"My App (v2)"` slugs to `my-app-v2`. The `publish` path is coerced to a relative path inside the project folder — absolute paths, a leading `/`, a redundant `{folder}/` prefix and any `..` segments are all reduced away, and the project root is `""`.
+`"My App (v2)"` slugs to `my-app-v2`. The `publish` path is coerced to a relative path inside the project folder - absolute paths, a leading `/`, a redundant `{folder}/` prefix and any `..` segments are all reduced away, and the project root is `""`.
 
 ## Applying a project on sign-in
 
@@ -79,7 +79,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-Publishing is **disabled by default** in ServiceStack AI Chat, so each host decides whether content may leave its application boundary. Connection config is stored per user at `App_Data/chat/user/{user}/publish/config.json`, and the publish dialog's folder browser is confined to the project folder — every path in and out is relative to it, so the UI never sees a server path.
+Publishing is **disabled by default** in ServiceStack AI Chat, so each host decides whether content may leave its application boundary. Connection config is stored per user at `App_Data/chat/user/{user}/publish/config.json`, and the publish dialog's folder browser is confined to the project folder - every path in and out is relative to it, so the UI never sees a server path.
 
 The extension can also publish selected chat threads and individual gallery media items.
 
@@ -111,7 +111,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-With `projects` disabled, filesystem tools fall back to `Tools.AllowedDirectories` for every user — appropriate when a single shared workspace is what you want, or when you've disabled filesystem tools entirely.
+With `projects` disabled, filesystem tools fall back to `Tools.AllowedDirectories` for every user - appropriate when a single shared workspace is what you want, or when you've disabled filesystem tools entirely.
 
 ## Operational guidance
 

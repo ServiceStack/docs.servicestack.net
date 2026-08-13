@@ -123,7 +123,7 @@ Designed as an SSG framework from the start, its pre-defined patterns include st
 
 Its [SWR](https://swr.vercel.app) Data Fetching React Hooks library is one innovative example utilizing the popular 
 [stale-while-revalidate](https://web.dev/stale-while-revalidate/) UX pattern to help developers balance 
-between **immediacy** — loading cached content right away — and **freshness** — ensuring updates to the cached content are used in the future.
+between **immediacy** - loading cached content right away - and **freshness** - ensuring updates to the cached content are used in the future.
 
 To take advantage of this, the [nextjs](https://github.com/NetCoreTemplates/nextjs) template includes a `swrClient` that provides a typed wrapper for making typed SWR API Requests with ServiceStack's generic [JsonServiceClient](/typescript-add-servicestack-reference):
 

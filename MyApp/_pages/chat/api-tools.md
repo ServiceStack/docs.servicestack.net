@@ -2,13 +2,13 @@
 title: API Tools
 ---
 
-**API Tools** let AI Models discover, learn and call your existing ServiceStack APIs. Your typed Request DTOs, metadata, validation, authorization and Services remain the single source of truth — there is no parallel schema, no bespoke function-calling gateway and no AI-specific application backend.
+**API Tools** let AI Models discover, learn and call your existing ServiceStack APIs. Your typed Request DTOs, metadata, validation, authorization and Services remain the single source of truth - there is no parallel schema, no bespoke function-calling gateway and no AI-specific application backend.
 
 <screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
 
 ## Three tools, not one per API
 
-Sending every API schema to a Model on every request would be expensive, slow and confusing — a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:
+Sending every API schema to a Model on every request would be expensive, slow and confusing - a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:
 
 | Tool | Purpose |
 | --- | --- |
@@ -76,7 +76,7 @@ public class GetCoffeeShopMenu : IGet, IReturn<GetCoffeeShopMenuResponse> { }
 
 | Property | Description |
 | --- | --- |
-| `WhenToUse` | The situation that calls for this API. **The single most valuable thing you can add** — `[Description]` tells a developer what the API *does*; this tells an Agent *when to pick it* |
+| `WhenToUse` | The situation that calls for this API. **The single most valuable thing you can add** - `[Description]` tells a developer what the API *does*; this tells an Agent *when to pick it* |
 | `Name` | The name the Agent calls this tool by. Defaults to the Request DTO name. Conventionally snake_case |
 | `Keywords` | Extra search terms a user might say that don't already appear in the name, route, tags or description |
 | `Aliases` | Alternative names and user vocabulary that should resolve to this API |
@@ -99,13 +99,13 @@ public class GetCoffeeShopMenu : IGet, IReturn<GetCoffeeShopMenuResponse> { }
 // ✅ the situation that calls for it
 [Tool("the user asks about a customer's orders, spend or contact details")]
 
-// ❌ what the API does — [Description] already says this
+// ❌ what the API does - [Description] already says this
 [Tool("queries the Customers table and returns matching rows")]
 ```
 
 ### Examples
 
-The highest accuracy-per-token you can buy for APIs whose usable inputs aren't obvious from their type alone. AutoQuery's implicit conventions (`%StartsWith`, `%Between`, `orderBy`, `fields`, `take`) don't appear in the generated schema at all — one realistic example teaches them all:
+The highest accuracy-per-token you can buy for APIs whose usable inputs aren't obvious from their type alone. AutoQuery's implicit conventions (`%StartsWith`, `%Between`, `orderBy`, `fields`, `take`) don't appear in the generated schema at all - one realistic example teaches them all:
 
 ```csharp
 [Tag("Northwind")]
@@ -125,7 +125,7 @@ The main defence against a single call flooding the Agent's context. A table wit
 [Tool(Fields = "id,companyName,country", Take = 25)]
 ```
 
-Both only limit the **default** — the Agent can still request other fields, bounded by `MaxTake`.
+Both only limit the **default** - the Agent can still request other fields, bounded by `MaxTake`.
 
 ### Preview and workflow metadata
 
@@ -179,7 +179,7 @@ Giving a Model access to an API should not mean giving it permission to perform 
 
 Only an approved request reaches the Service, and only a successful Service response lets the assistant report success. Afterwards the Model is told whether the user approved the proposal as-is or made changes, so it can acknowledge modifications.
 
-The valuable part is that **no API-specific Chat component has to be written**. The approval form is generated from the API's own schema, so nested DTOs, collections, allowable values, descriptions and validation are all visible and editable — and every API you add later gets the same treatment for free.
+The valuable part is that **no API-specific Chat component has to be written**. The approval form is generated from the API's own schema, so nested DTOs, collections, allowable values, descriptions and validation are all visible and editable - and every API you add later gets the same treatment for free.
 
 ## The AI acts as the authenticated user
 
@@ -191,7 +191,7 @@ API Tools are not a privileged backdoor into your application:
 - Calls are deserialized into the real Request DTO and executed through ServiceStack's in-process Service Gateway.
 - DTO validation, Service filters, business rules and database behaviour remain authoritative.
 
-API tools can only run on behalf of a request — without one there is no user to run as, and executing anyway would run the App's APIs unauthenticated.
+API tools can only run on behalf of a request - without one there is no user to run as, and executing anyway would run the App's APIs unauthenticated.
 
 ## The recommended workflow
 
@@ -232,6 +232,6 @@ API Tools remove most of the integration work but not the value of thoughtful AP
 
 Pick one read-only API, add a `[Tool]` attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.
 
-To let external AI Assistants use the same tools, name the group over MCP — see [MCP Server](/chat/mcp).
+To let external AI Assistants use the same tools, name the group over MCP - see [MCP Server](/chat/mcp).
 
 <screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot>

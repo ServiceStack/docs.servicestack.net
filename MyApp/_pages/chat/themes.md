@@ -2,7 +2,7 @@
 title: Themes
 ---
 
-AI Chat ships eight themes users can switch between, and the theming system is open — a host or an individual user can add their own by dropping a JSON file into `App_Data`, with no rebuild and no fork.
+AI Chat ships eight themes users can switch between, and the theming system is open - a host or an individual user can add their own by dropping a JSON file into `App_Data`, with no rebuild and no fork.
 
 <screenshots-gallery grid-class="grid grid-cols-2 md:grid-cols-4 gap-4" :images="{
     'Light': '/img/pages/chat/themes/light.webp',
@@ -19,11 +19,11 @@ AI Chat ships eight themes users can switch between, and the theming system is o
 
 | Theme | `colorScheme` | Background image |
 | --- | --- | --- |
-| `light` | light | — |
+| `light` | light | - |
 | `light_sky` | light | ✓ |
 | `light_slate` | light | ✓ |
 | `soft_pink` | light | ✓ |
-| `dark` | dark | — |
+| `dark` | dark | - |
 | `nord` | dark | ✓ |
 | `matrix` | dark | ✓ |
 | `blue_smoke` | dark | ✓ |
@@ -80,13 +80,13 @@ The variables worth knowing:
 | `--scrollbar-track-bg`, `--scrollbar-thumb-bg` | Scrollbars |
 | `--user-bg`, `--user-text`, `--user-border` | User message bubbles |
 | `--assistant-bg`, `--assistant-text`, `--assistant-border` | Assistant message bubbles |
-| `--tw-prose-*` | Rendered Markdown — body, headings, links, code, tables |
+| `--tw-prose-*` | Rendered Markdown - body, headings, links, code, tables |
 
 `--user-*` and `--assistant-*` do double duty: they're also what generated [avatars](#themed-avatars) are drawn with.
 
 ### styles
 
-`styles` is a flat map of **named UI slots** to Tailwind class strings. There are around 60, bound directly to elements throughout the Chat UI — so a theme restyles the App by naming classes, not by shipping CSS.
+`styles` is a flat map of **named UI slots** to Tailwind class strings. There are around 60, bound directly to elements throughout the Chat UI - so a theme restyles the App by naming classes, not by shipping CSS.
 
 | Group | Keys |
 | --- | --- |
@@ -104,7 +104,7 @@ The variables worth knowing:
 | Voice | `voiceButtonDefault`, `voiceButtonRecording`, `voiceButtonProcessing` |
 | Status | `bgSuccess`, `bgWarning` |
 
-A theme only needs to define the slots it wants to change — everything else falls through to the base theme.
+A theme only needs to define the slots it wants to change - everything else falls through to the base theme.
 
 ## How a theme is resolved
 
@@ -137,7 +137,7 @@ Within each root, a theme can take **either** shape:
 
 Directories are merged first, then flat files. A directory's `theme.json` overrides only the keys it defines; a flat `{name}.json` is treated as the complete definition, with any `vars` already merged from a directory stub layered back over the top.
 
-That's exactly how the bundled `light` and `dark` themes work — `dark.json` carries the full definition while `dark/theme.json` contributes nothing but its `colorScheme`.
+That's exactly how the bundled `light` and `dark` themes work - `dark.json` carries the full definition while `dark/theme.json` contributes nothing but its `colorScheme`.
 
 :::info
 `shared.json` is **not** a theme. It holds the vars and styles every theme inherits and is deliberately excluded from the theme listing.
@@ -164,7 +164,7 @@ The simplest custom theme starts from a built-in base and overrides a few values
 }
 ```
 
-It appears in the theme picker's Light column immediately — no rebuild, no plugin change.
+It appears in the theme picker's Light column immediately - no rebuild, no plugin change.
 
 ### With a background image
 
@@ -189,7 +189,7 @@ App_Data/chat/user/default/themes/company/
 }
 ```
 
-Assets are served at `{RoutePrefix}/themes/{theme}/ui/{file}`. Reference them with a **site-root** URL — `url(/themes/...)` — and AI Chat rebases it onto `RoutePrefix` as the theme is served, so the same theme file works whether the UI is mounted at `/chat` or at the site root.
+Assets are served at `{RoutePrefix}/themes/{theme}/ui/{file}`. Reference them with a **site-root** URL - `url(/themes/...)` - and AI Chat rebases it onto `RoutePrefix` as the theme is served, so the same theme file works whether the UI is mounted at `/chat` or at the site root.
 
 :::tip
 The asset route is deliberately anonymous, so the **sign-in screen renders themed**. The `/themes` listing itself stays authenticated, and the UI falls back to its bundled light/dark defaults until the user signs in.
@@ -273,6 +273,6 @@ Both routes belong to the `app` extension. Theme names containing `..` are rejec
 
 ## Related
 
-- [Agent Profiles](/chat/agents) — pinning a theme per assistant
-- [Custom Extensions](/chat/custom-extensions) — adding stylesheets and replacing UI components
-- [Data & Storage](/chat/data) — where per-user theme files live
+- [Agent Profiles](/chat/agents) - pinning a theme per assistant
+- [Custom Extensions](/chat/custom-extensions) - adding stylesheets and replacing UI components
+- [Data & Storage](/chat/data) - where per-user theme files live

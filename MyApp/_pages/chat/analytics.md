@@ -2,7 +2,7 @@
 title: Analytics & Admin
 ---
 
-Enterprise AI needs observability. AI Chat records every completion — provider, model, tokens, duration and cost — so administrators can understand usage instead of discovering it on a provider invoice.
+Enterprise AI needs observability. AI Chat records every completion - provider, model, tokens, duration and cost - so administrators can understand usage instead of discovering it on a provider invoice.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Cost analysis': '/img/pages/chat/analytics/analytics-costs.webp',
@@ -59,7 +59,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-The extension is UI-only — it consumes the `app` extension's requests/summary APIs, so disabling it removes the dashboards but keeps the data:
+The extension is UI-only - it consumes the `app` extension's requests/summary APIs, so disabling it removes the dashboards but keeps the data:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -77,7 +77,7 @@ It's backed by typed ServiceStack APIs you can also call directly:
 
 | API | Purpose |
 | --- | --- |
-| `AdminQueryChatRequests` | AutoQuery over `ChatRequest` — filter, sort, page by any field |
+| `AdminQueryChatRequests` | AutoQuery over `ChatRequest` - filter, sort, page by any field |
 | `AdminMonthlyChatAnalytics` | Monthly rollup |
 | `AdminDailyChatAnalytics` | Daily rollup |
 | `AdminGetChatThread` | A thread's messages and per-request stats for operational review |
@@ -158,5 +158,5 @@ Models you added yourself in `providers-extra.json` should carry their own prici
 
 ## Related
 
-- [Data & Storage](/chat/data) — the tables and file layout behind these numbers
-- [Integrated Auth](/chat/auth) — who can reach the Admin UIs
+- [Data & Storage](/chat/data) - the tables and file layout behind these numbers
+- [Integrated Auth](/chat/auth) - who can reach the Admin UIs

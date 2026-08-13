@@ -23,7 +23,7 @@ Where an [API Schema](/api-schema) describes how one `/api/{RequestDto}` endpoin
   ['GET /auto/{ModelName}.json','The model-level schema envelope'],
   ['GET /auto.json','The model catalog as JSON']]"></text-block>
 
-The integration is deliberately small — fetch that one document and give it to the generic component:
+The integration is deliberately small - fetch that one document and give it to the generic component:
 
 ```html
 <AutoQuerySchema :schema="schema" />
@@ -55,13 +55,13 @@ These routes belong to the existing [Metadata feature](/metadata-page), so there
 | `primaryKey` | Which property identifies a row, so UIs can deep link to one |
 | `model` | The writable model schema |
 | `viewModel` | Only present when the query returns a **different** shape |
-| `query` | The Query API — required; without access there is no schema |
+| `query` | The Query API - required; without access there is no schema |
 | `create` `update` `delete` `save` | Present only when an authorized API exists |
 
 Each of those API entries is a full [API Schema](/api-schema), so the same generic form components render them.
 
 :::info
-`viewModel` matters when a query joins, projects or enriches stored data. Rows returned by `IQueryDb<From, Into>` are the `Into` type, whilst Create/Update/Delete still write through the `From` type — so grids display the returned view whilst forms use the writable model.
+`viewModel` matters when a query joins, projects or enriches stored data. Rows returned by `IQueryDb<From, Into>` are the `Into` type, whilst Create/Update/Delete still write through the `From` type - so grids display the returned view whilst forms use the writable model.
 :::
 
 <screenshot src="/img/pages/autoquery-schema/tag-filter.webp" title="AutoQuery data models filtered by tag"></screenshot>
@@ -82,7 +82,7 @@ Query state is kept in the URL, so a filtered view can be bookmarked, refreshed 
 
 <text-block text="/auto/Booking?RoomType=Queen&amp;orderBy=-StartDate&amp;skip=20"></text-block>
 
-That URL is not a screenshot of transient client state — it's a durable link back to the same server-side query.
+That URL is not a screenshot of transient client state - it's a durable link back to the same server-side query.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Grid filters, ordering and pagination': '/img/pages/autoquery-schema/grid-filters.webp',
@@ -91,20 +91,20 @@ That URL is not a screenshot of transient client state — it's a durable link b
 
 ## Schema-driven Create, Edit and Delete
 
-Each form preserves the exact behavior of its API — required values and validation constraints shown before submission, server validation errors bound back to their fields, enums and allowable values as selections, editable nested objects and collections, multipart uploads for file properties, and HTTP methods and payloads taken from the schema.
+Each form preserves the exact behavior of its API - required values and validation constraints shown before submission, server validation errors bound back to their fields, enums and allowable values as selections, editable nested objects and collections, multipart uploads for file properties, and HTTP methods and payloads taken from the schema.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Generated Create Booking form': '/img/pages/autoquery-schema/create-booking.webp',
     'Edit dialog with guarded delete': '/img/pages/autoquery-schema/edit-booking.webp',
 }"></screenshots-gallery>
 
-Patch APIs receive **only changed values**. When a user clears an existing field the UI adds ServiceStack's `reset` instruction so the server can distinguish *"set this to empty"* from *"leave this field unchanged"* — the kind of edge case custom CRUD UIs frequently get wrong, solved once for every model.
+Patch APIs receive **only changed values**. When a user clears an existing field the UI adds ServiceStack's `reset` instruction so the server can distinguish *"set this to empty"* from *"leave this field unchanged"* - the kind of edge case custom CRUD UIs frequently get wrong, solved once for every model.
 
 ## References become live lookup UIs
 
 Foreign keys are often where generated CRUD tools stop feeling like real applications. Asking a user to remember that *"Customer 1042"* is *"Acme Inc."* is technically accurate and practically unusable.
 
-AutoQuery Schemas preserve reference metadata from `[Ref]`, `[References]`, `[ForeignKey]` and related attributes. The renderer displays a lookup control that resolves the current label and opens a full searchable picker for the referenced model — with the same paging, sorting, filters and column preferences as the main grid.
+AutoQuery Schemas preserve reference metadata from `[Ref]`, `[References]`, `[ForeignKey]` and related attributes. The renderer displays a lookup control that resolves the current label and opens a full searchable picker for the referenced model - with the same paging, sorting, filters and column preferences as the main grid.
 
 <screenshot src="/img/pages/autoquery-schema/customer-lookup.webp" title="Reference lookup opened from the Booking form"></screenshot>
 
@@ -115,13 +115,13 @@ Referenced model schemas are loaded on demand from `/auto/{ReferencedModel}.json
 Generated UIs are only useful when they preserve the application's security model. The catalog, model schema and CRUD UI are all generated for the current authenticated session:
 
 - A model is only listed when its Query API can be accessed.
-- **Query access is required** — without it, requesting the schema returns 401 or 403.
+- **Query access is required** - without it, requesting the schema returns 401 or 403.
 - Create appears only when the user can call the Create API.
 - Rows become editable only when Update or Patch is available.
 - Delete appears only when the selected Delete API is authorized.
 - Each action can carry different roles, permissions, claims, scopes or API-key requirements.
 
-This is more precise than a single *"admin page"* permission. A support user may have read access, an operator may create and edit, and an administrator may also delete — all from the same generated UI.
+This is more precise than a single *"admin page"* permission. A support user may have read access, an operator may create and edit, and an administrator may also delete - all from the same generated UI.
 
 ## Conventions for real AutoQuery APIs
 
@@ -129,7 +129,7 @@ ServiceStack derives the most useful CRUD surface from whichever API shapes are 
 
 | Convention | Behavior |
 | --- | --- |
-| Query API | Required — it's what grants access to the schema at all |
+| Query API | Required - it's what grants access to the schema at all |
 | Update | `IPatchDb<T>` is preferred over `IUpdateDb<T>` when both exist |
 | Delete | A single-row delete is preferred over a bulk delete |
 | Availability | Operations are included only when they exist **and** are authorized |
@@ -145,7 +145,7 @@ ServiceStack derives the most useful CRUD surface from whichever API shapes are 
 | **Customization** | Compose the Vue/React components yourself | Locode's customization model | Total |
 | **Runs where** | Built-in page *or* inside your App | Built-in page | Your App |
 
-They aren't competing and neither is going away. Locode remains the fuller standalone back-office experience. `/auto` is the schema-driven equivalent that scales to very large API surfaces and — the part that matters most — can be *taken apart*: the grid, the forms, the lookups and the field inputs are components you can drop into your own application's navigation and design system.
+They aren't competing and neither is going away. Locode remains the fuller standalone back-office experience. `/auto` is the schema-driven equivalent that scales to very large API surfaces and - the part that matters most - can be *taken apart*: the grid, the forms, the lookups and the field inputs are components you can drop into your own application's navigation and design system.
 
 ## Use AutoQuerySchema in your own Apps
 
@@ -220,7 +220,7 @@ Once the AutoQuery CRUD APIs exist, `/auto/Booking` is immediately useful. Add d
 
 ## The structured foundation for AI-operated data
 
-Because each write operation carries its own [API Schema](/api-schema), [AI Chat](/chat/api-tools) can render an editable preview and approval form whenever a Model proposes an AutoQuery Create, Update, Patch, Delete or Save — for **every model**, with no per-API Chat component to write.
+Because each write operation carries its own [API Schema](/api-schema), [AI Chat](/chat/api-tools) can render an editable preview and approval form whenever a Model proposes an AutoQuery Create, Update, Patch, Delete or Save - for **every model**, with no per-API Chat component to write.
 
 This supports experiences such as:
 
@@ -273,12 +273,12 @@ npm install @servicestack/vue
 npm install @servicestack/react
 :::
 
-To get more out of the generated UIs, improve the **APIs** rather than the UI — `[Description]`, validation attributes, `[Input]`, `[Ref]` and `[Intl]`/`[Format]` all show up in the forms and grids.
+To get more out of the generated UIs, improve the **APIs** rather than the UI - `[Description]`, validation attributes, `[Input]`, `[Ref]` and `[Intl]`/`[Format]` all show up in the forms and grids.
 
 <screenshot src="/img/pages/autoquery-schema/autoquery-overview.webp" title="AutoQuery Schema overview"></screenshot>
 
 ## Related
 
-- [API Schema](/api-schema) — the per-API contract each CRUD entry above contains
-- [AutoQuery RDBMS](/autoquery/rdbms) — the APIs these UIs are generated from
-- [Locode](/locode/) — the standalone metadata-driven admin App
+- [API Schema](/api-schema) - the per-API contract each CRUD entry above contains
+- [AutoQuery RDBMS](/autoquery/rdbms) - the APIs these UIs are generated from
+- [Locode](/locode/) - the standalone metadata-driven admin App

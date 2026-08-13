@@ -2,7 +2,7 @@
 title: API Schema
 ---
 
-Open `/schema` in any **.NET 8+** ServiceStack App and you'll find a searchable index of every API the signed-in user can call. Open one and you get a working UI for it — form, validation, request preview, `curl` command, execution and response — with no code written and nothing installed.
+Open `/schema` in any **.NET 8+** ServiceStack App and you'll find a searchable index of every API the signed-in user can call. Open one and you get a working UI for it - form, validation, request preview, `curl` command, execution and response - with no code written and nothing installed.
 
 <screenshot src="/img/pages/api-schema/api-schema-query-bookings.webp" title="A complete QueryBookings UI rendered and executed from its API Schema"></screenshot>
 
@@ -23,15 +23,15 @@ onMounted(async () =>
 </template>
 ```
 
-That's the whole integration — for that API, and every other one. The component never learns anything about `CreateCoffeeShopOrder`; the fetched schema supplies the fields, controls, validation, HTTP method and execution URL.
+That's the whole integration - for that API, and every other one. The component never learns anything about `CreateCoffeeShopOrder`; the fetched schema supplies the fields, controls, validation, HTTP method and execution URL.
 
 It's also what lets [AI Chat](/chat/) render a trustworthy approval form for any API a Model proposes calling, without anyone building a Chat component per Request DTO.
 
 ## Two complementary endpoints
 
 <text-block :rows="[
-  ['{HTTP Method} /api/{RequestDto}','Execute — send the typed Request DTO and receive its response'],
-  ['GET /schema/{RequestDto}.json','Describe — the portable contract a generic UI or tool needs to use it'],
+  ['{HTTP Method} /api/{RequestDto}','Execute - send the typed Request DTO and receive its response'],
+  ['GET /schema/{RequestDto}.json','Describe - the portable contract a generic UI or tool needs to use it'],
   ['GET /schema/{RequestDto}','The same contract, served as a complete executable UI'],
   ['GET /schema','Searchable catalog of every API available to the caller'],
   ['GET /schema.json','That catalog as JSON']]"></text-block>
@@ -60,7 +60,7 @@ Because the page is generated at runtime it always reflects the application that
 
 ## What's in a schema
 
-The schema is based on **JSON Schema Draft-07**, but describes more than the structural shape of a DTO — it contains enough to construct and invoke the API without loading ServiceStack's full metadata document.
+The schema is based on **JSON Schema Draft-07**, but describes more than the structural shape of a DTO - it contains enough to construct and invoke the API without loading ServiceStack's full metadata document.
 
 | Key | Description |
 | --- | --- |
@@ -111,12 +111,12 @@ Plus numeric, string and collection constraints, enum and allowable values, and 
 ```
 
 :::info
-`$id` is deliberately the **pre-defined route** (`/api/{RequestDto}`) rather than a custom `[Route]`. The pre-defined route always exists, never changes, and accepts every property in the body or query string — so it doubles as the URL to call. A custom `[Route]` can put properties in the path, which a generic client would have to reassemble.
+`$id` is deliberately the **pre-defined route** (`/api/{RequestDto}`) rather than a custom `[Route]`. The pre-defined route always exists, never changes, and accepts every property in the body or query string - so it doubles as the URL to call. A custom `[Route]` can put properties in the path, which a generic client would have to reassemble.
 :::
 
 ## Built to scale beyond thousands of APIs
 
-ServiceStack's [API Explorer](/api-explorer) at `/ui` loads the full `MetadataApp` document — every operation, DTO, data model and related type — before it can show you one API. That's convenient at smaller scales and increasingly expensive at larger ones.
+ServiceStack's [API Explorer](/api-explorer) at `/ui` loads the full `MetadataApp` document - every operation, DTO, data model and related type - before it can show you one API. That's convenient at smaller scales and increasingly expensive at larger ones.
 
 API Schemas invert that dependency:
 
@@ -127,12 +127,12 @@ API Schemas invert that dependency:
 
 Opening an API loads **only** the schema required to render and invoke that operation. Nested DTOs the form needs are encapsulated within that schema, whilst unrelated APIs and models never enter the page.
 
-- **Smaller payloads** — one focused contract instead of the entire metadata graph.
-- **Lower parsing and memory costs** — the browser only materializes types visible in the current UI.
-- **No giant JavaScript arguments** — schemas are fetched and parsed as ordinary JSON.
-- **Faster first use** — search a compact catalog and open one API without waiting for every definition.
-- **Independent caching** — individual schemas can be cached and invalidated separately.
-- **Bounded UI complexity** — rendering cost is set by the selected API, not the App's total size.
+- **Smaller payloads** - one focused contract instead of the entire metadata graph.
+- **Lower parsing and memory costs** - the browser only materializes types visible in the current UI.
+- **No giant JavaScript arguments** - schemas are fetched and parsed as ordinary JSON.
+- **Faster first use** - search a compact catalog and open one API without waiting for every definition.
+- **Independent caching** - individual schemas can be cached and invalidated separately.
+- **Bounded UI complexity** - rendering cost is set by the selected API, not the App's total size.
 
 An application can grow from ten APIs to ten thousand without making a single API form ten thousand times heavier.
 
@@ -181,7 +181,7 @@ Other metadata unlocks richer controls:
 - `[FieldCss]` and API form layouts control responsive presentation.
 - `[Authenticate]`, roles, permissions, claims and scopes describe who can invoke the API.
 
-None of this is specific to the schema page — it continues to improve ServiceStack's other [Auto UIs](/auto-ui), API Explorer and generated clients.
+None of this is specific to the schema page - it continues to improve ServiceStack's other [Auto UIs](/auto-ui), API Explorer and generated clients.
 
 ## A complete API workbench
 
@@ -192,7 +192,7 @@ The UI at `/schema/{RequestDto}` is more than a generated form. As values are en
   'Nested schema-generated form': '/img/pages/api-schema/nested-form.webp',
 }"></screenshots-gallery>
 
-Submitting uses the method and `$id` from the schema — `GET` and `DELETE` values are encoded in the query string, write requests use JSON, and APIs containing file inputs are sent as multipart form data. The response panel shows status, size, duration and formatted JSON, with ServiceStack validation errors bound back to their corresponding fields.
+Submitting uses the method and `$id` from the schema - `GET` and `DELETE` values are encoded in the query string, write requests use JSON, and APIs containing file inputs are sent as multipart form data. The response panel shows status, size, duration and formatted JSON, with ServiceStack validation errors bound back to their corresponding fields.
 
 ### Shareable, executable queries
 
@@ -204,9 +204,9 @@ For `GET` APIs, opening a populated link can execute the request immediately. Af
 
 ## Powered by reusable Vue and React components
 
-The built-in pages aren't a separate UI framework — they're composed from the same components published in `@servicestack/vue` and `@servicestack/react`.
+The built-in pages aren't a separate UI framework - they're composed from the same components published in `@servicestack/vue` and `@servicestack/react`.
 
-`ApiFormSchema` is the generic executable API UI. It renders only the form, leaving the surrounding workbench to the host page. Everything else it derives — the HTTP request preview, its `curl` equivalent, the request, the result and any error — is passed to its **default slot**, and completed calls emit `success` and `error` events:
+`ApiFormSchema` is the generic executable API UI. It renders only the form, leaving the surrounding workbench to the host page. Everything else it derives - the HTTP request preview, its `curl` equivalent, the request, the result and any error - is passed to its **default slot**, and completed calls emit `success` and `error` events:
 
 ```html
 <ApiFormSchema :schema="schema" v-model="request">
@@ -262,13 +262,13 @@ Because the renderer is generic, [AI Chat](/chat/api-tools) creates a Request pr
 
 <screenshot src="/img/pages/api-schema/chat-approval.webp" title="CoffeeShop schema approval form in AI Chat"></screenshot>
 
-New APIs gain the same preview and approval capability as soon as their schema is available — there's no per-DTO Chat component to write.
+New APIs gain the same preview and approval capability as soon as their schema is available - there's no per-DTO Chat component to write.
 
 ## Authorization remains server-owned
 
 Schema discovery respects the current request and authenticated session. APIs excluded from metadata or inaccessible to the caller are not presented as available capabilities.
 
-Schemas carry the API's authentication requirements — `requiresAuth`, `requiresApiKey`, `requiredRoles`, `requiresAnyRole`, `requiredPermissions`, `requiresAnyPermission`, `requiredClaims` and `requiredScopes` — which help UIs explain *why* an operation is unavailable.
+Schemas carry the API's authentication requirements - `requiresAuth`, `requiresApiKey`, `requiredRoles`, `requiresAnyRole`, `requiredPermissions`, `requiresAnyPermission`, `requiredClaims` and `requiredScopes` - which help UIs explain *why* an operation is unavailable.
 
 These details **do not replace enforcement**. The API remains the final authorization boundary when invoked: presentation adapts to the caller, whilst security stays deterministic and server-side.
 
@@ -288,7 +288,7 @@ services.AddServiceStack(typeof(MyServices).Assembly, options => {
 
 `IsApiSchemaEnabled` and `IsAutoQuerySchemaEnabled` report which are registered.
 
-Schemas can also be augmented before they're returned. Because there's only one schema, a change applies everywhere it's used — the JSON contract, the built-in UI, your own components and any AI approval form rendered from it:
+Schemas can also be augmented before they're returned. Because there's only one schema, a change applies everywhere it's used - the JSON contract, the built-in UI, your own components and any AI approval form rendered from it:
 
 ```csharp
 services.ConfigurePlugin<MetadataFeature>(feature => {
@@ -303,7 +303,7 @@ Disabling the HTML pages doesn't affect the JSON contract used by AI Chat and yo
 
 ## Get Started
 
-There's nothing to install — API Schemas are part of the Metadata feature, so any .NET 8+ ServiceStack App already serves them. Run your App and open:
+There's nothing to install - API Schemas are part of the Metadata feature, so any .NET 8+ ServiceStack App already serves them. Run your App and open:
 
 <text-block :rows="['/schema','/schema/{RequestDto}','/schema.json','/schema/{RequestDto}.json']"></text-block>
 
@@ -313,6 +313,6 @@ The fastest way to see the value is to open `/schema` on an App you already have
 
 ## Related
 
-- [AutoQuery Schema](/autoquery-schema) — the model-level equivalent for AutoQuery CRUD APIs
-- [API Explorer](/api-explorer) — the full metadata-driven API UI at `/ui`
-- [API Tools](/chat/api-tools) — how AI Models discover and call these same APIs
+- [AutoQuery Schema](/autoquery-schema) - the model-level equivalent for AutoQuery CRUD APIs
+- [API Explorer](/api-explorer) - the full metadata-driven API UI at `/ui`
+- [API Tools](/chat/api-tools) - how AI Models discover and call these same APIs

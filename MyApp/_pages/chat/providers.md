@@ -29,14 +29,14 @@ AI Chat normalizes commercial, open and locally-hosted providers behind one mode
 | MiniMax | `minimax` | `MINIMAX_API_KEY` |
 | Nvidia | `nvidia` | `NVIDIA_API_KEY` |
 | Chutes | `chutes` | `CHUTES_API_KEY` |
-| Alibaba | `alibaba` | — |
-| Hugging Face | `huggingface` | — |
-| GitHub Copilot / Models | `github-copilot`, `github-models` | — |
+| Alibaba | `alibaba` | - |
+| Hugging Face | `huggingface` | - |
+| GitHub Copilot / Models | `github-copilot`, `github-models` | - |
 | Ollama | `ollama` | none (local) |
 | Ollama Cloud | `ollama-cloud` | `OLLAMA_API_KEY` |
 | LM Studio | `lmstudio` | none (local) |
-| OpenAI-compatible (local) | `openai-local` | — |
-| llms.py | `llmspy` | — |
+| OpenAI-compatible (local) | `openai-local` | - |
+| llms.py | `llmspy` | - |
 
 The `ChatApiKey` static class names every environment variable AI Chat looks for:
 
@@ -51,7 +51,7 @@ ChatApiKey.Gemini      // "GEMINI_API_KEY"
 A provider is created and registered when **all** of these hold:
 
 1. It has an entry in `llms.json`'s `providers` object.
-2. It is enabled — either `"enabled": true` in its definition, or named in `ChatFeature.EnableProviders`.
+2. It is enabled - either `"enabled": true` in its definition, or named in `ChatFeature.EnableProviders`.
 3. Its `npm` sdk id resolves to a factory in `ChatFeature.ProviderTypes`.
 4. `provider.Test()` passes, which normally means an API key was resolved.
 
@@ -72,7 +72,7 @@ services.AddPlugin(new ChatFeature {
 ```
 
 :::tip
-Providers that can't resolve a key are simply skipped with an informational log entry — a missing key never fails startup.
+Providers that can't resolve a key are simply skipped with an informational log entry - a missing key never fails startup.
 :::
 
 ## Restricting the providers users can reach
@@ -86,7 +86,7 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-For a fully self-hosted deployment, enable only `ollama` or `lmstudio` — nothing then leaves your network.
+For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing then leaves your network.
 
 ## llms.json
 
@@ -125,7 +125,7 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` — nothi
 
 ### Supplying config in code
 
-Set `Config` (or `ConfigJson`) to bypass the `App_Data` file entirely — useful when configuration should come from your appsettings or a secret store:
+Set `Config` (or `ConfigJson`) to bypass the `App_Data` file entirely - useful when configuration should come from your appsettings or a secret store:
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -137,7 +137,7 @@ Top-level `$VAR` values in `Config` are substituted on load, so `"api_key": "$MY
 
 ## providers.json and the model catalog
 
-`App_Data/chat/providers.json` holds the model catalog — ids, display names, context sizes, pricing and capability flags — sourced from [models.dev](https://models.dev). A provider definition in `llms.json` is **merged over** its `providers.json` entry, with the definition winning.
+`App_Data/chat/providers.json` holds the model catalog - ids, display names, context sizes, pricing and capability flags - sourced from [models.dev](https://models.dev). A provider definition in `llms.json` is **merged over** its `providers.json` entry, with the definition winning.
 
 Refresh the catalog at runtime, keeping only your configured providers and layering in your own overrides:
 
@@ -147,7 +147,7 @@ var count = await feature.UpdateProviderModelsAsync();
 
 ### providers-extra.json
 
-Models that aren't in models.dev — a private deployment, a preview model, a self-hosted checkpoint — go in `App_Data/chat/providers-extra.json` and survive every catalog refresh:
+Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in `App_Data/chat/providers-extra.json` and survive every catalog refresh:
 
 ```json
 {
@@ -181,7 +181,7 @@ The Chat UI exposes the same operations, so an administrator can enable a provid
 
 ## Local models
 
-Ollama and LM Studio need no API key — AI Chat just needs to reach their endpoint:
+Ollama and LM Studio need no API key - AI Chat just needs to reach their endpoint:
 
 ```json
 {
@@ -194,7 +194,7 @@ Ollama and LM Studio need no API key — AI Chat just needs to reach their endpo
 }
 ```
 
-Any other OpenAI-compatible endpoint can be added under `openai-local`, or registered as a new sdk id — see [Custom Extensions](/chat/custom-extensions).
+Any other OpenAI-compatible endpoint can be added under `openai-local`, or registered as a new sdk id - see [Custom Extensions](/chat/custom-extensions).
 
 ## Modalities
 
@@ -219,7 +219,7 @@ An unsupported modality sdk drops just that modality rather than disabling the w
 
 ## Server tools
 
-Some providers host their own tools — web search, web fetch, code execution. AI Chat surfaces whatever the selected provider advertises, generating the configuration UI from the tool's JSON Schema:
+Some providers host their own tools - web search, web fetch, code execution. AI Chat surfaces whatever the selected provider advertises, generating the configuration UI from the tool's JSON Schema:
 
 <screenshot src="/img/pages/chat/tools/llm-tool-call.webp" title="Provider-hosted server tool configuration"></screenshot>
 
