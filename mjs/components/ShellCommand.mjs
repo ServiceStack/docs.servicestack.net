@@ -2,7 +2,7 @@ import { ref } from "vue"
 
 export default {
     template:`
-    <div :class="['group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700',
+    <div :class="['not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700',
                   'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800',
                   'shadow-sm hover:shadow-md transition-all duration-200']"
          @click="copy">

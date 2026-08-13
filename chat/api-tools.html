@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2026-08-13T10:14:57.7271095Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>API Tools</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <style>html { scroll-padding-top: 5rem }</style>
+    <link rel="stylesheet" href="/css/app.css">
+    
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.mjs",
+        "marked": "/lib/mjs/marked.min.mjs",
+        "highlight.js": "/lib/mjs/highlight.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white/90 dark:bg-black/90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/react/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            React
+                        </a>
+                        <a href="/add-servicestack-reference" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            DTOs
+                        </a>
+                        <a href="/Chat" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-indigo-500 text-gray-900">
+                            Chat
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/react/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        React
+                    </a>
+                    <a href="/add-servicestack-reference" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        DTOs
+                    </a>
+                    <a href="/Chat" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                        Chat
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="pt-16 pb-3 max-w-[100rem] mx-auto">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Getting Started
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/install" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Install
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/configuration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Configuration
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/providers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Providers &amp; Models
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/auth" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Integrated Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/themes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Themes
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Extensions
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/extensions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Architecture
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/custom-extensions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Custom Extensions
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Tools &amp; Agents
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/tools" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Tools
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/api-tools" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        API Tools
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/mcp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MCP Server
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/agents" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Agent Profiles
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/skills" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Skills
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/projects" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Projects
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Knowledge &amp; Media
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/gemini" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Gemini File Search
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/media" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Voice &amp; Media
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    PDF
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/pdf-studio" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PDF Studio
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/pdf" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Rendering PDFs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Operations
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/analytics" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Analytics &amp; Admin
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/api" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Chat API
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/data" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data &amp; Storage
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            API Tools
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p><strong>API Tools</strong> let AI Models discover, learn and call your existing ServiceStack APIs. Your typed Request DTOs, metadata, validation, authorization and Services remain the single source of truth — there is no parallel schema, no bespoke function-calling gateway and no AI-specific application backend.</p>
+<p><screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot></p>
+<h2 id="three-tools-not-one-per-api">Three tools, not one per API<a class="header-anchor" href="javascript:;" onclick="location.hash='#three-tools-not-one-per-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Sending every API schema to a Model on every request would be expensive, slow and confusing — a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api_search</code></td>
+<td>Find APIs relevant to the user's intent from a compact index</td>
+</tr>
+<tr>
+<td><code>api_describe</code></td>
+<td>Return complete schemas and workflow metadata for selected APIs</td>
+</tr>
+<tr>
+<td><code>api_call</code></td>
+<td>Invoke an API using its typed Request DTO, <strong>as the current user</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Only the search index is loaded eagerly; a Model pays for an API's schema only when it actually uses it.</p>
+<p><screenshot src="/img/pages/chat/api-tools/api-describe.webp" title="An API's schema returned by api_describe"></screenshot></p>
+<h2 id="enabling-api-tools">Enabling API Tools<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-api-tools'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>API Tools are <strong>on by default</strong> once <code>ChatFeature</code> is registered, but nothing is exposed until you opt an API in. There are three ways to do so:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    ApiTools = {
+        // expose every API with these [Tag]s in bulk
+        IncludeTags = [&quot;CoffeeShop&quot;, &quot;Bookings&quot;],
+
+        // expose these Request DTOs by name, for APIs you can't annotate
+        IncludeTypes = [&quot;QueryCustomers&quot;],
+
+        // never expose these, whatever else includes them
+        ExcludeTypes = [&quot;DeleteAllOrders&quot;],
+    },
+});
+</code></pre>
+<p>Plus the per-API opt-in, which is always included:</p>
+<pre><code class="language-csharp">[Tool(&quot;the user wants to browse the coffee shop menu&quot;)]
+public class GetCoffeeShopMenu : IGet, IReturn&lt;GetCoffeeShopMenuResponse&gt; { }
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IncludeTags</code></td>
+<td><code>[]</code></td>
+<td>Expose every API carrying one of these <code>[Tag]</code>s</td>
+</tr>
+<tr>
+<td><code>IncludeTypes</code></td>
+<td><code>[]</code></td>
+<td>Expose these Request DTOs by name</td>
+</tr>
+<tr>
+<td><code>ExcludeTypes</code></td>
+<td><code>[]</code></td>
+<td>Never expose these, whatever else includes them</td>
+</tr>
+<tr>
+<td><code>DefaultTake</code></td>
+<td><code>25</code></td>
+<td>Rows returned when neither the Agent nor <code>[Tool(Take)]</code> specifies a limit</td>
+</tr>
+<tr>
+<td><code>MaxTake</code></td>
+<td><code>100</code></td>
+<td>Maximum rows an Agent can ask for, whatever it requests</td>
+</tr>
+<tr>
+<td><code>MaxResultLength</code></td>
+<td><code>32 KB</code></td>
+<td>Result JSON longer than this is truncated</td>
+</tr>
+</tbody>
+</table>
+<p><code>Tools.EnableApiTools = false</code> removes the capability entirely.</p>
+<h2 id="the-tool-attribute">The <code>[Tool]</code> attribute<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-tool-attribute'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Existing API metadata is used as-is and should not be repeated. <code>[Description]</code> and <code>[Notes]</code> document what the API does, <code>[Tag]</code> groups it, and property-level <code>[Description]</code>, <code>[ApiMember]</code> and <code>[ApiAllowableValues]</code> become the JSON Schema an Agent reads. <code>[Tool]</code> adds only what an Agent needs beyond that.</p>
+<pre><code class="language-csharp">[Tag(&quot;CoffeeShop&quot;)]
+[Description(&quot;Returns the complete coffee shop menu with product IDs, prices, &quot; +
+             &quot;valid sizes, temperatures and customization options&quot;)]
+[Tool(
+    &quot;the user wants to browse the coffee shop menu, learn what can be ordered, &quot; +
+    &quot;check prices, or build an order&quot;,
+    Safety = ToolSafety.ReadOnly,
+    Keywords = [&quot;coffee&quot;, &quot;drink&quot;, &quot;food&quot;, &quot;bakery&quot;, &quot;customizations&quot;])]
+[Route(&quot;/coffee-shop/menu&quot;, &quot;GET&quot;)]
+public class GetCoffeeShopMenu : IGet, IReturn&lt;GetCoffeeShopMenuResponse&gt; { }
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WhenToUse</code></td>
+<td>The situation that calls for this API. <strong>The single most valuable thing you can add</strong> — <code>[Description]</code> tells a developer what the API <em>does</em>; this tells an Agent <em>when to pick it</em></td>
+</tr>
+<tr>
+<td><code>Name</code></td>
+<td>The name the Agent calls this tool by. Defaults to the Request DTO name. Conventionally snake_case</td>
+</tr>
+<tr>
+<td><code>Keywords</code></td>
+<td>Extra search terms a user might say that don't already appear in the name, route, tags or description</td>
+</tr>
+<tr>
+<td><code>Aliases</code></td>
+<td>Alternative names and user vocabulary that should resolve to this API</td>
+</tr>
+<tr>
+<td><code>Examples</code></td>
+<td>Example JSON request payloads returned alongside the schema</td>
+</tr>
+<tr>
+<td><code>Prerequisites</code></td>
+<td>APIs the Agent should normally call first</td>
+</tr>
+<tr>
+<td><code>Preview</code></td>
+<td>A read-only API that previews or validates this API's proposed arguments</td>
+</tr>
+<tr>
+<td><code>FollowUps</code></td>
+<td>APIs commonly useful after this one succeeds</td>
+</tr>
+<tr>
+<td><code>Safety</code></td>
+<td><code>Auto</code>, <code>ReadOnly</code>, <code>Write</code> or <code>Destructive</code></td>
+</tr>
+<tr>
+<td><code>RequiresApproval</code></td>
+<td>Require a human decision before every call, regardless of <code>Safety</code></td>
+</tr>
+<tr>
+<td><code>Fields</code></td>
+<td>Comma-delimited fields the response is reduced to by default</td>
+</tr>
+<tr>
+<td><code>Take</code></td>
+<td>Default row limit for result sets</td>
+</tr>
+<tr>
+<td><code>Group</code></td>
+<td>Tool group this API is listed under. Defaults to its first <code>[Tag]</code></td>
+</tr>
+<tr>
+<td><code>Exclude</code></td>
+<td>Hide this API even though something else would include it. Takes precedence over every opt-in</td>
+</tr>
+</tbody>
+</table>
+<h3 id="whentouse">WhenToUse<a class="header-anchor" href="javascript:;" onclick="location.hash='#whentouse'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>WhenToUse</code> is what makes discovery work. Phrase it as the user's situation, not the API's behaviour:</p>
+<pre><code class="language-csharp">// ✅ the situation that calls for it
+[Tool(&quot;the user asks about a customer's orders, spend or contact details&quot;)]
+
+// ❌ what the API does — [Description] already says this
+[Tool(&quot;queries the Customers table and returns matching rows&quot;)]
+</code></pre>
+<h3 id="examples">Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The highest accuracy-per-token you can buy for APIs whose usable inputs aren't obvious from their type alone. AutoQuery's implicit conventions (<code>%StartsWith</code>, <code>%Between</code>, <code>orderBy</code>, <code>fields</code>, <code>take</code>) don't appear in the generated schema at all — one realistic example teaches them all:</p>
+<pre><code class="language-csharp">[Tag(&quot;Northwind&quot;)]
+[Description(&quot;Search Customers by company, contact or country&quot;)]
+[Tool(&quot;the user asks who a customer is, where they're based or how to contact them&quot;,
+    Keywords = [&quot;client&quot;, &quot;account&quot;, &quot;buyer&quot;],
+    Examples = [&quot;&quot;&quot;{&quot;countryStartsWith&quot;:&quot;UK&quot;,&quot;take&quot;:10}&quot;&quot;&quot;],
+    Fields = &quot;id,companyName,country&quot;, Take = 25)]
+public class QueryCustomers : QueryDb&lt;Customer&gt; { }
+</code></pre>
+<h3 id="fields-and-take">Fields and Take<a class="header-anchor" href="javascript:;" onclick="location.hash='#fields-and-take'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The main defence against a single call flooding the Agent's context. A table with 90 columns costs more to return once than the entire tool index costs to keep loaded:</p>
+<pre><code class="language-csharp">[Tool(Fields = &quot;id,companyName,country&quot;, Take = 25)]
+</code></pre>
+<p>Both only limit the <strong>default</strong> — the Agent can still request other fields, bounded by <code>MaxTake</code>.</p>
+<h3 id="preview-and-workflow-metadata">Preview and workflow metadata<a class="header-anchor" href="javascript:;" onclick="location.hash='#preview-and-workflow-metadata'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For consequential workflows, point the Agent at a read-only API that validates and prices a proposed request before the real one runs:</p>
+<pre><code class="language-csharp">[Tool(&quot;the user has finished choosing an order and wants to place or submit it&quot;,
+    Safety = ToolSafety.Write,
+    RequiresApproval = true,
+    Prerequisites = [&quot;GetCoffeeShopMenu&quot;],
+    Preview = &quot;PreviewCoffeeShopOrder&quot;,
+    FollowUps = [&quot;GetCoffeeShopOrder&quot;],
+    Keywords = [&quot;buy&quot;, &quot;checkout&quot;, &quot;place order&quot;])]
+[Route(&quot;/coffee-shop/orders&quot;, &quot;POST&quot;)]
+public class CreateCoffeeShopOrder : IPost, IReturn&lt;CreateCoffeeShopOrderResponse&gt;
+{
+    [Description(&quot;Name to put on the order&quot;)]
+    [ValidateNotEmpty]
+    public string CustomerName { get; set; } = &quot;&quot;;
+
+    [Description(&quot;Final order items. The approval form lets the user edit &quot; +
+                 &quot;these before submission&quot;)]
+    [ValidateNotEmpty]
+    public List&lt;OrderItemRequest&gt; Items { get; set; } = [];
+}
+</code></pre>
+<h2 id="your-metadata-becomes-ai-context">Your metadata becomes AI context<a class="header-anchor" href="javascript:;" onclick="location.hash='#your-metadata-becomes-ai-context'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>API Tools reuse the machine-readable information your Apps already contain:</p>
+<ul>
+<li>Request and Response DTOs</li>
+<li>Routes and HTTP methods</li>
+<li>Property and API descriptions</li>
+<li>Required fields and declarative validation</li>
+<li>Enums and allowable values</li>
+<li>Authentication, roles, permissions, claims and scopes</li>
+<li>AutoQuery conventions and result types</li>
+<li>UI metadata such as <code>[Input]</code> and <code>[Ref]</code></li>
+</ul>
+<p>This is used to generate the JSON Schemas the Model reads <strong>and</strong> the schema-driven forms users edit. Existing investment in well-described, well-validated APIs immediately improves AI reliability.</p>
+<h2 id="human-approval">Human approval<a class="header-anchor" href="javascript:;" onclick="location.hash='#human-approval'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Giving a Model access to an API should not mean giving it permission to perform every operation unattended. AI Chat infers safe defaults from HTTP semantics: reads execute immediately, whilst writes and destructive operations pause and render the proposed Request DTO as an <strong>editable form</strong>.</p>
+<p><screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+'Approve the proposed order': '/img/pages/chat/api-tools/chat-coffeeshop-approval.webp',
+'Order confirmation after approval': '/img/pages/chat/api-tools/chat-coffeeshop-modified-order.webp',
+}"></screenshots-gallery></p>
+<p>Only an approved request reaches the Service, and only a successful Service response lets the assistant report success. Afterwards the Model is told whether the user approved the proposal as-is or made changes, so it can acknowledge modifications.</p>
+<p>The valuable part is that <strong>no API-specific Chat component has to be written</strong>. The approval form is generated from the API's own schema, so nested DTOs, collections, allowable values, descriptions and validation are all visible and editable — and every API you add later gets the same treatment for free.</p>
+<h2 id="the-ai-acts-as-the-authenticated-user">The AI acts as the authenticated user<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-ai-acts-as-the-authenticated-user'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>API Tools are not a privileged backdoor into your application:</p>
+<ul>
+<li>Search, description and execution all run within the current HTTP request and authenticated identity.</li>
+<li>APIs the user cannot access are omitted from search, cannot be described and cannot be called.</li>
+<li>Existing authentication requirements, API-key rules, roles, permissions, claims and scopes remain enforced.</li>
+<li>Calls are deserialized into the real Request DTO and executed through ServiceStack's in-process Service Gateway.</li>
+<li>DTO validation, Service filters, business rules and database behaviour remain authoritative.</li>
+</ul>
+<p>API tools can only run on behalf of a request — without one there is no user to run as, and executing anyway would run the App's APIs unauthenticated.</p>
+<h2 id="the-recommended-workflow">The recommended workflow<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-recommended-workflow'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The most dependable pattern for consequential operations:</p>
+<p><screenshot src="/img/pages/chat/api-tools/apitools-flow.svg" image-class="mx-auto max-h-[700px]"
+alt="Search → Describe → Resolve current data → Preview → Approve → Execute → Verify"></screenshot></p>
+<p>Each participant does what it's best at:</p>
+<ul>
+<li>The Model understands the user's language and chooses a workflow.</li>
+<li>ServiceStack supplies authoritative schemas and live capabilities.</li>
+<li>Read APIs resolve current IDs, allowed values, prices and state.</li>
+<li>Preview APIs normalize and validate without side effects.</li>
+<li>The user approves the exact operation that will be performed.</li>
+<li>Write APIs enforce business rules and persist the result.</li>
+</ul>
+<p><screenshot src="/img/pages/chat/api-tools/coffee-chat-order.webp" title="A complete natural language ordering workflow"></screenshot></p>
+<h2 id="better-apis-produce-better-agents">Better APIs produce better Agents<a class="header-anchor" href="javascript:;" onclick="location.hash='#better-apis-produce-better-agents'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>API Tools remove most of the integration work but not the value of thoughtful API design. Models are most reliable when:</p>
+<ul>
+<li>APIs are focused and do one thing</li>
+<li>Names are clear and describe intent</li>
+<li><code>[Description]</code> explains what an API is for</li>
+<li>Validation is declarative and at the boundary</li>
+<li>Write workflows provide a read-only preview</li>
+<li>Result sets are bounded with <code>Fields</code> and <code>Take</code></li>
+</ul>
+<h2 id="example-app">Example App<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><a href="https://github.com/NetCoreApps/CoffeeShopChat">NetCoreApps/CoffeeShopChat</a> is a complete natural-language ordering workflow built entirely from ordinary ServiceStack APIs:</p>
+<p><a href="https://github.com/NetCoreApps/CoffeeShopChat"><img src="/img/pages/chat/api-tools/coffeeshop-screenshot.webp" alt="CoffeeShopChat" /></a></p>
+<h2 id="getting-started-on-an-existing-app">Getting started on an existing App<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-started-on-an-existing-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Pick one read-only API, add a <code>[Tool]</code> attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.</p>
+<p>To let external AI Assistants use the same tools, name the group over MCP — see <a href="/chat/mcp">MCP Server</a>.</p>
+<p><screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot></p>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/chat/api-tools.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/chat/tools" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Tools
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/chat/mcp" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                MCP Server
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#three-tools-not-one-per-api'" data-id="three-tools-not-one-per-api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Three tools, not one per API
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#enabling-api-tools'" data-id="enabling-api-tools" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Enabling API Tools
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-tool-attribute'" data-id="the-tool-attribute" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The 
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="whentouse" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#whentouse'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            WhenToUse
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="examples" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#examples'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Examples
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="fields-and-take" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#fields-and-take'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Fields and Take
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="preview-and-workflow-metadata" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#preview-and-workflow-metadata'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Preview and workflow metadata
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#your-metadata-becomes-ai-context'" data-id="your-metadata-becomes-ai-context" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Your metadata becomes AI context
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#human-approval'" data-id="human-approval" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Human approval
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-ai-acts-as-the-authenticated-user'" data-id="the-ai-acts-as-the-authenticated-user" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The AI acts as the authenticated user
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-recommended-workflow'" data-id="the-recommended-workflow" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The recommended workflow
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#better-apis-produce-better-agents'" data-id="better-apis-produce-better-agents" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Better APIs produce better Agents
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#example-app'" data-id="example-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Example App
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#getting-started-on-an-existing-app'" data-id="getting-started-on-an-existing-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Getting started on an existing App
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
