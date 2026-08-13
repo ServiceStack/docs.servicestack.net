@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-13T11:07:38.5988117Z'>
+    <meta name='date' content='2026-08-13T11:24:15.7885159Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Custom Extensions</title>
@@ -323,7 +323,7 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>Adding your own capability to AI Chat means writing a <code>ChatExtension</code>. It's the same API the built-in extensions use — routes, tools, filters, providers, UI and background workers all register through the <code>ExtensionContext</code> passed to <code>Install</code>.</p>
+                <div class="content"><p>Adding your own capability to AI Chat means writing a <code>ChatExtension</code>. It's the same API the built-in extensions use - routes, tools, filters, providers, UI and background workers all register through the <code>ExtensionContext</code> passed to <code>Install</code>.</p>
 <pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
     Extensions = {
         new BookingToolsExtension(),
@@ -355,7 +355,7 @@ mount('#header', Header)
 <li>the key used in <code>DisableExtensions</code></li>
 <li>the folder its static UI assets are served from</li>
 </ul>
-<p>Any public properties you add are its configuration, set where the extension is added and readable from <code>Install</code> — see <a href="/chat/configuration#configuring-your-own-extensions">Configuring your own extensions</a>.</p>
+<p>Any public properties you add are its configuration, set where the extension is added and readable from <code>Install</code> - see <a href="/chat/configuration#configuring-your-own-extensions">Configuring your own extensions</a>.</p>
 <h2 id="registering-tools">Registering tools<a class="header-anchor" href="javascript:;" onclick="location.hash='#registering-tools'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <h3 id="from-a-servicestack-command">From a ServiceStack Command<a class="header-anchor" href="javascript:;" onclick="location.hash='#from-a-servicestack-command'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The most concise option: the Command's request type generates the tool's JSON Schema, and calls run through <code>CommandsFeature</code> so they're executed, validated, retried and logged like any other command.</p>
@@ -377,7 +377,7 @@ public class BookingSummaryCommand(IDbConnectionFactory dbFactory)
 <pre><code class="language-csharp">ctx.RegisterTool&lt;BookingSummaryCommand&gt;(&quot;bookings&quot;);
 ctx.RegisterTool(typeof(BookingSummaryCommand), &quot;bookings&quot;);  // runtime type
 </code></pre>
-<p>Document the request type <strong>for the Model</strong>, not for a developer — <code>[Description]</code> on each property becomes that argument's schema description, and an enum property becomes its allowed values:</p>
+<p>Document the request type <strong>for the Model</strong>, not for a developer - <code>[Description]</code> on each property becomes that argument's schema description, and an enum property becomes its allowed values:</p>
 <pre><code class="language-csharp">public class BookingSummary
 {
     [Description(&quot;Only count bookings starting on or after this date&quot;)]
@@ -418,7 +418,7 @@ ctx.RegisterTool(typeof(BookingSummaryCommand), &quot;bookings&quot;);  // runti
 <pre><code class="language-csharp">async Task&lt;object?&gt; BookingSummaryAsync(JsonObject args, ChatContext context)
 {
     // context.User is the signed-in user this tool acts for, and context.Request the
-    // request it's running under — pass it to a Service Gateway to call APIs as that user
+    // request it's running under - pass it to a Service Gateway to call APIs as that user
     using var db = await dbFactory.OpenAsync();
 
     var q = db.From&lt;Booking&gt;().Where(x =&gt; x.Cancelled == null || x.Cancelled == false);
@@ -444,7 +444,7 @@ ctx.AddPost(&quot;book&quot;, handler);            // /chat/ext/booking_tools/bo
 ctx.AddGet(&quot;/transcribe&quot;, handler);      // /chat/transcribe
 ctx.AddGet(&quot;public&quot;, handler, allowAnon: true);
 </code></pre>
-<p><code>AddGet</code>, <code>AddPost</code>, <code>AddPut</code>, <code>AddDelete</code> and <code>AddPatch</code> are available. Routes require an authenticated request satisfying <code>RequireAuth</code> + <code>RequiredRole</code> unless they opt out with <code>allowAnon</code> — which should only be used for what the UI genuinely needs before sign-in.</p>
+<p><code>AddGet</code>, <code>AddPost</code>, <code>AddPut</code>, <code>AddDelete</code> and <code>AddPatch</code> are available. Routes require an authenticated request satisfying <code>RequireAuth</code> + <code>RequiredRole</code> unless they opt out with <code>allowAnon</code> - which should only be used for what the UI genuinely needs before sign-in.</p>
 <p>Handlers receive a <code>ChatRequestContext</code>:</p>
 <pre><code class="language-csharp">async Task&lt;object?&gt; GetSummaryAsync(ChatRequestContext req)
 {
@@ -562,15 +562,15 @@ ctx.NextLoadingMessage();
 </code></pre>
 <h2 id="cross-extension-apis">Cross-extension APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#cross-extension-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Extensions publish pluggable interfaces so others don't need a direct reference:</p>
-<pre><code class="language-csharp">ctx.Threads;    // IThreadApi   — provided by the app extension
-ctx.Media;      // IMediaApi    — provided by the gallery extension
-ctx.Projects;   // IProjectsApi — provided by the projects extension
+<pre><code class="language-csharp">ctx.Threads;    // IThreadApi   - provided by the app extension
+ctx.Media;      // IMediaApi    - provided by the gallery extension
+ctx.Projects;   // IProjectsApi - provided by the projects extension
 </code></pre>
 <p>Assigning to them installs your own implementation, which is exactly how <code>GalleryExtension</code> registers itself as <code>IMediaApi</code>.</p>
 <h2 id="adding-ui">Adding UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#adding-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Two options:</p>
 <p><strong>1. Embedded resources.</strong> Ship a <code>chat/ext/{name}/</code> folder of embedded files. AI Chat serves them at <code>/{RoutePrefix}/ext/{name}/{path}</code> automatically, and if the folder contains an <code>index.mjs</code> it's registered in <code>/ext</code> so the Chat UI imports it on load.</p>
-<p><strong>2. The <code>custom</code> folder.</strong> <code>chat/custom/**</code> is served at <code>/{RoutePrefix}/custom/**</code> and is never touched by an upstream UI sync — the intended home for an App's own Chat UI code.</p>
+<p><strong>2. The <code>custom</code> folder.</strong> <code>chat/custom/**</code> is served at <code>/{RoutePrefix}/custom/**</code> and is never touched by an upstream UI sync - the intended home for an App's own Chat UI code.</p>
 <pre><code class="language-csharp">ctx.RegisterUiExtension();                     // imports /ext/{name}/index.mjs
 ctx.RegisterUiExtension(&quot;/custom/index.mjs&quot;);  // leading '/' escapes the prefix
 
@@ -581,7 +581,7 @@ ctx.AddImportMaps(new() {
 ctx.AddIndexHeader(&quot;&quot;&quot;&lt;link rel=&quot;stylesheet&quot; href=&quot;/chat/custom/app.css&quot;&gt;&quot;&quot;&quot;);
 ctx.AddIndexFooter(&quot;&lt;!-- analytics --&gt;&quot;);
 </code></pre>
-<p>Because the UI is assembled from registered Vue components, registering a component under an existing name replaces that building block — which is how an App rebrands or specializes the experience without forking.</p>
+<p>Because the UI is assembled from registered Vue components, registering a component under an existing name replaces that building block - which is how an App rebrands or specializes the experience without forking.</p>
 <h2 id="disabling-from-inside-install">Disabling from inside Install<a class="header-anchor" href="javascript:;" onclick="location.hash='#disabling-from-inside-install'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Set <code>ctx.Disabled</code> when a prerequisite is missing. The extension is skipped and nothing it registered is kept:</p>
 <pre><code class="language-csharp">public override void Install(ExtensionContext ctx)
