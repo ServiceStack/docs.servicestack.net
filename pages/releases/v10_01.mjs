@@ -5,7 +5,7 @@ import ScreenshotsGallery from "../components/ScreenshotsGallery.mjs"
 import WorkflowShowcase from "../components/WorkflowShowcase.mjs"
 import TabbedFeatureShowcase from "../components/TabbedFeatureShowcase.mjs"
 import LiveSchemaFrame from "../components/LiveSchemaFrame.mjs"
-import OpenAiChatLangs from "../components/OpenAiChatLangs.mjs"
+import OpenAiChatLangs from "../components/OpenAiChatLangs.mjs?v=20260813"
 import DtoQuickStart from "../components/DtoQuickStart.mjs"
 
 /** Top-of-page index of everything in this release */
