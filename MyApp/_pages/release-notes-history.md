@@ -3,6 +3,10 @@ title: Release Notes History
 slug: release-notes-history
 ---
 
+## 2026
+
+- [v10.1](/releases/v10_01)
+
 ## 2025
 
 - [v10](/releases/v10_00)

@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, reactive, ref, computed } from "vue"
+import AudioPlayer from "../podcasts/AudioPlayer.mjs"
 import Screenshot from "../components/Screenshot.mjs"
 import ScreenshotsGallery from "../components/ScreenshotsGallery.mjs"
 import WorkflowShowcase from "../components/WorkflowShowcase.mjs"
@@ -202,6 +203,7 @@ export default {
     install(app) {
     },
     components: {
+        AudioPlayer,
         ReleaseHighlights,
         Screenshot,
         ScreenshotsGallery,
