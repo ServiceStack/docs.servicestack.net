@@ -1,5 +1,5 @@
 
-import { ref, computed } from "vue"
+import { ref, computed, nextTick, watch } from "vue"
 import hljs from "highlight.js"
 
 /*! `dart` grammar compiled for Highlight.js 11.10.0 */
@@ -471,15 +471,10 @@ export const openAi = (() => {
     Object.keys(ret.code).forEach(lang => {
         const language = lang === 'mjs' ? 'javascript' : lang
         const code = ret.code[lang].replace(/^\n|\n$/g, '')
-        const html = hljs.getLanguage(language)
-            ? hljs.highlight(code, { language }).value
-            : code.replace(/[&<>"']/g, ch => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            })[ch])
-
-        // Highlight each example up front instead of relying on the page-level
-        // highlightAll() pass, which only runs for the initially selected language.
-        ret.html[lang] = `<pre><code class="hljs language-${language}">${html}\n</code></pre>`
+        const html = code.replace(/[&<>"']/g, ch => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[ch])
+        ret.html[lang] = `<pre style="margin:0!important;padding:0!important;background:transparent!important"><code class="hljs language-${language}" style="display:block;padding:1.25rem!important;background:transparent!important">${html}\n</code></pre>`
     })
 
     return ret
@@ -567,7 +562,7 @@ export default {
               {{copied ? 'Copied' : 'Copy'}}
             </button>
           </div>
-          <div v-html="openAi.html[selectedLang]"></div>
+          <div ref="codeExample" v-html="openAi.html[selectedLang]"></div>
         </div>
 
         </div>
@@ -580,7 +575,20 @@ export default {
     },
     setup(props) {
         const copied = ref(false)
+        const codeExample = ref()
         const selectedLang = computed(() => langs[props.routes?.lang] ? props.routes.lang : 'csharp')
+
+        watch(selectedLang, async () => {
+            await nextTick()
+            const code = codeExample.value?.querySelector('code')
+            if (!code) return
+
+            // highlightAll() only processes code present during initial page load.
+            // Language switches replace that node, so explicitly highlight the new one.
+            const highlighter = globalThis.hljs ?? hljs
+            code.removeAttribute('data-highlighted')
+            highlighter.highlightElement(code)
+        }, { immediate:true })
 
         function selectLanguage(lang) {
             if (!langs[lang] || lang === selectedLang.value) return
@@ -609,6 +617,6 @@ export default {
         }
 
         return { langs, langGroups, langFiles, langCount:Object.keys(langs).length,
-                 openAi, selectedLang, copied, copy, iconClass, selectLanguage }
+                 openAi, selectedLang, codeExample, copied, copy, iconClass, selectLanguage }
     }
 }
