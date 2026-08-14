@@ -127,10 +127,10 @@ AutoQuery Data's Open Provider model supports multiple back-end data sources. Th
 
 <h2 class="not-prose flex border-none text-4xl">
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="w-10 h-10 align-middle mr-1 text-blue-500 iconify iconify--ri" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M4 10.4V4a1 1 0 0 1 1-1h5V1h4v2h5a1 1 0 0 1 1 1v6.4l1.086.326a1 1 0 0 1 .682 1.2l-1.516 6.068A4.992 4.992 0 0 1 16 16a4.992 4.992 0 0 1-4 2a4.992 4.992 0 0 1-4-2a4.992 4.992 0 0 1-4.252 1.994l-1.516-6.068a1 1 0 0 1 .682-1.2L4 10.4zm2-.6L12 8l2.754.826l1.809.543L18 9.8V5H6v4.8zM4 20a5.978 5.978 0 0 0 4-1.528A5.978 5.978 0 0 0 12 20a5.978 5.978 0 0 0 4-1.528A5.978 5.978 0 0 0 20 20h2v2h-2a7.963 7.963 0 0 1-4-1.07A7.963 7.963 0 0 1 12 22a7.963 7.963 0 0 1-4-1.07A7.963 7.963 0 0 1 4 22H2v-2h2z"></path></svg>
-    <a href="/auto">AutoQuery CRUD UIs</a>
+    <a href="/autoquery-schema">AutoQuery CRUD UIs</a>
 </h2>
 
-Once your AutoQuery APIs exist you don't need to build an admin UI for them - open [`/auto`](/auto) and you already have one. It's a searchable list of your data models, and behind each one a working CRUD App with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.
+Once your AutoQuery APIs exist you don't need to build an admin UI for them - open [`/auto`](/autoquery-schema) and you already have one. It's a searchable list of your data models, and behind each one a working CRUD App with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Searchable data model gallery': '/img/pages/autoquery-schema/auto-gallery.webp',
@@ -139,7 +139,7 @@ Once your AutoQuery APIs exist you don't need to build an admin UI for them - op
 
 There's no frontend project, no generated source files and no scaffolding step. The page is assembled at runtime from your APIs and the current session, so every action it offers is one the signed-in user is **authorized** to perform - a model is only listed when its Query API is accessible, and Create, Edit and Delete controls appear only when the corresponding AutoQuery CRUD APIs exist and are authorized.
 
-Each model's [AutoQuery Schema](/auto) is a single document combining the data model with every API available for working with it, which the generic `AutoQuerySchema` component renders:
+Each model's [AutoQuery Schema](/autoquery-schema) is a single document combining the data model with every API available for working with it, which the generic `AutoQuerySchema` component renders:
 
 ```html
 <AutoQuerySchema :schema="schema" />
@@ -193,7 +193,7 @@ Add your custom DTO with route to register a table to query:
 public class QueryCustomers : QueryDb<Customer> {}
 ```
 
-That's all that's needed! From your contract-first API blueprint ServiceStack implements a fully queryable, type safe API for the Customer table that you can query with ServiceStack's built-in [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/auto).
+That's all that's needed! From your contract-first API blueprint ServiceStack implements a fully queryable, type safe API for the Customer table that you can query with ServiceStack's built-in [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/autoquery-schema).
 
 <div class="not-prose py-4 w-full text-center">
     <div class="buttons text-center text-2xl my-2">
@@ -287,7 +287,7 @@ After codifying your system conventions the generated classes can optionally be 
 AutoQuery seamlessly integrates with ServiceStack's endpoints, features and tools for maximum reuse and simplified integrations
 where it's typed service message contracts are able to drive completely dynamic user interfaces, enabling smart clients to deliver amazing levels of reuse.
 
-Your AutoQuery services can be managed with ServiceStack's built-in dynamic, capability-driven [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/auto) at `/auto` that are enabled by default, integrating with your existing App.
+Your AutoQuery services can be managed with ServiceStack's built-in dynamic, capability-driven [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/autoquery-schema) at `/auto` that are enabled by default, integrating with your existing App.
 
 ### Multiple, clean data formats allows for flexible data integrations
 
@@ -311,7 +311,7 @@ to generate Live Reports:
     <div class="w-full sm:w-1/2">
         <ul class="ul-circle">
             <li class="mt-2"><a href="/formats"> JSON, CSV, XML, JSV, ProtoBuf data formats</a></li>
-            <li class="mt-2"><a href="/service-reference"> Add ServiceStack Reference</a></li>
+            <li class="mt-2"><a href="/add-servicestack-reference"> Add ServiceStack Reference</a></li>
             <li class="mt-2"><a href="/grpc">gRPC</a></li>
             <li class="mt-2"><a href="/auth/encrypted-messaging">Encrypted Messaging</a></li>
             <li class="mt-2"><a href="/messaging">Message Queues</a></li>

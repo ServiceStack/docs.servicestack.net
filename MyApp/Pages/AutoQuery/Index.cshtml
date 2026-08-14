@@ -1,0 +1,1009 @@
+@page "/autoquery/"
+@attribute [RenderStatic]
+@{
+    ViewData["Title"] = "ServiceStack AutoQuery";
+    ViewData["Brand"] = "ServiceStack AutoQuery";
+}
+
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+<script src="/lib/js/lite-yt-embed.js"></script>
+<style>
+    @@keyframes aq-drift {
+        0%   { transform: translate3d(0,0,0) }
+        50%  { transform: translate3d(22px,-22px,0) }
+        100% { transform: translate3d(0,0,0) }
+    }
+    @@keyframes aq-scan {
+        0%   { transform: translateY(-100%) }
+        100% { transform: translateY(400%) }
+    }
+    .aq-drift { animation: aq-drift 18s ease-in-out infinite }
+    .aq-scan  { animation: aq-scan 4.5s ease-in-out infinite }
+    .aq-shot  { transition: opacity .9s ease-in-out }
+    @@media (prefers-reduced-motion: reduce) {
+        .aq-drift, .aq-scan { animation: none !important }
+    }
+</style>
+
+<!-- ============================================================ HERO -->
+<section class="relative w-full overflow-hidden bg-slate-950 border-b border-white/10">
+
+    <!-- Grid pattern -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none">
+        <svg class="h-full w-full" aria-hidden="true">
+            <defs>
+                <pattern id="aq-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+                    <path d="M44 0H0V44" fill="none" stroke="#38bdf8" stroke-width="1"/>
+                </pattern>
+                <radialGradient id="aq-fade" cx="50%" cy="0%" r="90%">
+                    <stop offset="0%" stop-color="white" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                </radialGradient>
+                <mask id="aq-mask"><rect width="100%" height="100%" fill="url(#aq-fade)"/></mask>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#aq-grid)" mask="url(#aq-mask)"/>
+        </svg>
+    </div>
+
+    <!-- Ambient glows -->
+    <div class="aq-drift absolute -top-24 left-1/4 h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-[120px] pointer-events-none"></div>
+    <div class="aq-drift absolute top-40 right-1/4 h-[26rem] w-[26rem] rounded-full bg-sky-400/20 blur-[120px] pointer-events-none" style="animation-delay:-6s"></div>
+    <div class="aq-drift absolute bottom-0 left-1/3 h-80 w-80 rounded-full bg-indigo-500/15 blur-[110px] pointer-events-none" style="animation-delay:-12s"></div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-16 lg:pb-24">
+        <div class="grid lg:grid-cols-[1fr_1.05fr] gap-12 lg:gap-16 items-center">
+
+            <!-- Left: copy -->
+            <div>
+                <div class="inline-flex items-center rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-sm font-medium text-sky-200 backdrop-blur-xl">
+                    <span class="flex h-2 w-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>
+                    Now with schema-driven CRUD UIs at <span class="font-mono ml-1">/auto</span>
+                </div>
+
+                <h1 class="mt-8 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.05]">
+                    One line of C#.<br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400">
+                        A complete data API.
+                    </span>
+                </h1>
+
+                <p class="mt-6 text-lg sm:text-xl text-slate-400 leading-relaxed max-w-xl">
+                    AutoQuery turns a typed Request DTO into a fully queryable, paged, filterable, authorized
+                    Query &amp; CRUD API - then renders its own admin UI, its own typed clients and its own
+                    AI capabilities from the same declaration.
+                </p>
+
+                <!-- Code teaser -->
+                <div class="mt-8 max-w-lg rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-sm p-4 font-mono text-sm text-slate-200 shadow-2xl">
+                    <div class="text-slate-500">// this is the whole API</div>
+                    <div class="mt-1">
+                        <span class="text-sky-400">public class</span> <span class="text-emerald-300">QueryBookings</span>
+                        : <span class="text-emerald-300">QueryDb</span>&lt;<span class="text-amber-300">Booking</span>&gt; { }
+                    </div>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="/autoquery/rdbms" class="group inline-flex items-center justify-center rounded-lg bg-sky-500 px-7 py-3.5 text-base font-bold text-slate-950 shadow-[0_0_30px_-8px_rgba(56,189,248,0.9)] hover:bg-sky-400 hover:no-underline transition-all">
+                        Get Started
+                        <svg class="ml-2 -mr-1 h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="#auto-ui" class="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-base font-semibold text-slate-200 hover:bg-white/10 hover:text-white hover:no-underline transition-all">
+                        See the generated UI
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: rotating screenshot -->
+            <div class="relative lg:ml-auto w-full">
+                <div class="relative group">
+                    <div class="absolute -inset-2 rounded-2xl bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 opacity-25 blur-2xl group-hover:opacity-45 transition duration-700"></div>
+
+                    <div class="relative rounded-xl bg-slate-900 border border-slate-700/80 shadow-2xl overflow-hidden">
+                        <div class="bg-slate-800/90 border-b border-slate-700 px-4 py-3 flex items-center gap-2">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            </div>
+                            <div id="aq-url" class="mx-auto text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1 rounded-md w-full max-w-[300px] text-center border border-slate-800 truncate">
+                                /auto
+                            </div>
+                        </div>
+                        <div class="relative aspect-video bg-slate-950 overflow-hidden">
+                            <img class="aq-shot absolute inset-0 h-full w-full object-cover object-top opacity-100" data-url="/auto"                                          src="/img/pages/autoquery-schema/auto-gallery.webp" alt="Searchable AutoQuery data model gallery"/>
+                            <img class="aq-shot absolute inset-0 h-full w-full object-cover object-top opacity-0"   data-url="/auto/Booking"                                  src="/img/pages/autoquery-schema/booking-grid.webp" alt="Generated Booking CRUD grid"/>
+                            <img class="aq-shot absolute inset-0 h-full w-full object-cover object-top opacity-0"   data-url="/auto/Booking?RoomType=Queen&amp;skip=20"        src="/img/pages/autoquery-schema/grid-filters.webp" alt="AutoQuery filters, ordering and pagination"/>
+                            <img class="aq-shot absolute inset-0 h-full w-full object-cover object-top opacity-0"   data-url="/auto/Booking#create"                            src="/img/pages/autoquery-schema/create-booking.webp" alt="Schema-generated Create Booking form"/>
+                            <img class="aq-shot absolute inset-0 h-full w-full object-cover object-top opacity-0"   data-url="/auto/Customer"                                 src="/img/pages/autoquery-schema/customer-lookup.webp" alt="Reference lookup generated from model metadata"/>
+                            <!-- scanline -->
+                            <div class="aq-scan pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-transparent via-sky-400/10 to-transparent"></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-4 text-center text-sm text-slate-500">
+                    Every screen above is generated at runtime - no frontend project, no scaffolding step.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="relative border-t border-white/5 bg-white/[0.02] backdrop-blur-sm">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <dl class="grid grid-cols-2 gap-y-8 py-10 lg:grid-cols-4 lg:gap-x-8">
+                <div class="text-center lg:text-left lg:pl-2">
+                    <dt class="text-3xl font-extrabold text-white">1 line</dt>
+                    <dd class="mt-1 text-sm text-slate-400">To expose a fully queryable typed API</dd>
+                </div>
+                <div class="text-center lg:text-left">
+                    <dt class="text-3xl font-extrabold text-white">4 sources</dt>
+                    <dd class="mt-1 text-sm text-slate-400">RDBMS, In Memory, Services &amp; DynamoDB</dd>
+                </div>
+                <div class="text-center lg:text-left">
+                    <dt class="text-3xl font-extrabold text-white">3 UI kits</dt>
+                    <dd class="mt-1 text-sm text-slate-400">Vue, React &amp; Blazor components</dd>
+                </div>
+                <div class="text-center lg:text-left">
+                    <dt class="text-3xl font-extrabold text-white">15 langs</dt>
+                    <dd class="mt-1 text-sm text-slate-400">End-to-end typed clients, generated</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ FROM DTO TO EVERYTHING -->
+<section class="bg-white dark:bg-black">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">One declaration, many surfaces</p>
+            <h2 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                Declare the API. Everything else is generated.
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                AutoQuery uses conventions to complete the API you would have written by hand - then the
+                same typed contract drives your UIs, your clients and your AI capabilities.
+            </p>
+        </div>
+
+        <div class="mt-14 grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-center">
+
+            <!-- The declaration -->
+            <div>
+                <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+                    <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">Bookings.cs</div>
+                    <pre class="p-5 text-sm leading-relaxed overflow-x-auto text-gray-800 dark:text-gray-200"><code><span class="text-purple-700 dark:text-purple-400">[Route(</span><span class="text-amber-700 dark:text-amber-400">"/bookings"</span><span class="text-purple-700 dark:text-purple-400">)]</span>
+<span class="text-sky-700 dark:text-sky-400">public class</span> <span class="text-emerald-700 dark:text-emerald-400">QueryBookings</span> : <span class="text-emerald-700 dark:text-emerald-400">QueryDb</span>&lt;<span class="text-emerald-700 dark:text-emerald-400">Booking</span>&gt; { }
+
+<span class="text-sky-700 dark:text-sky-400">public class</span> <span class="text-emerald-700 dark:text-emerald-400">CreateBooking</span>
+    : <span class="text-emerald-700 dark:text-emerald-400">ICreateDb</span>&lt;<span class="text-emerald-700 dark:text-emerald-400">Booking</span>&gt;, <span class="text-emerald-700 dark:text-emerald-400">IReturn</span>&lt;<span class="text-emerald-700 dark:text-emerald-400">IdResponse</span>&gt;
+{
+    <span class="text-purple-700 dark:text-purple-400">[ValidateNotEmpty]</span>
+    <span class="text-sky-700 dark:text-sky-400">public string</span> Name { <span class="text-sky-700 dark:text-sky-400">get</span>; <span class="text-sky-700 dark:text-sky-400">set</span>; }
+    <span class="text-sky-700 dark:text-sky-400">public</span> <span class="text-emerald-700 dark:text-emerald-400">RoomType</span> RoomType { <span class="text-sky-700 dark:text-sky-400">get</span>; <span class="text-sky-700 dark:text-sky-400">set</span>; }
+    <span class="text-sky-700 dark:text-sky-400">public</span> <span class="text-emerald-700 dark:text-emerald-400">DateTime</span> StartDate { <span class="text-sky-700 dark:text-sky-400">get</span>; <span class="text-sky-700 dark:text-sky-400">set</span>; }
+}</code></pre>
+                </div>
+                <p class="mt-4 text-sm text-gray-500">
+                    Add <a href="/declarative-validation" class="text-sky-600 dark:text-sky-400 font-medium">validation</a>,
+                    <a href="/locode/declarative" class="text-sky-600 dark:text-sky-400 font-medium">declarative attributes</a> and
+                    <a href="/auth/authentication-and-authorization" class="text-sky-600 dark:text-sky-400 font-medium">auth rules</a>
+                    to refine both the API and everything generated from it.
+                </p>
+            </div>
+
+            <!-- What you get -->
+            <div class="grid sm:grid-cols-2 gap-4">
+                <a href="/autoquery/rdbms" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition-all">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3.6 3 8 3s8-1 8-3V7M4 7c0 2 3.6 3 8 3s8-1 8-3M4 7c0-2 3.6-3 8-3s8 1 8 3"/></svg>
+                    </div>
+                    <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">A queryable REST API</h3>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Paging, sorting, typed filter conventions and clean URLs - no opaque query syntax.</p>
+                </a>
+
+                <a href="/autoquery-schema" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition-all">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM4 10h16M9 10v10"/></svg>
+                    </div>
+                    <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">A working admin UI</h3>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">A complete authorized CRUD App at <span class="font-mono text-xs">/auto</span>, assembled at runtime.</p>
+                </a>
+
+                <a href="/api-schema" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition-all">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l4.4 4.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">A portable schema</h3>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">JSON Schema contracts that any renderer - or AI Model - can use.</p>
+                </a>
+
+                <a href="/add-servicestack-reference" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition-all">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    </div>
+                    <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">Typed clients everywhere</h3>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Native DTOs and typed AutoQuery responses in 15 languages.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ WHY NOT ODATA -->
+<section class="border-y border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                A better alternative to OData, GraphQL &amp; JSON:API
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                No opaque query language, no bespoke client runtime, no second schema to maintain.
+                AutoQuery APIs are just clean REST services - usable from a browser address bar.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-6 lg:grid-cols-3">
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100">Clean, linkable URLs</h3>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Queries are ordinary query strings, so any result is a durable link a stakeholder can bookmark or drop into Excel.</p>
+                <div class="mt-4 rounded-lg bg-slate-900 px-3 py-2.5 font-mono text-xs text-slate-300 overflow-x-auto">/bookings?RoomType=Queen&amp;orderBy=-StartDate</div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100">Optional typing</h3>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Start contract-less for rapid prototyping, then formalize the API by decorating the Request DTO - without breaking the Service Contract.</p>
+                <div class="mt-4 rounded-lg bg-slate-900 px-3 py-2.5 font-mono text-xs text-slate-300 overflow-x-auto">public int? AgeGreaterThan { get; set; }</div>
+            </div>
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6">
+                <h3 class="font-bold text-gray-900 dark:text-gray-100">Yours to override</h3>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Join tables, project custom results, change per-field behavior or replace the implementation entirely - it's a normal ServiceStack Service.</p>
+                <div class="mt-4 rounded-lg bg-slate-900 px-3 py-2.5 font-mono text-xs text-slate-300 overflow-x-auto">QueryDb&lt;Rockstar,CustomRockstar&gt;</div>
+            </div>
+        </div>
+
+        <div class="mt-10 text-center">
+            <a href="/autoquery/why-not-odata" class="inline-flex items-center gap-2 text-base font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-500">
+                Read why we didn't build on OData
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ /auto CRUD UI -->
+<section id="auto-ui" class="scroll-mt-20 relative overflow-hidden bg-white dark:bg-black">
+    <div class="absolute -left-24 top-32 h-96 w-96 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Instant Admin UI</p>
+            <h2 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                Open <span class="font-mono text-indigo-600 dark:text-indigo-400">/auto</span> and the App is already there
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                A searchable list of your data models, and behind each one a working CRUD App with a results grid,
+                paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded
+                Delete actions.
+            </p>
+        </div>
+
+        <div class="mt-14 grid lg:grid-cols-2 gap-8 items-start">
+            <a href="/autoquery-schema" class="relative block group">
+                <div class="absolute -inset-3 rounded-2xl bg-gradient-to-tr from-indigo-500 to-sky-500 opacity-15 blur-2xl group-hover:opacity-30 transition duration-500"></div>
+                <img src="/img/pages/autoquery-schema/booking-grid.webp" alt="Generated Booking CRUD grid"
+                     class="relative rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full transition-transform duration-500 group-hover:scale-[1.02]"/>
+            </a>
+
+            <div>
+                <ul class="space-y-4">
+                    <li class="flex gap-3 text-gray-700 dark:text-gray-300">
+                        <svg class="h-5 w-5 flex-none text-indigo-500 mt-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
+                        <span><b class="text-gray-900 dark:text-gray-100">Authorization shapes the App.</b> A model is only listed when its Query API is accessible; Create, Edit and Delete appear only when those APIs exist <em>and</em> the signed-in user can call them.</span>
+                    </li>
+                    <li class="flex gap-3 text-gray-700 dark:text-gray-300">
+                        <svg class="h-5 w-5 flex-none text-indigo-500 mt-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
+                        <span><b class="text-gray-900 dark:text-gray-100">Query state lives in the URL.</b> A filtered view can be bookmarked, refreshed or shared - it's a durable link back to the same server-side query.</span>
+                    </li>
+                    <li class="flex gap-3 text-gray-700 dark:text-gray-300">
+                        <svg class="h-5 w-5 flex-none text-indigo-500 mt-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
+                        <span><b class="text-gray-900 dark:text-gray-100">Patch sends only what changed.</b> Clearing a field adds ServiceStack's <span class="font-mono text-sm">reset</span> instruction, so "set to empty" and "leave unchanged" stay distinguishable.</span>
+                    </li>
+                    <li class="flex gap-3 text-gray-700 dark:text-gray-300">
+                        <svg class="h-5 w-5 flex-none text-indigo-500 mt-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
+                        <span><b class="text-gray-900 dark:text-gray-100">Foreign keys become live lookups.</b> <span class="font-mono text-sm">[Ref]</span> and <span class="font-mono text-sm">[References]</span> render a searchable picker instead of asking users to remember that Customer 1042 is Acme Inc.</span>
+                    </li>
+                </ul>
+
+                <div class="mt-8 grid grid-cols-2 gap-3">
+                    <a href="/autoquery-schema" class="group overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-lg transition">
+                        <img src="/img/pages/autoquery-schema/create-booking.webp" alt="Generated Create form" class="w-full aspect-video object-cover object-top group-hover:scale-105 transition-transform duration-500"/>
+                    </a>
+                    <a href="/autoquery-schema" class="group overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-lg transition">
+                        <img src="/img/pages/autoquery-schema/customer-lookup.webp" alt="Reference lookup" class="w-full aspect-video object-cover object-top group-hover:scale-105 transition-transform duration-500"/>
+                    </a>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="/autoquery-schema" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-indigo-500 hover:no-underline transition">
+                        AutoQuery CRUD UI Docs
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="/locode/" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:no-underline transition">
+                        Locode
+                    </a>
+                    <a href="/api-explorer" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:no-underline transition">
+                        API Explorer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ SCHEMAS -->
+<section class="relative overflow-hidden border-y border-gray-200 dark:border-gray-800 bg-gradient-to-b from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-black">
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Schemas</p>
+                <h2 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                    One portable contract, any renderer
+                </h2>
+                <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                    An <a href="/api-schema" class="font-medium text-emerald-600 dark:text-emerald-400">API Schema</a>
+                    describes one endpoint. An <a href="/autoquery-schema" class="font-medium text-emerald-600 dark:text-emerald-400">AutoQuery Schema</a>
+                    describes the whole data capability - its Query API, returned model and every authorized
+                    Create, Update, Patch, Delete or Save API, in one document.
+                </p>
+
+                <!-- Replaced by the SchemaCard component below on mount; this is the no-JS fallback -->
+                <div id="booking-schema" class="mt-8">
+                    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+                        <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">GET /auto/Booking.json</div>
+                        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><code>{
+  "name": "Booking",
+  "primaryKey": "Id",
+  "model":  { "type": "object", "properties": {} },
+  "query":  { "$id": "/api/QueryBookings", "method": "GET" },
+  "create": { "$id": "/api/CreateBooking", "method": "POST" },
+  "update": { "$id": "/api/UpdateBooking", "method": "PATCH" },
+  "delete": { "$id": "/api/DeleteBooking", "method": "DELETE" }
+}</code></pre>
+                    </div>
+                </div>
+
+                <p class="mt-6 text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Opening a model loads <b>only</b> that schema, so an App can grow from ten APIs to ten thousand
+                    without making a single form ten thousand times heavier.
+                </p>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="/api-schema" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-500 hover:no-underline transition">
+                        API Schema Docs
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="/vue/json-schema" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 hover:no-underline transition">
+                        <svg class="h-4 w-4" viewBox="0 0 256 221"><path fill="#41B883" d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0z"/><path fill="#35495E" d="m0 0l128 220.8L256 0h-51.2L128 132.48L50.56 0z"/></svg>
+                        Vue Schema
+                    </a>
+                    <a href="https://react.servicestack.net/gallery/schema" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-900 hover:no-underline transition">
+                        <svg class="h-4 w-4" viewBox="-11 -10.13 22 20.27" fill="none"><circle r="2" fill="#087ea4"/><g stroke="#087ea4"><ellipse rx="10" ry="4.5"/><ellipse rx="10" ry="4.5" transform="rotate(60)"/><ellipse rx="10" ry="4.5" transform="rotate(120)"/></g></svg>
+                        React Schema Gallery
+                    </a>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <a href="/chat/api-tools" class="relative block group">
+                    <div class="absolute -inset-3 rounded-2xl bg-gradient-to-tr from-emerald-400 to-teal-500 opacity-15 blur-2xl group-hover:opacity-30 transition duration-500"></div>
+                    <img src="/img/pages/autoquery-schema/chat-approval.webp" alt="Schema-generated approval form in AI Chat"
+                         class="relative rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full transition-transform duration-500 group-hover:scale-[1.02]"/>
+                </a>
+                <div class="rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-gray-950 p-6">
+                    <h3 class="font-bold text-gray-900 dark:text-gray-100">The foundation for AI-operated data</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Because each write operation carries its own schema,
+                        <a href="/chat/api-tools" class="font-medium text-emerald-600 dark:text-emerald-400">AI Chat</a>
+                        renders an editable preview and approval form whenever a Model proposes an AutoQuery
+                        Create, Update, Patch, Delete or Save - for <b>every model</b>, with no per-API Chat
+                        component to write.
+                    </p>
+                    <p class="mt-4 text-sm text-gray-500 italic">
+                        &ldquo;Find products below their reorder threshold and prepare updates for approval.&rdquo;
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ COMPONENTS -->
+<section id="components" class="scroll-mt-20 bg-white dark:bg-black">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Components</p>
+            <h2 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                <span class="font-mono text-sky-600 dark:text-sky-400">AutoQueryGrid</span> in your framework of choice
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                The generated pages aren't a separate UI framework - they're built from the same components
+                published for Vue, React and Blazor. Drop a full CRUD grid into your own App in one tag.
+            </p>
+        </div>
+
+        <!-- Framework tabs -->
+        <div class="mt-12 flex flex-wrap justify-center gap-3">
+            <button type="button" data-fw="vue" onclick="aqTab('vue')" class="aq-tab inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition">
+                <svg class="h-5 w-5" viewBox="0 0 256 221"><path fill="#41B883" d="M204.8 0H256L128 220.8L0 0h97.92L128 51.2L157.44 0z"/><path fill="#35495E" d="m0 0l128 220.8L256 0h-51.2L128 132.48L50.56 0z"/></svg>
+                Vue
+            </button>
+            <button type="button" data-fw="react" onclick="aqTab('react')" class="aq-tab inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition">
+                <svg class="h-5 w-5" viewBox="-11 -10.13 22 20.27" fill="none"><circle r="2" fill="#087ea4"/><g stroke="#087ea4"><ellipse rx="10" ry="4.5"/><ellipse rx="10" ry="4.5" transform="rotate(60)"/><ellipse rx="10" ry="4.5" transform="rotate(120)"/></g></svg>
+                React
+            </button>
+            <button type="button" data-fw="blazor" onclick="aqTab('blazor')" class="aq-tab inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition">
+                <svg class="h-5 w-5 text-purple-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.834 8.101a13.912 13.912 0 0 1-13.643 11.72a10.105 10.105 0 0 1-1.994-.12a6.111 6.111 0 0 1-5.082-5.761a5.934 5.934 0 0 1 11.867-.084c.025.983-.401 1.846-1.277 1.871c-.936 0-1.374-.668-1.374-1.567v-2.5a1.531 1.531 0 0 0-1.52-1.533H8.715a3.648 3.648 0 1 0 2.695 6.08l.073-.11l.074.121a2.58 2.58 0 0 0 2.2 1.048a2.909 2.909 0 0 0 2.695-3.04a7.912 7.912 0 0 0-.217-1.933a7.404 7.404 0 0 0-14.64 1.603a7.497 7.497 0 0 0 7.308 7.405s.549.05 1.167.035a15.803 15.803 0 0 0 8.475-2.528c.036-.025.072.025.048.061a12.44 12.44 0 0 1-9.69 3.963a8.744 8.744 0 0 1-8.9-8.972a9.049 9.049 0 0 1 3.635-7.247a8.863 8.863 0 0 1 5.229-1.726h2.813a7.915 7.915 0 0 0 5.839-2.578a.11.11 0 0 1 .059-.034a.112.112 0 0 1 .12.053a.113.113 0 0 1 .015.067a7.934 7.934 0 0 1-1.227 3.549a.107.107 0 0 0-.014.06a.11.11 0 0 0 .073.095a.109.109 0 0 0 .062.004a8.505 8.505 0 0 0 5.913-4.876a.155.155 0 0 1 .055-.053a.15.15 0 0 1 .147 0a.153.153 0 0 1 .054.053A10.779 10.779 0 0 1 23.834 8.1zM8.895 11.628a2.188 2.188 0 1 0 2.188 2.188v-2.042a.158.158 0 0 0-.15-.15Z"/></svg>
+                Blazor
+            </button>
+        </div>
+
+        <div class="mt-10 grid lg:grid-cols-2 gap-10 items-center">
+            <!-- Code panes -->
+            <div>
+                <div class="aq-pane" data-fw="vue">
+                    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+                        <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">Bookings.vue</div>
+                        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><code class="language-html">&lt;AutoQueryGrid type="Booking" /&gt;</code></pre>
+                    </div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <span class="font-mono text-sm">@@servicestack/vue</span> ships AutoQueryGrid, DataGrid, Auto Forms,
+                        reference lookups and the full Tailwind input suite.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <a href="/vue/autoquerygrid" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-500 hover:no-underline transition">AutoQueryGrid Docs</a>
+                        <a href="https://vue.servicestack.net/gallery/autoquerygrid" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:no-underline transition">Live Gallery</a>
+                    </div>
+                </div>
+
+                <div class="aq-pane hidden" data-fw="react">
+                    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+                        <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">Bookings.tsx</div>
+                        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><code class="language-tsx">&lt;AutoQueryGrid type="Booking" /&gt;</code></pre>
+                    </div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <span class="font-mono text-sm">@@servicestack/react</span> exports the same component names, so
+                        Vue and React teams share one mental model over one set of APIs.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <a href="/templates/react" class="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-5 py-2.5 text-sm font-bold text-slate-950 shadow-sm hover:bg-cyan-400 hover:no-underline transition">React Templates</a>
+                        <a href="https://react.servicestack.net/gallery/autoquerygrid" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:no-underline transition">Live Gallery</a>
+                    </div>
+                </div>
+
+                <div class="aq-pane hidden" data-fw="blazor">
+                    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+                        <div class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">Bookings.razor</div>
+                        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><code class="language-html">&lt;AutoQueryGrid Model="Booking" /&gt;</code></pre>
+                    </div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <span class="font-mono text-sm">ServiceStack.Blazor</span> Tailwind components work identically
+                        across Blazor Server and WASM - a pure end-to-end C# solution.
+                    </p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <a href="/templates/blazor-components" class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-purple-500 hover:no-underline transition">Blazor Component Docs</a>
+                        <a href="https://blazor-gallery.servicestack.net/gallery/autoquerygrid" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:no-underline transition">Live Gallery</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screenshot panes -->
+            <div class="relative">
+                <div class="aq-pane" data-fw="vue">
+                    <img src="/img/pages/vue/servicestackvue-lookup.webp" alt="Vue AutoQueryGrid reference lookup"
+                         class="rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full"/>
+                </div>
+                <div class="aq-pane hidden" data-fw="react">
+                    <img src="/img/pages/react/bookings-locode.webp" alt="React AutoQueryGrid Bookings CRUD"
+                         class="rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full"/>
+                </div>
+                <div class="aq-pane hidden" data-fw="blazor">
+                    <img src="/img/pages/blazor/autoquerygrid-crud.png" alt="Blazor AutoQueryGrid CRUD"
+                         class="rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lower-level components -->
+        <div class="mt-16">
+            <h3 class="text-center text-xl font-bold text-gray-900 dark:text-gray-100">Or compose the pieces yourself</h3>
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <a href="/vue/autoquerygrid" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">AutoQueryGrid</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">The complete CRUD App for one model</p>
+                </a>
+                <a href="/vue/datagrid" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">DataGrid</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Tabular rendering with sortable columns</p>
+                </a>
+                <a href="/vue/autoform" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">AutoForm</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Create &amp; Edit forms from a Request DTO</p>
+                </a>
+                <a href="/vue/json-schema" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">JsonSchemaForm</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Arbitrary nested JSON Schema forms</p>
+                </a>
+                <a href="/vue/form-inputs" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">Form Inputs</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">The full Tailwind input suite</p>
+                </a>
+                <a href="/vue/autocomplete" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-5 hover:border-sky-400 hover:shadow-lg hover:no-underline transition">
+                    <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">Lookups &amp; Autocomplete</div>
+                    <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Searchable pickers for related records</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ DATA SOURCES -->
+<section class="border-y border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                Connect to anything with data
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                AutoQuery's open provider model exposes consistent, flexible APIs over multiple back-ends -
+                clients control the query details, whatever the source.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <a href="/autoquery/rdbms" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 hover:border-sky-400 hover:shadow-xl hover:no-underline transition-all">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 3.6 3 8 3s8-1 8-3V7M4 7c0 2 3.6 3 8 3s8-1 8-3M4 7c0-2 3.6-3 8-3s8 1 8 3m0 5c0 2-3.6 3-8 3s-8-1-8-3"/></svg>
+                </div>
+                <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">AutoQuery RDBMS</h3>
+                <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">High-performance typed APIs over anything OrmLite connects to.</p>
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                    <span class="rounded bg-gray-100 dark:bg-gray-900 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">PostgreSQL</span>
+                    <span class="rounded bg-gray-100 dark:bg-gray-900 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">SQL Server</span>
+                    <span class="rounded bg-gray-100 dark:bg-gray-900 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">SQLite</span>
+                    <span class="rounded bg-gray-100 dark:bg-gray-900 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">MySQL</span>
+                </div>
+            </a>
+
+            <a href="/autoquery/memory" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 hover:border-sky-400 hover:shadow-xl hover:no-underline transition-all">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
+                </div>
+                <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">In Memory</h3>
+                <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Query .NET collections, a flat-file CSV or a throttled 3rd Party API with built-in caching.</p>
+            </a>
+
+            <a href="/autoquery/service" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 hover:border-sky-400 hover:shadow-xl hover:no-underline transition-all">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
+                </div>
+                <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">Existing Services</h3>
+                <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Decorate the response of Services you already have with rich querying capabilities.</p>
+            </a>
+
+            <a href="/autoquery/dynamodb" class="group rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 hover:border-sky-400 hover:shadow-xl hover:no-underline transition-all">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h10a4 4 0 000-8 6 6 0 00-11.6-2A4 4 0 003 15z"/></svg>
+                </div>
+                <h3 class="mt-4 font-bold text-gray-900 dark:text-gray-100">DynamoDB</h3>
+                <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">Rich querying over an AWS DynamoDB Table without hand-constructing queries.</p>
+            </a>
+        </div>
+
+        <div class="mt-10 text-center">
+            <a href="/autoquery/data" class="inline-flex items-center gap-2 text-base font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-500">
+                Explore AutoQuery Data providers
+                <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ AUTOGEN + OKAI -->
+<section class="relative overflow-hidden bg-slate-950 border-y border-white/10">
+    <div class="absolute inset-0 opacity-[0.15] pointer-events-none">
+        <svg class="h-full w-full" aria-hidden="true">
+            <defs><pattern id="aq-dots" width="56" height="56" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#38bdf8"/></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#aq-dots)"/>
+        </svg>
+    </div>
+    <div class="aq-drift absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[32rem] w-[32rem] rounded-full bg-sky-600/15 blur-[130px] pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <p class="text-xs font-bold uppercase tracking-widest text-sky-400">Generate the APIs too</p>
+            <h2 class="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+                Point it at a database. Or describe the App.
+            </h2>
+        </div>
+
+        <div class="mt-14 grid lg:grid-cols-2 gap-8">
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-8 hover:bg-white/[0.06] transition">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 border border-sky-400/20 text-sky-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h3 class="mt-5 text-xl font-bold text-white">AutoGen</h3>
+                <p class="mt-3 text-slate-400 leading-relaxed">
+                    The fastest way to ServiceStack-ify an existing system. Connect your database and AutoGen
+                    generates typed end-to-end HTTP Services for every table - then augment the generated
+                    types with your App's conventions, or "eject" them and continue code-first.
+                </p>
+                <div class="mt-6 rounded-xl bg-slate-900/80 border border-white/10 p-4 font-mono text-sm text-slate-300 overflow-x-auto">
+<span class="text-sky-400">services</span>.AddPlugin(<span class="text-sky-400">new</span> <span class="text-emerald-300">AutoQueryFeature</span> {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;GenerateCrudServices = <span class="text-sky-400">new</span>() { AutoRegister = <span class="text-amber-300">true</span> }<br/>
+});
+                </div>
+                <a href="/autoquery/autogen" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-sky-500 px-5 py-2.5 text-sm font-bold text-slate-950 hover:bg-sky-400 hover:no-underline transition">
+                    AutoGen Docs
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.3 3.3a1 1 0 011.4 0l6 6a1 1 0 010 1.4l-6 6a1 1 0 01-1.4-1.4L14.6 11H3a1 1 0 110-2h11.6l-4.3-4.3a1 1 0 010-1.4z" clip-rule="evenodd"/></svg>
+                </a>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-8 hover:bg-white/[0.06] transition">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/15 border border-violet-400/20 text-violet-300">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9.8 3.6l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2 1.2-3zM18 12l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2zM6 15l.6 1.5 1.5.6-1.5.6L6 19.2l-.6-1.5-1.5-.6 1.5-.6L6 15z"/></svg>
+                </div>
+                <h3 class="mt-5 text-xl font-bold text-white">CRUD APIs &amp; UI Generator</h3>
+                <p class="mt-3 text-slate-400 leading-relaxed">
+                    Describe the App you want in a sentence and generate the TypeScript data models, AutoQuery CRUD
+                    APIs and a working Blazor UI from it - or reverse-engineer models from an existing database.
+                </p>
+                <ul class="mt-6 space-y-2.5">
+                    <li><a href="/autoquery/text-to-blazor" class="inline-flex items-center gap-2 text-slate-300 hover:text-white"><span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>Text to Blazor CRUD App</a></li>
+                    <li><a href="/autoquery/okai-models" class="inline-flex items-center gap-2 text-slate-300 hover:text-white"><span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>TypeScript Data Models</a></li>
+                    <li><a href="/autoquery/okai-db" class="inline-flex items-center gap-2 text-slate-300 hover:text-white"><span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>Generate from Existing DBs</a></li>
+                    <li><a href="/autoquery/okai-chat" class="inline-flex items-center gap-2 text-slate-300 hover:text-white"><span class="h-1.5 w-1.5 rounded-full bg-violet-400"></span>Free LLM Chat Models</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ ECOSYSTEM -->
+<section class="bg-white dark:bg-black">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+                AutoQuery Services are ServiceStack Services
+            </h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                Same <a href="/order-of-operations" class="font-medium text-sky-600 dark:text-sky-400">Request Pipeline</a>,
+                same <a href="/routing" class="font-medium text-sky-600 dark:text-sky-400">user-defined routes</a>,
+                same <a href="/formats" class="font-medium text-sky-600 dark:text-sky-400">registered formats</a>,
+                same <a href="/clients-overview" class="font-medium text-sky-600 dark:text-sky-400">typed Service Clients</a> -
+                so everything you already know still applies.
+            </p>
+        </div>
+
+        <div class="mt-12 flex flex-wrap justify-center gap-3">
+            <a href="/formats" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">JSON, CSV, XML &amp; ProtoBuf</a>
+            <a href="/add-servicestack-reference" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Add ServiceStack Reference</a>
+            <a href="/grpc" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">gRPC</a>
+            <a href="/declarative-validation" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Declarative Validation</a>
+            <a href="/auth/authentication-and-authorization" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Authentication</a>
+            <a href="/autoquery/audit-log" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Audit Log</a>
+            <a href="/caching" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Caching</a>
+            <a href="/messaging" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">Message Queues</a>
+            <a href="/autoquery/crud" class="rounded-full border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:no-underline transition">AutoQuery CRUD</a>
+        </div>
+
+        <!-- Excel -->
+        <div class="mt-16 grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Clean data formats, flexible integrations</h3>
+                <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Because AutoQuery Services are pure HTTP APIs available in
+                    <a href="/formats" class="font-medium text-sky-600 dark:text-sky-400">multiple formats</a>,
+                    a stakeholder can turn any query into a live Excel data source - no export job, no BI tool,
+                    just the URL.
+                </p>
+                <div class="mt-6 rounded-lg bg-slate-900 px-4 py-3 font-mono text-sm text-slate-300 overflow-x-auto">
+                    /bookings.csv?RoomType=Queen&amp;orderBy=-StartDate
+                </div>
+            </div>
+            <img src="/img/pages/autoquery/import-csv-table.png" alt="AutoQuery CSV as a live Excel data source"
+                 class="rounded-xl border border-gray-200 dark:border-gray-800 shadow-xl w-full"/>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ GET STARTED -->
+<section id="start" class="scroll-mt-20 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50">Get Started</h2>
+            <p class="mt-5 text-lg text-gray-600 dark:text-gray-400">Three steps from an empty project to a working data App.</p>
+        </div>
+
+        <div class="mt-14 space-y-6">
+            <div class="flex gap-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 sm:p-8">
+                <div class="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-sky-600 font-bold text-white">1</div>
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-50">Start from a project template</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">
+                        Most templates already ships with AutoQuery pre-configured, so the quickest start is to pick the stack you want:
+                    </p>
+
+                    <!-- Replaced by the CreateProject component on mount; this is the no-JS fallback -->
+                    <div id="aq-create-project" class="mt-4">
+                        <div class="relative rounded-xl bg-slate-900 px-4 py-3.5 font-mono text-sm text-slate-200 overflow-x-auto">
+                            <span class="select-none text-emerald-400 mr-2">$</span><span id="aq-cmd1">npx create-net react-spa ProjectName</span>
+                            <button type="button" onclick="aqCopy('aq-cmd1', this)" aria-label="Copy" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 hover:text-white hover:bg-white/10 transition">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="mt-3 text-sm text-gray-500">
+                        Or customize one at
+                        <a href="https://servicestack.net/start" class="text-sky-600 dark:text-sky-400 font-medium">servicestack.net/start</a>,
+                        or browse all <a href="/templates/" class="text-sky-600 dark:text-sky-400 font-medium">project templates</a>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 sm:p-8">
+                <div class="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-sky-600 font-bold text-white">2</div>
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-50">Declare your API &amp; migrate the table</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">
+                        <span class="font-mono text-sm">AutoQueryFeature</span> is already registered, so all that's left is
+                        the Request DTO for the API you want:
+                    </p>
+                    <div class="mt-4 rounded-xl bg-slate-900 px-4 py-3.5 font-mono text-sm text-slate-200 overflow-x-auto">
+<span class="text-sky-400">public class</span> <span class="text-emerald-300">QueryBookings</span> : <span class="text-emerald-300">QueryDb</span>&lt;<span class="text-amber-300">Booking</span>&gt; { }
+                    </div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">
+                        AutoQuery queries a real RDBMS table, so its Data Model needs to exist in the database. Add it to a
+                        <a href="/ormlite/db-migrations" class="text-sky-600 dark:text-sky-400 font-medium">DB Migration</a>
+                        and apply it with:
+                    </p>
+                    <div class="mt-4 relative rounded-xl bg-slate-900 px-4 py-3.5 font-mono text-sm text-slate-200 overflow-x-auto">
+                        <span class="select-none text-emerald-400 mr-2">$</span><span id="aq-cmd-migrate">npm run migrate</span>
+                        <button type="button" onclick="aqCopy('aq-cmd-migrate', this)" aria-label="Copy" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 hover:text-white hover:bg-white/10 transition">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        </button>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-500">
+                        See <a href="/ormlite/db-migrations" class="text-sky-600 dark:text-sky-400 font-medium">DB Migrations</a> for
+                        schema changes, <a href="/autoquery/rdbms" class="text-sky-600 dark:text-sky-400 font-medium">AutoQuery RDBMS</a> for
+                        query conventions and <a href="/autoquery/crud" class="text-sky-600 dark:text-sky-400 font-medium">AutoQuery CRUD</a> for write APIs.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black p-6 sm:p-8">
+                <div class="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-sky-600 font-bold text-white">3</div>
+                <div class="min-w-0 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-50">Run it and open the generated UIs</h3>
+                    <div class="mt-4 grid sm:grid-cols-3 gap-3">
+                        <a href="/autoquery-schema" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-3 hover:border-sky-400 hover:no-underline transition">
+                            <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">/auto</div>
+                            <div class="mt-1 text-xs text-gray-500">CRUD UI per model</div>
+                        </a>
+                        <a href="/api-schema" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-3 hover:border-sky-400 hover:no-underline transition">
+                            <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">/schema</div>
+                            <div class="mt-1 text-xs text-gray-500">Executable API workbench</div>
+                        </a>
+                        <a href="/api-explorer" class="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 px-4 py-3 hover:border-sky-400 hover:no-underline transition">
+                            <div class="font-mono text-sm font-bold text-sky-700 dark:text-sky-300">/ui</div>
+                            <div class="mt-1 text-xs text-gray-500">API Explorer</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo video -->
+        <div class="mt-16">
+            <h3 class="text-center text-xl font-bold text-gray-900 dark:text-gray-100">
+                Watch a multi-user Booking System built from an empty project
+            </h3>
+            <div class="mt-6 mx-auto w-full max-w-[720px] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl">
+                <lite-youtube class="w-full" width="560" height="315" videoid="rSFiikDjGos"
+                              style="background-image: url('https://img.youtube.com/vi/rSFiikDjGos/maxresdefault.jpg')"></lite-youtube>
+            </div>
+            <p class="mt-4 text-center text-sm text-gray-500">
+                Full walkthrough in the <a href="/autoquery/bookings-crud" class="text-sky-600 dark:text-sky-400 font-medium">Bookings CRUD demo</a>.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ FINAL CTA -->
+<section class="bg-white dark:bg-black py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 px-6 py-16 sm:px-16 text-center shadow-2xl ring-1 ring-white/10">
+            <div class="aq-drift absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-sky-500/25 blur-[100px] pointer-events-none"></div>
+            <div class="aq-drift absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-indigo-500/20 blur-[100px] pointer-events-none" style="animation-delay:-8s"></div>
+
+            <h2 class="relative text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                Stop writing CRUD. Declare it.
+            </h2>
+            <p class="relative mx-auto mt-5 max-w-2xl text-lg text-slate-300">
+                Your Request DTOs already describe your data. AutoQuery turns that description into the API,
+                the admin UI, the typed clients and the AI capability - and keeps them in sync for free.
+            </p>
+            <div class="relative mt-9 flex flex-wrap justify-center gap-4">
+                <a href="/autoquery/rdbms" class="inline-flex items-center justify-center rounded-lg bg-white px-8 py-3.5 text-base font-bold text-slate-900 shadow-lg hover:bg-slate-100 hover:no-underline transition">
+                    Read the docs
+                </a>
+                <a href="/autoquery-schema" class="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 px-8 py-3.5 text-base font-semibold text-white hover:bg-white/10 hover:no-underline transition">
+                    See the CRUD UIs
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function aqCopy(id, btn) {
+    const el = document.getElementById(id)
+    if (!el) return
+    navigator.clipboard.writeText(el.textContent.trim())
+    const html = btn.innerHTML
+    btn.innerHTML = '<svg class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+    setTimeout(() => btn.innerHTML = html, 1500)
+}
+const AQ_ON  = 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300'
+const AQ_OFF = 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-600 dark:text-gray-400 hover:border-sky-300'
+function aqTab(fw) {
+    document.querySelectorAll('.aq-tab').forEach(b => {
+        const on = b.dataset.fw === fw
+        b.className = 'aq-tab inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition ' + (on ? AQ_ON : AQ_OFF)
+    })
+    document.querySelectorAll('.aq-pane').forEach(p => p.classList.toggle('hidden', p.dataset.fw !== fw))
+}
+;(function () {
+    aqTab('vue')
+    const shots = Array.from(document.querySelectorAll('.aq-shot'))
+    const url = document.getElementById('aq-url')
+    if (shots.length < 2) return
+    let i = 0
+    if (url && shots[0].dataset.url) url.textContent = shots[0].dataset.url
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    setInterval(() => {
+        shots[i].style.opacity = '0'
+        i = (i + 1) % shots.length
+        shots[i].style.opacity = '1'
+        if (url && shots[i].dataset.url) url.textContent = shots[i].dataset.url
+    }, 4500)
+})()
+</script>
+
+<script type="module">
+import { mount } from "app.mjs"
+import { ref, computed } from "vue"
+import HighlightJson from "/pages/components/HighlightJson.mjs"
+
+const bookingSchema = `{
+  "name": "Booking",
+  "primaryKey": "Id",
+  "model":  { "type": "object", "properties": {} },
+  "query":  { "$id": "/api/QueryBookings", "method": "GET" },
+  "create": { "$id": "/api/CreateBooking", "method": "POST" },
+  "update": { "$id": "/api/UpdateBooking", "method": "PATCH" },
+  "delete": { "$id": "/api/DeleteBooking", "method": "DELETE" }
+}`
+
+// Every template below has AutoQuery pre-configured (empty + MQ Worker templates are excluded)
+const TEMPLATE_GROUPS = [
+    { name: 'React', color: 'bg-cyan-500', items: [
+        { repo: 'react-spa',    desc: 'React Vite TypeScript SPA with Tailwind' },
+        { repo: 'react-static', desc: 'React Vite Identity Auth with static export' },
+        { repo: 'nextjs',       desc: 'Jamstack Next.js SSG React App' },
+        { repo: 'next-rsc',     desc: 'Next.js React Server Components' },
+        { repo: 'next-static',  desc: 'Next.js static export, Tailwind' },
+    ]},
+    { name: 'Vue', color: 'bg-emerald-500', items: [
+        { repo: 'vue-spa',    desc: 'Vue Vite TypeScript SPA with Tailwind' },
+        { repo: 'vue-static', desc: 'Jamstack Vue Vite App with Tailwind' },
+    ]},
+    { name: 'Blazor', color: 'bg-purple-500', items: [
+        { repo: 'blazor',       desc: 'Blazor App with Tailwind' },
+        { repo: 'blazor-vue',   desc: 'Blazor Vue App with Tailwind' },
+        { repo: 'blazor-admin', desc: 'Blazor Admin Vue App with Tailwind' },
+    ]},
+    { name: 'Angular', color: 'bg-rose-500', items: [
+        { repo: 'angular-spa', desc: 'Angular 21 App with Tailwind' },
+    ]},
+    { name: 'Razor Pages & MVC', color: 'bg-violet-500', items: [
+        { repo: 'mvc',             desc: 'MVC Identity Auth App with Tailwind' },
+        { repo: 'mvc-bootstrap',   desc: 'MVC Identity Auth App with Bootstrap' },
+        { repo: 'razor',           desc: 'Razor Pages App with Tailwind' },
+        { repo: 'razor-bootstrap', desc: 'Razor Pages App with Bootstrap' },
+    ]},
+]
+
+const CreateProject = {
+    template: `
+    <div>
+        <div class="grid gap-3 sm:grid-cols-[1.6fr_1fr]">
+            <label class="block">
+                <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500">Template</span>
+                <select v-model="repo"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                    <optgroup v-for="g in groups" :key="g.name" :label="g.name">
+                        <option v-for="t in g.items" :key="t.repo" :value="t.repo">{{ t.repo }} — {{ t.desc }}</option>
+                    </optgroup>
+                </select>
+            </label>
+            <label class="block">
+                <span class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-500">Project name</span>
+                <input v-model="project" type="text" spellcheck="false" autocorrect="off" placeholder="ProjectName"
+                       class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 font-mono text-sm text-gray-900 shadow-sm placeholder-gray-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+            </label>
+        </div>
+
+        <div class="mt-3 relative rounded-xl bg-slate-900 px-4 py-3.5 font-mono text-sm text-slate-200 overflow-x-auto">
+            <span class="select-none text-emerald-400 mr-2">$</span><span class="whitespace-nowrap">npx create-net <span class="text-sky-300">{{ repo }}</span> <span class="text-amber-300">{{ projectName }}</span></span>
+            <button type="button" v-on:click="copy" :aria-label="copied ? 'Copied' : 'Copy command'"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 transition hover:bg-white/10 hover:text-white">
+                <svg v-if="copied" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </button>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <span class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <span :class="['h-2 w-2 rounded-full', selected.color]"></span>
+                {{ selected.desc }}
+            </span>
+            <a :href="'https://github.com/NetCoreTemplates/' + repo" class="text-sky-600 dark:text-sky-400 font-medium hover:text-sky-500">Source</a>
+        </div>
+    </div>`,
+    setup() {
+        const groups = TEMPLATE_GROUPS
+        const repo = ref('react-spa')
+        const project = ref('')
+        const copied = ref(false)
+
+        const projectName = computed(() => project.value.trim() || 'ProjectName')
+        const selected = computed(() => {
+            for (const g of groups) {
+                const t = g.items.find(x => x.repo === repo.value)
+                if (t) return { ...t, group: g.name, color: g.color }
+            }
+            return { desc: '', color: 'bg-gray-400' }
+        })
+
+        async function copy() {
+            const cmd = `npx create-net ${repo.value} ${projectName.value}`
+            try { await navigator.clipboard.writeText(cmd) } catch (err) { /* clipboard unavailable */ }
+            copied.value = true
+            setTimeout(() => copied.value = false, 2000)
+        }
+
+        return { groups, repo, project, projectName, selected, copied, copy }
+    }
+}
+
+mount('#aq-create-project', CreateProject)
+
+// Presentation for a JSON response; HighlightJson only colours the JSON itself
+const SchemaCard = {
+    props: { title: String },
+    template: `
+    <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 overflow-hidden shadow-lg">
+        <div v-if="title" class="border-b border-gray-200 dark:border-gray-800 px-4 py-2.5 text-xs font-mono text-gray-500">{{ title }}</div>
+        <pre class="p-5 text-sm leading-relaxed overflow-x-auto"><slot></slot></pre>
+    </div>`
+}
+
+mount('#booking-schema', {
+    components: { SchemaCard, HighlightJson },
+    template: `<SchemaCard title="GET /auto/Booking.json"><HighlightJson :json="schema" /></SchemaCard>`,
+    setup() {
+        return { schema: bookingSchema }
+    }
+})
+</script>
