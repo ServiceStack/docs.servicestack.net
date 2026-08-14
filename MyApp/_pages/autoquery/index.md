@@ -125,16 +125,31 @@ AutoQuery Data's Open Provider model supports multiple back-end data sources. Th
  - [AutoQuery Service](/autoquery/service) - a step higher than `MemorySource` where you can decorate the response of existing Services with AutoQuery's rich querying capabilities.
  - [AutoQuery DynamoDB](/autoquery/dynamodb) - adds rich querying capabilities over an AWS DynamoDB Table, offering a giant leap of productivity than constructing DynamoDB queries manually.
 
-<h2 class="flex border-none text-4xl">
+<h2 class="not-prose flex border-none text-4xl">
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="w-10 h-10 align-middle mr-1 text-blue-500 iconify iconify--ri" width="1em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M4 10.4V4a1 1 0 0 1 1-1h5V1h4v2h5a1 1 0 0 1 1 1v6.4l1.086.326a1 1 0 0 1 .682 1.2l-1.516 6.068A4.992 4.992 0 0 1 16 16a4.992 4.992 0 0 1-4 2a4.992 4.992 0 0 1-4-2a4.992 4.992 0 0 1-4.252 1.994l-1.516-6.068a1 1 0 0 1 .682-1.2L4 10.4zm2-.6L12 8l2.754.826l1.809.543L18 9.8V5H6v4.8zM4 20a5.978 5.978 0 0 0 4-1.528A5.978 5.978 0 0 0 12 20a5.978 5.978 0 0 0 4-1.528A5.978 5.978 0 0 0 20 20h2v2h-2a7.963 7.963 0 0 1-4-1.07A7.963 7.963 0 0 1 12 22a7.963 7.963 0 0 1-4-1.07A7.963 7.963 0 0 1 4 22H2v-2h2z"></path></svg>
-    <a href="https://servicestack.net/locode">Locode</a>
+    <a href="/auto">AutoQuery CRUD UIs</a>
 </h2>
 
-If you're just getting started AutoQuery we also recommend using the built-in [Locode UI](/locode/) which lets you rapidly develop beautiful database-powered Web Apps, from an Instant UI around existing database-first RDBMS tables, or export into [highly customizable](/locode/declarative) declarative code-first development model with, on top of AutoQuery's industrial strength APIs to enable a rapid end-to-end typed development model for Web, Mobile & Desktop Apps.
+Once your AutoQuery APIs exist you don't need to build an admin UI for them - open [`/auto`](/auto) and you already have one. It's a searchable list of your data models, and behind each one a working CRUD App with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.
 
-<div class="py-8 max-w-7xl mx-auto px-4 sm:px-6">
-    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="hkuO_DMFXmc" style="background-image: url('https://img.youtube.com/vi/hkuO_DMFXmc/maxresdefault.jpg')"></lite-youtube>
-</div>
+<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'Searchable data model gallery': '/img/pages/autoquery-schema/auto-gallery.webp',
+    'Populated Booking CRUD grid': '/img/pages/autoquery-schema/booking-grid.webp',
+}"></screenshots-gallery>
+
+There's no frontend project, no generated source files and no scaffolding step. The page is assembled at runtime from your APIs and the current session, so every action it offers is one the signed-in user is **authorized** to perform - a model is only listed when its Query API is accessible, and Create, Edit and Delete controls appear only when the corresponding AutoQuery CRUD APIs exist and are authorized.
+
+Each model's [AutoQuery Schema](/auto) is a single document combining the data model with every API available for working with it, which the generic `AutoQuerySchema` component renders:
+
+```html
+<AutoQuerySchema :schema="schema" />
+```
+
+Both `@servicestack/vue` and `@servicestack/react` ship the same components, so the grid, forms, lookups and field inputs can be taken apart and dropped into your own App's navigation and design system.
+
+<screenshot src="/img/pages/autoquery-schema/grid-filters.webp" title="AutoQuery filters, ordering and pagination"></screenshot>
+
+For a complete standalone back-office App rather than embeddable components, [Locode](/locode/) remains the fuller experience - it loads your App's full metadata and adds its own [declarative customization model](/locode/declarative) on top of the same AutoQuery APIs.
 
 ## Effortless High performance Query & CRUD APIs
 
@@ -178,7 +193,7 @@ Add your custom DTO with route to register a table to query:
 public class QueryCustomers : QueryDb<Customer> {}
 ```
 
-That's all that's needed! From your contract-first API blueprint ServiceStack implements a fully queryable, type safe API for the Customer table that you can query with ServiceStack's built-in [API Explorer](/api-explorer) and [Locode](/locode/) UIs.
+That's all that's needed! From your contract-first API blueprint ServiceStack implements a fully queryable, type safe API for the Customer table that you can query with ServiceStack's built-in [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/auto).
 
 <div class="not-prose py-4 w-full text-center">
     <div class="buttons text-center text-2xl my-2">
@@ -272,7 +287,7 @@ After codifying your system conventions the generated classes can optionally be 
 AutoQuery seamlessly integrates with ServiceStack's endpoints, features and tools for maximum reuse and simplified integrations
 where it's typed service message contracts are able to drive completely dynamic user interfaces, enabling smart clients to deliver amazing levels of reuse.
 
-Your AutoQuery services can be managed with ServiceStack's built-in dynamic, capability-driven [API Explorer](/api-explorer) and [Locode](/locode/) UI's that are enabled by default, integrating with your existing App.
+Your AutoQuery services can be managed with ServiceStack's built-in dynamic, capability-driven [API Explorer](/api-explorer) and [AutoQuery CRUD UIs](/auto) at `/auto` that are enabled by default, integrating with your existing App.
 
 ### Multiple, clean data formats allows for flexible data integrations
 
