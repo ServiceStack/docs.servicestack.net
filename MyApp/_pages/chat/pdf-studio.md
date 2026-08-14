@@ -10,6 +10,10 @@ This page covers **authoring**. For publishing, production rendering and typed C
 
 ## The lifecycle
 
+:::youtube BhATkVOXknE
+Turn Any PDF into a Dynamic API with AI, Typst & ServiceStack
+:::
+
 <text-block text="AI Chat PDF Studio → Publish → Admin PDF → Generate C# → Render in your App"></text-block>
 
 PDF Studio is only the authoring half. Everything after Publish is a controlled software artifact, and **production rendering never calls an LLM**.
