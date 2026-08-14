@@ -340,7 +340,7 @@ These details **do not replace enforcement**. The API remains the final authoriz
 
 ## API Schema and `/auto`
 
-An API Schema describes one Request DTO. An [AutoQuery Schema](/auto) groups the model schema with all authorized Query, Create, Update, Patch, Delete and Save API Schemas needed to build a CRUD UI.
+An API Schema describes one Request DTO. An [AutoQuery Schema](/autoquery-schema) groups the model schema with all authorized Query, Create, Update, Patch, Delete and Save API Schemas needed to build a CRUD UI.
 
 | Surface | Scope |
 | --- | --- |
@@ -388,7 +388,7 @@ The fastest way to see the value is to open `/schema` on an App you already have
 
 ## Related
 
-- [AutoQuery CRUD UI](/auto) - the model-level equivalent for AutoQuery CRUD APIs
+- [AutoQuery CRUD UI](/autoquery-schema) - the model-level equivalent for AutoQuery CRUD APIs
 - [API Explorer](/api-explorer) - the full metadata-driven API UI at `/ui`
 - [API Tools](/chat/api-tools) - how AI Models discover and call these same APIs
 - [Metadata page](/metadata-page) - ServiceStack API metadata configuration

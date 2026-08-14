@@ -15,7 +15,7 @@ That changes what a data UI costs. A back-office screen that would have been a s
 
 ## Model-level, not API-level
 
-Where an [API Schema](/schema) describes how one `/api/{RequestDto}` endpoint can be rendered and executed, an **AutoQuery Schema** describes the whole data capability: its Query API, returned model and every authorized Create, Update, Patch, Delete or Save API.
+Where an [API Schema](/api-schema) describes how one `/api/{RequestDto}` endpoint can be rendered and executed, an **AutoQuery Schema** describes the whole data capability: its Query API, returned model and every authorized Create, Update, Patch, Delete or Save API.
 
 | Route | Response |
 | --- | --- |
@@ -91,7 +91,7 @@ public class DeleteBooking : IDeleteDb<Booking>, IReturnVoid
 | `query` | The Query API - required; without access there is no schema |
 | `create` `update` `delete` `save` | Present only when an authorized API exists |
 
-Each of those API entries is a full [API Schema](/schema), including its request fields, validation constraints, HTTP method, route and UI metadata - so the same generic form components render them.
+Each of those API entries is a full [API Schema](/api-schema), including its request fields, validation constraints, HTTP method, route and UI metadata - so the same generic form components render them.
 
 :::info
 `viewModel` matters when a query joins, projects or enriches stored data. Rows returned by `IQueryDb<From, Into>` are the `Into` type, whilst Create/Update/Delete still write through the `From` type - so grids display the returned view whilst forms use the writable model.
@@ -300,7 +300,7 @@ Once the AutoQuery CRUD APIs exist, `/auto/Booking` is immediately useful. Add d
 
 ## The structured foundation for AI-operated data
 
-Because each write operation carries its own [API Schema](/schema), [AI Chat](/chat/api-tools) can render an editable preview and approval form whenever a Model proposes an AutoQuery Create, Update, Patch, Delete or Save - for **every model**, with no per-API Chat component to write.
+Because each write operation carries its own [API Schema](/api-schema), [AI Chat](/chat/api-tools) can render an editable preview and approval form whenever a Model proposes an AutoQuery Create, Update, Patch, Delete or Save - for **every model**, with no per-API Chat component to write.
 
 This supports experiences such as:
 
@@ -357,7 +357,7 @@ npm install @servicestack/react
 
 ## Related
 
-- [API Schema](/schema) - the per-API contract each CRUD entry above contains
+- [API Schema](/api-schema) - the per-API contract each CRUD entry above contains
 - [AutoQuery RDBMS](/autoquery/rdbms) - the APIs these UIs are generated from
 - [Locode](/locode/) - the standalone metadata-driven admin App
 - [API Explorer](/api-explorer) - the full metadata-driven API UI at `/ui`
