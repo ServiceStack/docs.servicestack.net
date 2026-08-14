@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-13T16:05:43.6548752Z'>
+    <meta name='date' content='2026-08-14T01:55:09.3458995Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>AutoQuery CRUD UI</title>
@@ -1478,10 +1478,15 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>The <code>/auto</code> pages provide a schema-driven browser and CRUD UI for the AutoQuery data models available to the current user. They are served by ServiceStack's existing <code>MetadataFeature</code>; no separate plugin or frontend build is required.</p>
-<p>Open <code>/auto</code> to browse models, or <code>/auto/{ModelName}</code> to work with a specific model:</p>
-<p><screenshot src="/img/pages/autoquery-schema/booking-grid.webp" title="The generated Booking CRUD UI at /auto/Booking"></screenshot></p>
-<h2 id="routes">Routes<a class="header-anchor" href="javascript:;" onclick="location.hash='#routes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+                <div class="content"><p>If your App has <a href="/autoquery/rdbms">AutoQuery</a> APIs, open <code>/auto</code> in any <strong>.NET 8+</strong> ServiceStack App and you already have an admin application: a searchable list of your data models, and behind each one a working CRUD app with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.</p>
+<p><screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+'Searchable data model gallery': '/img/pages/autoquery-schema/auto-gallery.webp',
+'Populated Booking CRUD grid': '/img/pages/autoquery-schema/booking-grid.webp',
+}"></screenshots-gallery></p>
+<p>No frontend project, no generated source files, no scaffolding step. Every action it offers is one the signed-in user is <strong>authorized</strong> to perform, because the page is assembled at runtime from your APIs and the current session.</p>
+<p>That changes what a data UI costs. A back-office screen that would have been a sprint of grid, form, validation, lookup and permission work is now the thing you get <em>before</em> deciding whether a bespoke UI is worth building.</p>
+<h2 id="model-level-not-api-level">Model-level, not API-level<a class="header-anchor" href="javascript:;" onclick="location.hash='#model-level-not-api-level'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Where an <a href="/schema">API Schema</a> describes how one <code>/api/{RequestDto}</code> endpoint can be rendered and executed, an <strong>AutoQuery Schema</strong> describes the whole data capability: its Query API, returned model and every authorized Create, Update, Patch, Delete or Save API.</p>
 <table>
 <thead>
 <tr>
@@ -1492,23 +1497,26 @@ mount('#header', Header)
 <tbody>
 <tr>
 <td><code>GET /auto</code></td>
-<td>Searchable HTML catalog of available AutoQuery models</td>
+<td>Every AutoQuery data model available to the current user</td>
 </tr>
 <tr>
 <td><code>GET /auto.json</code></td>
-<td>Model catalog as JSON</td>
+<td>The model catalog as JSON</td>
 </tr>
 <tr>
 <td><code>GET /auto/{ModelName}</code></td>
-<td>HTML query and CRUD UI for a model</td>
+<td>A complete authorized CRUD App for one model</td>
 </tr>
 <tr>
 <td><code>GET /auto/{ModelName}.json</code></td>
-<td>Model-level AutoQuery schema</td>
+<td>The model-level schema envelope</td>
 </tr>
 </tbody>
 </table>
-<p>The catalog and individual schemas are generated for each request. Models and operations that are not available to the current authenticated user are omitted.</p>
+<p>The integration is deliberately small - fetch that one document and give it to the generic component:</p>
+<pre><code class="language-html">&lt;AutoQuerySchema :schema=&quot;schema&quot; /&gt;
+</code></pre>
+<p>These routes belong to the existing <a href="/metadata-page">Metadata feature</a>, so there's nothing to install. The catalog and individual schemas are generated for each request, and models and operations that are not available to the current authenticated user are omitted.</p>
 <h2 id="requirements">Requirements<a class="header-anchor" href="javascript:;" onclick="location.hash='#requirements'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The UI is available in .NET 8+ ServiceStack Apps that have:</p>
 <ul>
@@ -1536,83 +1544,96 @@ public class DeleteBooking : IDeleteDb&lt;Booking&gt;, IReturnVoid
     public int Id { get; set; }
 }
 </code></pre>
-<h2 id="model-schema">Model schema<a class="header-anchor" href="javascript:;" onclick="location.hash='#model-schema'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><code>/auto/Booking.json</code> returns a model envelope containing the data model and the API schemas used to operate on it:</p>
+<h2 id="the-schema-envelope">The schema envelope<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-schema-envelope'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><code>/auto/Booking.json</code> combines a model and every API available for working with it:</p>
 <pre><code class="language-json">{
   &quot;name&quot;: &quot;Booking&quot;,
   &quot;title&quot;: &quot;Booking&quot;,
   &quot;primaryKey&quot;: &quot;Id&quot;,
   &quot;model&quot;:  { &quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {} },
-  &quot;query&quot;:  { &quot;$id&quot;: &quot;/api/QueryBookings&quot;, &quot;method&quot;: &quot;GET&quot;, &quot;operation&quot;: &quot;Query&quot; },
-  &quot;create&quot;: { &quot;$id&quot;: &quot;/api/CreateBooking&quot;, &quot;method&quot;: &quot;POST&quot;, &quot;operation&quot;: &quot;Create&quot; },
-  &quot;update&quot;: { &quot;$id&quot;: &quot;/api/UpdateBooking&quot;, &quot;method&quot;: &quot;PATCH&quot;, &quot;operation&quot;: &quot;Patch&quot; },
-  &quot;delete&quot;: { &quot;$id&quot;: &quot;/api/DeleteBooking&quot;, &quot;method&quot;: &quot;DELETE&quot;, &quot;operation&quot;: &quot;Delete&quot; }
+  &quot;query&quot;:  { &quot;$id&quot;: &quot;/api/QueryBookings&quot;, &quot;method&quot;: &quot;GET&quot;,    &quot;operation&quot;: &quot;Query&quot;,  &quot;properties&quot;: {} },
+  &quot;create&quot;: { &quot;$id&quot;: &quot;/api/CreateBooking&quot;, &quot;method&quot;: &quot;POST&quot;,   &quot;operation&quot;: &quot;Create&quot;, &quot;properties&quot;: {} },
+  &quot;update&quot;: { &quot;$id&quot;: &quot;/api/UpdateBooking&quot;, &quot;method&quot;: &quot;PATCH&quot;,  &quot;operation&quot;: &quot;Patch&quot;,  &quot;properties&quot;: {} },
+  &quot;delete&quot;: { &quot;$id&quot;: &quot;/api/DeleteBooking&quot;, &quot;method&quot;: &quot;DELETE&quot;, &quot;operation&quot;: &quot;Delete&quot;, &quot;properties&quot;: {} }
 }
 </code></pre>
 <table>
 <thead>
 <tr>
-<th>Member</th>
-<th>Purpose</th>
+<th>Key</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>name</code></td>
-<td>Data model type name</td>
+<td>The data model type name</td>
 </tr>
 <tr>
 <td><code>title</code></td>
-<td>Display title derived from metadata or the model name</td>
+<td>From <code>[Description]</code>, or the humanized model name</td>
 </tr>
 <tr>
 <td><code>primaryKey</code></td>
-<td>Property used to identify and deep-link rows</td>
+<td>Which property identifies a row, so UIs can deep link to one</td>
 </tr>
 <tr>
 <td><code>model</code></td>
-<td>Writable model schema used by CRUD forms</td>
+<td>The writable model schema used by CRUD forms</td>
 </tr>
 <tr>
 <td><code>viewModel</code></td>
-<td>Optional projected result type for <code>IQueryDb&lt;From, Into&gt;</code> queries</td>
+<td>Only present when the query returns a <strong>different</strong> shape</td>
 </tr>
 <tr>
 <td><code>query</code></td>
-<td>Query API schema; required for the model to be listed</td>
+<td>The Query API - required; without access there is no schema</td>
 </tr>
 <tr>
-<td><code>create</code>, <code>update</code>, <code>delete</code>, <code>save</code></td>
-<td>Authorized write API schemas, when available</td>
+<td><code>create</code> <code>update</code> <code>delete</code> <code>save</code></td>
+<td>Present only when an authorized API exists</td>
 </tr>
 </tbody>
 </table>
-<p>Each operation is a complete <a href="/schema">API Schema</a>, including its request fields, validation constraints, HTTP method, route and UI metadata.</p>
-<h2 id="query-ui">Query UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#query-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The generated query view supports:</p>
+<p>Each of those API entries is a full <a href="/schema">API Schema</a>, including its request fields, validation constraints, HTTP method, route and UI metadata - so the same generic form components render them.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p><code>viewModel</code> matters when a query joins, projects or enriches stored data. Rows returned by <code>IQueryDb&lt;From, Into&gt;</code> are the <code>Into</code> type, whilst Create/Update/Delete still write through the <code>From</code> type - so grids display the returned view whilst forms use the writable model.</p>
+</div>
+<p><screenshot src="/img/pages/autoquery-schema/tag-filter.webp" title="AutoQuery data models filtered by tag"></screenshot></p>
+<h2 id="a-full-autoquery-grid-with-no-frontend-code">A full AutoQuery grid with no frontend code<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-full-autoquery-grid-with-no-frontend-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The results grid calls the schema's Query API and provides:</p>
 <ul>
-<li>Server-side paging and sorting</li>
-<li>AutoQuery filters and multiple filter expressions</li>
-<li>Selectable columns and page sizes</li>
+<li>Server-side paging and per-column sorting</li>
+<li>AutoQuery's typed filter conventions and multiple filter expressions</li>
+<li>Selectable visible columns and configurable page sizes</li>
+<li>Formatted values from <code>[Intl]</code> and <code>[Format]</code> metadata</li>
+<li>Persistent per-model preferences stored in the browser</li>
 <li>Deep links through query-string state</li>
-<li>Per-model preferences stored in the browser</li>
-<li>Formatting supplied by <code>[Intl]</code> and <code>[Format]</code></li>
+<li>Responsive light/dark modes</li>
 </ul>
-<p>For example:</p>
+<p>Query state is kept in the URL, so a filtered view can be bookmarked, refreshed or shared:</p>
 <p><text-block text="/auto/Booking?RoomType=Queen&amp;orderBy=-BookingStartDate&amp;skip=20"></text-block></p>
-<p><screenshot src="/img/pages/autoquery-schema/grid-filters.webp" title="AutoQuery filters, ordering and pagination"></screenshot></p>
-<h2 id="create-edit-and-delete">Create, edit and delete<a class="header-anchor" href="javascript:;" onclick="location.hash='#create-edit-and-delete'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Forms are generated independently from each write API. This is important when Create and Update DTOs expose different fields or validation rules.</p>
+<p>That URL is not a screenshot of transient client state - it's a durable link back to the same server-side query.</p>
+<p><screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+'Grid filters, ordering and pagination': '/img/pages/autoquery-schema/grid-filters.webp',
+'Per-model query preferences': '/img/pages/autoquery-schema/query-preferences.webp',
+}"></screenshots-gallery></p>
+<h2 id="schema-driven-create-edit-and-delete">Schema-driven Create, Edit and Delete<a class="header-anchor" href="javascript:;" onclick="location.hash='#schema-driven-create-edit-and-delete'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Forms are generated independently from each write API. This matters when Create and Update DTOs expose different fields or validation rules - each form preserves the exact behavior of its own API, with required values and validation constraints shown before submission, server validation errors bound back to their fields, enums and allowable values as selections, editable nested objects and collections, multipart uploads for file properties, and HTTP methods and payloads taken from the schema.</p>
 <ul>
 <li>Create uses the <code>create</code> schema.</li>
 <li>Edit prefers Patch, then Update or Save when available.</li>
-<li>Patch sends changed fields only.</li>
-<li>Clearing an existing value uses ServiceStack's <code>reset</code> instruction where necessary.</li>
-<li>Delete is shown only when an authorized Delete API exists and requires confirmation.</li>
+<li>Delete is shown only when an authorized Delete API exists, and requires confirmation.</li>
 </ul>
+<p><screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+'Generated Create Booking form': '/img/pages/autoquery-schema/create-booking.webp',
+'Edit dialog with guarded delete': '/img/pages/autoquery-schema/edit-booking.webp',
+}"></screenshots-gallery></p>
+<p>Patch APIs receive <strong>only changed values</strong>. When a user clears an existing field the UI adds ServiceStack's <code>reset</code> instruction so the server can distinguish <em>&quot;set this to empty&quot;</em> from <em>&quot;leave this field unchanged&quot;</em> - the kind of edge case custom CRUD UIs frequently get wrong, solved once for every model.</p>
 <p>Server-side validation remains authoritative. Validation failures are returned as normal ServiceStack <code>ResponseStatus</code> field errors and displayed beside their inputs.</p>
-<h2 id="references-and-lookup-controls">References and lookup controls<a class="header-anchor" href="javascript:;" onclick="location.hash='#references-and-lookup-controls'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><code>[Ref]</code>, <code>[References]</code> and foreign-key metadata can render searchable lookup controls. Referenced schemas are loaded on demand from <code>/auto/{ReferencedModel}.json</code>, keeping the initial model schema small.</p>
+<h2 id="references-become-live-lookup-uis">References become live lookup UIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#references-become-live-lookup-uis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Foreign keys are often where generated CRUD tools stop feeling like real applications. Asking a user to remember that <em>&quot;Customer 1042&quot;</em> is <em>&quot;Acme Inc.&quot;</em> is technically accurate and practically unusable.</p>
+<p>AutoQuery Schemas preserve reference metadata from <code>[Ref]</code>, <code>[References]</code>, <code>[ForeignKey]</code> and related attributes. The renderer displays a lookup control that resolves the current label and opens a full searchable picker for the referenced model - with the same paging, sorting, filters and column preferences as the main grid.</p>
 <pre><code class="language-csharp">public class Booking
 {
     public int Id { get; set; }
@@ -1624,17 +1645,96 @@ public class DeleteBooking : IDeleteDb&lt;Booking&gt;, IReturnVoid
     public Customer Customer { get; set; }
 }
 </code></pre>
-<p><screenshot src="/img/pages/autoquery-schema/customer-lookup.webp" title="A reference lookup generated from model metadata"></screenshot></p>
-<h2 id="authorization">Authorization<a class="header-anchor" href="javascript:;" onclick="location.hash='#authorization'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><code>/auto</code> is a client of the same APIs as any other UI. It does not bypass API authorization:</p>
+<p><screenshot src="/img/pages/autoquery-schema/customer-lookup.webp" title="Reference lookup opened from the Booking form"></screenshot></p>
+<p>Referenced model schemas are loaded on demand from <code>/auto/{ReferencedModel}.json</code>, so the parent schema stays compact.</p>
+<h2 id="authorization-shapes-the-app">Authorization shapes the App<a class="header-anchor" href="javascript:;" onclick="location.hash='#authorization-shapes-the-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p><code>/auto</code> is a client of the same APIs as any other UI - it does not bypass API authorization. The catalog, model schema and CRUD UI are all generated for the current authenticated session:</p>
 <ul>
-<li>The catalog omits models without an accessible Query API.</li>
-<li>A model schema omits write operations the caller cannot access.</li>
-<li>The API revalidates authentication, roles, permissions and validation rules when invoked.</li>
+<li>A model is only listed when its Query API can be accessed.</li>
+<li><strong>Query access is required</strong> - without it, requesting the schema returns 401 or 403.</li>
+<li>Create appears only when the user can call the Create API.</li>
+<li>Rows become editable only when Update or Patch is available.</li>
+<li>Delete appears only when the selected Delete API is authorized.</li>
 <li>APIs excluded from metadata are not included.</li>
+<li>Each action can carry different roles, permissions, claims, scopes or API-key requirements.</li>
 </ul>
-<p>The generated UI is therefore caller-specific, but the Service remains the final security boundary.</p>
-<h2 id="customize-generated-controls">Customize generated controls<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-generated-controls'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>This is more precise than a single <em>&quot;admin page&quot;</em> permission. A support user may have read access, an operator may create and edit, and an administrator may also delete - all from the same generated UI.</p>
+<p>The generated UI is therefore caller-specific, but the API remains the final security boundary: authentication, roles, permissions and validation rules are all revalidated when it's invoked.</p>
+<h2 id="conventions-for-real-autoquery-apis">Conventions for real AutoQuery APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#conventions-for-real-autoquery-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>ServiceStack derives the most useful CRUD surface from whichever API shapes are available:</p>
+<table>
+<thead>
+<tr>
+<th>Convention</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query API</td>
+<td>Required - it's what grants access to the schema at all</td>
+</tr>
+<tr>
+<td>Update</td>
+<td><code>IPatchDb&lt;T&gt;</code> is preferred over <code>IUpdateDb&lt;T&gt;</code> when both exist</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>A single-row delete is preferred over a bulk delete</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>Operations are included only when they exist <strong>and</strong> are authorized</td>
+</tr>
+<tr>
+<td>Primary key</td>
+<td>Discovered from <code>[PrimaryKey]</code>, <code>[AutoIncrement]</code>, <code>Id</code> or <code>{Model}Id</code></td>
+</tr>
+<tr>
+<td>View models</td>
+<td>Represented separately when they differ from the write model</td>
+</tr>
+</tbody>
+</table>
+<h2 id="where-this-fits-alongside-locode">Where this fits alongside Locode<a class="header-anchor" href="javascript:;" onclick="location.hash='#where-this-fits-alongside-locode'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>/auto</code></th>
+<th><a href="/locode/">Locode</a></th>
+<th>Custom UI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Best for</strong></td>
+<td>Embedding data UIs in your own App</td>
+<td>A complete standalone admin App</td>
+<td>Product surfaces users live in</td>
+</tr>
+<tr>
+<td><strong>Loads</strong></td>
+<td>One model's schema at a time</td>
+<td>The App's full metadata</td>
+<td>Whatever you build</td>
+</tr>
+<tr>
+<td><strong>Customization</strong></td>
+<td>Compose the Vue/React components yourself</td>
+<td>Locode's customization model</td>
+<td>Total</td>
+</tr>
+<tr>
+<td><strong>Runs where</strong></td>
+<td>Built-in page <em>or</em> inside your App</td>
+<td>Built-in page</td>
+<td>Your App</td>
+</tr>
+</tbody>
+</table>
+<p>They aren't competing and neither is going away. Locode remains the fuller standalone back-office experience. <code>/auto</code> is the schema-driven equivalent that scales to very large API surfaces and - the part that matters most - can be <em>taken apart</em>: the grid, the forms, the lookups and the field inputs are components you can drop into your own application's navigation and design system.</p>
+<h2 id="customize-the-generated-controls">Customize the generated controls<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-the-generated-controls'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The UI consumes the metadata already attached to Request DTOs and data models. Use the same attributes used by API Explorer and AutoQuery components:</p>
 <pre><code class="language-csharp">public class CreateBooking : ICreateDb&lt;Booking&gt;, IReturn&lt;IdResponse&gt;
 {
@@ -1645,32 +1745,17 @@ public class DeleteBooking : IDeleteDb&lt;Booking&gt;, IReturnVoid
     public decimal Cost { get; set; }
 }
 </code></pre>
-<p>Useful metadata includes <code>[Description]</code>, <code>[Input]</code>, validation attributes, <code>[Ref]</code>, <code>[References]</code>, <code>[Intl]</code> and <code>[Format]</code>.</p>
-<p>To modify the generated envelope programmatically:</p>
-<pre><code class="language-csharp">services.ConfigurePlugin&lt;MetadataFeature&gt;(feature =&gt; {
-    feature.OnAutoQuerySchema = (dataModel, schema) =&gt; {
-        if (dataModel == typeof(Booking))
-            schema[&quot;title&quot;] = &quot;Room Bookings&quot;;
-    };
-});
-</code></pre>
-<h2 id="disable-auto">Disable <code>/auto</code><a class="header-anchor" href="javascript:;" onclick="location.hash='#disable-auto'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The AutoQuery schema routes can be disabled without disabling <code>/schema</code>:</p>
-<pre><code class="language-csharp">services.AddServiceStack(typeof(MyServices).Assembly, options =&gt; {
-    var metadata = options.Plugins.OfType&lt;MetadataFeature&gt;().First();
-    metadata.DisableAutoQuerySchema = true;
-});
-</code></pre>
-<p><code>MetadataFeature.IsAutoQuerySchemaEnabled</code> reports whether the routes are registered.</p>
-<h2 id="embed-the-vue-component">Embed the Vue component<a class="header-anchor" href="javascript:;" onclick="location.hash='#embed-the-vue-component'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The built-in page uses the <code>AutoQuerySchema</code> component from <code>@servicestack/vue</code>. It can also be used in an application's own Vue UI:</p>
-<pre><code class="language-html">&lt;script setup&gt;
+<p>Useful metadata includes <code>[Description]</code>, <code>[Input]</code>, validation attributes, <code>[Ref]</code>, <code>[References]</code>, <code>[Intl]</code> and <code>[Format]</code>. To get more out of the generated UIs, improve the <strong>APIs</strong> rather than the UI - the same metadata also improves API Explorer and every generated client.</p>
+<h2 id="use-autoqueryschema-in-your-own-apps">Use AutoQuerySchema in your own Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#use-autoqueryschema-in-your-own-apps'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The built-in page uses the <code>AutoQuerySchema</code> component from <code>@servicestack/vue</code>. It can also be used in your own Vue UI:</p>
+<pre><code class="language-html">&lt;script setup lang=&quot;ts&quot;&gt;
 import { ref, onMounted } from 'vue'
 import { AutoQuerySchema } from '@servicestack/vue'
 
 const schema = ref()
+
 onMounted(async () =&gt; {
-  schema.value = await fetch('/auto/Booking.json').then(r =&gt; r.json())
+    schema.value = await fetch('/auto/Booking.json').then(r =&gt; r.json())
 })
 &lt;/script&gt;
 
@@ -1678,8 +1763,7 @@ onMounted(async () =&gt; {
   &lt;AutoQuerySchema v-if=&quot;schema&quot; :schema=&quot;schema&quot; /&gt;
 &lt;/template&gt;
 </code></pre>
-<h2 id="embed-the-react-component">Embed the React component<a class="header-anchor" href="javascript:;" onclick="location.hash='#embed-the-react-component'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The React package provides the equivalent <code>AutoQuerySchema</code> component. Pass it the model schema and a <code>JsonServiceClient</code> for the App serving the AutoQuery APIs:</p>
+<p><code>@servicestack/react</code> ships the same components with the same names. Pass it the model schema and a <code>JsonServiceClient</code> for the App serving the AutoQuery APIs:</p>
 <pre><code class="language-tsx">import { useEffect, useMemo, useState } from 'react'
 import { JsonServiceClient } from '@servicestack/client'
 import { AutoQuerySchema } from '@servicestack/react'
@@ -1699,14 +1783,146 @@ export default function Bookings() {
     : null
 }
 </code></pre>
-<p>Install the required packages with:</p>
-<p><shell-command>npm install @servicestack/react @servicestack/client</shell-command></p>
-<h2 id="related-documentation">Related documentation<a class="header-anchor" href="javascript:;" onclick="location.hash='#related-documentation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>For more specialized experiences, both libraries expose the lower-level components independently:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AutoQuerySchema</code></td>
+<td>The complete CRUD App for one model</td>
+</tr>
+<tr>
+<td><code>SchemaResults</code></td>
+<td>A schema-powered query grid</td>
+</tr>
+<tr>
+<td><code>SchemaGrid</code> / <code>SortableColumn</code></td>
+<td>Building blocks for a custom results view</td>
+</tr>
+<tr>
+<td><code>SchemaInput</code></td>
+<td>Individual generated fields</td>
+</tr>
+<tr>
+<td><code>SchemaLookup</code></td>
+<td>Reference pickers</td>
+</tr>
+<tr>
+<td><code>JsonSchemaForm</code></td>
+<td>Arbitrary nested JSON Schema forms</td>
+</tr>
+</tbody>
+</table>
+<h2 id="from-database-to-app-in-minutes">From database to App in minutes<a class="header-anchor" href="javascript:;" onclick="location.hash='#from-database-to-app-in-minutes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<pre><code class="language-csharp">[Tag(&quot;Bookings&quot;)]
+[Route(&quot;/bookings&quot;, &quot;GET&quot;)]
+public class QueryBookings : QueryDb&lt;Booking&gt; { }
+
+[ValidateHasRole(&quot;Employee&quot;)]
+[AutoApply(Behavior.AuditCreate)]
+public class CreateBooking : ICreateDb&lt;Booking&gt;, IReturn&lt;IdResponse&gt;
+{
+    [ValidateNotEmpty]
+    public string Name { get; set; } = &quot;&quot;;
+
+    public RoomType RoomType { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+}
+</code></pre>
+<p>Once the AutoQuery CRUD APIs exist, <code>/auto/Booking</code> is immediately useful. Add descriptions, validation, references and input metadata to refine both the APIs <strong>and</strong> their generated experience.</p>
+<p><screenshot src="/img/pages/autoquery-schema/dto-to-crud.webp" title="Schema-generated Booking CRUD application"></screenshot></p>
+<h2 id="the-structured-foundation-for-ai-operated-data">The structured foundation for AI-operated data<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-structured-foundation-for-ai-operated-data'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Because each write operation carries its own <a href="/schema">API Schema</a>, <a href="/chat/api-tools">AI Chat</a> can render an editable preview and approval form whenever a Model proposes an AutoQuery Create, Update, Patch, Delete or Save - for <strong>every model</strong>, with no per-API Chat component to write.</p>
+<p>This supports experiences such as:</p>
 <ul>
-<li><a href="/autoquery-schema">AutoQuery Schema overview</a> - architecture, components and broader use cases</li>
-<li><a href="/schema">API Schema</a> - per-Request DTO schemas used by every CRUD operation</li>
-<li><a href="/autoquery/rdbms">AutoQuery RDBMS</a> - defining Query and CRUD APIs</li>
-<li><a href="/locode/">Locode</a> - standalone metadata-driven data management UI</li>
+<li><em>&quot;Show overdue invoices over $5,000, ordered by customer.&quot;</em></li>
+<li><em>&quot;Find tomorrow's bookings and move this one to the available conference room.&quot;</em></li>
+<li><em>&quot;Create a follow-up task for every high-priority support case assigned to me.&quot;</em></li>
+<li><em>&quot;Find products below their reorder threshold and prepare updates for approval.&quot;</em></li>
+</ul>
+<p><screenshot src="/img/pages/autoquery-schema/chat-approval.webp" title="Schema-generated approval form"></screenshot></p>
+<p>The grid UI and AI Assistant are two clients over the same typed capability layer: one starts with visual exploration, the other with natural language.</p>
+<h2 id="configuration">Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <code>/auto</code> routes belong to the Metadata feature and can be disabled independently of <code>/schema</code>:</p>
+<pre><code class="language-csharp">services.AddServiceStack(typeof(MyServices).Assembly, options =&gt; {
+    var metadata = options.Plugins.OfType&lt;MetadataFeature&gt;().First();
+    metadata.DisableAutoQuerySchema = true;
+});
+</code></pre>
+<p><code>MetadataFeature.IsAutoQuerySchemaEnabled</code> reports whether they're registered. An App can therefore keep its API workbench whilst withholding the AutoQuery data UIs, or the reverse.</p>
+<p>Schemas can be augmented before they're returned, which applies everywhere the schema is used:</p>
+<pre><code class="language-csharp">services.ConfigurePlugin&lt;MetadataFeature&gt;(feature =&gt; {
+    feature.OnAutoQuerySchema = (dataModel, schema) =&gt; {
+        if (dataModel == typeof(Booking))
+            schema[&quot;title&quot;] = &quot;Room Bookings&quot;;
+    };
+});
+</code></pre>
+<h2 id="get-started">Get Started<a class="header-anchor" href="javascript:;" onclick="location.hash='#get-started'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Nothing to install. Run your App and open:</p>
+<p><text-block :rows="['/auto','/auto/{ModelName}','/auto.json','/auto/{ModelName}.json']"></text-block></p>
+<p>To embed the components in your own App:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npm install @servicestack/vue</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npm install @servicestack/react</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p><screenshot src="/img/pages/autoquery-schema/autoquery-overview.webp" title="AutoQuery Schema overview"></screenshot></p>
+<h2 id="related">Related<a class="header-anchor" href="javascript:;" onclick="location.hash='#related'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<ul>
+<li><a href="/schema">API Schema</a> - the per-API contract each CRUD entry above contains</li>
+<li><a href="/autoquery/rdbms">AutoQuery RDBMS</a> - the APIs these UIs are generated from</li>
+<li><a href="/locode/">Locode</a> - the standalone metadata-driven admin App</li>
+<li><a href="/api-explorer">API Explorer</a> - the full metadata-driven API UI at <code>/ui</code></li>
 </ul>
 </div>
 
@@ -1751,8 +1967,8 @@ export default function Bookings() {
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#routes'" data-id="routes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Routes
+                                        <span v-hash="'#model-level-not-api-level'" data-id="model-level-not-api-level" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Model-level, not API-level
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
@@ -1761,53 +1977,73 @@ export default function Bookings() {
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#model-schema'" data-id="model-schema" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Model schema
+                                        <span v-hash="'#the-schema-envelope'" data-id="the-schema-envelope" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The schema envelope
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#query-ui'" data-id="query-ui" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Query UI
+                                        <span v-hash="'#a-full-autoquery-grid-with-no-frontend-code'" data-id="a-full-autoquery-grid-with-no-frontend-code" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            A full AutoQuery grid with no frontend code
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#create-edit-and-delete'" data-id="create-edit-and-delete" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Create, edit and delete
+                                        <span v-hash="'#schema-driven-create-edit-and-delete'" data-id="schema-driven-create-edit-and-delete" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Schema-driven Create, Edit and Delete
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#references-and-lookup-controls'" data-id="references-and-lookup-controls" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            References and lookup controls
+                                        <span v-hash="'#references-become-live-lookup-uis'" data-id="references-become-live-lookup-uis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            References become live lookup UIs
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#authorization'" data-id="authorization" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Authorization
+                                        <span v-hash="'#authorization-shapes-the-app'" data-id="authorization-shapes-the-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Authorization shapes the App
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#customize-generated-controls'" data-id="customize-generated-controls" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Customize generated controls
+                                        <span v-hash="'#conventions-for-real-autoquery-apis'" data-id="conventions-for-real-autoquery-apis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Conventions for real AutoQuery APIs
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#disable-auto'" data-id="disable-auto" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Disable 
+                                        <span v-hash="'#where-this-fits-alongside-locode'" data-id="where-this-fits-alongside-locode" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Where this fits alongside Locode
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#embed-the-vue-component'" data-id="embed-the-vue-component" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Embed the Vue component
+                                        <span v-hash="'#customize-the-generated-controls'" data-id="customize-the-generated-controls" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Customize the generated controls
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#embed-the-react-component'" data-id="embed-the-react-component" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Embed the React component
+                                        <span v-hash="'#use-autoqueryschema-in-your-own-apps'" data-id="use-autoqueryschema-in-your-own-apps" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Use AutoQuerySchema in your own Apps
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#related-documentation'" data-id="related-documentation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Related documentation
+                                        <span v-hash="'#from-database-to-app-in-minutes'" data-id="from-database-to-app-in-minutes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            From database to App in minutes
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#the-structured-foundation-for-ai-operated-data'" data-id="the-structured-foundation-for-ai-operated-data" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            The structured foundation for AI-operated data
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#configuration'" data-id="configuration" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Configuration
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#get-started'" data-id="get-started" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Get Started
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#related'" data-id="related" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Related
                                         </span>
                                     </li>
                             </ul>
