@@ -1,0 +1,682 @@
+﻿@page "/pdf"
+@attribute [RenderStatic]
+
+@{
+    ViewData["Title"] = "PDF Studio";
+    ViewData["Brand"] = "ServiceStack.PDF";
+}
+
+<style>
+    /* Shared with /chat: click any screenshot to view it full size */
+    .zoomable { cursor: zoom-in; transition: opacity .15s ease }
+    .zoomable:hover { opacity: .92 }
+    .zoomable:focus-visible { outline: 2px solid rgb(244 63 94); outline-offset: 3px }
+
+    .lb { position: fixed; inset: 0; z-index: 100; display: none }
+    .lb[open] { display: flex; align-items: center; justify-content: center }
+    .lb-backdrop { position: absolute; inset: 0; background: rgb(2 6 23 / .92); backdrop-filter: blur(4px) }
+    .lb-fig {
+        position: relative; margin: 0; display: flex; flex-direction: column;
+        align-items: center; gap: .75rem; max-width: 94vw; max-height: 94vh;
+    }
+    .lb-img {
+        max-width: 94vw; max-height: 82vh; width: auto; height: auto; object-fit: contain;
+        border-radius: .5rem; box-shadow: 0 25px 50px -12px rgb(0 0 0 / .6);
+    }
+    .lb-cap { color: rgb(203 213 225); font-size: .8125rem; line-height: 1.4; text-align: center; max-width: 62ch }
+    .lb-count { color: rgb(100 116 139); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .75rem }
+    .lb-btn {
+        position: absolute; z-index: 1; display: flex; align-items: center; justify-content: center;
+        width: 2.75rem; height: 2.75rem; border-radius: 9999px; border: 0; cursor: pointer;
+        background: rgb(255 255 255 / .1); color: #fff; transition: background .15s ease;
+    }
+    .lb-btn:hover { background: rgb(255 255 255 / .2) }
+    .lb-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px }
+    .lb-close { top: 1rem; right: 1rem; position: fixed }
+    .lb-prev { left: 1rem; position: fixed; top: 50%; margin-top: -1.375rem }
+    .lb-next { right: 1rem; position: fixed; top: 50%; margin-top: -1.375rem }
+    .lb-hidden { display: none }
+    @@media (max-width: 640px) {
+        .lb-prev { left: .25rem } .lb-next { right: .25rem }
+        .lb-img { max-height: 74vh }
+    }
+    body.lb-open { overflow: hidden }
+
+    /* Placeholder for an Admin UI shot that still needs capturing - doubles as the shot list */
+    .shot-todo {
+        display: flex; flex-direction: column; gap: .5rem; align-items: flex-start;
+        border: 2px dashed rgb(203 213 225); border-radius: .75rem; padding: 1.5rem;
+        background: repeating-linear-gradient(45deg, transparent, transparent 10px,
+            rgb(148 163 184 / .06) 10px, rgb(148 163 184 / .06) 20px);
+        min-height: 12rem; justify-content: center;
+    }
+    :root.dark .shot-todo { border-color: rgb(51 65 85) }
+</style>
+
+<!-- ───────────────────────── Hero ───────────────────────── -->
+<div class="relative isolate overflow-hidden border-b bg-white dark:bg-slate-950">
+
+    <svg class="absolute inset-0 -z-10 h-full w-full stroke-slate-200 [mask-image:radial-gradient(90%_70%_at_top,white,transparent)] dark:stroke-slate-800/60" aria-hidden="true">
+        <defs>
+            <pattern id="pdf-grid" width="120" height="120" x="50%" y="-1" patternUnits="userSpaceOnUse">
+                <path d="M60 120V.5M.5 .5H120" fill="none" />
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" stroke-width="0" fill="url(#pdf-grid)" />
+    </svg>
+
+    <div class="mx-auto max-w-7xl px-6 pt-16 pb-16 sm:pt-20 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <div class="flex justify-center">
+                <div class="rounded-full px-3 py-1 font-mono text-xs tracking-tight text-slate-600 ring-1 ring-slate-900/10 dark:text-slate-400 dark:ring-white/10">
+                    PDF Studio + Admin UI
+                </div>
+            </div>
+
+            <h1 class="mt-6 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl dark:text-white">
+                <span class="mb-4 block">Describe the PDF.</span>
+                <span class="bg-gradient-to-r from-rose-500 to-orange-500 bg-clip-text text-transparent dark:from-rose-400 dark:to-orange-400">Ship the C# class.</span>
+            </h1>
+
+            <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Design documents in plain English against a live preview, publish them to your App, and render them
+                from strongly-typed C# - no binary templates, no Windows-only report designer, no AI at runtime.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+                <a href="/chat/pdf-studio" class="rounded-md bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-rose-500">
+                    Get Started
+                </a>
+                <a href="/chat" class="text-sm font-semibold leading-6 text-slate-900 transition-colors hover:text-rose-600 dark:text-white dark:hover:text-rose-400">
+                    See AI Chat <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <div class="my-8 mx-auto max-w-lg" data-component="ShellCommand" data-props="{text:'npx add-in chat'}"></div>
+
+        </div>
+
+        <div class="mx-auto mt-14 max-w-6xl overflow-hidden rounded-xl border border-slate-200 shadow-2xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/pdf/designer-overview.webp" alt="PDF Studio: file explorer, typst template, and the live PDF preview" class="h-auto w-full">
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Why typst ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">Built on typst</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            A format the models already know
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            <a href="https://typst.app" class="text-rose-600 hover:underline dark:text-rose-400">typst</a> is a modern
+            typesetting language with a fast Rust compiler and enough public source for LLMs to write it fluently.
+            That combination is what makes "add a payment status badge and highlight overdue rows in red" a workable
+            instruction instead of a wish.
+        </p>
+    </div>
+
+    <div class="mt-14 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Documents as source code</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Plain text you can diff, review in a PR and track in git - not a binary Word file someone edits by hand.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">One fast binary</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                A Rust compiler renders the true PDF in milliseconds. No headless browser that lays out differently on
+                every machine.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">AI writes it well</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Models handle typst fluently, so most documents are a few plain-English prompts rather than a
+                layout project.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Pixel-identical, every time</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                The same template renders one customer or ten thousand, and each PDF comes out the same as the preview.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Design with AI ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">PDF Studio</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Create and edit with text prompts
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Template on the left, the real compiled PDF on the right, re-rendering as you type.
+            </p>
+        </div>
+
+        <ul class="mx-auto mt-10 grid max-w-4xl gap-x-10 gap-y-4 sm:grid-cols-2">
+            <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                <span><strong class="font-semibold text-slate-900 dark:text-white">Rebuild what you already send</strong> -
+                    attach a screenshot or an existing PDF and get a template plus its data model back</span>
+            </li>
+            <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                <span><strong class="font-semibold text-slate-900 dark:text-white">Or start from nothing</strong> -
+                    describe the document and let the model draft it</span>
+            </li>
+            <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                <span><strong class="font-semibold text-slate-900 dark:text-white">Errors heal themselves</strong> -
+                    compile diagnostics are fed back for up to 3 repair passes before you ever see them</span>
+            </li>
+            <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                <span><strong class="font-semibold text-slate-900 dark:text-white">Undo is a button</strong> -
+                    revert cleanly to the pre-prompt state when a change doesn't land</span>
+            </li>
+        </ul>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/edit-with-ai-before.webp" alt="The Edit with AI panel before a prompt" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/edit-with-ai-after.webp" alt="The same template after the prompt was applied" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/toolbar.webp" alt="The formatting toolbar above a template" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/ai-attachment-edit.webp" alt="Attaching a reference image while editing an existing template" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 md:grid-cols-3">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/ai-attachment-new.webp" alt="Attaching a screenshot to build a new template from an existing design" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/page-setup.webp" alt="Page setup for size, orientation and margins" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/font-picker.webp" alt="Choosing fonts and typography" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Data separate from design ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+        <div>
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">Data-driven</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                The layout is the template. The content is JSON.
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Every template has a <code class="font-mono text-sm text-rose-700 dark:text-rose-400">.json</code>
+                sidecar holding its data, and a <code class="font-mono text-sm text-rose-700 dark:text-rose-400">.ui.json</code>
+                JSON Schema describing the shape of it. That separation is what lets your App render the same design
+                with its own data - one customer or ten thousand.
+            </p>
+            <ul class="mt-6 space-y-3">
+                <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                    <span>Edit as raw JSON, or through a form generated from the schema</span>
+                </li>
+                <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                    <span>Labelled fields, date pickers, enum dropdowns, add/remove rows for line items</span>
+                </li>
+                <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                    <span>No schema yet? Generate one from the sample data with a click</span>
+                </li>
+                <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                    <span>Either way the preview re-renders as you edit</span>
+                </li>
+            </ul>
+        </div>
+        <div class="grid gap-6">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/data-form.webp" alt="A template's data edited through a schema-driven form" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/data-code.webp" alt="The same data edited as raw JSON" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-16 grid items-start gap-10 lg:grid-cols-2">
+        <div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">One shared library, every document</h3>
+            <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
+                Brand colours, typography, headers, footers and helpers like
+                <code class="font-mono text-xs text-rose-700 dark:text-rose-400">#money()</code> live in a shared
+                <code class="font-mono text-xs text-rose-700 dark:text-rose-400">lib.typ</code> every template imports.
+                Restyle every document your App produces by editing one file - and
+                <code class="font-mono text-xs text-rose-700 dark:text-rose-400">lib.preview.typ</code> renders every
+                component it defines on one page, so you can see the whole design system update as you change it.
+            </p>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+            <img src="/img/pages/chat/pdf/lib-preview.webp" alt="lib.preview.typ rendering every component the shared library styles" class="h-auto w-full" loading="lazy">
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Code generation ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">Typed, not stringly</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                JSON Schema in, C# classes out
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                The generator turns a template's schema into real classes - so populating a document is
+                <code class="font-mono text-sm text-rose-700 dark:text-rose-400">new Invoice { … }</code> with
+                compile-time checking, not a dictionary of strings and a hope that the keys match.
+            </p>
+        </div>
+
+        <div class="mt-12 grid items-start gap-10 lg:grid-cols-2">
+            <div>
+                <ul class="space-y-3">
+                    <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                        <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <span>A class per type, with <code class="font-mono text-xs">[JsonPropertyName]</code>,
+                            <code class="font-mono text-xs">List&lt;T&gt;</code> and non-nullable members</span>
+                    </li>
+                    <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                        <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <span>Schema types carried through - <code class="font-mono text-xs">multipleOf: 0.01</code>
+                            becomes <code class="font-mono text-xs">decimal</code>,
+                            <code class="font-mono text-xs">format: date</code> becomes
+                            <code class="font-mono text-xs">DateTime</code>, enums become real enums</span>
+                    </li>
+                    <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                        <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <span>Generated locally and instantly - no model call, no network</span>
+                    </li>
+                    <li class="flex gap-3 text-slate-600 dark:text-slate-400">
+                        <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <span>Python, TypeScript and JavaScript from the same schema</span>
+                    </li>
+                </ul>
+
+                <h3 class="mt-8 font-semibold text-slate-900 dark:text-white">Generate the whole set into your project</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Copying from the UI is fine for one model. For all of them, register an AppTask - the same
+                    arrangement as OrmLite Migrations, where writing into your source tree is something you ask for
+                    rather than something a running App does. Hand-edited files are skipped, not clobbered.
+                </p>
+                <div class="mt-4 overflow-hidden rounded-xl bg-slate-900 shadow-xl ring-1 ring-white/10">
+                    <div class="border-b border-white/5 px-4 py-2.5 font-mono text-xs text-slate-500">Configure.Pdf.cs</div>
+                    <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-[13px] leading-6 text-slate-300"><code>services.<span class="text-sky-400">AddPlugin</span>(<span class="text-purple-400">new</span> <span class="text-emerald-300">PdfFeature</span> {
+    PdfCodeGen = <span class="text-purple-400">new</span>() {
+        Namespace  = <span class="text-amber-300">"MyApp.ServiceModel.Pdf"</span>,
+        OutputPath = <span class="text-amber-300">"../MyApp.ServiceModel/Pdf"</span>,
+    }
+});
+
+AppTasks.<span class="text-sky-400">Register</span>(<span class="text-amber-300">"pdf"</span>, _ =&gt;
+    appHost.<span class="text-sky-400">GetPlugin</span>&lt;<span class="text-emerald-300">PdfFeature</span>&gt;().<span class="text-sky-400">GeneratePdfs</span>());</code></pre>
+                    <div class="border-t border-white/5 px-5 py-3 font-mono text-[11px] leading-5 text-slate-400">
+                        $ dotnet run --AppTasks=pdf<br>
+                        <span class="text-emerald-300">generated</span> Invoice.cs<br>
+                        <span class="text-slate-500">unchanged</span> Receipt.cs<br>
+                        <span class="text-amber-300">skipped</span>&nbsp;&nbsp; quote (Quote.cs was edited by hand)
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/generated-types-csharp.webp" alt="C# classes generated from the invoice template's schema" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Admin UI ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+        <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">/admin-ui/pdf</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            Published templates, live in your App
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Publishing copies a template into <code class="font-mono text-sm text-rose-700 dark:text-rose-400">App_Data/pdf</code>
+            where your App can render it. The Admin UI is where you browse what's published, run a template against
+            real data with a live preview, and copy the code to use it.
+        </p>
+    </div>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-2">
+        <figure>
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700">
+                <img src="/img/pages/chat/pdf/admin-gallery.webp" alt="Published PDF template gallery in the Admin UI" class="h-auto w-full" loading="lazy">
+            </div>
+            <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Browse published templates with thumbnail previews, search and sorting.</figcaption>
+        </figure>
+        <figure>
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700">
+                <img src="/img/pages/chat/pdf/admin-workspace.webp" alt="Live PDF workspace with JSON data and a rendered invoice preview" class="h-auto w-full" loading="lazy">
+            </div>
+            <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Test real data and inspect the compiled PDF side by side.</figcaption>
+        </figure>
+    </div>
+
+    <div class="mt-6 grid gap-6 md:grid-cols-3">
+        <figure>
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700">
+                <img src="/img/pages/chat/pdf/admin-tab-form.webp" alt="Schema-generated invoice form with nested fields and collection controls" class="h-auto w-full" loading="lazy">
+            </div>
+            <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Fill schema-generated forms, including nested objects and collections.</figcaption>
+        </figure>
+        <figure>
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700">
+                <img src="/img/pages/chat/pdf/admin-tab-data.webp" alt="Invoice JSON data editor beside the live PDF preview" class="h-auto w-full" loading="lazy">
+            </div>
+            <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Edit the JSON payload directly and render the result.</figcaption>
+        </figure>
+        <figure>
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700">
+                <img src="/img/pages/chat/pdf/admin-tab-code.webp" alt="Generated C# PDF data model with copy controls and rendering examples" class="h-auto w-full" loading="lazy">
+            </div>
+            <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Copy strongly typed models and ready-to-use rendering examples.</figcaption>
+        </figure>
+    </div>
+
+    <div class="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Real PDFs, not previews</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Rendered with pdf.js from the actual compiled output, with zoom, fit, page count and download.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Exercise it with real data</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Paste a payload or fill the form and watch it re-render - a faithful preview of what your App will
+                produce.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Pick up someone else's</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                <strong>Edit</strong> opens it back in PDF Studio, copying the published files into your workspace
+                first if a colleague published it.
+            </p>
+        </div>
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-white">Admin-only</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                The whole Admin UI requires the <code class="font-mono text-xs">Admin</code> role, like the rest of
+                your App's admin surface.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Use it from your App ───────────────────────── -->
+<div class="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">In your App</p>
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Copy the code, ship the feature
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                The <strong>Code</strong> tab generates working examples against the template you're looking at - real
+                type names, real members. Two of them cover most of what Apps need.
+            </p>
+        </div>
+
+        <div class="mt-14 grid items-start gap-6 lg:grid-cols-2">
+            <div>
+                <div class="mb-3 flex items-center gap-2">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </span>
+                    <h3 class="font-semibold text-slate-900 dark:text-white">Return a PDF from an API</h3>
+                </div>
+                <div class="overflow-hidden rounded-xl bg-slate-900 shadow-xl ring-1 ring-white/10">
+                    <div class="flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
+                        <div class="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+                        <div class="h-2.5 w-2.5 rounded-full bg-amber-500"></div>
+                        <div class="h-2.5 w-2.5 rounded-full bg-green-500"></div>
+                        <div class="ml-2 font-mono text-xs text-slate-500">InvoiceServices.cs</div>
+                    </div>
+                    <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-[13px] leading-6 text-slate-300"><code><span class="text-purple-400">public async</span> <span class="text-blue-400">Task</span>&lt;<span class="text-blue-400">object</span>&gt; <span class="text-yellow-300">Get</span>(<span class="text-emerald-300">DownloadInvoice</span> request)
+{
+    <span class="text-purple-400">var</span> order = <span class="text-purple-400">await</span> Db.<span class="text-sky-400">LoadSingleByIdAsync</span>&lt;<span class="text-emerald-300">Order</span>&gt;(request.Id);
+
+    <span class="text-purple-400">return await</span> pdf.<span class="text-sky-400">PdfResultAsync</span>(<span class="text-sky-400">MapToInvoice</span>(order),
+        <span class="text-amber-300">$"Invoice-{order.InvoiceNo}.pdf"</span>);
+}</code></pre>
+                    <div class="border-t border-white/5 px-5 py-3 font-mono text-[11px] leading-5 text-slate-500">
+                        Content-Type: application/pdf<br>
+                        Content-Disposition: attachment; filename="Invoice-INV-2026-042.pdf"
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="mb-3 flex items-center gap-2">
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </span>
+                    <h3 class="font-semibold text-slate-900 dark:text-white">Email it from a background job</h3>
+                </div>
+                <div class="overflow-hidden rounded-xl bg-slate-900 shadow-xl ring-1 ring-white/10">
+                    <div class="flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
+                        <div class="h-2.5 w-2.5 rounded-full bg-red-500"></div>
+                        <div class="h-2.5 w-2.5 rounded-full bg-amber-500"></div>
+                        <div class="h-2.5 w-2.5 rounded-full bg-green-500"></div>
+                        <div class="ml-2 font-mono text-xs text-slate-500">SendInvoiceEmailCommand.cs</div>
+                    </div>
+                    <pre class="!bg-transparent overflow-x-auto px-5 py-4 font-mono text-[13px] leading-6 text-slate-300"><code><span class="text-yellow-300">[Worker(</span><span class="text-amber-300">"smtp"</span><span class="text-yellow-300">)]</span>
+<span class="text-purple-400">public class</span> <span class="text-emerald-300">SendInvoiceEmailCommand</span>(<span class="text-emerald-300">IPdfRenderer</span> pdf, …)
+    : <span class="text-blue-400">AsyncCommand</span>&lt;<span class="text-emerald-300">SendInvoiceEmail</span>&gt;
+{
+    <span class="text-purple-400">protected override async</span> <span class="text-blue-400">Task</span> <span class="text-yellow-300">RunAsync</span>(
+        <span class="text-emerald-300">SendInvoiceEmail</span> request, <span class="text-blue-400">CancellationToken</span> token)
+    {
+        <span class="text-purple-400">var</span> pdfBytes = <span class="text-purple-400">await</span> pdf.<span class="text-sky-400">RenderPdfAsync</span>(
+            <span class="text-sky-400">MapToInvoice</span>(order), token);
+
+        msg.Attachments.<span class="text-sky-400">Add</span>(<span class="text-purple-400">new</span> <span class="text-emerald-300">Attachment</span>(
+            <span class="text-purple-400">new</span> <span class="text-emerald-300">MemoryStream</span>(pdfBytes),
+            <span class="text-amber-300">"invoice.pdf"</span>, MimeTypes.Pdf));
+
+        <span class="text-purple-400">await</span> client.<span class="text-sky-400">SendMailAsync</span>(msg, token);
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            <figure>
+                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700">
+                    <img src="/img/pages/chat/pdf/admin-code-examples.webp" alt="Generated C# PDF API with a strongly typed invoice object initializer and live PDF preview" class="h-auto w-full" loading="lazy">
+                </div>
+                <figcaption class="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">Start with a generated, strongly typed API and map your application data into the PDF model.</figcaption>
+            </figure>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <h3 class="font-semibold text-slate-900 dark:text-white">Production never needs a model</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    Authoring lives in <code class="font-mono text-xs text-rose-700 dark:text-rose-400">ChatFeature</code>;
+                    rendering is <code class="font-mono text-xs text-rose-700 dark:text-rose-400">PdfFeature</code>, and
+                    it stands alone. Design templates on a dev machine and deploy an App that has only the renderer -
+                    no API key, no provider, no designer, nothing to go down.
+                </p>
+                <p class="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                    At runtime your App only ever touches
+                    <code class="font-mono text-xs">App_Data/pdf</code> and
+                    <code class="font-mono text-xs">IPdfRenderer</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Save & export ───────────────────────── -->
+<div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                Render and save as you go
+            </h2>
+            <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                Download the compiled PDF at any point, or save a numbered snapshot -
+                <code class="font-mono text-sm text-rose-700 dark:text-rose-400">invoice-0001.pdf</code>,
+                <code class="font-mono text-sm text-rose-700 dark:text-rose-400">invoice-0002.pdf</code> - straight
+                into the explorer tree, so you have a trail of what the document looked like as it evolved.
+            </p>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2">
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/saved-pdfs.webp" alt="Saved PDF snapshots in the explorer" class="h-auto w-full" loading="lazy">
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200 shadow-lg dark:border-slate-700 dark:bg-white">
+                <img src="/img/pages/chat/pdf/download-pdf.webp" alt="Downloading the compiled PDF" class="h-auto w-full" loading="lazy">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── CTA ───────────────────────── -->
+<div class="border-t border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40">
+    <div class="mx-auto max-w-3xl px-6 text-center lg:px-8">
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+            Put a real PDF in your App
+        </h2>
+        <p class="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Install typst, add the plugin, design a template, and render it from typed C#.
+        </p>
+        <div class="mt-8 flex justify-center">
+            <a href="/ai-chat" class="rounded-md bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-rose-500">
+                Read the Docs
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ───────────────────────── Lightbox ───────────────────────── -->
+<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+    <div class="lb-backdrop" data-lb-dismiss></div>
+    <button type="button" class="lb-btn lb-close" data-lb-dismiss aria-label="Close (Esc)">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <button type="button" class="lb-btn lb-prev" data-lb-prev aria-label="Previous screenshot">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+    </button>
+    <button type="button" class="lb-btn lb-next" data-lb-next aria-label="Next screenshot">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+    </button>
+    <figure class="lb-fig">
+        <img class="lb-img" id="lb-img" src="" alt="">
+        <figcaption class="lb-cap" id="lb-cap"></figcaption>
+        <div class="lb-count" id="lb-count"></div>
+    </figure>
+</div>
+
+<script>
+(function () {
+    var shots = Array.prototype.slice.call(
+        document.querySelectorAll('img[src^="/img/pages/chat/pdf/"]'));
+    if (!shots.length) return;
+
+    var lb = document.getElementById('lightbox'),
+        img = document.getElementById('lb-img'),
+        cap = document.getElementById('lb-cap'),
+        count = document.getElementById('lb-count'),
+        prevBtn = lb.querySelector('[data-lb-prev]'),
+        nextBtn = lb.querySelector('[data-lb-next]'),
+        closeBtn = lb.querySelector('.lb-close'),
+        index = 0, lastFocus = null;
+
+    shots.forEach(function (el, i) {
+        el.classList.add('zoomable');
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('aria-label', 'View larger: ' + (el.alt || 'screenshot'));
+        el.addEventListener('click', function () { open(i); });
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
+        });
+    });
+
+    function show(i) {
+        index = (i + shots.length) % shots.length;
+        var el = shots[index];
+        img.src = el.currentSrc || el.src;
+        img.alt = el.alt || '';
+        cap.textContent = el.alt || '';
+        count.textContent = (index + 1) + ' / ' + shots.length;
+    }
+
+    function open(i) {
+        lastFocus = document.activeElement;
+        show(i);
+        lb.setAttribute('open', '');
+        document.body.classList.add('lb-open');
+        closeBtn.focus();
+    }
+
+    function close() {
+        lb.removeAttribute('open');
+        document.body.classList.remove('lb-open');
+        img.src = '';
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    var single = shots.length < 2;
+    if (single) {
+        prevBtn.classList.add('lb-hidden');
+        nextBtn.classList.add('lb-hidden');
+    }
+
+    Array.prototype.forEach.call(lb.querySelectorAll('[data-lb-dismiss]'), function (el) {
+        el.addEventListener('click', close);
+    });
+    prevBtn.addEventListener('click', function () { show(index - 1); });
+    nextBtn.addEventListener('click', function () { show(index + 1); });
+
+    document.addEventListener('keydown', function (e) {
+        if (!lb.hasAttribute('open')) return;
+        if (e.key === 'Escape') { e.preventDefault(); close(); }
+        else if (e.key === 'ArrowLeft' && !single) { e.preventDefault(); show(index - 1); }
+        else if (e.key === 'ArrowRight' && !single) { e.preventDefault(); show(index + 1); }
+        else if (e.key === 'Tab') {
+            var focusable = Array.prototype.filter.call(
+                lb.querySelectorAll('button'),
+                function (b) { return !b.classList.contains('lb-hidden'); });
+            if (!focusable.length) return;
+            var first = focusable[0], last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+    });
+})();
+</script>
