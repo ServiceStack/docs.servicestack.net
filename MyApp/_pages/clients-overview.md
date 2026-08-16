@@ -317,7 +317,7 @@ ServiceStack also allows for the maximum reuse possible by letting you reuse the
 
 There are multiple C# service clients included, each optimized for their respective formats:
 
-![ServiceStack HTTP Client Architecture](/img/pages/overview/servicestack-httpclients.png) 
+![ServiceStack HTTP Client Architecture](/img/pages/overview/servicestack-httpclients.webp) 
 
 - [JSON Client](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Client/JsonServiceClient.cs)
 - [XML Client](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Client/XmlServiceClient.cs)

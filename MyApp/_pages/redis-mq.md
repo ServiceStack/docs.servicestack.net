@@ -82,7 +82,7 @@ Major kudos goes to Redis which thanks to its versatility, has Pub/Sub and Lists
 
 The logical architecture of how a MQ Publisher and MQ Host works together in ServiceStack:
 
-![ServiceStack MQ Client Architecture](/img/pages/messaging/servicestack-mqclients.png) 
+![ServiceStack MQ Client Architecture](/img/pages/overview/servicestack-mqclients.webp)
 
 ### Easily testable and swappable
 

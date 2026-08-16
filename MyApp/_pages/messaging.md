@@ -99,14 +99,14 @@ By promoting clean (endpoint-ignorant and dependency-free) Service and DTO class
 
 Within MQ Services, Request DTO's get wrapped and sent within the [IMessage](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Messaging/IMessage.cs) body, which looks like:
 
-![ServiceStack MQ Client Architecture](/img/pages/messaging/servicestack-mqclients.png) 
+![ServiceStack MQ Client Architecture](/img/pages/overview/servicestack-mqclients.webp) 
 
 ## MQ Server Architecture
 
 The Server Architecture shows where MQ Hosts (in green) fits within the context of ServiceStack's Request Pipeline.
 Effectively MQ Services are treated as "internal Services" bypassing HTTP Web Services Content Negotiation and Global Request/Response Filters:
 
-![ServiceStack Logical Architecture View](/img/pages/overview/servicestack-logical-view-02.png) 
+![ServiceStack Logical Architecture View](/img/pages/overview/servicestack-logical-view-02.webp) 
 
 MQ Services also have their own distinct `GlobalMessageRequestFilters` and `GlobalMessageResponseFilters` for registering custom logic that only applies to MQ Requests. Plugins like [Validation Feature](/validation#validation-feature) can execute custom behavior for both HTTP and MQ Services by registering it in [both HTTP GlobalRequestFilters and MQ GlobalMessageRequestFilters](https://github.com/ServiceStack/ServiceStack/blob/fc191835d97e5b6d89d3cd7a4742793af44eb8c3/src/ServiceStack/Validation/ValidationFeature.cs#L25-L29), e.g:
 
