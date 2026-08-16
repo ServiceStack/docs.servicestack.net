@@ -3,539 +3,226 @@ slug: why-servicestack
 title: Why ServiceStack
 ---
 
-Developed in the modern age, ServiceStack provides an alternate, cleaner POCO-driven way of creating web services.
+<div class="hide-title"></div>
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="Vae0ALalIP0" style="background-image: url('https://img.youtube.com/vi/Vae0ALalIP0/maxresdefault.jpg')"></lite-youtube>
+<div class="not-prose">
+<why-hero></why-hero>
+</div>
 
-### Features Overview
+ServiceStack is a batteries-included framework for building **typed, message-based APIs** in .NET.
 
-ServiceStack is a simple, fast, versatile and highly-productive full-featured [Web](https://blazor-vue.web-templates.io) and 
-[Web Services](/web-services) Framework that's 
-thoughtfully-architected to [reduce artificial complexity](/autoquery/why-not-odata#why-not-complexity) and promote 
-[remote services best-practices](/advantages-of-message-based-web-services) 
-with a [message-based design](/what-is-a-message-based-web-service) 
-that allows for maximum re-use that can leverage an integrated 
-[Service Gateway](/service-gateway) 
-for the creation of loosely-coupled 
-[Modularized Service](/modularizing-services) Architectures.
-ServiceStack Services are consumable via an array of built-in fast data formats (inc. 
-[JSON](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text), 
-XML,
-[CSV](/csv-format),
-[JSONL](/jsonl-format),
-[JSV](/jsv-format), 
-[ProtoBuf](/protobuf-format) and 
-[MsgPack](/messagepack-format)) 
-as well as XSD/WSDL for [SOAP endpoints](/soap-support) and 
-[Rabbit MQ](/rabbit-mq), 
-[Redis MQ](/redis-mq),
-[Azure Service Bus](/azure-service-bus-mq),
-[Amazon SQS](/aws#sqsmqserver) and
-[Background MQ](/background-mq),
-MQ hosts. 
+Most frameworks give you a way to return JSON from a method. ServiceStack starts one level up: you describe *what the message is*, and everything downstream - the routes, the docs, the validation, the admin UIs, the native clients, the AI tool definitions - is generated from that single description.
 
-Its design and simplicity focus offers an unparalleled suite of productivity features that can be declaratively enabled 
-without code, from creating fully queryable Web API's with just a single Typed Request DTO with
-[Auto Query](/autoquery/) supporting 
-[every major RDBMS](/ormlite/#ormlite-rdbms-providers) 
-to the built-in support for
-[Auto Batched Requests](/auto-batched-requests) 
-or effortlessly enabling rich [HTTP Caching](/http-caching) and
-[Encrypted Messaging](/auth/encrypted-messaging) 
-for all your existing services via [Plugins](/plugins).
+The result is a framework where **adding a capability usually means adding an attribute**, not adding a project.
 
-<img src="/img/pages/svg/servicify.svg" width="100%">
+## One contract, everything else generated
 
-Your same Services also serve as the Controller in ServiceStack's [Smart Razor Views](https://razor.netcore.io/)
-reducing the effort to serve both 
-[Web and Single Page Apps](https://github.com/ServiceStackApps/LiveDemos) as well as 
-[Rich Desktop and Mobile Clients](https://github.com/ServiceStackApps/HelloMobile) that are able to deliver instant interactive 
-experiences using ServiceStack's real-time [Server Events](/server-events).
-
-ServiceStack Services also maximize productivity for consumers providing an 
-[instant end-to-end typed API without code-gen](/csharp-client) enabling
-the most productive development experience for developing .NET to .NET Web Services.
-
-### Benefits
- 
-- **Simplicity** - All features are centered around APIs that accept and return Typed DTOs
-- **Speed** - Built for speed on high-performance components utilizing performance APIs available in each .NET runtime
-- **Web Services Best Practices** - Adopts time-tested SOA Integration Patterns for APIs and client integrations
-- **Message-based Services** - Model-driven, code-first, friction-free development
-- **Native Clients** - Clean, end-to-end typed idiomatic APIs for most major platforms
-- **Modern** - No XML config, IOC built-in, no code-gen, conventional defaults
-- **Smart** - Infers greater intelligence from your strongly typed DTOs
-- **Effortless Features** - Most features enhance your existing DTOs making them trivial to enable
-- **Multi Platform** - Supports .NET 4.5 and .NET Core platforms for hosting on Windows, OSX, Linux
-- **Multiple Hosts** - Run in Web, Console, native Windows/OSX Desktop Apps, Windows Services
-- **Host Agnostic** - Services are decoupled from HTTP and can be hosted in MQ Services
-- **Highly testable** - Typed, idiomatic client APIs enable succinct, intuitive Integration tests
-- **Mature** - Stable with over 10+ years of development 
-- **Preserve Investment** - modern libraries that are [Continuously Improved](/release-notes-history) (not abandoned or replaced)
-- **Dependable** - Commercially supported and actively developed
-- **Increasing Value** - ServiceStack's [ever-growing features](https://servicestack.net/features) adds more capabilities around your Services with each release
-
-
-### Generate Instant Typed APIs from within all Major IDEs!
-
-ServiceStack now [integrates with all Major IDE's](/add-servicestack-reference) used for creating the best native experiences 
-on the most popular platforms to enable a highly productive dev workflow for consuming Web Services, making ServiceStack the ideal 
-back-end choice for powering rich, native iPhone and iPad Apps on iOS with Swift, Mobile and Tablet Apps on the Android platform 
-with Java, OSX Desktop Applications as well as targeting the most popular .NET PCL platforms including Xamarin.iOS, Xamarin.Android, 
-Windows Store, WPF, WinForms and Silverlight: 
-
-[![](./img/pages/servicestack-reference/ide-plugins-splash.png)](https://www.youtube.com/watch?v=JKsgrstNnYY)
-
-#### [JetBrains Rider ServiceStack Plugin](https://www.youtube.com/watch?v=JKsgrstNnYY)
-
-The **ServiceStack** Rider plugin is installable directly from JetBrains Marketplace and enables seamless integration with JetBrains Rider for easily generating C#, TypeScript, F# and VB.NET Typed APIs from just a remote ServiceStack Base URL.
-
-#### [VS.NET integration with ServiceStackVS](/create-your-first-webservice#step-1-download-and-install-servicestackvs)
-
-Providing instant Native Typed API's for 
-[C#](/csharp-add-servicestack-reference), 
-[TypeScript](/typescript-add-servicestack-reference),
-[F#](/fsharp-add-servicestack-reference) and 
-[VB.NET](/vbnet-add-servicestack-reference) 
-directly in Visual Studio for the 
-[most popular .NET platforms](https://github.com/ServiceStackApps/HelloMobile) including iOS and Android using 
-[Xamarin.iOS](https://github.com/ServiceStackApps/HelloMobile#xamarinios-client) and 
-[Xamarin.Android](https://github.com/ServiceStackApps/HelloMobile#xamarinandroid-client) on Windows.
-
-#### [Xamarin Studio integration with ServiceStackXS](/csharp-add-servicestack-reference.html#xamarin-studio)
-
-Providing [C# Native Types](/csharp-add-servicestack-reference) 
-support for developing iOS and Android mobile Apps using 
-[Xamarin.iOS](https://github.com/ServiceStackApps/HelloMobile#xamarinios-client) and 
-[Xamarin.Android](https://github.com/ServiceStackApps/HelloMobile#xamarinandroid-client) with 
-[Xamarin Studio](https://www.xamarin.com/studio) on OSX. The **ServiceStackXS** plugin also provides a rich web service 
-development experience developing Client applications with 
-[Mono Develop on Linux](/csharp-add-servicestack-reference.html#xamarin-studio-for-linux)
-
-#### [Android Studio integration with ServiceStack Plugin](/java-add-servicestack-reference)
-
-Providing [an instant Native Typed API in Java](/java-add-servicestack-reference) 
-and [Kotlin](/kotlin-add-servicestack-reference)
-including idiomatic Java Generic Service Clients supporting Sync and Async Requests by leveraging Android's AsyncTasks to enable the creation of services-rich and responsive native Java or Kotlin Mobile Apps on the Android platform - directly from within Android Studio!
-
-#### [JetBrains IDEs integration with ServiceStack IDEA plugin](/java-add-servicestack-reference.html#install-servicestack-idea-from-the-plugin-repository)
-
-The ServiceStack IDEA plugin is installable directly from IntelliJ's Plugin repository and enables seamless integration with IntelliJ Java Maven projects for generating a Typed API to quickly and effortlessly consume remote ServiceStack Web Services from pure cross-platform Java or Kotlin Clients.
-
-#### [Eclipse integration with ServiceStackEclipse](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/ServiceStackEclipse#eclipse-integration-with-servicestack)
-
-The unmatched productivity offered by [Java Add ServiceStack Reference](/java-add-servicestack-reference) is also available in the 
-[ServiceStackEclipse IDE Plugin](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/ServiceStackEclipse#eclipse-integration-with-servicestack) that's installable 
-from the [Eclipse MarketPlace](https://marketplace.eclipse.org/content/servicestackeclipse) to provide deep integration of Add ServiceStack Reference with Eclipse Java Maven Projects
-enabling Java Developers to effortlessly Add and Update the references of their evolving remote ServiceStack Web Services.
-
-#### [Simple command-line utilities for ServiceStack](/add-servicestack-reference.html#simple-command-line-utilities)
-
-In addition to our growing list of supported IDE's, the [x dotnet tool](/dotnet-tool) allows VS Code and other cross-platform IDEs, build servers, shell scripts and other automated tasks to easily Add and Update ServiceStack References with a single command.
-
-#### [Invoke ServiceStack APIs from the command-line](/post-command)
-
-Easily inspect and invoke C# .NET Web APIs from the command-line with Post Command which allows you to both inspect and
-call any ServiceStack API with just its name and a JS Object literal. API Responses returned in human-friendly markdown tables by default or 
-optionally as JSON & raw HTTP.
-
-## Simple Customer Database REST Services Example
-
-This example is also available as a [stand-alone integration test](https://github.com/ServiceStack/ServiceStack/blob/master/tests/ServiceStack.WebHost.Endpoints.Tests/CustomerRestExample.cs):
+Here is a complete, working, queryable, secured API:
 
 ```csharp
-//Web Service Host Configuration
-public class AppHost : AppSelfHostBase
+[ValidateIsAuthenticated]
+[Description("Find bookings matching the specified criteria")]
+public class QueryBookings : QueryDb<Booking>
 {
-    public AppHost() 
-        : base("Customer REST Example", typeof(CustomerService).Assembly) {}
-
-    public override void Configure(Container container)
-    {
-        //Register which RDBMS provider to use
-        container.Register<IDbConnectionFactory>(c => 
-            new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
-
-        using (var db = container.Resolve<IDbConnectionFactory>().Open())
-        {
-            //Create the Customer POCO table if it doesn't already exist
-            db.CreateTableIfNotExists<Customer>();
-        }
-    }
+    public int[] Ids { get; set; }
 }
-
-//Web Service DTOs
-[Route("/customers", "GET")]
-public class GetCustomers : IReturn<GetCustomersResponse> {}
-
-public class GetCustomersResponse
-{
-    public List<Customer> Results { get; set; } 
-}
-
-[Route("/customers/{Id}", "GET")]
-public class GetCustomer : IReturn<Customer>
-{
-    public int Id { get; set; }
-}
-
-[Route("/customers", "POST")]
-public class CreateCustomer : IReturn<Customer>
-{
-    public string Name { get; set; }
-}
-
-[Route("/customers/{Id}", "PUT")]
-public class UpdateCustomer : IReturn<Customer>
-{
-    public int Id { get; set; }
-
-    public string Name { get; set; }
-}
-
-[Route("/customers/{Id}", "DELETE")]
-public class DeleteCustomer : IReturnVoid
-{
-    public int Id { get; set; }
-}
-
-// POCO DB Model
-public class Customer
-{
-    [AutoIncrement]
-    public int Id { get; set; }
-
-    public string Name { get; set; }
-}
-
-//Web Services Implementation
-public class CustomerService : Service
-{
-    public object Get(GetCustomers request)
-    {
-        return new GetCustomersResponse { Results = Db.Select<Customer>() };
-    }
-
-    public object Get(GetCustomer request)
-    {
-        return Db.SingleById<Customer>(request.Id);
-    }
-
-    public object Post(CreateCustomer request)
-    {
-        var customer = new Customer { Name = request.Name };
-        Db.Save(customer);
-        return customer;
-    }
-
-    public object Put(UpdateCustomer request)
-    {
-        var customer = Db.SingleById<Customer>(request.Id);
-        if (customer == null)
-            throw HttpError.NotFound($"Customer '{request.Id}' does not exist");
-
-        customer.Name = request.Name;
-        Db.Update(customer);
-
-        return customer;
-    }
-
-    public void Delete(DeleteCustomer request)
-    {
-        Db.DeleteById<Customer>(request.Id);
-    }
-}
-
 ```
 
-### [Calling the above REST Service from any C#/.NET Client](/csharp-add-servicestack-reference)
+That single Request DTO gives you a REST API with filtering, paging and sorting, an executable API Explorer UI, a portable JSON Schema, an entry in your OpenAPI spec, a Locode CRUD App, an AI-callable tool and native typed clients in **15 languages** - with no Service implementation, no controller, no DTO mapping and no SDK project.
 
-No code-gen required, can re-use above Server DTOs:
+<div class="not-prose my-8">
+<img src="/img/pages/svg/servicify.svg" width="100%" alt="One Service, many consumers">
+</div>
 
-```csharp
-var client = new JsonApiClient(BaseUri);
+<div class="not-prose">
+<core-pillars></core-pillars>
+</div>
 
-//GET /customers
-var all = client.Get(new GetCustomers());                         // Count = 0
+## Write the contract. Skip the rest.
 
-//POST /customers
-var customer = client.Post(new CreateCustomer { Name = "Foo" });
+The clearest way to see the value is to compare what you write against what you'd otherwise have to write - and keep writing, for every platform, forever.
 
-//GET /customer/1
-customer = client.Get(new GetCustomer { Id = customer.Id });      // Name = Foo
+<div class="not-prose">
+<one-dto-compare></one-dto-compare>
+</div>
 
-//GET /customers
-all = client.Get(new GetCustomers());                             // Count = 1
+## Rich UIs your APIs get for free
 
-//PUT /customers/1
-customer = client.Put(
-    new UpdateCustomer { Id = customer.Id, Name = "Bar" });       // Name = Bar
+Every ServiceStack App ships with capable, authorized management UIs that are **generated from your APIs at runtime**. There is nothing to install, no separate admin project to maintain, and no drift between your API and the tools used to operate it.
 
-//DELETE /customers/1
-client.Delete(new DeleteCustomer { Id = customer.Id });
-
-//GET /customers
-all = client.Get(new GetCustomers());                             // Count = 0
-```
-
-Same code also works with [Android, iOS, Xamarin.Forms, UWP and WPF clients](https://github.com/ServiceStackApps/HelloMobile).
+<div class="not-prose">
+<built-in-uis></built-in-uis>
+</div>
 
 ::: info
-[F#](/fsharp-add-servicestack-reference) and 
-[VB.NET](/vbnet-add-servicestack-reference) can re-use same 
-[.NET Service Clients](/csharp-client) and DTOs
+All Admin UIs respect your App's existing authentication and authorization - users only see the screens and actions their roles allow.
 :::
 
-### [Calling from TypeScript](/typescript-add-servicestack-reference.html#ideal-typed-message-based-api)
+## Typed clients in 15 languages
 
-```ts
-const client = new JsonServiceClient(baseUrl);
-const { results } = await client.get(new GetCustomers());
-```
+[Add ServiceStack Reference](/add-servicestack-reference) reads the metadata your App already publishes and generates a **single native source file** of DTOs for the target language, paired with an idiomatic Service Client that understands the contract: response types, routes, HTTP methods, authentication, structured errors, validation failures and AutoQuery conventions.
 
-### [Calling from Swift](/swift-add-servicestack-reference.html#jsonserviceclientswift)
+<div class="not-prose my-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">.NET</div>
+    <div class="mt-2 font-semibold text-slate-900 dark:text-white">C# · F# · VB.NET</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Web &amp; Scripting</div>
+    <div class="mt-2 font-semibold text-slate-900 dark:text-white">TypeScript · JavaScript · Python · PHP · Ruby</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Mobile</div>
+    <div class="mt-2 font-semibold text-slate-900 dark:text-white">Swift · Java · Kotlin · Dart</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Cloud &amp; Systems</div>
+    <div class="mt-2 font-semibold text-slate-900 dark:text-white">Go · Rust · Zig</div>
+  </div>
+</div>
 
-```swift
-let client = JsonServiceClient(baseUrl: BaseUri)
+Two commands in any language - add the client, then generate the DTOs:
 
-client.getAsync(GetCustomers())
-    .then {
-        let results = $0.results;
-    }
-```
+<div class="not-prose my-8">
+<dto-quick-start selected="typescript" url="https://vue-spa.web-templates.io"></dto-quick-start>
+</div>
 
-### [Calling from Java](/java-add-servicestack-reference.html#jsonserviceclient-usage)
+Re-run the same command whenever your API changes. New fields appear in the generated DTOs; removed or renamed members become **compile errors in the consuming App** instead of runtime surprises in production.
 
-```java
-JsonServiceClient client = new JsonServiceClient(BaseUri);
+::: tip
+This is the opposite of the SDK treadmill. There's no per-platform SDK repo to version, publish and document - the contract *is* the SDK.
+:::
 
-GetCustomersResponse response = client.get(new GetCustomers());
-List<Customer> results = response.results; 
-```
+## AI-native, without an AI backend
 
-### [Calling from Kotlin](/kotlin-add-servicestack-reference.html#jsonserviceclient-usage)
+The metadata that generates typed clients also describes your APIs well enough for a model to use them. So instead of building a parallel "AI API" with its own auth, its own schemas and its own risk profile, ServiceStack lets AI call the APIs you already have - **as the signed-in user, through the same pipeline as every other client**.
 
-```kotlin
-val client = JsonServiceClient(BaseUri)
+<div class="not-prose">
+<ai-journey></ai-journey>
+</div>
 
-val response = client.get(GetCustomers())
-val results = response.results
-```
+Because approval forms are generated from the same schema that powers API Explorer, users can **inspect and correct** what a model is about to submit before anything is written. And since it's your normal request pipeline, your authorization, validation, filters and business logic all still apply - a model cannot do anything the current user couldn't do themselves.
 
-### Calling the from [Dart](/dart-add-servicestack-reference#example-usage)
+<div class="not-prose my-8 grid gap-4 sm:grid-cols-3">
+  <a href="/chat/overview" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+    <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">AI Chat</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">A complete multi-provider AI App at <code>/chat</code> using your App's existing users, database and security boundary.</p>
+  </a>
+  <a href="/chat/mcp" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+    <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">MCP Server</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Expose the same approved APIs to external AI Assistants over the Model Context Protocol.</p>
+  </a>
+  <a href="/chat/pdf-studio" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+    <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">PDF Studio</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Design documents with AI, publish immutable revisions, then render production PDFs with no LLM at runtime.</p>
+  </a>
+</div>
 
-```dart
-var client = new JsonServiceClient(baseUri);
-var response = await client.get(new GetCustomers());
-```
+## Host it your way
 
-### [Calling from jQuery using TypeScript Definitions](/typescript-add-servicestack-reference.html#typescript-interface-definitions)
+ServiceStack Services are decoupled from HTTP, from any UI technology and from any single host. The same implementation can serve a website, a mobile App, a queue consumer and a gRPC endpoint.
 
-```js
-$.getJSON($.ss.createUrl("/customers", request), request, 
-    function (r: dtos.GetCustomersResponse) {
-    	alert(r.Results.length == 1);
-    });
-```
+<div class="not-prose">
+<deploy-anywhere></deploy-anywhere>
+</div>
 
-### Calling from jQuery
+## Why message-based APIs
 
-```js
-$.getJSON(baseUri + "/customers", function(r) {
-	alert(r.Results.length == 1);
-});
-```
+ServiceStack's design follows [Martin Fowler's Data Transfer Object pattern](https://martinfowler.com/eaaCatalog/dataTransferObject.html): when a call crosses a process boundary, send *one well-defined message* rather than many fine-grained calls.
 
-That's all the application code required to create and consume a simple database-enabled REST Web Service!
+This isn't stylistic. A remote call is the most expensive thing in general-purpose computing, and an interface that hides that cost behind method signatures encourages exactly the wrong shape of system.
 
+<div class="not-prose my-8 grid gap-4 md:grid-cols-2">
+  <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-slate-500 dark:text-slate-400">RPC-style</div>
+    <ul class="mt-3 space-y-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+      <li>A new method for every way a client wants to ask</li>
+      <li>Adding a parameter is a breaking change</li>
+      <li>N chatty round-trips where one would do</li>
+      <li>Can't be cached, queued, batched or deferred</li>
+      <li>Client-shaped APIs that outlive the client</li>
+    </ul>
+  </div>
+  <div class="rounded-2xl border border-indigo-200 bg-indigo-50/70 p-6 dark:border-indigo-800 dark:bg-indigo-950/40">
+    <div class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Message-based</div>
+    <ul class="mt-3 space-y-2 text-sm leading-6 text-slate-700 dark:text-slate-200">
+      <li>One coarse-grained message serves many use cases</li>
+      <li>Adding a field is additive and backwards-compatible</li>
+      <li>Any combination fulfilled in a single call</li>
+      <li>Cacheable, queueable, batchable, proxyable</li>
+      <li>Service-shaped APIs that outlive their consumers</li>
+    </ul>
+  </div>
+</div>
 
-### Define web services following Martin Fowlers Data Transfer Object Pattern
+Because the message is a plain POCO with no framework artifacts in it, the *same type* is your server contract, your client contract, your validation schema, your documentation, your UI definition and your AI tool definition. That's the entire trick - and it's why enabling a new capability so often costs one attribute instead of one project.
 
-ServiceStack was heavily influenced by [**Martin Fowlers Data Transfer Object Pattern**](http://martinfowler.com/eaaCatalog/dataTransferObject):
+Read the long-form argument in [Advantages of message-based Web Services](/advantages-of-message-based-web-services) and [Why remote services use DTOs](/why-remote-services-use-dtos).
 
->When you're working with a remote interface, such as Remote Facade (388), each call to it is expensive. 
->As a result you need to reduce the number of calls, and that means that you need to transfer more data 
->with each call. One way to do this is to use lots of parameters. 
->However, this is often awkward to program - indeed, it's often impossible with languages such as Java 
->that return only a single value.
->
->The solution is to create a Data Transfer Object that can hold all the data for the call. It needs 
-to be serializable to go across the connection. 
->Usually an assembler is used on the server side to transfer data between the DTO and any domain objects.
+## Everything in the box
 
-The Request- and Response DTO's used to define web services in ServiceStack are standard POCO's while 
-the implementation just needs to inherit from a testable and dependency-free `IService` marker interface. 
-As a bonus for keeping your DTO's in a separate dependency-free .dll, you're able to re-use them in 
-your C#/.NET clients providing a strongly-typed API without any code-gen what-so-ever. Also your DTO's 
-*define everything* ServiceStack does not pollute your web services with any additional custom 
-artifacts or markup.
+<div class="not-prose">
+<feature-explorer></feature-explorer>
+</div>
 
-### Multiple Clients
+## What this means in practice
 
-Our generic Service clients covers the most popular Mobile, Desktop and Server platforms with first-class implementations for Xamarin, Android, Java and TypeScript which now includes:
+<div class="not-prose my-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Less code to maintain</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Admin screens, SDKs, docs and API clients are generated from the contract instead of hand-written and left to drift.</p>
+  </div>
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Fewer moving parts</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Auth, jobs, caching, messaging, logging and analytics ship together and are designed to work together.</p>
+  </div>
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Genuinely testable</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Services are dependency-free classes and typed clients make integration tests read like unit tests.</p>
+  </div>
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Fast by default</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Built on high-performance serializers and data access, on the fastest APIs each .NET runtime offers.</p>
+  </div>
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Investment preserved</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Libraries are <a href="/release-notes-history" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">continuously improved</a> across 20+ years - not abandoned and replaced.</p>
+  </div>
+  <div class="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <div class="font-bold text-slate-900 dark:text-white">Commercially supported</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Actively developed with paid support, and <a href="https://servicestack.net/free" class="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">free for individuals &amp; OSS</a>.</p>
+  </div>
+</div>
 
- - [.NET Service Clients](/csharp-client)
-    - C# / VB.NET / F#
-    - .NET Core 2.1+
-    - .NET Framework 4.5+
-    - Blazor WASM
-    - Xamarin.iOS
-    - Xamarin.Android
-    - UWP
-    - Silverlight
- - [TypeScript Service Client](/typescript-add-servicestack-reference#typescript-serviceclient)
-    - Web
-    - Node.js Server
-    - React Native
-        - iOS
-        - Android
- - [Python Service Client](/python-add-servicestack-reference)
- - [Dart](/dart-add-servicestack-reference)
-   - Flutter
-        - iOS
-        - Android
-   - Web / Angular.dart
- - [Java Service Client](/java-add-servicestack-reference#jsonserviceclient-api)
-    - Android
-    - JVM 1.7+ (Java, Kotlin, Scala, etc)
-        - Java Clients
-        - Java Servers
- - [Kotlin Service Client](/kotlin-add-servicestack-reference)
- - [Swift Service Client](/swift-add-servicestack-reference#swift-client-usage)
-    - iOS
-    - OSX
-    - [Swift Package Manager Apps](https://github.com/ServiceStackApps/swift-techstacks-console)
- - [JavaScript (jQuery)](/ss-utils-js)
-   - Web
- - [MQ Clients](/messaging#mq-client-architecture)
-   - Background MQ
-   - Rabbit MQ
-   - Redis MQ
-   - Amazon SQS
-   - Azure Service Bus
+## Start in 60 seconds
 
-### Multiple pluggable Formats
+<div class="not-prose my-8 grid gap-4 md:grid-cols-3">
+  <a href="https://servicestack.net/start" class="group rounded-2xl border border-indigo-200 bg-indigo-50/60 p-6 transition hover:-translate-y-0.5 hover:shadow-md dark:border-indigo-800 dark:bg-indigo-950/40">
+    <div class="text-2xl">🚀</div>
+    <div class="mt-3 font-bold text-slate-900 dark:text-white">Create a project</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-300">Pick a template and download a ready-to-run App - Blazor, Vue, React, MVC, API-only and more.</p>
+    <div class="mt-3 text-sm font-semibold text-indigo-600 group-hover:translate-x-1 dark:text-indigo-400">servicestack.net/start →</div>
+  </a>
+  <a href="/create-your-first-webservice" class="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+    <div class="text-2xl">📘</div>
+    <div class="mt-3 font-bold text-slate-900 dark:text-white">Build your first API</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-300">A guided walkthrough from empty project to a working, documented, typed API.</p>
+    <div class="mt-3 text-sm font-semibold text-indigo-600 group-hover:translate-x-1 dark:text-indigo-400">Get started →</div>
+  </a>
+  <a href="/releases/v10_01" class="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+    <div class="text-2xl">✨</div>
+    <div class="mt-3 font-bold text-slate-900 dark:text-white">See what's new</div>
+    <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-300">15 typed languages, AI Chat, API Tools, API Schemas and PDF Studio in the latest release.</p>
+    <div class="mt-3 text-sm font-semibold text-indigo-600 group-hover:translate-x-1 dark:text-indigo-400">v10.1 release notes →</div>
+  </a>
+</div>
 
-ServiceStack re-uses the custom artifacts above and with zero-config and without imposing any extra 
-burden on the developer adds discoverability and provides hosting of your web service on a number 
-of different formats, including: 
- 
- - [JSON]/json-format)
- - XML
- - [JSV](/jsv-format)
- - [CSV](/csv-format)
- - [MsgPack](/messagepack-format)
- - [ProtoBuf](/protobuf-format)
- - [gRPC](/grpc/)
- - [SOAP 1.1/1.2](/soap-support)
- - HTML
-   - [Auto HTML API](/auto-html-api)
-   - [Blazor](https://blazor-vue.web-templates.io)
-   - [Razor](https://razor.netcore.io/)
-   - [Sharp Pages](https://sharpscript.net/docs/script-pages)
-   - [Markdown Razor](/markdown-razor)
+<div class="not-prose mx-auto my-10 w-full max-w-3xl overflow-hidden rounded-xl border border-slate-200 shadow-2xl dark:border-slate-700">
+  <lite-youtube class="block w-full aspect-video" videoid="Vae0ALalIP0"
+                style="max-width: none; background-image: url('https://img.youtube.com/vi/Vae0ALalIP0/maxresdefault.jpg')">
+  </lite-youtube>
+</div>
 
-### Multiple Endpoints
-
-Whilst ServiceStack is fundamentally a premier HTTP Framework, its Services can also be consumed from new [gRPC](/grpc/) as well as legacy [SOAP 1.1 and 1.2](/soap-support) endpoints as well as a number of [MQ Servers](/messaging):
-
-  - [Background MQ Service](/background-mq)
-  - [Rabbit MQ Server](/rabbit-mq)
-  - [Redis MQ Server](/redis-mq)
-  - [Amazon SQS MQ Server](/amazon-sqs-mq)
-  - [Azure Service Bus MQ](/azure-service-bus-mq)
-
-### Multiple Hosting Options
-
-In addition to supporting multiple formats and endpoints, ServiceStack can also be hosted within a multitude of different hosting options:
-
-#### Windows, OSX or Linux
-- **.NET 10+**
-  - [ASP .NET Identity Auth Templates](https://servicestack.net/start)
-  - [ServiceStack Auth Templates](https://servicestack.net/start-auth#projects)
-
- - **.NET Core 2.1+**
-   - [Web App or SelfHost](https://github.com/NetCoreApps/LiveDemos#servicestack-net-core-live-demos)
-   - [Worker Service](/messaging#worker-service-templates)
-
-#### Windows
- - **.NET Framework 4.7.2+**
-   - [ASP.NET Core 2.1 LTS](/templates/corefx)
-   - [Classic ASP.NET System.Web](https://github.com/ServiceStackApps/LiveDemos#live-servicestack-demos)
-   - [Stand-alone, Self-Hosted HttpListener](/self-hosting)
-   - [Stand-alone Windows Service](/templates/windows-service)
-   - [Hosted inside WinForms with Chromium Embedded Framework](https://github.com/ServiceStack/ServiceStack.Gap#winforms-with-chromium-embedded-framework)
-   - [Windows and Azure Service Fabric](https://github.com/ServiceStackApps/HelloServiceFabric)
-
-#### OSX
- - [Hosted inside Mac OSX Cocoa App with Xamarin.Mac](https://github.com/ServiceStack/ServiceStack.Gap#mac-osx-cocoa-app-with-xmarainmac)
-
-### Target Multiple platforms
-
-With multi-targeted projects creating both .NET Framework and .NET Standard builds you can optionally run your same ServiceStack App on multiple platforms as seen with the [Hello Mobile Shared Gateway](/releases/v5_0_0#run-aspnet-core-apps-on-the-net-framework) project where its same shared [ServiceStack Server.Common project](https://github.com/ServiceStackApps/HelloMobile#servicestack-server-app) is used to host the same App running on:
-
- - [Server.NetCore](https://github.com/ServiceStackApps/HelloMobile/tree/master/src/Server.NetCore) - hosting the ServiceStack Services in a **ASP.NET Core 2.1 App**
- - [Server.NetCoreFx](https://github.com/ServiceStackApps/HelloMobile/tree/master/src/Server.NetCoreFx) - hosting in a **ASP.NET Core App** on the **.NET Framework**
- - [Server.AspNet](https://github.com/ServiceStackApps/HelloMobile/tree/master/src/Server.AspNet) - hosting classic **ASP.NET Framework** Web Applications
- - [Server.HttpListener](https://github.com/ServiceStackApps/HelloMobile/tree/master/src/Server.HttpListener) - host in a .NET Framework Self-Hosting **HttpListener** AppHost
-
-### VS.NET Templates
-
-There's a [VS.NET Template](/templates/) for creating solutions targeting most of the above platforms.
-
-E.g. the [React Desktop Apps](https://github.com/ServiceStackApps/ReactDesktopApps) VS.NET Template provides an easy and integrated way to host a Single Page React App on multiple platforms.
-
-## Goals of Service Design
-
-The primary benefits of Services are that they offer the highest level of software re-use, they're [Real Computers all the way down](https://mythz.servicestack.net/#messaging) retaining the ability to represent anything. Especially at this level, encapsulation and its external interactions are paramount which sees the [Service Layer as its most important Contract](http://stackoverflow.com/a/15369736/85785), constantly evolving to support new capabilities whilst serving and outliving its many consumers. 
-
-Extra special attention should be given to Service design with the primary goals of exposing its capabilities behind [consistent and self-describing](/why-servicestack#goals-of-service-design), intent-based [tell-dont-ask](https://pragprog.com/articles/tell-dont-ask) APIs. 
-
-A Services ability to encapsulate complexity is what empowers consumers to be able to perform higher-level tasks like provisioning a cluster of AWS servers or being able to send a tweet to millions of followers in seconds with just a simple HTTP request, i.e. being able to re-use existing hardened functionality without the required effort, resources and infrastructure to facilitate the request yourself. To maximize accessibility it's recommended for Service Interfaces to be orientated around resources and verbs, retain a flat structure, customizable with key value pairs so they're accessible via the built-in QueryString 
-and FormData support present in all HTTP clients, from HTML Forms to command-line utilities like [curl](https://curl.haxx.se).
-
-### WCF the anti-DTO Web Services Framework
-
-Unfortunately this best-practices convention is effectively discouraged by Microsoft's WCF SOAP Web Services framework as they encourage you to develop API-specific RPC method calls by mandating the use of method signatures to define your web services API. This results in less re-usable, more client-specific APIs that encourages more remote method calls. 
-
-Unhappy with this perceived anti-pattern in WCF, ServiceStack was born providing a Web Service framework that embraces best-practices for calling remote services, using config-free, convention-based DTO's.
-
-### Encourages development of message-style, re-usable and batch-full web services
-
-Entire POCO types are used to define the request- and response DTO's to promote the creation well-defined coarse-grained web services. Message-based interfaces are best-practices when dealing with out-of-process calls as they can batch more work using less network calls and are ultimately more re-usable as the same operation can be called using different calling semantics. This is in stark contrast to WCF's Operation or Service contracts which encourage RPC-style, application-specific web services by using method signatures to define each operation.
-
-As it stands in general-purpose computing today, there is nothing more expensive you can do than a remote network call. Although easier for the newbie developer, by using _methods_ to define web service operations, WCF is promoting bad-practices by encouraging them to design and treat web-service calls like normal function calls even though they are millions of times slower. Especially at the app-server tier, nothing hurts performance and scalability of your client and server than multiple dependent and synchronous web service calls.
-
-Batch-full, message-based web services are ideally suited in development of SOA services as they result in fewer, richer and more re-usable web services that need to be maintained. RPC-style services normally manifest themselves from a *client perspective* that is the result of the requirements of a single applications data access scenario. Single applications come and go over time while your data and services are poised to hang around for the longer term. Ideally you want to think about the definition of your web service from a *services and data perspective* and how you can expose your data so it is more re-usable by a number of your clients.
-
-## Difference between an RPC-chatty and message-based API
-
-```csharp
-public interface IWcfCustomerService
-{
-    Customer GetCustomerById(int id);
-    List<Customer> GetCustomerByIds(int[] id);
-    Customer GetCustomerByUserName(string userName);
-    List<Customer> GetCustomerByUserNames(string[] userNames);
-    Customer GetCustomerByEmail(string email);
-    List<Customer> GetCustomerByEmails(string[] emails);
-}
-```
-
-### contrast with an equivalent message based service:
-
-```csharp
-public class Customers : IReturn<List<Customer>> 
-{
-   public int[] Ids { get; set; }
-   public string[] UserNames { get; set; }
-   public string[] Emails { get; set; }
-}
-```
-
-**Any combination of the above can be fulfilled by 1 remote call, by the same single web service - i.e what ServiceStack encourages!**
-
-Fewer and more batch-full services require less maintenance and promote the development of more re-usable and efficient services. 
-In addition, message APIs are much more resilient to changes as you're able to safely add more functionality or return more data without breaking or needing to re-gen existing clients. Message-based APIs also lend them better for cached, asynchronous, deferred, proxied and reliable execution with the use of brokers and proxies.
-
-Comparatively there is almost no win for a remote RPC API, except to maybe [hide a remote service even exists](https://en.wikipedia.org/wiki/Fallacies_of_Distributed_Computing) by making a remote call look like a method call even though they're millions of times slower, leading new developers to develop inefficient, brittle systems from the start. 
+::: info
+Questions? Join the community on [Discord](https://servicestack.net/discord), ask on [GitHub Discussions](https://servicestack.net/ask) or browse the [Live Demos](https://github.com/NetCoreApps/LiveDemos).
+:::
