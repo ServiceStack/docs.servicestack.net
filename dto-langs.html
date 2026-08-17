@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-17T05:10:23.3766857Z'>
+    <meta name='date' content='2026-08-17T05:10:22.9499843Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>gRPC Server Events</title>
+    <title>dto-langs.md</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -695,7 +695,7 @@ mount('#header', Header)
                                 </h2>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
-                                    <a href="/server-events" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/server-events" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Overview
                                     </a>
                                 </li>
@@ -720,7 +720,7 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/server-events-grpc" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                    <a href="/server-events-grpc" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         gRPC Clients
                                     </a>
                                 </li>
@@ -1473,162 +1473,151 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            gRPC Server Events
+                            dto-langs.md
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><h2 id="server-stream-grpc-services">Server Stream gRPC Services<a class="header-anchor" href="javascript:;" onclick="location.hash='#server-stream-grpc-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>In addition to standard Services which gRPC Refers to as <strong>Unary RPC</strong>, i.e. where clients sends a single request to the server and
-gets a single response back. Another very useful communication style supported by gRPC is <strong>Server streaming</strong>:</p>
-<div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>the client sends a request to the server and gets a stream to read a sequence of messages back. The client reads from the returned stream
-until there are no more messages. gRPC guarantees message ordering within an individual RPC call</p>
-</div>
-<h3 id="streamserverevents">StreamServerEvents<a class="header-anchor" href="javascript:;" onclick="location.hash='#streamserverevents'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>This communication channel is especially useful in <a href="/server-events">Server Events</a> which operates in a similar style with clients connecting to
-a long-lived HTTP connection that streams back &quot;real-time Events&quot; over the light and efficient
-<a href="https://www.html5rocks.com/en/tutorials/eventsource/basics/">SSE</a> standard natively supported in modern browsers.</p>
-<p>Although as HTTP Requests are not normally used for maintaining long-lived connections they're susceptible to issues like buffering
-from App Servers, middleware and proxies and require implementing a bespoke health-check and auto-reconnect solution in order to maintain
-interrupted service.</p>
-<p>As a first class supported communication channel clients can instead leverage gRPC's library infrastructure which is perfectly suited for
-streaming real-time Server Events over an efficient persistent HTTP/2 channel that's available from the <code>StreamServerEvents</code> gRPC Service:</p>
-<pre><code class="language-proto">rpc ServerStreamServerEvents(StreamServerEvents) returns (stream StreamServerEventsResponse) {}
+                <div class="content"><h3 id="c-productive-end-to-end-typed-apis-for.net">C# - Productive End-to-end typed APIs for .NET<a class="header-anchor" href="javascript:;" onclick="location.hash='#c-productive-end-to-end-typed-apis-for.net'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>JsonApiClient</code> in <a href="https://nuget.org/packages/ServiceStack.Client">ServiceStack.Client</a> consumes the same DTOs your API is defined with - except consumers generate them from the <strong>deployed API</strong> instead of taking a binary dependency on it, so client and server teams can ship on their own release schedules:</p>
+<pre><code class="language-csharp">var api = await client.ApiAsync(new Hello { Name = &quot;World&quot; });
+if (api.Succeeded)
+    Console.WriteLine(api.Response.Result);
 </code></pre>
-<p>Which gives all <code>protoc</code> supported languages a Typed Client for consuming your <a href="/server-events">Server Events</a>.</p>
-<h3 id="grpcserviceclient-streams">GrpcServiceClient Streams<a class="header-anchor" href="javascript:;" onclick="location.hash='#grpcserviceclient-streams'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>When using the generic <code>GrpcServiceClient</code> you're able to take advantage of C#'s 8 new <code>await foreach</code> syntax sugar for consuming gRPC Server Streams.</p>
-<p>Its usage is analogous to all Server Events clients where your initial connection contains the channels you want to subscribe to receive notifications
-from, e.g:</p>
-<pre><code class="language-csharp">var stream = client.StreamAsync(new StreamServerEvents {
-    Channels = new[] { &quot;todos&quot; }
+<p><code>Api</code>/<code>ApiAsync</code> return an <code>ApiResult&lt;T&gt;</code> so success and structured validation errors are handled as values instead of exceptions - the pattern Blazor, MAUI, WPF, WinForms and console Apps use to bind server errors directly to their UI. Everything else in the .NET clients comes along too: authentication, typed AutoQuery, batched and one-way requests, file uploads and Service Gateway support, covered in the <a href="/csharp-add-servicestack-reference">C# Add ServiceStack Reference docs</a>.</p>
+<h3 id="f-typed-contracts-for-functional.net">F# - Typed contracts for functional .NET<a class="header-anchor" href="javascript:;" onclick="location.hash='#f-typed-contracts-for-functional.net'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>F# gets the same first-class .NET clients, with DTOs generated into a single namespace that's immediately usable from projects, <code>dotnet fsi</code> scripts and <a href="/jupyter-notebooks-fsharp">Jupyter notebooks</a>:</p>
+<pre><code class="language-fsharp">let client = JsonApiClient(baseUrl)
+
+let response = client.Send(Hello(Name = &quot;World&quot;))
+printfn $&quot;{response.Result}&quot;
+</code></pre>
+<p>That combination suits the teams F# tends to live in - quantitative, data and integration work where a short script needs to call a production API with real types rather than parse JSON by hand. Typed AutoQuery, authentication, structured errors and file uploads all work exactly as they do in C#, as described in the <a href="/fsharp-add-servicestack-reference">F# Add ServiceStack Reference docs</a>.</p>
+<h3 id="vb.net-modern-typed-apis-for-long-lived-business-apps">VB.NET - Modern typed APIs for long-lived business Apps<a class="header-anchor" href="javascript:;" onclick="location.hash='#vb.net-modern-typed-apis-for-long-lived-business-apps'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Plenty of organizations still run substantial VB.NET line-of-business software that has to keep talking to new services. Adding a reference gives those Apps the same generated DTOs and full .NET client - no rewrite, no hand-rolled HTTP layer:</p>
+<pre><code class="language-vbnet">Dim client = New JsonApiClient(baseUrl)
+
+Dim response = Await client.SendAsync(New Hello With {.Name = &quot;World&quot;})
+Console.WriteLine(response.Result)
+</code></pre>
+<p>Both async and blocking APIs are available, so it fits event-driven desktop code as naturally as it does batch jobs and scheduled integrations. See the <a href="/vbnet-add-servicestack-reference">VB.NET Add ServiceStack Reference docs</a> for the generated type conventions.</p>
+<h3 id="typescript-the-contract-your-web-app-builds-against">TypeScript - The contract your web App builds against<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-the-contract-your-web-app-builds-against'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://www.npmjs.com/package/@servicestack/client">@servicestack/client</a> <code>JsonServiceClient</code> turns your API into part of the frontend's type system - completion for every request, response and enum, in Vue, React, Angular, Svelte, Node and Deno alike:</p>
+<pre><code class="language-ts">const api = await client.api(new Hello({ name: 'World' }))
+console.log(api.response.result)
+</code></pre>
+<p>Because the DTOs are regenerated from the running API, a removed field or renamed enum surfaces as a <strong>TypeScript compile error in CI</strong> - the earliest and cheapest place for a frontend team to find out the backend changed. Includes structured <code>ResponseStatus</code> errors ready to bind to form validation, authentication, typed AutoQuery, batch and one-way requests and file uploads, detailed in the <a href="/typescript-add-servicestack-reference">TypeScript Add ServiceStack Reference docs</a>.</p>
+<h3 id="javascript-typed-apis-without-a-build-step">JavaScript - Typed APIs without a build step<a class="header-anchor" href="javascript:;" onclick="location.hash='#javascript-typed-apis-without-a-build-step'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Generated ES module DTOs are annotated with JSDoc types, so plain JavaScript gets the same editor intelli-sense TypeScript does - and they can be imported straight from a running API, with no bundler, transpiler or toolchain involved:</p>
+<pre><code class="language-js">import { JsonServiceClient } from '@servicestack/client'
+import { Hello } from 'https://example.org/types/mjs'
+
+const client = new JsonServiceClient('https://example.org')
+const api = await client.api(new Hello({ name: 'World' }))
+</code></pre>
+<p>Ideal for the code that isn't a SPA: server-rendered Razor and MVC pages, admin screens, embedded widgets, internal dashboards and quick Node scripts - anywhere adding a build pipeline would cost more than the feature. The <a href="/javascript-add-servicestack-reference">JavaScript Add ServiceStack Reference docs</a> also cover saving annotated DTOs locally for static analysis.</p>
+<h3 id="python-typed-apis-for-data-scripting-and-automation">Python - Typed APIs for data, scripting and automation<a class="header-anchor" href="javascript:;" onclick="location.hash='#python-typed-apis-for-data-scripting-and-automation'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://pypi.org/project/servicestack/">servicestack</a> package generates dataclass DTOs that follow PEP 8 naming, so they read like Python rather than translated C#, and populate in a single constructor expression:</p>
+<pre><code class="language-python">client = JsonServiceClient(base_url)
+
+response: HelloResponse = client.send(Hello(name=&quot;World&quot;))
+print(response.result)
+</code></pre>
+<p>That makes it a natural fit for the parts of an organization that live outside the App - data and analytics notebooks, ETL and ML pipelines, DevOps automation and internal tooling - all calling the same authenticated business APIs the product uses, with type hints driving completion in PyCharm and VS Code. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads are covered in the <a href="/python-add-servicestack-reference">Python Add ServiceStack Reference docs</a>.</p>
+<h3 id="php-typed-apis-for-the-webs-most-deployed-stack">PHP - Typed APIs for the web's most deployed stack<a class="header-anchor" href="javascript:;" onclick="location.hash='#php-typed-apis-for-the-webs-most-deployed-stack'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://packagist.org/packages/servicestack/client">servicestack/client</a> Composer package generates DTOs using PHP 8's promoted constructors and typed properties, so requests are populated with named arguments and checked by static analysis:</p>
+<pre><code class="language-php">$client = new JsonServiceClient($baseUrl);
+
+/** @var HelloResponse $response */
+$response = $client-&gt;send(new Hello(name: &quot;World&quot;));
+echo $response-&gt;result;
+</code></pre>
+<p>For organizations with an established PHP presence - Laravel and Symfony Apps, CMS and intranet sites, hosting and billing portals - it's the shortest path to consuming a .NET backend without either side changing platforms. Includes structured errors with field validation details, authentication, typed AutoQuery, batch and one-way requests and file uploads, documented in the <a href="/php-add-servicestack-reference">PHP Add ServiceStack Reference docs</a>.</p>
+<h3 id="ruby-servicestack-productivity-in-a-dynamic-language">Ruby - ServiceStack productivity in a dynamic language<a class="header-anchor" href="javascript:;" onclick="location.hash='#ruby-servicestack-productivity-in-a-dynamic-language'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://rubygems.org/gems/servicestack">servicestack</a> gem provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:</p>
+<pre><code class="language-ruby">client = ServiceStack::JsonServiceClient.new(base_url)
+
+response = client.send(Hello.new(name: 'World'))
+puts response.result
+</code></pre>
+<p>Implemented with Ruby's standard library and no external runtime dependencies. Includes structured <code>WebServiceException</code> errors, field validation details, authentication, typed AutoQuery conventions, batch calls, one-way requests, custom URLs and file uploads - each documented in the <a href="/ruby-add-servicestack-reference">Ruby Add ServiceStack Reference docs</a>.</p>
+<h3 id="swift-native-async-first-apis-for-apple-platforms">Swift - Native, async-first APIs for Apple platforms<a class="header-anchor" href="javascript:;" onclick="location.hash='#swift-native-async-first-apis-for-apple-platforms'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Added with Swift Package Manager, <a href="https://github.com/ServiceStack/ServiceStack.Swift">ServiceStack.Swift</a> generates <code>Codable</code> DTOs whose request types declare the response they return, letting the client infer the entire call under <code>async/await</code>:</p>
+<pre><code class="language-swift">let client = JsonServiceClient(baseUrl: baseUrl)
+
+let response = try await client.getAsync(Hello(name: &quot;World&quot;))
+print(response.result)
+</code></pre>
+<p>For iOS, iPadOS and macOS teams this replaces the usual <code>URLSession</code> plumbing and hand-written response structs with a contract that Xcode understands - so a backend change shows up as a Swift compile error rather than a nil field in a shipped App. Structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads are covered in the <a href="/swift-add-servicestack-reference">Swift Add ServiceStack Reference docs</a>.</p>
+<h3 id="java-typed-apis-for-android-and-the-jvm">Java - Typed APIs for Android and the JVM<a class="header-anchor" href="javascript:;" onclick="location.hash='#java-typed-apis-for-android-and-the-jvm'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>net.servicestack:client</code> package adds a <code>JsonServiceClient</code> closely modelled on ServiceStack's .NET clients, with generated DTOs using fluent setters that chain into a single expression:</p>
+<pre><code class="language-java">JsonServiceClient client = new JsonServiceClient(baseUrl);
+
+HelloResponse response = client.get(new Hello().setName(&quot;World&quot;));
+System.out.println(response.getResult());
+</code></pre>
+<p>Java remains the backbone of both Android and large enterprise back offices, and the same generated file serves each: Android Apps get async variants that marshal results back to the UI thread, whilst server-side integrations get a typed client for calling business APIs from existing JVM services. IntelliJ IDEA, Android Studio and Eclipse can add and refresh references directly from the IDE - see the <a href="/java-add-servicestack-reference">Java Add ServiceStack Reference docs</a>.</p>
+<h3 id="kotlin-concise-null-safe-clients-for-android-and-jvm-services">Kotlin - Concise, null-safe clients for Android and JVM services<a class="header-anchor" href="javascript:;" onclick="location.hash='#kotlin-concise-null-safe-clients-for-android-and-jvm-services'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Kotlin uses the same JVM client with DTOs generated as idiomatic Kotlin classes, keeping calls terse whilst nullability stays explicit in the type system:</p>
+<pre><code class="language-kotlin">val client = JsonServiceClient(baseUrl)
+
+val response = client.get(Hello().apply { Name = &quot;World&quot; })
+println(response.Result)
+</code></pre>
+<p>As the default language for new Android development, it's typically where an organization's mobile client meets the same backend its web App uses - with async APIs for background calls, structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads. Both Android Studio and IntelliJ can update the reference in place, as described in the <a href="/kotlin-add-servicestack-reference">Kotlin Add ServiceStack Reference docs</a>.</p>
+<h3 id="dart-one-typed-client-for-every-flutter-target">Dart - One typed client for every Flutter target<a class="header-anchor" href="javascript:;" onclick="location.hash='#dart-one-typed-client-for-every-flutter-target'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://pub.dev/packages/servicestack">servicestack</a> package generates DTOs and a <code>JsonServiceClient</code> that works unchanged across every platform Flutter builds for - iOS, Android, web, desktop and server-side Dart:</p>
+<pre><code class="language-dart">var client = JsonServiceClient(baseUrl);
+
+var response = await client.get(Hello(name: 'World'));
+print(response.result);
+</code></pre>
+<p>That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with <code>dart:io</code> and <code>dart:html</code> implementations sharing the same <code>IServiceClient</code> interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads are covered in the <a href="/dart-add-servicestack-reference">Dart Add ServiceStack Reference docs</a>.</p>
+<h3 id="go-simple-typed-apis-for-cloud-software">Go - Simple, typed APIs for cloud software<a class="header-anchor" href="javascript:;" onclick="location.hash='#go-simple-typed-apis-for-cloud-software'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The new <a href="https://github.com/ServiceStack/servicestack-go">servicestack-go</a> client preserves everything that makes Go appealing: simplicity, fast builds and straightforward deployment. Generated Request DTOs carry their response type and HTTP method, allowing Go's generic client to infer the complete API call:</p>
+<pre><code class="language-go">res, err := ss.Send(client, dtos.Hello{Name: &quot;World&quot;})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(res.Result)
+</code></pre>
+<p>Built on Go's standard library with <strong>no external runtime dependencies</strong>. Provides <code>context.Context</code> variants for cancellation and deadlines, structured <code>ResponseStatus</code> errors, field validation errors, typed AutoQuery responses, multipart uploads, batched and one-way requests, and authentication using Basic Auth, API Keys, JWTs, refresh tokens or session cookies - all covered in the <a href="/go-add-servicestack-reference">Go Add ServiceStack Reference docs</a>.</p>
+<h3 id="rust-correctness-from-the-wire-to-application-code">Rust - Correctness from the wire to application code<a class="header-anchor" href="javascript:;" onclick="location.hash='#rust-correctness-from-the-wire-to-application-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://crates.io/crates/servicestack">servicestack</a> crate brings Rust's priorities to API integration. Generated DTOs implement the traits that associate each request with its response, route and HTTP method:</p>
+<pre><code class="language-rust">let response = client.send(&amp;Hello {
+    name: &quot;World&quot;.to_string(),
+}).await?;
+
+println!(&quot;{}&quot;, response.result);
+</code></pre>
+<p>The async client is the default, with an optional blocking client. Supports structured errors, authentication with automatic token refresh, typed AutoQuery, multipart uploads, batch and one-way calls, and access to the underlying <code>reqwest</code> configuration when finer control is needed.</p>
+<p>Most importantly, changes at the API boundary become <strong>ordinary Rust compiler feedback</strong> - no scattering <code>serde_json::Value</code> through business logic. See the <a href="/rust-add-servicestack-reference">Rust Add ServiceStack Reference docs</a> for the complete client API.</p>
+<h3 id="zig-explicit-efficient-apis-for-systems-software">Zig - Explicit, efficient APIs for systems software<a class="header-anchor" href="javascript:;" onclick="location.hash='#zig-explicit-efficient-apis-for-systems-software'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><a href="https://github.com/ServiceStack/servicestack-zig">servicestack-zig</a> uses Zig's standard library with no third-party dependencies, infers the response type at compile time and makes ownership explicit:</p>
+<pre><code class="language-zig">var client = try ss.JsonServiceClient.init(allocator, base_url);
+defer client.deinit();
+
+var response = try client.send(dtos.Hello{
+    .name = &quot;World&quot;,
 });
+defer response.deinit();
 </code></pre>
-<p>Then you can use <code>await foreach</code> to consume an endless stream of Server Events. Use <code>Selector</code> to identify the type of Server Event
-whilst the complex-type body of each event message can be parsed from its JSON body, e.g:</p>
-<pre><code class="language-csharp">await foreach (var msg in stream)
-{
-    if (msg.Selector.StartsWith(&quot;todos.&quot;)) //custom todos.* events
-    {
-        var obj = JSON.parse(msg.Json); //body of message in JSON
-        if (obj is Dictionary&lt;string, object&gt; map)
-        {
-            //todos.create + todos.update properties
-            var id = map[&quot;id&quot;];
-            var title = map[&quot;title&quot;];
-            $&quot;EVENT {msg.Selector} [{msg.Channel}]: #{id} {title}&quot;.Print(); 
-        }
-        else
-        {
-            //todos.delete id
-            $&quot;EVENT {msg.Selector} [{msg.Channel}]: {obj}&quot;.Print();
-        }
-    }
-    else
-    {
-        // general server events, e.g cmd.onConnect, cmd.onJoin, cmd.onLeave
-        $&quot;EVENT {msg.Selector} [{msg.Channel}]: #{msg.UserId} {msg.DisplayName}&quot;.Print();
-    }
-}
-</code></pre>
-<p>If connected whilst running the <a href="https://todoworld.servicestack.net/#user-content-c-local-development-grpc-ssl-crud-example">TodoWorld CRUD Example</a>
-this stream will output something similar to:</p>
-<pre><code>EVENT cmd.onConnect []: #-1 user1
-EVENT cmd.onJoin [todos]: #-1 user1
-EVENT todos.create [todos]: #1 ServiceStack
-EVENT todos.update [todos]: #1 gRPC
-EVENT todos.delete [todos]: 1
-</code></pre>
-<h3 id="protoc-dart-streams">protoc Dart Streams<a class="header-anchor" href="javascript:;" onclick="location.hash='#protoc-dart-streams'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Other <code>protoc</code> languages will require using their own language constructs for consuming gRPC Streams,
-here's the <a href="https://todoworld.servicestack.net/#dart">example for Dart</a> that also has a pleasant API for consuming Server Streams:</p>
-<pre><code class="language-dart">var stream = client.serverStreamServerEvents(StreamServerEvents()..channels.add('todos'));
-await for (var r in stream) {
-    var obj = jsonDecode(r.json);
-    if (r.selector.startsWith('todos')) {
-        if (obj is Map) {
-            print('EVENT ${r.selector} [${r.channel}]: #${obj['id']} ${obj['title']}');
-        } else {
-            print('EVENT ${r.selector} [${r.channel}]: ${obj}');
-        }
-    } else {
-        print('EVENT ${r.selector} ${r.channels}: #${obj['userId']} ${obj['displayName']}');
-    }
-}
-</code></pre>
+<p>The caller supplies the allocator and owns the parsed response lifecycle, whilst the client still provides structured errors, validation details, authentication, session cookies, typed AutoQuery, batch and one-way requests, custom URLs and multipart uploads. Allocation and ownership conventions are explained in the <a href="/zig-add-servicestack-reference">Zig Add ServiceStack Reference docs</a>.</p>
 </div>
 
                 <div class="not-prose"></div>
                 
                     <div class="not-prose py-8">
-                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/server-events-grpc.md" target="_blank" rel="noopener noreferrer">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/dto-langs.md" target="_blank" rel="noopener noreferrer">
                             Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
                         </a>
                     </div>
 
                     <div class="not-prose my-20">
-                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
-                                    <div class="-mt-px flex w-0 flex-1">
-                                            <a href="/commonjs-add-servicestack-reference" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                <!-- Heroicon name: mini/arrow-long-left -->
-                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
-                                                </svg>
-                                                ES3 Common.js Add Reference
-                                            </a>
-                                    </div>
-                                    <div class="hidden md:-mt-px md:flex"></div>
-                                    <div class="-mt-px flex w-0 flex-1 justify-end">
-                                            <a href="/csharp-server-events-client" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
-                                                C# Client
-                                                <!-- Heroicon name: mini/arrow-long-right -->
-                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
-                                                </svg>
-                                            </a>
-                                    </div>
-                                </nav>
                     </div>
             </div>
                 
-                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
-                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
-                        <div>
-                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
-                                On This Page
-                            </h5>
-                            <ul class="text-slate-700 text-sm leading-6">
-                                    <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#server-stream-grpc-services'" data-id="server-stream-grpc-services" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Server Stream gRPC Services
-                                        </span>
-                                            <ul class="ml-4">
-                                                    <li data-id="streamserverevents" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#streamserverevents'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            StreamServerEvents
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="grpcserviceclient-streams" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#grpcserviceclient-streams'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            GrpcServiceClient Streams
-                                                        </span>
-                                                    </li>
-                                                    <li data-id="protoc-dart-streams" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#protoc-dart-streams'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
-                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            protoc Dart Streams
-                                                        </span>
-                                                    </li>
-                                            </ul>
-                                    </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
                 
         </div>
     </div>    

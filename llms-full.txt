@@ -23134,7 +23134,21 @@ The primary and most popular [Add ServiceStack Reference](/add-servicestack-refe
 
 Our goal with Native Types is to provide an alternative for sharing DTO dlls, that can enable a better dev workflow for external clients who are now able to generate (and update) Typed APIs for your Services from a remote url - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
 
-C# Xamarin.Android Example in VS.NET
+### C# - Productive End-to-end typed APIs for .NET
+
+The `JsonApiClient` in [ServiceStack.Client](https://nuget.org/packages/ServiceStack.Client) consumes the same DTOs your API is defined with - except consumers generate them from the **deployed API** instead of taking a binary dependency on it, so client and server teams can ship on their own release schedules:
+
+```csharp
+var api = await client.ApiAsync(new Hello { Name = "World" });
+if (api.Succeeded)
+{
+    Console.WriteLine(api.Response.Result);
+}
+```
+
+`Api`/`ApiAsync` return an `ApiResult<T>` so success and structured validation errors are handled as values instead of exceptions - the pattern Blazor, MAUI, WPF, WinForms and console Apps use to bind server errors directly to their UI. Everything else in the .NET clients comes along too: authentication, typed AutoQuery, batched and one-way requests, file uploads and Service Gateway support.
+
+### C# Xamarin.Android Example in VS.NET
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="cbYuem1b2tg" style="background-image: url('https://img.youtube.com/vi/cbYuem1b2tg/maxresdefault.jpg')"></lite-youtube>
 
@@ -23648,6 +23662,17 @@ Source: https://docs.servicestack.net/typescript-add-servicestack-reference
 ![ServiceStack and TypeScript Banner](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simple way to give clients typed access to your ServiceStack Services.
+
+### TypeScript - The contract your web App builds against
+
+The [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) `JsonServiceClient` turns your API into part of the frontend's type system - completion for every request, response and enum, in Vue, React, Angular, Svelte, Node and Deno alike:
+
+```ts
+const api = await client.api(new Hello({ name: 'World' }))
+console.log(api.response.result)
+```
+
+Because the DTOs are regenerated from the running API, a removed field or renamed enum surfaces as a **TypeScript compile error in CI** - the earliest and cheapest place for a frontend team to find out the backend changed. Includes structured `ResponseStatus` errors ready to bind to form validation, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ## Install
 
@@ -24734,6 +24759,20 @@ Source: https://docs.servicestack.net/javascript-add-servicestack-reference
 
 In addition to [TypeScript](/typescript-add-servicestack-reference) support for generating typed Data Transfer Objects (DTOs), JavaScript is now supported in the form of [JSDoc](https://jsdoc.app) annotated typed ES6 classes that can be referenced natively from [JavaScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
 
+### JavaScript - Typed APIs without a build step
+
+Generated ES module DTOs are annotated with JSDoc types, so plain JavaScript gets the same editor intelli-sense TypeScript does - and they can be imported straight from a running API, with no bundler, transpiler or toolchain involved:
+
+```js
+import { JsonServiceClient } from '@servicestack/client'
+import { Hello } from 'https://example.org/types/mjs'
+
+const client = new JsonServiceClient('https://example.org')
+const api = await client.api(new Hello({ name: 'World' }))
+```
+
+Ideal for the code that isn't a SPA: server-rendered Razor and MVC pages, admin screens, embedded widgets, internal dashboards and quick Node scripts - anywhere adding a build pipeline would cost more than the feature - whilst annotating DTOs locally for static analysis.
+
 ### Reference directly in JavaScript Modules
 
 Unlike TypeScript, the JavaScript ES6 class DTOs can be referenced directly in a browser as-is, removing the need to keep your DTOs in sync with extra tooling by direct referencing them in a JavaScript Module:
@@ -25017,6 +25056,19 @@ Source: https://docs.servicestack.net/python-add-servicestack-reference
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PyCharm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="WjbhfH45i5k" style="background-image: url('https://img.youtube.com/vi/WjbhfH45i5k/maxresdefault.jpg')"></lite-youtube>
+
+### Python - Typed APIs for data, scripting and automation
+
+The [servicestack](https://pypi.org/project/servicestack/) package generates dataclass DTOs that follow PEP 8 naming, so they read like Python rather than translated C#, and populate in a single constructor expression:
+
+```python
+client = JsonServiceClient(base_url)
+
+response: HelloResponse = client.send(Hello(name="World"))
+print(response.result)
+```
+
+That makes it a natural fit for the parts of an organization that live outside the App - data and analytics notebooks, ETL and ML pipelines, DevOps automation and internal tooling - all calling the same authenticated business APIs the product uses, with type hints driving completion in PyCharm and VS Code. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ### First class development experience
 
@@ -25973,6 +26025,20 @@ ServiceStack's **Add ServiceStack Reference** feature allows clients to generate
 <div class="flex justify-center">
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
 </div>
+
+### PHP - Typed APIs for the web's most deployed stack
+
+The [servicestack/client](https://packagist.org/packages/servicestack/client) Composer package generates DTOs using PHP 8's promoted constructors and typed properties, so requests are populated with named arguments and checked by static analysis:
+
+```php
+$client = new JsonServiceClient($baseUrl);
+
+/** @var HelloResponse $response */
+$response = $client->send(new Hello(name: "World"));
+echo $response->result;
+```
+
+For organizations with an established PHP presence - Laravel and Symfony Apps, CMS and intranet sites, hosting and billing portals - it's the shortest path to consuming a .NET backend without either side changing platforms. Includes structured errors with field validation details, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ### First class development experience
 
@@ -27094,10 +27160,21 @@ Source: https://docs.servicestack.net/swift-add-servicestack-reference
 
 ![Swift iOS, XCode and macOS Banner](/img/pages/servicestack-reference/swift-logo-banner.jpg)
 
-## Swift
+### Swift - Native, async-first APIs for Apple platforms
 
 ServiceStack's **Add ServiceStack Reference** feature lets iOS/macOS developers easily generate an native 
 typed Swift API for your ServiceStack Services using the `x` dotnet command-line tool.
+
+Added with Swift Package Manager, [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) generates `Codable` DTOs whose request types declare the response they return, letting the client infer the entire call under `async/await`:
+
+```swift
+let client = JsonServiceClient(baseUrl: baseUrl)
+
+let response = try await client.getAsync(Hello(name: "World"))
+print(response.result)
+```
+
+For iOS, iPadOS and macOS teams this replaces the usual `URLSession` plumbing and hand-written response structs with a contract that Xcode understands - so a backend change shows up as a Swift compile error rather than a nil field in a shipped App. Structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads.
 
 ## Simple command-line utils for ServiceStack
 
@@ -28140,6 +28217,19 @@ Source: https://docs.servicestack.net/java-add-servicestack-reference
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/android-studio-splash.png)
 
+### Java - Typed APIs for Android and the JVM
+
+The `net.servicestack:client` package adds a `JsonServiceClient` closely modelled on ServiceStack's .NET clients, with generated DTOs using fluent setters that chain into a single expression:
+
+```java
+JsonServiceClient client = new JsonServiceClient(baseUrl);
+
+HelloResponse response = client.get(new Hello().setName("World"));
+System.out.println(response.getResult());
+```
+
+Java remains the backbone of both Android and large enterprise back offices, and the same generated file serves each: Android Apps get async variants that marshal results back to the UI thread, whilst server-side integrations get a typed client for calling business APIs from existing JVM services. IntelliJ IDEA, Android Studio and Eclipse can add and refresh references directly from the IDE.
+
 ## [ServiceStack IDEA Android Studio Plugin](https://plugins.jetbrains.com/plugin/7749?pr=androidstudio)
 
 Like the existing IDE integrations before it, the ServiceStack IDEA plugin provides Add ServiceStack Reference functionality to [Android Studio - the official Android IDE](https://developer.android.com/sdk/index.html). 
@@ -29067,6 +29157,18 @@ support for Kotlin with IDE integration in
 [Android Studio](http://developer.android.com/tools/studio/index.html) and 
 [IntelliJ IDEA](https://www.jetbrains.com/idea/) where App Devlopers can create and update an end-to-end typed 
 API with just a Menu Item click - enabling a highly-productive workflow for consuming ServiceStack Services.
+
+### Kotlin - Concise, null-safe clients for Android and JVM services
+
+Kotlin uses the same JVM client with DTOs generated as idiomatic Kotlin classes, keeping calls terse whilst nullability stays explicit in the type system:
+
+```kotlin
+val client = JsonServiceClient(baseUrl)
+
+val response = client.get(Hello().apply { Name = "World" })
+println(response.Result)
+```
+As the default language for new Android development, it's typically where an organization's mobile client meets the same backend its web App uses - with async APIs for background calls, structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads. Both Android Studio and IntelliJ can update the reference in place.
 
 ## Kotlin Android Example using Android Studio
 
@@ -30044,6 +30146,19 @@ Source: https://docs.servicestack.net/dart-add-servicestack-reference
 ![Dart Banner](/img/pages/dart/dart.png)
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [@servicestack/cli command-line utility](https://github.com/ServiceStack/servicestack-cli#servicestackcli) - providing a simple way to give clients typed access to your ServiceStack Services.
+
+### Dart - One typed client for every Flutter target
+
+The [servicestack](https://pub.dev/packages/servicestack) package generates DTOs and a `JsonServiceClient` that works unchanged across every platform Flutter builds for - iOS, Android, web, desktop and server-side Dart:
+
+```dart
+var client = JsonServiceClient(baseUrl);
+
+var response = await client.get(Hello(name: 'World'));
+print(response.result);
+```
+
+That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with `dart:io` and `dart:html` implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ## Dart Android Example using Android Studio
 
@@ -31077,6 +31192,20 @@ Source: https://docs.servicestack.net/go-add-servicestack-reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.
 
+### Go - Simple, typed APIs for cloud software
+
+The new [servicestack-go](https://github.com/ServiceStack/servicestack-go) client preserves everything that makes Go appealing: simplicity, fast builds and straightforward deployment. Generated Request DTOs carry their response type and HTTP method, allowing Go's generic client to infer the complete API call:
+
+```go
+res, err := ss.Send(client, dtos.Hello{Name: "World"})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(res.Result)
+```
+
+Built on Go's standard library with **no external runtime dependencies**. Provides `context.Context` variants for cancellation and deadlines, structured `ResponseStatus` errors, field validation errors, typed AutoQuery responses, multipart uploads, batched and one-way requests, and authentication using Basic Auth, API Keys, JWTs, refresh tokens or session cookies.
+
 ### First class development experience
 
 [Go](https://go.dev) has become the language of choice for cloud infrastructure, CLI tooling and high-throughput network services thanks to its fast compile times, first-class concurrency and single-binary deployments. To maximize the experience for calling ServiceStack APIs from these environments, Go is supported as a 1st class Add ServiceStack Reference language which gives Go developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.
@@ -31616,6 +31745,22 @@ Whilst the generic `[EmitCode]` attribute lets you emit the same code in multipl
 Source: https://docs.servicestack.net/rust-add-servicestack-reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Rust - providing a simple way to give Rust clients typed access to your ServiceStack Services.
+
+### Rust - Correctness from the wire to application code
+
+The [servicestack](https://crates.io/crates/servicestack) crate brings Rust's priorities to API integration. Generated DTOs implement the traits that associate each request with its response, route and HTTP method:
+
+```rust
+let response = client.send(&Hello {
+    name: "World".to_string(),
+}).await?;
+
+println!("{}", response.result);
+```
+
+The async client is the default, with an optional blocking client. Supports structured errors, authentication with automatic token refresh, typed AutoQuery, multipart uploads, batch and one-way calls, and access to the underlying `reqwest` configuration when finer control is needed.
+
+Most importantly, changes at the API boundary become **ordinary Rust compiler feedback** - no scattering `serde_json::Value` through business logic.
 
 ### First class development experience
 
@@ -32180,6 +32325,19 @@ Whilst the generic `[EmitCode]` attribute lets you emit the same code in multipl
 Source: https://docs.servicestack.net/ruby-add-servicestack-reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.
+
+### Ruby - ServiceStack productivity in a dynamic language
+
+The [servicestack](https://rubygems.org/gems/servicestack) gem provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:
+
+```ruby
+client = ServiceStack::JsonServiceClient.new(base_url)
+
+response = client.send(Hello.new(name: 'World'))
+puts response.result
+```
+
+Implemented with Ruby's standard library and no external runtime dependencies. Includes structured `WebServiceException` errors, field validation details, authentication, typed AutoQuery conventions, batch calls, one-way requests, custom URLs and file uploads.
 
 ### First class development experience
 
@@ -32911,6 +33069,22 @@ Source: https://docs.servicestack.net/zig-add-servicestack-reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Zig - providing a simple way to give Zig clients typed access to your ServiceStack Services.
 
+### Zig - Explicit, efficient APIs for systems software
+
+[servicestack-zig](https://github.com/ServiceStack/servicestack-zig) uses Zig's standard library with no third-party dependencies, infers the response type at compile time and makes ownership explicit:
+
+```zig
+var client = try ss.JsonServiceClient.init(allocator, base_url);
+defer client.deinit();
+
+var response = try client.send(dtos.Hello{
+    .name = "World",
+});
+defer response.deinit();
+```
+
+The caller supplies the allocator and owns the parsed response lifecycle, whilst the client still provides structured errors, validation details, authentication, session cookies, typed AutoQuery, batch and one-way requests, custom URLs and multipart uploads.
+
 ### First class development experience
 
 [Zig](https://ziglang.org) is a fast-growing systems language offering a simpler alternative to C with compile-time metaprogramming, explicit allocators and no hidden control flow, which sees it increasingly used for performance-critical services, embedded software and cross-compilation toolchains. To maximize the experience for calling ServiceStack APIs from these environments, Zig is supported as a 1st class Add ServiceStack Reference language which gives Zig developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.
@@ -33436,7 +33610,20 @@ Source: https://docs.servicestack.net/fsharp-add-servicestack-reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simpler, cleaner and more versatile alternative to WCF's Add Service Reference feature that's built into VS.NET.
 
-The article outlines ServiceStack's support generating F# DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now F# clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback. 
+The article outlines ServiceStack's support generating F# DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now F# clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
+
+### F# - Typed contracts for functional .NET
+
+F# gets the same first-class .NET clients, with DTOs generated into a single namespace that's immediately usable from projects, `dotnet fsi` scripts and [Jupyter notebooks](/jupyter-notebooks-fsharp):
+
+```fsharp
+let client = JsonApiClient(baseUrl)
+
+let response = client.Send(Hello(Name = "World"))
+printfn $"{response.Result}"
+```
+
+That combination suits the teams F# tends to live in - quantitative, data and integration work where a short script needs to call a production API with real types rather than parse JSON by hand. Typed AutoQuery, authentication, structured errors and file uploads all work exactly as they do in C#.
 
 ## [Add ServiceStack Reference](/add-servicestack-reference)
 
@@ -33700,6 +33887,19 @@ Source: https://docs.servicestack.net/vbnet-add-servicestack-reference
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simpler, cleaner and more versatile alternative to WCF's Add Service Reference feature that's built into VS.NET.
 
 The article outlines ServiceStack's support generating VB.Net DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now VB.Net clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback. 
+
+### VB.NET - Modern typed APIs for long-lived business Apps
+
+Plenty of organizations still run substantial VB.NET line-of-business software that has to keep talking to new services. Adding a reference gives those Apps the same generated DTOs and full .NET client - no rewrite, no hand-rolled HTTP layer:
+
+```vbnet
+Dim client = New JsonApiClient(baseUrl)
+
+Dim response = Await client.SendAsync(New Hello With {.Name = "World"})
+Console.WriteLine(response.Result)
+```
+
+Both async and blocking APIs are available, so it fits event-driven desktop code as naturally as it does batch jobs and scheduled integrations.
 
 ## [Add ServiceStack Reference](/add-servicestack-reference)
 
