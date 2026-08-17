@@ -9,6 +9,19 @@ ServiceStack's **Add ServiceStack Reference** feature allows clients to generate
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="WjbhfH45i5k" style="background-image: url('https://img.youtube.com/vi/WjbhfH45i5k/maxresdefault.jpg')"></lite-youtube>
 
+### Python - Typed APIs for data, scripting and automation
+
+The [servicestack](https://pypi.org/project/servicestack/) package generates dataclass DTOs that follow PEP 8 naming, so they read like Python rather than translated C#, and populate in a single constructor expression:
+
+```python
+client = JsonServiceClient(base_url)
+
+response: HelloResponse = client.send(Hello(name="World"))
+print(response.result)
+```
+
+That makes it a natural fit for the parts of an organization that live outside the App - data and analytics notebooks, ETL and ML pipelines, DevOps automation and internal tooling - all calling the same authenticated business APIs the product uses, with type hints driving completion in PyCharm and VS Code. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+
 ### First class development experience
 
 [Python](https://python.org) is one of the worlds most popular programming languages thanks to its ease of use and comprehensive libraries which sees it excels in many industries from education where it's often the first language taught in school to data science, machine learning and AI where it's often the dominant language used. To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports Python as a 1st class Add ServiceStack Reference supported language which gives Python developers an end-to-end typed API for consuming ServiceStack APIs, complete with IDE integration in [PyCharm](https://www.jetbrains.com/pycharm/) as well as [built-in support in x dotnet tool](/dotnet-tool#addupdate-servicestack-references) to generate Python DTOs for a remote ServiceStack instance from a single command-line.

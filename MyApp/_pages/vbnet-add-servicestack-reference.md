@@ -9,6 +9,19 @@ ServiceStack's **Add ServiceStack Reference** feature allows clients to generate
 
 The article outlines ServiceStack's support generating VB.Net DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now VB.Net clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback. 
 
+### VB.NET - Modern typed APIs for long-lived business Apps
+
+Plenty of organizations still run substantial VB.NET line-of-business software that has to keep talking to new services. Adding a reference gives those Apps the same generated DTOs and full .NET client - no rewrite, no hand-rolled HTTP layer:
+
+```vbnet
+Dim client = New JsonApiClient(baseUrl)
+
+Dim response = Await client.SendAsync(New Hello With {.Name = "World"})
+Console.WriteLine(response.Result)
+```
+
+Both async and blocking APIs are available, so it fits event-driven desktop code as naturally as it does batch jobs and scheduled integrations.
+
 ## [Add ServiceStack Reference](/add-servicestack-reference)
 
 The easiest way to Add a ServiceStack reference to your project is to right-click on your project to bring up [ServiceStackVS's](/create-your-first-webservice) `Add ServiceStack Reference` context-menu item. This opens a dialog where you can add the url of the ServiceStack instance you want to typed DTO's for, as well as the name of the DTO source file that's added to your project.

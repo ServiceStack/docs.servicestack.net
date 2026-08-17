@@ -5,6 +5,19 @@ title: Ruby Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.
 
+### Ruby - ServiceStack productivity in a dynamic language
+
+The [servicestack](https://rubygems.org/gems/servicestack) gem provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:
+
+```ruby
+client = ServiceStack::JsonServiceClient.new(base_url)
+
+response = client.send(Hello.new(name: 'World'))
+puts response.result
+```
+
+Implemented with Ruby's standard library and no external runtime dependencies. Includes structured `WebServiceException` errors, field validation details, authentication, typed AutoQuery conventions, batch calls, one-way requests, custom URLs and file uploads.
+
 ### First class development experience
 
 [Ruby](https://www.ruby-lang.org) enjoys enduring popularity thanks to its expressive syntax and its focus on developer productivity, where it continues to power a large ecosystem of Web Apps, CLI tools, automation scripts and DevOps tooling. To maximize the experience for calling ServiceStack APIs from these environments, Ruby is supported as a 1st class Add ServiceStack Reference language which gives Ruby developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.

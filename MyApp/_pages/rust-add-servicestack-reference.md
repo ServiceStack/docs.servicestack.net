@@ -5,6 +5,22 @@ title: Rust Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Rust - providing a simple way to give Rust clients typed access to your ServiceStack Services.
 
+### Rust - Correctness from the wire to application code
+
+The [servicestack](https://crates.io/crates/servicestack) crate brings Rust's priorities to API integration. Generated DTOs implement the traits that associate each request with its response, route and HTTP method:
+
+```rust
+let response = client.send(&Hello {
+    name: "World".to_string(),
+}).await?;
+
+println!("{}", response.result);
+```
+
+The async client is the default, with an optional blocking client. Supports structured errors, authentication with automatic token refresh, typed AutoQuery, multipart uploads, batch and one-way calls, and access to the underlying `reqwest` configuration when finer control is needed.
+
+Most importantly, changes at the API boundary become **ordinary Rust compiler feedback** - no scattering `serde_json::Value` through business logic.
+
 ### First class development experience
 
 [Rust](https://www.rust-lang.org) continues to see rapid adoption for systems programming, WebAssembly, CLI tooling and high-performance network services, where its ownership model delivers memory safety without a garbage collector. To maximize the experience for calling ServiceStack APIs from these environments, Rust is supported as a 1st class Add ServiceStack Reference language which gives Rust developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.

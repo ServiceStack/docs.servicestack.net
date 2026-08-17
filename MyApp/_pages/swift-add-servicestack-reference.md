@@ -4,10 +4,21 @@ title: Swift Add ServiceStack Reference
 
 ![Swift iOS, XCode and macOS Banner](/img/pages/servicestack-reference/swift-logo-banner.jpg)
 
-## Swift
+### Swift - Native, async-first APIs for Apple platforms
 
 ServiceStack's **Add ServiceStack Reference** feature lets iOS/macOS developers easily generate an native 
 typed Swift API for your ServiceStack Services using the `x` dotnet command-line tool.
+
+Added with Swift Package Manager, [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) generates `Codable` DTOs whose request types declare the response they return, letting the client infer the entire call under `async/await`:
+
+```swift
+let client = JsonServiceClient(baseUrl: baseUrl)
+
+let response = try await client.getAsync(Hello(name: "World"))
+print(response.result)
+```
+
+For iOS, iPadOS and macOS teams this replaces the usual `URLSession` plumbing and hand-written response structs with a contract that Xcode understands - so a backend change shows up as a Swift compile error rather than a nil field in a shipped App. Structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads.
 
 ## Simple command-line utils for ServiceStack
 

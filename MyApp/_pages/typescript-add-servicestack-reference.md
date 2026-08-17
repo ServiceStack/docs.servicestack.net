@@ -7,6 +7,17 @@ title: TypeScript Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simple way to give clients typed access to your ServiceStack Services.
 
+### TypeScript - The contract your web App builds against
+
+The [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) `JsonServiceClient` turns your API into part of the frontend's type system - completion for every request, response and enum, in Vue, React, Angular, Svelte, Node and Deno alike:
+
+```ts
+const api = await client.api(new Hello({ name: 'World' }))
+console.log(api.response.result)
+```
+
+Because the DTOs are regenerated from the running API, a removed field or renamed enum surfaces as a **TypeScript compile error in CI** - the earliest and cheapest place for a frontend team to find out the backend changed. Includes structured `ResponseStatus` errors ready to bind to form validation, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+
 ## Install
 
 ::include ref-servicestack-client.md::

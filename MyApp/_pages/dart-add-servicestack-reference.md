@@ -7,6 +7,19 @@ title: Dart Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [@servicestack/cli command-line utility](https://github.com/ServiceStack/servicestack-cli#servicestackcli) - providing a simple way to give clients typed access to your ServiceStack Services.
 
+### Dart - One typed client for every Flutter target
+
+The [servicestack](https://pub.dev/packages/servicestack) package generates DTOs and a `JsonServiceClient` that works unchanged across every platform Flutter builds for - iOS, Android, web, desktop and server-side Dart:
+
+```dart
+var client = JsonServiceClient(baseUrl);
+
+var response = await client.get(Hello(name: 'World'));
+print(response.result);
+```
+
+That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with `dart:io` and `dart:html` implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+
 ## Dart Android Example using Android Studio
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ocH5L-CikQ0" style="background-image: url('https://img.youtube.com/vi/ocH5L-CikQ0/maxresdefault.jpg')"></lite-youtube>

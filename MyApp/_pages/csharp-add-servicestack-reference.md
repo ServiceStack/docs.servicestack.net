@@ -9,7 +9,21 @@ The primary and most popular [Add ServiceStack Reference](/add-servicestack-refe
 
 Our goal with Native Types is to provide an alternative for sharing DTO dlls, that can enable a better dev workflow for external clients who are now able to generate (and update) Typed APIs for your Services from a remote url - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
 
-C# Xamarin.Android Example in VS.NET
+### C# - Productive End-to-end typed APIs for .NET
+
+The `JsonApiClient` in [ServiceStack.Client](https://nuget.org/packages/ServiceStack.Client) consumes the same DTOs your API is defined with - except consumers generate them from the **deployed API** instead of taking a binary dependency on it, so client and server teams can ship on their own release schedules:
+
+```csharp
+var api = await client.ApiAsync(new Hello { Name = "World" });
+if (api.Succeeded)
+{
+    Console.WriteLine(api.Response.Result);
+}
+```
+
+`Api`/`ApiAsync` return an `ApiResult<T>` so success and structured validation errors are handled as values instead of exceptions - the pattern Blazor, MAUI, WPF, WinForms and console Apps use to bind server errors directly to their UI. Everything else in the .NET clients comes along too: authentication, typed AutoQuery, batched and one-way requests, file uploads and Service Gateway support.
+
+### C# Xamarin.Android Example in VS.NET
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="cbYuem1b2tg" style="background-image: url('https://img.youtube.com/vi/cbYuem1b2tg/maxresdefault.jpg')"></lite-youtube>
 

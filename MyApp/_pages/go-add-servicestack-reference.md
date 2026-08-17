@@ -5,6 +5,20 @@ title: Go Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.
 
+### Go - Simple, typed APIs for cloud software
+
+The new [servicestack-go](https://github.com/ServiceStack/servicestack-go) client preserves everything that makes Go appealing: simplicity, fast builds and straightforward deployment. Generated Request DTOs carry their response type and HTTP method, allowing Go's generic client to infer the complete API call:
+
+```go
+res, err := ss.Send(client, dtos.Hello{Name: "World"})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(res.Result)
+```
+
+Built on Go's standard library with **no external runtime dependencies**. Provides `context.Context` variants for cancellation and deadlines, structured `ResponseStatus` errors, field validation errors, typed AutoQuery responses, multipart uploads, batched and one-way requests, and authentication using Basic Auth, API Keys, JWTs, refresh tokens or session cookies.
+
 ### First class development experience
 
 [Go](https://go.dev) has become the language of choice for cloud infrastructure, CLI tooling and high-throughput network services thanks to its fast compile times, first-class concurrency and single-binary deployments. To maximize the experience for calling ServiceStack APIs from these environments, Go is supported as a 1st class Add ServiceStack Reference language which gives Go developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.

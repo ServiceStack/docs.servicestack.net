@@ -5,6 +5,22 @@ title: Zig Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Zig - providing a simple way to give Zig clients typed access to your ServiceStack Services.
 
+### Zig - Explicit, efficient APIs for systems software
+
+[servicestack-zig](https://github.com/ServiceStack/servicestack-zig) uses Zig's standard library with no third-party dependencies, infers the response type at compile time and makes ownership explicit:
+
+```zig
+var client = try ss.JsonServiceClient.init(allocator, base_url);
+defer client.deinit();
+
+var response = try client.send(dtos.Hello{
+    .name = "World",
+});
+defer response.deinit();
+```
+
+The caller supplies the allocator and owns the parsed response lifecycle, whilst the client still provides structured errors, validation details, authentication, session cookies, typed AutoQuery, batch and one-way requests, custom URLs and multipart uploads.
+
 ### First class development experience
 
 [Zig](https://ziglang.org) is a fast-growing systems language offering a simpler alternative to C with compile-time metaprogramming, explicit allocators and no hidden control flow, which sees it increasingly used for performance-critical services, embedded software and cross-compilation toolchains. To maximize the experience for calling ServiceStack APIs from these environments, Zig is supported as a 1st class Add ServiceStack Reference language which gives Zig developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.

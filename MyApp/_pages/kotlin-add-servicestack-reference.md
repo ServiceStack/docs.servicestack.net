@@ -26,6 +26,18 @@ support for Kotlin with IDE integration in
 [IntelliJ IDEA](https://www.jetbrains.com/idea/) where App Devlopers can create and update an end-to-end typed 
 API with just a Menu Item click - enabling a highly-productive workflow for consuming ServiceStack Services.
 
+### Kotlin - Concise, null-safe clients for Android and JVM services
+
+Kotlin uses the same JVM client with DTOs generated as idiomatic Kotlin classes, keeping calls terse whilst nullability stays explicit in the type system:
+
+```kotlin
+val client = JsonServiceClient(baseUrl)
+
+val response = client.get(Hello().apply { Name = "World" })
+println(response.Result)
+```
+As the default language for new Android development, it's typically where an organization's mobile client meets the same backend its web App uses - with async APIs for background calls, structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads. Both Android Studio and IntelliJ can update the reference in place.
+
 ## Kotlin Android Example using Android Studio
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="nmB0NaI9-3k" style="background-image: url('https://img.youtube.com/vi/nmB0NaI9-3k/maxresdefault.jpg')"></lite-youtube>

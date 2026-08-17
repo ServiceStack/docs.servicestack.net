@@ -4,6 +4,20 @@ title: ES6 Class Add ServiceStack Reference
 
 In addition to [TypeScript](/typescript-add-servicestack-reference) support for generating typed Data Transfer Objects (DTOs), JavaScript is now supported in the form of [JSDoc](https://jsdoc.app) annotated typed ES6 classes that can be referenced natively from [JavaScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
 
+### JavaScript - Typed APIs without a build step
+
+Generated ES module DTOs are annotated with JSDoc types, so plain JavaScript gets the same editor intelli-sense TypeScript does - and they can be imported straight from a running API, with no bundler, transpiler or toolchain involved:
+
+```js
+import { JsonServiceClient } from '@servicestack/client'
+import { Hello } from 'https://example.org/types/mjs'
+
+const client = new JsonServiceClient('https://example.org')
+const api = await client.api(new Hello({ name: 'World' }))
+```
+
+Ideal for the code that isn't a SPA: server-rendered Razor and MVC pages, admin screens, embedded widgets, internal dashboards and quick Node scripts - anywhere adding a build pipeline would cost more than the feature - whilst annotating DTOs locally for static analysis.
+
 ### Reference directly in JavaScript Modules
 
 Unlike TypeScript, the JavaScript ES6 class DTOs can be referenced directly in a browser as-is, removing the need to keep your DTOs in sync with extra tooling by direct referencing them in a JavaScript Module:

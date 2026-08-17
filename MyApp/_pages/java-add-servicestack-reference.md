@@ -4,6 +4,19 @@ title: Java Add ServiceStack Reference
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/android-studio-splash.png)
 
+### Java - Typed APIs for Android and the JVM
+
+The `net.servicestack:client` package adds a `JsonServiceClient` closely modelled on ServiceStack's .NET clients, with generated DTOs using fluent setters that chain into a single expression:
+
+```java
+JsonServiceClient client = new JsonServiceClient(baseUrl);
+
+HelloResponse response = client.get(new Hello().setName("World"));
+System.out.println(response.getResult());
+```
+
+Java remains the backbone of both Android and large enterprise back offices, and the same generated file serves each: Android Apps get async variants that marshal results back to the UI thread, whilst server-side integrations get a typed client for calling business APIs from existing JVM services. IntelliJ IDEA, Android Studio and Eclipse can add and refresh references directly from the IDE.
+
 ## [ServiceStack IDEA Android Studio Plugin](https://plugins.jetbrains.com/plugin/7749?pr=androidstudio)
 
 Like the existing IDE integrations before it, the ServiceStack IDEA plugin provides Add ServiceStack Reference functionality to [Android Studio - the official Android IDE](https://developer.android.com/sdk/index.html). 

@@ -10,6 +10,20 @@ ServiceStack's **Add ServiceStack Reference** feature allows clients to generate
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
 </div>
 
+### PHP - Typed APIs for the web's most deployed stack
+
+The [servicestack/client](https://packagist.org/packages/servicestack/client) Composer package generates DTOs using PHP 8's promoted constructors and typed properties, so requests are populated with named arguments and checked by static analysis:
+
+```php
+$client = new JsonServiceClient($baseUrl);
+
+/** @var HelloResponse $response */
+$response = $client->send(new Hello(name: "World"));
+echo $response->result;
+```
+
+For organizations with an established PHP presence - Laravel and Symfony Apps, CMS and intranet sites, hosting and billing portals - it's the shortest path to consuming a .NET backend without either side changing platforms. Includes structured errors with field validation details, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+
 ### First class development experience
 
 [PHP](https://www.php.net) is one of the worlds most popular programming languages thanks to its ease of use, 

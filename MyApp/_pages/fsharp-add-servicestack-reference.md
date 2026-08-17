@@ -7,7 +7,20 @@ title: F# Add ServiceStack Reference
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simpler, cleaner and more versatile alternative to WCF's Add Service Reference feature that's built into VS.NET.
 
-The article outlines ServiceStack's support generating F# DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now F# clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback. 
+The article outlines ServiceStack's support generating F# DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now F# clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
+
+### F# - Typed contracts for functional .NET
+
+F# gets the same first-class .NET clients, with DTOs generated into a single namespace that's immediately usable from projects, `dotnet fsi` scripts and [Jupyter notebooks](/jupyter-notebooks-fsharp):
+
+```fsharp
+let client = JsonApiClient(baseUrl)
+
+let response = client.Send(Hello(Name = "World"))
+printfn $"{response.Result}"
+```
+
+That combination suits the teams F# tends to live in - quantitative, data and integration work where a short script needs to call a production API with real types rather than parse JSON by hand. Typed AutoQuery, authentication, structured errors and file uploads all work exactly as they do in C#.
 
 ## [Add ServiceStack Reference](/add-servicestack-reference)
 
