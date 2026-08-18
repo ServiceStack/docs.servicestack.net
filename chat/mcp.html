@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-17T16:08:55.3998372Z'>
+    <meta name='date' content='2026-08-18T16:01:06.5173748Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>MCP Server</title>
@@ -374,9 +374,19 @@ mount('#header', Header)
 <td>Optional usage hint Clients can add to their system prompt</td>
 </tr>
 <tr>
-<td><code>RejectToolsRequiringApproval</code></td>
-<td><code>true</code></td>
-<td>Refuse tools that need ServiceStack's interactive approval UI</td>
+<td><code>ApprovalMode</code></td>
+<td><code>ConfirmationToken</code></td>
+<td>How MCP handles tools requiring approval: <code>ConfirmationToken</code> (two-phase signed token), <code>Reject</code> (fail-closed), or <code>DelegateToClient</code></td>
+</tr>
+<tr>
+<td><code>ConfirmationTokenExpiry</code></td>
+<td><code>5 min</code></td>
+<td>How long a generated confirmation token remains valid</td>
+</tr>
+<tr>
+<td><code>SigningSecret</code></td>
+<td><code>null</code></td>
+<td>Secret for HMAC-SHA256 token signing. Falls back to <code>AdminAuthSecret</code>, then to an ephemeral per-process secret</td>
 </tr>
 <tr>
 <td><code>MaxInlineResourceBytes</code></td>
@@ -456,17 +466,43 @@ mount('#header', Header)
 </ul>
 <p>Images and audio are inlined as base64 when small enough - an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above <code>MaxInlineResourceBytes</code> is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.</p>
 <h2 id="approval-across-the-mcp-boundary">Approval across the MCP boundary<a class="header-anchor" href="javascript:;" onclick="location.hash='#approval-across-the-mcp-boundary'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses an explicit boundary policy.</p>
-<p>By default <code>RejectToolsRequiringApproval = true</code> <strong>fails closed</strong>: if a tool would require interactive approval, the MCP call is refused before execution.</p>
-<p>An application using a trusted MCP client with its own confirmation system can delegate that decision:</p>
+<p>The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses a configurable <code>ApprovalMode</code>.</p>
+<h3 id="default-two-phase-confirmation-token">Default: Two-Phase Confirmation Token<a class="header-anchor" href="javascript:;" onclick="location.hash='#default-two-phase-confirmation-token'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-csharp">Mcp = {
     ToolGroups = [&quot;api_tools&quot;],
-    RejectToolsRequiringApproval = false,
+    ApprovalMode = McpApprovalMode.ConfirmationToken, // Default
+    ConfirmationTokenExpiry = TimeSpan.FromMinutes(5),
 }
 </code></pre>
-<p>In this mode ServiceStack publishes the tool's read-only/write/destructive safety annotations and the MCP client is expected to ask the user before allowing the call.</p>
+<p>When a write or destructive API is called without a token:</p>
+<ol>
+<li>The server returns a <code>requires_confirmation</code> status containing a summary, the proposed arguments, and a signed, short-lived <code>confirmationToken</code>.</li>
+<li>The AI assistant presents the summary to the user in chat for confirmation.</li>
+<li>Upon approval, the assistant re-invokes <code>api_call</code> with the same arguments and the <code>confirmationToken</code>.</li>
+<li>The server cryptographically validates the token (user identity, target API, payload argument hash, expiry, and single-use replay check) before executing.</li>
+</ol>
+<p>Read-only operations (<code>IGet</code>, <code>QueryBase</code>, etc.) execute immediately without requiring a token.</p>
+<h4 id="production-deployment">Production deployment<a class="header-anchor" href="javascript:;" onclick="location.hash='#production-deployment'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<ul>
+<li><strong>Signing secret</strong>: Configure <code>SigningSecret</code> (or <code>HostConfig.AdminAuthSecret</code>) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated — tokens won't survive restarts and are rejected across load-balanced instances.</li>
+<li><strong>Distributed cache</strong>: Register a shared <code>ICacheClient</code> (Redis, <code>OrmLiteCacheClient</code>, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.</li>
+</ul>
+<h3 id="fail-closed-reject">Fail-closed: Reject<a class="header-anchor" href="javascript:;" onclick="location.hash='#fail-closed-reject'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">Mcp = {
+    ToolGroups = [&quot;api_tools&quot;],
+    ApprovalMode = McpApprovalMode.Reject,
+}
+</code></pre>
+<p>Refuses any tool that would require interactive approval before it executes. Use for strictly read-only MCP exposure.</p>
+<h3 id="delegate-to-the-mcp-client">Delegate to the MCP client<a class="header-anchor" href="javascript:;" onclick="location.hash='#delegate-to-the-mcp-client'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-csharp">Mcp = {
+    ToolGroups = [&quot;api_tools&quot;],
+    ApprovalMode = McpApprovalMode.DelegateToClient,
+}
+</code></pre>
+<p>Executes the tool immediately. The client is expected to use MCP safety annotations and its own native confirmation dialog to ask the user before mutating calls. Use only when the MCP client is trusted and its confirmation policy is enabled.</p>
 <div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>API authorization and DTO validation are <strong>never</strong> disabled by this setting. Only responsibility for the interactive approval decision moves to the trusted client.</p>
+            <p class="custom-block-title">INFO</p><p>API authorization and DTO validation are <strong>never</strong> disabled by any approval mode. Only responsibility for the interactive approval decision changes.</p>
 </div>
 <h2 id="model-agnostic-by-design">Model-agnostic by design<a class="header-anchor" href="javascript:;" onclick="location.hash='#model-agnostic-by-design'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Because MCP is model-agnostic, the same ServiceStack endpoint works regardless of which model powers the assistant. The same CoffeeShop workflow completes under very different model families, each discovering the menu, previewing the order and placing it through the same <code>api_search</code>, <code>api_describe</code> and <code>api_call</code> tools:</p>
@@ -486,8 +522,9 @@ mount('#header', Header)
 <ul>
 <li>Register <code>ApiKeysFeature</code> and issue a scoped key per client or per user.</li>
 <li>Name only the tool groups external Assistants should reach.</li>
-<li>Leave <code>RejectToolsRequiringApproval = true</code> unless the client has its own confirmation UI.</li>
-<li>Keep <code>[Tool(Safety)]</code> accurate - it's what an MCP client uses to decide whether to prompt.</li>
+<li>Configure <code>SigningSecret</code> with a shared value (≥ 32 bytes) when using <code>ConfirmationToken</code> mode in production.</li>
+<li>Register a distributed <code>ICacheClient</code> for single-use token replay protection across instances.</li>
+<li>Keep <code>[Tool(Safety)]</code> accurate — it drives both confirmation token requirements and MCP safety annotations.</li>
 <li>Remember the key's user is the identity every call runs as: scope its roles accordingly.</li>
 </ul>
 </div>
@@ -561,6 +598,26 @@ mount('#header', Header)
                                         <span v-hash="'#approval-across-the-mcp-boundary'" data-id="approval-across-the-mcp-boundary" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Approval across the MCP boundary
                                         </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="default-two-phase-confirmation-token" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#default-two-phase-confirmation-token'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Default: Two-Phase Confirmation Token
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="fail-closed-reject" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#fail-closed-reject'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Fail-closed: Reject
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="delegate-to-the-mcp-client" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#delegate-to-the-mcp-client'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Delegate to the MCP client
+                                                        </span>
+                                                    </li>
+                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#model-agnostic-by-design'" data-id="model-agnostic-by-design" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">

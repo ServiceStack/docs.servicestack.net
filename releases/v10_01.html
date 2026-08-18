@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-17T16:08:55.3264182Z'>
+    <meta name='date' content='2026-08-18T16:01:06.4470138Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v10.1</title>
@@ -625,6 +625,82 @@ Releases                                    </span>
 <div class="info custom-block">
             <p class="custom-block-title">INFO</p><p>Everything in this release works on <strong>.NET 8+</strong> ServiceStack Apps. <a href="/api-schema">API Schemas</a> and <a href="/autoquery-schema">AutoQuery Schemas</a> require <strong>nothing to install</strong> - they're part of the existing <a href="/metadata-page">Metadata feature</a>.</p>
 </div>
+<hr />
+<h2 id="v10.1.4-updates">v10.1.4 Updates<a class="header-anchor" href="javascript:;" onclick="location.hash='#v10.1.4-updates'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="mcp-two-phase-confirmation-tokens">MCP Two-Phase Confirmation Tokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#mcp-two-phase-confirmation-tokens'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The MCP Server's approval policy has been upgraded from a simple boolean (<code>RejectToolsRequiringApproval</code>) to a three-mode <code>ApprovalMode</code> enum:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ConfirmationToken</code></td>
+<td><strong>New default.</strong> Write/destructive calls return a <code>requires_confirmation</code> response with a signed, short-lived token. The AI assistant presents the summary to the user for explicit confirmation, then re-invokes with the token. The server validates user identity, target API, payload hash, expiry and single-use replay before executing.</td>
+</tr>
+<tr>
+<td><code>Reject</code></td>
+<td>Fail-closed — refuses any tool requiring interactive approval (the previous default).</td>
+</tr>
+<tr>
+<td><code>DelegateToClient</code></td>
+<td>Executes immediately, relying on the MCP client's native confirmation dialog.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-csharp">Mcp = {
+    ToolGroups = [&quot;api_tools&quot;],
+    ApprovalMode = McpApprovalMode.ConfirmationToken, // Default
+    ConfirmationTokenExpiry = TimeSpan.FromMinutes(5),
+}
+</code></pre>
+<p>For production deployments, configure a shared <code>SigningSecret</code> (≥ 32 bytes) and register a distributed <code>ICacheClient</code> for cross-instance replay protection. See <a href="/chat/mcp#approval-across-the-mcp-boundary">MCP Server — Approval</a> for details.</p>
+<p>The old <code>RejectToolsRequiringApproval</code> property is marked <code>[Obsolete]</code> and maps to <code>Reject</code> (true) or <code>DelegateToClient</code> (false).</p>
+<h3 id="mcp-attribute-for-mcp-specific-descriptions"><code>[Mcp]</code> Attribute for MCP-specific Descriptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#mcp-attribute-for-mcp-specific-descriptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A new <code>[Mcp(Description = ...)]</code> attribute lets you provide imperative, agent-facing descriptions for DTOs exposed over MCP — such as mandatory prerequisites or confirmation steps — without polluting the regular <code>[Description]</code> used by OpenAPI generators and admin UIs:</p>
+<pre><code class="language-csharp">[Description(&quot;Submits and charges a coffee shop order.&quot;)]
+[Mcp(Description =
+    &quot;Submits and charges a coffee shop order. &quot; +
+    &quot;IMPORTANT: Before calling this you MUST first call &quot; +
+    &quot;PreviewCoffeeShopOrder and obtain explicit customer confirmation.&quot;)]
+[Tool(&quot;the user wants to place an order&quot;, Safety = ToolSafety.Write, RequiresApproval = true)]
+public class CreateCoffeeShopOrder : IPost, IReturn&lt;CreateCoffeeShopOrderResponse&gt; { }
+</code></pre>
+<p>When set, MCP responses (<code>api_search</code>, <code>api_describe</code>, confirmation summaries) prefer <code>McpDescription</code> over the regular <code>Description</code>. All non-MCP consumers continue to see the original <code>[Description]</code>.</p>
+<h3 id="mcp-aware-api-tool-responses">MCP-aware API Tool Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#mcp-aware-api-tool-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li><code>api_search</code> and <code>api_describe</code> now return MCP-flavored summaries when called over the MCP transport.</li>
+<li><code>api_call</code> output schema includes <code>confirmationToken</code>, <code>expiresInSeconds</code>, <code>summary</code> and <code>instruction</code> fields for the two-phase flow.</li>
+<li>Empty <code>args</code> on parameterless APIs (e.g. <code>IGet</code> DTOs with no properties) now correctly emit <code>{}</code> instead of <code>null</code> to satisfy strict MCP schema validation.</li>
+</ul>
+<h3 id="durable-agents">Durable Agents<a class="header-anchor" href="javascript:;" onclick="location.hash='#durable-agents'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The motivation for this architectural upgrade came after extreme long-running agent workflows caused single thread message JSON payloads to grow past 200MB. This monolithic column approach eventually degraded database tooling (even causing database IDE JDBC drivers to run out of memory) and strained the browser DOM until the UI froze and crashed.</p>
+<p>To scale reliably for complex autonomous tasks, the agent execution was re-architected into a durable, slice-based system that is significantly more responsive, memory-efficient, and resilient:</p>
+<p>AI.Chat agents can now run complex, multi-step tasks that span many model and tool exchanges without being tied to a single browser request. You can close your browser, refresh the page, or lose connectivity mid-run and return to find the agent's progress exactly where it left off.</p>
+<p><strong>Resumable execution</strong> — Long tool-calling workflows no longer fail after hitting a fixed iteration limit. The agent works in resumable slices, checkpointing progress to the database between each one. A run can continue across hundreds of model exchanges with a configurable budget (default 250 steps).</p>
+<p><strong>Survives disconnects</strong> — Run state, elapsed time, context usage, errors, cancellation, and tool-approval waits are all persisted. A page refresh reconnects to the live run. A partial streaming response is isolated from committed history, so an interrupted stream never damages earlier messages.</p>
+<p><strong>Automatic context compaction</strong> — A context usage indicator shows how much of the selected model's window is in use. When it reaches ~80%, AI.Chat automatically summarizes older working context while preserving current instructions and a recent verbatim tail, then continues the same run. The full original conversation remains available for review. A manual compact button creates a clean child thread instead, leaving the original unchanged.</p>
+<p><strong>Windowed message loading</strong> — Threads with thousands of messages no longer block the UI. The chat view loads the first 20 and latest 100 messages initially; the middle is fetched on demand. The sidebar uses an authoritative database message count and a compact preview rather than downloading every conversation.</p>
+<p><strong>SSE with automatic fallback</strong> — Real-time updates are delivered over Server-Sent Events for lower latency. If SSE is unavailable through a proxy or host configuration, the browser automatically falls back to reliable long polling. No configuration is required — the default <code>&quot;auto&quot;</code> transport handles both.</p>
+<p><strong>Provider compatibility</strong> — Text-only and strict providers (e.g. GLM) receive a compatible projection of the conversation. Multipart attachments, orphaned tool results, and malformed legacy tool history are cleaned up in the outbound copy without rewriting canonical history, reducing provider failures in long-running sessions.</p>
+<h3 id="new-core_tools-for-ai-agents">New core_tools for AI Agents<a class="header-anchor" href="javascript:;" onclick="location.hash='#new-core_tools-for-ai-agents'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Added two essential, zero-dependency core tools to enable web resource reading and fast codebase exploration:</p>
+<p><strong>fetch_url</strong></p>
+<ul>
+<li>Fetches HTTP/HTTPS URLs and converts HTML into clean, token-efficient Markdown.</li>
+<li>Automatically strips boilerplate, scripts, stylesheets, and navigation layouts (<code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;footer&gt;</code>, <code>&lt;aside&gt;</code>, etc.).</li>
+<li>Accurately preserves headings, tables, code blocks, blockquotes, lists, emphasis, and hyperlinks (with relative URL resolution).</li>
+<li>Returns raw text for non-HTML content (JSON, plain text) and includes configurable length limits and response truncation.</li>
+</ul>
+<p><strong>grep_search</strong></p>
+<ul>
+<li>Fast text and regular expression search across files and directory trees.</li>
+<li>Automatically prunes non-source and virtual environment directories (<code>.git</code>, <code>node_modules</code>, <code>bin</code>, <code>obj</code>, <code>.venv</code>, <code>dist</code>, <code>build</code>, etc.) and ignores binary files.</li>
+<li>Supports file glob filtering (e.g. <code>*.cs</code>, <code>*.py</code>), case-sensitivity options, and result capping with formatted relative path and line numbers.</li>
+</ul>
 <hr />
 <h2 id="typed-apis-in-15-languages">Typed APIs in 15 Languages<a class="header-anchor" href="javascript:;" onclick="location.hash='#typed-apis-in-15-languages'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><img src="/img/pages/release-notes/v10.1/langs/bg.webp" alt="" /></p>
@@ -1998,6 +2074,37 @@ public class SendInvoiceEmailCommand(
                                 On This Page
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#v10.1.4-updates'" data-id="v10.1.4-updates" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            v10.1.4 Updates
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="mcp-two-phase-confirmation-tokens" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#mcp-two-phase-confirmation-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            MCP Two-Phase Confirmation Tokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="mcp-aware-api-tool-responses" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#mcp-aware-api-tool-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            MCP-aware API Tool Responses
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="durable-agents" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#durable-agents'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Durable Agents
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="new-core_tools-for-ai-agents" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#new-core_tools-for-ai-agents'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            New core_tools for AI Agents
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#typed-apis-in-15-languages'" data-id="typed-apis-in-15-languages" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Typed APIs in 15 Languages
