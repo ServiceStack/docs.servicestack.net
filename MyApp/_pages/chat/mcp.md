@@ -25,7 +25,9 @@ services.AddPlugin(new ChatFeature {
 | `ServerName` | assembly name | Server name reported to MCP Clients in `initialize` |
 | `ServerVersion` | ServiceStack version | Server version reported to MCP Clients |
 | `Instructions` | `null` | Optional usage hint Clients can add to their system prompt |
-| `RejectToolsRequiringApproval` | `true` | Refuse tools that need ServiceStack's interactive approval UI |
+| `ApprovalMode` | `ConfirmationToken` | How MCP handles tools requiring approval: `ConfirmationToken` (two-phase signed token), `Reject` (fail-closed), or `DelegateToClient` |
+| `ConfirmationTokenExpiry` | `5 min` | How long a generated confirmation token remains valid |
+| `SigningSecret` | `null` | Secret for HMAC-SHA256 token signing. Falls back to `AdminAuthSecret`, then to an ephemeral per-process secret |
 | `MaxInlineResourceBytes` | `4 MB` | Largest image/audio result inlined as base64 |
 
 `IsEnabled` reports whether anything is exposed; with both lists empty the endpoint isn't registered at all.
@@ -102,23 +104,56 @@ Images and audio are inlined as base64 when small enough - an external Agent has
 
 ## Approval across the MCP boundary
 
-The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses an explicit boundary policy.
+The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses a configurable `ApprovalMode`.
 
-By default `RejectToolsRequiringApproval = true` **fails closed**: if a tool would require interactive approval, the MCP call is refused before execution.
-
-An application using a trusted MCP client with its own confirmation system can delegate that decision:
+### Default: Two-Phase Confirmation Token
 
 ```csharp
 Mcp = {
     ToolGroups = ["api_tools"],
-    RejectToolsRequiringApproval = false,
+    ApprovalMode = McpApprovalMode.ConfirmationToken, // Default
+    ConfirmationTokenExpiry = TimeSpan.FromMinutes(5),
 }
 ```
 
-In this mode ServiceStack publishes the tool's read-only/write/destructive safety annotations and the MCP client is expected to ask the user before allowing the call.
+When a write or destructive API is called without a token:
+
+1. The server returns a `requires_confirmation` status containing a summary, the proposed arguments, and a signed, short-lived `confirmationToken`.
+2. The AI assistant presents the summary to the user in chat for confirmation.
+3. Upon approval, the assistant re-invokes `api_call` with the same arguments and the `confirmationToken`.
+4. The server cryptographically validates the token (user identity, target API, payload argument hash, expiry, and single-use replay check) before executing.
+
+Read-only operations (`IGet`, `QueryBase`, etc.) execute immediately without requiring a token.
+
+#### Production deployment
+
+- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated — tokens won't survive restarts and are rejected across load-balanced instances.
+- **Distributed cache**: Register a shared `ICacheClient` (Redis, `OrmLiteCacheClient`, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.
+
+### Fail-closed: Reject
+
+```csharp
+Mcp = {
+    ToolGroups = ["api_tools"],
+    ApprovalMode = McpApprovalMode.Reject,
+}
+```
+
+Refuses any tool that would require interactive approval before it executes. Use for strictly read-only MCP exposure.
+
+### Delegate to the MCP client
+
+```csharp
+Mcp = {
+    ToolGroups = ["api_tools"],
+    ApprovalMode = McpApprovalMode.DelegateToClient,
+}
+```
+
+Executes the tool immediately. The client is expected to use MCP safety annotations and its own native confirmation dialog to ask the user before mutating calls. Use only when the MCP client is trusted and its confirmation policy is enabled.
 
 :::info
-API authorization and DTO validation are **never** disabled by this setting. Only responsibility for the interactive approval decision moves to the trusted client.
+API authorization and DTO validation are **never** disabled by any approval mode. Only responsibility for the interactive approval decision changes.
 :::
 
 ## Model-agnostic by design
@@ -148,6 +183,7 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 
 - Register `ApiKeysFeature` and issue a scoped key per client or per user.
 - Name only the tool groups external Assistants should reach.
-- Leave `RejectToolsRequiringApproval = true` unless the client has its own confirmation UI.
-- Keep `[Tool(Safety)]` accurate - it's what an MCP client uses to decide whether to prompt.
+- Configure `SigningSecret` with a shared value (≥ 32 bytes) when using `ConfirmationToken` mode in production.
+- Register a distributed `ICacheClient` for single-use token replay protection across instances.
+- Keep `[Tool(Safety)]` accurate — it drives both confirmation token requirements and MCP safety annotations.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.
