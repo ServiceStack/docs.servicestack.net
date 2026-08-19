@@ -406,18 +406,150 @@
     RequiresApproval = <span class="text-purple-400">true</span>)]
 <span class="text-purple-400">public class</span> <span class="text-emerald-300">CreateCoffeeShopOrder</span> : IPost { }</code></pre>
             </div>
+
+            <p class="mt-8 text-sm font-semibold text-slate-900 dark:text-white">The rest of the <code class="font-mono text-sky-700 dark:text-sky-400">CoffeeShop</code> Tag</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                Each API declares its own safety and which APIs come before and after it, so the Model discovers the
+                workflow from the APIs themselves instead of a hand-written system prompt.
+            </p>
+            <div class="mt-4 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+                    <code class="font-mono text-xs font-semibold text-slate-900 dark:text-white">GetCoffeeShopMenu</code>
+                    <span class="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Read</span>
+                    <span class="w-full text-sm leading-6 text-slate-600 dark:text-slate-400">Products, prices and the sizes, temperatures &amp; options each category allows</span>
+                </div>
+                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+                    <code class="font-mono text-xs font-semibold text-slate-900 dark:text-white">PreviewCoffeeShopOrder</code>
+                    <span class="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Read</span>
+                    <span class="w-full text-sm leading-6 text-slate-600 dark:text-slate-400">Validates and prices a proposed order without saving it - returning normalized defaults and actionable errors the Model can correct</span>
+                </div>
+                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+                    <code class="font-mono text-xs font-semibold text-slate-900 dark:text-white">CreateCoffeeShopOrder</code>
+                    <span class="rounded bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">Write</span>
+                    <span class="rounded bg-sky-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-400">Approval</span>
+                    <span class="w-full text-sm leading-6 text-slate-600 dark:text-slate-400">Submits the order, with <code class="font-mono text-xs">Preview</code> pointing at PreviewCoffeeShopOrder so the approval form shows a priced summary</span>
+                </div>
+                <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-4 py-3">
+                    <code class="font-mono text-xs font-semibold text-slate-900 dark:text-white">GetCoffeeShopOrder</code>
+                    <span class="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Read</span>
+                    <span class="w-full text-sm leading-6 text-slate-600 dark:text-slate-400">Looks up a submitted order and its status by Id</span>
+                </div>
+            </div>
+            <p class="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                <span class="font-mono text-xs text-slate-500 dark:text-slate-500">Menu &rarr; Preview &rarr; Create &rarr; Get</span>
+                - the order the Model follows, read from each API's <code class="font-mono text-xs">Prerequisites</code> and <code class="font-mono text-xs">FollowUps</code>.
+            </p>
         </div>
 
         <div>
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Consequential calls need a human</h3>
             <p class="mt-3 leading-7 text-slate-600 dark:text-slate-400">
                 Reads execute immediately. Writes and destructive operations pause and render an editable form
-                generated from the API's own schema - so the user sees exactly what will be sent, and can fix it
+                generated from the API's own schema - the user sees exactly what's sent, and can fix it
                 before approving. No per-API Chat component to write.
             </p>
-            <div class="mt-6 overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
-                <img src="/img/pages/chat/api-tools/chat-coffeeshop-approval.webp" alt="Schema-generated approval form" class="ss-zoom cursor-zoom-in h-auto w-full" loading="lazy">
+            <div id="ai-approval" tabindex="0" aria-label="The approval flow inside the Chat UI"
+                 class="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:border-slate-800 dark:bg-slate-900">
+
+                <div role="tablist" aria-label="Steps" class="flex gap-1.5 border-b border-slate-200 bg-slate-50 px-2.5 py-2 dark:border-slate-800 dark:bg-slate-950/60">
+                    <button type="button" role="tab" aria-controls="ai-panel"
+                            class="ai-tab flex-1 cursor-pointer rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition dark:text-slate-400 dark:ring-slate-700"
+                            data-src="/img/pages/chat/mcp/aichat-coffeeshop-menu.webp"
+                            data-alt="Reading the CoffeeShop menu in the Chat UI"
+                            data-say="A read is safe, so the call runs the moment the Model asks for it and answers in the thread.">
+                        Browse
+                    </button>
+                    <button type="button" role="tab" aria-controls="ai-panel"
+                            class="ai-tab flex-1 cursor-pointer rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition dark:text-slate-400 dark:ring-slate-700"
+                            data-src="/img/pages/chat/mcp/aichat-order-preview.webp"
+                            data-alt="The schema-generated approval form for a CoffeeShop order"
+                            data-say="The write stops here. Every field comes from CreateCoffeeShopOrder's own schema, and stays editable until Confirm & execute.">
+                        Approve
+                    </button>
+                    <button type="button" role="tab" aria-controls="ai-panel"
+                            class="ai-tab flex-1 cursor-pointer rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition dark:text-slate-400 dark:ring-slate-700"
+                            data-src="/img/pages/chat/mcp/aichat-order-confirmed.webp"
+                            data-alt="The placed CoffeeShop order confirmed back in the thread"
+                            data-say="Approved, the API runs as the signed-in user and the result comes back into the same thread.">
+                        Confirmed
+                    </button>
+                </div>
+
+                <div id="ai-panel" role="tabpanel" class="relative aspect-[83/94] w-full bg-slate-100 dark:bg-slate-950">
+                    <div id="ai-spinner" class="absolute inset-0 z-10 hidden place-items-center">
+                        <svg class="h-6 w-6 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-20"/>
+                            <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <img id="ai-shot" src="/img/pages/chat/mcp/aichat-order-preview.webp"
+                         alt="The schema-generated approval form for a CoffeeShop order"
+                         class="ss-zoom absolute inset-0 h-full w-full cursor-zoom-in object-cover transition-opacity duration-300" loading="lazy">
+                </div>
+
+                <div aria-live="polite" class="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
+                    <p id="ai-say" class="text-xs leading-5 text-slate-600 dark:text-slate-400">
+                        The write stops here. Every field comes from CreateCoffeeShopOrder's own schema, and stays editable until Confirm &amp; execute.
+                    </p>
+                </div>
             </div>
+
+            <script>
+            ;(function () {
+                const root = document.getElementById('ai-approval')
+                if (!root) return
+                const tabs = Array.from(root.querySelectorAll('.ai-tab'))
+                const shot = document.getElementById('ai-shot')
+                const spin = document.getElementById('ai-spinner')
+                const say  = document.getElementById('ai-say')
+                if (!tabs.length || !shot) return
+
+                const BASE = 'ai-tab flex-1 cursor-pointer rounded-lg px-2 py-1.5 text-xs font-semibold transition'
+                const ON   = BASE + ' bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                const OFF  = BASE + ' text-slate-500 ring-1 ring-slate-200 hover:text-slate-900 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-white'
+
+                let i = 1  // opens on the approval form - the screen this section is about
+
+                /** decode off-screen first, so the frame never flashes empty between screens */
+                function swap(src, alt) {
+                    if (shot.getAttribute('src') === src) return
+                    shot.style.opacity = '0'
+                    spin.classList.remove('hidden')
+                    spin.classList.add('grid')
+                    const next = new Image()
+                    next.onload = next.onerror = () => {
+                        shot.src = src
+                        shot.alt = alt
+                        shot.style.opacity = '1'
+                        spin.classList.add('hidden')
+                        spin.classList.remove('grid')
+                    }
+                    next.src = src
+                }
+
+                function render() {
+                    tabs.forEach((t, n) => {
+                        t.className = n === i ? ON : OFF
+                        t.setAttribute('aria-selected', n === i ? 'true' : 'false')
+                    })
+                    say.textContent = tabs[i].dataset.say
+                    swap(tabs[i].dataset.src, tabs[i].dataset.alt)
+                }
+
+                tabs.forEach((t, n) => t.addEventListener('click', () => { i = n; render() }))
+                root.addEventListener('pointerenter', () => tabs.forEach(t => { new Image().src = t.dataset.src }), { once: true })
+
+                // scoped to the card, so it never competes with the page's other arrow-key handlers
+                root.addEventListener('keydown', e => {
+                    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+                    e.preventDefault()
+                    i = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length
+                    render()
+                })
+
+                render()
+            })()
+            </script>
         </div>
     </div>
 
@@ -441,9 +573,257 @@
         </div>
     </div>
 
-    <div class="mt-12 overflow-hidden rounded-xl border border-slate-200 shadow-xl dark:border-slate-700 dark:bg-white">
-        <img src="/img/pages/chat/api-tools/opencode-mcp.webp" alt="An external AI Assistant using ServiceStack API Tools over MCP" class="h-auto w-full" loading="lazy">
+    <!-- ── The same flow, from every MCP client ── -->
+    <div class="mt-16">
+        <div class="mx-auto max-w-2xl text-center">
+            <h3 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                One coffee order, seven MCP clients
+            </h3>
+            <p class="mt-3 text-base leading-7 text-slate-600 dark:text-slate-400">
+                None of this was built per-client. Every assistant discovers the same
+                <code class="font-mono text-sm text-sky-700 dark:text-sky-400">CoffeeShop</code> APIs through the same
+                three tools, and stops at the same approval before anything is written.
+            </p>
+        </div>
+
+        <div id="mcp-clients" tabindex="0" aria-label="MCP client walkthrough"
+             class="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:border-slate-800 dark:bg-slate-900">
+
+            <!-- Client picker -->
+            <div role="tablist" aria-label="MCP clients"
+                 class="flex gap-1.5 overflow-x-auto border-b border-slate-200 bg-slate-50 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-950/60">
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="Claude Desktop"
+                        data-menu="/img/pages/chat/mcp/claude-desktop-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/claude-desktop-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/claude-desktop-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/claute-desktop.svg" alt="" class="h-4 w-4"></span>
+                    <span>Claude Desktop</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="Claude Code"
+                        data-menu="/img/pages/chat/mcp/claude-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/claude-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/claude-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/claude.svg" alt="" class="h-4 w-4"></span>
+                    <span>Claude Code</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="Codex"
+                        data-menu="/img/pages/chat/mcp/codex-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/codex-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/codex-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/codex.svg" alt="" class="h-4 w-4"></span>
+                    <span>Codex</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="OpenCode"
+                        data-menu="/img/pages/chat/mcp/opencode-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/opencode-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/opencode-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/opencode.svg" alt="" class="h-4 w-4"></span>
+                    <span>OpenCode</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="Antigravity"
+                        data-menu="/img/pages/chat/mcp/anitgravity-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/antigravity-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/antigravity-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/antigravity.svg" alt="" class="h-4 w-4"></span>
+                    <span>Antigravity</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="ZCode"
+                        data-menu="/img/pages/chat/mcp/zcode-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/zcode-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/zcode-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/zai.svg" alt="" class="h-4 w-4"></span>
+                    <span>ZCode</span>
+                </button>
+
+                <button type="button" role="tab" aria-controls="mcp-panel"
+                        class="mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700"
+                        data-name="Oh My Pi"
+                        data-menu="/img/pages/chat/mcp/omp-coffeeshop-menu.webp"
+                        data-preview="/img/pages/chat/mcp/omp-order-preview.webp"
+                        data-confirmed="/img/pages/chat/mcp/omp-order-confirmed.webp">
+                    <span class="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white shadow-sm ring-1 ring-slate-900/10"><img src="/img/tools/omp.svg" alt="" class="h-4 w-4"></span>
+                    <span>Oh My Pi</span>
+                </button>
+            </div>
+
+            <!-- Step picker -->
+            <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-slate-200 px-3 py-2.5 dark:border-slate-800">
+                <div role="tablist" aria-label="Steps" class="flex flex-wrap gap-1.5">
+                    <button type="button" role="tab" aria-controls="mcp-panel"
+                            class="mcp-step flex cursor-pointer items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition sm:text-sm dark:text-slate-400 dark:ring-slate-700">
+                        <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold opacity-70 ring-1 ring-current">1</span>
+                        <span>Browse the menu</span>
+                    </button>
+                    <button type="button" role="tab" aria-controls="mcp-panel"
+                            class="mcp-step flex cursor-pointer items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition sm:text-sm dark:text-slate-400 dark:ring-slate-700">
+                        <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold opacity-70 ring-1 ring-current">2</span>
+                        <span>Preview the order</span>
+                    </button>
+                    <button type="button" role="tab" aria-controls="mcp-panel"
+                            class="mcp-step flex cursor-pointer items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 transition sm:text-sm dark:text-slate-400 dark:ring-slate-700">
+                        <span class="grid h-5 w-5 shrink-0 place-items-center rounded-full text-[11px] font-bold opacity-70 ring-1 ring-current">3</span>
+                        <span>Order confirmed</span>
+                    </button>
+                </div>
+
+                <div class="flex shrink-0 items-center gap-2">
+                    <button type="button" id="mcp-prev" aria-label="Previous step" title="Previous step"
+                            class="cursor-pointer rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition hover:text-sky-600 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-sky-400">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span id="mcp-count" class="font-mono text-xs font-semibold tabular-nums text-slate-400">2 / 3</span>
+                    <button type="button" id="mcp-next" aria-label="Next step" title="Next step"
+                            class="cursor-pointer rounded-lg p-1.5 text-slate-500 ring-1 ring-slate-200 transition hover:text-sky-600 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-sky-400">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Screenshot -->
+            <div id="mcp-panel" role="tabpanel" class="relative aspect-[1.7] w-full bg-slate-100 dark:bg-slate-950">
+                <div id="mcp-spinner" class="absolute inset-0 z-10 hidden place-items-center">
+                    <svg class="h-6 w-6 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-20"/>
+                        <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <img id="mcp-shot" src="/img/pages/chat/mcp/claude-desktop-order-preview.webp"
+                     alt="Claude Desktop previewing a CoffeeShop order before approving it"
+                     class="ss-zoom absolute inset-0 h-full w-full cursor-zoom-in object-contain transition-opacity duration-300" loading="lazy">
+            </div>
+
+            <!-- Caption -->
+            <div aria-live="polite" class="border-t border-slate-200 px-4 py-3.5 dark:border-slate-800">
+                <p id="mcp-client-name" class="font-mono text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400">Claude Desktop</p>
+                <p id="mcp-caption" class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    <code class="font-mono text-xs">CreateCoffeeShopOrder</code> is a write, so the call comes back as a
+                    validated preview and a confirmation token instead of an order.
+                </p>
+            </div>
+        </div>
+
+        <p class="mt-5 text-center text-sm">
+            <a href="/chat/connect-mcp" class="font-semibold text-sky-600 hover:text-sky-500 dark:text-sky-400">Registration snippets for each client <span aria-hidden="true">&rarr;</span></a>
+        </p>
     </div>
+
+    <script>
+    ;(function () {
+        const root = document.getElementById('mcp-clients')
+        if (!root) return
+        const tabs    = Array.from(root.querySelectorAll('.mcp-tab'))
+        const steps   = Array.from(root.querySelectorAll('.mcp-step'))
+        const shot    = document.getElementById('mcp-shot')
+        const spinner = document.getElementById('mcp-spinner')
+        const count   = document.getElementById('mcp-count')
+        const label   = document.getElementById('mcp-client-name')
+        const caption = document.getElementById('mcp-caption')
+        if (!tabs.length || !steps.length || !shot) return
+
+        const KEY = ['menu', 'preview', 'confirmed']
+        const ALT = [
+            'browsing the CoffeeShop menu over MCP',
+            'previewing a CoffeeShop order before approving it',
+            'after the CoffeeShop order was approved and placed'
+        ]
+        const SAYS = [
+            '<code class="font-mono text-xs">api_search</code> finds the CoffeeShop APIs and ' +
+            '<code class="font-mono text-xs">api_describe</code> returns their schemas - a read-only ' +
+            '<code class="font-mono text-xs">api_call</code> then runs without stopping for anyone.',
+            '<code class="font-mono text-xs">CreateCoffeeShopOrder</code> is a write, so the call comes back as a ' +
+            'validated preview and a confirmation token instead of an order.',
+            'Only once the user approves is the call replayed with that token - placed as the user behind the API key, ' +
+            'through the same validation as every other client.'
+        ]
+
+        const TAB  = 'mcp-tab flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition'
+        const TAB_ON  = TAB + ' bg-sky-600 text-white shadow-sm shadow-sky-600/30'
+        const TAB_OFF = TAB + ' bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-sky-50 hover:text-sky-700 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800 dark:hover:text-white'
+
+        const STEP = 'mcp-step flex cursor-pointer items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-xs font-semibold transition sm:text-sm'
+        const STEP_ON  = STEP + ' bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+        const STEP_OFF = STEP + ' text-slate-500 ring-1 ring-slate-200 hover:text-slate-900 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-white'
+
+        let c = 0, s = 1  // opens on the approval step - the one worth seeing first
+
+        /** decode off-screen first, so the frame never flashes empty between screenshots */
+        function swap(src, alt) {
+            if (shot.getAttribute('src') === src) return
+            shot.style.opacity = '0'
+            spinner.classList.remove('hidden')
+            spinner.classList.add('grid')
+            const next = new Image()
+            next.onload = next.onerror = () => {
+                shot.src = src
+                shot.alt = alt
+                shot.style.opacity = '1'
+                spinner.classList.add('hidden')
+                spinner.classList.remove('grid')
+            }
+            next.src = src
+        }
+
+        /** the other two steps of a client are one click away - fetch them while the user reads */
+        function preload(tab) {
+            KEY.forEach(k => { new Image().src = tab.dataset[k] })
+        }
+
+        function render() {
+            tabs.forEach((t, n) => {
+                t.className = n === c ? TAB_ON : TAB_OFF
+                t.setAttribute('aria-selected', n === c ? 'true' : 'false')
+            })
+            steps.forEach((t, n) => {
+                t.className = n === s ? STEP_ON : STEP_OFF
+                t.setAttribute('aria-selected', n === s ? 'true' : 'false')
+            })
+            const tab = tabs[c]
+            label.textContent = tab.dataset.name
+            caption.innerHTML = SAYS[s]
+            count.textContent = (s + 1) + ' / ' + steps.length
+            swap(tab.dataset[KEY[s]], tab.dataset.name + ' ' + ALT[s])
+        }
+
+        tabs.forEach((t, n) => {
+            t.addEventListener('click', () => { c = n; preload(t); render() })
+            t.addEventListener('mouseenter', () => preload(t), { once: true })
+        })
+        steps.forEach((t, n) => t.addEventListener('click', () => { s = n; render() }))
+
+        function go(d) { s = (s + d + steps.length) % steps.length; render() }
+        document.getElementById('mcp-prev').addEventListener('click', () => go(-1))
+        document.getElementById('mcp-next').addEventListener('click', () => go(1))
+
+        // scoped to the panel, so it never competes with the page's other arrow-key handlers
+        root.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight')     { e.preventDefault(); go(1) }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1) }
+            else if (e.key === 'ArrowDown') { e.preventDefault(); c = (c + 1) % tabs.length; preload(tabs[c]); render() }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); c = (c - 1 + tabs.length) % tabs.length; preload(tabs[c]); render() }
+        })
+
+        render()
+        preload(tabs[0])
+    })()
+    </script>
 </div>
 
 <!-- ───────────────────────── Gemini RAG ───────────────────────── -->

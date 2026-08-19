@@ -31,7 +31,7 @@ export function dedent(text) {
 }
 
 /** Flatten a slot's vnodes down to their text, without needing the DOM (works during SSG) */
-function slotText(nodes) {
+export function slotText(nodes) {
     if (nodes == null || typeof nodes === 'boolean') return ''
     if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes)
     if (Array.isArray(nodes)) return nodes.map(slotText).join('')

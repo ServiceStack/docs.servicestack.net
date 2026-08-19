@@ -4,7 +4,7 @@ title: MCP Server
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
 
-<text-block text="https://your-app.example.com/chat/mcp"></text-block>
+<text-block text="https://example.org/chat/mcp"></text-block>
 
 ## Enabling it
 
@@ -60,7 +60,7 @@ MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `C
 ```json
 {
   "type": "remote",
-  "url": "https://your-app.example.com/chat/mcp",
+  "url": "https://example.org/chat/mcp",
   "oauth": false,
   "headers": {
     "Authorization": "Bearer {env:MY_APP_API_KEY}"
@@ -78,9 +78,12 @@ services.AddPlugin(new ApiKeysFeature());
 
 ## Registering with a client
 
-Most MCP clients take a single command or a small JSON block. For example:
+Most MCP clients take a single command or a small JSON block. For example, adding an endpoint in **Claude Code**:
 
-<text-block text="/mcp add coffeeshop --url https://your-app.example.com/chat/mcp --token ak-xxxx"></text-block>
+```sh
+claude mcp add --transport http coffeeshop https://example.org/chat/mcp \
+  --header "Authorization: Bearer ak-xxxx"
+```
 
 Once registered, the client discovers the available tools and lists them alongside its other MCP servers:
 
@@ -89,7 +92,15 @@ Once registered, the client discovers the available tools and lists them alongsi
     'Tool list': '/img/pages/chat/api-tools/omp-tools.webp',
 }"></screenshots-gallery>
 
-<screenshot src="/img/pages/chat/tools/mcp-add.webp" title="Adding an MCP Server"></screenshot>
+See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration examples across supported clients:
+
+- [Claude Code](/chat/connect-mcp#claude-code)
+- [Claude Desktop](/chat/connect-mcp#claude-desktop)
+- [Codex](/chat/connect-mcp#codex)
+- [Open Code](/chat/connect-mcp#open-code)
+- [Antigravity](/chat/connect-mcp#antigravity)
+- [ZCode](/chat/connect-mcp#zcode)
+- [Oh My Pi](/chat/connect-mcp#oh-my-pi)
 
 ## What the server publishes
 
@@ -176,8 +187,6 @@ services.AddPlugin(new ChatFeature {
 ```
 
 See [Custom Extensions](/chat/custom-extensions) for registering tools.
-
-<screenshot src="/img/pages/chat/tools/mcp-servers.webp" title="MCP servers configured in an AI Assistant"></screenshot>
 
 ## Deployment checklist
 
