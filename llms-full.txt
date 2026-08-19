@@ -13487,7 +13487,7 @@ Source: https://docs.servicestack.net/chat/mcp
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
 
-<text-block text="https://your-app.example.com/chat/mcp"></text-block>
+<text-block text="https://example.org/chat/mcp"></text-block>
 
 ## Enabling it
 
@@ -13543,7 +13543,7 @@ MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `C
 ```json
 {
   "type": "remote",
-  "url": "https://your-app.example.com/chat/mcp",
+  "url": "https://example.org/chat/mcp",
   "oauth": false,
   "headers": {
     "Authorization": "Bearer {env:MY_APP_API_KEY}"
@@ -13561,9 +13561,12 @@ services.AddPlugin(new ApiKeysFeature());
 
 ## Registering with a client
 
-Most MCP clients take a single command or a small JSON block. For example:
+Most MCP clients take a single command or a small JSON block. For example, adding an endpoint in **Claude Code**:
 
-<text-block text="/mcp add coffeeshop --url https://your-app.example.com/chat/mcp --token ak-xxxx"></text-block>
+```sh
+claude mcp add --transport http coffeeshop https://example.org/chat/mcp \
+  --header "Authorization: Bearer ak-xxxx"
+```
 
 Once registered, the client discovers the available tools and lists them alongside its other MCP servers:
 
@@ -13572,7 +13575,15 @@ Once registered, the client discovers the available tools and lists them alongsi
     'Tool list': '/img/pages/chat/api-tools/omp-tools.webp',
 }"></screenshots-gallery>
 
-<screenshot src="/img/pages/chat/tools/mcp-add.webp" title="Adding an MCP Server"></screenshot>
+See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration examples across supported clients:
+
+- [Claude Code](/chat/connect-mcp#claude-code)
+- [Claude Desktop](/chat/connect-mcp#claude-desktop)
+- [Codex](/chat/connect-mcp#codex)
+- [Open Code](/chat/connect-mcp#open-code)
+- [Antigravity](/chat/connect-mcp#antigravity)
+- [ZCode](/chat/connect-mcp#zcode)
+- [Oh My Pi](/chat/connect-mcp#oh-my-pi)
 
 ## What the server publishes
 
@@ -13660,8 +13671,6 @@ services.AddPlugin(new ChatFeature {
 
 See [Custom Extensions](/chat/custom-extensions) for registering tools.
 
-<screenshot src="/img/pages/chat/tools/mcp-servers.webp" title="MCP servers configured in an AI Assistant"></screenshot>
-
 ## Deployment checklist
 
 - Register `ApiKeysFeature` and issue a scoped key per client or per user.
@@ -13670,6 +13679,210 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 - Register a distributed `ICacheClient` for single-use token replay protection across instances.
 - Keep `[Tool(Safety)]` accurate — it drives both confirmation token requirements and MCP safety annotations.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.
+
+
+# Connect MCP Clients
+Source: https://docs.servicestack.net/chat/connect-mcp
+
+MCP clients can register a ServiceStack MCP server via a single CLI command or by configuring their respective MCP settings.
+
+## Claude Code
+
+Add via the Claude Code CLI:
+
+<copy-block>
+claude mcp add --transport http coffeeshop https://example.org/chat/mcp --header "Authorization: Bearer ak-xxxx"
+</copy-block>
+
+Or configure directly in `~/.claude.json`:
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/claude-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/claude-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/claude-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Claude Desktop
+
+Claude Desktop connects to remote MCP servers using `mcp-remote` configured in `claude_desktop_config.json` 
+- Windows: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- macOS: `%APPDATA%\Claude\claude_desktop_config.json`
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "command": "npx",
+      "args": [
+        "mcp-remote@latest",
+        "https://macbook.raptor-elver.ts.net/chat/mcp",
+        "--header",
+        "Authorization: Bearer ${AUTH_TOKEN}"
+      ],
+      "env": {
+        "AUTH_TOKEN": "ak-3dcd3567656f49fbb5a791a35e464567"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/claude-desktop-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/claude-desktop-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/claude-desktop-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Codex
+
+Add via the Codex CLI:
+
+<copy-block>
+codex mcp add coffeeshop https://example.org/chat/mcp --header "Authorization: Bearer ak-xxxx"
+</copy-block>
+
+Or configure in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.coffeeshop]
+url = "https://example.org/chat/mcp"
+http_headers = { "Authorization" = "Bearer ak-xxxx" }
+```
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/codex-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/codex-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/codex-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Open Code
+
+Configure in `opencode.json` (or `.opencode/mcp.json`):
+
+<view-json>
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "coffeeshop": {
+      "type": "remote",
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/opencode-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/opencode-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/opencode-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Antigravity
+
+Configure in `~/.gemini/antigravity/mcp_config.json` or `.gemini/mcp.json`:
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+Or configure via the Antigravity IDE UI under **Settings > MCP Servers**.
+
+<screenshot-toggle :images="{
+    'MCP Settings': '/img/pages/chat/mcp/claude-desktop-mcp-connected.webp',
+    'Browse Menu': '/img/pages/chat/mcp/anitgravity-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/antigravity-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/antigravity-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## ZCode
+
+Configure in `~/.zcode/cli/config.json`:
+
+<view-json>
+{
+  "mcp": {
+    "servers": {
+      "coffeeshop": {
+        "type": "http",
+        "url": "http://localhost:5000/chat/mcp",
+        "headers": {
+          "Authorization": "Bearer ak-xxxx"
+        }
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/zcode-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/zcode-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/zcode-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Oh My Pi
+
+Register from the prompt:
+
+<copy-block>
+/mcp add coffeeshop --url https://example.org/chat/mcp --token ak-xxxx
+</copy-block>
+
+Once registered, the client discovers the available tools and lists them alongside its other MCP servers:
+
+<screenshot-toggle :images="{
+    'Discovered Tools': '/img/pages/chat/api-tools/omp-mcp-list.webp',
+    'Tool List': '/img/pages/chat/api-tools/omp-tools.webp',
+    'Browse Menu': '/img/pages/chat/mcp/omp-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/omp-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/omp-order-confirmed.webp',
+}"></screenshot-toggle>
+
+
+### Troubleshooting
+
+:::tip Local Development
+For local development, many MCP clients won't accept .NET's self-signed development HTTPS certificate.
+:::
+
+Workarounds include:
+
+- Connecting to the plaintext HTTP endpoint instead:
+
+<copy-block>
+claude mcp add --transport http coffeeshop http://localhost:5000/chat/mcp --header "Authorization: Bearer ak-xxx"
+</copy-block>
+
+- Using [Tailscale Funnel](https://tailscale.com/kb/1223/funnel) to expose your local port with a trusted TLS certificate:
+
+<copy-block>
+tailscale funnel 5000
+</copy-block>
 
 
 # PDF Studio
@@ -84977,7 +85190,7 @@ Source: https://docs.servicestack.net/chat/mcp
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
 
-<text-block text="https://your-app.example.com/chat/mcp"></text-block>
+<text-block text="https://example.org/chat/mcp"></text-block>
 
 ## Enabling it
 
@@ -85033,7 +85246,7 @@ MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `C
 ```json
 {
   "type": "remote",
-  "url": "https://your-app.example.com/chat/mcp",
+  "url": "https://example.org/chat/mcp",
   "oauth": false,
   "headers": {
     "Authorization": "Bearer {env:MY_APP_API_KEY}"
@@ -85051,9 +85264,12 @@ services.AddPlugin(new ApiKeysFeature());
 
 ## Registering with a client
 
-Most MCP clients take a single command or a small JSON block. For example:
+Most MCP clients take a single command or a small JSON block. For example, adding an endpoint in **Claude Code**:
 
-<text-block text="/mcp add coffeeshop --url https://your-app.example.com/chat/mcp --token ak-xxxx"></text-block>
+```sh
+claude mcp add --transport http coffeeshop https://example.org/chat/mcp \
+  --header "Authorization: Bearer ak-xxxx"
+```
 
 Once registered, the client discovers the available tools and lists them alongside its other MCP servers:
 
@@ -85062,7 +85278,15 @@ Once registered, the client discovers the available tools and lists them alongsi
     'Tool list': '/img/pages/chat/api-tools/omp-tools.webp',
 }"></screenshots-gallery>
 
-<screenshot src="/img/pages/chat/tools/mcp-add.webp" title="Adding an MCP Server"></screenshot>
+See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration examples across supported clients:
+
+- [Claude Code](/chat/connect-mcp#claude-code)
+- [Claude Desktop](/chat/connect-mcp#claude-desktop)
+- [Codex](/chat/connect-mcp#codex)
+- [Open Code](/chat/connect-mcp#open-code)
+- [Antigravity](/chat/connect-mcp#antigravity)
+- [ZCode](/chat/connect-mcp#zcode)
+- [Oh My Pi](/chat/connect-mcp#oh-my-pi)
 
 ## What the server publishes
 
@@ -85150,8 +85374,6 @@ services.AddPlugin(new ChatFeature {
 
 See [Custom Extensions](/chat/custom-extensions) for registering tools.
 
-<screenshot src="/img/pages/chat/tools/mcp-servers.webp" title="MCP servers configured in an AI Assistant"></screenshot>
-
 ## Deployment checklist
 
 - Register `ApiKeysFeature` and issue a scoped key per client or per user.
@@ -85160,6 +85382,210 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 - Register a distributed `ICacheClient` for single-use token replay protection across instances.
 - Keep `[Tool(Safety)]` accurate — it drives both confirmation token requirements and MCP safety annotations.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.
+
+
+# Connect MCP Clients
+Source: https://docs.servicestack.net/chat/connect-mcp
+
+MCP clients can register a ServiceStack MCP server via a single CLI command or by configuring their respective MCP settings.
+
+## Claude Code
+
+Add via the Claude Code CLI:
+
+<copy-block>
+claude mcp add --transport http coffeeshop https://example.org/chat/mcp --header "Authorization: Bearer ak-xxxx"
+</copy-block>
+
+Or configure directly in `~/.claude.json`:
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/claude-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/claude-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/claude-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Claude Desktop
+
+Claude Desktop connects to remote MCP servers using `mcp-remote` configured in `claude_desktop_config.json` 
+- Windows: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- macOS: `%APPDATA%\Claude\claude_desktop_config.json`
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "command": "npx",
+      "args": [
+        "mcp-remote@latest",
+        "https://macbook.raptor-elver.ts.net/chat/mcp",
+        "--header",
+        "Authorization: Bearer ${AUTH_TOKEN}"
+      ],
+      "env": {
+        "AUTH_TOKEN": "ak-3dcd3567656f49fbb5a791a35e464567"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/claude-desktop-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/claude-desktop-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/claude-desktop-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Codex
+
+Add via the Codex CLI:
+
+<copy-block>
+codex mcp add coffeeshop https://example.org/chat/mcp --header "Authorization: Bearer ak-xxxx"
+</copy-block>
+
+Or configure in `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.coffeeshop]
+url = "https://example.org/chat/mcp"
+http_headers = { "Authorization" = "Bearer ak-xxxx" }
+```
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/codex-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/codex-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/codex-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Open Code
+
+Configure in `opencode.json` (or `.opencode/mcp.json`):
+
+<view-json>
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "coffeeshop": {
+      "type": "remote",
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/opencode-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/opencode-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/opencode-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Antigravity
+
+Configure in `~/.gemini/antigravity/mcp_config.json` or `.gemini/mcp.json`:
+
+<view-json>
+{
+  "mcpServers": {
+    "coffeeshop": {
+      "url": "https://example.org/chat/mcp",
+      "headers": {
+        "Authorization": "Bearer ak-xxxx"
+      }
+    }
+  }
+}
+</view-json>
+
+Or configure via the Antigravity IDE UI under **Settings > MCP Servers**.
+
+<screenshot-toggle :images="{
+    'MCP Settings': '/img/pages/chat/mcp/claude-desktop-mcp-connected.webp',
+    'Browse Menu': '/img/pages/chat/mcp/anitgravity-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/antigravity-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/antigravity-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## ZCode
+
+Configure in `~/.zcode/cli/config.json`:
+
+<view-json>
+{
+  "mcp": {
+    "servers": {
+      "coffeeshop": {
+        "type": "http",
+        "url": "http://localhost:5000/chat/mcp",
+        "headers": {
+          "Authorization": "Bearer ak-xxxx"
+        }
+      }
+    }
+  }
+}
+</view-json>
+
+<screenshot-toggle :images="{
+    'Browse Menu': '/img/pages/chat/mcp/zcode-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/zcode-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/zcode-order-confirmed.webp',
+}"></screenshot-toggle>
+
+## Oh My Pi
+
+Register from the prompt:
+
+<copy-block>
+/mcp add coffeeshop --url https://example.org/chat/mcp --token ak-xxxx
+</copy-block>
+
+Once registered, the client discovers the available tools and lists them alongside its other MCP servers:
+
+<screenshot-toggle :images="{
+    'Discovered Tools': '/img/pages/chat/api-tools/omp-mcp-list.webp',
+    'Tool List': '/img/pages/chat/api-tools/omp-tools.webp',
+    'Browse Menu': '/img/pages/chat/mcp/omp-coffeeshop-menu.webp',
+    'Order Preview': '/img/pages/chat/mcp/omp-order-preview.webp',
+    'Order Confirmed': '/img/pages/chat/mcp/omp-order-confirmed.webp',
+}"></screenshot-toggle>
+
+
+### Troubleshooting
+
+:::tip Local Development
+For local development, many MCP clients won't accept .NET's self-signed development HTTPS certificate.
+:::
+
+Workarounds include:
+
+- Connecting to the plaintext HTTP endpoint instead:
+
+<copy-block>
+claude mcp add --transport http coffeeshop http://localhost:5000/chat/mcp --header "Authorization: Bearer ak-xxx"
+</copy-block>
+
+- Using [Tailscale Funnel](https://tailscale.com/kb/1223/funnel) to expose your local port with a trusted TLS certificate:
+
+<copy-block>
+tailscale funnel 5000
+</copy-block>
 
 
 # Agent Profiles
