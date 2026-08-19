@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-18T16:31:38.0903050Z'>
+    <meta name='date' content='2026-08-19T02:29:30.5201951Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v10.1</title>
@@ -652,24 +652,28 @@ Releases                                    </span>
 </tbody>
 </table>
 <pre><code class="language-csharp">Mcp = {
-    ToolGroups = [&quot;api_tools&quot;],
+    ToolGroups = [&quot;api_tools&quot;], // Default
     ApprovalMode = McpApprovalMode.ConfirmationToken, // Default
-    ConfirmationTokenExpiry = TimeSpan.FromMinutes(5),
+    ConfirmationTokenExpiry = TimeSpan.FromMinutes(5), // Default
 }
 </code></pre>
 <p>For production deployments, configure a shared <code>SigningSecret</code> (≥ 32 bytes) and register a distributed <code>ICacheClient</code> for cross-instance replay protection. See <a href="/chat/mcp#approval-across-the-mcp-boundary">MCP Server - Approval</a> for details.</p>
 <p>The old <code>RejectToolsRequiringApproval</code> property is marked <code>[Obsolete]</code> and maps to <code>Reject</code> (true) or <code>DelegateToClient</code> (false).</p>
 <h3 id="mcp-attribute-for-mcp-specific-descriptions"><code>[Mcp]</code> Attribute for MCP-specific Descriptions<a class="header-anchor" href="javascript:;" onclick="location.hash='#mcp-attribute-for-mcp-specific-descriptions'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>A new <code>[Mcp(Description = ...)]</code> attribute lets you provide imperative, agent-facing descriptions for DTOs exposed over MCP - such as mandatory prerequisites or confirmation steps - without polluting the regular <code>[Description]</code> used by OpenAPI generators and admin UIs:</p>
+<p>A new <code>[Mcp(Description = ...)]</code> attribute lets you provide imperative, agent-facing instructions for DTOs exposed over MCP - such as mandatory prerequisites or confirmation steps - without polluting the regular <code>[Description]</code> used by AI.Chat API Tools, API Explorers, Admin UIs and OpenAPI generators:</p>
 <pre><code class="language-csharp">[Description(&quot;Submits and charges a coffee shop order.&quot;)]
 [Mcp(Description =
-    &quot;Submits and charges a coffee shop order. &quot; +
-    &quot;IMPORTANT: Before calling this you MUST first call &quot; +
-    &quot;PreviewCoffeeShopOrder and obtain explicit customer confirmation.&quot;)]
+    &quot;&quot;&quot;
+    Submits and charges a coffee shop order.
+    IMPORTANT: Before calling this API you MUST first call PreviewCoffeeShopOrder, present the 
+    itemized summary and total price to the human customer verbatim, and WAIT for their explicit 
+    natural-language confirmation of both the items and the total in a subsequent user turn.
+    &quot;&quot;&quot;)]
 [Tool(&quot;the user wants to place an order&quot;, Safety = ToolSafety.Write, RequiresApproval = true)]
 public class CreateCoffeeShopOrder : IPost, IReturn&lt;CreateCoffeeShopOrderResponse&gt; { }
 </code></pre>
-<p>When set, MCP responses (<code>api_search</code>, <code>api_describe</code>, confirmation summaries) prefer <code>McpDescription</code> over the regular <code>Description</code>. All non-MCP consumers continue to see the original <code>[Description]</code>.</p>
+<p>When set, MCP responses (<code>api_search</code>, <code>api_describe</code>, confirmation summaries) prefer <code>[MCP(Description)]</code> over the regular <code>[Description]</code>. All non-MCP consumers continue to see the original <code>[Description]</code>.</p>
+<p>Most MCP API Assistants can infer the need for confirmation from the MCP annotations, but some require explicit instructions to avoid circumventing the 2-phase confirmation without seeking explicit human approval. The <code>[Mcp]</code> attribute provides a way to communicate those instructions without affecting other consumers.</p>
 <h3 id="mcp-aware-api-tool-responses">MCP-aware API Tool Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#mcp-aware-api-tool-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <ul>
 <li><code>api_search</code> and <code>api_describe</code> now return MCP-flavored summaries when called over the MCP transport.</li>
