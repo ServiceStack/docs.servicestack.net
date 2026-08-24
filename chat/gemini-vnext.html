@@ -1,0 +1,1574 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2026-08-24T09:00:34.5537922Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Gemini RAG</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <style>html { scroll-padding-top: 5rem }</style>
+    <link rel="stylesheet" href="/css/app.css">
+    
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.mjs",
+        "marked": "/lib/mjs/marked.min.mjs",
+        "highlight.js": "/lib/mjs/highlight.min.mjs"
+    }
+}
+</script>
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white/90 dark:bg-black/90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+                        <a href="/templates/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span> Templates
+                        </a>
+                        <a href="/vue/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Vue
+                        </a>
+                        <a href="/react/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            React
+                        </a>
+                        <a href="/add-servicestack-reference" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            DTOs
+                        </a>
+                        <a href="/chat/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-indigo-500 text-gray-900">
+                            AI
+                        </a>
+                        <a href="/pdf" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            PDF
+                        </a>
+                        <a href="/autoquery/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            AutoQuery
+                        </a>
+                        <a href="/auth/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Auth
+                        </a>
+                        <a href="/ormlite/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            OrmLite
+                        </a>
+                        <a href="/redis/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            Redis
+                        </a>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <typesense></typesense>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                    <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Project Templates
+                    </a>
+                    <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Vue
+                    </a>
+                    <a href="/react/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        React
+                    </a>
+                    <a href="/add-servicestack-reference" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        DTOs
+                    </a>
+                    <a href="/chat/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                        AI
+                    </a>
+                    <a href="/pdf" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        PDF
+                    </a>
+                    <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        AutoQuery
+                    </a>
+                    <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Auth
+                    </a>
+                    <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        OrmLite
+                    </a>
+                    <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        Redis
+                    </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        return { open }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="w-full pt-16 pb-3">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Getting Started
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/install" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Install
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/configuration" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Configuration
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/providers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Providers &amp; Models
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/auth" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Integrated Auth
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/themes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Themes
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Extensions
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/extensions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Architecture
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/custom-extensions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Custom Extensions
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Tools &amp; Agents
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/tools" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Tools
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/api-tools" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Tools
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/mcp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MCP Server
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/connect-mcp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Connect MCP Clients
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/agents" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Agent Profiles
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/skills" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Skills
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/projects" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Projects
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Knowledge &amp; Media
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/gemini" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Gemini File Search
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/media" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Voice &amp; Media
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    PDF
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/pdf-studio" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PDF Studio
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/pdf" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Rendering PDFs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Operations
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/chat/analytics" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Analytics &amp; Admin
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/api" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Chat API
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/data" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Data &amp; Storage
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                            Gemini RAG
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p>Gemini RAG turns your documents into a managed knowledge system built on Google Gemini's
+<a href="https://ai.google.dev/api/file-search">File Search API</a>. Import files, documentation repositories,
+or entire websites into isolated <strong>File Stores</strong>, organize them with categories and metadata, then
+ask questions over exactly the documents you choose.</p>
+<p>The same knowledge base can power private research chats and public, embeddable <strong>Website
+Assistants</strong>. Responses stay grounded in your indexed content and can include citations that lead
+readers back to the original source.</p>
+<p><screenshot src="/img/pages/chat/gemini/gemini-02-filestore.webp" title="Gemini File Store showing the Explore, Import, and Assistants workspaces"></screenshot></p>
+<h2 id="what-you-can-build">What you can build<a class="header-anchor" href="javascript:;" onclick="location.hash='#what-you-can-build'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>What it gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Managed knowledge bases</strong></td>
+<td>Separate File Stores for products, teams, customers, or security boundaries.</td>
+</tr>
+<tr>
+<td><strong>Repeatable ingestion</strong></td>
+<td>Upload files, synchronize local folders, or crawl websites into clean Markdown.</td>
+</tr>
+<tr>
+<td><strong>Precise retrieval</strong></td>
+<td>Scope searches by category, document type, status, locale, product, version, and tags.</td>
+</tr>
+<tr>
+<td><strong>Verifiable answers</strong></td>
+<td>Grounded responses with inline citations and inspectable source excerpts.</td>
+</tr>
+<tr>
+<td><strong>Website Assistants</strong></td>
+<td>Publish a branded Shadow DOM chat widget using one script tag.</td>
+</tr>
+<tr>
+<td><strong>Operational visibility</strong></td>
+<td>Preview changes, watch upload progress, audit coverage, and reconcile local and Gemini state.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="enable-and-configure">Enable and configure<a class="header-anchor" href="javascript:;" onclick="location.hash='#enable-and-configure'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Gemini RAG is a built-in AI Chat extension. It installs automatically when AI Chat can resolve both:</p>
+<ol>
+<li>a Gemini API key; and</li>
+<li>the App's <code>IDbConnectionFactory</code>, used by OrmLite to persist File Stores, documents, imports,
+Assistants, conversations, and citations.</li>
+</ol>
+<p>Create an API key in <a href="https://aistudio.google.com/">Google AI Studio</a> and add either variable to the
+App's environment:</p>
+<pre><code class="language-bash">GOOGLE_API_KEY=your_api_key
+# or
+GEMINI_API_KEY=your_api_key
+</code></pre>
+<p>AI Chat resolves <code>GOOGLE_API_KEY</code>, then <code>GEMINI_API_KEY</code>, then the API key on its configured
+<code>google</code> provider. You can also provide the key programmatically:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    Variables = {
+        [&quot;GEMINI_API_KEY&quot;] = context.Configuration[&quot;Gemini:ApiKey&quot;]!,
+    },
+});
+</code></pre>
+<p>Restart the App after changing its environment. You also need at least one Google Gemini chat
+model configured in AI Chat; the Gemini model selector only lists compatible Google chat models.
+Without an API key or database connection, the extension logs why and disables its routes and UI.</p>
+<p>To disable it explicitly:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    DisableExtensions = [&quot;gemini&quot;],
+});
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">Local catalogue, remote retrieval</p><p>AI Chat keeps the document catalogue, cached source files, imports, metadata, Assistants, and
+conversation history locally. Gemini File Search Stores hold the indexed copies used for semantic
+retrieval. Upload and sync states describe the relationship between those two systems.</p>
+</div>
+<h3 id="upload-tuning-and-mime-type-overrides">Upload tuning and MIME type overrides<a class="header-anchor" href="javascript:;" onclick="location.hash='#upload-tuning-and-mime-type-overrides'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The upload worker normally lets Gemini infer a file's type. If Gemini rejects or misidentifies a
+particular extension, map it explicitly with <code>GEMINI_UPLOAD_MIME_TYPES</code>:</p>
+<pre><code class="language-bash"># Comma-separated extension:mime/type pairs; do not include the leading dot
+GEMINI_UPLOAD_MIME_TYPES=&quot;mdx:text/markdown,cshtml:text/html,ss:text/markdown&quot;
+</code></pre>
+<p>The built-in mapping is <code>mdx:text/markdown,cshtml:text/html</code>. Setting the environment variable
+replaces that mapping, so retain any defaults you still need. Restart the App after changing it.
+Use an override only for extensions that need one; forcing the wrong type can reduce indexing and
+retrieval quality.</p>
+<p>Large imports use bounded concurrency and retry transient provider failures with exponential
+backoff. Their defaults can also be overridden from the App's environment:</p>
+<pre><code class="language-bash">GEMINI_UPLOAD_CONCURRENCY=4
+GEMINI_UPLOAD_MAX_RETRIES=4
+</code></pre>
+<h2 id="file-stores">File Stores<a class="header-anchor" href="javascript:;" onclick="location.hash='#file-stores'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>A <strong>File Store</strong> is an isolated searchable corpus. It is also the practical ownership and lifecycle
+boundary: documents that should be searched, administered, and deleted together belong in the same
+store.</p>
+<p>The Gemini home page lists each store with its document count and size. Create a store with a clear,
+stable name such as <code>docs.example.com</code>, or use the chat icon to immediately query an existing one.</p>
+<p><screenshot src="/img/pages/chat/gemini/gemini-01-filestores.webp" title="Gemini File Stores overview with store creation and chat actions"></screenshot></p>
+<p>Opening a store exposes three deep-linkable workspaces:</p>
+<ul>
+<li><strong>Explore</strong> - browse categories, search documents, apply metadata filters, edit metadata, inspect
+coverage, monitor uploads, and start grounded chats.</li>
+<li><strong>Import</strong> - upload files, synchronize folders, or stage a website crawl.</li>
+<li><strong>Assistants</strong> - design, publish, and review website chat Assistants grounded in the store.</li>
+</ul>
+<p>The selected workspace, Import subsection, Explorer category, saved crawl, Assistant, and
+conversation are preserved in the URL, so a reload or shared link returns to the same view.</p>
+<h2 id="quick-start">Quick start<a class="header-anchor" href="javascript:;" onclick="location.hash='#quick-start'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<ol>
+<li>Open <strong>Gemini</strong> from the left toolbar and create a File Store.</li>
+<li>Open <strong>Import → Upload files</strong> and drop in one or more documents.</li>
+<li>Optionally choose a destination category and add metadata.</li>
+<li>Upload the files, then follow <strong>View uploads</strong> to watch Gemini indexing progress.</li>
+<li>In <strong>Explore</strong>, choose <strong>New Chat</strong> to query the whole store-or apply filters and choose
+<strong>Ask about this</strong>.</li>
+<li>Expand <strong>Sources</strong> below an answer to inspect the evidence Gemini retrieved.</li>
+</ol>
+<p>That is the smallest useful RAG workflow. The sections below show how to turn it into a repeatable,
+curated knowledge pipeline.</p>
+<hr />
+<h2 id="importing-knowledge">Importing knowledge<a class="header-anchor" href="javascript:;" onclick="location.hash='#importing-knowledge'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Choose the ingestion path that matches the source:</p>
+<table>
+<thead>
+<tr>
+<th>Import type</th>
+<th>Best for</th>
+<th>How it behaves</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Upload files</strong></td>
+<td>PDFs, documents, ad-hoc files, and ZIP archives</td>
+<td>Queues selected files immediately. ZIP folder structure becomes categories.</td>
+</tr>
+<tr>
+<td><strong>Folder</strong></td>
+<td>Documentation repositories and maintained server folders</td>
+<td>Previews a diff before importing and can be saved for recurring synchronization.</td>
+</tr>
+<tr>
+<td><strong>Web crawl</strong></td>
+<td>Public websites and documentation portals</td>
+<td>Crawls into an inspectable Markdown workspace before handing off to Folder import.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="upload-files-and-zip-archives">Upload files and ZIP archives<a class="header-anchor" href="javascript:;" onclick="location.hash='#upload-files-and-zip-archives'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The upload drop zone accepts PDF, Markdown/MDX, plain text, HTML, reStructuredText, AsciiDoc, CSV,
+JSON, YAML, and ZIP archives containing supported files.</p>
+<p><screenshot src="/img/pages/chat/gemini/gemini-22-import-upload-files.webp" title="Upload files and ZIP archives into a Gemini File Store"></screenshot></p>
+<p>Choose an optional <strong>Destination category</strong> before uploading. A ZIP is expanded safely and each
+supported entry becomes a document; its internal directories are preserved beneath that category.
+For example, <code>guides/auth/login.md</code> uploaded to <code>products</code> becomes:</p>
+<pre><code class="language-text">products/guides/auth/login.md
+</code></pre>
+<p>Hidden system files, macOS metadata, dependencies, build output, and other common archive noise are
+excluded automatically.</p>
+<div class="tip custom-block">
+            <p class="custom-block-title">Import into the current category</p><p>While browsing an Explorer category, choose <strong>Import here</strong>. The Import workspace opens with that
+category already set as the destination.</p>
+</div>
+<h3 id="import-a-local-folder">Import a local folder<a class="header-anchor" href="javascript:;" onclick="location.hash='#import-a-local-folder'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Folder import scans a directory on the machine hosting AI Chat. It is designed for sources you
+expect to preview and synchronize repeatedly.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Folder path</strong></td>
+<td>Directory to scan. Non-admin users must remain inside a trusted import root.</td>
+</tr>
+<tr>
+<td><strong>Category root</strong></td>
+<td>Limits the scan to a subfolder and removes that prefix from derived categories.</td>
+</tr>
+<tr>
+<td><strong>Max depth</strong></td>
+<td><code>0</code> imports direct files only; <code>1</code> also includes immediate child directories; blank is unlimited.</td>
+</tr>
+<tr>
+<td><strong>Include only</strong></td>
+<td>Optional glob such as <code>**/*.md</code>.</td>
+</tr>
+<tr>
+<td><strong>Exclude</strong></td>
+<td>Optional glob such as <code>**/drafts/**</code>.</td>
+</tr>
+<tr>
+<td><strong>Destination category</strong></td>
+<td>Prefix applied to every category produced by the import.</td>
+</tr>
+<tr>
+<td><strong>Save as recurring import</strong></td>
+<td>Retains the source definition after a confirmed import.</td>
+</tr>
+</tbody>
+</table>
+<p><screenshots-gallery-view :images="{
+'Folder configuration': '/img/pages/chat/gemini/gemini-23-import-folder.webp',
+'Metadata editor': '/img/pages/chat/gemini/gemini-23-import-folder-metadata-dialog.webp',
+'Applied metadata': '/img/pages/chat/gemini/gemini-24-import-folder-metadata.webp',
+'Preview changes': '/img/pages/chat/gemini/gemini-25-import-folder-preview.webp',
+'Upload progress': '/img/pages/chat/gemini/gemini-26-import-folder-uploading.webp',
+}"></screenshots-gallery-view></p>
+<p>Categories come from a document's directory, not its filename. Given
+<code>docs/guides/auth/login.md</code>, a Category root of <code>docs</code> produces <code>guides/auth</code>. Adding a destination
+of <code>products</code> produces <code>products/guides/auth</code>.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">Import one directory level only</p><p>Use <strong>Max depth = 0</strong> to import only files directly inside the selected folder. Use <strong>1</strong> for direct
+files plus files in immediate child directories. Depth is measured from Category root when one is
+set, otherwise from Folder path.</p>
+</div>
+<h4 id="preview-before-committing">Preview before committing<a class="header-anchor" href="javascript:;" onclick="location.hash='#preview-before-committing'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p><strong>Preview import</strong> is read-only: it scans and compares the source without writing documents,
+uploading content, or incurring embedding work.</p>
+<table>
+<thead>
+<tr>
+<th>Preview result</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Discovered</strong></td>
+<td>Files considered by the scan.</td>
+</tr>
+<tr>
+<td><strong>New</strong></td>
+<td>Documents not yet present in this source.</td>
+</tr>
+<tr>
+<td><strong>Changed</strong></td>
+<td>Existing documents whose extracted content changed.</td>
+</tr>
+<tr>
+<td><strong>Metadata only</strong></td>
+<td>Content is unchanged but indexed metadata changed.</td>
+</tr>
+<tr>
+<td><strong>Unchanged</strong></td>
+<td>Documents requiring no work.</td>
+</tr>
+<tr>
+<td><strong>Removed</strong></td>
+<td>Documents previously imported from this source but no longer present.</td>
+</tr>
+<tr>
+<td><strong>Skipped / Failed</strong></td>
+<td>Excluded, unsupported, too short, unreadable, or otherwise rejected files.</td>
+</tr>
+<tr>
+<td><strong>Embeds</strong></td>
+<td>Documents Gemini will upload and index after confirmation.</td>
+</tr>
+</tbody>
+</table>
+<p>Only <strong>Import N documents</strong> applies the preview. Progress updates naturally-for example,
+<code>Uploading 16/21 documents to docs.example.com…</code>-and <strong>View uploads</strong> opens Explorer at the
+destination category sorted by active uploads. Pending uploads resume when the application starts
+again after an interruption.</p>
+<h4 id="saved-imports">Saved imports<a class="header-anchor" href="javascript:;" onclick="location.hash='#saved-imports'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Enable <strong>Save as a recurring import</strong> and give the import a unique name before confirming it. A
+preview alone does not create a saved import; it appears only after the import is actually run.</p>
+<p><screenshot src="/img/pages/chat/gemini/gemini-20-import-saved.webp" title="Saved recurring imports with preview results and trusted folder configuration"></screenshot></p>
+<p>Re-running a saved import compares normalized content and metadata independently. Unchanged files
+are not embedded again. Content changes and metadata-only changes both require re-indexing because
+Gemini cannot patch indexed metadata in place.</p>
+<p>When an upstream file disappears, the import removes its Gemini copy and retains a local
+<code>removed upstream</code> tombstone so the change remains visible. A deletion safety rail refuses an
+unexpectedly large removal, protecting against a mistyped path or incomplete source listing.</p>
+<h4 id="trusted-import-folders">Trusted import folders<a class="header-anchor" href="javascript:;" onclick="location.hash='#trusted-import-folders'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Server-side folder access is privileged:</p>
+<ul>
+<li>Administrators may import any accessible folder.</li>
+<li>Other users are restricted to server-allowed directories and Gemini <strong>Trusted import folders</strong>.</li>
+<li>Real paths are checked so a symlink cannot escape an allowed root.</li>
+</ul>
+<p>Trusted roots are saved in <code>App_Data/chat/user/default/config.json</code>. They can use any directory
+aliases registered in <code>ChatFeature.AliasedDirectories</code>, and can also be configured in that file:</p>
+<pre><code class="language-json">{
+  &quot;gemini&quot;: {
+    &quot;importRoots&quot;: [&quot;$WORKSPACE/docs&quot;, &quot;/srv/knowledge&quot;]
+  }
+}
+</code></pre>
+<p>For example, an App can define the <code>$WORKSPACE</code> alias used above when registering AI Chat:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    AliasedDirectories = {
+        [&quot;$WORKSPACE&quot;] = &quot;/srv/workspace&quot;,
+    },
+});
+</code></pre>
+<h3 id="crawl-a-website-into-markdown">Crawl a website into Markdown<a class="header-anchor" href="javascript:;" onclick="location.hash='#crawl-a-website-into-markdown'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Web crawl is intentionally a two-stage workflow:</p>
+<ol>
+<li>Fetch pages into a private, inspectable Markdown workspace.</li>
+<li>Clean and review that workspace, then import it through the normal Folder pipeline.</li>
+</ol>
+<p>Nothing is sent to Gemini during the crawl itself. This separation makes noisy navigation,
+duplicate content, or extraction mistakes visible before they affect retrieval quality.</p>
+<h4 id="define-crawl-boundaries">Define crawl boundaries<a class="header-anchor" href="javascript:;" onclick="location.hash='#define-crawl-boundaries'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Enter a <strong>Start URL</strong> and the import folder is pre-populated from its host. A port uses a dash, so
+<code>http://localhost:5000</code> becomes <code>localhost-5000</code>. Crawls are stored beneath:</p>
+<pre><code class="language-text">App_Data/chat/user/&lt;user&gt;/gemini/imports/&lt;domain&gt;/
+</code></pre>
+<p><screenshots-gallery-view :images="{
+'Crawl boundaries': '/img/pages/chat/gemini/gemini-03-import-web-crawl.webp',
+'Additional crawl rules': '/img/pages/chat/gemini/gemini-04-import-web-crawl-config.webp',
+}"></screenshots-gallery-view></p>
+<p>The common controls cover the safety rules most crawls need:</p>
+<ul>
+<li><strong>Include / Exclude paths</strong> use folder-style globs such as <code>/docs/**</code> and <code>/archives/**</code>.</li>
+<li><strong>Max pages</strong> and <strong>Max depth</strong> bound the crawl.</li>
+<li>Query strings can be ignored, selectively allowed, or included with tracking/session parameters
+excluded and variants capped per path.</li>
+<li>Crawls stay on the same origin unless named supporting hosts are allowed.</li>
+<li><code>robots.txt</code>, <code>noindex</code>, <code>nofollow</code>, canonical URLs, HTML content types, and duplicate extracted
+content are handled explicitly.</li>
+<li>Ordered additional rules can <strong>Exclude</strong> a match or <strong>Follow links only</strong> without saving the page.</li>
+</ul>
+<p>The crawl output uses clean paths: <code>/docs/templates/next-rsc</code> becomes
+<code>docs/templates/next-rsc.md</code>; the site root becomes <code>index.md</code>; and a directory URL such as
+<code>/docs/</code> becomes <code>docs/index.md</code>.</p>
+<p>Each file begins with frontmatter containing available page information such as title, source URL,
+path, query string, description, and tags. Page metadata is more specific than global crawl
+metadata and therefore overwrites matching defaults.</p>
+<h4 id="transform-and-inspect-extracted-pages">Transform and inspect extracted pages<a class="header-anchor" href="javascript:;" onclick="location.hash='#transform-and-inspect-extracted-pages'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Regex transforms provide an ordered, repeatable cleanup pass over the crawled Markdown. Each rule
+defines a file glob, regex pattern, replacement, and flags:</p>
+<ul>
+<li><code>g</code> - global</li>
+<li><code>i</code> - ignore case</li>
+<li><code>m</code> - multiline</li>
+<li><code>s</code> - <code>.</code> matches line breaks</li>
+</ul>
+<p>Replacement capture groups are supported. For example, pattern <code>\b0(\d)\b</code> with replacement
+<code>\1.</code> converts <code>01</code> to <code>1.</code>.</p>
+<p><screenshots-gallery-view :images="{
+'Define transforms': '/img/pages/chat/gemini/gemini-05-import-web-crawl-transforms.webp',
+'Apply and save': '/img/pages/chat/gemini/gemini-06-import-web-crawl-transforms-applied.webp',
+'Inspect crawled pages': '/img/pages/chat/gemini/gemini-07-import-web-crawl-view-pages.webp',
+}"></screenshots-gallery-view></p>
+<p><strong>Apply transforms</strong> updates the workspace and saves the rules to <code>import.json</code>. <strong>View crawled
+pages</strong> opens a large read-only browser with directories on the left and vertically scrollable file
+content on the right. When the content is ready, <strong>Import this folder</strong> opens Folder import with the
+workspace path and metadata pre-populated.</p>
+<p>Saved crawl imports are deep-linkable. Reopen one to load its configuration, make more
+transformations, inspect the result, and hand it back to Folder import whenever the website changes.</p>
+<h3 id="versioned-import-configuration">Versioned import configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#versioned-import-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A folder or ZIP may include <code>import.json</code>. A root manifest supplies global defaults; a manifest in
+a nested directory inherits and overwrites settings for the files beneath it. Page frontmatter is
+more specific, and metadata explicitly entered in the Import UI has the highest precedence.</p>
+<pre><code class="language-json">{
+  &quot;version&quot;: 1,
+  &quot;metadata&quot;: {
+    &quot;defaults&quot;: {
+      &quot;product&quot;: &quot;ServiceStack&quot;,
+      &quot;status&quot;: &quot;published&quot;,
+      &quot;tags&quot;: [&quot;docs&quot;]
+    },
+    &quot;rules&quot;: [
+      {
+        &quot;match&quot;: &quot;auth/**/*.md&quot;,
+        &quot;set&quot;: { &quot;tags&quot;: [&quot;auth&quot;] }
+      }
+    ]
+  },
+  &quot;transforms&quot;: [
+    {
+      &quot;match&quot;: &quot;**/*.md&quot;,
+      &quot;pattern&quot;: &quot;\\nEdit this page.*$&quot;,
+      &quot;replacement&quot;: &quot;&quot;,
+      &quot;flags&quot;: &quot;gim&quot;
+    }
+  ]
+}
+</code></pre>
+<p>When the UI contains no explicit metadata, Preview import automatically loads the root manifest.
+Saving a recurring folder import writes its effective metadata back atomically while preserving
+crawl and transform settings.</p>
+<hr />
+<h2 id="metadata-that-improves-retrieval">Metadata that improves retrieval<a class="header-anchor" href="javascript:;" onclick="location.hash='#metadata-that-improves-retrieval'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Metadata makes a large store navigable and lets Gemini search only the documents relevant to a
+question.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Typical values and purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Category</strong></td>
+<td>Hierarchical location such as <code>guides/auth</code>; derived during import and editable later.</td>
+</tr>
+<tr>
+<td><strong>Doc type</strong></td>
+<td><code>guide</code>, <code>reference</code>, <code>api</code>, <code>faq</code>, <code>release-notes</code>, <code>policy</code>, <code>changelog</code>.</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td><code>published</code>, <code>draft</code>, <code>deprecated</code>, <code>archived</code>.</td>
+</tr>
+<tr>
+<td><strong>Locale</strong></td>
+<td><code>en</code>, <code>en-AU</code>, <code>fr</code>.</td>
+</tr>
+<tr>
+<td><strong>Product</strong></td>
+<td>Product, module, or service owning the content.</td>
+</tr>
+<tr>
+<td><strong>Versions</strong></td>
+<td>One or more independently searchable versions such as <code>v2</code>, <code>v3</code>.</td>
+</tr>
+<tr>
+<td><strong>Tags</strong></td>
+<td>One or more topic labels such as <code>redis</code>, <code>security</code>, <code>react</code>.</td>
+</tr>
+<tr>
+<td><strong>Source URL</strong></td>
+<td>Canonical public page opened by citations.</td>
+</tr>
+</tbody>
+</table>
+<p>Versions and tags are lists: entering <code>v2, v3</code> creates two searchable values rather than one string.
+Import metadata can define defaults for every document and ordered path rules that skip matches or
+override individual fields. Scalar fields are overwritten by the most specific matching value;
+list values such as versions and tags accumulate.</p>
+<h3 id="source-url-templates">Source URL templates<a class="header-anchor" href="javascript:;" onclick="location.hash='#source-url-templates'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Source URL templates generate a canonical link for each imported document. The editor validates
+braces and variable names, and clicking a variable appends it with the appropriate <code>/</code> or <code>.</code>
+separator.</p>
+<p>For <code>docs/guides/auth.md</code> with Category root <code>docs</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Example</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{fullPath}</code></td>
+<td><code>docs/guides/auth.md</code></td>
+<td>Full source path.</td>
+</tr>
+<tr>
+<td><code>{path}</code></td>
+<td><code>guides/auth.md</code></td>
+<td>Path after removing Category root.</td>
+</tr>
+<tr>
+<td><code>{pathNoExt}</code></td>
+<td><code>guides/auth</code></td>
+<td>Root-relative path without extension.</td>
+</tr>
+<tr>
+<td><code>{dir}</code></td>
+<td><code>docs/guides</code></td>
+<td>Directory portion of the full path.</td>
+</tr>
+<tr>
+<td><code>{filename}</code></td>
+<td><code>auth.md</code></td>
+<td>Filename with extension.</td>
+</tr>
+<tr>
+<td><code>{name}</code></td>
+<td><code>auth</code></td>
+<td>Filename without extension.</td>
+</tr>
+<tr>
+<td><code>{ext}</code></td>
+<td><code>md</code></td>
+<td>Extension without a leading dot.</td>
+</tr>
+<tr>
+<td><code>{category}</code></td>
+<td><code>guides</code></td>
+<td>Final category, including any destination prefix.</td>
+</tr>
+<tr>
+<td><code>{title}</code></td>
+<td><code>auth.md</code></td>
+<td>Source title, or filename when no title exists.</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-text">https://docs.example.com/{pathNoExt}
+</code></pre>
+<p>resolves to <code>https://docs.example.com/guides/auth</code>.</p>
+<div class="tip custom-block">
+            <p class="custom-block-title">Citations should lead somewhere useful</p><p>Set Source URL metadata to the public documentation page whenever possible. Without it, a citation
+may fall back to Gemini's URI or the locally cached document download.</p>
+</div>
+<hr />
+<h2 id="explore-filter-and-maintain-documents">Explore, filter, and maintain documents<a class="header-anchor" href="javascript:;" onclick="location.hash='#explore-filter-and-maintain-documents'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Explorer combines category navigation, full-store search, sorting, facet filters, metadata editing,
+upload state, and document actions.</p>
+<p><screenshots-gallery-view :images="{
+'Browse categories': '/img/pages/chat/gemini/gemini-27-explore.webp',
+'Apply metadata filters': '/img/pages/chat/gemini/gemini-30-explore-filters.webp',
+}"></screenshots-gallery-view></p>
+<p>Compact dropdowns for <strong>doc type</strong>, <strong>status</strong>, <strong>locale</strong>, <strong>product</strong>, <strong>versions</strong>, and <strong>tags</strong>
+sit beside <strong>Categories</strong> and <strong>Coverage</strong>. Selecting a value converts the dropdown into a visible,
+removable filter chip; clearing it restores the dropdown. Missing metadata is shown as <code>(no value)</code>.</p>
+<p>Category and facet filters are deep-linkable. Coverage links operate over the whole File Store, so
+they clear the current category before showing a store-wide result that would otherwise appear
+empty.</p>
+<p>Each document row can:</p>
+<ul>
+<li>open its category or Source URL;</li>
+<li>download the cached source;</li>
+<li>edit metadata;</li>
+<li>retry a failed or pending Gemini upload;</li>
+<li>start a chat scoped to that document; or</li>
+<li>delete the local and Gemini copies.</li>
+</ul>
+<p>Work in progress remains visible: uploads show activity, failures show their provider message, and
+a document being deleted displays a red struck-through name with a spinner.</p>
+<h3 id="edit-metadata-in-bulk">Edit metadata in bulk<a class="header-anchor" href="javascript:;" onclick="location.hash='#edit-metadata-in-bulk'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Select the current page-or every document matching the current filters-to apply a staged bulk edit.</p>
+<ul>
+<li>Scalar fields support <strong>Set where empty</strong>, <strong>Overwrite</strong>, and <strong>Clear</strong>.</li>
+<li>Versions and tags support <strong>Add</strong>, <strong>Remove</strong>, <strong>Replace</strong>, and <strong>Clear</strong>.</li>
+</ul>
+<p>The preview reports how many documents will change. Bulk edits update the local catalogue first,
+letting you make several corrections before paying for a single re-indexing pass.</p>
+<h3 id="coverage-and-synchronization">Coverage and synchronization<a class="header-anchor" href="javascript:;" onclick="location.hash='#coverage-and-synchronization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><strong>Coverage &amp; filters</strong> answers two separate questions:</p>
+<ol>
+<li>How consistently is metadata populated?</li>
+<li>Does the local catalogue agree with Gemini?</li>
+</ol>
+<p><screenshot src="/img/pages/chat/gemini/gemini-21-filestore-sync.webp" title="Gemini File Store synchronization report showing matching local and remote documents"></screenshot></p>
+<p>The sync report detects documents missing locally or remotely, metadata differences, unmatched
+fields, and duplicate remote copies. Issue counts link back to an unscoped Explorer result with the
+active filter visibly displayed.</p>
+<p>Local metadata edits appear immediately in Explorer, but Gemini still searches its last indexed
+metadata until you choose <strong>Push N to Gemini</strong>. Because Gemini cannot patch metadata in place, those
+documents are uploaded and embedded again. Use <strong>Prune duplicates</strong> when sync detects redundant
+remote documents.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">Import, push, and sync solve different problems</p><p>Re-run an import to discover source changes. Push pending metadata to re-index intentional metadata
+edits. Run Sync Store to audit and reconcile local state against Gemini.</p>
+</div>
+<hr />
+<h2 id="ask-grounded-questions">Ask grounded questions<a class="header-anchor" href="javascript:;" onclick="location.hash='#ask-grounded-questions'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Gemini RAG supports three useful scopes:</p>
+<ul>
+<li><strong>New Chat</strong> searches the whole File Store.</li>
+<li>A document's chat icon searches only that document.</li>
+<li><strong>Ask about this</strong> preserves the current category and every active metadata filter.</li>
+</ul>
+<p><screenshots-gallery-view :images="{
+'Filtered Explorer scope': '/img/pages/chat/gemini/gemini-30-explore-filters.webp',
+'Preserved chat filters': '/img/pages/chat/gemini/gemini-31-chat-filters.webp',
+}"></screenshots-gallery-view></p>
+<p>The chat header makes the retrieval scope visible. A category is displayed as a path, while other
+filters are summarized by count:</p>
+<pre><code class="language-text">docs.example.com/auth (2)
+</code></pre>
+<p>Hover over it to see each filter on a separate line. The same filter expression shown in Coverage
+is passed to Gemini File Search, so Explorer and the grounded query describe the same document set.</p>
+<h3 id="answers-citations-and-source-evidence">Answers, citations, and source evidence<a class="header-anchor" href="javascript:;" onclick="location.hash='#answers-citations-and-source-evidence'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><screenshots-gallery-view :images="{
+'Grounded answer': '/img/pages/chat/gemini/gemini-28-chat-ask.webp',
+'Source evidence': '/img/pages/chat/gemini/gemini-29-chat-ask-sources.webp',
+'Metadata-scoped RAG': '/img/pages/chat/gemini/gemini-31-chat-filters.webp',
+}"></screenshots-gallery-view></p>
+<p>Grounded answers place citation markers beside supported claims. Each assistant response retains
+its own <strong>Sources</strong> section as the conversation continues. Expand a source to inspect the retrieved
+excerpt, or follow its title to the document's Source URL.</p>
+<p>Source links resolve in this order:</p>
+<ol>
+<li>the document's Source URL;</li>
+<li>the URI returned by Gemini;</li>
+<li>the cached document download.</li>
+</ol>
+<p>Gemini File Search is a built-in retrieval tool. When a File Search request is active, the Gemini
+provider sends only <code>file_search</code> and temporarily omits other selected function tools, avoiding an
+unsupported built-in-tool/function-calling combination. Your normal tool selections are not
+changed.</p>
+<hr />
+<h2 id="publish-a-website-assistant">Publish a Website Assistant<a class="header-anchor" href="javascript:;" onclick="location.hash='#publish-a-website-assistant'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The <strong>Assistants</strong> workspace turns a File Store-or a filtered slice of it-into a branded,
+document-grounded support experience for any website.</p>
+<p><screenshot src="/img/pages/chat/gemini/gemini-40-assistants.webp" title="Saved Website Assistants for a Gemini File Store"></screenshot></p>
+<p>Each named Assistant owns its:</p>
+<ul>
+<li>visitor-facing identity and suggested questions;</li>
+<li>server-enforced document scope;</li>
+<li>behavior template, private system prompt, and optional Gemini model;</li>
+<li>theme, typography, panel, and launcher appearance;</li>
+<li>allowed website origins and request limit;</li>
+<li>deployment ID and publish state; and</li>
+<li>retained customer conversations.</li>
+</ul>
+<p>The widget is rendered in a <strong>Shadow DOM</strong>, isolating it from the host page's CSS. It also traps its
+keyboard events so global website shortcuts do not fire while a visitor is typing.</p>
+<h3 id="identity-behavior-and-document-scope">1. Identity, behavior, and document scope<a class="header-anchor" href="javascript:;" onclick="location.hash='#identity-behavior-and-document-scope'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><screenshots-gallery-view :images="{
+'Identity and welcome': '/img/pages/chat/gemini/gemini-41-assistant-identity.webp',
+'Behavior and prompting': '/img/pages/chat/gemini/gemini-42-assistant-behavior.webp',
+'Document scope': '/img/pages/chat/gemini/gemini-43-assistant-document.webp',
+}"></screenshots-gallery-view></p>
+<p>Start with the visitor experience:</p>
+<ul>
+<li><strong>Name</strong> identifies the Assistant in the dashboard and must be unique within the store.</li>
+<li><strong>Title</strong> and <strong>Description</strong> appear in the widget header.</li>
+<li><strong>Welcome message</strong> appears when a new thread opens.</li>
+<li><strong>Suggested questions</strong> are editable single-line rows; press Enter or <code>+</code> to add another.</li>
+</ul>
+<p>Then define how it should answer:</p>
+<table>
+<thead>
+<tr>
+<th>Template</th>
+<th>Best fit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Documentation guide</strong></td>
+<td>Product manuals, reference material, and general how-to questions.</td>
+</tr>
+<tr>
+<td><strong>Technical troubleshooter</strong></td>
+<td>Diagnosis that should progress from symptoms to safe checks and fixes.</td>
+</tr>
+<tr>
+<td><strong>Customer support</strong></td>
+<td>Clear policy/process answers and practical next actions.</td>
+</tr>
+<tr>
+<td><strong>Developer/API assistant</strong></td>
+<td>Precise APIs, code, commands, prerequisites, and version-sensitive guidance.</td>
+</tr>
+<tr>
+<td><strong>Product advisor</strong></td>
+<td>Capability fit, trade-offs, prerequisites, and documented limitations.</td>
+</tr>
+<tr>
+<td><strong>Onboarding guide</strong></td>
+<td>Ordered milestones leading to a first successful outcome.</td>
+</tr>
+<tr>
+<td><strong>Policy and procedures</strong></td>
+<td>Controlled interpretations of policies, responsibilities, and escalation paths.</td>
+</tr>
+</tbody>
+</table>
+<p>Template prompts are editable specialist instructions. The server combines them with shared RAG
+rules for retrieval, grounding, prompt-injection resistance, conflicting documents, conversation
+context, fallback behavior, and response formatting.</p>
+<p>Choose <strong>Concise</strong>, <strong>Balanced</strong>, or <strong>Detailed</strong>, require grounded answers, enable citations, and
+customize the fallback and conversation-review notice. A custom Gemini model can be selected per
+Assistant; leaving it unset uses the server default.</p>
+<p>Assistants open only when initiated by default. They can instead open after page load or when the
+visitor reaches the bottom of the page. <strong>Open with Ctrl/⌘+K</strong> is enabled for new Assistants and
+opens and focuses the widget independently of the automatic trigger.</p>
+<p>Finally, restrict retrieval by category, doc type, status, locale, product, version, or tag. These
+filters and the private system prompt are applied by the server: they are not embedded in the
+public JavaScript and cannot be changed by the host website.</p>
+<div class="tip custom-block">
+            <p class="custom-block-title">Publish only approved content</p><p>A common public support scope is <code>status = published</code>, optionally combined with a product,
+documentation category, locale, or version. Test the equivalent filters in Explorer before
+publishing the Assistant.</p>
+</div>
+<h3 id="design-the-widget">2. Design the widget<a class="header-anchor" href="javascript:;" onclick="location.hash='#design-the-widget'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Choose <strong>Auto</strong>, <strong>Light</strong>, <strong>Dark</strong>, <strong>Nord</strong>, <strong>Matrix</strong>, or <strong>Soft Pink</strong>. Auto follows the
+visitor's <code>prefers-color-scheme</code> and uses your independently saved Light or Dark customizations.</p>
+<p><screenshots-gallery-view :images="{
+'Light': '/img/pages/chat/gemini/gemini-44-assistant-appearance-light.webp',
+'Dark': '/img/pages/chat/gemini/gemini-45-assistant-appearance-dark.webp',
+'Nord': '/img/pages/chat/gemini/gemini-46-assistant-appearance-nord.webp',
+'Matrix': '/img/pages/chat/gemini/gemini-12-assistant-appearance-matrix.webp',
+'Soft Pink': '/img/pages/chat/gemini/gemini-47-assistant-appearance-softpink.webp',
+}"></screenshots-gallery-view></p>
+<p>Every theme is a preset, not a locked skin. Override and reset individual values for:</p>
+<ul>
+<li>assistant and user bubble backgrounds, borders, and text;</li>
+<li>accent, panel, and conversation backgrounds;</li>
+<li>panel and focus borders;</li>
+<li>primary, muted, link, error, and warning text; and</li>
+<li>a per-theme CSS <code>font-family</code> stack.</li>
+</ul>
+<p>Only explicit overrides are saved. <strong>Reset theme appearance</strong> restores the complete preset, while
+the reset action beside a value restores only that variable. The live preview uses the same SVG
+icons, layout, and CSS variables as the real widget.</p>
+<h3 id="customize-the-launcher-and-hosting-rules">3. Customize the launcher and hosting rules<a class="header-anchor" href="javascript:;" onclick="location.hash='#customize-the-launcher-and-hosting-rules'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><screenshots-gallery-view :images="{
+'Launcher button': '/img/pages/chat/gemini/gemini-48-assistant-appearance-button.webp',
+'Hosting and access': '/img/pages/chat/gemini/gemini-49-assistant-hosting.webp',
+'Publish and embed': '/img/pages/chat/gemini/gemini-50-assistant-publish.webp',
+}"></screenshots-gallery-view></p>
+<p>The launcher can appear bottom-left or bottom-right. Configure its size, icon size, corner radius,
+shadow, border width, border color, background, and icon color. Choose <strong>Sparkles</strong>, <strong>Chat</strong>, or
+<strong>Help</strong>, or provide a PNG, JPEG, GIF, WebP, or SVG Data URI for a custom icon.</p>
+<p>Leave <strong>Allowed origins</strong> empty to allow the Assistant on any website, or enter one exact HTTP(S)
+origin per line:</p>
+<pre><code class="language-text">https://docs.example.com
+https://*.example.com
+http://localhost:5173
+</code></pre>
+<p>An exact origin includes its scheme and port. A wildcard matches subdomains but not the apex, so
+add <code>https://example.com</code> separately when both are needed. The requests-per-minute setting applies
+a rolling per-client limit to public chat requests.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">Why the script itself does not need CORS</p><p>Browsers may load a public classic <code>&lt;script&gt;</code> across origins. The access check is applied to each
+chat request using its <code>Origin</code> header. Requests without an Origin are refused when an allowlist is
+configured.</p>
+</div>
+<h3 id="save-publish-and-embed">4. Save, publish, and embed<a class="header-anchor" href="javascript:;" onclick="location.hash='#save-publish-and-embed'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use <strong>Save draft</strong> while configuring. <strong>Publish</strong> makes the deployment available and produces a
+stable embed snippet:</p>
+<pre><code class="language-html">&lt;script
+  src=&quot;https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123&quot;
+  async&gt;
+&lt;/script&gt;
+</code></pre>
+<p>The deployment identifier is on the <code>g</code> query string. The public endpoint merges the saved
+configuration with the static widget and Markdown renderer, then returns a self-contained classic
+script. The <code>/chat</code> segment is AI Chat's default <code>RoutePrefix</code>; use your configured prefix when AI
+Chat is mounted somewhere else.</p>
+<p>The host page may override presentation choices without changing retrieval behavior:</p>
+<pre><code class="language-html">&lt;script
+  src=&quot;https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123&quot;
+  data-theme=&quot;dark&quot;
+  data-position=&quot;bottom-left&quot;
+  data-accent=&quot;#7c3aed&quot;
+  data-icon=&quot;chat&quot;
+  async&gt;
+&lt;/script&gt;
+</code></pre>
+<p>The host cannot override document scope, prompts, model, origin rules, or rate limits. Invalid or
+unavailable deployments return JavaScript that writes a useful error to the browser console rather
+than a JSON response that fails silently.</p>
+<p>The widget supports:</p>
+<ul>
+<li>streaming Markdown responses with plain-text fallback;</li>
+<li>citation links and source titles;</li>
+<li>suggested questions and a configurable welcome message;</li>
+<li>smooth fly-in/out animation from the launcher;</li>
+<li>maximized full-screen reading;</li>
+<li>a scrollable conversation thread;</li>
+<li>clearing the current thread without confirmation; and</li>
+<li>browser-local session continuity across page loads.</li>
+</ul>
+<h3 id="review-customer-conversations">Review customer conversations<a class="header-anchor" href="javascript:;" onclick="location.hash='#review-customer-conversations'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Authoritative conversations and messages are retained server-side so support teams can understand
+what visitors ask, identify missing coverage, and improve documentation.</p>
+<p>Open <strong>View Conversations</strong> on a saved Assistant. The sidebar counts user messages, and each
+conversation shows its exact originating page. Expand the user-message navigator to jump directly
+to the corresponding Assistant response. Responses render as Markdown and retain their source
+citations.</p>
+<p>The conversation count appears in <strong>View/Hide Conversations</strong>, making new activity visible while
+you work. The review view and selected conversation are deep-linkable.</p>
+<div class="warning custom-block">
+            <p class="custom-block-title">Treat retained conversations as customer data</p><p>Choose an appropriate conversation notice, access policy, retention practice, and privacy review
+for your deployment. The notice can be hidden, but doing so does not disable server-side retention.</p>
+</div>
+<h3 id="assistant-lifecycle">Assistant lifecycle<a class="header-anchor" href="javascript:;" onclick="location.hash='#assistant-lifecycle'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><screenshots-gallery-view :images="{
+'Archive and restore': '/img/pages/chat/gemini/gemini-51-assistant-archive.webp',
+'Delete Assistant': '/img/pages/chat/gemini/gemini-52-assistant-delete.webp',
+'Delete File Store': '/img/pages/chat/gemini/gemini-53-filestore-delete.webp',
+}"></screenshots-gallery-view></p>
+<ul>
+<li><strong>Unpublish</strong> takes the public deployment offline while leaving the Assistant editable.</li>
+<li><strong>Regenerate ID</strong> invalidates every old embed immediately and creates a replacement ID.</li>
+<li><strong>Archive Assistant</strong> takes it offline and makes it read-only while retaining configuration and
+conversations. <strong>Restore Assistant</strong> returns it as an unpublished draft.</li>
+<li><strong>Delete permanently</strong> removes the Assistant, conversations, messages, and citations. The
+confirmation shows affected referrer domains and when each was last used, then requires the
+Assistant name.</li>
+</ul>
+<p>Deleting a File Store is broader: it removes the remote Gemini store, local and remote documents,
+saved imports and runs, Assistants, conversations, and messages. Its dedicated impact summary and
+typed store-name confirmation are intentionally difficult to bypass.</p>
+<hr />
+<h2 id="operational-guidance">Operational guidance<a class="header-anchor" href="javascript:;" onclick="location.hash='#operational-guidance'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="choose-store-boundaries-deliberately">Choose store boundaries deliberately<a class="header-anchor" href="javascript:;" onclick="location.hash='#choose-store-boundaries-deliberately'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use separate File Stores when knowledge must have a different owner, access policy, lifecycle, or
+deletion boundary. Use categories and metadata inside a store when the same team should manage the
+content but queries need narrower scopes.</p>
+<h3 id="prefer-curated-sources-over-larger-sources">Prefer curated sources over larger sources<a class="header-anchor" href="javascript:;" onclick="location.hash='#prefer-curated-sources-over-larger-sources'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Retrieval quality improves when navigation fragments, stale versions, duplicate pages, drafts, and
+boilerplate are excluded. Preview folder diffs, inspect crawl Markdown, set <code>status</code> and <code>version</code>
+metadata, and test filtered chats before exposing an Assistant publicly.</p>
+<h3 id="make-citations-durable">Make citations durable<a class="header-anchor" href="javascript:;" onclick="location.hash='#make-citations-durable'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Use canonical Source URL templates instead of local cache links. Preserve stable page paths across
+re-imports, and push metadata changes after correcting URLs so Gemini retrieves the updated values.</p>
+<h3 id="recover-from-interrupted-uploads">Recover from interrupted uploads<a class="header-anchor" href="javascript:;" onclick="location.hash='#recover-from-interrupted-uploads'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Pending documents remain queued in the local catalogue and resume after application startup. To
+inspect them, open Explorer at the destination category and sort by <strong>Uploading</strong>. Sort by
+<strong>Failed</strong> to review provider errors and retry individual documents.</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="header-anchor" href="javascript:;" onclick="location.hash='#troubleshooting'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<h3 id="the-gemini-icon-is-missing">The Gemini icon is missing<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-gemini-icon-is-missing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Confirm <code>GOOGLE_API_KEY</code> or <code>GEMINI_API_KEY</code> is available to the App, an
+<code>IDbConnectionFactory</code> is registered, and <code>gemini</code> is not listed in <code>DisableExtensions</code>. Restart the
+App after changing its environment. The extension logs which prerequisite is missing when it
+disables itself.</p>
+<h3 id="no-gemini-model-is-available">No Gemini model is available<a class="header-anchor" href="javascript:;" onclick="location.hash='#no-gemini-model-is-available'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Configure a Google provider chat model. The Gemini picker excludes other providers and incompatible
+model types.</p>
+<h3 id="a-folder-cannot-be-imported">A folder cannot be imported<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-folder-cannot-be-imported'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Check the resolved folder shown by the picker. Non-admin users must remain beneath a trusted import
+root. The permission is checked again whenever a saved import runs.</p>
+<h3 id="files-were-skipped">Files were skipped<a class="header-anchor" href="javascript:;" onclick="location.hash='#files-were-skipped'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Open <strong>Skipped &amp; failed</strong> in the preview. Common causes include unsupported binary formats during a
+folder scan, very short prose, include/exclude globs, Category root, or an explicit skip rule.</p>
+<h3 id="an-upload-failed-or-appears-stuck">An upload failed or appears stuck<a class="header-anchor" href="javascript:;" onclick="location.hash='#an-upload-failed-or-appears-stuck'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Sort Explorer by <strong>Failed</strong> or <strong>Uploading</strong>, hover the status for the provider message, and retry
+the document. Pending work resumes automatically after a server restart.</p>
+<h3 id="a-metadata-filter-returns-no-results">A metadata filter returns no results<a class="header-anchor" href="javascript:;" onclick="location.hash='#a-metadata-filter-returns-no-results'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Clear other chips and verify exact values in Coverage. Versions and tags are lists, and every active
+facet is combined with the category when creating the Gemini metadata filter.</p>
+<h3 id="citations-open-cached-files">Citations open cached files<a class="header-anchor" href="javascript:;" onclick="location.hash='#citations-open-cached-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Add or correct Source URL metadata, then push pending metadata changes to Gemini. Existing source
+cards can resolve locally, but future filtered retrieval uses the newly indexed metadata.</p>
+<h3 id="explorer-and-gemini-disagree">Explorer and Gemini disagree<a class="header-anchor" href="javascript:;" onclick="location.hash='#explorer-and-gemini-disagree'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Run <strong>Sync Store</strong>. Use its issue links to open the relevant store-wide filter, push intentional
+metadata changes, retry missing uploads, and prune duplicates when reported.</p>
+<h2 id="storage-and-access">Storage and access<a class="header-anchor" href="javascript:;" onclick="location.hash='#storage-and-access'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>When authentication is enabled, write operations require a signed-in user. A deployment can also
+require a role such as <code>Admin</code> with <code>GEMINI_WRITE_ROLE</code> or <code>gemini_write_role</code>.</p>
+<p>Structured Gemini state is stored in the App's configured OrmLite database. <code>AutoInitSchema = true</code>
+creates and updates these tables automatically:</p>
+<ul>
+<li><code>ChatFilestore</code> and <code>ChatDocument</code> for the local Gemini catalogue;</li>
+<li><code>ChatSource</code> and <code>ChatSourceRun</code> for recurring imports and their history; and</li>
+<li><code>ChatAssistant</code>, <code>ChatAssistantConversation</code>, and <code>ChatAssistantMessage</code> for published Assistants
+and retained customer conversations.</li>
+</ul>
+<p>When authentication is enabled, rows are partitioned by the authenticated username. With
+<code>RequireAuth = false</code>, AI Chat uses the shared <code>default</code> user.</p>
+<p>Cached document bodies use SHA-256 content-addressed paths beneath AI Chat's <code>AppDataPath</code>, which
+defaults to <code>App_Data/chat</code>. A JSON sidecar retains the original filename, MIME type, size, date,
+and cache URL:</p>
+<pre><code class="language-text">App_Data/chat/cache/[hash_prefix]/[hash].[ext]
+App_Data/chat/cache/[hash_prefix]/[hash].info.json
+</code></pre>
+<p>User-specific crawl workspaces live beneath
+<code>App_Data/chat/user/&lt;user&gt;/gemini/imports/</code>. Back up the OrmLite database and <code>App_Data/chat</code>
+together so catalog records, cached originals, imports, and Assistant state remain consistent. See
+<a href="/chat/data">Data &amp; Storage</a> for AI Chat's complete storage layout. For provider-level API
+constraints, consult Google's <a href="https://ai.google.dev/gemini-api/docs/file-search">File Search documentation</a>.</p>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/chat/gemini-vnext.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/chat/projects" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Projects
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/chat/media" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Voice &amp; Media
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#what-you-can-build'" data-id="what-you-can-build" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            What you can build
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#enable-and-configure'" data-id="enable-and-configure" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Enable and configure
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="upload-tuning-and-mime-type-overrides" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#upload-tuning-and-mime-type-overrides'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Upload tuning and MIME type overrides
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#file-stores'" data-id="file-stores" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            File Stores
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#quick-start'" data-id="quick-start" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Quick start
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#importing-knowledge'" data-id="importing-knowledge" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Importing knowledge
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="upload-files-and-zip-archives" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#upload-files-and-zip-archives'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Upload files and ZIP archives
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="import-a-local-folder" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#import-a-local-folder'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Import a local folder
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="crawl-a-website-into-markdown" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#crawl-a-website-into-markdown'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Crawl a website into Markdown
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="versioned-import-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#versioned-import-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Versioned import configuration
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#metadata-that-improves-retrieval'" data-id="metadata-that-improves-retrieval" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Metadata that improves retrieval
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="source-url-templates" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#source-url-templates'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Source URL templates
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#explore-filter-and-maintain-documents'" data-id="explore-filter-and-maintain-documents" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Explore, filter, and maintain documents
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="edit-metadata-in-bulk" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#edit-metadata-in-bulk'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Edit metadata in bulk
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="coverage-and-synchronization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#coverage-and-synchronization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Coverage and synchronization
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#ask-grounded-questions'" data-id="ask-grounded-questions" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Ask grounded questions
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="answers-citations-and-source-evidence" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#answers-citations-and-source-evidence'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Answers, citations, and source evidence
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#publish-a-website-assistant'" data-id="publish-a-website-assistant" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Publish a Website Assistant
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="identity-behavior-and-document-scope" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#identity-behavior-and-document-scope'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            1. Identity, behavior, and document scope
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="design-the-widget" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#design-the-widget'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            2. Design the widget
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="customize-the-launcher-and-hosting-rules" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#customize-the-launcher-and-hosting-rules'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            3. Customize the launcher and hosting rules
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="save-publish-and-embed" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#save-publish-and-embed'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            4. Save, publish, and embed
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="review-customer-conversations" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#review-customer-conversations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Review customer conversations
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="assistant-lifecycle" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#assistant-lifecycle'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Assistant lifecycle
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#operational-guidance'" data-id="operational-guidance" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Operational guidance
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="choose-store-boundaries-deliberately" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#choose-store-boundaries-deliberately'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Choose store boundaries deliberately
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="prefer-curated-sources-over-larger-sources" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#prefer-curated-sources-over-larger-sources'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Prefer curated sources over larger sources
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="make-citations-durable" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#make-citations-durable'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Make citations durable
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="recover-from-interrupted-uploads" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#recover-from-interrupted-uploads'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Recover from interrupted uploads
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#troubleshooting'" data-id="troubleshooting" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Troubleshooting
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="the-gemini-icon-is-missing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-gemini-icon-is-missing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The Gemini icon is missing
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="no-gemini-model-is-available" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#no-gemini-model-is-available'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            No Gemini model is available
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="a-folder-cannot-be-imported" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#a-folder-cannot-be-imported'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            A folder cannot be imported
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="files-were-skipped" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#files-were-skipped'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Files were skipped
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="an-upload-failed-or-appears-stuck" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#an-upload-failed-or-appears-stuck'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            An upload failed or appears stuck
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="a-metadata-filter-returns-no-results" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#a-metadata-filter-returns-no-results'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            A metadata filter returns no results
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="citations-open-cached-files" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#citations-open-cached-files'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Citations open cached files
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="explorer-and-gemini-disagree" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#explorer-and-gemini-disagree'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Explorer and Gemini disagree
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#storage-and-access'" data-id="storage-and-access" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Storage and access
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ 
+        startOnLoad: true,
+        theme: 'base',
+        'themeVariables': {
+            'primaryColor': '#fff',
+            'lineColor': '#333',
+            'primaryBorderColor': 'rgb(67 56 202)', // text-indigo-700	
+            'secondaryColor': '#fff',
+            'primaryTextColor': '#333',
+            'tertiaryColor': '#333'
+        }        
+    });
+</script>
+<style>
+pre.mermaid {
+    background-color: #fff !important;
+}
+.dark pre.mermaid {
+    background-color: #000 !important; /*bg-gray-800*/
+}
+.dark pre.mermaid .edgeLabel, .dark pre.mermaid .edgeLabel p, .dark pre.mermad .labelBkg {
+    background-color: #000 !important;
+}
+.dark pre.mermaid .edgeLabel, .dark pre.mermaid .edgeLabel p {
+    color: rgb(209 213 219) !important;
+}
+.dark pre.mermaid .flowchart-link { 
+    stroke: rgb(209 213 219) !important;
+}
+.dark pre.mermaid .node rect {
+    stroke: #fff !important;
+}
+.dark pre.mermaid .marker.flowchart-v2 {
+    stroke: #fff !important;
+    fill: #fff !important;
+}
+</style>
+<link rel="stylesheet" href="/css/asciinema-player.css">
+<script src="/lib/js/asciinema-player.js"></script>
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+        import App from "/pages/chat/gemini-vnext.mjs" 
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>
