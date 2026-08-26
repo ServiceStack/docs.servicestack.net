@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-26T05:00:29.5906216Z'>
+    <meta name='date' content='2026-08-26T13:02:33.7952180Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>API Tools</title>
@@ -335,7 +335,7 @@ mount('#header', Header)
                 <div class="not-prose"></div>
 
                 <div class="content"><p><strong>API Tools</strong> let AI Models discover, learn and call your existing ServiceStack APIs. Your typed Request DTOs, metadata, validation, authorization and Services remain the single source of truth - there is no parallel schema, no bespoke function-calling gateway and no AI-specific application backend.</p>
-<p><screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot></p>
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="pClPDAtpqz8" playlabel="Your existing C# DTO is the AI Contract - enable API + MCP tools for your APIs" style="background-image:url('https://img.youtube.com/vi/pClPDAtpqz8/maxresdefault.jpg')"></lite-youtube>
 <h2 id="three-tools-not-one-per-api">Three tools, not one per API<a class="header-anchor" href="javascript:;" onclick="location.hash='#three-tools-not-one-per-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Sending every API schema to a Model on every request would be expensive, slow and confusing - a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:</p>
 <table>
@@ -360,8 +360,20 @@ mount('#header', Header)
 </tr>
 </tbody>
 </table>
+<p><screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot></p>
 <p>Only the search index is loaded eagerly; a Model pays for an API's schema only when it actually uses it.</p>
 <p><screenshot src="/img/pages/chat/api-tools/api-describe.webp" title="An API's schema returned by api_describe"></screenshot></p>
+<h3 id="progressive-discovery-end-to-end">Progressive discovery, end to end<a class="header-anchor" href="javascript:;" onclick="location.hash='#progressive-discovery-end-to-end'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For a request like <em>&quot;two grande hot oat milk lattes with light vanilla syrup for Sam&quot;</em> the Model:</p>
+<ol>
+<li><code>api_search</code> for APIs related to ordering coffee</li>
+<li><code>api_describe</code> the menu, preview and create-order APIs it found</li>
+<li><code>api_call</code> the menu API to resolve the current product Id, supported sizes and available options</li>
+<li><code>api_call</code> the preview API to apply defaults, validate customizations and calculate the current price</li>
+<li>Present the proposed <code>CreateCoffeeShopOrder</code> for approval</li>
+<li>Submit the approved request and report the persisted order number</li>
+</ol>
+<p>Nothing about the menu was memorized from a prompt. The Model isn't given a snapshot of your application, it's taught how to find and use its live capabilities - so the same conversation keeps working as products, prices, options and APIs change.</p>
 <h2 id="enabling-api-tools">Enabling API Tools<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-api-tools'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>API Tools are <strong>on by default</strong> once <code>ChatFeature</code> is registered, but nothing is exposed until you opt an API in. There are three ways to do so:</p>
 <pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
@@ -547,6 +559,26 @@ public class CreateCoffeeShopOrder : IPost, IReturn&lt;CreateCoffeeShopOrderResp
     public List&lt;OrderItemRequest&gt; Items { get; set; } = [];
 }
 </code></pre>
+<h3 id="safety">Safety<a class="header-anchor" href="javascript:;" onclick="location.hash='#safety'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>Safety</code> defaults to <code>Auto</code>, inferred from the API's HTTP verb - GET/HEAD is read-only, DELETE is destructive, everything else is a write. Set it explicitly when the verb lies about the consequences: a POST that only runs a report is <code>ReadOnly</code>, a POST that emails every customer is <code>Destructive</code>. <code>RequiresApproval = true</code> demands a human decision for every call regardless of <code>Safety</code>.</p>
+<p>See <a href="/chat/tools#tool-safety">Tool safety</a> for how the classification is used across the whole Tool Registry.</p>
+<h3 id="agent-facing-instructions-with-mcp">Agent-facing instructions with <code>[Mcp]</code><a class="header-anchor" href="javascript:;" onclick="location.hash='#agent-facing-instructions-with-mcp'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>[Description]</code> is read by API Explorer, Admin UIs, OpenAPI generators and your own clients, so it's the wrong place for imperative instructions aimed at an Agent. <code>[Mcp(Description)]</code> adds wording only MCP consumers see:</p>
+<pre><code class="language-csharp">[Description(&quot;Submits and charges a coffee shop order.&quot;)]
+[Mcp(Description =
+    &quot;&quot;&quot;
+    Submits and charges a coffee shop order.
+    IMPORTANT: Before calling this API you MUST first call PreviewCoffeeShopOrder, present the
+    itemized summary and total price to the human customer verbatim, and WAIT for their explicit
+    natural-language confirmation of both the items and the total in a subsequent user turn.
+    &quot;&quot;&quot;)]
+[Tool(&quot;the user wants to place an order&quot;,
+    Safety = ToolSafety.Write,
+    RequiresApproval = true)]
+public class CreateCoffeeShopOrder : IPost, IReturn&lt;CreateCoffeeShopOrderResponse&gt; { }
+</code></pre>
+<p>When set, MCP responses - <code>api_search</code>, <code>api_describe</code> and confirmation summaries - prefer it over <code>[Description]</code>, whilst every non-MCP consumer continues to see the original.</p>
+<p>Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the <a href="/chat/mcp#approval-across-the-mcp-boundary">two-phase confirmation</a> without asking a human.</p>
 <h2 id="your-metadata-becomes-ai-context">Your metadata becomes AI context<a class="header-anchor" href="javascript:;" onclick="location.hash='#your-metadata-becomes-ai-context'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>API Tools reuse the machine-readable information your Apps already contain:</p>
 <ul>
@@ -602,12 +634,54 @@ alt="Search → Describe → Resolve current data → Preview → Approve → Ex
 <li>Write workflows provide a read-only preview</li>
 <li>Result sets are bounded with <code>Fields</code> and <code>Take</code></li>
 </ul>
+<h2 id="where-api-tools-fit">Where API Tools fit<a class="header-anchor" href="javascript:;" onclick="location.hash='#where-api-tools-fit'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>CoffeeShop is deliberately easy to follow, but any workflow expressible as well-designed APIs can be reached in natural language:</p>
+<ul>
+<li><strong>Customer service</strong> - look up a customer's recent orders, inspect delivery status, issue an approved refund or add an account note, still bounded by that staff member's permissions</li>
+<li><strong>Bookings &amp; scheduling</strong> - search availability, resolve customers and resources, preview a booking, then approve before committing it</li>
+<li><strong>Commerce &amp; procurement</strong> - find products from live inventory, price them, validate quantities and submit an approved purchase, with no catalog snapshot in the prompt</li>
+<li><strong>Business intelligence</strong> - focused read-only reporting and AutoQuery APIs answer questions in natural language, with <code>Fields</code> and <code>Take</code> keeping results within useful context limits</li>
+<li><strong>Internal operations</strong> - create tickets, update CRM records, run reports or start deployment workflows, with destructive actions explicitly classified and guarded</li>
+<li><strong>Vertical assistants</strong> - package the domain knowledge already in your APIs into specialised assistants; the App stays responsible for deterministic validation and authorization, the Model for language and orchestration</li>
+</ul>
+<p>Because the <a href="/chat/tools">Tool Registry</a> is shared, API Tools run alongside AI Chat's other tools in the same conversation - so your business APIs can be combined with search, files, images, audio, <a href="/chat/custom-extensions">custom extensions</a> and ServiceStack Commands. That's what makes <code>/chat</code> useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.</p>
 <h2 id="example-app">Example App<a class="header-anchor" href="javascript:;" onclick="location.hash='#example-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><a href="https://github.com/NetCoreApps/CoffeeShopChat">NetCoreApps/CoffeeShopChat</a> is a complete natural-language ordering workflow built entirely from ordinary ServiceStack APIs:</p>
 <p><a href="https://github.com/NetCoreApps/CoffeeShopChat"><img src="/img/pages/chat/api-tools/coffeeshop-screenshot.webp" alt="CoffeeShopChat" /></a></p>
-<h2 id="getting-started-on-an-existing-app">Getting started on an existing App<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-started-on-an-existing-app'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Pick one read-only API, add a <code>[Tool]</code> attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.</p>
-<p>To let external AI Assistants use the same tools, name the group over MCP - see <a href="/chat/mcp">MCP Server</a>.</p>
+<h2 id="getting-started">Getting started<a class="header-anchor" href="javascript:;" onclick="location.hash='#getting-started'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>API Tools ship with AI Chat, so a .NET 8+ ServiceStack App gets both from:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npx add-in chat</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Then open <code>/chat</code> and ask for something your APIs can do - see <a href="/chat/install">Install AI Chat</a> for what's registered.</p>
+<p>On an existing App the smallest useful step is one API: pick a read-only one, add a <code>[Tool]</code> attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.</p>
+<p>To let external AI Assistants use the same three tools, name the group over MCP and point them at <code>https://example.org/chat/mcp</code> with a ServiceStack <a href="/auth/apikeys">API key</a> as the Bearer token:</p>
+<pre><code class="language-csharp">Mcp = {
+    ToolGroups = [&quot;api_tools&quot;],
+}
+</code></pre>
+<p>See <a href="/chat/mcp">MCP Server</a> and <a href="/chat/connect-mcp">Connect MCP Clients</a>.</p>
 <p><screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot></p>
 </div>
 
@@ -655,6 +729,14 @@ alt="Search → Describe → Resolve current data → Preview → Approve → Ex
                                         <span v-hash="'#three-tools-not-one-per-api'" data-id="three-tools-not-one-per-api" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Three tools, not one per API
                                         </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="progressive-discovery-end-to-end" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#progressive-discovery-end-to-end'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Progressive discovery, end to end
+                                                        </span>
+                                                    </li>
+                                            </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#enabling-api-tools'" data-id="enabling-api-tools" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
@@ -690,6 +772,18 @@ alt="Search → Describe → Resolve current data → Preview → Approve → Ex
                                                             Preview and workflow metadata
                                                         </span>
                                                     </li>
+                                                    <li data-id="safety" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#safety'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Safety
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="agent-facing-instructions-with-mcp" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#agent-facing-instructions-with-mcp'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Agent-facing instructions with 
+                                                        </span>
+                                                    </li>
                                             </ul>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
@@ -718,13 +812,18 @@ alt="Search → Describe → Resolve current data → Preview → Approve → Ex
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#where-api-tools-fit'" data-id="where-api-tools-fit" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Where API Tools fit
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#example-app'" data-id="example-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Example App
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
-                                        <span v-hash="'#getting-started-on-an-existing-app'" data-id="getting-started-on-an-existing-app" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
-                                            Getting started on an existing App
+                                        <span v-hash="'#getting-started'" data-id="getting-started" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Getting started
                                         </span>
                                     </li>
                             </ul>
