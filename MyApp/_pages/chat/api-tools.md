@@ -4,7 +4,9 @@ title: API Tools
 
 **API Tools** let AI Models discover, learn and call your existing ServiceStack APIs. Your typed Request DTOs, metadata, validation, authorization and Services remain the single source of truth - there is no parallel schema, no bespoke function-calling gateway and no AI-specific application backend.
 
-<screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
+:::youtube pClPDAtpqz8
+Your existing C# DTO is the AI Contract - enable API + MCP tools for your APIs
+:::
 
 ## Three tools, not one per API
 
@@ -16,9 +18,24 @@ Sending every API schema to a Model on every request would be expensive, slow an
 | `api_describe` | Return complete schemas and workflow metadata for selected APIs |
 | `api_call` | Invoke an API using its typed Request DTO, **as the current user** |
 
+<screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
+
 Only the search index is loaded eagerly; a Model pays for an API's schema only when it actually uses it.
 
 <screenshot src="/img/pages/chat/api-tools/api-describe.webp" title="An API's schema returned by api_describe"></screenshot>
+
+### Progressive discovery, end to end
+
+For a request like *"two grande hot oat milk lattes with light vanilla syrup for Sam"* the Model:
+
+1. `api_search` for APIs related to ordering coffee
+2. `api_describe` the menu, preview and create-order APIs it found
+3. `api_call` the menu API to resolve the current product Id, supported sizes and available options
+4. `api_call` the preview API to apply defaults, validate customizations and calculate the current price
+5. Present the proposed `CreateCoffeeShopOrder` for approval
+6. Submit the approved request and report the persisted order number
+
+Nothing about the menu was memorized from a prompt. The Model isn't given a snapshot of your application, it's taught how to find and use its live capabilities - so the same conversation keeps working as products, prices, options and APIs change.
 
 ## Enabling API Tools
 
@@ -153,6 +170,35 @@ public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderRespons
 }
 ```
 
+### Safety
+
+`Safety` defaults to `Auto`, inferred from the API's HTTP verb - GET/HEAD is read-only, DELETE is destructive, everything else is a write. Set it explicitly when the verb lies about the consequences: a POST that only runs a report is `ReadOnly`, a POST that emails every customer is `Destructive`. `RequiresApproval = true` demands a human decision for every call regardless of `Safety`.
+
+See [Tool safety](/chat/tools#tool-safety) for how the classification is used across the whole Tool Registry.
+
+### Agent-facing instructions with `[Mcp]`
+
+`[Description]` is read by API Explorer, Admin UIs, OpenAPI generators and your own clients, so it's the wrong place for imperative instructions aimed at an Agent. `[Mcp(Description)]` adds wording only MCP consumers see:
+
+```csharp
+[Description("Submits and charges a coffee shop order.")]
+[Mcp(Description =
+    """
+    Submits and charges a coffee shop order.
+    IMPORTANT: Before calling this API you MUST first call PreviewCoffeeShopOrder, present the
+    itemized summary and total price to the human customer verbatim, and WAIT for their explicit
+    natural-language confirmation of both the items and the total in a subsequent user turn.
+    """)]
+[Tool("the user wants to place an order",
+    Safety = ToolSafety.Write,
+    RequiresApproval = true)]
+public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderResponse> { }
+```
+
+When set, MCP responses - `api_search`, `api_describe` and confirmation summaries - prefer it over `[Description]`, whilst every non-MCP consumer continues to see the original.
+
+Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp#approval-across-the-mcp-boundary) without asking a human.
+
 ## Your metadata becomes AI context
 
 API Tools reuse the machine-readable information your Apps already contain:
@@ -222,16 +268,45 @@ API Tools remove most of the integration work but not the value of thoughtful AP
 - Write workflows provide a read-only preview
 - Result sets are bounded with `Fields` and `Take`
 
+## Where API Tools fit
+
+CoffeeShop is deliberately easy to follow, but any workflow expressible as well-designed APIs can be reached in natural language:
+
+- **Customer service** - look up a customer's recent orders, inspect delivery status, issue an approved refund or add an account note, still bounded by that staff member's permissions
+- **Bookings & scheduling** - search availability, resolve customers and resources, preview a booking, then approve before committing it
+- **Commerce & procurement** - find products from live inventory, price them, validate quantities and submit an approved purchase, with no catalog snapshot in the prompt
+- **Business intelligence** - focused read-only reporting and AutoQuery APIs answer questions in natural language, with `Fields` and `Take` keeping results within useful context limits
+- **Internal operations** - create tickets, update CRM records, run reports or start deployment workflows, with destructive actions explicitly classified and guarded
+- **Vertical assistants** - package the domain knowledge already in your APIs into specialised assistants; the App stays responsible for deterministic validation and authorization, the Model for language and orchestration
+
+Because the [Tool Registry](/chat/tools) is shared, API Tools run alongside AI Chat's other tools in the same conversation - so your business APIs can be combined with search, files, images, audio, [custom extensions](/chat/custom-extensions) and ServiceStack Commands. That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
+
 ## Example App
 
 [NetCoreApps/CoffeeShopChat](https://github.com/NetCoreApps/CoffeeShopChat) is a complete natural-language ordering workflow built entirely from ordinary ServiceStack APIs:
 
 [![CoffeeShopChat](/img/pages/chat/api-tools/coffeeshop-screenshot.webp)](https://github.com/NetCoreApps/CoffeeShopChat)
 
-## Getting started on an existing App
+## Getting started
 
-Pick one read-only API, add a `[Tool]` attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.
+API Tools ship with AI Chat, so a .NET 8+ ServiceStack App gets both from:
 
-To let external AI Assistants use the same tools, name the group over MCP - see [MCP Server](/chat/mcp).
+:::sh
+npx add-in chat
+:::
+
+Then open `/chat` and ask for something your APIs can do - see [Install AI Chat](/chat/install) for what's registered.
+
+On an existing App the smallest useful step is one API: pick a read-only one, add a `[Tool]` attribute describing when to use it, and ask AI Chat a question that should reach it. Once discovery works for one API, adding the rest is just metadata.
+
+To let external AI Assistants use the same three tools, name the group over MCP and point them at `https://example.org/chat/mcp` with a ServiceStack [API key](/auth/apikeys) as the Bearer token:
+
+```csharp
+Mcp = {
+    ToolGroups = ["api_tools"],
+}
+```
+
+See [MCP Server](/chat/mcp) and [Connect MCP Clients](/chat/connect-mcp).
 
 <screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot>
