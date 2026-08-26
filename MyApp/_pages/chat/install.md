@@ -126,7 +126,7 @@ brew install typst
 cargo install --locked typst-cli
 :::
 
-AI Chat resolves `typst` from `$TYPST_PATH` first, then `PATH`. See [PDF Studio](/chat/pdf-studio) and [Rendering PDFs](/chat/pdf).
+AI Chat resolves `typst` from `$TYPST_PATH` first, then `PATH`. See [PDF Studio](/chat/pdf-studio) and [Rendering PDFs](/chat/rendering-pdfs).
 
 ## First-run files
 

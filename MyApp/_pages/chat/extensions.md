@@ -25,7 +25,7 @@ AI Chat solves this with a shared extension architecture spanning the server and
 | `identity` | Sign-in using the host App's ASP.NET Identity users |
 | `katex` | Mathematical typesetting |
 | `mcp` | The built-in [MCP Server](/chat/mcp) at `/chat/mcp` |
-| `pdf` | [PDF Studio](/chat/pdf-studio) at `/chat/pdf` |
+| `pdf` | [PDF Studio](/chat/pdf-studio) at `/chat/pdf-studio` |
 | `projects` | [Per-user workspaces](/chat/projects) and directory boundaries |
 | `publish` | Sharing threads, projects and media - **off by default** |
 | `skills` | [Skill](/chat/skills) management, search, install and authoring |

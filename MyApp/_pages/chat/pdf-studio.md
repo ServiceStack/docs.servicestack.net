@@ -6,7 +6,7 @@ title: PDF Studio
 
 <screenshot src="/img/pages/chat/pdf/designer-overview.webp" title="PDF Studio designer"></screenshot>
 
-This page covers **authoring**. For publishing, production rendering and typed C# integration see [Rendering PDFs](/chat/pdf).
+This page covers **authoring**. For publishing, production rendering and typed C# integration see [Rendering PDFs](/chat/rendering-pdfs).
 
 ## The lifecycle
 
@@ -182,4 +182,4 @@ Renders are serialized per user, since a user's templates all compile out of the
 
 Once a document is ready, an administrator publishes it into `App_Data/pdf`, where it becomes a validated immutable revision your application can render deterministically.
 
-[Rendering PDFs →](/chat/pdf)
+[Rendering PDFs →](/chat/rendering-pdfs)

@@ -16,7 +16,7 @@ title: AI Chat Overview
 | Discovery + invocation of your App's own APIs | [API Tools](/chat/api-tools) |
 | MCP Server for external AI Assistants | `/chat/mcp` |
 | Managed RAG over your documents | [Gemini File Search](/chat/gemini) |
-| PDF template designer | `/chat/pdf` |
+| PDF template designer | `/chat/rendering-pdfs` |
 | Production PDF rendering | `IPdfRenderer` + `PdfFeature` |
 | Cost, token and activity reporting | `/admin-ui/chat` |
 
@@ -29,7 +29,7 @@ AI Chat ships as two independent plugins in the **ServiceStack.AI.Chat** package
 | `ChatFeature` | Chat UI, providers, tools, API Tools, MCP, RAG, PDF Studio | An AI provider API key |
 | `PdfFeature` | Published PDF template management + rendering | The `typst` CLI |
 
-`PdfFeature` has no dependency on `ChatFeature` - an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/pdf).
+`PdfFeature` has no dependency on `ChatFeature` - an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/rendering-pdfs).
 
 ## Architecture
 

@@ -122,7 +122,7 @@ Cached files are served at `{RoutePrefix}/~cache/{path}` to authenticated users.
   ['App_Data/pdf/.versions/{template}/{revision}/','Immutable revision history'],
   ['App_Data/pdf/fonts/','Application fonts available to typst']]"></text-block>
 
-See [Rendering PDFs](/chat/pdf).
+See [Rendering PDFs](/chat/rendering-pdfs).
 
 ## Backup and deployment
 
