@@ -1,8 +1,7 @@
 import Default from './why-servicestack.mjs'
 
 const OtherProducts = {
-  template: `'
-  <div>
+  template: `<div>
       <div class="my-8">
           <h2 class="text-center text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl">Other ServiceStack Products</h2>
       </div>
@@ -269,6 +268,42 @@ const OtherProducts = {
                           </div>
                       </div>
 
+
+                        <div class="pt-6">
+                            <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                                <div class="-mt-6">
+                                    <div>
+                                        <a href="https://servicestack.net" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M3.338 17A9.996 9.996 0 0 0 12 22a9.996 9.996 0 0 0 8.662-5M3.338 7A9.996 9.996 0 0 1 12 2a9.996 9.996 0 0 1 8.662 5"/><path d="M13 21.95s1.408-1.853 2.295-4.95M13 2.05S14.408 3.902 15.295 7M11 21.95S9.592 20.098 8.705 17M11 2.05S9.592 3.902 8.705 7M9 10l1.5 5l1.5-5l1.5 5l1.5-5M1 10l1.5 5L4 10l1.5 5L7 10m10 0l1.5 5l1.5-5l1.5 5l1.5-5"/></g></svg>
+                                        </a>
+                                    </div>
+                                    <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                        <a href="https://servicestack.net">servicestack.net</a>
+                                    </h3>
+                                    <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                        See ServiceStack's Website for product info and pricing
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-6">
+                            <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                                <div class="-mt-6">
+                                    <div>
+                                        <a href="https://github.com/ServiceStack/docs.servicestack.net" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                            <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 6s1.5-2 5-2s5 2 5 2v14s-1.5-1-5-1s-5 1-5 1V6Zm10 0s1.5-2 5-2s5 2 5 2v14s-1.5-1-5-1s-5 1-5 1V6Z"></path></svg>
+                                        </a>
+                                    </div>
+                                    <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                        <a href="https://github.com/ServiceStack/docs.servicestack.net">Contribute to Docs</a>
+                                    </h3>
+                                    <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                        Send a pull request to modify markdown in our Repo
+                                    </p>
+                                </div>
+                            </div>
+                        </div>                      
                   </div>
               </div>
           </div>
