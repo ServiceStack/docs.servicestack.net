@@ -1,0 +1,283 @@
+import Default from './why-servicestack.mjs'
+
+const OtherProducts = {
+  template: `'
+  <div>
+      <div class="my-8">
+          <h2 class="text-center text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl">Other ServiceStack Products</h2>
+      </div>
+      <div class="sm:grid sm:grid-cols-12 sm:gap-12">
+          <div class="text-center sm:col-span-6">
+              <a href="/redis/">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                          <path fill="currentColor" d="M31.99 19.12c-.01.307-.417.646-1.245 1.078c-1.708.891-10.552 4.531-12.438 5.51c-1.885.984-2.927.974-4.417.26c-1.49-.708-10.901-4.516-12.599-5.323c-.844-.406-1.276-.745-1.292-1.068v3.234c0 .323.448.661 1.292 1.068c1.698.813 11.115 4.615 12.599 5.323c1.49.714 2.531.724 4.417-.26c1.885-.979 10.729-4.62 12.438-5.51c.87-.448 1.255-.802 1.255-1.12v-3.188c0-.005-.005-.005-.01-.005zm0-5.271c-.016.302-.417.641-1.245 1.078c-1.708.885-10.552 4.526-12.438 5.505c-1.885.984-2.927.974-4.417.266c-1.49-.714-10.901-4.516-12.599-5.328c-.844-.401-1.276-.745-1.292-1.068v3.234c0 .323.448.667 1.292 1.068c1.698.813 11.109 4.615 12.599 5.328c1.49.708 2.531.719 4.417-.26c1.885-.984 10.729-4.62 12.438-5.51c.87-.453 1.255-.807 1.255-1.125v-3.188h-.01zm0-5.474c.016-.323-.406-.609-1.266-.922c-1.661-.609-10.458-4.109-12.141-4.729c-1.682-.615-2.37-.589-4.349.12c-1.979.714-11.339 4.385-13.005 5.036c-.833.328-1.24.63-1.224.953v3.234c0 .323.443.661 1.292 1.068c1.693.813 11.109 4.615 12.599 5.328c1.484.708 2.531.719 4.417-.266c1.88-.979 10.729-4.62 12.438-5.505c.865-.453 1.25-.807 1.25-1.125V8.374zm-20.532 3.063l7.417-1.135l-2.24 3.281zm16.401-2.959L23 10.401l-4.385-1.734l4.854-1.917zM14.984 5.302l-.719-1.323l2.24.875l2.109-.688l-.573 1.365l2.151.807l-2.771.286l-.625 1.495l-1-1.667l-3.203-.286zm-5.526 1.87c2.193 0 3.964.688 3.964 1.531c0 .849-1.776 1.536-3.964 1.536s-3.964-.688-3.964-1.536c0-.844 1.776-1.531 3.964-1.531z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">ServiceStack.Redis</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  .NET's leading C# Client
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/ormlite/">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600 p-2" xmlns="http://www.w3.org/2000/svg" width="448" height="512" viewBox="0 0 448 512">
+                          <path fill="currentColor" d="M448 73.143v45.714C448 159.143 347.667 192 224 192S0 159.143 0 118.857V73.143C0 32.857 100.333 0 224 0s224 32.857 224 73.143zM448 176v102.857C448 319.143 347.667 352 224 352S0 319.143 0 278.857V176c48.125 33.143 136.208 48.572 224 48.572S399.874 209.143 448 176zm0 160v102.857C448 479.143 347.667 512 224 512S0 479.143 0 438.857V336c48.125 33.143 136.208 48.572 224 48.572S399.874 369.143 448 336z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">ServiceStack.OrmLite</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Code-first, fast, lightweight ORM
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/chat">
+                  <div class="text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="w-20 h-20 inline-block p-3 text-indigo-600"><path fill="currentColor" d="M8 2.19c3.13 0 5.68 2.25 5.68 5s-2.55 5-5.68 5a5.7 5.7 0 0 1-1.89-.29l-.75-.26l-.56.56a14 14 0 0 1-2 1.55a.13.13 0 0 1-.07 0v-.06a6.58 6.58 0 0 0 .15-4.29a5.25 5.25 0 0 1-.55-2.16c0-2.77 2.55-5 5.68-5M8 .94c-3.83 0-6.93 2.81-6.93 6.27a6.4 6.4 0 0 0 .64 2.64a5.53 5.53 0 0 1-.18 3.48a1.32 1.32 0 0 0 2 1.5a15 15 0 0 0 2.16-1.71a6.8 6.8 0 0 0 2.31.36c3.83 0 6.93-2.81 6.93-6.27S11.83.94 8 .94"></path><ellipse cx="5.2" cy="7.7" fill="currentColor" rx=".8" ry=".75"></ellipse><ellipse cx="8" cy="7.7" fill="currentColor" rx=".8" ry=".75"></ellipse><ellipse cx="10.8" cy="7.7" fill="currentColor" rx=".8" ry=".75"></ellipse></svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">AI Chat</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Modular AI Chat, Agents and API tools for ServiceStack Apps
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/add-servicestack-reference">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block p-3 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                          <path d="M0 0h16v16H0z" fill="none" />
+                          <path fill="currentColor" d="M11.586 3H1v2h10.586l-1.5 1.5L11.5 7.914L15.414 4L11.5.086L10.086 1.5zM4.414 13H15v-2H4.414l1.5-1.5L4.5 8.086L.586 12L4.5 15.914L5.914 14.5z" />
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">DTOs</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  End-to-end typed API clients for 15 programming languages
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/grpc/">
+                  <div class="text-center">
+                      <img class="w-20 h-20 inline-block p-2" src="/img/pages/svg/grpc-icon-color.svg" alt="gRPC">
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">gRPC</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Code-first, high-performance HTTP/2 typed services
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="https://react-templates.net/">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M12 10.11c1.03 0 1.87.84 1.87 1.89c0 1-.84 1.85-1.87 1.85c-1.03 0-1.87-.85-1.87-1.85c0-1.05.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7c-.52-.59-1.03-1.23-1.51-1.9a22.7 22.7 0 0 1-2.4-.36c-.51 2.14-.32 3.61.31 3.96m.71-5.74l-.29-.51c-.11.29-.22.58-.29.86c.27.06.57.11.88.16l-.3-.51m6.54-.76l.81-1.5l-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9c-.6 0-1.17 0-1.71.03c-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47c.54.03 1.11.03 1.71.03c.6 0 1.17 0 1.71-.03c.29-.47.61-.94.91-1.47M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.62-.38-2 .2-3.59 1.7c.52.59 1.03 1.23 1.51 1.9c.82.08 1.63.2 2.4.36c.51-2.14.32-3.61-.32-3.96m-.7 5.74l.29.51c.11-.29.22-.58.29-.86c-.27-.06-.57-.11-.88-.16l.3.51m1.45-7.05c1.47.84 1.63 3.05 1.01 5.63c2.54.75 4.37 1.99 4.37 3.68c0 1.69-1.83 2.93-4.37 3.68c.62 2.58.46 4.79-1.01 5.63c-1.46.84-3.45-.12-5.37-1.95c-1.92 1.83-3.91 2.79-5.38 1.95c-1.46-.84-1.62-3.05-1-5.63c-2.54-.75-4.37-1.99-4.37-3.68c0-1.69 1.83-2.93 4.37-3.68c-.62-2.58-.46-4.79 1-5.63c1.47-.84 3.46.12 5.38 1.95c1.92-1.83 3.91-2.79 5.37-1.95M17.08 12c.34.75.64 1.5.89 2.26c2.1-.63 3.28-1.53 3.28-2.26c0-.73-1.18-1.63-3.28-2.26c-.25.76-.55 1.51-.89 2.26M6.92 12c-.34-.75-.64-1.5-.89-2.26c-2.1.63-3.28 1.53-3.28 2.26c0 .73 1.18 1.63 3.28 2.26c.25-.76.55-1.51.89-2.26m9 2.26l-.3.51c.31-.05.61-.1.88-.16c-.07-.28-.18-.57-.29-.86l-.29.51m-2.89 4.04c1.59 1.5 2.97 2.08 3.59 1.7c.64-.35.83-1.82.32-3.96c-.77.16-1.58.28-2.4.36c-.48.67-.99 1.31-1.51 1.9M8.08 9.74l.3-.51c-.31.05-.61.1-.88.16c.07.28.18.57.29.86l.29-.51m2.89-4.04C9.38 4.2 8 3.62 7.37 4c-.63.35-.82 1.82-.31 3.96a22.7 22.7 0 0 1 2.4-.36c.48-.67.99-1.31 1.51-1.9Z"></path>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">React Templates</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Ultimate .NET React Templates for Vibe Coded UIs
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/text">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+                          <g fill="currentColor">
+                              <path fill-rule="evenodd" d="M14.5 10a4.5 4.5 0 0 0 4.284-5.882c-.105-.324-.51-.391-.752-.15L15.34 6.66a.454.454 0 0 1-.493.11a3.01 3.01 0 0 1-1.618-1.616a.455.455 0 0 1 .11-.494l2.694-2.692c.24-.241.174-.647-.15-.752a4.5 4.5 0 0 0-5.873 4.575c.055.873-.128 1.808-.8 2.368l-7.23 6.024a2.724 2.724 0 1 0 3.837 3.837l6.024-7.23c.56-.672 1.495-.855 2.368-.8c.096.007.193.01.291.01ZM5 16a1 1 0 1 1-2 0a1 1 0 0 1 2 0Z" clip-rule="evenodd"/><path d="M14.5 11.5c.173 0 .345-.007.514-.022l3.754 3.754a2.5 2.5 0 0 1-3.536 3.536l-4.41-4.41l2.172-2.607c.052-.063.147-.138.342-.196a2.28 2.28 0 0 1 .777-.067c.128.008.257.012.387.012ZM6 4.586l2.33 2.33a.452.452 0 0 1-.08.09L6.8 8.214L4.586 6H3.309a.5.5 0 0 1-.447-.276l-1.7-3.402a.5.5 0 0 1 .093-.577l.49-.49a.5.5 0 0 1 .577-.094l3.402 1.7A.5.5 0 0 1 6 3.31v1.277Z"/>
+                          </g>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">ServiceStack.Text</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  .NET's missing high-performance utility belt
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="https://sharpscript.net">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600 p-1" xmlns="http://www.w3.org/2000/svg" width="576" height="512" viewBox="0 0 576 512">
+                          <path fill="currentColor" d="M0 80v48c0 17.7 14.3 32 32 32h64V80c0-26.5-21.5-48-48-48S0 53.5 0 80zm112-48c10 13.4 16 30 16 48v304c0 35.3 28.7 64 64 64s64-28.7 64-64v-5.3c0-32.4 26.3-58.7 58.7-58.7H480V128c0-53-43-96-96-96H112zm352 448c61.9 0 112-50.1 112-112c0-8.8-7.2-16-16-16H314.7c-14.7 0-26.7 11.9-26.7 26.7v5.3c0 53-43 96-96 96h272z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">#Script</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Simple, Fun, Live Scripting of .NET
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/aws-pocodynamo">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600 p-2" xmlns="http://www.w3.org/2000/svg" width="448" height="512" viewBox="0 0 448 512">
+                          <path fill="currentColor" d="M448 73.143v45.714C448 159.143 347.667 192 224 192S0 159.143 0 118.857V73.143C0 32.857 100.333 0 224 0s224 32.857 224 73.143zM448 176v102.857C448 319.143 347.667 352 224 352S0 319.143 0 278.857V176c48.125 33.143 136.208 48.572 224 48.572S399.874 209.143 448 176zm0 160v102.857C448 479.143 347.667 512 224 512S0 479.143 0 438.857V336c48.125 33.143 136.208 48.572 224 48.572S399.874 369.143 448 336z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">PocoDynamo</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Code-first DynamoDB LINQ Client
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="https://servicestack.net/creatorkit/">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13 23V13h10v10H13Zm1.5-1.5h7v-.8q-.625-.775-1.525-1.238T18 19q-1.075 0-1.975.463T14.5 20.7v.8ZM18 18q.625 0 1.063-.438T19.5 16.5q0-.625-.438-1.063T18 15q-.625 0-1.063.438T16.5 16.5q0 .625.438 1.063T18 18Zm-8.75 4l-.4-3.2q-.325-.125-.613-.3t-.562-.375L4.7 19.375l-2.75-4.75l2.575-1.95Q4.5 12.5 4.5 12.337v-.674q0-.163.025-.338L1.95 9.375l2.75-4.75l2.975 1.25q.275-.2.575-.375t.6-.3l.4-3.2h5.5l.4 3.2q.325.125.613.3t.562.375l2.975-1.25l2.75 4.75L19.925 11H15.4q-.35-1.075-1.25-1.788t-2.1-.712q-1.45 0-2.475 1.025T8.55 12q0 1.2.675 2.1T11 15.35V22H9.25Z"></path></svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">Creator Kit</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Add Mailchimp and Disqus features to any website
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/aws">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M18.75 11.35a4.32 4.32 0 0 1-.79-.08a3.9 3.9 0 0 1-.73-.23l-.17-.04h-.12q-.15 0-.15.21v.33a.43.43 0 0 0 0 .19a.5.5 0 0 0 .21.19a3 3 0 0 0 .76.26a4.38 4.38 0 0 0 1 .12a3 3 0 0 0 1-.14a1.94 1.94 0 0 0 .73-.37a1.81 1.81 0 0 0 .49-.58a1.79 1.79 0 0 0 .17-.78a1.54 1.54 0 0 0-.3-.93a2.15 2.15 0 0 0-1-.64l-.95-.3a2 2 0 0 1-.73-.36a.65.65 0 0 1-.2-.47a.66.66 0 0 1 .31-.6a1.82 1.82 0 0 1 .89-.18a2.89 2.89 0 0 1 1.27.26a.79.79 0 0 0 .26.08c.1 0 .15-.08.15-.22v-.36a.38.38 0 0 0-.06-.22a.56.56 0 0 0-.2-.16a1.55 1.55 0 0 0-.28-.12a3.44 3.44 0 0 0-.38-.11l-.44-.1A3.4 3.4 0 0 0 19 6a2.82 2.82 0 0 0-.83.11a2.19 2.19 0 0 0-.7.35A1.61 1.61 0 0 0 17 7a1.5 1.5 0 0 0-.18.74a1.6 1.6 0 0 0 .33 1a2.08 2.08 0 0 0 1.06.68l1 .3a1.58 1.58 0 0 1 .67.34a.66.66 0 0 1 .18.47a.72.72 0 0 1-.35.63a1.83 1.83 0 0 1-.96.19zM12.94 6.5a.48.48 0 0 0-.13-.26a.37.37 0 0 0-.26-.07H12a.43.43 0 0 0-.26.07a.42.42 0 0 0-.13.26l-1 4.4l-1.14-4.4a.48.48 0 0 0-.14-.26s-.13-.07-.26-.07h-.65c-.11 0-.16.06-.16.17a1.22 1.22 0 0 0 .06.27l1.56 5.14A.61.61 0 0 0 10 12a.45.45 0 0 0 .26.06h.57a.49.49 0 0 0 .27-.06a.57.57 0 0 0 .12-.27l1-4.28l1 4.29a.42.42 0 0 0 .12.26a.4.4 0 0 0 .27.07h.57a.41.41 0 0 0 .25-.07a.44.44 0 0 0 .14-.26l1.61-5.14a.73.73 0 0 0 0-.16a.52.52 0 0 0 0-.11a.15.15 0 0 0-.17-.17h-.62a.45.45 0 0 0-.26.07a.68.68 0 0 0-.13.26L14 11zM5.77 8.63a5.92 5.92 0 0 0-.71-.05a2.42 2.42 0 0 0-1.63.52a1.72 1.72 0 0 0-.6 1.37a1.7 1.7 0 0 0 .49 1.28a1.82 1.82 0 0 0 1.33.48a2.48 2.48 0 0 0 2-.92a3.5 3.5 0 0 0 .2.39a2.34 2.34 0 0 0 .24.31a.26.26 0 0 0 .37 0l.42-.28a.28.28 0 0 0 .13-.2a.27.27 0 0 0 0-.16a3.63 3.63 0 0 1-.21-.47a2 2 0 0 1-.07-.6V8.19a2.2 2.2 0 0 0-.55-1.64A2.42 2.42 0 0 0 5.33 6a3.9 3.9 0 0 0-1 .13a3.9 3.9 0 0 0-.84.3a.47.47 0 0 0-.18.14a.37.37 0 0 0 0 .23v.33c0 .14 0 .2.14.2a.26.26 0 0 0 .11 0l.23-.08A4.32 4.32 0 0 1 4.42 7a3 3 0 0 1 .72-.09a1.5 1.5 0 0 1 1.08.31a1.46 1.46 0 0 1 .31 1.06v.49zm.78.9v.27a2.36 2.36 0 0 1-.07.58a1.06 1.06 0 0 1-.23.43a1.38 1.38 0 0 1-.63.42a2.12 2.12 0 0 1-.68.12a.94.94 0 0 1-.7-.24a.92.92 0 0 1-.24-.71a.92.92 0 0 1 .33-.76a1.52 1.52 0 0 1 1-.27h.62a5.67 5.67 0 0 1 .6.16zM19.76 15a19.68 19.68 0 0 1-7.55 1.54a20 20 0 0 1-9.9-2.62c-.24-.15-.43.1-.22.29A14.68 14.68 0 0 0 12 18a14.4 14.4 0 0 0 8.1-2.47c.34-.31.03-.72-.34-.53z"/><path fill="currentColor" d="M18.38 14.06c-.19.14-.16.33.05.3c.71-.09 2.28-.27 2.56.09s-.31 1.83-.58 2.49c-.08.2.1.28.28.13a3.9 3.9 0 0 0 1.23-3.34a3.94 3.94 0 0 0-3.54.33z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">ServiceStack.Aws</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Full featured support for AWS managed services.
+              </p>
+          </div>
+
+          <div class="text-center sm:col-span-6">
+              <a href="/azure">
+                  <div class="text-center">
+                      <svg class="w-20 h-20 inline-block text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M13.05 4.24L6.56 18.05L2 18l5.09-8.76l5.96-5m.7 1.09L22 19.76H6.74l9.3-1.66l-4.87-5.79l2.58-6.98Z"/>
+                      </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold leading-7 text-gray-900 dark:text-gray-50">ServiceStack.Azure</h3>
+              </a>
+              <p class="text-base leading-7 text-gray-600 dark:text-gray-300">
+                  Full featured support for Azure managed services
+              </p>
+          </div>
+      </div>
+
+      <div class="mt-20">
+          <h2 class="text-center mb-4 text-4xl font-bold leading-8">Commercial Support</h2>
+      </div>
+      <div class="relative bg-white dark:bg-black mb-8 py-8">
+          <div class="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:max-w-7xl lg:px-8">
+              <div class="mt-12">
+                  <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+
+                      <div class="pt-6">
+                          <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                              <div class="-mt-6">
+                                  <div>
+                                      <a href="https://forums.servicestack.net" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                          <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                              <path fill="currentColor" d="M12.077 3C7.149 3 3 6.96 3 11.843V21l9.075-.01c4.928 0 8.925-4.11 8.925-8.993C21 7.113 17 3 12.077 3zm3.92 12.859a5.568 5.568 0 0 1-6.102 1.043l-3.595.805l1.001-3.192a5.435 5.435 0 0 1 .11-5.415a5.55 5.55 0 0 1 4.753-2.678v.001h.006a5.533 5.533 0 0 1 5.131 3.438a5.442 5.442 0 0 1-1.304 5.998z"/>
+                                          </svg>
+                                      </a>
+                                  </div>
+                                  <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                      <a href="https://forums.servicestack.net">Customer Forums</a>
+                                  </h3>
+                                  <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                      We're here to help! Active Customers can get technical support from our
+                                      <a class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100" href="https://forums.servicestack.net">Customer Forums</a>
+                                  </p>
+                                  <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                      Your email needs to match your Account's email or a
+                                      <a class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100" href="https://servicestack.net/account/support">registered support contact</a>
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="pt-6">
+                          <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                              <div class="-mt-6">
+                                  <div>
+                                      <a href="https://github.com/ServiceStack/Issues" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                          <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                              <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33c.85 0 1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/>
+                                          </svg>
+                                      </a>
+                                  </div>
+                                  <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                      <a href="https://github.com/ServiceStack/Issues">Report a bug issue</a>
+                                  </h3>
+                                  <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                      If you've found an issue in anyone of our libraries, please report it to our
+                                      <a class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100" href="https://github.com/ServiceStack/Issues">GitHub Issues repository</a>
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="pt-6">
+                          <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                              <div class="-mt-6">
+                                  <div>
+                                      <a href="https://servicestack.net/ideas" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                          <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+                                              <path fill="currentColor" d="M0 262q0 43 24.5 81T90 405q-2 7-4.5 18t-7 34.5t-3.5 39T85 512q30 0 60.5-16t48.5-32t19-16q55 0 107-21q-6-2-22.5-12T277 405h-64q-18 0-38 20q-28 25-53 36l6-77l-17-15q-68-44-68-107q0-16 6-36q-4-6-5.5-18.5T42 185v-23l1-13Q0 195 0 262zM299 0q-89 0-151.5 52T85 177q0 72 62 118t152 46q1 0 20.5 21.5t51.5 43t62 21.5q7 0 8.5-11t-1.5-26.5t-7-31.5t-7-27l-4-11q41-25 65.5-62.5T512 177q0-73-62.5-125T299 0zm102 284l-28 17l11 32q2 5 5 17t6 19q-22-15-52-45q-23-25-42-25q-70 0-120.5-32.5T130 177q-1-56 48.5-95T299 43t120.5 39t49.5 95q0 63-68 107z"/>
+                                          </svg>
+                                      </a>
+                                  </div>
+                                  <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                      <a href="https://servicestack.net/ideas">Request a Feature</a>
+                                  </h3>
+                                  <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                      <a class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100" href="https://servicestack.net/ideas">Request a new Feature</a>
+                                      or additional docs, samples, etc you would like to see
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="pt-6">
+                          <div class="flow-root rounded-lg bg-gray-50 dark:bg-gray-900 px-6 pb-8">
+                              <div class="-mt-6">
+                                  <div>
+                                      <a href="mailto:team@servicestack.net" class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg text-white">
+                                          <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                              <path fill="currentColor" d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6m-2 0l-8 5l-8-5h16m0 12H4V8l8 5l8-5v10Z"/>
+                                          </svg>
+                                      </a>
+                                  </div>
+                                  <h3 class="mt-8 text-lg font-medium tracking-tight text-gray-900 dark:text-gray-50">
+                                      <a href="mailto:team@servicestack.net">Account, billing or other?</a>
+                                  </h3>
+                                  <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                                      <a class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-100" href="mailto:team@servicestack.net">Email us</a>
+                                      if you need to renew your existing subscription or change your Account's email.
+                                  </p>
+                              </div>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+
+  </div>
+  `
+}
+
+Default.components['OtherProducts'] = OtherProducts
+
+export default Default
