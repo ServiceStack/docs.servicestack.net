@@ -11,6 +11,7 @@ public class DocsPage : PageModel
     public MarkdownFileInfo? Doc { get; set; }
     public Func<dynamic?, object>? Header { get; set; }
     public Func<dynamic?, object>? Footer { get; set; }
+    public string? DocClass { get; set; } = "mt-8 mx-auto prose lg:prose-lg";
     public string TitleClass { get; set; } = "text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl";
     public bool HideTitle { get; set; }
     public bool HideNavigation { get; set; }

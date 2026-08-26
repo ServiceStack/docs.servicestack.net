@@ -2,6 +2,11 @@
 title: ServiceStack Documentation
 ---
 
+<div class="not-prose">
+<feature-explorer></feature-explorer>
+<other-products></other-products>
+</div>
+
 ## ServiceStack Community
 
 - [servicestack.net/discord](https://servicestack.net/discord) - Join **#ServiceStack** Discord Channel
@@ -12,14 +17,12 @@ title: ServiceStack Documentation
 
 ## ServiceStack Examples and Live Demos
 
-- [Blazor Diffusion](https://blazordiffusion.com) - Generate images with AI for Free
-- [PvQ App](https://pvq.app) - Free AI powered Q&A App
+- [.NET Apps](https://github.com/NetCoreApps) - Source code for .NET Apps
+- [ai.llmspy.org](https://ai.llmspy.org) - Gen AI with ComfyUI
+- [TechStacks](https://techstacks.io) - TechStacks SPA Example
 - [AI Server](https://openai.servicestack.net) - AI Server (LLMs, ComfyUI and FFmpeg API Server)
 - [Instant Client Apps](https://apps.servicestack.net) - Instant Client Apps
-- [TechStacks](https://techstacks.io) - TechStacks SPA Example
 - [gist.cafe](https://gist.cafe) - Explore ServiceStack Live on gist.cafe
-- [.NET Core Live Demos](https://github.com/NetCoreApps/LiveDemos) - .NET Core Live Demos
-- [.NET Framework Live Demos](https://github.com/ServiceStackApps/LiveDemos) - Web, Mobile and Desktop Apps and Live Demos
 
 ## ServiceStack Downloads
 
