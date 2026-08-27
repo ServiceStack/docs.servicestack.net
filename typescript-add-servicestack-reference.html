@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T03:37:55.6651735Z'>
+    <meta name='date' content='2026-08-27T08:20:24.1627289Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>TypeScript Add ServiceStack Reference</title>
@@ -1484,7 +1484,8 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p><img src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png" alt="ServiceStack and TypeScript Banner" /></p>
+                <div class="content"><div class="shadow -ml-12 w-[940px] rounded-md"><p><img src="/img/pages/servicestack-reference/typescript-info.webp" alt="" /></p>
+</div>
 <p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types from directly within VS.NET using <a href="/create-your-first-webservice">ServiceStackVS VS.NET Extension</a> - providing a simple way to give clients typed access to your ServiceStack Services.</p>
 <h3 id="typescript-the-contract-your-web-app-builds-against">TypeScript - The contract your web App builds against<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-the-contract-your-web-app-builds-against'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <a href="https://www.npmjs.com/package/@servicestack/client">@servicestack/client</a> <code>JsonServiceClient</code> turns your API into part of the frontend's type system - completion for every request, response and enum, in Vue, React, Angular, Svelte, Node and Deno alike:</p>
@@ -1575,28 +1576,31 @@ type feedback than what's possible in vanilla ES6 - invaluable when scaling larg
 productive, typed API development experience available in our other 1st-class supported client platforms.</p>
 <p>ServiceStack embeds additional type hints in each Request DTO in order to achieve the ideal typed,
 message-based API. You can see an example of this is below which shows how to create a C# Gist in
-<a href="http://gistlyn.com">Gislyn</a> after adding a ServiceStack Reference to <code>gistlyn.com</code> and installing the
+<a href="https://gistlyn.com">Gistlyn</a> after adding a ServiceStack Reference to <code>gistlyn.com</code> and installing the
 <a href="https://www.npmjs.com/package/@servicestack/client">@servicestack/client</a> npm package:</p>
-<pre><code class="language-ts">import { JsonServiceClient } from 'servicestack-client';
-import { StoreGist, GithubFile } from './Gistlyn.dtos';
+<pre><code class="language-ts">import { JsonApiClient } from '@servicestack/client'
+import { StoreGist, GithubFile } from './dtos'
 
-var client = new JsonServiceClient(&quot;http://gistlyn.com&quot;);
+const client = JsonApiClient.create(&quot;https://gistlyn.com&quot;)
 
-var request = new StoreGist();
-var file = new GithubFile();
-file.filename = &quot;main.cs&quot;;
-file.content = 'var greeting = &quot;Hi, from TypeScript!&quot;;';
-request.files = { [file.filename]: file };
+const request = new StoreGist({
+    files: {
+        'main.cs': new GithubFile({
+            filename: 'main.cs',
+            content: 'var greeting = &quot;Hi, from TypeScript!&quot;;'
+        })
+    }
+})
 
-try {
-    var r = await client.post(request); // r:StoreGistResponse
-    console.log(`New C# Gist was created with id: ${r.gist}`);
-    location.href = `http://gistlyn.com?gist=${r.gist}`;
-} catch (e) {
-    console.log(&quot;Failed to create Gist: &quot;, e.responseStatus);
+const api = await client.api(request)  // ApiResult&lt;StoreGistResponse&gt;
+if (api.succeeded) {
+    console.log(`New C# Gist was created with id: ${api.response.gist}`)
+} else {
+    console.log(&quot;Failed to create Gist: &quot;, api.errorMessage)
 }
 </code></pre>
-<p>Where the <code>r</code> param in the returned <code>then()</code> Promise callback is typed to <code>StoreGistResponse</code> DTO Type.</p>
+<p>Where <code>api.response</code> is typed to the <code>StoreGistResponse</code> DTO Type whilst <code>api.error</code> contains the structured
+<code>ResponseStatus</code> of any error - letting you handle both success and error responses without any <code>try/catch</code> handling.</p>
 <h3 id="supports-javascript-only-environments">Supports JavaScript only Environments<a class="header-anchor" href="javascript:;" onclick="location.hash='#supports-javascript-only-environments'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Despite generating Typed TypeScript DTOs, the generic <code>JsonServiceClient</code> and generated TypeScript DTOs can also be utilized in
 JavaScript-Only development environments like <a href="https://youtu.be/T3KTDPdovOw">React Native</a> or in the <a href="/templates/nuxt">Nuxt Templates</a>
@@ -1934,26 +1938,55 @@ which instead defaults to using required properties.</p>
 i.e. will use <strong>camelCase</strong> properties when the <code>AppHost</code> is configured with:</p>
 <pre><code class="language-csharp">JsConfig.Init(new Config { TextCase = TextCase.CamelCase });
 </code></pre>
+<h3 id="creating-a-service-client">Creating a Service Client<a class="header-anchor" href="javascript:;" onclick="location.hash='#creating-a-service-client'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Modern <strong>v6+</strong> ServiceStack Apps should use <code>JsonApiClient.create()</code> to create clients configured to use the
+<a href="/routing#json-api-pre-defined-route">JSON /api pre-defined route</a>:</p>
+<pre><code class="language-ts">import { JsonApiClient } from '@servicestack/client'
+
+const client = JsonApiClient.create(&quot;https://example.org&quot;)
+</code></pre>
+<p>Which is configured to not send any JSON HTTP Headers so Browser requests can avoid the additional
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflight_requests">CORS preflight request</a>. It also accepts a
+configuration lambda for customizing the client it creates:</p>
+<pre><code class="language-ts">const client = JsonApiClient.create(baseUrl, c =&gt; {
+    c.bearerToken = apiKey
+    c.headers.set('X-Custom','Value')
+})
+</code></pre>
+<p>Apps hosted at the same origin as their APIs can omit the <strong>baseUrl</strong> to have APIs sent to the same server:</p>
+<pre><code class="language-ts">const client = JsonApiClient.create()
+</code></pre>
+<p>Alternatively all other Apps can use the <code>JsonServiceClient</code> constructor:</p>
+<pre><code class="language-ts">import { JsonServiceClient } from '@servicestack/client'
+
+const client = new JsonServiceClient(&quot;https://example.org&quot;)
+</code></pre>
+<p>Which also defaults to sending requests to the <code>/api</code> route, that older ServiceStack instances which only have the
+<code>/json/reply</code> pre-defined routes registered can revert to with:</p>
+<pre><code class="language-ts">const client = new JsonServiceClient(baseUrl).useBasePath()
+</code></pre>
 <h3 id="making-typed-api-requests">Making Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Making API Requests in TypeScript is the same as all other
 <a href="/clients-overview">ServiceStack's Service Clients</a>
 by sending a populated Request DTO using a <code>JsonServiceClient</code> which returns typed Response DTO.</p>
 <p>So the only things we need to make any API Request is the <code>JsonServiceClient</code> from the <code>@servicestack/client</code>
 package and any DTO's we're using from generated TypeScript ServiceStack Reference, e.g:</p>
-<pre><code class="language-ts">import { JsonServiceClient } from '@servicestack/client';
-import { GetTechnology } from './dtos';
+<pre><code class="language-ts">import { JsonServiceClient } from '@servicestack/client'
+import { GetTechnology } from './dtos'
 
-const client = new JsonServiceClient(&quot;https://techstacks.io&quot;);
+const client = new JsonServiceClient(&quot;https://techstacks.io&quot;)
 
-const request = new GetTechnology();
-request.Slug = &quot;ServiceStack&quot;;
+const request = new GetTechnology({ slug: &quot;ServiceStack&quot; })
 
-var r = await client.get(request);  // typed to GetTechnologyResponse
-cont tech = r.Technology;           // typed to Technology
+const r = await client.get(request)  // typed to GetTechnologyResponse
+const tech = r.technology            // typed to Technology
 
-console.log(`${tech.Name} by ${tech.VendorName} (${tech.ProductUrl})`);
-console.log(`${tech.Name} TechStacks:`, r.TechnologyStacks);
+console.log(`${tech.name} by ${tech.vendorName} (${tech.productUrl})`)
+console.log(`${tech.name} TechStacks:`, r.technologyStacks)
 </code></pre>
+<p>The <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code> and <code>send</code> methods return the Typed Response DTO directly and throw an
+<code>ErrorResponse</code> on failure, whilst the <code>api</code> methods below return an <code>ApiResult&lt;T&gt;</code> &quot;Value Result&quot; which contains
+either the Typed Response or a structured API Error, letting you handle both without <code>try/catch</code>.</p>
 <h3 id="partial-constructors">Partial Constructors<a class="header-anchor" href="javascript:;" onclick="location.hash='#partial-constructors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>All TypeScript Reference DTOs also includes support for <strong>Partial Constructors</strong>
 making them much nicer to populate using object initializer syntax we're used to in C#, so instead of:</p>
@@ -1972,6 +2005,175 @@ const response = await client.post(request);
     rememberMe: this.rememberMe,
 }));
 </code></pre>
+<h3 id="the-api-method">The api Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-api-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>api</code> method returns a typed <code>ApiResult&lt;TResponse&gt;</code> &quot;Value Result&quot; that encapsulates either a Typed Response or
+a structured API Error populated in its <code>error</code> <code>ResponseStatus</code>, allowing you to handle API responses
+programmatically without <code>try/catch</code> handling:</p>
+<pre><code class="language-ts">const api = await client.api(new Hello({ name }))
+if (api.succeeded) {
+    console.log(`API Says: ${api.response.result}`)
+} else {
+    console.log(`${api.errorCode}: ${api.errorMessage}`)
+}
+</code></pre>
+<p>Where an <code>ApiResult&lt;T&gt;</code> provides access to both its Typed Response and any structured Error information:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>response</code></td>
+<td>The Typed Response DTO of a successful API Request</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>The structured <code>ResponseStatus</code> of a failed API Request</td>
+</tr>
+<tr>
+<td><code>succeeded</code></td>
+<td><code>true</code> when the API returned a Response and no Error</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td><code>true</code> when the API returned an Error</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td><code>true</code> when the API returned either a Response or an Error</td>
+</tr>
+<tr>
+<td><code>errorCode</code></td>
+<td>The Error's <code>errorCode</code>, e.g. <code>NotFound</code></td>
+</tr>
+<tr>
+<td><code>errorMessage</code></td>
+<td>The Error's summary error message</td>
+</tr>
+<tr>
+<td><code>errors</code></td>
+<td>The collection of <code>ResponseError</code> field validation errors</td>
+</tr>
+<tr>
+<td><code>errorSummary</code></td>
+<td>The summary error message, only when there are no field errors</td>
+</tr>
+<tr>
+<td><code>fieldError(name)</code></td>
+<td>The <code>ResponseError</code> for the specified field, if any (case-insensitive)</td>
+</tr>
+<tr>
+<td><code>fieldErrorMessage(name)</code></td>
+<td>The error message for the specified field, if any</td>
+</tr>
+<tr>
+<td><code>hasFieldError(name)</code></td>
+<td>Whether the specified field has an error</td>
+</tr>
+<tr>
+<td><code>showSummary(except)</code></td>
+<td>Whether to show the summary message, excluding fields displaying their own error</td>
+</tr>
+<tr>
+<td><code>summaryMessage(except)</code></td>
+<td>The summary error message to display, excluding the specified fields</td>
+</tr>
+<tr>
+<td><code>addFieldError(name,msg)</code></td>
+<td>Add or update a field error on the result's existing <code>error</code></td>
+</tr>
+</tbody>
+</table>
+<p>APIs annotated with <code>IReturnVoid</code> should use <code>apiVoid</code> which returns an <code>ApiResult&lt;EmptyResponse&gt;</code>:</p>
+<pre><code class="language-ts">const api = await client.apiVoid(new DeleteContact({ id }))
+if (api.failed) console.log(api.errorMessage)
+</code></pre>
+<p>Both accept optional <code>args</code> for sending additional QueryString arguments and a <code>method</code> to override the HTTP Method
+the Request is sent with, e.g:</p>
+<pre><code class="language-ts">const api = await client.apiVoid(new HelloReturnVoid({ id:1 }), null, 'GET')
+</code></pre>
+<h3 id="simplified-api-handling">Simplified API Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#simplified-api-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Being able to treat errors as values greatly increases the ability to programmatically handle and genericize API
+handling, simplifying functionality needing to handle both successful and error responses like binding to UI
+components.</p>
+<p>An example of this is below where we're able to concurrently fire off multiple unrelated async requests in parallel,
+wait for them all to complete, print out the ones that have succeeded or failed then access their strong typed
+responses:</p>
+<pre><code class="language-ts">import { JsonServiceClient, ApiRequest, ApiResponse } from '@servicestack/client'
+
+const client = new JsonServiceClient(&quot;https://techstacks.io&quot;)
+
+let requests:ApiRequest[] = [
+    new AppOverview(),            // GET  =&gt; AppOverviewResponse
+    new DeleteTechnology(),       // DELETE =&gt; IReturnVoid (requires auth)
+    new GetAllTechnologies(),     // GET  =&gt; GetAllTechnologiesResponse
+    new GetAllTechnologyStacks(), // GET  =&gt; GetAllTechnologyStacksResponse
+]
+
+let results = await Promise.all(requests.map(async (request) =&gt;
+    ({ request, api: await client.api(request) as ApiResponse }) ))
+
+let failed = results.filter(x =&gt; x.api.failed)
+console.log(`${failed.length} failed:`)
+failed.forEach(x =&gt;
+    console.log(`    ${x.request.getTypeName()} Request Failed: ${x.api.errorMessage}`))
+
+let succeeded = results.filter(x =&gt; x.api.succeeded)
+console.log(`\n${succeeded.length} succeeded: ${succeeded.map(x =&gt; x.request.getTypeName()).join(', ')}`)
+
+let r = succeeded.find(x =&gt; x.request.getTypeName() == 'AppOverview')?.api.response as AppOverviewResponse
+if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,5).map(tech =&gt; tech.name).join(', ')}`)
+</code></pre>
+<p>Output:</p>
+<pre><code>1 failed:
+    DeleteTechnology Request Failed: Unauthorized
+
+3 succeeded: AppOverview, GetAllTechnologies, GetAllTechnologyStacks
+Top 5 Technologies: Redis, MySQL, Python, PostgreSQL, node.js
+</code></pre>
+<p>Being able to treat Errors as values has dramatically reduced the effort required to accomplish the same feat if
+needing to handle errors with <code>try/catch</code>.</p>
+<h3 id="binding-validation-errors-to-ui">Binding Validation Errors to UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#binding-validation-errors-to-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>APIs with <a href="/declarative-validation">Declarative Validation</a> or FluentValidation rules return each field validation
+error in <code>errors</code>, with the first error also captured in the summary <code>errorCode</code> and <code>errorMessage</code>:</p>
+<pre><code class="language-ts">const api = await client.api(new ThrowValidation({ email:'invalidemail' }))
+
+console.log(api.errorCode)     // InclusiveBetween
+console.log(api.errorMessage)  // 'Age' must be between 1 and 120. You entered 0.
+
+api.errors.forEach(x =&gt; console.log(`${x.fieldName}: ${x.errorCode} ${x.message}`))
+// Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+// Required: NotEmpty 'Required' must not be empty.
+// Email: Email 'Email' is not a valid email address.
+</code></pre>
+<p>Which UI components can bind to individual field errors with <code>fieldError()</code> and <code>hasFieldError()</code>, e.g:</p>
+<pre><code class="language-ts">if (api.hasFieldError('email')) {
+    emailError.textContent = api.fieldErrorMessage('email')
+}
+</code></pre>
+<p>Whilst <code>showSummary()</code> and <code>summaryMessage()</code> let you display the summary error message for any errors that aren't
+already being displayed next to their field inputs:</p>
+<pre><code class="language-ts">const displayedFields = ['email','age']
+if (api.showSummary(displayedFields)) {
+    summaryError.textContent = api.summaryMessage(displayedFields)
+}
+</code></pre>
+<p>Client-side validation errors can be surfaced through the same UI components by creating an <code>ApiResult</code> populated
+with <code>createErrorStatus()</code> for summary errors or <code>createFieldError()</code> for field validation errors:</p>
+<pre><code class="language-ts">import { ApiResult, createErrorStatus, createFieldError } from '@servicestack/client'
+
+const failed = new ApiResult({ error: createErrorStatus(&quot;Not Authorized&quot;, &quot;Unauthorized&quot;) })
+failed.errorCode     // Unauthorized
+failed.errorMessage  // Not Authorized
+
+const invalid = new ApiResult({ error: createFieldError('confirmPassword', 'Passwords do not match') })
+invalid.fieldErrorMessage('confirmPassword')  // Passwords do not match
+</code></pre>
+<p>Where <code>addFieldError()</code> can add additional field errors to an <code>ApiResult</code> that already has a populated <code>errors</code>
+collection.</p>
 <h3 id="sending-additional-arguments-with-typed-api-requests">Sending additional arguments with Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-additional-arguments-with-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Many AutoQuery Services utilize <a href="/autoquery/rdbms#implicit-conventions">implicit conventions</a> to
 query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying
@@ -1979,6 +2181,39 @@ additional arguments with the typed Request DTO, e.g:</p>
 <pre><code class="language-ts">const request = new FindTechStacks();
 
 var r = client.get(request, { VendorName: &quot;ServiceStack&quot; }); // typed to QueryResponse&lt;TechnologyStack&gt;
+</code></pre>
+<h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><a href="/autoquery/">AutoQuery</a> APIs return a typed <code>QueryResponse&lt;T&gt;</code> containing the <code>results</code> matching the query, the
+<code>total</code> number of matching results and any <code>meta</code> data returned:</p>
+<pre><code class="language-ts">const api = await client.api(new FindTechnologies({ take:3 }), { VendorName: &quot;Amazon&quot; })
+
+const r = api.response  // typed to QueryResponse&lt;Technology&gt;
+console.log(r.total)    // 20
+console.log(r.results.map(x =&gt; x.name).join(', '))
+// Amazon EC2, AWS RDS, Amazon DynamoDB
+</code></pre>
+<p>Where all <a href="/autoquery/rdbms#implicit-conventions">AutoQuery filters</a> can be sent in the typed Request DTO for
+explicitly defined properties, or in the untyped <code>args</code> for querying any other field, e.g:</p>
+<pre><code class="language-ts">// GET /api/FindTechnologies?take=3&amp;orderBy=-viewCount&amp;nameStartsWith=Am
+const api = await client.api(new FindTechnologies({ take:3, orderBy:'-viewCount' }), {
+    nameStartsWith: 'Am'
+})
+</code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTOs annotated with a <code>IVerb</code> interface marker (i.e. <code>IGet</code>, <code>IPost</code>, <code>IPut</code>, <code>IPatch</code>, <code>IDelete</code>) generate a
+<code>getMethod()</code> method on the DTO which <code>api()</code> uses to send the Request with the API's preferred HTTP Method,
+defaulting to <code>POST</code> when unspecified:</p>
+<pre><code class="language-ts">import { getMethod } from '@servicestack/client'
+
+getMethod(new Hello())          // POST  (no IVerb marker)
+getMethod(new GetTechnology())  // GET   (implements IGet)
+getMethod(new Hello(), 'GET')   // GET   (explicit override)
+</code></pre>
+<p>Which can be overridden by passing an explicit <code>method</code> to <code>api()</code>, or by calling the HTTP Method's client method
+directly:</p>
+<pre><code class="language-ts">const api = await client.api(new Hello({ name }), null, 'GET')
+
+const response = await client.get(new Hello({ name }))
 </code></pre>
 <h3 id="making-api-requests-with-urls">Making API Requests with URLs<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-api-requests-with-urls'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>In addition to making Typed API Requests you can also call Services using relative or absolute urls, e.g:</p>
@@ -2027,26 +2262,220 @@ raw <code>byte[]</code> responses:</p>
 
 let data:Uint8Array = await client.get(new ReturnBytes());
 </code></pre>
-<h3 id="access-request-response-headers">Access Request / Response Headers<a class="header-anchor" href="javascript:;" onclick="location.hash='#access-request-response-headers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>You can use <a href="https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts">JsonServiceClient</a> instance
-<code>requestFilter</code> and <code>responseFilter</code> to inspect the underlying
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a> API's:</p>
-<pre><code class="language-ts">export declare class JsonServiceClient {
-    //...
-    requestFilter: (req: IRequestInit) =&gt; void;
-    responseFilter: (res: Response) =&gt; void;
+<h3 id="batched-requests">Batched Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#batched-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Multiple Request DTOs of the same Type can be sent together in a single Request with <code>sendAll</code> which returns all
+their Responses:</p>
+<pre><code class="language-ts">const requests = [&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;].map(name =&gt; new Hello({ name }))
+
+// POST /api/Hello[]
+const responses = await client.sendAll(requests)
+
+console.log(responses.map(x =&gt; x.result).join(', '))
+// Hello, foo!, Hello, bar!, Hello, baz!
+</code></pre>
+<p>Or use <code>sendAllOneWay</code> to send Requests you want to ignore the Responses of:</p>
+<pre><code class="language-ts">const requests = [1,2,3].map(id =&gt; new HelloReturnVoid({ id }))
+
+// POST /api/HelloReturnVoid[]
+await client.sendAllOneWay(requests)
+</code></pre>
+<p>All Requests in a batch are sent to the same <code>/api/{Request}[]</code> endpoint (or <code>/json/reply/{Request}[]</code> and
+<code>/json/oneway/{Request}[]</code> when the client is configured with <code>useBasePath()</code>) where the Server executes them in order
+and returns the number of Requests it completed in the <code>X-AutoBatch-Completed</code> HTTP Response Header:</p>
+<pre><code class="language-ts">client.responseFilter = res =&gt; console.log(res.headers.get('X-AutoBatch-Completed'))  // 3
+</code></pre>
+<h3 id="one-way-requests">One-way Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#one-way-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>APIs whose Responses you're not interested in can be sent to the one-way endpoint with <code>publish</code> for <code>IReturnVoid</code>
+APIs or <code>sendOneWay</code> for APIs returning a Response, e.g:</p>
+<pre><code class="language-ts">await client.publish(new HelloReturnVoid({ id:1 }))
+
+await client.sendOneWay(new Hello({ name:'World' }))
+</code></pre>
+<h3 id="sending-raw-request-bodies">Sending Raw Request Bodies<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-raw-request-bodies'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>APIs that accept a custom Request Body can be sent with <code>postBody</code>, <code>putBody</code> and <code>patchBody</code> where the Request DTO's
+properties are sent in the QueryString and the <code>body</code> is sent as the HTTP Request Body:</p>
+<pre><code class="language-ts">// POST /api/SendJson?id=1&amp;name=name {&quot;foo&quot;:&quot;bar&quot;}
+const json = await client.postBody(new SendJson({ id:1, name:&quot;name&quot; }), { foo:&quot;bar&quot; })
+
+// POST /api/SendText?id=1&amp;name=name foo
+const text = await client.postBody(new SendText({ id:1, name:&quot;name&quot;, contentType:&quot;text/plain&quot; }), &quot;foo&quot;)
+</code></pre>
+<p>Where an object body is serialized to JSON whilst a <code>string</code> body is sent as-is.</p>
+<h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>api</code> methods return any structured error information in its <code>ApiResult</code> <code>error</code> <code>ResponseStatus</code> which is
+populated for both Application Errors and transport errors like <code>401 Unauthorized</code> responses:</p>
+<pre><code class="language-ts">const api = await client.api(new ThrowType({ type:&quot;NotFound&quot;, message:&quot;not here&quot; }))
+
+console.log(api.failed)        // true
+console.log(api.errorCode)     // NotFound
+console.log(api.errorMessage)  // not here
+</code></pre>
+<p>Whilst the <code>get/post/put/patch/delete/send</code> methods instead throw an <code>ErrorResponse</code> containing the API's structured
+<code>ResponseStatus</code> in its <code>responseStatus</code> property:</p>
+<pre><code class="language-ts">try {
+    await client.post(new ThrowType({ type:&quot;NotFound&quot;, message:&quot;not here&quot; }))
+} catch (e) {
+    console.log(e.responseStatus.errorCode)  // NotFound
+    console.log(e.responseStatus.message)    // not here
+    console.log(e.responseStatus.errors)     // field validation errors
 }
 </code></pre>
-<p>To inspect the underlying W3C
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a>
-API's <a href="https://developer.mozilla.org/en-US/docs/Web/API/Request">Request</a> and
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">Response</a> objects, e.g:</p>
-<pre><code class="language-js">let client = new JsonServiceClient()
-client.responseFilter = res =&gt; {
-    console.log(res.headers)
-}
+<p>Which can be more conveniently accessed with <code>getResponseStatus()</code> that returns a normalized <code>ResponseStatus</code> from
+an Error Response DTO, a bare <code>ResponseStatus</code> or a JavaScript <code>Error</code>:</p>
+<pre><code class="language-ts">import { getResponseStatus } from '@servicestack/client'
 
-var response = await client.get(new MyRequest())
+const status = getResponseStatus(e)
+</code></pre>
+<p>Failed Requests using a <a href="/auth/jwt-authprovider#refresh-tokens">Refresh Token</a> that was invalid or expired throw an
+<code>ErrorResponse</code> with its <code>type</code> set to <code>RefreshTokenException</code>:</p>
+<pre><code class="language-ts">client.refreshToken = &quot;Invalid.Refresh.Token&quot;
+try {
+    await client.get(new Secured())
+} catch (e) {
+    console.log(e.type)                      // RefreshTokenException
+    console.log(e.responseStatus.errorCode)  // ArgumentException
+    console.log(e.responseStatus.message)    // Illegal base64url string!
+}
+</code></pre>
+<p>Use the <code>exceptionFilter</code> to inspect all Error Responses, useful for logging or generically handling API errors:</p>
+<pre><code class="language-ts">client.exceptionFilter = (res, error) =&gt; {
+    console.log(`${res.status}: ${error.responseStatus.message}`)
+}
+</code></pre>
+<h3 id="access-request-response-headers">Access Request / Response Headers<a class="header-anchor" href="javascript:;" onclick="location.hash='#access-request-response-headers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>You can use the <a href="https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts">JsonServiceClient</a>
+instance <code>requestFilter</code> and <code>responseFilter</code> to inspect the underlying W3C
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch</a> API's
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Request">Request</a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Response">Response</a> objects, e.g. to send a custom Request Header
+and read a custom Response Header:</p>
+<pre><code class="language-ts">const client = new JsonServiceClient(baseUrl)
+client.requestFilter = req =&gt; req.headers.set('X-Custom','Value')
+client.responseFilter = res =&gt; console.log(res.headers.get('X-Args'))
+
+const response = await client.get(new MyRequest())
+</code></pre>
+<p>Where <code>requestFilter</code> is passed an <code>IRequestInit</code> which extends fetch's <code>RequestInit</code> with the <code>url</code> the Request will
+be sent to:</p>
+<pre><code class="language-ts">export interface IRequestInit extends RequestInit {
+    url?: string;
+    compress?: boolean;
+}
+</code></pre>
+<h3 id="request-response-and-exception-filters">Request, Response and Exception Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-response-and-exception-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Clients can be decorated with generic functionality using instance and static Request, Response and Exception filters,
+useful for logging, adding headers or inspecting Responses:</p>
+<pre><code class="language-ts">// Instance filters only apply to this client
+client.requestFilter = req =&gt; req.headers.set('X-Custom','Value')
+client.responseFilter = res =&gt; console.log(res.status, res.headers)
+client.exceptionFilter = (res,error) =&gt; console.log('ERROR:', error.responseStatus.message)
+client.urlFilter = url =&gt; console.log('URL:', url)
+
+// Static filters apply to all clients
+JsonServiceClient.globalRequestFilter = req =&gt; console.log(`${req.method} ${req.url}`)
+JsonServiceClient.globalResponseFilter = res =&gt; console.log(res.status)
+</code></pre>
+<p>Request Filters can modify the Request's URL, HTTP Method, Headers and Body before it's sent, e.g. this appends a
+<a href="/customize-json-responses">JS Config</a> QueryString to every Request:</p>
+<pre><code class="language-ts">client.requestFilter = req =&gt; req.url += &quot;?jsconfig=EmitCamelCaseNames:false&quot;
+</code></pre>
+<p>Instance filters are invoked before their global counterparts. The <code>urlFilter</code> is invoked with the absolute URL of
+each Request which is useful for logging or inspecting the URLs your typed API Requests are sent to:</p>
+<pre><code class="language-ts">client.urlFilter = url =&gt; console.log(url)
+
+await client.sendAll([&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;].map(name =&gt; new Hello({ name })))
+// https://test.servicestack.net/api/Hello[]
+</code></pre>
+<h3 id="client-configuration">Client Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>JsonServiceClient</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route, which can be changed with
+<code>basePath</code> or <code>useBasePath()</code>:</p>
+<pre><code class="language-ts">const client = new JsonServiceClient(&quot;https://test.servicestack.net&quot;)
+client.replyBaseUrl   // https://test.servicestack.net/api/
+client.oneWayBaseUrl  // https://test.servicestack.net/api/
+
+client.basePath = null
+client.replyBaseUrl   // https://test.servicestack.net/json/reply/
+client.oneWayBaseUrl  // https://test.servicestack.net/json/oneway/
+</code></pre>
+<p>Use <code>apply()</code> to configure a client inline as it's created:</p>
+<pre><code class="language-ts">const client = new JsonServiceClient(baseUrl)
+    .apply(c =&gt; {
+        c.basePath = '/api'
+        c.headers = new Headers()
+        c.bearerToken = apiKey
+    })
+</code></pre>
+<p>Custom Headers can be added to all Requests by populating its <code>headers</code>
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Headers">Headers</a> collection:</p>
+<pre><code class="language-ts">client.headers.set('X-Custom','Value')
+</code></pre>
+<p>Other client properties available for customizing how Requests are sent:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseUrl</code></td>
+<td>The Base URL Requests are sent to</td>
+</tr>
+<tr>
+<td><code>basePath</code></td>
+<td>The path APIs are sent to, e.g. <code>api</code> (default), <code>null</code> uses <code>/json/reply</code> &amp; <code>/json/oneway</code></td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td>HTTP Headers sent with each Request</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td>The fetch <a href="https://developer.mozilla.org/en-US/docs/Web/API/Request/mode">Request Mode</a>, e.g. <code>cors</code></td>
+</tr>
+<tr>
+<td><code>credentials</code></td>
+<td>The fetch <a href="https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials">credentials</a> policy, e.g. <code>include</code></td>
+</tr>
+<tr>
+<td><code>userName</code> / <code>password</code></td>
+<td>Credentials to send with HTTP Basic Auth</td>
+</tr>
+<tr>
+<td><code>bearerToken</code></td>
+<td>JWT or API Key to send in the <code>Authorization: Bearer</code> HTTP Header</td>
+</tr>
+<tr>
+<td><code>refreshToken</code></td>
+<td>Refresh Token used to automatically fetch new JWT Access Tokens</td>
+</tr>
+<tr>
+<td><code>refreshTokenUri</code></td>
+<td>Alternate URL to send Refresh Token Requests to</td>
+</tr>
+<tr>
+<td><code>enableAutoRefreshToken</code></td>
+<td>Whether to automatically fetch new Access Tokens (default <code>true</code>)</td>
+</tr>
+<tr>
+<td><code>manageCookies</code></td>
+<td>Whether the client should manage Cookies itself (default in Node.js)</td>
+</tr>
+<tr>
+<td><code>cookies</code></td>
+<td>The Cookies the client is managing, keyed by Cookie name</td>
+</tr>
+<tr>
+<td><code>parseJson</code></td>
+<td>Override how JSON Responses are parsed</td>
+</tr>
+</tbody>
+</table>
+<p>In Node.js (where there's no browser Cookie jar) the client manages the Cookies the Server returns itself in its
+<code>cookies</code> collection which are sent on subsequent Requests - so use a separate client instance for each Authenticated
+Session you want to maintain. Individual cookies can be removed with:</p>
+<pre><code class="language-ts">client.deleteCookie('ss-pid')
 </code></pre>
 <h3 id="typescript-nullable-properties">TypeScript Nullable properties<a class="header-anchor" href="javascript:;" onclick="location.hash='#typescript-nullable-properties'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The default TypeScript generated for a C# DTO like:</p>
@@ -2099,7 +2528,9 @@ client.password = pass;
 
 const response = await client.get(new SecureRequest());
 </code></pre>
-<p>Or use <code>client.setCredentials()</code> to have them set both together.</p>
+<p>Or use <code>client.setCredentials()</code> to have them set both together:</p>
+<pre><code class="language-ts">client.setCredentials(user, pass);
+</code></pre>
 <h3 id="authenticating-using-credentials">Authenticating using Credentials<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-credentials'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Alternatively you can authenticate using userName/password credentials by
 <a href="/typescript-add-servicestack-reference#add-typescript-reference">adding a TypeScript Reference</a>
@@ -2160,6 +2591,167 @@ const response = await client.get(new Secured());
 <p>Use the <code>refreshTokenUri</code> property when refresh tokens need to be sent to a different ServiceStack Server, e.g:</p>
 <pre><code class="language-ts">client.refreshToken = refreshToken;
 client.refreshTokenUri = authBaseUrl + &quot;/access-token&quot;;
+</code></pre>
+<p>When authenticating against Apps using <a href="/auth/jwt-authprovider#json-web-tokens">JWT Token Cookies</a> the client
+automatically switches to using its <code>ss-tok</code> and <code>ss-reftok</code> Cookies to fetch new Access Tokens, which is reflected in
+its <code>useTokenCookie</code> property:</p>
+<pre><code class="language-ts">const authResponse = await client.post(new Authenticate({
+    provider:&quot;credentials&quot;, userName, password }))
+
+client.useTokenCookie // true
+</code></pre>
+<p>Automatically fetching new Access Tokens can be disabled with:</p>
+<pre><code class="language-ts">client.enableAutoRefreshToken = false
+</code></pre>
+<h3 id="complex-type-support">Complex Type Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#complex-type-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists,
+Arrays, Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent JavaScript
+types:</p>
+<pre><code class="language-ts">const request = new HelloAllTypes({
+    name: &quot;name&quot;,
+    allTypes: new AllTypes({
+        id: 1,
+        int: 4,
+        double: 2.2,
+        string: &quot;string&quot;,
+        dateTime: toDateTime(new Date(Date.UTC(2001,0,1))),
+        timeSpan: &quot;PT1H&quot;,
+        guid: &quot;ea762009b66c410b9bf5ce21ad519249&quot;,
+        stringList: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+        stringArray: [&quot;D&quot;, &quot;E&quot;, &quot;F&quot;],
+        stringMap: { A:&quot;D&quot;, B:&quot;E&quot;, C:&quot;F&quot; },
+        intStringMap: { 1:&quot;A&quot;, 2:&quot;B&quot;, 3:&quot;C&quot; },
+        subType: new SubType({ id:1, name:&quot;name&quot; }),
+    }),
+    allCollectionTypes: new AllCollectionTypes({
+        intArray: [1,2,3],
+        intList: [4,5,6],
+        byteArray: toBase64String(&quot;ABC&quot;),
+        pocoArray: [new Poco({ name:&quot;pocoArray&quot; })],
+        pocoLookup: { A: [new Poco({ name:&quot;B&quot; }), new Poco({ name:&quot;C&quot; })] },
+        pocoLookupMap: { A: [{ B: new Poco({ name:&quot;C&quot; }), D: new Poco({ name:&quot;E&quot; }) }] },
+    })
+})
+
+const api = await client.api(request)
+</code></pre>
+<h3 id="serialization-utils">Serialization Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#serialization-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>.NET Types without a native JavaScript equivalent are serialized as strings which can be converted to and from their
+JavaScript types using the built-in conversion functions:</p>
+<pre><code class="language-ts">import {
+    toDateTime, fromDateTime,
+    toTimeSpan, fromTimeSpan,
+    toGuid, fromGuid,
+    toByteArray, fromByteArray,
+    toBase64String,
+} from '@servicestack/client'
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>.NET Type</th>
+<th>Serialized as</th>
+<th>Convert with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DateTime</code></td>
+<td>WCF JSON Date, e.g. <code>/Date(978307200000)/</code></td>
+<td><code>toDateTime()</code> / <code>fromDateTime()</code></td>
+</tr>
+<tr>
+<td><code>DateTimeOffset</code></td>
+<td>WCF JSON Date</td>
+<td><code>toDateTime()</code> / <code>fromDateTime()</code></td>
+</tr>
+<tr>
+<td><code>TimeSpan</code></td>
+<td>XSD Duration, e.g. <code>PT1H</code></td>
+<td><code>toTimeSpan()</code> / <code>fromTimeSpan()</code></td>
+</tr>
+<tr>
+<td><code>Guid</code></td>
+<td>String, e.g. <code>ea762009b66c410b9bf5ce21ad519249</code></td>
+<td><code>toGuid()</code> / <code>fromGuid()</code></td>
+</tr>
+<tr>
+<td><code>byte[]</code></td>
+<td>Base64 String</td>
+<td><code>toByteArray()</code> / <code>fromByteArray()</code></td>
+</tr>
+</tbody>
+</table>
+<p>E.g. converting a JS <code>Date</code> to a .NET <code>DateTime</code> and back:</p>
+<pre><code class="language-ts">const dateTime = toDateTime(new Date(Date.UTC(2001,0,1)))  // /Date(978307200000)/
+const date = fromDateTime(dateTime)                        // Date
+</code></pre>
+<p>Whilst <code>toDate()</code> can parse a .NET <code>DateTime</code> from any of its serialized formats:</p>
+<pre><code class="language-ts">import { toDate, dateFmt, toLocalISOString } from '@servicestack/client'
+
+toDate('/Date(978307200000)/')
+toDate('2001-01-01T00:00:00.0000000Z')
+
+dateFmt(new Date(Date.UTC(2001,0,1)))  // 2001/01/01
+toLocalISOString(new Date())           // ISO 8601 date in local time
+</code></pre>
+<h3 id="node.js-and-deno">Node.js and Deno<a class="header-anchor" href="javascript:;" onclick="location.hash='#node.js-and-deno'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As <code>fetch</code> is built into Node.js v18+ LTS, <code>@servicestack/client</code> <strong>v2+</strong> is dependency-free and can be used as-is in
+Node.js, Deno, Bun and Browser Apps. Node.js projects using
+<a href="/typescript-server-events-client">ServerEventsClient</a> (e.g. in tests) will need to polyfill <code>EventSource</code>:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npm install eventsource</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<pre><code class="language-ts">globalThis.EventSource = require(&quot;eventsource&quot;)
+</code></pre>
+<p>Older Node.js runtimes can continue using the <strong>v1.x</strong> version of <code>@servicestack/client</code> or polyfill <code>fetch</code> with
+<a href="https://www.npmjs.com/package/cross-fetch">cross-fetch</a>:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npm install cross-fetch</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<pre><code class="language-js">require('cross-fetch/polyfill')
 </code></pre>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated TypeScript DTO's as-is, however you can further customize how
@@ -2337,7 +2929,7 @@ bindHandlers({
 </code></pre>
 <p>Here we're using the built-in <code>createUrl()</code> servicestack client API to create the url for the <strong>GET</strong> HTTP Request
 using the Route definition for the API you want to call and the Request DTO which results in:</p>
-<pre><code>/hello/World?title=Dr
+<pre><code>hello/World?title=Dr
 </code></pre>
 <p>We're also able to use the <code>HelloResponse</code> type definition to take advantage of typed DTO compile time safety in TypeScript code bases.</p>
 <h3 id="angular-http-client">Angular HTTP Client<a class="header-anchor" href="javascript:;" onclick="location.hash='#angular-http-client'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -2416,6 +3008,191 @@ const client = new ServerEventsClient(&quot;/&quot;, channels, {
 </code></pre>
 <p>When publishing a DTO Type for your Server Events message, your clients will be able to benefit from
 the generated DTOs in <a href="/typescript-add-servicestack-reference">TypeScript ServiceStack References</a>.</p>
+<h2 id="client-utils">Client Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>In addition to its API Clients, <code>@servicestack/client</code> is a dependency-free library of utils useful in any TypeScript
+or JavaScript App, all of which are documented in its
+<a href="https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts">index.d.ts</a> TypeScript definition.</p>
+<h3 id="inspect-utils">Inspect Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#inspect-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>To help with inspecting API Responses the <code>Inspect</code> class includes utils for quickly visualizing API outputs.</p>
+<p>For a basic indented object graph use <code>Inspect.dump()</code> to capture and <code>Inspect.printDump()</code> to print the output of any
+API Response, e.g:</p>
+<pre><code class="language-ts">import { Inspect } from '@servicestack/client'
+
+const orgName = &quot;nodejs&quot;
+const orgRepos = (await (await fetch(`https://api.github.com/orgs/${orgName}/repos`)).json())
+    .map(x =&gt; ({
+        name: x.name,
+        description: x.description,
+        lang: x.language,
+        watchers: x.watchers_count,
+        forks: x.forks
+    }))
+
+orgRepos.sort((a, b) =&gt; b.watchers - a.watchers)
+
+console.log(`Top 3 ${orgName} GitHub Repos:`)
+Inspect.printDump(orgRepos.slice(0, 3))
+</code></pre>
+<p>Output:</p>
+<pre><code>Top 3 nodejs GitHub Repos:
+[
+    {
+        name: node,
+        description: Node.js JavaScript runtime ✨🐢🚀✨,
+        lang: JavaScript,
+        watchers: 119635,
+        forks: 36612
+    },
+    {
+        name: node-v0.x-archive,
+        description: Moved to https://github.com/nodejs/node,
+        lang: null,
+        watchers: 34286,
+        forks: 7219
+    },
+    {
+        name: node-gyp,
+        description: Node.js native addon build tool,
+        lang: Python,
+        watchers: 10685,
+        forks: 1878
+    }
+]
+</code></pre>
+<p>For tabular result-sets use <code>Inspect.dumpTable()</code> to capture and <code>Inspect.printDumpTable()</code> to print result-sets in a
+human-friendly markdown table, e.g:</p>
+<pre><code class="language-ts">console.log(`\nTop 10 ${orgName} GitHub Repos:`)
+Inspect.printDumpTable(orgRepos.map(x =&gt; ({
+    name: x.name, lang: x.lang, watchers: x.watchers, forks: x.forks
+})).slice(0, 10))
+</code></pre>
+<p>Output:</p>
+<pre><code>Top 10 nodejs GitHub Repos:
++-----------------------------------------------------+
+|        name         |    lang    | watchers | forks |
+|-----------------------------------------------------|
+| node                | JavaScript |   119635 | 36612 |
+| node-v0.x-archive   | null       |    34286 |  7219 |
+| node-gyp            | Python     |    10685 |  1878 |
+| docker-node         | Dockerfile |     8585 |  1985 |
+| http-parser         | C          |     6446 |  1522 |
+| nan                 | C++        |     3353 |   529 |
+| node-addon-examples | C++        |     2589 |   602 |
+| readable-stream     | JavaScript |     1048 |   240 |
+| diagnostics         | null       |      550 |    69 |
+| build               | Jinja      |      541 |   183 |
++-----------------------------------------------------+
+</code></pre>
+<p>Both accept the same data structures so they can be used to inspect any API Response or its <code>results</code> collection, e.g:</p>
+<pre><code class="language-ts">const api = await client.api(new FindTechnologies({ take:10 }))
+Inspect.printDumpTable(api.response.results)
+</code></pre>
+<h3 id="url-utils">URL Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#url-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Utils for constructing URLs from your API's Route definitions and QueryStrings:</p>
+<pre><code class="language-ts">import { combinePaths, createUrl, createPath, appendQueryString, setQueryString, queryString } from '@servicestack/client'
+
+combinePaths('/api','Hello')                     // /api/Hello
+createPath('/hello/{Name}', { name:'World' })    // hello/World
+createUrl('/hello/{Name}', { name:'World', title:'Dr' })  // hello/World?title=Dr
+appendQueryString('/hello', { name:'World' })    // /hello?name=World
+setQueryString('/hello?name=Foo', { name:'World' })       // /hello?name=World
+queryString('/hello?name=World&amp;title=Dr')        // { name:'World', title:'Dr' }
+</code></pre>
+<h3 id="string-utils">String Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#string-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-ts">import { humanify, humanize, toPascalCase, toCamelCase, toKebabCase,
+         splitOnFirst, splitOnLast, leftPart, rightPart, lastLeftPart, lastRightPart } from '@servicestack/client'
+
+humanify('TheIDWithWord')   // The ID With Word
+humanize('the_id')          // The Id
+toPascalCase('theId')       // TheId
+toCamelCase('TheId')        // theId
+toKebabCase('TheId')        // the-id
+
+splitOnFirst('a:b:c', ':')  // ['a','b:c']
+splitOnLast('a:b:c', ':')   // ['a:b','c']
+leftPart('a:b:c', ':')      // a
+rightPart('a:b:c', ':')     // b:c
+lastLeftPart('a:b:c', ':')  // a:b
+lastRightPart('a:b:c', ':') // c
+</code></pre>
+<p>Where <code>humanify()</code> is useful for converting DTO property names into human-friendly form labels.</p>
+<h3 id="date-and-time-utils">Date and Time Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#date-and-time-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-ts">import { toDate, dateFmt, dateFmtHM, timeFmt12, toLocalISOString, toTime, msToTime,
+         fromXsdDuration, toXsdDuration } from '@servicestack/client'
+
+toDate('/Date(978307200000)/')  // Date
+toDate('2001-01-01T00:00:00Z')  // Date
+
+dateFmt(new Date(Date.UTC(2001,0,1)))  // 2001/01/01
+toLocalISOString(new Date())           // ISO 8601 date in local time
+
+fromXsdDuration('PT1H')         // 3600 (total seconds)
+toXsdDuration(3600)             // PT1H
+toTime(3600000)                 // 01:00:00
+</code></pre>
+<h3 id="object-utils">Object Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#object-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-ts">import { pick, omit, omitEmpty, uniq, flatMap, each, apply, map, classNames } from '@servicestack/client'
+
+pick({ a:1, b:2, c:3 }, ['a','c'])   // { a:1, c:3 }
+omit({ a:1, b:2, c:3 }, ['b'])       // { a:1, c:3 }
+omitEmpty({ a:1, b:null, c:'' })     // { a:1 }
+uniq(['b','a','b'])                  // ['a','b']
+flatMap(x =&gt; [x,x], [1,2])           // [1,1,2,2]
+
+classNames('btn', isActive &amp;&amp; 'active', { 'btn-lg':isLarge })
+</code></pre>
+<p>Where <code>apply()</code> is useful for configuring objects inline, e.g:</p>
+<pre><code class="language-ts">const client = apply(new JsonServiceClient(baseUrl), c =&gt; c.basePath = '/api')
+</code></pre>
+<h3 id="form-utils">Form Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#form-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Browser Apps can use the built-in Form utils to serialize and populate HTML Forms:</p>
+<pre><code class="language-ts">import { serializeToObject, serializeToUrlEncoded, serializeToFormData, populateForm, toFormData } from '@servicestack/client'
+
+const form = document.forms[0]
+
+serializeToObject(form)      // { name:'World', title:'Dr' }
+serializeToUrlEncoded(form)  // name=World&amp;title=Dr
+serializeToFormData(form)    // FormData
+toFormData({ name:'World' }) // FormData
+
+populateForm(form, { name:'World', title:'Dr' })
+</code></pre>
+<p>Which can be sent with the API's typed Request DTO using <code>apiForm</code>:</p>
+<pre><code class="language-ts">const api = await client.apiForm(new CreateContact(), new FormData(document.forms[0]))
+</code></pre>
+<h3 id="event-bus">Event Bus<a class="header-anchor" href="javascript:;" onclick="location.hash='#event-bus'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A minimal pub/sub <code>EventBus</code> is included for loosely-coupled communication between components:</p>
+<pre><code class="language-ts">import { createBus } from '@servicestack/client'
+
+const bus = createBus()
+
+const sub = bus.subscribe('theEvent', arg =&gt; console.log('got', arg))
+
+bus.publish('theEvent', 1)   // got 1
+
+sub.unsubscribe()
+bus.publish('theEvent', 2)   // (no handlers)
+</code></pre>
+<h3 id="jsv-format">JSV Format<a class="header-anchor" href="javascript:;" onclick="location.hash='#jsv-format'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>APIs using the <a href="/jsv-format">JSV Format</a> can serialize objects into their compact JSV representation with:</p>
+<pre><code class="language-ts">import { JSV } from '@servicestack/client'
+
+JSV.stringify({ Id:1234, Name:&quot;TEST&quot;, Obj:[{ Id:1, Key:&quot;Value&quot; }] })
+// {Id:1234,Name:TEST,Obj:[{Id:1,Key:Value}]}
+</code></pre>
+<h3 id="stringbuffer">StringBuffer<a class="header-anchor" href="javascript:;" onclick="location.hash='#stringbuffer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>An efficient <code>StringBuffer</code> for building large strings:</p>
+<pre><code class="language-ts">import { StringBuffer } from '@servicestack/client'
+
+const sb = new StringBuffer()
+sb.append('Four score')
+sb.append(' ')
+sb.append('and seven years ago.')
+
+sb.toString()    // Four score and seven years ago.
+sb.getLength()   // 31
+sb.clear()
+</code></pre>
 <h2 id="servicestackidea-plugin">ServiceStackIDEA plugin<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestackidea-plugin'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <img align="right" src="https://raw.githubusercontent.com/ServiceStack/Assets/master/img/servicestackidea/supported-ides.png" />
 ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify development of client applications for ServiceStack services with integrated support for Add ServiceStack Reference feature.
@@ -2604,6 +3381,12 @@ ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify devel
                                                             TypeScript Reference Example
                                                         </span>
                                                     </li>
+                                                    <li data-id="creating-a-service-client" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#creating-a-service-client'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Creating a Service Client
+                                                        </span>
+                                                    </li>
                                                     <li data-id="making-typed-api-requests" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#making-typed-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2616,10 +3399,40 @@ ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify devel
                                                             Partial Constructors
                                                         </span>
                                                     </li>
+                                                    <li data-id="the-api-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-api-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The api Method
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="simplified-api-handling" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#simplified-api-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Simplified API Handling
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="binding-validation-errors-to-ui" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#binding-validation-errors-to-ui'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Binding Validation Errors to UI
+                                                        </span>
+                                                    </li>
                                                     <li data-id="sending-additional-arguments-with-typed-api-requests" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#sending-additional-arguments-with-typed-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Sending additional arguments with Typed API Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autoquery-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
                                                         </span>
                                                     </li>
                                                     <li data-id="making-api-requests-with-urls" class="text-gray-500 hover:text-gray-900">
@@ -2646,10 +3459,46 @@ ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify devel
                                                             Raw Data Responses
                                                         </span>
                                                     </li>
+                                                    <li data-id="batched-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#batched-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Batched Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="one-way-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#one-way-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            One-way Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sending-raw-request-bodies" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sending-raw-request-bodies'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sending Raw Request Bodies
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="error-handling" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#error-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Error Handling
+                                                        </span>
+                                                    </li>
                                                     <li data-id="access-request-response-headers" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#access-request-response-headers'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Access Request / Response Headers
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="request-response-and-exception-filters" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#request-response-and-exception-filters'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Request, Response and Exception Filters
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="client-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Client Configuration
                                                         </span>
                                                     </li>
                                                     <li data-id="typescript-nullable-properties" class="text-gray-500 hover:text-gray-900">
@@ -2692,6 +3541,24 @@ ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify devel
                                                         <span v-hash="'#automatically-refresh-access-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Automatically refresh Access Tokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="complex-type-support" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#complex-type-support'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Complex Type Support
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="serialization-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#serialization-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Serialization Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="node.js-and-deno" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#node.js-and-deno'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Node.js and Deno
                                                         </span>
                                                     </li>
                                             </ul>
@@ -2783,6 +3650,67 @@ ServiceStackIDEA is a plugin for JetBrains IntelliJ based IDEs to simplify devel
                                                         <span v-hash="'#ss-utils.js'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             ss-utils.js
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#client-utils'" data-id="client-utils" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Client Utils
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="inspect-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#inspect-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Inspect Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="url-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#url-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            URL Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="string-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#string-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            String Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="date-and-time-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#date-and-time-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Date and Time Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="object-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#object-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Object Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="form-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#form-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Form Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="event-bus" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#event-bus'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Event Bus
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="jsv-format" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#jsv-format'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            JSV Format
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="stringbuffer" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#stringbuffer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            StringBuffer
                                                         </span>
                                                     </li>
                                             </ul>
