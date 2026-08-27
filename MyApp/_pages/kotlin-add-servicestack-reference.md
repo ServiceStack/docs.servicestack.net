@@ -1,23 +1,21 @@
 ---
-title: Kotlin Add ServiceStack Reference
+title: Kotlin ServiceStack Reference
 ---
 
-![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/android-studio-splash-kotlin.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/kotlin-info.webp)
+:::
 
 ## [Kotlin](https://kotlinlang.org/) - a better language for Android and the JVM
 
-Whilst Java is the flagship language for the JVM, it's slow evolution, lack of modern features and distasteful
-language additions have grown it into an cumbersome language to develop with, as illustrated in the 
-[C# 101 LINQ Examples in Java](https://github.com/mythz/java-linq-examples) where it's by far the worst of all 
-modern languages compared, making it a poor choice for a functional-style of programming that's especially painful
-for Android development which is stuck on Java 7.
-
-By contrast [Kotlin](https://kotlinlang.org/) ended up being one of the 
+[Kotlin](https://kotlinlang.org/) is one of the 
 [best modern languages for functional programming](https://github.com/mythz/kotlin-linq-examples) that's 
-vastly more expressive, readable, maintainable and safer than Java. As Kotlin is being developed by JetBrains 
+vastly more expressive, readable, maintainable and safer than Java - as illustrated by comparing 
+[C#'s 101 LINQ Examples in Kotlin](https://github.com/mythz/kotlin-linq-examples) with the 
+[same examples in Java](https://github.com/mythz/java-linq-examples). As Kotlin is developed by JetBrains 
 it also has great tooling support in **Android Studio**, **IntelliJ** and **Eclipse** and seamlessly integrates 
 with existing Java code where projects can mix-and-match Java and Kotlin code together within the same application - 
-making Kotlin a very attractive and easy choice for Android Development.
+making Kotlin the default choice for Android Development.
 
 As we expect more Android and Java projects to be written in Kotlin in future we've added first-class 
 [Add ServiceStack Reference](/add-servicestack-reference) 
@@ -33,10 +31,113 @@ Kotlin uses the same JVM client with DTOs generated as idiomatic Kotlin classes,
 ```kotlin
 val client = JsonServiceClient(baseUrl)
 
-val response = client.get(Hello().apply { Name = "World" })
-println(response.Result)
+val response = client.get(Hello().apply { name = "World" })
+println(response.result)
 ```
+
 As the default language for new Android development, it's typically where an organization's mobile client meets the same backend its web App uses - with async APIs for background calls, structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads. Both Android Studio and IntelliJ can update the reference in place.
+
+### What you can build
+
+Kotlin uses the same [Java Client Library](/java-add-servicestack-reference) whose
+[test suite](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/AndroidClient/client/src/test/java/net/servicestack/client)
+exercises the API surface available to Kotlin Android Apps and JVM Applications:
+
+ - Typed `GET`, `POST`, `PUT` and `DELETE` requests with blocking APIs in `JsonServiceClient` and callback APIs in `AndroidServiceClient`
+ - Blocking APIs that can be called from Kotlin Coroutines to keep requests off the UI thread
+ - HTTP Method inference from the generated `IGet`, `IPost`, `IPut`, `IDelete` and `IPatch` marker interfaces
+ - Typed AutoQuery requests incl. paging, ordering and dynamic [implicit conventions](/autoquery/rdbms#implicit-conventions)
+ - Structured `ResponseStatus` errors with field-level validation errors and local + global exception filters
+ - Basic Auth, Session Cookies, Bearer Tokens and transparent Access Token renewal using Refresh Tokens
+ - Single and multi-file multipart uploads sent together with a populated Request DTO
+ - Custom routes, relative or absolute URLs, raw `String`, `ByteArray` and `InputStream` responses and request/response filters
+ - `IReturnVoid` requests and high-fidelity Gson serialization of collections, enums, dates, `TimeSpan` durations, `UUID` and `BigDecimal`
+ - Real-time [Server Events](/java-server-events-client) subscriptions
+
+## Install
+
+The pure Java `net.servicestack:client` package works in any **Java 8+** JVM Application and can be added to your
+**build.gradle** with:
+
+```groovy
+dependencies {
+    implementation 'net.servicestack:client:1.1.5'
+    implementation 'com.google.code.gson:gson:2.11.0'
+}
+```
+
+Or in Maven:
+
+```xml
+<dependency>
+  <groupId>net.servicestack</groupId>
+  <artifactId>client</artifactId>
+  <version>1.1.5</version>
+</dependency>
+```
+
+[Gson](https://github.com/google/gson) is the client's only external dependency, which is also referenced directly
+by generated DTOs (e.g. for its `@SerializedName` annotation) so it should be included in your compile classpath.
+
+Android Apps should instead use the **net.servicestack:android** package which contains the same
+`net.servicestack.client` classes as well as the Android-specific `AndroidServiceClient` with its Async APIs and
+`AndroidServerEventsClient`:
+
+```groovy
+dependencies {
+    implementation 'net.servicestack:android:1.1.5'
+}
+```
+
+## Add ServiceStack Reference from the command-line
+
+Kotlin DTOs can be generated for any ServiceStack API from the command-line with
+[npx get-dtos](/npx-get-dtos) which just needs Node.js installed:
+
+:::sh
+npx get-dtos kotlin https://test.servicestack.net
+:::
+
+Which saves the generated DTOs to `dtos.kt`. Unlike Java, Kotlin DTOs are generated as top-level classes so
+only the `Package` they should be generated in needs to be specified, which can be added to the Add ServiceStack
+Reference URL:
+
+:::sh
+npx get-dtos kotlin "https://test.servicestack.net?Package=com.myapp.dtos"
+:::
+
+Then later update all Kotlin ServiceStack References in the current directory (recursively) with:
+
+:::sh
+npx get-dtos kotlin
+:::
+
+Or update a single reference by specifying its file name:
+
+:::sh
+npx get-dtos dtos.kt
+:::
+
+Which resends the [code-generation options](#kotlin-configuration) in the generated file's header comments,
+letting you customize what's generated by uncommenting and modifying them before updating.
+
+The same functionality is also available in the [x dotnet tool](/dotnet-tool) with `x kotlin` and from within
+Android Studio and IntelliJ IDEA using the ServiceStack IDEA plugin below.
+
+### Quick start
+
+Sending a populated Request DTO returns its typed Response DTO where Kotlin is able to infer the Response Type
+from the Request DTO's `IReturn<T>` interface marker:
+
+```kotlin
+import net.servicestack.client.*
+import com.myapp.dtos.*
+
+val client = JsonServiceClient("https://test.servicestack.net")
+
+val response = client.get(Hello().apply { name = "World" })
+println(response.result) //= Hello, World!
+```
 
 ## Kotlin Android Example using Android Studio
 
@@ -116,19 +217,21 @@ When using **Add ServiceStack Reference** feature the ServiceStack IDEA Plugin a
 the **net.servicestack:android** dependency in your projects **build.gradle**, this can also manually add the 
 reference by adding the dependency below:
 
-```
+```groovy
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'net.servicestack:android:1.1.0'
+    implementation 'net.servicestack:android:1.1.5'
 }
 ```
 
-This also lets you to change which ServiceStack Client library version you want to use, the example above uses 
-**1.1.0**. The **net.servicestack:android** dependency contains the `AndroidServiceClient` and 
-`JavaServiceClient` that your projects use to call remote ServiceStack Services using the typed Kotlin DTO's
-added to your project by the **Add ServiceStack Reference** feature.
+This also lets you change which ServiceStack Client library version you want to use, the example above uses 
+**1.1.5** which is the latest version published to 
+[Maven Central](https://mvnrepository.com/artifact/net.servicestack/android). The **net.servicestack:android** 
+dependency contains the `AndroidServiceClient` and `JsonServiceClient` that your projects use to call remote 
+ServiceStack Services using the typed Kotlin DTO's added to your project by the 
+**Add ServiceStack Reference** feature.
 
-### [Add ServiceStack Reference](/add-servicestack-reference)
+### [Add ServiceStack Reference](/add-servicestack-reference) in Android Studio
 
 If you've previously used 
 [Add ServiceStack Reference](/add-servicestack-reference) 
@@ -303,22 +406,47 @@ Typical usage of the Service Client is the same in .NET where you just need to s
 and the Service Client will return a populated Response DTO, e.g:
 
 ```kotlin
-val response: AppOverviewResponse? = client.get(AppOverview())
-val allTiers: ArrayList<Option> = response.AllTiers
-val topTech: ArrayList<TechnologyInfo> = response.TopTechnologies
+val response: AppOverviewResponse = client.get(AppOverview())
+val allTiers: ArrayList<Option> = response.allTiers
+val topTech: ArrayList<TechnologyInfo> = response.topTechnologies
 ```
 
 ::: info Tip
 Explicit type annotations are unnecessary in Kotlin, added above to show the types returned
 :::
 
-Another example using a populated Request DTO:
+Another example using a populated Request DTO, where Kotlin's `apply` scope function can be used to populate
+and send a Request DTO in a single expression:
 
 ```kotlin
-var request = GetTechnology()
-request.Slug = "servicestack"
+val request = GetTechnology()
+request.slug = "servicestack"
 
 val response = client.get(request)
+```
+
+Kotlin's `apply` scope function can also be used to populate and send a Request DTO in a single expression:
+
+```kotlin
+val response = client.get(GetTechnology().apply { slug = "servicestack" })
+```
+
+### JSON API Base Path
+
+`JsonServiceClient` sends Requests to ServiceStack's [pre-defined /api route](/routing#json-api-pre-defined-route)
+by default, i.e. APIs without a user-defined route are sent to `/api/{Request}`:
+
+```kotlin
+val client = JsonServiceClient("https://test.servicestack.net")
+client.replyUrl //= https://test.servicestack.net/api/
+```
+
+Use `setBasePath()` to change where APIs are sent, e.g. older ServiceStack instances that only have the legacy
+pre-defined routes enabled can revert to using them with:
+
+```kotlin
+client.setBasePath()      //= /json/reply/{Request}
+client.setBasePath("api") //= /api/{Request} (default)
 ```
 
 ### Custom Example Usage
@@ -340,9 +468,29 @@ val response = client.get("https://techstacks.io/overview", OverviewResponse::cl
 
 ### AutoQuery Example Usage
 
+Generated [AutoQuery](/autoquery/) Request DTOs inherit the standard paging, ordering and field selection 
+properties from `QueryBase` which can be populated like any other Kotlin property. As AutoQuery services return 
+the generic `QueryResponse<T>` Response Type, the generated Request DTO encodes it in a Gson `TypeToken` so the 
+same terse typed API can be used:
+
+```kotlin
+val request = FindTechnologies().apply {
+    name = "ServiceStack"
+    skip = 0
+    take = 10
+    orderByDesc = "ViewCount"
+}
+
+val response = client.get(request)
+
+response.offset
+response.total
+response.results.forEach { println(it.name) }
+```
+
 You can also send requests composed of both a Typed DTO and untyped String Map by providing a Hash Map of 
 additional args. This is typically used when querying 
-[implicit conventions in AutoQuery services](/autoquery#implicit-conventions), e.g:
+[implicit conventions in AutoQuery services](/autoquery/rdbms#implicit-conventions), e.g:
 
 ```kotlin
 val response = client.get(FindTechnologies(), hashMapOf(Pair("DescriptionContains","framework")))
@@ -361,21 +509,172 @@ val imgBytes = Utils.readBytesToEnd(httpRes)
 val img = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
 ```
 
+### Integrated Basic Auth
+
+HTTP Basic Auth is supported in `JsonServiceClient` following the implementation in .NET Service Clients
+where you can specify the users credentials and whether you always want to send Basic Auth with each request by:
+
+```kotlin
+client.setCredentials(userName, password)
+client.alwaysSendBasicAuthHeaders = true
+
+val response = client.get(TestAuth())
+```
+
+It also supports processing challenged 401 Auth HTTP responses where it will transparently replay the failed
+request with the Basic Auth Headers.
+
+### Cookies-enabled Service Client
+
+The `JsonServiceClient` initializes a `CookieManager` in its constructor to enable any Cookies received to
+be added on subsequent requests to allow you to make authenticated requests after authenticating, e.g:
+
+```kotlin
+val authResponse = client.post(Authenticate().apply {
+    provider = "credentials"
+    userName = "test"
+    password = "test"
+})
+
+val response = client.get(TestAuth())
+```
+
+Individual cookies can also be read and populated directly:
+
+```kotlin
+client.setCookie("ss-opt", "perm")
+client.setCookie("ss-tok", jwt, 60 * 60L) //expires in secs
+
+val value = client.getCookieValue("ss-opt")
+val cookies = client.cookies
+client.clearCookies()
+```
+
+### Bearer Tokens and API Keys
+
+APIs protected with [JWT](/auth/jwt-authprovider) or [API Keys](/auth/apikeys) just need to have their token
+populated on the client where it's sent in the HTTP `Authorization` Bearer Token header of each request:
+
+```kotlin
+client.bearerToken = apiKeyOrJwt
+
+val response = client.send(Secured().apply { name = "test" })
+```
+
+### Automatic Access Token renewal with Refresh Tokens
+
+When a [Refresh Token](/auth/jwt-authprovider#refresh-tokens) is populated, a `401 Unauthorized` response causes
+`JsonServiceClient` to transparently fetch a new JWT Access Token and replay the original request with it:
+
+```kotlin
+client.refreshToken = refreshToken
+
+val response = client.send(request)
+```
+
+Authenticating with a server configured to use JWT Cookies also populates the `ss-tok` and `ss-reftok` Cookies
+which the client uses to renew expired Access Tokens without any additional configuration:
+
+```kotlin
+client.post(Authenticate().apply {
+    provider = "credentials"
+    userName = "test"
+    password = "test"
+})
+
+val accessToken = client.tokenCookie         //= ss-tok Cookie
+val refreshToken = client.refreshTokenCookie //= ss-reftok Cookie
+
+//Continues to work after the Access Token has expired
+val response = client.send(Secured().apply { name = "test" })
+```
+
+If the Refresh Token has also expired a `RefreshTokenException` is thrown which can be used to redirect users
+to re-authenticate:
+
+```kotlin
+try {
+    val response = client.send(request)
+} catch (ex: RefreshTokenException) {
+    //Refresh Token invalid or expired, re-authenticate...
+}
+```
+
 ### Uploading Files
 
-The `postFileWithRequest` method can be used to upload a file with an API Request.
-
-### Kotlin Speech to Text
-
-Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+Use `postFileWithRequest` to upload a file with a populated Request DTO where the Request DTO's properties are
+sent as fields in the same `multipart/form-data` HTTP Request:
 
 ```kotlin
 val audioBytes = Files.readAllBytes(Paths.get("audio.wav"))
-val response = client.postFileWithRequest(SpeechToText(),
+
+val request = SpeechToText().apply { refId = "uniqueUserIdForRequest" }
+
+val response = client.postFileWithRequest(request,
     UploadFile("audio", "audio.wav", "audio/wav", audioBytes))
 ```
 
-To upload multiple files use `postFilesWithRequest`.
+Where `UploadFile` is populated with the **field name** the server expects, the **file name**, its **Content Type**
+and the file's contents. Uploads can also be sent to a custom path by specifying the path and Response Type:
+
+```kotlin
+val response = client.postFileWithRequest<TextGenerationResponse>("/api/SpeechToText",
+    request,
+    UploadFile("audio", "audio.wav", "audio/wav", audioBytes),
+    TextGenerationResponse::class.java)
+```
+
+::: info
+The explicit type argument is needed for the custom path overloads as Kotlin can't infer the Response Type
+from the `Class` argument, alternatively it can be inferred from an explicit type annotation, i.e.
+`val response:TextGenerationResponse = client.postFileWithRequest(...)`
+:::
+
+Multiple files can be uploaded in the same request with `postFilesWithRequest`:
+
+```kotlin
+val files = arrayOf(
+    UploadFile("audio", "test.txt", "text/plain", Utils.toUtf8Bytes("Hello World")),
+    UploadFile("content", "test.md", "text/markdown", Utils.toUtf8Bytes("## Heading"))
+)
+
+val response = client.postFilesWithRequest(TestFileUploads().apply {
+    id = 1
+    refId = "refId"
+}, files)
+
+response.files.forEach {
+    println("${it.name}: ${it.fileName} (${it.contentType}) ${it.contentLength} bytes")
+}
+```
+
+Android Apps can use the equivalent `postFileWithRequestAsync` and `postFilesWithRequestAsync` APIs on
+`AndroidServiceClient` to upload files without blocking the UI thread.
+
+### Kotlin Speech to Text
+
+An example of calling [AI Server's](/ai-server/) `SpeechToText` API to transcribe an audio recording:
+
+```kotlin
+val client = JsonServiceClient(aiServerUrl)
+client.bearerToken = apiKey
+
+val audioBytes = Files.readAllBytes(Paths.get("test_audio.wav"))
+
+val response = client.postFileWithRequest(SpeechToText(),
+    UploadFile("audio", "test_audio.wav", "audio/wav", audioBytes))
+
+// Two texts are returned, the timestamped text JSON and the plain text
+val results = response.results!!
+val textWithTimestamps = results[0].text
+val textOnly = results[1].text
+```
+
+::: info
+Whether generated collection properties are nullable depends on the remote Server's `InitializeCollections`
+configuration, i.e. servers that initialize collections generate non-null `ArrayList<T>` properties whilst
+servers that don't generate nullable `ArrayList<T>?` properties requiring a `!!` or `?.` safe call
+:::
 
 ### AndroidServiceClient
 
@@ -404,8 +703,7 @@ and having their results called back on the Main UI thread.
 
 To enable a simpler Async API decoupled from Android, we've introduced a higher-level 
 [AsyncResult](https://github.com/ServiceStack/ServiceStack.Java/blob/master/src/AndroidClient/client/src/main/java/net/servicestack/client/AsyncResult.java) 
-abstract class which allows capturing of Async callbacks using an idiomatic anonymous Java class to provide an 
-optimal dev experience for Java 7 on Android.
+abstract class which allows capturing of Async callbacks using an idiomatic anonymous Java class.
 
 ::: info
 `AsyncResult` is modelled after [jQuery.ajax](http://api.jquery.com/jquery.ajax/) and allows specifying 
@@ -421,7 +719,7 @@ contain a single method are treated like a lambda in Kotlin/Java 8, so instead o
 ```kotlin
 client.getAsync(Overview(), object: AsyncResult<OverviewResponse>() {
     override fun success(response: OverviewResponse?) {
-        var topUsers = response!!.TopUsers
+        val topUsers = response!!.topUsers
     }
     override fun error(ex: Exception?) {
         ex?.printStackTrace()
@@ -433,7 +731,7 @@ You can instead use the equivalent and more succinct `AsyncSuccess<T>` API:
 
 ```kotlin
 client.getAsync(Overview(), AsyncSuccess<OverviewResponse> {
-        var topUsers = it.TopUsers
+        val topUsers = it.topUsers
     }, AsyncError {
         it.printStackTrace()
     })
@@ -445,78 +743,88 @@ The complete `AsyncServiceClient` API implemented by `AndroidServiceClient`:
 
 ```java
 public interface AsyncServiceClient {
-    <T> void sendAsync(IReturn<T> request, final AsyncResult<T> asyncResult);
-    <T> void sendAsync(IReturn<T> request, final AsyncSuccess<T> success);
-    <T> void sendAsync(IReturn<T> request, final AsyncSuccess<T> success, final AsyncError error);
-    void sendAsync(IReturnVoid request, final AsyncResultVoid asyncResult);
-    void sendAsync(IReturnVoid request, final AsyncSuccessVoid success);
-    void sendAsync(IReturnVoid request, final AsyncSuccessVoid success, final AsyncError error);
+    <T> void sendAsync(IReturn<T> request, AsyncResult<T> asyncResult);
+    <T> void sendAsync(IReturn<T> request, AsyncSuccess<T> success);
+    <T> void sendAsync(IReturn<T> request, AsyncSuccess<T> success, AsyncError error);
+    void sendAsync(IReturnVoid request, AsyncResultVoid asyncResult);
+    void sendAsync(IReturnVoid request, AsyncSuccessVoid success);
+    void sendAsync(IReturnVoid request, AsyncSuccessVoid success, AsyncError error);
 
-    <T> void getAsync(IReturn<T> request, final AsyncResult<T> asyncResult);
-    <T> void getAsync(IReturn<T> request, final AsyncSuccess<T> success);
-    <T> void getAsync(IReturn<T> request, final AsyncSuccess<T> success, final AsyncError error);
-    void getAsync(IReturnVoid request, final AsyncResultVoid asyncResult);
-    void getAsync(IReturnVoid request, final AsyncSuccessVoid success);
-    void getAsync(IReturnVoid request, final AsyncSuccessVoid success, final AsyncError error);
-    <T> void getAsync(IReturn<T> request, final Map<String, String> queryParams, final AsyncResult<T> asyncResult);
-    <T> void getAsync(IReturn<T> request, final Map<String, String> queryParams, AsyncSuccess<T> success);
-    <T> void getAsync(String path, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void getAsync(String path, final Class responseType, final AsyncSuccess<T> success);
-    <T> void getAsync(String path, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void getAsync(String path, final Type responseType, final AsyncSuccess<T> success);
-    void getAsync(String path, final AsyncResult<byte[]> asyncResult);
-    void getAsync(String path, final AsyncSuccess<byte[]> success);
+    <T> void getAsync(IReturn<T> request, AsyncResult<T> asyncResult);
+    <T> void getAsync(IReturn<T> request, AsyncSuccess<T> success);
+    <T> void getAsync(IReturn<T> request, AsyncSuccess<T> success, AsyncError error);
+    void getAsync(IReturnVoid request, AsyncResultVoid asyncResult);
+    void getAsync(IReturnVoid request, AsyncSuccessVoid success);
+    void getAsync(IReturnVoid request, AsyncSuccessVoid success, AsyncError error);
+    <T> void getAsync(IReturn<T> request, Map<String, String> queryParams, AsyncResult<T> asyncResult);
+    <T> void getAsync(IReturn<T> request, Map<String, String> queryParams, AsyncSuccess<T> success);
+    <T> void getAsync(String path, Class responseType, AsyncResult<T> asyncResult);
+    <T> void getAsync(String path, Class responseType, AsyncSuccess<T> success);
+    <T> void getAsync(String path, Type responseType, AsyncResult<T> asyncResult);
+    <T> void getAsync(String path, Type responseType, AsyncSuccess<T> success);
+    void getAsync(String path, AsyncResult<byte[]> asyncResult);
+    void getAsync(String path, AsyncSuccess<byte[]> success);
 
-    <T> void postAsync(IReturn<T> request, final AsyncResult<T> asyncResult);
-    <T> void postAsync(IReturn<T> request, final AsyncSuccess<T> success);
-    <T> void postAsync(IReturn<T> request, final AsyncSuccess<T> success, final AsyncError error);
-    void postAsync(IReturnVoid request, final AsyncResultVoid asyncResult);
-    void postAsync(IReturnVoid request, final AsyncSuccessVoid success);
-    void postAsync(IReturnVoid request, final AsyncSuccessVoid success, final AsyncError error);
-    <T> void postAsync(String path, final Object request, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void postAsync(String path, final Object request, final Class responseType, final AsyncSuccess<T> success);
-    <T> void postAsync(String path, final Object request, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void postAsync(String path, final Object request, final Type responseType, final AsyncSuccess<T> success);
-    <T> void postAsync(String path, final byte[] requestBody, final String contentType, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void postAsync(String path, final byte[] requestBody, final String contentType, final Class responseType, final AsyncSuccess<T> success);
-    <T> void postAsync(String path, final byte[] requestBody, final String contentType, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void postAsync(String path, final byte[] requestBody, final String contentType, final Type responseType, final AsyncSuccess<T> success);
-    void postAsync(String path, final byte[] requestBody, final String contentType, final AsyncResult<byte[]> asyncResult);
-    void postAsync(String path, final byte[] requestBody, final String contentType, final AsyncSuccess<byte[]> success);
+    <T> void postAsync(IReturn<T> request, AsyncResult<T> asyncResult);
+    <T> void postAsync(IReturn<T> request, AsyncSuccess<T> success);
+    <T> void postAsync(IReturn<T> request, AsyncSuccess<T> success, AsyncError error);
+    void postAsync(IReturnVoid request, AsyncResultVoid asyncResult);
+    void postAsync(IReturnVoid request, AsyncSuccessVoid success);
+    void postAsync(IReturnVoid request, AsyncSuccessVoid success, AsyncError error);
+    <T> void postAsync(String path, Object request, Class responseType, AsyncResult<T> asyncResult);
+    <T> void postAsync(String path, Object request, Class responseType, AsyncSuccess<T> success);
+    <T> void postAsync(String path, Object request, Type responseType, AsyncResult<T> asyncResult);
+    <T> void postAsync(String path, Object request, Type responseType, AsyncSuccess<T> success);
+    <T> void postAsync(String path, byte[] requestBody, String contentType, Class responseType, AsyncResult<T> asyncResult);
+    <T> void postAsync(String path, byte[] requestBody, String contentType, Class responseType, AsyncSuccess<T> success);
+    <T> void postAsync(String path, byte[] requestBody, String contentType, Type responseType, AsyncResult<T> asyncResult);
+    <T> void postAsync(String path, byte[] requestBody, String contentType, Type responseType, AsyncSuccess<T> success);
+    void postAsync(String path, byte[] requestBody, String contentType, AsyncResult<byte[]> asyncResult);
+    void postAsync(String path, byte[] requestBody, String contentType, AsyncSuccess<byte[]> success);
 
-    <T> void putAsync(IReturn<T> request, final AsyncResult<T> asyncResult);
-    <T> void putAsync(IReturn<T> request, final AsyncSuccess<T> success);
-    <T> void putAsync(IReturn<T> request, final AsyncSuccess<T> success, final AsyncError error);
-    void putAsync(IReturnVoid request, final AsyncResultVoid asyncResult);
-    void putAsync(IReturnVoid request, final AsyncSuccessVoid success);
-    void putAsync(IReturnVoid request, final AsyncSuccessVoid success, final AsyncError error);
-    <T> void putAsync(String path, final Object request, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void putAsync(String path, final Object request, final Class responseType, final AsyncSuccess<T> success);
-    <T> void putAsync(String path, final Object request, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void putAsync(String path, final Object request, final Type responseType, final AsyncSuccess<T> success);
-    <T> void putAsync(String path, final byte[] requestBody, final String contentType, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void putAsync(String path, final byte[] requestBody, final String contentType, final Class responseType, final AsyncSuccess<T> success);
-    <T> void putAsync(String path, final byte[] requestBody, final String contentType, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void putAsync(String path, final byte[] requestBody, final String contentType, final Type responseType, final AsyncSuccess<T> success);
-    void putAsync(String path, final byte[] requestBody, final String contentType, final AsyncResult<byte[]> asyncResult);
-    void putAsync(String path, final byte[] requestBody, final String contentType, final AsyncSuccess<byte[]> success);
+    <T> void putAsync(IReturn<T> request, AsyncResult<T> asyncResult);
+    <T> void putAsync(IReturn<T> request, AsyncSuccess<T> success);
+    <T> void putAsync(IReturn<T> request, AsyncSuccess<T> success, AsyncError error);
+    void putAsync(IReturnVoid request, AsyncResultVoid asyncResult);
+    void putAsync(IReturnVoid request, AsyncSuccessVoid success);
+    void putAsync(IReturnVoid request, AsyncSuccessVoid success, AsyncError error);
+    <T> void putAsync(String path, Object request, Class responseType, AsyncResult<T> asyncResult);
+    <T> void putAsync(String path, Object request, Class responseType, AsyncSuccess<T> success);
+    <T> void putAsync(String path, Object request, Type responseType, AsyncResult<T> asyncResult);
+    <T> void putAsync(String path, Object request, Type responseType, AsyncSuccess<T> success);
+    <T> void putAsync(String path, byte[] requestBody, String contentType, Class responseType, AsyncResult<T> asyncResult);
+    <T> void putAsync(String path, byte[] requestBody, String contentType, Class responseType, AsyncSuccess<T> success);
+    <T> void putAsync(String path, byte[] requestBody, String contentType, Type responseType, AsyncResult<T> asyncResult);
+    <T> void putAsync(String path, byte[] requestBody, String contentType, Type responseType, AsyncSuccess<T> success);
+    void putAsync(String path, byte[] requestBody, String contentType, AsyncResult<byte[]> asyncResult);
+    void putAsync(String path, byte[] requestBody, String contentType, AsyncSuccess<byte[]> success);
 
-    <T> void deleteAsync(IReturn<T> request, final AsyncResult<T> asyncResult);
-    <T> void deleteAsync(IReturn<T> request, final AsyncSuccess<T> success);
-    <T> void deleteAsync(IReturn<T> request, final AsyncSuccess<T> success, final AsyncError error);
-    void deleteAsync(IReturnVoid request, final AsyncResultVoid asyncResult);
-    void deleteAsync(IReturnVoid request, final AsyncSuccessVoid success);
-    void deleteAsync(IReturnVoid request, final AsyncSuccessVoid success, final AsyncError error);
-    <T> void deleteAsync(IReturn<T> request, final Map<String, String> queryParams, final AsyncResult<T> asyncResult);
-    <T> void deleteAsync(IReturn<T> request, final Map<String, String> queryParams, final AsyncSuccess<T> success);
-    <T> void deleteAsync(String path, final Class responseType, final AsyncResult<T> asyncResult);
-    <T> void deleteAsync(String path, final Class responseType, final AsyncSuccess<T> success);
-    <T> void deleteAsync(String path, final Type responseType, final AsyncResult<T> asyncResult);
-    <T> void deleteAsync(String path, final Type responseType, final AsyncSuccess<T> success);
-    void deleteAsync(String path, final AsyncResult<byte[]> asyncResult);
-    void deleteAsync(String path, final AsyncSuccess<byte[]> success);
+    <T> void deleteAsync(IReturn<T> request, AsyncResult<T> asyncResult);
+    <T> void deleteAsync(IReturn<T> request, AsyncSuccess<T> success);
+    <T> void deleteAsync(IReturn<T> request, AsyncSuccess<T> success, AsyncError error);
+    void deleteAsync(IReturnVoid request, AsyncResultVoid asyncResult);
+    void deleteAsync(IReturnVoid request, AsyncSuccessVoid success);
+    void deleteAsync(IReturnVoid request, AsyncSuccessVoid success, AsyncError error);
+    <T> void deleteAsync(IReturn<T> request, Map<String, String> queryParams, AsyncResult<T> asyncResult);
+    <T> void deleteAsync(IReturn<T> request, Map<String, String> queryParams, AsyncSuccess<T> success);
+    <T> void deleteAsync(String path, Class responseType, AsyncResult<T> asyncResult);
+    <T> void deleteAsync(String path, Class responseType, AsyncSuccess<T> success);
+    <T> void deleteAsync(String path, Type responseType, AsyncResult<T> asyncResult);
+    <T> void deleteAsync(String path, Type responseType, AsyncSuccess<T> success);
+    void deleteAsync(String path, AsyncResult<byte[]> asyncResult);
+    void deleteAsync(String path, AsyncSuccess<byte[]> success);
+
+    <T> void postFileWithRequestAsync(IReturn<T> request, UploadFile file, AsyncResult<T> asyncResult);
+    <T> void postFileWithRequestAsync(Object request, UploadFile file, Object responseType, AsyncResult<T> asyncResult);
+    <T> void postFileWithRequestAsync(String path, Object request, UploadFile file, Object responseType, AsyncResult<T> asyncResult);
+
+    <T> void postFilesWithRequestAsync(IReturn<T> request, UploadFile[] files, AsyncResult<T> asyncResult);
+    <T> void postFilesWithRequestAsync(Object request, UploadFile[] files, Object responseType, AsyncResult<T> asyncResult);
+    <T> void postFilesWithRequestAsync(String path, Object request, UploadFile[] files, Object responseType, AsyncResult<T> asyncResult);
 }
 ```
+
+> The `final` modifiers on callback parameters have been omitted for readability
 
 The `AsyncServiceClient` interface is implemented by the `AndroidServiceClient` concrete class which 
 behind-the-scenes uses an Android [AsyncTask](http://developer.android.com/reference/android/os/AsyncTask.html) 
@@ -526,6 +834,37 @@ Whilst the `AndroidServiceClient` is contained in the **net.servicestack:android
 Android, the `JsonServiceClient` instead is contained in a seperate pure Java **net.servicestack:client** 
 dependency which can be used independently to provide a typed Java API for consuming ServiceStack Services 
 from any Java or Kotlin JVM application.
+
+### Using Coroutines
+
+Modern Kotlin Apps can skip the callback APIs entirely and call `JsonServiceClient`'s blocking APIs from a
+Coroutine using the `Dispatchers.IO` dispatcher, which keeps the request off the Main UI thread whilst
+retaining a linear, exception-based control flow:
+
+```kotlin
+suspend fun getTechnology(slug:String): GetTechnologyResponse = withContext(Dispatchers.IO) {
+    client.get(GetTechnology().apply { this.slug = slug })
+}
+```
+
+Which can be called from any Coroutine Scope, e.g. from an Android `ViewModel`:
+
+```kotlin
+viewModelScope.launch {
+    try {
+        val response = getTechnology("servicestack")
+        //Back on the Main thread, safe to update the UI
+        technology.value = response.technology
+    } catch (webEx: WebServiceException) {
+        error.value = webEx.responseStatus.message
+    }
+}
+```
+
+::: info
+`JsonServiceClient` instances are safe to share between Coroutines, but as its configuration properties
+(e.g. `bearerToken`, filters) are mutable it's recommended to configure a client instance once, up-front
+:::
 
 ### Async API Usage
 
@@ -543,8 +882,8 @@ with the typed response, e.g:
 
 ```kotlin
 client.getAsync(AppOverview(), AsyncSuccess<AppOverviewResponse> {
-    val allTiers = it.AllTiers
-    val topTech = it.TopTechnologies
+    val allTiers = it.allTiers
+    val topTech = it.topTechnologies
 })
 ```
 
@@ -585,24 +924,43 @@ client.getAsync("https://servicestack.net/img/logo.png", {
 })
 ```
 
-#### Send Raw String or byte[] Requests
+#### Send Raw String or ByteArray Requests
 
-You can easily get the raw string Response from Request DTO's that return are annotated with `IReturn<string>`, e.g:
+You can easily get the raw string Response from Request DTO's that are annotated with `IReturn<String>`, e.g:
  
-```java
+```kotlin
 open class HelloString : IReturn<String> { ... }
 
-var request = HelloString()
-request.name = "World"
-
-val response:String? = client.get(request)
+val response:String = client.get(HelloString().apply { name = "World" })
 ```
 
-You can also specify that you want the raw UTF-8 `byte[]` or `String` response instead of a the deserialized 
+You can also specify that you want the raw UTF-8 `ByteArray` or `String` response instead of the deserialized 
 Response DTO by specifying the Response class you want returned, e.g:
 
 ```kotlin
-val response:ByteArray = client.get("/hello?Name=World", ByteArray::class.java);
+val response:ByteArray = client.get("/hello?Name=World", ByteArray::class.java)
+```
+
+Large responses can be streamed by requesting an `InputStream` response, which is also returned for Request DTOs
+annotated with `IReturn<InputStream>`:
+
+```kotlin
+val stream:InputStream = client.get("/hello?Name=World", InputStream::class.java)
+val bytes = Utils.readBytesToEnd(stream)
+stream.close()
+```
+
+::: info
+As Kotlin can't infer the Response Type from a `Class` argument, these overloads need either an explicit type
+annotation as above or an explicit type argument, e.g. `client.get<ByteArray>(path, ByteArray::class.java)`
+:::
+
+Requests can also be sent with a custom Content-Type and raw `ByteArray` body, e.g:
+
+```kotlin
+val httpRes:HttpURLConnection = client.post("/hello", 
+    Utils.toUtf8Bytes("Name=World"), MimeTypes.FormUrlEncoded)
+val json = Utils.readToEnd(httpRes) //= {"result":"Hello, World!"}
 ```
 
 #### Kotlin HTTP Marker Interfaces
@@ -617,8 +975,13 @@ open class HelloPut : IReturn<HelloVerbResponse>, IPut { ... }
 val response = client.send(HelloGet()) //GET
 
 client.sendAsync(HelloPut(),           //PUT
-    AsyncSuccess<HelloVerbResponse> { });
+    AsyncSuccess<HelloVerbResponse> { })
 ```
+
+Requests are sent to the [pre-defined /api route](/routing#json-api-pre-defined-route) with the HTTP Method of
+the marker interface it implements, e.g. `send(SendGet().apply { id = 1 })` is sent as a `GET /api/SendGet?id=1`
+whilst Request DTOs without a HTTP marker interface are sent as a `POST`. As `GET` and `DELETE` requests can't
+have a request body, their DTO properties are sent in the query string instead.
 
 #### IReturnVoid Support
 
@@ -635,14 +998,19 @@ familiar to C# devs which also throws a typed `WebServiceException` containing t
 error data:
 
 ```kotlin
-var request = ThrowType()
-request.Type = "NotFound"
-request.message = "not here"
+val request = ThrowType().apply {
+    Type = "NotFound"
+    message = "not here"
+}
 
 try {
     val response = client.post(request)
 } catch(webEx: WebServiceException) {
+    webEx.statusCode        //= 404
+    webEx.statusDescription //= Not Found
+
     val status = webEx.responseStatus
+    status.errorCode  //= NotFound
     status.message    //= not here
     status.stackTrace //= (Server StackTrace)
 }
@@ -651,11 +1019,10 @@ try {
 Likewise structured Validation Field Errors are also accessible from the familiar `ResponseStatus` DTO, e.g:
 
 ```kotlin
-var request = ThrowValidation()
-request.email = "invalidemail"
+val request = ThrowValidation().apply { email = "invalidemail" }
 
 try {
-    client.post(request);
+    client.post(request)
 } catch (webEx: WebServiceException){
     val status = webEx.responseStatus
 
@@ -696,10 +1063,13 @@ client.postAsync(request, AsyncSuccess<ThrowValidationResponse> { },
 ```
 
 ### JsonServiceClient Error Handlers
-To make it easier to generically handle Web Service Exceptions, the Java Service Clients also support static Global Exception handlers by assigning `AndroidServiceClient.GlobalExceptionFilter`, e.g:
+
+To make it easier to generically handle Web Service Exceptions, the Java Service Clients also support static
+Global Exception handlers by assigning `JsonServiceClient.GlobalExceptionFilter` (or
+`AndroidServiceClient.GlobalExceptionFilter` in Android Apps), e.g:
 
 ```kotlin
-AndroidServiceClient.GlobalExceptionFilter = ExceptionFilter { res:HttpURLConnection?, ex ->
+JsonServiceClient.GlobalExceptionFilter = ExceptionFilter { res:HttpURLConnection?, ex ->
 }
 ```
 
@@ -710,11 +1080,136 @@ client.ExceptionFilter = ExceptionFilter { res:HttpURLConnection?, ex ->
 }
 ```
 
+### Request and Response Filters
+
+Each request can be inspected and customized with local and global Request and Response Filters which receive
+the `HttpURLConnection` before it's sent and after the response is received. As they're single-method interfaces
+Kotlin can implement them with a lambda, e.g. to add a custom HTTP Header to every request:
+
+```kotlin
+client.RequestFilter = ConnectionFilter { it.setRequestProperty("X-Api-Version", "2") }
+client.ResponseFilter = ConnectionFilter { Log.i(it.getHeaderField("X-Elapsed")) }
+```
+
+The static `GlobalRequestFilter` and `GlobalResponseFilter` are applied to all clients and are executed
+**after** each client's local filters, i.e. filters are executed in the order:
+
+```
+RequestFilter, GlobalRequestFilter, ResponseFilter, GlobalResponseFilter
+```
+
+```kotlin
+JsonServiceClient.GlobalRequestFilter = ConnectionFilter { }
+JsonServiceClient.GlobalResponseFilter = ConnectionFilter { }
+```
+
+### Client Configuration
+
+Other behavior that can be configured on the client:
+
+```kotlin
+client.setTimeout(60 * 1000)  //Connect + Read timeout in ms
+client.setBasePath("api")     //Change the base path APIs are sent to
+client.bearerToken = jwt
+client.refreshToken = refreshToken
+client.setCredentials(userName, password)
+client.alwaysSendBasicAuthHeaders = true
+```
+
+The `Gson` instance used to serialize and deserialize DTOs can also be customized or replaced entirely, where
+`gsonBuilder` returns a `GsonBuilder` pre-configured with the Type Adapters needed to support ServiceStack's
+JSON Types (i.e. Dates, `TimeSpan`, `UUID`, `ByteArray` and case-insensitive Enums):
+
+```kotlin
+client.gson = client.gsonBuilder
+    .setPrettyPrinting()
+    .serializeNulls()
+    .create()
+```
+
+The client's serializer can also be used directly to convert DTOs to and from JSON:
+
+```kotlin
+val json = client.toJson(dto)
+val dto = client.fromJson(json, Option::class.java) as Option
+```
+
+Whilst `apiUrl()` and `createUrl()` can be used to inspect the URL a Request DTO would be sent to:
+
+```kotlin
+client.apiUrl(Hello())
+//= https://test.servicestack.net/api/Hello
+
+client.createUrl(Hello().apply { name = "World" })
+//= https://test.servicestack.net/api/Hello?name=World
+```
+
+### Logging
+
+All HTTP JSON Requests and Responses can be logged by enabling debug logging, useful for diagnosing what's
+being sent over the wire:
+
+```kotlin
+Log.setInstance(LogProvider("ServiceStack", true))
+```
+
+Android Apps can use `AndroidLogProvider` to have logging routed to Android's `android.util.Log`:
+
+```kotlin
+Log.setInstance(AndroidLogProvider("ServiceStack", true))
+```
+
+### Inspect Utils
+
+The `Inspect` utils provide a quick way to visualize the contents of Response DTOs and collections in
+human-friendly output whilst developing and debugging:
+
+```kotlin
+Inspect.printDump(response)      //Print readable object graph
+Inspect.printDumpTable(results)  //Print all fields in a table
+Inspect.printDumpTable(results, listOf("name","language","watchers","forks"))
+```
+
+Where `printDump()` renders a quote-free object graph:
+
+```
+{
+  name: jdk,
+  language: Java,
+  watchers: 19587,
+  forks: 5457
+}
+```
+
+Whilst `printDumpTable()` renders a collection of results in an ASCII table:
+
+```
++-------------------------------------+
+| name | language | watchers | forks  |
+|-------------------------------------|
+| jdk  | Java     |    19587 |   5457 |
+| loom | Java     |     1499 |    190 |
+| jfx  | Java     |     1096 |    489 |
++-------------------------------------+
+```
+
+`Inspect.vars()` can also dump the state of multiple variables to the JSON file in the `INSPECT_VARS`
+Environment Variable, used by [gist.cafe](https://gist.cafe) to display variables in its UI:
+
+```kotlin
+Inspect.vars(mapOf("results" to results))
+```
+
 ### More Usage Examples
 
-You can find more sync and async Kotlin ServiceClient examples in the links below:
+As Kotlin uses the same Java Client Library, the
+[Java Client Test Suite](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/AndroidClient/client/src/test/java/net/servicestack/client)
+contains working examples of every feature covered above which are run against the live
+[test.servicestack.net](https://test.servicestack.net) and [techstacks.io](https://techstacks.io) Services.
 
- - [Kotlin ServiceClient Tests](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/AndroidClient/kotlin/src/androidTest/java/test/servicestack/net/kotlin)
+More Kotlin-specific sync and async ServiceClient examples can be found in:
+
+ - [Kotlin ServiceClient Tests](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/legacy/kotlin/src/androidTest/java/test/servicestack/net/kotlin)
  - [TechStacks Kotlin App](https://github.com/ServiceStackApps/TechStacksKotlinApp)
 
 ## Kotlin generated DTO Types
@@ -737,17 +1232,20 @@ Kotlin Request DTO's are also able to take advantage of the `IReturn<TResponse>`
 its terse, typed generic API but due to JVM's Type erasure the Response Type also needs to be encoded in the 
 Request DTO as seen by the `responseType` static companion property:
 
-```java
-@Route("/all-types")
+```kotlin
+@Route(Path="/all-types")
 open class HelloAllTypes : IReturn<HelloAllTypesResponse>
 {
-    var name:String? = null
-    var allTypes:AllTypes? = null
-    var allCollectionTypes:AllCollectionTypes? = null
+    open var name:String? = null
+    open var allTypes:AllTypes? = null
+    open var allCollectionTypes:AllCollectionTypes? = null
     companion object { private val responseType = HelloAllTypesResponse::class.java }
-    override fun getResponseType(): Any? = responseType
+    override fun getResponseType(): Any? = HelloAllTypes.responseType
 }
 ```
+
+Classes are generated as `open` so they can be inherited and their properties overridden where needed, e.g. by
+generated Request DTOs that inherit AutoQuery's `QueryDb<T>` base types.
 
 ### DTO Property Behavior
 
@@ -769,38 +1267,67 @@ collection types are default initialized to an empty collection to make it simpl
 ```kotlin
 open class AllTypes
 {
-    var id:Int? = null
-    var nullableId:Int? = null
-    @SerializedName("byte") var Byte:Short? = null
-    @SerializedName("short") var Short:Short? = null
-    @SerializedName("int") var Int:Int? = null
-    @SerializedName("long") var Long:Long? = null
-    var uShort:Int? = null
-    var uInt:Long? = null
-    var uLong:BigInteger? = null
-    @SerializedName("float") var Float:Float? = null
-    @SerializedName("double") var Double:Double? = null
-    var decimal:BigDecimal? = null
-    var string:String? = null
-    var dateTime:Date? = null
-    var timeSpan:TimeSpan? = null
-    var dateTimeOffset:Date? = null
-    var guid:UUID? = null
-    @SerializedName("char") var Char:String? = null
-    var nullableDateTime:Date? = null
-    var nullableTimeSpan:TimeSpan? = null
-    var stringList:ArrayList<String> = ArrayList<String>()
-    var stringArray:ArrayList<String>? = null
-    var stringMap:HashMap<String,String> = HashMap<String,String>()
-    var intStringMap:HashMap<Int,String> = HashMap<Int,String>()
-    var subType:SubType? = null
+    open var id:Int? = null
+    open var nullableId:Int? = null
+    @SerializedName("byte") open var Byte:Short? = null
+    @SerializedName("short") open var Short:Short? = null
+    @SerializedName("int") open var Int:Int? = null
+    @SerializedName("long") open var Long:Long? = null
+    open var uShort:Int? = null
+    open var uInt:Long? = null
+    open var uLong:BigInteger? = null
+    @SerializedName("float") open var Float:Float? = null
+    @SerializedName("double") open var Double:Double? = null
+    open var decimal:BigDecimal? = null
+    open var string:String? = null
+    open var dateTime:Date? = null
+    open var timeSpan:TimeSpan? = null
+    open var dateTimeOffset:Date? = null
+    open var guid:UUID? = null
+    @SerializedName("char") open var Char:String? = null
+    open var nullableDateTime:Date? = null
+    open var nullableTimeSpan:TimeSpan? = null
+    open var stringList:ArrayList<String> = ArrayList<String>()
+    open var stringArray:ArrayList<String>? = null
+    open var stringMap:HashMap<String,String> = HashMap<String,String>()
+    open var intStringMap:HashMap<Int,String> = HashMap<Int,String>()
+    open var subType:SubType? = null
 }
 ```
+
+::: info
+Collection properties are only initialized to an empty collection (and generated non-null) when the remote
+Server is configured with [InitializeCollections](#initializecollections), otherwise they're generated as
+nullable `ArrayList<T>?` properties
+:::
 
 The only built-in Value Type that didn't have a suitable built-in Java equivalent was `TimeSpan`. 
 In this case it uses our new 
 [TimeSpan.java](https://github.com/ServiceStack/ServiceStack.Java/blob/master/src/AndroidClient/client/src/main/java/net/servicestack/client/TimeSpan.java) 
-class which implements the same familiar API available in .NET's `TimeSpan`. 
+class which implements the same familiar API available in .NET's `TimeSpan`, which is serialized in the same 
+XSD Duration format used by .NET:
+
+```kotlin
+val duration = TimeSpan().addHours(1).addMinutes(30)
+duration.hours          //= 1
+duration.toXsdDuration() //= PT1H30M
+
+TimeSpan.fromXsdDuration("P1DT1H1M1.001S")
+```
+
+Likewise `Utils` contains the conversions used to marshal the remaining .NET Value Types over the wire, e.g.
+.NET's `Guid` uses a different byte ordering to Java's `UUID` which is transparently handled by the client:
+
+```kotlin
+val date = Utils.fromDateTime("2015-03-27T03:41:41.987375+00:00")
+val jsonDate = Utils.toDateTime(date) //= /Date(1427398901987-0000)/
+
+val uuid = Utils.fromGuidString("4E07D932-8D1A-4CE1-9314-7AC7826E8966")
+val guid = Utils.toGuidString(uuid)   //= 4E07D9328D1A4CE193147AC7826E8966
+
+val bytes = Utils.fromByteArray("QUJD") //Base64 -> ByteArray
+val base64 = Utils.toByteArray(bytes)
+```
 
 Something else you'll notice is that some fields are annotated with the `@SerializedName()` Gson annotation. 
 This is automatically added for Kotlin keywords. The first time a Gson annotation is referenced it also 
@@ -844,22 +1371,26 @@ be sent to the server to override any server defaults.
 
 ```kotlin
 /* Options:
-Date: 2015-12-17 05:17:47
-Version: 4.051
+Date: 2026-08-27 07:01:45
+Version: 10.09
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://techstacks.io
+BaseUrl: https://test.servicestack.net
 
-Package: servicestack.net.techstacks
+Package: com.myapp.dtos
 //AddServiceStackTypes: True
 //AddResponseStatus: False
 //AddImplicitVersion: 
+//AddDescriptionAsComments: True
 //IncludeTypes: 
 //ExcludeTypes: 
-//InitializeCollections: True
+//InitializeCollections: False
 //TreatTypesAsStrings: 
-//DefaultImports: java.math.*,java.util.*,net.servicestack.client.*,com.google.gson.annotations.*,com.google.gson.reflect.*
+//DefaultImports: java.math.*,java.util.*,java.io.InputStream,net.servicestack.client.*,com.google.gson.annotations.*,com.google.gson.reflect.*
 */
 ```
+
+The same options are also sent when updating an existing reference with `npx get-dtos dtos.kt`.
+
 We'll go through and cover each of the above options to see how they affect the generated DTO's:
 
 ### Package
@@ -879,6 +1410,25 @@ Lets you exclude built-in ServiceStack Types and DTO's from being generated with
 AddServiceStackTypes: False
 ```
 This will prevent Request DTO's for built-in ServiceStack Services like `Authenticate` from being emitted.
+
+### InitializeCollections
+Lets you control whether collection properties are initialized to an empty collection, which also determines
+whether they're generated as non-null Kotlin properties:
+```
+InitializeCollections: True
+```
+Which changes nullable collection properties from:
+
+```kotlin
+open var stringList:ArrayList<String>? = null
+```
+
+To non-null properties initialized with an empty collection, avoiding the need for null checks when
+populating or reading them:
+
+```kotlin
+open var stringList:ArrayList<String> = ArrayList<String>()
+```
 
 ### AddImplicitVersion
 Lets you specify the Version number to be automatically populated in all Request DTO's sent from the client:
