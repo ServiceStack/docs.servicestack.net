@@ -234,7 +234,66 @@ Useful metadata includes `[Description]`, `[Input]`, validation attributes, `[Re
 
 ## Use AutoQuerySchema in your own Apps
 
-The built-in page uses the `AutoQuerySchema` component from `@servicestack/vue`. It can also be used in your own Vue UI:
+<div class="not-prose relative my-10 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 shadow-2xl ring-1 ring-white/10 sm:px-10 sm:py-12">
+    <div class="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl"></div>
+    <div class="absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl"></div>
+    <div class="relative">
+        <div class="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+            Rapid application development
+        </div>
+        <h3 class="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Build AutoQuery CRUD UIs in minutes
+        </h3>
+        <p class="mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
+            Pass <code class="text-emerald-300">/auto/{Model}.json</code> to <code class="text-emerald-300">AutoQuerySchema</code> to get a query grid and authorized Create, Edit and Delete forms. Use the complete component or compose its lower-level parts.
+        </p>
+        <div class="mt-8 grid gap-4 md:grid-cols-2">
+            <a href="/vue/json-schema" class="group rounded-2xl border border-white/10 bg-white/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-emerald-400/50 hover:bg-white/[0.11]">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-3 shadow-lg shadow-emerald-950/30">
+                        <img src="/img/svgs/vue.svg" alt="Vue" class="h-10 w-12">
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-white">Vue 3</div>
+                        <code class="text-sm text-emerald-300">@servicestack/vue</code>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm leading-6 text-slate-300">Add a complete schema-driven CRUD UI to a Vue page.</p>
+                <div class="mt-4 text-sm font-semibold text-emerald-300">Vue components <span class="inline-block transition group-hover:translate-x-1">→</span></div>
+            </a>
+            <a href="https://react.servicestack.net/gallery/schema" class="group rounded-2xl border border-white/10 bg-white/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.11]">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-lg shadow-cyan-950/30">
+                        <img src="/img/svgs/react.svg" alt="React" class="h-12 w-12">
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-white">React</div>
+                        <code class="text-sm text-cyan-300">@servicestack/react</code>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm leading-6 text-slate-300">Add the same CRUD UI to React, Vite or Next.js.</p>
+                <div class="mt-4 text-sm font-semibold text-cyan-300">React components <span class="inline-block transition group-hover:translate-x-1">→</span></div>
+            </a>
+        </div>
+        <div class="mt-8 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-3">
+            <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> One schema request</div>
+            <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Grid and CRUD forms</div>
+            <div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Auth and validation</div>
+        </div>
+    </div>
+</div>
+
+<div class="not-prose mt-10 flex items-center gap-4">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40">
+        <img src="/img/svgs/vue.svg" alt="Vue" class="h-9 w-10">
+    </div>
+    <div>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Use it in Vue</h3>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Fetch the model schema and mount the complete CRUD component.</p>
+    </div>
+</div>
+
+The built-in page uses the `AutoQuerySchema` component from `@servicestack/vue`. The same component can be used directly in your own Vue UI:
 
 ```html
 <script setup lang="ts">
@@ -252,6 +311,16 @@ onMounted(async () => {
   <AutoQuerySchema v-if="schema" :schema="schema" />
 </template>
 ```
+
+<div class="not-prose mt-12 flex items-center gap-4">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-200 bg-cyan-50 p-2 dark:border-cyan-800 dark:bg-cyan-950/40">
+        <img src="/img/svgs/react.svg" alt="React" class="h-10 w-10">
+    </div>
+    <div>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Use it in React</h3>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Use the same schema-driven components with React APIs.</p>
+    </div>
+</div>
 
 `@servicestack/react` ships the same components with the same names. Pass it the model schema and a `JsonServiceClient` for the App serving the AutoQuery APIs:
 
@@ -276,7 +345,9 @@ export default function Bookings() {
 }
 ```
 
-For more specialized experiences, both libraries expose the lower-level components independently:
+### Start complete, customize when it matters
+
+For more specialized experiences, both libraries expose the lower-level components independently. Keep `AutoQuerySchema` as the productive default, or compose the exact surface your users need:
 
 | Component | Purpose |
 | --- | --- |

@@ -248,7 +248,66 @@ For `GET` APIs, opening a populated link can execute the request immediately. Af
 
 ## Powered by reusable Vue and React components
 
+<div class="not-prose relative my-10 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 shadow-2xl ring-1 ring-white/10 sm:px-10 sm:py-12">
+    <div class="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"></div>
+    <div class="absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-cyan-500/20 blur-3xl"></div>
+    <div class="relative">
+        <div class="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">
+            Rapid application development
+        </div>
+        <h3 class="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Build API forms from schemas in minutes
+        </h3>
+        <p class="mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
+            Pass <code class="text-violet-300">/schema/{Request}.json</code> to <code class="text-violet-300">ApiFormSchema</code> to generate inputs, execute the API and inspect its response. Use <code class="text-violet-300">JsonSchemaForm</code> for standalone structured forms.
+        </p>
+        <div class="mt-8 grid gap-4 md:grid-cols-2">
+            <a href="/vue/json-schema" class="group rounded-2xl border border-white/10 bg-white/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-emerald-400/50 hover:bg-white/[0.11]">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-3 shadow-lg shadow-emerald-950/30">
+                        <img src="/img/svgs/vue.svg" alt="Vue" class="h-10 w-12">
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-white">Vue 3</div>
+                        <code class="text-sm text-emerald-300">@servicestack/vue</code>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm leading-6 text-slate-300">Generate executable API forms in Vue.</p>
+                <div class="mt-4 text-sm font-semibold text-emerald-300">Vue components <span class="inline-block transition group-hover:translate-x-1">→</span></div>
+            </a>
+            <a href="https://react.servicestack.net/gallery/schema" class="group rounded-2xl border border-white/10 bg-white/[0.07] p-5 transition hover:-translate-y-0.5 hover:border-cyan-400/50 hover:bg-white/[0.11]">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-lg shadow-cyan-950/30">
+                        <img src="/img/svgs/react.svg" alt="React" class="h-12 w-12">
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-white">React</div>
+                        <code class="text-sm text-cyan-300">@servicestack/react</code>
+                    </div>
+                </div>
+                <p class="mt-4 text-sm leading-6 text-slate-300">Generate the same forms in React, Vite or Next.js.</p>
+                <div class="mt-4 text-sm font-semibold text-cyan-300">React components <span class="inline-block transition group-hover:translate-x-1">→</span></div>
+            </a>
+        </div>
+        <div class="mt-8 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-3">
+            <div class="flex items-center gap-2"><span class="text-violet-400">✓</span> Generated inputs</div>
+            <div class="flex items-center gap-2"><span class="text-violet-400">✓</span> Request and response</div>
+            <div class="flex items-center gap-2"><span class="text-violet-400">✓</span> Auth and validation</div>
+        </div>
+    </div>
+</div>
+
 The built-in pages aren't a separate UI framework - they're composed from the same components published in `@servicestack/vue` and `@servicestack/react`.
+
+<div class="not-prose mt-10 flex items-center gap-4">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40">
+        <img src="/img/svgs/vue.svg" alt="Vue" class="h-9 w-10">
+    </div>
+    <div>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Build it with Vue</h3>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Render an executable API form and customize it with slots.</p>
+    </div>
+</div>
 
 `ApiFormSchema` is the generic executable API UI. It renders only the form, leaving the surrounding workbench to the host page. Everything else it derives - the HTTP request preview, its `curl` equivalent, the request, the result and any error - is passed to its **default slot**, and completed calls emit `success` and `error` events:
 
@@ -284,6 +343,16 @@ This makes schemas useful beyond executable API forms: the same renderer can pow
 The demo uses `JsonSchemaForm` from `@servicestack/vue`. Equivalent `JsonSchemaForm` and `ApiFormSchema` components are also available from `@servicestack/react`; see the [React Schema gallery](https://react.servicestack.net/gallery/schema) for live examples. Use `JsonSchemaForm` for arbitrary JSON values, or `ApiFormSchema` when the schema also describes an API that should be invoked.
 
 `ApiFormSchema` also accepts a `client` for authenticated calls, `auto-execute` to run `GET` APIs on load, and `sync-url` to keep current values in the address bar.
+
+<div class="not-prose mt-12 flex items-center gap-4">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-cyan-200 bg-cyan-50 p-2 dark:border-cyan-800 dark:bg-cyan-950/40">
+        <img src="/img/svgs/react.svg" alt="React" class="h-10 w-10">
+    </div>
+    <div>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Build it with React</h3>
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Customize the same request and result state with render props.</p>
+    </div>
+</div>
 
 The `ApiFormSchema` snippet above translates directly to React - here its render prop is used to build a custom result UI:
 
