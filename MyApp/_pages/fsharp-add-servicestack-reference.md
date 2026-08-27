@@ -1,90 +1,319 @@
 ---
 slug: fsharp-add-servicestack-reference
-title: F# Add ServiceStack Reference
+title: F# ServiceStack Reference
 ---
 
-![F# Header](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/fsharp-header.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/fsharp-info.webp)
+:::
 
-ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simpler, cleaner and more versatile alternative to WCF's Add Service Reference feature that's built into VS.NET.
+Add ServiceStack Reference generates your API's F# DTOs from a running ServiceStack App. It gives F# clients an end-to-end typed API without sharing the server's ServiceModel assembly, so client and server projects can be versioned, deployed and updated independently.
 
-The article outlines ServiceStack's support generating F# DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now F# clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
+The generated source retains routes, HTTP verb markers, response types, validation metadata, inheritance, collections, enums and AutoQuery conventions. It can be used from compiled applications, `dotnet fsi` scripts and [Jupyter notebooks](/jupyter-notebooks-fsharp).
 
-### F# - Typed contracts for functional .NET
+## Productive typed APIs for F#
 
-F# gets the same first-class .NET clients, with DTOs generated into a single namespace that's immediately usable from projects, `dotnet fsi` scripts and [Jupyter notebooks](/jupyter-notebooks-fsharp):
-
-```fsharp
-let client = JsonApiClient(baseUrl)
-
-let response = client.Send(Hello(Name = "World"))
-printfn $"{response.Result}"
-```
-
-That combination suits the teams F# tends to live in - quantitative, data and integration work where a short script needs to call a production API with real types rather than parse JSON by hand. Typed AutoQuery, authentication, structured errors and file uploads all work exactly as they do in C#.
-
-## [Add ServiceStack Reference](/add-servicestack-reference)
-
-The easiest way to Add a ServiceStack reference to your project is to right-click on your project to bring up [ServiceStackVS's](/create-your-first-webservice) `Add ServiceStack Reference` context-menu item. This opens a dialog where you can add the url of the ServiceStack instance you want to typed DTO's for, as well as the name of the DTO source file that's added to your project.
-
-[![Add ServiceStack Reference](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)
-
-After clicking OK, the servers DTO's and [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) NuGet package are added to the project, providing an instant typed API:
-
-[![Calling ServiceStack Service with FSharp](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/fsharp-add-servicestack-reference.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/fsharp-add-servicestack-reference.png)
-
-### Update ServiceStack Reference
-
-Updating a ServiceStack reference works intuitively where you just have to click on the DTO's you want to update and click **Update ServiceStack Reference** on the context menu:
-
-[![Calling ServiceStack Service with FSharp](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/fsharp-update-servicestack-reference.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/fsharp-update-servicestack-reference.png)
-
-As there's no configuration stored about the ServiceStack Reference you might be wondering how this works? The **Update ServiceStack Reference** context menu only appears on F# source files ending with `.dto.fs` or `.dtos.fs`. It then uses the `BaseUrl` in the metadata comments for where to fetch and update to the latest F# server DTO's.
-
-### Console Demo
-![FSharp Console Demo](https://github.com/ServiceStack/Assets/raw/master/img/servicestackvs/servicestack%20reference/fsharp-demo.gif)
-
-### F# Client Example
-
-Just like with C#, F# Native Types can be used in ServiceStack's [Generic Service Clients](/csharp-client) providing and end-to-end Typed API whose PCL support also allows F# to be used in [mobile clients apps](https://github.com/ServiceStackApps/HelloMobile) without having to share compiled DTOs:
+F# uses the same current `JsonApiClient` and `ServiceStack.Client` package as C#. Generated classes use named property initialization and expose strongly typed responses:
 
 ```fsharp
-let client = new JsonApiClient("https://blazor-vue.web-templates.io")
-let response = client.Get(new SearchQuestions(
-    Tags = new List<string>([ "redis"; "ormlite" ])))        
+let client = JsonApiClient("https://api.example.com")
 
-Inspect.printDump(response)
+let response = client.Get(Hello(Name = "World"))
+printfn "%s" response.Result
 ```
 
-### Change Default Server Configuration
+This is particularly useful for data processing, automation and integration code where a concise F# workflow still needs production API contracts, structured errors and authentication rather than hand-written JSON handling.
 
-The above defaults are also overridable on the ServiceStack Server by modifying the default config on the `NativeTypesFeature` Plugin, e.g:
+## Add ServiceStack Reference
 
-```csharp
-var typesConfig = this.GetPlugin<NativeTypesFeature>().MetadataTypesConfig;
-typesConfig.AddDataContractAttributes = false;
-...
+Use the cross-platform [`x` tool](/dotnet-tool) from any IDE or build environment:
+
+```sh
+dotnet tool install --global x
+x fsharp https://api.example.com
+dotnet add package ServiceStack.Client
 ```
 
-## Constraints
+This saves the generated contract to `dtos.fs`. The `fs` alias provides a shorter command:
 
-As the ordering constraint in F# conflicted with the ordering of types by C# namespaces, the cleanest approach was to add all DTO's under a single namespace. By default the namespace used will be the base **ServiceModel** namespace which is overridable with the `GlobalNamespace` Config:
+```sh
+x fs https://api.example.com
+```
+
+F# compiles files in project order, so ensure `dtos.fs` appears before files which use its types:
+
+```xml
+<ItemGroup>
+  <Compile Include="dtos.fs" />
+  <Compile Include="Program.fs" />
+</ItemGroup>
+```
+
+Visual Studio users can alternatively use [ServiceStackVS's](/templates/install-servicestackvs) **Add ServiceStack Reference** project context menu.
+
+## Update ServiceStack Reference
+
+After the API contract changes, run this from the client solution:
+
+```sh
+x fsharp
+```
+
+The tool finds existing references from the `BaseUrl` in their generated headers and preserves uncommented customization options. You can also update one file directly with `x dtos.fs`. In Visual Studio, use **Update ServiceStack Reference** on files ending in `.dto.fs` or `.dtos.fs`.
+
+Generated files should be treated as replaceable source. Put client-only functions and extensions in separate source files.
+
+## What is generated
+
+A `Hello` API is emitted as an F# class with its routes, supported attributes and inferred response marker:
+
+```fsharp
+[<Route("/hello")>]
+[<Route("/hello/{Name}")>]
+[<AllowNullLiteral>]
+type Hello() =
+    interface IReturn<HelloResponse>
+
+    [<Required>]
+    member val Name:String = null with get,set
+
+    member val Title:String = null with get,set
+
+[<AllowNullLiteral>]
+type HelloResponse() =
+    member val Result:String = null with get,set
+```
+
+The generated contract provides:
+
+- `IReturn<HelloResponse>` for compile-time response inference.
+- `[<Route>]` metadata for custom route selection and path substitution.
+- `IGet`, `IPost`, `IPut`, `IPatch` and `IDelete` markers for `Send`/`SendAsync` HTTP method inference.
+- `IReturnVoid` for commands which intentionally return no response body.
+- Native F#/.NET representations for enums, arrays, `ResizeArray<_>`, dictionaries, inheritance and interfaces.
+- Supported descriptions and serialization attributes for IntelliSense and wire compatibility.
+
+| Generated contract | Typed F# result |
+| --- | --- |
+| `IReturn<String>` | String |
+| `IReturn<Item[]>` | Array |
+| `IReturn<ResizeArray<Item>>` | Mutable generic collection |
+| `IReturn<Dictionary<String,Item>>` | Typed dictionary |
+| `IReturn<QueryResponse<Item>>` | AutoQuery results, totals and metadata |
+| `IReturn<Byte[]>` | Raw binary response |
+| `IReturn<Stream>` | Response stream |
+| `IReturnVoid` | No response body |
+
+## Call generated APIs
+
+The client provides both synchronous and asynchronous typed methods. In asynchronous F# workflows, use a `task` expression:
+
+```fsharp
+let callHello cancellationToken = task {
+    let client = JsonApiClient("https://api.example.com")
+
+    let! response =
+        client.GetAsync(Hello(Name = "World"), cancellationToken)
+
+    printfn "%s" response.Result
+}
+```
+
+Use an explicit HTTP method when the caller should choose it:
+
+```fsharp
+let syncResponse = client.Post(Hello(Name = "World"))
+let! asyncResponse = client.PostAsync(Hello(Name = "World"))
+```
+
+When the generated request has a verb marker, `SendAsync` chooses it automatically:
+
+```fsharp
+[<AllowNullLiteral>]
+type HelloGet() =
+    interface IReturn<HelloVerbResponse>
+    interface IGet
+    member val Id:Int32 = 0 with get,set
+
+let! response = client.SendAsync(HelloGet(Id = 1), cancellationToken)
+```
+
+### Current `JsonApiClient` capabilities
+
+`JsonApiClient` is the current `HttpClient`-based implementation for .NET 6+. It uses `/api/` as the fallback route, prefers matching custom routes for explicit HTTP methods, and defaults unmarked `Send` requests to `POST`.
+
+It supports:
+
+- Per-call cancellation and .NET typed-client registration with `AddJsonApiClient`.
+- Cookie, Basic, Bearer Token and automatic Refresh Token authentication.
+- Request/response filters, custom headers, URL resolvers and request compression.
+- Direct `String`, `Byte[]` and `Stream` responses in addition to JSON DTOs.
+- Batching, one-way publishing, file uploads, multipart forms and custom HTTP methods.
+
+Register it with .NET's typed client factory from application startup:
+
+```fsharp
+services.AddJsonApiClient("https://api.example.com") |> ignore
+```
+
+Configure automatic token renewal when an authenticated API returns `401`:
+
+```fsharp
+let client = JsonApiClient("https://api.example.com")
+client.BearerToken <- auth.BearerToken
+client.RefreshToken <- auth.RefreshToken
+client.EnableAutoRefreshToken <- true
+```
+
+The client's `SessionId` and `Version` are also copied onto generated requests implementing `IHasSessionId` and `IHasVersion`.
+
+### Handle errors as values
+
+`ApiAsync` returns `ApiResult<'Response>` so validation and API failures can remain normal application values:
+
+```fsharp
+let! api = client.ApiAsync(Hello(Name = form.Name), cancellationToken)
+
+if api.Succeeded then
+    printfn "%s" api.Response.Result
+else
+    printfn "%s" api.ErrorMessage
+    printfn "%s" (api.FieldErrorMessage("Name"))
+```
+
+`ApiResult<_>` also exposes `Errors`, `ErrorSummary`, `FieldError()`, `FieldErrorMessage()` and `HasFieldError()` for form and validation workflows.
+
+The lower-level client APIs throw `WebServiceException` for failed responses:
+
+```fsharp
+try
+    let! response = client.PostAsync(Hello(Name = null), cancellationToken)
+    printfn "%s" response.Result
+with :? WebServiceException as ex ->
+    printfn "%i %s" ex.StatusCode ex.StatusDescription
+    printfn "%s: %s" ex.ResponseStatus.ErrorCode ex.ResponseStatus.Message
+```
+
+### Batch and one-way requests
+
+Send multiple requests of the same type in a single HTTP request:
+
+```fsharp
+let requests : IReturn<HelloResponse>[] =
+    [| Hello(Name = "A")
+       Hello(Name = "B")
+       Hello(Name = "C") |]
+
+let! responses = client.SendAllAsync(requests, cancellationToken)
+```
+
+Use `PublishAsync` or `PublishAllAsync` for one-way commands which do not need a response DTO:
+
+```fsharp
+do! client.PublishAsync(HelloReturnVoid(Id = 1), cancellationToken)
+```
+
+### Typed AutoQuery
+
+Generated AutoQuery requests retain their generic query contracts:
+
+```fsharp
+[<Route("/rockstars", "GET")>]
+[<AllowNullLiteral>]
+type QueryRockstars() =
+    inherit QueryDb<Rockstar>()
+    interface IReturn<QueryResponse<Rockstar>>
+```
+
+Use inherited paging, ordering, projection and metadata properties with typed results:
+
+```fsharp
+let request = QueryRockstars()
+request.Skip <- Nullable 0
+request.Take <- Nullable 25
+request.OrderBy <- "Age"
+
+let! query = client.GetAsync(request, cancellationToken)
+printfn "Showing %i of %i" query.Results.Count query.Total
+```
+
+`GetLazy()` also provides lazy synchronous enumeration across AutoQuery pages.
+
+### Rich .NET data contracts
+
+Generated DTOs preserve .NET primitives and compound types including `Nullable<_>`, `Decimal`, `Guid`, `DateTime`, `DateTimeOffset`, `TimeSpan`, byte arrays, F# arrays, `ResizeArray<_>` and nested dictionaries. The same serializer handles route, query-string and request-body values, avoiding transport-specific mapping code.
+
+### File uploads
+
+Combine a generated Request DTO with a file stream:
+
+```fsharp
+use audio = File.OpenRead("recording.wav")
+
+let request = SpeechToText(RefId = "task-42", Tag = "meeting")
+let file = UploadFile("recording.wav", audio, "Audio")
+let! response =
+    client.PostFileWithRequestAsync(request, file, cancellationToken)
+```
+
+Use `PostFilesWithRequestAsync` for multiple streams or `ApiFormAsync` when multipart form failures should be returned as `ApiResult<_>`.
+
+### Proxy and API gateway endpoints
+
+The Base URL can include a path prefix, allowing the same generated DTOs to call a downstream ServiceStack API through a proxy or gateway:
+
+```fsharp
+let client = JsonApiClient("https://gateway.example.com/techstacks")
+let! response =
+    client.GetAsync(GetTechnology(Slug = "ServiceStack"), cancellationToken)
+```
+
+Typed responses and structured `WebServiceException` errors continue to work through the proxy. This is useful for exposing multiple internal services behind one public host or applying tenant-specific routing.
+
+### Integration testing
+
+Generated contracts make black-box API tests concise and representative of production clients:
+
+```fsharp
+[<Test>]
+let ``echoes supported values`` () = task {
+    let client = JsonApiClient(TestConfig.BaseUrl)
+    let request = EchoTypes(Int = 3, Float = 1.1f, String = "value")
+
+    let! response = client.PostAsync(request)
+
+    Assert.That(response.Int, Is.EqualTo(request.Int))
+    Assert.That(response.Float, Is.EqualTo(request.Float))
+    Assert.That(response.String, Is.EqualTo(request.String))
+}
+```
+
+The same pattern covers authenticated APIs, validation failures, AutoQuery and APIs exposed behind proxy path prefixes.
+
+## Use in any .NET App
+
+Because a ServiceStack Reference is ordinary F# source and `ServiceStack.Client` supports current .NET targets, the same contract and client patterns can be shared across ASP.NET Core, Blazor, MAUI, desktop, console, worker, scripting and test projects.
+
+## F# generation constraints
+
+F# requires dependency-ordered type definitions. To avoid conflicts between dependency order and C# namespace order, the generator places all DTOs in a single namespace. By default it uses the base **ServiceModel** namespace, which can be changed with `GlobalNamespace`:
 
 ```csharp
 typesConfig.GlobalNamespace = "Client.Namespace";
 ```
 
-This does mean that each type name needs to be unique which is a best-practice that's now a requirement in order to make use of F# native types. Another semantic difference is that any C# nested classes become top-level classes when translated to F#.  
+Each generated type name must therefore be unique. C# nested classes are also emitted as top-level F# classes.
 
-### FSharp Configuration
+## DTO customization options
 
-The header comments in the generated DTO's allows for further customization of how they're generated where ServiceStackVS automatically watches for any file changes and updates the generated DTO's with any custom Options provided. Options that are preceded by a F# single line comment `//` are defaults from the server that can be overridden, e.g:
+The options in each generated file's header control how its F# DTOs are generated. Commented options are server defaults. To override one, remove its `//`, change the value, then run `x fsharp` or use Visual Studio's **Update ServiceStack Reference** action:
 
 ```fsharp
 (* Options:
-Date: 2025-06-04 09:53:35
-Version: 8.80
+Date: 2026-08-27 12:00:00
+Version: 10.1.5
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor-vue.web-templates.io
+BaseUrl: https://api.example.com
 
 //GlobalNamespace: 
 //MakeDataContractsExtensible: False
@@ -105,11 +334,20 @@ BaseUrl: https://blazor-vue.web-templates.io
 
 To override a value, remove the `//` and specify the value to the right of the `:`. Any value uncommented will be sent to the server to override any server defaults.
 
-We'll go through and cover each of the above options to see how they affect the generated DTO's:
+The following options control the generated source.
+
+### Change Default Server Configuration
+
+The defaults can also be overridden on the ServiceStack server by modifying the `NativeTypesFeature` configuration:
+
+```csharp
+var typesConfig = this.GetPlugin<NativeTypesFeature>().MetadataTypesConfig;
+typesConfig.AddDataContractAttributes = false;
+```
 
 ### MakeDataContractsExtensible
 
-Add .NET's DataContract's [ExtensionDataObject](http://msdn.microsoft.com/en-us/library/system.runtime.serialization.extensiondataobject(v=vs.110).aspx) to all DTO's:
+Add .NET's DataContract [ExtensionDataObject](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.serialization.extensiondataobject) to all DTOs:
 
 ```fsharp
 [<AllowNullLiteral>]
@@ -117,13 +355,13 @@ type GetAnswersResponse() =
     interface IExtensibleDataObject with
         member val ExtensionData:ExtensionDataObject = null with get, set
     end
-    member val Ansnwer:Answer = null with get,set
+    member val Answer:Answer = null with get,set
     member val ExtensionData:ExtensionDataObject = null with get,set
 ```
 
 ### AddReturnMarker
 
-AddReturnMarker annotates Request DTO's with an `IReturn<TResponse>` marker referencing the Response type ServiceStack infers your Service to return:
+`AddReturnMarker` annotates Request DTOs with an `IReturn<TResponse>` marker referencing the response type ServiceStack infers the Service returns:
 
 ```fsharp
 type GetAnswers() = 
@@ -131,13 +369,13 @@ type GetAnswers() =
     member val QuestionId:Int32 = new Int32() with get,set
 ``` 
 
-::: info 
-Original DTO doesn't require a return marker as response type can be inferred from Services return type or when using the `%Response` DTO Naming convention
+::: info
+The original DTO does not need a return marker. ServiceStack can infer its response from the Service return type or the `%Response` DTO naming convention.
 :::
 
 ### AddDescriptionAsComments
 
-Converts any textual Description in `[Description]` attributes as F# Doc comments which allows your API to add intellisense in client projects:
+Converts text from `[Description]` attributes into F# documentation comments, providing IntelliSense in client projects:
 
 ```fsharp
 ///<summary>
@@ -176,16 +414,16 @@ type GetAnswers() =
 
 ### AddGeneratedCodeAttributes
 
-Emit `[<GeneratedCode>]` attribute on all generated Types:
+Emits a `[<GeneratedCode>]` attribute on every generated type:
 
 ```fsharp
-[<GeneratedCode>]
+[<GeneratedCode("AddServiceStackReference", "10.1.5")>]
 type GetAnswers() = ...
 ```
 
 ### AddResponseStatus
 
-Automatically add a `ResponseStatus` property on all Response DTO's, regardless if it wasn't already defined:
+Automatically adds a `ResponseStatus` property to response DTOs which do not already define one:
 
 ```fsharp
 type GetAnswersResponse() = 
@@ -195,24 +433,28 @@ type GetAnswersResponse() =
 
 ### AddImplicitVersion
 
-Lets you specify the Version number to be automatically populated in all Request DTO's sent from the client: 
+Specifies the version number automatically populated in every Request DTO sent from the client:
 
-```csharp
+```fsharp
 type GetAnswers() = 
     interface IReturn<GetAnswersResponse>
     member val Version:int = 1 with get, set
     ...
 ```
 
-This lets you know what Version of the Service Contract that existing clients are using making it easy to implement ServiceStack's [recommended versioning strategy](http://stackoverflow.com/a/12413091/85785). 
+This identifies the service-contract version used by existing clients, making it easier to implement ServiceStack's [recommended versioning strategy](http://stackoverflow.com/a/12413091/85785).
 
 ### IncludeTypes
-Is used as a Whitelist that can be used to specify only the types you would like to have code-generated:
-```
-/* Options:
+
+Specifies only the types you want generated:
+
+```fsharp
+(* Options:
 IncludeTypes: GetTechnology,GetTechnologyResponse
+*)
 ```
-Will only generate `GetTechnology` and `GetTechnologyResponse` DTO's, e.g:
+
+Only generates the `GetTechnology` and `GetTechnologyResponse` DTOs:
 
 ```fsharp
 type GetTechnology() = ...
@@ -223,54 +465,71 @@ type GetTechnologyResponse() = ...
 
 You can include a Request DTO and all its dependent types with a `.*` suffix on the Request DTO, e.g:
 
-```
-/* Options:
+```fsharp
+(* Options:
 IncludeTypes: GetTechnology.*
+*)
 ```
 
-Which will include the `GetTechnology` Request DTO, the `GetTechnologyResponse` Response DTO and all Types that they both reference.
+This includes the `GetTechnology` Request DTO, its `GetTechnologyResponse` Response DTO and all types referenced by either DTO.
 
 #### Include All Types within a C# namespace
 
-If your DTOs are grouped into different namespaces they can be all included using the `/*` suffix, e.g:
+If your DTOs are grouped into different namespaces, include a complete C# namespace with the `/*` suffix:
 
-```
-/* Options:
+```fsharp
+(* Options:
 IncludeTypes: MyApp.ServiceModel.Admin/*
+*)
 ```
 
-This will include all DTOs within the `MyApp.ServiceModel.Admin` C# namespace. 
+This includes all DTOs within the `MyApp.ServiceModel.Admin` C# namespace.
 
 ### ExcludeTypes
-Is used as a Blacklist where you can specify which types you would like to exclude from being generated:
-```
-/* Options:
+
+Specifies types to exclude from generation:
+
+```fsharp
+(* Options:
 ExcludeTypes: GetTechnology,GetTechnologyResponse
+*)
 ```
-Will exclude `GetTechnology` and `GetTechnologyResponse` DTO's from being generated.
+
+Excludes the `GetTechnology` and `GetTechnologyResponse` DTOs from generation.
 
 ### InitializeCollections
 
-Lets you automatically initialize collections in Request DTO's:
+Automatically initializes collections in generated DTOs:
 
 ```fsharp
 type SearchQuestions() = 
     interface IReturn<SearchQuestionsResponse>
-    member val Tags:List<String> = new List<String>() with get,set
+    member val Tags:ResizeArray<String> = new ResizeArray<String>() with get,set
+```
+
+### ExportValueTypes
+
+By default custom value types are represented as strings unless they are enums. Enable `ExportValueTypes` to emit and reference their value type definitions instead:
+
+```fsharp
+(* Options:
+ExportValueTypes: True
+*)
 ```
 
 ### AddNamespaces
 
 Include additional F# namespaces, e.g:
 
-```
-/* Options:
+```fsharp
+(* Options:
 AddNamespaces: System.Drawing,MyApp
+*)
 ```
 
 Where it will generate the specified namespaces in the generated Types:
 
-```csharp
+```fsharp
 open System.Drawing
 open MyApp
 ```
