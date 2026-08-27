@@ -1,17 +1,19 @@
 ---
 slug: csharp-add-servicestack-reference
-title: C# Add ServiceStack Reference
+title: C# ServiceStack Reference
 ---
 
-[![](https://raw.githubusercontent.com/ServiceStackApps/HelloMobile/master/screenshots/splash-900.png)](https://github.com/ServiceStackApps/HelloMobile)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/csharp-info.webp)
+:::
 
-The primary and most popular [Add ServiceStack Reference](/add-servicestack-reference) language supported is C#, providing a flexible alternative than sharing your DTO assembly with clients, now clients can easily add a reference to a remote ServiceStack instance and update DTO's directly from within VS.NET. This also lays the groundwork and signals our approach on adding support for typed API's in other languages in future. Add a [feature request for your favorite language](https://servicestack.net/ideas) to prioritize support for it sooner!
+Add ServiceStack Reference generates your API's C# DTOs from a running ServiceStack App. It gives .NET clients an end-to-end typed API without sharing the server's ServiceModel assembly, so client and server projects can be versioned, deployed and updated independently.
 
-Our goal with Native Types is to provide an alternative for sharing DTO dlls, that can enable a better dev workflow for external clients who are now able to generate (and update) Typed APIs for your Services from a remote url - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
+The generated source retains the API contract needed by ServiceStack's generic .NET clients, including routes, HTTP verb markers, response types, validation metadata, nullability, inheritance, collections, enums and AutoQuery conventions.
 
-### C# - Productive End-to-end typed APIs for .NET
+## Productive end-to-end typed APIs for .NET
 
-The `JsonApiClient` in [ServiceStack.Client](https://nuget.org/packages/ServiceStack.Client) consumes the same DTOs your API is defined with - except consumers generate them from the **deployed API** instead of taking a binary dependency on it, so client and server teams can ship on their own release schedules:
+The recommended `JsonApiClient` in [ServiceStack.Client](https://nuget.org/packages/ServiceStack.Client) consumes the same DTO contract your API is defined with. Consumers generate it from the **deployed API** instead of taking a binary dependency on the server:
 
 ```csharp
 var api = await client.ApiAsync(new Hello { Name = "World" });
@@ -21,54 +23,327 @@ if (api.Succeeded)
 }
 ```
 
-`Api`/`ApiAsync` return an `ApiResult<T>` so success and structured validation errors are handled as values instead of exceptions - the pattern Blazor, MAUI, WPF, WinForms and console Apps use to bind server errors directly to their UI. Everything else in the .NET clients comes along too: authentication, typed AutoQuery, batched and one-way requests, file uploads and Service Gateway support.
-
-### C# Xamarin.Android Example in VS.NET
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="cbYuem1b2tg" style="background-image: url('https://img.youtube.com/vi/cbYuem1b2tg/maxresdefault.jpg')"></lite-youtube>
+`Api`/`ApiAsync` return an `ApiResult<T>` so success and structured validation errors can be handled as values instead of exceptions. This is ideal for Blazor, MAUI, desktop and console Apps, and the generated DTOs can also use the rest of the .NET client API including authentication, typed AutoQuery, batched and one-way requests, file uploads and Service Gateway support.
 
 ## Add ServiceStack Reference
 
-The easiest way to [Add a ServiceStack reference](/add-servicestack-reference) to your project is to right-click on your project to bring up [ServiceStackVS's](/templates/install-servicestackvs) `Add ServiceStack Reference` context-menu item. This opens a dialog where you can add the url of the ServiceStack instance you want to typed DTO's for, as well as the name of the DTO source file that's added to your project.
+The cross-platform [`x` tool](/dotnet-tool) is the simplest way to generate a C# reference from any IDE or build environment:
 
-[![Add ServiceStack Reference](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)
+```sh
+dotnet tool install --global x
+x csharp https://api.example.com
+dotnet add package ServiceStack.Client
+```
 
-After clicking OK, the servers DTOs and [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) NuGet package are added to the project, providing an instant typed API:
+This saves the generated contract to `dtos.cs`. The `cs` alias can be used for shorter commands:
 
-[![Calling ServiceStack Service](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/call-service.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/call-service.png)
+```sh
+x cs https://api.example.com
+```
 
-With the C# code generated on the Server, the role of [ServiceStackVS's](/create-your-first-webservice) **Add ServiceStack Reference** is then just to integrate the remote C# DTOs into the clients VS.NET project. This is just getting the generated DTOs from the server with default options set by the server and adding them locally to your project within Visual Studio.
+Visual Studio users can alternatively use [ServiceStackVS's](/templates/install-servicestackvs) **Add ServiceStack Reference** project context menu. Enter the Base URL and destination filename and it will add both the generated DTOs and the `ServiceStack.Client` NuGet package.
 
-![Add CSharp ServiceStack Reference Demo](https://github.com/ServiceStack/Assets/raw/master/img/servicestackvs/servicestack%20reference/addref-csharp.gif)
+The server remains the source of truth in either workflow. No server implementation, database model or binary dependency is copied into the client.
 
 ## Update ServiceStack Reference
-If your server has been updated and you want to update to client DTOs, simply right-click on the DTO file within VS.NET and select `Update ServiceStack Reference`. 
 
-![CSharp update demo](https://github.com/ServiceStack/Assets/raw/master/img/servicestackvs/servicestack%20reference/updateref-csharp.gif)
+After the API contract changes, run this from the client solution to refresh its C# references:
 
-## Consuming Services from Mobile Clients
+```sh
+x csharp
+```
 
-Thanks to [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) PCL Support, it can also be used from within supported client platforms. Here's a quick Android demo of adding a ServiceStack reference to [blazor-vue.web-templates.io](https://blazor-vue.web-templates.io) and consuming one of StackApi's Services:
+The tool finds existing references from the `BaseUrl` in each generated file's header and preserves any uncommented customization options. In Visual Studio, the equivalent action is **Update ServiceStack Reference** on the generated DTO file.
 
-[![Android Add ServiceStack Reference](https://raw.githubusercontent.com/ServiceStack/ServiceStackVS/master/Images/android-add-ref-demo.gif)](https://raw.githubusercontent.com/ServiceStack/ServiceStackVS/master/Images/android-add-ref-demo.gif)
+Generated files should be treated as replaceable source. Add client-only behavior in separate `partial` class files instead of editing generated type bodies.
 
-## DTO Customization Options 
+## What is generated
 
-The header comments in the generated DTOs allows for further customization of how they're generated where ServiceStackVS automatically watches for any file changes and updates the generated DTOs with any custom Options provided. Options that are preceded by a C# single line comment `//` are defaults from the server that can be overridden, e.g:
+A server request such as `Hello` is emitted with its public API metadata and inferred response type:
+
+```csharp
+[Route("/hello")]
+[Route("/hello/{Name}")]
+public partial class Hello : IReturn<HelloResponse>
+{
+    [Required]
+    public virtual string Name { get; set; }
+    public virtual string? Title { get; set; }
+}
+
+public partial class HelloResponse
+{
+    public virtual string? Result { get; set; }
+}
+```
+
+This generated metadata gives the client several useful capabilities:
+
+- `IReturn<HelloResponse>` lets client methods infer their return type at compile time.
+- `[Route]` lets the client select a matching custom route and substitute path properties such as `Name`.
+- `IGet`, `IPost`, `IPut`, `IPatch` and `IDelete` let `Send`/`SendAsync` infer the HTTP method.
+- `IReturnVoid` represents commands which intentionally return no response body.
+- Nullable annotations, `[Required]`, descriptions and supported serialization attributes preserve contract intent for IDEs and UI validation.
+- Generic types, inheritance, nested types, interfaces, enums, arrays, lists and dictionaries are generated as native C# types.
+
+The generated response marker works for more than response DTO classes:
+
+| Server contract | Typed C# result |
+| --- | --- |
+| `IReturn<string>` | Scalar value |
+| `IReturn<Item[]>` | Array |
+| `IReturn<List<Item>>` | Generic collection |
+| `IReturn<Dictionary<string,Item>>` | Typed map |
+| `IReturn<QueryResponse<Item>>` | AutoQuery results, totals and metadata |
+| `IReturn<byte[]>` | Raw binary response |
+| `IReturn<Stream>` | Response stream |
+| `IReturnVoid` | No response body |
+
+## Call generated APIs
+
+Create one client for the API's Base URL and pass generated Request DTOs to it:
+
+```csharp
+var client = new JsonApiClient("https://api.example.com");
+
+HelloResponse response = await client.GetAsync(new Hello {
+    Name = "World"
+});
+
+Console.WriteLine(response.Result);
+```
+
+Both synchronous and asynchronous typed APIs are available. Use an explicit verb when the caller should choose it:
+
+```csharp
+var syncResponse = client.Post(new Hello { Name = "World" });
+var asyncResponse = await client.PostAsync(new Hello { Name = "World" });
+```
+
+When the generated Request DTO has a verb marker, `SendAsync` chooses it automatically:
+
+```csharp
+public partial class HelloGet : IReturn<HelloVerbResponse>, IGet
+{
+    public int Id { get; set; }
+}
+
+HelloVerbResponse response = await client.SendAsync(new HelloGet { Id = 1 });
+```
+
+This is useful in application layers that queue, log, retry or dispatch request messages generically without coupling that code to URLs or HTTP verbs.
+
+### Current `JsonApiClient` behavior
+
+`JsonApiClient` is the current `HttpClient`-based implementation for .NET 6+. It uses `/api/` as the fallback route for Request DTOs without a matching custom route. Custom routes are preferred when using typed `Get`, `Post`, `Put`, `Patch` and `Delete` methods, whilst `Send`/`SendAsync` use the generated HTTP verb marker and default to `POST` when a Request DTO has none.
+
+It can create and reuse its own `HttpClient`, accept an existing `HttpClient`, or be registered with .NET's typed client factory:
+
+```csharp
+builder.Services.AddJsonApiClient("https://api.example.com");
+```
+
+All async request methods accept a `CancellationToken`:
+
+```csharp
+var response = await client.SendAsync(
+    new HelloGet { Id = 1 }, cancellationToken);
+```
+
+The client also provides:
+
+- Cookie, Basic, Bearer Token and automatic Refresh Token authentication.
+- Per-client and global request/response filters, custom headers and typed URL resolvers.
+- Optional request compression; its default handler automatically decompresses Brotli, GZip and Deflate responses.
+- Direct `string`, `byte[]` and `Stream` responses in addition to JSON DTOs.
+- Batched requests, one-way publishing, file uploads and multipart form APIs.
+- Both sync and async APIs, including custom HTTP methods and custom URLs.
+
+For token-authenticated APIs, the client can retry a `401` once after using its Refresh Token to obtain a new Bearer Token:
+
+```csharp
+var client = new JsonApiClient("https://api.example.com") {
+    BearerToken = auth.BearerToken,
+    RefreshToken = auth.RefreshToken,
+    EnableAutoRefreshToken = true,
+};
+```
+
+Its `SessionId` and `Version` settings are also copied onto generated requests which implement `IHasSessionId` and `IHasVersion`.
+
+### Handle errors as values
+
+Use `ApiAsync` when validation and API failures are expected application outcomes, such as submitting a form:
+
+```csharp
+var api = await client.ApiAsync(new Hello { Name = form.Name });
+
+if (api.Succeeded)
+{
+    Console.WriteLine(api.Response.Result);
+}
+else
+{
+    Console.WriteLine($"{api.Error?.ErrorCode}: {api.ErrorMessage}");
+    Console.WriteLine(api.FieldErrorMessage(nameof(form.Name)));
+    // api.Errors is always an array and contains any field validation errors
+}
+```
+
+`ApiResult<T>` contains either the typed `Response` or the API's structured `ResponseStatus` in `Error`. It also provides `Errors`, `ErrorSummary`, `FieldError()`, `FieldErrorMessage()` and `HasFieldError()` helpers, which makes it easy to bind field errors directly to Blazor or MAUI forms.
+
+The lower-level `Get`, `Post`, `Send` and async equivalents throw `WebServiceException` for failed responses:
+
+```csharp
+try
+{
+    var response = await client.SendAsync(new Authenticate {
+        provider = "credentials",
+        UserName = userName,
+        Password = password,
+    });
+}
+catch (WebServiceException ex)
+{
+    Console.WriteLine(ex.StatusCode);                    // e.g. 401
+    Console.WriteLine(ex.StatusDescription);             // Unauthorized
+    Console.WriteLine(ex.ResponseStatus.ErrorCode);      // Unauthorized
+    Console.WriteLine(ex.ResponseStatus.Message);        // server message
+}
+```
+
+This retains both HTTP-level details and ServiceStack's structured error response, including individual validation errors.
+
+### Batch and one-way requests
+
+Request DTOs of the same type can be sent in one HTTP request and returned in the same order:
+
+```csharp
+List<HelloResponse> responses = await client.SendAllAsync(new[] {
+    new Hello { Name = "A" },
+    new Hello { Name = "B" },
+    new Hello { Name = "C" },
+}, cancellationToken);
+```
+
+Use one-way publishing when the client does not need to wait for a response DTO:
+
+```csharp
+await client.PublishAsync(new HelloReturnVoid { Id = 1 }, cancellationToken);
+```
+
+`PublishAllAsync` provides the batched equivalent. These APIs are useful for commands, background work and high-throughput integrations.
+
+### Typed AutoQuery
+
+AutoQuery Request DTOs retain their generic query and response contracts:
+
+```csharp
+[Route("/rockstars", "GET")]
+public partial class QueryRockstars
+    : QueryDb<Rockstar>, IReturn<QueryResponse<Rockstar>>
+{
+}
+```
+
+They use the same client, with paging, ordering, field selection and typed results provided by `QueryDb<T>` and `QueryResponse<T>`:
+
+```csharp
+QueryResponse<Rockstar> query = await client.GetAsync(new QueryRockstars {
+    Skip = 0,
+    Take = 25,
+    OrderBy = "Age"
+});
+
+Console.WriteLine($"Showing {query.Results.Count} of {query.Total}");
+```
+
+For lazy synchronous enumeration over a large result set, `GetLazy()` follows AutoQuery pages and yields each row without callers managing `Skip` themselves.
+
+### Rich .NET data contracts
+
+Generated DTOs preserve .NET primitives and common compound types including nullable values, `decimal`, `Guid`, `DateTime`, `DateTimeOffset`, `TimeSpan`, `byte[]`, arrays, lists and nested dictionaries. ServiceStack's client serializer also uses the same rules for route, query-string and request-body serialization, so a DTO can move between those transports without hand-written mapping.
+
+For example, route values are substituted into the route and remaining values are encoded in the query string for GET requests. Default value types such as `false` and `0` are preserved when serialized in request bodies.
+
+### File uploads and multipart forms
+
+Upload APIs can combine generated Request DTO metadata with one or more file streams:
+
+```csharp
+await using var audio = File.OpenRead("recording.wav");
+
+TextGenerationResponse response = await client.PostFileWithRequestAsync(
+    new SpeechToText { RefId = "task-42", Tag = "meeting" },
+    new UploadFile("recording.wav", audio, nameof(SpeechToText.Audio)),
+    cancellationToken);
+```
+
+Use `PostFilesWithRequestAsync` for multiple files, `PostFileAsync` when no Request DTO is needed, or `ApiFormAsync` when multipart form errors should be returned in an `ApiResult<T>`.
+
+### Proxy and API gateway endpoints
+
+The Base URL can include a path prefix, which lets the same generated DTOs call a downstream ServiceStack API through a proxy or API gateway:
+
+```csharp
+var client = new JsonApiClient("https://gateway.example.com/techstacks");
+
+var response = await client.GetAsync(new GetTechnology {
+    Slug = "ServiceStack"
+});
+```
+
+Typed responses and structured `WebServiceException` errors continue to work through the proxy. This is useful for exposing multiple internal services behind one public host, tenant-specific routing or custom load balancing.
+
+### Integration testing
+
+Generated DTOs also make black-box integration tests concise: the test exercises the same route, serialization, response and error contract as production clients.
+
+```csharp
+[Test]
+public async Task Echoes_all_supported_values()
+{
+    var client = new JsonApiClient(TestConfig.BaseUrl);
+    var request = new EchoTypes {
+        Byte = 1,
+        Short = 2,
+        Int = 3,
+        Long = 4,
+        Float = 1.1f,
+        String = "value"
+    };
+
+    var response = await client.PostAsync(request);
+
+    Assert.That(response.Int, Is.EqualTo(request.Int));
+    Assert.That(response.Float, Is.EqualTo(request.Float));
+    Assert.That(response.String, Is.EqualTo(request.String));
+}
+```
+
+This pattern is equally useful for testing authenticated APIs, AutoQuery responses, validation failures and APIs exposed behind a proxy path.
+
+## Use in any .NET App
+
+Because a ServiceStack Reference is ordinary C# source and `ServiceStack.Client` supports current .NET targets, the same contract and client patterns can be shared across ASP.NET Core, Blazor, MAUI, desktop, console, worker and test projects.
+
+## DTO Customization Options
+
+The options in each generated file's header control how its C# DTOs are generated. Commented options are server defaults. To override one, remove its `//`, change the value, then run `x csharp` or use Visual Studio's **Update ServiceStack Reference** action:
 
 ```csharp
 /* Options:
-Date: 2025-06-04 09:45:54
-Version: 8.80
+Date: 2026-08-27 12:00:00
+Version: 10.1.5
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor-vue.web-templates.io
+BaseUrl: https://api.example.com
 
 //GlobalNamespace: 
 //MakePartial: True
 //MakeVirtual: True
 //MakeInternal: False
 //MakeDataContractsExtensible: False
-//AddNullableAnnotations: False
+//AddNullableAnnotations: True
 //AddReturnMarker: True
 //AddDescriptionAsComments: True
 //AddDataContractAttributes: False
@@ -89,17 +364,17 @@ To override these options on the client, the `//` has to be removed. For example
 
 ```csharp
 /* Options:
-Date: 2025-06-04 09:46:15
-Version: 8.80
+Date: 2026-08-27 12:00:00
+Version: 10.1.5
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: https://blazor-vue.web-templates.io
+BaseUrl: https://api.example.com
 
 //GlobalNamespace: 
 MakePartial: False
 //MakeVirtual: True
 //MakeInternal: False
 //MakeDataContractsExtensible: False
-//AddNullableAnnotations: False
+//AddNullableAnnotations: True
 //AddReturnMarker: True
 //AddDescriptionAsComments: True
 //AddDataContractAttributes: False
@@ -228,9 +503,17 @@ public partial class GetAnswers {
 }
 ```
 
+### MakeInternal
+
+Changes generated top-level types from `public` to `internal`, which is useful when the ServiceStack Reference should remain an implementation detail of the client assembly:
+
+```csharp
+internal partial class GetAnswers { ... }
+```
+
 ### MakeDataContractsExtensible
 
-Add .NET's DataContract's [ExtensionDataObject](http://msdn.microsoft.com/en-us/library/system.runtime.serialization.extensiondataobject(v=vs.110).aspx) to all DTO's:
+Add .NET's DataContract [ExtensionDataObject](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.serialization.extensiondataobject) to all DTOs:
 
 ```csharp
 public partial class GetAnswers
@@ -243,7 +526,7 @@ public partial class GetAnswers
 
 ### AddNullableAnnotations
 
-Generate DTOs with nullable reference types, e.g:
+Nullable reference annotations are enabled by default in the current C# generator. Required reference properties are emitted as non-nullable and optional properties are emitted with `?`, e.g:
 
 ```csharp
 public class Data
@@ -407,17 +690,12 @@ Usage:
 InitializeCollections: True
 ```
 
-Lets you automatically initialize collections in Request DTOs:
+Lets you automatically initialize collections in generated DTOs with current C# collection expressions:
 
 ```csharp
 public class SearchQuestions
 {
-    public SearchQuestions()
-    {
-        Tags = new List<string>{};
-    }
-
-    public List<string> Tags { get; set; }
+    public List<string> Tags { get; set; } = [];
     ...
 }
 ```
@@ -428,6 +706,15 @@ Initialized collections lets you take advantage of C#'s collection initializers 
 var response = client.Get(new SearchQuestions { 
     Tags = { "redis", "ormlite" }
 });
+```
+
+### ExportValueTypes
+
+By default custom value types are represented as strings unless they are enums. Enable `ExportValueTypes` to emit and reference their value type definitions instead:
+
+```
+/* Options:
+ExportValueTypes: True
 ```
 
 ### IncludeTypes
