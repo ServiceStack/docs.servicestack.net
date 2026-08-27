@@ -24,7 +24,7 @@ That makes it a natural fit for the parts of an organization that live outside t
 
 ### First class development experience
 
-[Python](https://python.org) is one of the worlds most popular programming languages thanks to its ease of use and comprehensive libraries which sees it excels in many industries from education where it's often the first language taught in school to data science, machine learning and AI where it's often the dominant language used. To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports Python as a 1st class Add ServiceStack Reference supported language which gives Python developers an end-to-end typed API for consuming ServiceStack APIs, complete with IDE integration in [PyCharm](https://www.jetbrains.com/pycharm/) as well as [built-in support in x dotnet tool](/dotnet-tool#addupdate-servicestack-references) to generate Python DTOs for a remote ServiceStack instance from a single command-line.
+[Python](https://python.org) is one of the worlds most popular programming languages thanks to its ease of use and comprehensive libraries which sees it excels in many industries from education where it's often the first language taught in school to data science, machine learning and AI where it's often the dominant language used. To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports Python as a 1st class Add ServiceStack Reference supported language which gives Python developers an end-to-end typed API for consuming ServiceStack APIs, complete with IDE integration in [PyCharm](https://www.jetbrains.com/pycharm/) as well as [built-in support in the get-dtos script](/npx-get-dtos) to generate Python DTOs for a remote ServiceStack instance from a single command-line.
 
 ### Ideal idiomatic Typed Message-based API
 
@@ -160,22 +160,20 @@ If any of the the remote APIs change their DTOs can be updated by right-clicking
 
 ### Simple command-line utility for Python
 
-Developers using other Python IDEs and Text Editors like VS Code can utilize the cross-platform [`x` command line utility](/dotnet-tool) for generating Python DTOs from the command-line.
-
-To install first install the [latest .NET SDK](https://dotnet.microsoft.com/download) for your OS then install the [`x` dotnet tool](/dotnet-tool) with:
+Developers using other Python IDEs and Text Editors like VS Code can generate Python DTOs from the command-line with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x 
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a Python ServiceStack Reference just call `x python` with the URL of a remote ServiceStack instance:
+To Add a Python ServiceStack Reference just call `npx get-dtos python` with the URL of a remote ServiceStack instance:
 
 :::sh
-x python https://techstacks.io
+npx get-dtos python https://techstacks.io
 :::
 
 Result:
@@ -184,10 +182,10 @@ Result:
 Saved to: dtos.py
 ```
 
-Calling `x python` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos python` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-x python https://techstacks.io Tech
+npx get-dtos python https://techstacks.io Tech
 :::
 
 Result:
@@ -198,10 +196,10 @@ Saved to: Tech.dtos.py
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x python` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos python` with the Filename:
 
 :::sh
-x python dtos.py
+npx get-dtos python dtos.py
 :::
 
 Result:
@@ -214,10 +212,10 @@ Which will update the File with the latest Python Server DTOs from [techstacks.i
 
 ### Updating all Python DTOs
 
-Calling `x python` without any arguments will update all Python DTOs in the current directory:
+Calling `npx get-dtos python` without any arguments will update all Python DTOs in the current directory:
 
 :::sh
-x python
+npx get-dtos python
 :::
 
 Result:
@@ -260,7 +258,10 @@ class JsonServiceClient:
 
     def __init__(self, base_url)
 
+    def set_base_path(self, base_path: str = '')
     def set_credentials(self, username, password)
+    def set_bearer_token(self, bearer_token: str)
+    def set_refresh_token(self, refresh_token: str)
     @property def token_cookie(self)
     @property def refresh_token_cookie(self)
 
@@ -282,6 +283,10 @@ class JsonServiceClient:
     def patch_url(self, path: str, body: Any = None, response_as: Type = None, args: Dict[str, Any] = None)
     def send_url(self, path: str, method: str = None, response_as: Type = None, body: Any = None,
                  args: Dict[str, Any] = None)
+
+    def post_file_with_request(self, request: IReturn[T], file: UploadFile) -> T
+    def post_files_with_request(self, request: IReturn[T], files: List[UploadFile]) -> T
+    def post_files_with_request_url(self, request_uri: str, request: Any, files: List[UploadFile]) -> T
 
     def send_all(self, request_dtos: List[IReturn[T]])  # Auto Batch Reply Requests
     def send_all_oneway(self, request_dtos: list)       # Auto Batch Oneway Requests
@@ -445,6 +450,48 @@ print(f"{tech.name} by {tech.vendor_name} ({tech.product_url})")
 print(f"`{tech.name} TechStacks: {r.technology_stacks}")
 ```
 
+### Resolving the HTTP Method
+
+`send` uses the HTTP Method its API is annotated with, which generated DTOs inherit from their `IGet`, `IPost`,
+`IPut`, `IPatch`, `IDelete` and `IOptions` interface markers:
+
+```python
+# @Route("/technology/{Slug}")
+class GetTechnology(IReturn[GetTechnologyResponse], IGet):
+    slug: Optional[str] = None
+
+# GET /api/GetTechnology?slug=ServiceStack
+r: GetTechnologyResponse = client.send(GetTechnology(slug="ServiceStack"))
+```
+
+Request DTOs that aren't annotated with a Verb default to `POST`, which can be overridden per Request by using the
+explicit `get`, `post`, `put`, `patch`, `delete`, `head` and `options` methods:
+
+```python
+client.get(SendReturnVoid(id=1))     # GET
+client.post(SendReturnVoid(id=2))    # POST
+client.put(SendReturnVoid(id=3))     # PUT
+client.delete(SendReturnVoid(id=4))  # DELETE
+```
+
+The HTTP Method also determines whether a Request DTO's populated properties are sent in the QueryString or the
+JSON Request Body, where only `GET`, `DELETE`, `HEAD` and `OPTIONS` Requests send their properties in the QueryString.
+
+APIs that don't return a Response Body implement `IReturnVoid` and can be sent with any of the client's methods:
+
+```python
+client.post(HelloReturnVoid(id=1))
+```
+
+Use `resolve_httpmethod` to resolve what HTTP Method a Request DTO will be sent with:
+
+```python
+from servicestack import resolve_httpmethod
+
+resolve_httpmethod(SendGet())   # GET
+resolve_httpmethod(SendPost())  # POST
+```
+
 ### Constructors Initializer
 
 All Python Reference dataclass DTOs also implements **__init__** making them much nicer to populate using a constructor expression with named params syntax we're used to in C#, so instead of:
@@ -466,6 +513,37 @@ response = client.post(Authenticate(
     user_name=user_name,
     password=password,
     remember_me=remember_me))
+```
+
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a typed `QueryResponse[T]` with the query params of their base types
+flattened into the Request DTO, so `skip`, `take`, `order_by`, `order_by_desc`, `include` and `fields` can be
+populated in the same constructor expression:
+
+```python
+from servicestack import JsonServiceClient, QueryResponse
+from .dtos import *
+
+client = JsonServiceClient("https://techstacks.io")
+
+response: QueryResponse[TechnologyView] = client.get(FindTechnologies(
+    ids=[1, 2, 3],
+    vendor_name="Google",
+    take=5,
+    order_by_desc="viewCount",
+    fields='id,name,vendorName,viewCount,favCount'))
+
+for tech in response.results:  # typed to TechnologyView
+    print(f"{tech.id} {tech.name} ({tech.view_count})")
+```
+
+Which can also be called with a custom URL by specifying the generic Response Type in `response_as`:
+
+```python
+args = {"Take": 3, "VendorName": "Amazon"}
+response = client.get_url("/technology/search", args=args,
+                          response_as=QueryResponse[TechnologyView])
 ```
 
 ### Sending additional arguments with Typed API Requests
@@ -515,6 +593,111 @@ Which can then be accessed as normal, with their Response typed to a JavaScript 
 str:str = client.get(ReturnString())
 
 data:bytes = client.get(ReturnBytes())
+```
+
+### Batched Requests
+
+Multiple Request DTOs of the same Type can be sent together in a single Request with `send_all` which returns
+all their Responses:
+
+```python
+requests = [Hello(name=name) for name in ["foo", "bar", "baz"]]
+
+responses = client.send_all(requests)  # POST /api/Hello[]
+
+print([r.result for r in responses])
+# ['Hello, foo!', 'Hello, bar!', 'Hello, baz!']
+```
+
+Or use `send_all_oneway` to send Requests you want to ignore the Responses of:
+
+```python
+client.send_all_oneway(requests)
+```
+
+::: info
+Auto Batched Requests use `list[T]` generics which requires **Python 3.9+**
+:::
+
+### Sending Raw Request Bodies
+
+APIs that accept a custom Request Body can be sent by populating the `body` param, where the Request DTO's
+properties are sent in the QueryString and the `body` is sent as the Request Body:
+
+```python
+from servicestack import to_json
+
+# POST /api/SendJson?id=1&name=name {"foo":"bar"}
+json_str = client.post(SendJson(id=1, name="name"), body=to_json({"foo": "bar"}))
+
+# POST /api/SendText?id=1&name=name foo
+text = client.post(SendText(id=1, name="name", content_type="text/plain"), body="foo")
+```
+
+A `str` body is sent as-is whilst any other value is serialized to JSON.
+
+### Error Handling
+
+Failed API Requests raise a `WebServiceException` containing the HTTP Status Code and the API's structured
+[ResponseStatus](/error-handling) error:
+
+```python
+from servicestack import WebServiceException
+
+try:
+    client.put(ThrowType(type="NotFound", message="not here"))
+except WebServiceException as e:
+    print(e.status_code)                  # 404
+    print(e.response_status.error_code)   # NotFound
+    print(e.response_status.message)      # not here
+```
+
+| Property             | Description                                                                                     |
+|----------------------|-------------------------------------------------------------------------------------------------|
+| `status_code`        | HTTP Status Code of the error Response, e.g. `400`                                               |
+| `status_description` | HTTP Status Description, e.g. `"Bad Request"`                                                    |
+| `response_status`    | The API's structured `ResponseStatus` with its `error_code`, `message` and field `errors`        |
+| `inner_exception`    | The underlying Exception the error was created from                                              |
+| `type`               | `WebServiceExceptionType.REFRESH_TOKEN_EXCEPTION` for Refresh Token errors, otherwise `DEFAULT`  |
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field
+validation error in `errors`, with the first error also captured in the summary `error_code` and `message`:
+
+```python
+try:
+    client.post(ThrowValidation(email="invalidemail"))
+except WebServiceException as e:
+    status = e.response_status
+
+    print(status.error_code)  # InclusiveBetween
+    print(status.message)     # 'Age' must be between 1 and 120. You entered 0.
+
+    for error in status.errors:
+        print(f"{error.field_name}: {error.error_code} {error.message}")
+    # Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+    # Required: NotEmpty 'Required' must not be empty.
+    # Email: Email 'Email' is not a valid email address.
+```
+
+Requests failing before reaching the Server, e.g. connection errors, are also raised as a `WebServiceException`
+with a `500` Status Code and the underlying error in `status_description`:
+
+```python
+client = JsonServiceClient("http://unknown-zzz.net")
+try:
+    client.get(Hello(name="World"))
+except WebServiceException as e:
+    print(e.status_code)         # 500
+    print(e.status_description)  # Max retries exceeded with url...
+```
+
+Whilst Requests to APIs requiring Authentication that the client wasn't able to authenticate with raise a `401`:
+
+```python
+try:
+    client.post(RequiresAdmin())
+except WebServiceException as e:
+    print(e.status_code)  # 401
 ```
 
 ### Authenticating using Basic Auth
@@ -618,21 +801,370 @@ client.refresh_token = refresh_token
 client.refresh_token_uri = AUTH_URL + "/access-token"
 ```
 
+### Built-in ServiceStack DTOs
+
+The `servicestack` package includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them
+without needing to generate them:
+
+```python
+from servicestack import Authenticate, AuthenticateResponse, AssignRoles, UnAssignRoles, \
+    ConvertSessionToToken, ConvertSessionToTokenResponse, GetAccessToken, GetAccessTokenResponse
+
+# Authentication
+auth: AuthenticateResponse = client.post(Authenticate(
+    provider="credentials", user_name="test", password="test", remember_me=True))
+
+# JWT
+token: ConvertSessionToTokenResponse = client.post(ConvertSessionToToken())  # Session -> JWT
+access: GetAccessTokenResponse = client.post(GetAccessToken(refresh_token=refresh_token))
+
+# Roles and Permissions
+client.post(AssignRoles(user_name="user", roles=["Employee"]))
+client.post(UnAssignRoles(user_name="user", roles=["Employee"]))
+```
+
+Together with the built-in Response Types, interface markers and base types that generated DTOs reference:
+
+| Type                                                             | Description                                                       |
+|------------------------------------------------------------------|-------------------------------------------------------------------|
+| `ResponseStatus`                                                 | ServiceStack's structured error response                           |
+| `ResponseError`                                                  | An individual field validation error                               |
+| `EmptyResponse`                                                  | Response of APIs that don't return a Response Body                 |
+| `IdResponse`                                                     | Response returning the Id of the created or updated entity         |
+| `StringResponse` / `StringsResponse`                             | Response returning a single `result` string or list of `results`   |
+| `QueryResponse[T]`                                               | Typed Response of [AutoQuery](/autoquery/) Requests                |
+| `QueryDb[T]`, `QueryDb2[From,Into]`, `QueryData[T]`              | Base types of generated AutoQuery Request DTOs                     |
+| `IGet` `IPost` `IPut` `IPatch` `IDelete` `IOptions`              | Interface markers resolving a Request DTO's HTTP Method            |
+| `IReturn[T]` / `IReturnVoid`                                     | Interface markers resolving a Request DTO's Response Type          |
+| `ICreateDb[T]` `IUpdateDb[T]` `IPatchDb[T]` `IDeleteDb[T]`       | Interface markers of [AutoQuery CRUD](/autoquery/crud) APIs        |
+| `IHasSessionId` / `IHasBearerToken` / `IHasVersion`              | Interface markers for Requests carrying auth and versioning info   |
+| `AuditBase`                                                      | Base type of Tables with [Audit](/autoquery/audit-log) fields      |
+| `KeyValuePair[K,V]`                                              | .NET's `KeyValuePair<K,V>`                                         |
+| `UploadFile`                                                     | A file uploaded in a `multipart/form-data` Request                 |
+| `WebServiceException`                                            | Structured error details of a failed Request                       |
+
+As well as the DTOs for querying and managing [Background Jobs](/background-jobs), e.g. `BackgroundJob`,
+`JobSummary`, `BackgroundJobOptions`, `ScheduledTask`, `CompletedJob`, `FailedJob`, `BackgroundJobState`,
+`JobStatSummary`, `HourSummary` and `WorkerStats`.
+
 ### Uploading Files
 
-The `post_file_with_request` method can be used to upload a file with an API Request.
+Use `post_file_with_request` to upload a file with an API Request, where the Request DTO's populated properties
+are sent as form fields alongside the file in a `multipart/form-data` Request:
+
+```python
+from servicestack import UploadFile
+
+with open("files/test_image.png", "rb") as image:
+    response = client.post_file_with_request(
+        request=TestUploadWithDto(int_=1, string="string", poco_list=[Poco(name="poco")]),
+        file=UploadFile(
+            field_name="image",
+            file_name="test_image.png",
+            content_type="image/png",
+            stream=image))
+```
+
+Complex Request DTO properties like Lists, Dictionaries and nested POCOs are serialized using the
+[JSV Format](/jsv-format) so they can be sent as form fields in the same Request.
+
+`content_type` is optional where it's otherwise inferred from the file name, defaulting to
+`application/octet-stream`:
+
+```python
+UploadFile(field_name="image", file_name="test_image.png", stream=image)
+```
+
+Use `post_files_with_request` to upload multiple files:
+
+```python
+with open("a.png", "rb") as a, open("b.png", "rb") as b:
+    response = client.post_files_with_request(UploadPhotos(album="Holiday"), [
+        UploadFile(field_name="file1", file_name="a.png", stream=a),
+        UploadFile(field_name="file2", file_name="b.png", stream=b),
+    ])
+```
+
+Or `post_files_with_request_url` to upload files to a custom relative or absolute URL:
+
+```python
+response = client.post_files_with_request_url("/api/UploadPhotos", UploadPhotos(album="Holiday"), files)
+```
+
+::: info
+All file streams are closed after the Request is sent
+:::
 
 ### Python Speech to Text
 
 Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
 
 ```python
+client = JsonServiceClient(AI_SERVER_URL)
+client.set_bearer_token(AI_SERVER_API_KEY)
+
 with open("files/audio.wav", "rb") as audio:
-  response = client.post_file_with_request(SpeechToText(), 
-    UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+    response: GenerationResponse = client.post_file_with_request(SpeechToText(),
+        UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+
+print(response.text_outputs[0].text)
 ```
 
-To upload multiple files use `post_files_with_request`.
+Which can be used to call any of [AI Server's](/ai-server/) APIs that accept file uploads, e.g:
+
+```python
+request = ImageToImage(model="sdxl-lightning",
+                       positive_prompt="A beautiful landscape painting",
+                       negative_prompt="A pixelated image")
+
+with open("files/test_image.png", "rb") as image:
+    response: GenerationResponse = client.post_file_with_request(request,
+        UploadFile(field_name="image", file_name="test_image.png",
+                   content_type="image/png", stream=image))
+
+print(response.outputs[0].url)
+```
+
+### Client Configuration
+
+`JsonServiceClient` sends Requests to ServiceStack's pre-defined `/api` route, use `set_base_path` to change
+the base path Requests are sent to, e.g. for older ServiceStack instances that only have the pre-defined
+`/json/reply` routes enabled:
+
+```python
+client.set_base_path("")          # /json/reply/{Request} and /json/oneway/{Request}
+client.set_base_path("api")       # /api/{Request} (default)
+```
+
+Custom headers can be added to all Requests by populating `headers`, whilst `set_credentials`,
+`set_bearer_token` and `set_refresh_token` are chainable to allow configuring a client in a single expression:
+
+```python
+client = JsonServiceClient(BASE_URL)
+client.headers["X-Custom"] = "Value"
+client.set_bearer_token(api_key)
+```
+
+As the client maintains its Cookies in a `requests.Session`, use a separate client instance where you need to
+maintain different Authenticated Sessions.
+
+### Request, Response and Exception Filters
+
+Clients can be decorated with generic functionality using instance and static Request, Response and Exception
+filters, useful for logging, adding headers or inspecting Responses:
+
+```python
+# Instance filters only apply to this client
+client.request_filter = lambda info: print(f"{info.method} {info.url}")
+client.response_filter = lambda res: print(f"{res.status_code} {res.headers}")
+client.exception_filter = lambda res, e: print(f"ERROR: {e}")
+
+# Static filters apply to all clients
+JsonServiceClient.global_request_filter = lambda info: log_request(info)
+JsonServiceClient.global_response_filter = lambda res: log_response(res)
+JsonServiceClient.global_exception_filter = lambda res, e: log_error(res, e)
+```
+
+Instance filters are invoked before global filters, where the `SendContext` passed to Request filters lets you
+inspect and modify the Request before it's sent:
+
+| Property      | Description                                                            |
+|---------------|------------------------------------------------------------------------|
+| `method`      | HTTP Method the Request is sent with                                    |
+| `url`         | Absolute URL the Request is sent to, including its QueryString          |
+| `headers`     | The Request Headers, a copy of the client's `headers`                   |
+| `request`     | The Request DTO being sent                                              |
+| `body`        | Custom Request Body, when sent                                          |
+| `args`        | Additional untyped arguments sent with the Request                      |
+| `response_as` | The Type the Response will be deserialized into                          |
+
+Whilst Response filters are passed the `requests.Response` the API returned, e.g. to inspect its Headers:
+
+```python
+client.response_filter = lambda res: print(res.headers["X-AutoBatch-Completed"])
+```
+
+### Complex Type Support
+
+Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists,
+Arrays, Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent
+Python types:
+
+```python
+request = AllCollectionTypes(
+    int_array=[1, 2, 3],
+    int_list=[1, 2, 3],
+    string_array=["A", "B", "C"],
+    string_list=["D", "E", "F"],
+    byte_array=b"ABC",  # sent as base64
+    poco_array=[Poco(name="poco")],
+    poco_lookup={"A": [Poco(name="B"), Poco(name="C")]},
+    poco_lookup_map={"A": [{"B": Poco(name="C"), "D": Poco(name="E")}]})
+```
+
+.NET's built-in Types are mapped to their closest Python equivalent, where their different serialization
+formats are transparently converted to and from native Python types:
+
+| .NET Type                            | Python Type                    | Serialized as                    |
+|--------------------------------------|--------------------------------|----------------------------------|
+| `string`                             | `str`                          | `"string"`                       |
+| `bool`                               | `bool`                         | `true`                           |
+| `int` `long` `short` `byte` `uint`   | `int`                          | `1`                              |
+| `float` `double`                     | `float`                        | `1.1`                            |
+| `decimal`                            | `decimal.Decimal`              | `3.0`                            |
+| `DateTime` / `DateTimeOffset`        | `datetime.datetime`            | `"/Date(978307200000)/"`         |
+| `TimeSpan`                           | `datetime.timedelta`           | `"PT1H"`                         |
+| `Guid`                               | `str`                          | `"ea762009b66c410b9bf5ce21ad519249"` |
+| `byte[]` / `Stream`                  | `bytes`                        | base64 encoded `str`             |
+| `List<T>` / `T[]`                    | `List[T]`                      | `[1,2,3]`                        |
+| `Dictionary<K,V>`                    | `Dict[K,V]`                    | `{"A":"B"}`                      |
+
+Properties that clash with a Python keyword or built-in are generated with a `_` suffix which are mapped back
+to their original name on the wire, e.g. `int_` is sent as `int`:
+
+```python
+response: EchoTypes = client.post(EchoTypes(int_=1, string="foo"))
+```
+
+### Enum Support
+
+C# `enum` Types are generated as Python `str, Enum` types whose values are sent as strings, using their
+`[EnumMember]` value where they have one, whilst `[Flags]` enums and enums annotated with `[EnumAsInt]` are
+generated as an `IntEnum` which are sent as their integer values:
+
+```python
+class TechnologyTier(str, Enum):
+    PROGRAMMING_LANGUAGE = 'ProgrammingLanguage'
+    CLIENT = 'Client'
+
+# @Flags()
+class EnumFlags(IntEnum):
+    VALUE1 = 1
+    VALUE2 = 2
+    VALUE3 = 4
+```
+
+Which can be populated in Request DTOs as well as in Lists and Dictionaries of enums, where they're serialized
+in the format the Server expects:
+
+```python
+client.get(HelloWithEnum(
+    enum_prop=EnumType.VALUE2,          # ?enumProp=Value2
+    enum_flags=EnumFlags.VALUE1,        # &enumFlags=1
+    enum_style=EnumStyle.UPPER))        # &enumStyle=UPPER
+
+client.get(HelloWithEnumList(
+    enum_flags=[EnumFlags.VALUE1, EnumFlags.VALUE2],  # ?enumFlags=[1,2]
+    enum_style=[EnumStyle.LOWER, EnumStyle.UPPER]))   # &enumStyle=[lower,UPPER]
+```
+
+### QueryString Serialization
+
+Request DTO properties sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex
+types, which `qsvalue` can be used to inspect:
+
+```python
+from servicestack import qsvalue
+
+qsvalue("A")                # "A"
+qsvalue(1)                  # "1"
+qsvalue(True)               # "true"
+qsvalue(b"Python")          # "UHl0aG9u"  (base64)
+qsvalue([1, 2, 3])          # "[1,2,3]"
+qsvalue(EnumStyle.UPPER)    # "UPPER"
+```
+
+Names and values are URL encoded whilst `None` properties are omitted from the QueryString so the Server can
+apply its own defaults, `False` and `0` are sent as-is:
+
+```python
+# /api/HelloTypes?bool=false&int=0
+client.get(HelloTypes(bool_=False, int_=0))
+```
+
+### Serialization Utils
+
+The same utils the client uses to serialize DTOs are also exported for use in your own integrations:
+
+```python
+from servicestack import to_json, from_json, convert, to_dict, to_jsv_data
+
+to_json(Hello(name="A"))                   # '{"name": "A"}'
+to_json([Hello(name="A"), Hello(name="B")])
+to_json({'a': Hello(name="A")})
+
+from_json(HelloResponse, '{"result":"Hello, World!"}')  # HelloResponse DTO
+convert(HelloResponse, {"result": "Hello, World!"})     # from a JSON object
+
+to_dict(Hello(name="A"))                   # {'name': 'A'}
+to_jsv_data(Hello(name="A"))               # JSV encoded form fields
+```
+
+`to_dict` accepts a `key_case` to convert property names into a different naming convention, e.g. to display
+API Responses with .NET's PascalCase property names:
+
+```python
+from servicestack import to_dict, titlecase, camelcase, pascalcase, snakecase
+
+to_dict(response.results, key_case=titlecase)
+```
+
+### JWT Utils
+
+Use `inspect_jwt` to decode a JWT's header, payload and expiry date, useful for inspecting the JWT Tokens and
+Session Cookies used to authenticate Requests:
+
+```python
+from servicestack import inspect_jwt
+
+head, body, expiry = inspect_jwt(client.token_cookie)
+print(body['sub'], expiry)
+```
+
+### String Utils
+
+The client's string utils for converting between different naming conventions and parsing strings are also
+exported for reuse:
+
+```python
+from servicestack import snakecase, camelcase, pascalcase, titlecase, \
+    left_part, right_part, last_left_part, last_right_part, split_on_first, split_on_last
+
+snakecase("vendorName")     # vendor_name
+camelcase("vendor_name")    # vendorName
+pascalcase("vendor_name")   # VendorName
+titlecase("vendor_name")    # Vendor Name
+
+left_part("user@email.com", "@")   # user
+right_part("user@email.com", "@")  # email.com
+```
+
+### Testing
+
+As `JsonServiceClient` accepts any Base URL, APIs can be tested against a local instance of your App or a
+remote ServiceStack instance without needing to mock the client itself, which is how the client's own
+[test suite](https://github.com/ServiceStack/servicestack-python/tree/main/tests) verifies its Requests
+against the live [test.servicestack.net](https://test.servicestack.net) Services:
+
+```python
+import unittest
+from servicestack import JsonServiceClient
+from .dtos import *
+
+client = JsonServiceClient("https://test.servicestack.net")
+
+class TestApi(unittest.TestCase):
+
+    def test_can_get_hello(self):
+        response: HelloResponse = client.get(Hello(name="World"))
+        self.assertEqual(response.result, "Hello, World!")
+```
+
+Which can be run with [pytest](https://docs.pytest.org):
+
+:::sh
+python -m pytest
+:::
 
 ## DTO Customization Options 
 
@@ -873,6 +1405,20 @@ TypeConverters.serializers[bytes] = to_bytearray
 TypeConverters.deserializers[bytes] = from_bytearray
 ```
 
+Which can also be registered together with `TypeConverters.register()`:
+
+```python
+from servicestack import TypeConverters
+from servicestack.utils import to_bytearray, from_bytearray
+
+TypeConverters.register(bytes, serializer=to_bytearray, deserializer=from_bytearray)
+```
+
+::: info
+`bytes`, `bytearray`, `datetime` and `timedelta` conversions are registered by default, so `byte[]`, `Stream`,
+`DateTime`, `DateTimeOffset` and `TimeSpan` properties can be populated with their native Python types
+:::
+
 ## Inspect Utils
 
 To help clients with inspecting API Responses the `servicestack` library also includes a number of helpful utils to quickly visualizing API outputs.
@@ -960,6 +1506,25 @@ Top 10 python Repos:
 | planet       | Python    |        100 |     145 |
 | psf-salt     | SaltStack |         87 |      50 |
 +--------------+-----------+------------+---------+
+```
+
+Both `printdump` and `printtable` accept the same data structures, so they can be used to inspect any API
+Response, its `results` collection or a `to_dict()` view of it in a different naming convention:
+
+```python
+response = client.send(FindTechnologies(ids=[1, 2, 3], vendor_name="Google", take=5))
+
+printdump(response)
+printtable(response.results)
+printtable(response.results, headers=['id', 'name', 'vendor_name', 'view_count'])
+printtable(to_dict(response.results, key_case=titlecase))
+```
+
+Whilst `inspect_vars` captures a JSON snapshot of any variables to the path in the `INSPECT_VARS` Environment
+Variable, letting you inspect the state of an App's variables from outside the process:
+
+```python
+inspect_vars({"response": response})
 ```
 
 Alternatively you can use `htmldump` to generate API responses in a HTML UI which is especially useful in [Python Jupyter Notebooks](/jupyter-notebooks-python) to easily visualize API responses, e.g:
