@@ -1,9 +1,11 @@
 ---
 slug: dart-add-servicestack-reference
-title: Dart Add ServiceStack Reference
+title: Dart ServiceStack Reference
 ---
 
-![Dart Banner](/img/pages/dart/dart.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![Dart Banner](/img/pages/dart/dart.webp)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [npx get-dtos command-line script](/npx-get-dtos) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -18,7 +20,7 @@ var response = await client.get(Hello(name: 'World'));
 print(response.result);
 ```
 
-That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with `dart:io` and `dart:html` implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with native `dart:io` and Browser implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ## Dart Android Example using Android Studio
 
@@ -27,10 +29,10 @@ That's the real leverage for a team that chose Flutter to build one App for seve
 
 ### Dart ServiceStack Reference
 
-Dart ServiceStack Reference supports **all Dart 2.0 platforms**, including Flutter and AngularDart or Dart Web Apps - in the same optimal development workflow pioneered in [Add ServiceStack Reference](/add-servicestack-reference) where it doesn't requiring any additional tooling, transformers or build steps. 
+Dart ServiceStack Reference supports **all Dart 3 platforms**, including Flutter and AngularDart or Dart Web Apps - in the same optimal development workflow pioneered in [Add ServiceStack Reference](/add-servicestack-reference) where it doesn't requiring any additional tooling, transformers or build steps. 
 
-Due to the lack of reflection and Mirror support, consuming JSON APIs can be quite [cumbersome in Flutter](https://flutter.io/cookbook/networking/fetch-data/). But we've been able to achieve the same productive development experience available in [all supported languages](/add-servicestack-reference) where you can use the generated Dart DTOs from any remote v5.1+ ServiceStack endpoint with ServiceStack's Smart generic
-[JsonServiceClient](https://pub.dartlang.org/documentation/servicestack/0.0.7/client/JsonServiceClient-class.html) available in the [servicestack Dart package](https://pub.dartlang.org/packages/servicestack#-installing-tab-), to enable an end-to-end Typed API for calling Services by [sending and receiving native DTOs](/architecture-overview#client-architecture).
+Due to the lack of reflection and Mirror support, consuming JSON APIs can be quite [cumbersome in Flutter](https://docs.flutter.dev/cookbook/networking/fetch-data). But we've been able to achieve the same productive development experience available in [all supported languages](/add-servicestack-reference) where you can use the generated Dart DTOs from any remote v5.1+ ServiceStack endpoint with ServiceStack's Smart generic
+[JsonServiceClient](https://pub.dev/documentation/servicestack/latest/client/JsonServiceClient-class.html) available in the [servicestack Dart package](https://pub.dev/packages/servicestack), to enable an end-to-end Typed API for calling Services by [sending and receiving native DTOs](/architecture-overview#client-architecture).
 
 ### Install
 
@@ -60,11 +62,11 @@ Saved to: dtos.dart
 If no name is specified in the 2nd argument, it uses `dtos` if it doesn't exist, otherwise falls back to infer it from the URL
 :::
 
-To make API calls we need to use the `JsonServiceClient`, installed by adding the [servicestack](https://pub.dartlang.org/packages/servicestack#-installing-tab-) package to our Dart projects `pubspec.yaml`:
+To make API calls we need to use the `JsonServiceClient`, installed by adding the [servicestack](https://pub.dev/packages/servicestack) package to our Dart projects `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  servicestack: ^2.0.1
+  servicestack: ^3.0.3
 ```
 
 Saving `pubspec.yaml` in VS Code with the [Dart Code Extension](https://dartcode.org) automatically calls `pub get` or `flutter packages get` (in Flutter projects) to add any new dependencies to your project.
@@ -88,7 +90,7 @@ Like C#, Dart has Generics and Type Inference so the `response` returned is the 
 
 ### Platform neutral usage
 
-Both **dart:io** `JsonServiceClient` and **dart:html** `JsonWebClient` implement the same shared `IServiceClient` interface which support a platform-neutral source-compatible API using the
+Both **dart:io** `JsonServiceClient` and Browser `JsonWebClient` implement the same shared `IServiceClient` interface which support a platform-neutral source-compatible API using the
 `ClientFactory` APIs, e.g: 
 
 ```dart
@@ -192,12 +194,38 @@ fetchTechnologies(IServiceClient client) async {
 
 ### Rich Generated Models
 
-Thanks to the direct C# to Dart model code generation we're able to create the ideal idiomatic message-based APIs utilizing rich typed models with broad support for many of the C#/.NET features used when defining DTOs inc. Generics, Inheritance, multiple Interfaces, Enums (inc. int and Flag Enums), Tuples, metadata Attributes emitted in comments (emitting additional documentation in the generated models) whilst also taking care of mapping built-in C# Types like `DateTime`, `TimeSpan`, `byte[]` and `Stream` into their equivalent native Dart [DateTime](https://api.dartlang.org/stable/1.24.3/dart-core/DateTime-class.html), [Duration](https://api.dartlang.org/stable/1.24.3/dart-core/Duration-class.html) and [Uint8List](https://api.dartlang.org/stable/1.24.3/dart-typed_data/Uint8List-class.html) types, C# generic collections are also converted into their equivalent Dart generic collection Type.
+Thanks to the direct C# to Dart model code generation we're able to create the ideal idiomatic message-based APIs utilizing rich typed models with broad support for many of the C#/.NET features used when defining DTOs inc. Generics, Inheritance, multiple Interfaces, Enums (inc. int and Flag Enums), Tuples, metadata Attributes emitted in comments (emitting additional documentation in the generated models) whilst also taking care of mapping built-in C# Types like `DateTime`, `TimeSpan`, `byte[]` and `Stream` into their equivalent native Dart [DateTime](https://api.dart.dev/dart-core/DateTime-class.html), [Duration](https://api.dart.dev/dart-core/Duration-class.html) and [Uint8List](https://api.dart.dev/dart-typed_data/Uint8List-class.html) types, C# generic collections are also converted into their equivalent Dart generic collection Type.
+
+#### Dart Type Mappings
+
+C# DTOs are mapped to their closest equivalent Dart Type:
+
+| C# Type                       | Dart Type                     |
+|-------------------------------|-------------------------------|
+| `string`                      | `String`                      |
+| `bool`                        | `bool`                        |
+| `char`                        | `String`                      |
+| `byte` `short` `int` `long`   | `int`                         |
+| `ushort` `uint` `ulong`       | `int`                         |
+| `float` `double` `decimal`    | `double`                      |
+| `Guid`                        | `String`                      |
+| `DateTime` `DateTimeOffset`   | `DateTime`                    |
+| `TimeSpan`                    | `Duration`                    |
+| `byte[]` `Stream`             | `Uint8List`                   |
+| `T[]` `List<T>`               | `List<T>`                     |
+| `Dictionary<K,V>`             | `Map<K,V>`                    |
+| `KeyValuePair<K,V>`           | `KeyValuePair<K,V>`           |
+| `Tuple<T1,T2>`                | `Tuple2<T1,T2>`               |
+| `enum`                        | `enum`                        |
+| `[Flags] enum`                | `class` with `int` values     |
+| `Nullable<T>`                 | `T?`                          |
+
+Where all C# `enum` types are supported, including `[Flags]` enums (generated as classes of `int` constants), enums with explicit values and enums using custom [Enum Styles](/system-text-json#custom-enum-serialization), which are all serializable in Enum properties, `List<Enum>` and `Map<Enum,Enum>` collections.
 
 
 #### JsonCodec compatible
 
-The generated DTOs follow Dart's [JsonCodec](https://api.dartlang.org/stable/1.24.3/dart-convert/JsonCodec-class.html) pattern allowing them to be individually serializable with Dart's universal JSON encode/decode APIs, e.g:
+The generated DTOs follow Dart's [JsonCodec](https://api.dart.dev/dart-convert/JsonCodec-class.html) pattern allowing them to be individually serializable with Dart's universal JSON encode/decode APIs, e.g:
 
 ```dart
 //Serialization
@@ -239,7 +267,7 @@ abstract class IConvertible
 }
 ```
 
-The conversion logic that handles the behind-the-scenes conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dartlang.org/documentation/servicestack/0.0.7/client/JsonConverters/Converters.html) class which lets you replace built-in converters with your own implementation or register new Converters when you want to take over handling of specific types.
+The conversion logic that handles the behind-the-scenes conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dev/documentation/servicestack/latest/servicestack/JsonConverters-class.html) class which lets you replace built-in converters with your own implementation or register new Converters when you want to take over handling of specific types.
 
 ### JsonServiceClient
 
@@ -250,14 +278,18 @@ The `JsonServiceClient` is a smart full-featured Service Client implementation w
  - [JWT, including using RefreshTokens to auto-fetch new JWT Bearer Tokens](/auth/jwt-authprovider)
  - [Structured Error Handling](/error-handling)
  - [Auto Batched Requests](/auto-batched-requests)
- - Global and per-instance Request, Response and Exception Filters
+ - Global and per-instance Request, Response, URL and Exception Filters
  - `onAuthenticationRequired` hook to handle re-authentication and transparent replay of failed 401 requests
+ - `api()` and `apiVoid()` APIs returning a typed `ApiResult<T>` encapsulating an API Response or Error
+ - Typed and untyped APIs for calling any HTTP Verb, custom URLs and raw `String` and `Uint8List` responses
+ - `multipart/form-data` File Uploads with a typed Request DTO
+ - Configurable Base Path for calling either the `/api` or legacy `/json/reply` [pre-defined routes](/endpoint-routing)
 
-Behind the scenes `JsonServiceClient` leverages the optimal [`HttpClient` in dart:io](https://docs.flutter.io/flutter/dart-io/HttpClient-class.html) to perform HTTP Requests in Flutter and Dart VM Apps.
+Behind the scenes `JsonServiceClient` leverages the optimal [`HttpClient` in dart:io](https://api.flutter.dev/flutter/dart-io/HttpClient-class.html) to perform HTTP Requests in Flutter and Dart VM Apps.
 
 ### JsonWebClient
 
-The `JsonWebClient` performs HTTP Requests using [dart:html BrowserClient](https://webdev.dartlang.org/angular/guide/server-communication) to use the browsers built-in `XMLHttpRequest` object. Despite their implementation differences `JsonWebClient` also supports the same feature-set as the Dart VM's `JsonServiceClient` above. 
+The `JsonWebClient` performs HTTP Requests using [package:http's BrowserClient](https://pub.dev/documentation/http/latest/browser_client/BrowserClient-class.html) which uses the browsers built-in `XMLHttpRequest` object. Despite their implementation differences `JsonWebClient` also supports the same feature-set as the Dart VM's `JsonServiceClient` above. 
 
 AngularDart or Dart Web Apps can use `JsonWebClient` by importing `web_client.dart`, e.g: 
 
@@ -344,47 +376,603 @@ var webClient = JsonWebClient(baseUrl)
     ..responseFilter = (res) => print(res.headers["X-Args"]);
 ```
 
-### Uploading Files
+### Making Typed API Requests
 
-The `postFileWithRequest` method can be used to upload a file with an API Request.
-
-### Dart Speech to Text
-
-Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+Each `IServiceClient` supports sending a Request DTO with any HTTP Verb where the typed Response DTO is inferred from the `IReturn<T>` marker on the Request DTO:
 
 ```dart
-var audioFile = new File('audio.wav');
-var uploadFile = new UploadFile(
+var client = JsonServiceClient("https://test.servicestack.net");
+
+HelloResponse response = await client.get(Hello(name: "World"));
+response = await client.post(Hello(name: "World"));
+response = await client.put(Hello(name: "World"));
+response = await client.patch(Hello(name: "World"));
+response = await client.delete(Hello(name: "World"));
+```
+
+Where all URLs, QueryStrings and JSON Request Bodies are handled for you, e.g. `GET` and `DELETE` requests send all populated properties on the QueryString whilst `POST`, `PUT` and `PATCH` requests send them in a JSON Request Body.
+
+Unicode is supported throughout, e.g. sending `Hello(name: "üöäß")` returns `"Hello, üöäß!"`.
+
+### Resolving the HTTP Method
+
+Instead of specifying the HTTP Method yourself you can use `send()` which uses the [HTTP Verb interface marker](/csharp-client#http-verb-interface-markers) on the Request DTO to resolve which HTTP Method to send it with, which you can inspect with `resolveHttpMethod()`:
+
+```dart
+resolveHttpMethod(SendGet());   //= GET
+resolveHttpMethod(SendPost());  //= POST
+resolveHttpMethod(SendPut());   //= PUT
+
+var response = await client.send(SendGet(id: 1)); // sent as GET
+```
+
+Request DTOs without a Verb interface marker are sent as a `POST` request.
+
+### The api() and apiVoid() APIs
+
+Whilst the `get/post/put/patch/delete` APIs throw a `WebServiceException` for error responses, the `api()` and `apiVoid()` APIs return a typed `ApiResult<T>` which encapsulates either a successful Response or a structured API Error - ideal for Flutter Apps where displaying validation errors next to their Form fields is part of normal control flow:
+
+```dart
+var api = await client.api(Hello(name: "World"));
+
+if (api.succeeded) {
+    print(api.response!.result);      // Hello, World!
+} else {
+    print(api.errorMessage);
+}
+```
+
+You can override which HTTP Method it's sent with using the optional `method` argument, e.g. `client.api(request, method:"PUT")` whilst `apiVoid()` should be used for `IReturnVoid` APIs which returns an `ApiResult<EmptyResponse>`.
+
+The `ApiResult<T>` includes a number of APIs for inspecting an API Error Response:
+
+| Property / Method            | Description                                                            |
+|------------------------------|------------------------------------------------------------------------|
+| `response`                   | The typed Response DTO, `null` if the API failed                        |
+| `error`                      | The structured [ResponseStatus](/error-handling) error, if it failed     |
+| `succeeded`                  | Whether the API returned a successful Response                           |
+| `failed`                     | Whether the API returned an error                                        |
+| `completed`                  | Whether the API returned either a Response or an Error                   |
+| `errorCode`                  | The `ErrorCode` of the error, e.g. `NotFound`                            |
+| `errorMessage`               | The error message                                                        |
+| `errors`                     | All field validation errors                                              |
+| `fieldError(name)`           | The `ResponseError` for a field, if it has one                           |
+| `fieldErrorMessage(name)`    | The validation error message for a field, if it has one                  |
+| `hasFieldError(name)`        | Whether a field has a validation error                                   |
+| `errorSummary`               | The error message when it's not a field validation error                 |
+| `showSummary([exceptFields])`| Whether to display a summary error message for the specified fields       |
+| `addFieldError(name,message)`| Add a client-side validation error to the result                         |
+
+Which lets you handle each class of error appropriately:
+
+```dart
+var api = await client.api(ThrowValidation(email: "invalidemail"));
+
+if (api.failed) {
+    // Display validation errors next to their fields
+    print(api.fieldErrorMessage("Email")); //= 'Email' is not a valid email address.
+    print(api.hasFieldError("Age"));       //= true
+
+    for (var error in api.errors) {
+        print("${error.fieldName}: ${error.errorCode} - ${error.message}");
+    }
+
+    // Only show the summary message when the field errors aren't displayed
+    if (api.showSummary(["Email"])) {
+        print(api.errorSummary);
+    }
+}
+```
+
+Whilst `errorCode` lets you handle different classes of errors, e.g. APIs that require Authentication return a `401` error code:
+
+```dart
+var api = await client.api(RequiresAdmin());
+if (api.errorCode == "401") {
+    // Re-authenticate...
+}
+```
+
+### Error Handling
+
+All non `api()` requests throw a structured `WebServiceException` containing the same information available in [ServiceStack's structured Error Responses](/error-handling):
+
+```dart
+try {
+    await client.post(ThrowType(type: "NotFound", message: "not here"));
+} on WebServiceException catch (e) {
+    print(e.statusCode);         //= 404
+    print(e.statusDescription);  //= Not Found
+    print(e.message);            //= not here
+    var status = e.responseStatus!;
+    print(status.errorCode);     //= NotFound
+    print(status.message);       //= not here
+    print(status.stackTrace);
+}
+```
+
+Where APIs with failed [Validation Rules](/validation) return all field validation errors in `responseStatus.errors`:
+
+```dart
+try {
+    await client.post(ThrowValidation(email: "invalidemail"));
+} on WebServiceException catch (e) {
+    var errors = e.responseStatus!.errors!;
+    print(errors[0].errorCode);  //= InclusiveBetween
+    print(errors[0].fieldName);  //= Age
+    print(errors[0].message);    //= 'Age' must be between 1 and 120. You entered 0.
+    print(errors[2].errorCode);  //= Email
+    print(errors[2].fieldName);  //= Email
+    print(errors[2].message);    //= 'Email' is not a valid email address.
+}
+```
+
+Connection and transport errors are also surfaced as a `WebServiceException` (with a `500` status code) so failed requests can be handled the same way, e.g:
+
+```dart
+var client = JsonServiceClient("http://unknown-zzz.net")
+    ..connectionTimeout = Duration(seconds: 1);
+
+var api = await client.api(Hello(name: "World"));
+print(api.error!.errorCode); //= 500
+print(api.error!.message);   //= SocketException: ...
+```
+
+Should you need to inspect **all** errors in a single place you can register a client `exceptionFilter`:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..exceptionFilter = (res, e) {
+        if (e is WebServiceException) {
+            print("ERROR: ${json.encode(e.responseStatus)}");
+        }
+    };
+```
+
+Or handle every error in your App with the `JsonServiceClient.globalExceptionFilter`.
+
+### Sending Runtime Arguments
+
+Every `IServiceClient` API supports an optional `args` parameter for sending additional arguments that aren't defined on the typed Request DTO which are sent on the QueryString, useful for calling [AutoQuery](/autoquery/rdbms) APIs with any of its supported [Implicit Conventions](/autoquery/rdbms#implicit-conventions):
+
+```dart
+var response = await client.get(FindTechnologies()..take = 3,
+    args: {"VendorName": "Amazon"});
+```
+
+It can also be used to send [JS Config](/customize-json-responses) options to change how the Response is serialized, e.g:
+
+```dart
+var api = await client.api(ThrowValidation(),
+    args: {"jsconfig": "EmitCamelCaseNames:true"});
+```
+
+### Calling APIs with Custom URLs
+
+APIs can also be called with any relative or absolute URL where their JSON Response is returned in a `Map<String,dynamic>` that can be converted into a typed DTO with its `fromJson()` constructor:
+
+```dart
+// Any of the different ways to call the same API:
+var jsonObj = await client.getUrl("/hello/World");                              // Path Info
+var jsonObj = await client.getUrl("https://test.servicestack.net/hello/World"); // Absolute URL
+var jsonObj = await client.getUrl("/hello", args: {"name": "World"});           // QueryString
+
+var response = HelloResponse.fromJson(jsonObj);
+```
+
+Alternatively use the `*As` APIs with a `responseAs` instance to have the Response deserialized into a typed DTO, `String` or `Uint8List`:
+
+```dart
+HelloResponse dto = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: HelloResponse());
+
+String jsonStr = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: TypeAs.string);
+
+Uint8List bytes = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: TypeAs.bytes);
+```
+
+The same APIs are available for each HTTP Verb, e.g. `postToUrl`, `postAs`, `putToUrl`, `putAs`, `patchToUrl`, `patchAs`, `deleteUrl` and `deleteAs`, which can also send custom JSON or plain text Request Bodies:
+
+```dart
+// Send a Map as the JSON Request Body
+var jsonObj = await client.postToUrl("/sendjson", {"foo": "bar"},
+    args: toMap(SendJson(id: 1, name: "name")));
+
+// Send a raw JSON String Request Body with a typed Request DTO
+var jsonStr = await client.post(SendJson(id: 1, name: "name"),
+    body: json.encode({"foo": "bar"}));
+
+// Send a raw text Request Body
+var str = await client.post(
+    SendText(id: 1, name: "name", contentType: "text/plain"), body: "foo");
+```
+
+Generic Response Types can be deserialized by initializing them with the `context` of your generated DTOs:
+
+```dart
+var response = await client.getAs("/technology/search",
+    args: {"Take": 3, "VendorName": "Amazon"},
+    responseAs: QueryResponse<Technology>()..context = FindTechnologies().context);
+```
+
+### Raw Data Responses
+
+Services that [return raw data](/service-return-types) are also seamlessly supported where APIs implementing `IReturn<String>` return the raw HTTP Body in a `String` whilst `IReturn<byte[]>` and `IReturn<Stream>` APIs return a `Uint8List`:
+
+```dart
+String str = await client.get(HelloString(name: "World"));
+
+Uint8List bytes = await client.get(HelloImage(name: "Flutter",
+    fontFamily: "Roboto", background: "#0091EA", width: 500, height: 170));
+```
+
+Which in Flutter can be rendered directly with the [Image widget](https://api.flutter.dev/flutter/widgets/Image-class.html), e.g. `Image.memory(bytes)`.
+
+### Batched Requests
+
+The `sendAll` and `sendAllOneWay` APIs let you use ServiceStack's [Auto Batched Requests](/auto-batched-requests) feature to send multiple Request DTOs of the same Type in a single Request (sent to `/api/Hello[]`), that returns all their Responses in a single Response:
+
+```dart
+var requests = ["foo", "bar", "baz"].map((name) => Hello(name: name));
+
+List<HelloResponse> responses = await client.sendAll(requests);
+//= [Hello, foo!, Hello, bar!, Hello, baz!]
+```
+
+Use `sendAllOneWay` for fire-and-forget batched requests that ignore their Responses, which also supports `IReturnVoid` Request DTOs:
+
+```dart
+await client.sendAllOneWay([1, 2, 3].map((id) => HelloReturnVoid(id: id)));
+```
+
+### Authentication
+
+The Service Clients support all of ServiceStack's [Authentication](/auth/authentication-and-authorization) options.
+
+#### HTTP Basic Auth
+
+Use `setCredentials()` to send [HTTP Basic Auth](/auth/client-auth) credentials on each request:
+
+```dart
+client.setCredentials("test", "test");
+var response = await client.get(TestAuth());
+```
+
+#### Credentials Auth
+
+Alternatively you can authenticate using the [Credentials Auth Provider](/auth/authentication-and-authorization#credentials-auth-providers) by sending an `Authenticate` Request DTO, where any [Session Cookies](/auth/sessions) or Tokens returned are automatically retained on the client instance and re-sent on subsequent requests:
+
+```dart
+var authResponse = await client.post(Authenticate(
+    provider: "credentials", userName: "test", password: "test"));
+
+print(authResponse.userId);      //= 1
+print(authResponse.sessionId);
+print(authResponse.bearerToken);
+print(authResponse.refreshToken);
+
+// Client is now authenticated
+var response = await client.get(TestAuth());
+```
+
+Sign out by sending a `logout` Authenticate request, e.g. `await client.post(Authenticate(provider:"logout"))`.
+
+#### JWT and API Keys
+
+Populate `bearerToken` to authenticate with a [JWT Token](/auth/jwt-authprovider) or an [API Key](/auth/api-key-authprovider):
+
+```dart
+client.bearerToken = jwt;             // JWT Bearer Token
+client.bearerToken = "ak-3d3...4f6";  // API Key
+```
+
+#### Refresh Tokens
+
+Instead of a JWT you can populate the client with just a long-lived [Refresh Token](/auth/jwt-authprovider#refresh-tokens) where the client will transparently fetch a new JWT Bearer Token and replay any requests that returned `401 Unauthorized`:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..refreshToken = authResponse.refreshToken;
+
+var response = await client.get(TestAuth()); // Auto fetches JWT + retries
+```
+
+The same transparent behavior is also applied when the Server returns [Token Cookies](/auth/jwt-authprovider#jwt-token-cookies) where an expired `ss-tok` Access Token Cookie is automatically refreshed using its `ss-reftok` Refresh Token Cookie which you can access with:
+
+```dart
+var accessToken = client.getTokenCookie();        // ss-tok
+var refreshToken = client.getRefreshTokenCookie(); // ss-reftok
+```
+
+Should the Refresh Token itself be invalid or expired, a `WebServiceException` with a `RefreshTokenException` type is thrown so your App can prompt the User to sign in again:
+
+```dart
+try {
+    await client.get(TestAuth());
+} on WebServiceException catch (e) {
+    if (e.type == WebServiceExceptionType.RefreshTokenException) {
+        // Refresh Token invalid or expired, sign in again...
+    }
+}
+```
+
+#### Transparently handle 401 Unauthorized Responses
+
+The `onAuthenticationRequired` async callback lets you handle re-authenticating your client where the failed request is transparently replayed with the new authenticated client, e.g:
+
+```dart
+client.onAuthenticationRequired = () async {
+    client.userName = "test";
+    client.password = "test";
+};
+
+// Fails with 401, re-authenticates then transparently retries the request
+var response = await client.get(TestAuth());
+```
+
+Use `client.clearCookies()` to clear any Session and Token Cookies retained on the client.
+
+### Request, Response and URL Filters
+
+Each client supports both instance and global filters for inspecting and modifying HTTP Requests and Responses, e.g. to add a custom HTTP Header on all requests or to inspect the HTTP Headers returned:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..requestFilter = (req) => req.headers.add("X-Custom", "Value")
+    ..responseFilter = (res) => print(res.headers["X-Args"]);
+
+JsonServiceClient.globalRequestFilter = (req) => print(req.uri);
+JsonServiceClient.globalResponseFilter = (res) => print(res.statusCode);
+```
+
+Instance filters are invoked before their global counterparts, i.e. `requestFilter`, `globalRequestFilter`, `responseFilter`, `globalResponseFilter`.
+
+The `urlFilter` can be used to inspect the URL each API is sent to which is useful for debugging and verifying which URLs are being called:
+
+```dart
+client.urlFilter = (url) => print(url);
+```
+
+::: info
+As the Request/Response filters have different Type signatures in the Dart VM (`HttpClientRequest`/`HttpClientResponse`) and Web (`Request`/`Response`) clients they're not declared on the shared `IServiceClient` interface, but thanks to Dart's type inference most filter source code remains source-compatible between both clients
+:::
+
+### Client Configuration
+
+#### JSON /api Route
+
+`JsonServiceClient` and `JsonWebClient` are configured to call the modern [/api pre-defined route](/endpoint-routing#api-pre-defined-route) by default, i.e:
+
+```dart
+var client = JsonServiceClient("https://test.servicestack.net");
+client.replyBaseUrl;   //= https://test.servicestack.net/api/
+client.oneWayBaseUrl;  //= https://test.servicestack.net/api/
+```
+
+To call older ServiceStack Servers you can use the `legacy()` constructors (or set `basePath = null`) to use the pre-existing `/json/reply` and `/json/oneway` routes:
+
+```dart
+var client = JsonServiceClient.legacy("https://test.servicestack.net");
+// or with the platform-neutral factory:
+// var client = ClientFactory.legacy("https://test.servicestack.net");
+
+client.replyBaseUrl;   //= https://test.servicestack.net/json/reply/
+client.oneWayBaseUrl;  //= https://test.servicestack.net/json/oneway/
+```
+
+Or change it at anytime with the `basePath` setter, e.g. `client.basePath = "api"`.
+
+#### Configuring Clients
+
+Both concrete clients support additional configuration for customizing behavior of their underlying HTTP Clients:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..headers = {HttpHeaders.acceptHeader: "application/json"} // Default Headers
+    ..connectionTimeout = Duration(seconds: 10)
+    ..maxRetries = 5;      // Max retries for failed connections
+
+client.close();            // Close the client and its open connections
+```
+
+#### Ignoring Self-Signed Certificates
+
+`ClientOptions` lets you create clients that ignore the self-signed certificates used in local development, either for its `baseUrl` with `ignoreCert:true` or for a specific list of hosts:
+
+```dart
+// Ignore the self-signed certificate of the client's baseUrl
+var client = ClientFactory.createWith(ClientOptions(
+    baseUrl: 'https://dev.servicestack.com:5001', ignoreCert: true));
+
+// Or ignore the certificates of a specific list of hosts
+var options = ClientOptions(baseUrl: 'https://dev.servicestack.com:5001')
+    ..ignoreCertificatesFor.addAll([
+        'https://dev.servicestack.com:5001',
+        'http://local.servicestack.com',
+    ]);
+var devClient = ClientFactory.createWith(options);
+```
+
+### Uploading Files
+
+`postFileWithRequest` lets you upload a file with a populated Request DTO which is sent as a `multipart/form-data` request where all populated Request DTO properties are sent as form fields alongside the file:
+
+```dart
+var audioFile = File('audio.wav');
+
+var response = await client.postFileWithRequest(SpeechToText(), UploadFile(
     fieldName: 'audio',
     fileName: audioFile.uri.pathSegments.last,
     contentType: 'audio/wav',
-    contents: await audioFile.readAsBytes()
-);
-
-var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
+    contents: await audioFile.readAsBytes()));
 ```
 
-To upload multiple files use `postFilesWithRequest`.
+This example calls [AI Server's](/ai-server/) `SpeechToText` API, use `postFilesWithRequest` to upload multiple files in the same request:
 
+```dart
+var request = TestFileUploads()
+    ..id = 1
+    ..refId = "zid";
 
-#### Comprehensive Test Suite
+var files = [
+    UploadFile(fieldName: 'audio', fileName: 'test.txt',
+        contentType: 'text/plain', contents: utf8.encode("Hello World")),
+    UploadFile(fieldName: 'content', fileName: 'test.md',
+        contentType: 'text/markdown', contents: utf8.encode("## Heading")),
+];
 
-To ensure a high quality implementation we've ported the [TypeScript @servicestack/client](https://github.com/ServiceStack/servicestack-client) test suite over to Dart which is itself a good resource for discovering [different supported features and flexible HTTP Request options](https://github.com/ServiceStack/servicestack-dart/tree/master/test) available. 
+var response = await client.postFilesWithRequest(request, files);
+
+print(response.files![0].fileName);      //= test.txt
+print(response.files![0].contentLength); //= 11
+```
+
+Both APIs accept optional `requestFilter` and `responseFilter` arguments for customizing the multipart Request whilst `postFilesWithRequestAs` lets you upload files to a custom URL:
+
+```dart
+var response = await client.postFilesWithRequestAs("/custom/path", request, files,
+    responseAs: TestFileUploadsResponse());
+```
+
+::: info
+File Uploads are implemented in the `dart:io` `JsonServiceClient`
+:::
+
+### Built-in ServiceStack DTOs
+
+The `servicestack` package includes typed DTOs for ServiceStack's built-in APIs letting you call them without needing to generate them, including `Authenticate`, `Register`, `AssignRoles`, `UnAssignRoles`, `GetApiKeys`, `RegenerateApiKeys`, `ConvertSessionToToken`, `GetAccessToken` and `GetNavItems` as well as the built-in `ResponseStatus`, `ResponseError`, `QueryResponse<T>`, `EmptyResponse`, `IdResponse`, `StringResponse`, `StringsResponse`, `KeyValuePair<K,V>` and `Tuple<T1,T2>` types:
+
+```dart
+import 'package:servicestack/client.dart';
+
+var authResponse = await client.post(Authenticate(
+    provider: "credentials", userName: "test", password: "test"));
+
+var apiKeys = await client.get(GetApiKeys());
+var navItems = await client.get(GetNavItems());
+```
+
+[Background Jobs](/background-jobs) DTOs like `BackgroundJob`, `JobSummary`, `ScheduledTask`, `CompletedJob` and `FailedJob` are also included.
+
+### Inspecting API Responses
+
+The `Inspect` utils are useful for quickly viewing the contents of API Responses and Dart collections during development, where `Inspect.dump()` renders any object graph in a human-friendly format that ignores `null` properties:
+
+```dart
+import 'package:servicestack/inspect.dart';
+
+var response = await client.get(FindTechnologies()
+    ..vendorName = "Google"
+    ..take = 3
+    ..orderByDesc = "ViewCount"
+    ..fields = "Id,Name,VendorName,Tier");
+
+print(Inspect.dump(response.results!.first));
+```
+
+```
+{
+    id: 7,
+    name: AngularJS,
+    vendorName: Google,
+    tier: Client
+}
+```
+
+Whilst `Inspect.dumpTable()` renders any `Iterable` of records into a text table with auto-aligned columns:
+
+```dart
+print(Inspect.dumpTable(response.results!));
+```
+
+```
++----------------------------------------------------------+
+| id |       name       | vendorName |        tier         |
+|----------------------------------------------------------|
+|  7 | AngularJS        | Google     | Client              |
+| 18 | Go               | Google     | ProgrammingLanguage |
+| 77 | Protocol Buffers | Google     | Server              |
++----------------------------------------------------------+
+```
+
+Use `Inspect.printDump()` and `Inspect.printDumpTable()` to print them directly or `Inspect.vars()` to dump the state of multiple variables at once:
+
+```dart
+Inspect.vars({'response': response, 'results': response.results});
+```
+
+### Logging
+
+Both clients log to the `Log` abstraction which by default only logs `Warn` and `Error` messages to the Console. Enable debug logging to troubleshoot Type resolution and serialization issues:
+
+```dart
+Log.levels = [LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error];
+Log.logger = ConsoleLogger();   // or NullLogger() to disable logging
+```
+
+### Custom JSON Converters
+
+The conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dev/documentation/servicestack/latest/servicestack/JsonConverters-class.html) class where you can replace built-in converters with your own implementation or register new converters to take over handling of specific types:
+
+```dart
+class MyDateConverter implements IConverter {
+    @override
+    dynamic toJson(dynamic value, TypeContext context) => ...;
+    @override
+    dynamic fromJson(dynamic value, TypeContext context) => ...;
+}
+
+JsonConverters.Converters['DateTime'] = MyDateConverter();
+```
+
+Built-in converters include `DateTimeConverter` (ISO 8601 and WCF `/Date(…)/` formats), `ByteArrayConverter` (Base64), `KeyValuePairConverter`, `MapConverter`, `ListConverter` and `EnumConverter` which handles C# `enum`, `[Flags]` enums, enums with values and custom Enum Styles.
+
+C# `TimeSpan` properties are converted to Dart `Duration` using the XSD duration format which you can convert manually with:
+
+```dart
+fromTimeSpan("P11DT2H3M4.123S"); //= Duration(days:11,hours:2,minutes:3,seconds:4,milliseconds:123)
+toTimeSpan(Duration(hours: 1));  //= PT1H
+```
+
+### Comprehensive Test Suite
+
+To ensure a high quality implementation we've ported the [TypeScript @servicestack/client](https://github.com/ServiceStack/servicestack-client) test suite over to Dart which is itself a good resource for discovering [different supported features and flexible HTTP Request options](https://github.com/ServiceStack/servicestack-dart/tree/master/test) available, including:
+
+| Test Suite                                                                                                                       | Description                                                    |
+|----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| [client_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_test.dart)                           | All HTTP Verbs, custom URLs, raw responses, batching, uploads   |
+| [client_api_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_api_test.dart)                   | `api()` / `apiVoid()` and `ApiResult<T>` error handling          |
+| [client_auth_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_auth_test.dart)                 | JWT, Refresh Tokens, Token Cookies and re-authentication         |
+| [test_auth_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/test_auth_test.dart)                     | Basic Auth and Credentials Auth                                  |
+| [serization_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/serization_test.dart)                   | Serializing all C# Types, collections and inheritance            |
+| [enum_serization_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/enum_serization_test.dart)         | Enums, `[Flags]` Enums, Enum Lists and Maps                      |
+| [converter_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/converter_test.dart)                     | `DateTime` and XSD `Duration` conversions                        |
+| [techstacks_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/techstacks_test.dart)                   | AutoQuery requests with runtime args                             |
+| [aiserver_client_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/aiserver_client_test.dart)         | [AI Server](/ai-server/) file uploads, e.g. Speech to Text       |
+| [inspect_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/inspect_test.dart)                         | `Inspect.dump()` and `Inspect.dumpTable()` utils                 |
+
+Which you can run after cloning the repo with:
+
+:::sh
+dart test
+:::
 
 ### HelloFlutter App
 
 To showcase popular API Requests in action we've created a basic [HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) App that mimics functionality in the [HelloMobile](https://github.com/ServiceStackApps/HelloMobile) App used to provide working examples of the same ServiceStack Service Client features running in the different supported Mobile and Desktop platforms.
 
-[HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) was created in VS Code with the [DartCode extension](https://dartcode.org) using the [Flutter: New Project](https://flutter.io/get-started/test-drive/#vscode) action in VS Code's Command Palette.
+[HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) was created in VS Code with the [DartCode extension](https://dartcode.org) using the [Flutter: New Project](https://docs.flutter.dev/get-started/test-drive?tab=vscode) action in VS Code's Command Palette.
 
 This creates a basic Flutter App which you can run in your Android Device or Android Emulator where it's automatically picked and made visible in the **bottom right** of VS Code's status bar.
 
 Then to use `JsonServiceClient` add the `servicestack` dependency to your apps [pubspec.yaml](https://github.com/ServiceStackApps/HelloFlutter/blob/master/pubspec.yaml):
 
   dependencies:
-    servicestack: ^2.0.1
+    servicestack: ^3.0.3
 
-Saving `pubspec.yaml` automatically runs [flutter packages get](https://flutter.io/using-packages/) to install any new dependencies in your App. 
+Saving `pubspec.yaml` automatically runs [flutter packages get](https://docs.flutter.dev/packages-and-plugins/using-packages) to install any new dependencies in your App. 
 
 Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `get-dtos` script:
 
@@ -671,7 +1259,7 @@ result != null && result != ""
     : Image.memory(imageBytes, width:500.0, height:170.0),
 ```
 
-To display the image we assign the response to the `imageBytes` field within the stateful widget's `setState()` which triggers a re-render of the UI containing the generated Image displayed using the [Image widget](https://docs.flutter.io/flutter/widgets/Image-class.html):
+To display the image we assign the response to the `imageBytes` field within the stateful widget's `setState()` which triggers a re-render of the UI containing the generated Image displayed using the [Image widget](https://api.flutter.dev/flutter/widgets/Image-class.html):
 
 ![](/img/pages/dart/flutter/helloflutter-06.png)
 
