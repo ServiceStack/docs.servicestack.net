@@ -13,6 +13,7 @@ import ProjectCreator from "./components/ProjectCreator.mjs"
 import TextBlock from "./components/TextBlock.mjs"
 import VibeTemplate from "../pages/components/VibeTemplate.mjs"
 import ScreenshotsGallery from "../pages/components/ScreenshotsGallery.mjs"
+import ScreenshotsGalleryView from "../pages/components/ScreenshotsGalleryView.mjs"
 import Screenshot from "../pages/components/Screenshot.mjs"
 
 let client = null, Apps = []
@@ -63,7 +64,7 @@ const Components = {
     ProjectCreator,
     TextBlock,
     VibeTemplate,
-    ScreenshotsGallery,
+    ScreenshotsGalleryView,
     Screenshot,
 }
 const CustomElements = [
