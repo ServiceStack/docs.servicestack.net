@@ -1,76 +1,308 @@
 ---
 slug: vbnet-add-servicestack-reference
-title: VB.NET Add ServiceStack Reference
+title: VB ServiceStack Reference
 ---
 
-![VB.NET Header](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/wikis/vb-header.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/vbnet-info.webp)
+:::
 
-ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simpler, cleaner and more versatile alternative to WCF's Add Service Reference feature that's built into VS.NET.
+Add ServiceStack Reference generates your API's VB.NET DTOs from a running ServiceStack App. It gives VB.NET clients an end-to-end typed API without sharing the server's ServiceModel assembly, so client and server projects can be versioned, deployed and updated independently.
 
-The article outlines ServiceStack's support generating VB.Net DTO's - providing a flexible alternative than sharing your compiled DTO .NET assembly with clients. Now VB.Net clients can easily add a reference to a remote ServiceStack instance and update typed DTO's directly from within VS.NET - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback. 
+The generated source retains routes, HTTP verb markers, response types, validation metadata, inheritance, collections, enums and AutoQuery conventions. Existing desktop and line-of-business applications can consume new APIs without a hand-written HTTP or JSON layer.
 
-### VB.NET - Modern typed APIs for long-lived business Apps
+## Modern typed APIs for VB.NET
 
-Plenty of organizations still run substantial VB.NET line-of-business software that has to keep talking to new services. Adding a reference gives those Apps the same generated DTOs and full .NET client - no rewrite, no hand-rolled HTTP layer:
+VB.NET uses the same current `JsonApiClient` and `ServiceStack.Client` package as C#:
 
 ```vbnet
-Dim client = New JsonApiClient(baseUrl)
+Dim client = New JsonApiClient("https://api.example.com")
 
-Dim response = Await client.SendAsync(New Hello With {.Name = "World"})
+Dim response = client.Get(New Hello With {.Name = "World"})
 Console.WriteLine(response.Result)
 ```
 
-Both async and blocking APIs are available, so it fits event-driven desktop code as naturally as it does batch jobs and scheduled integrations.
+Both asynchronous and blocking APIs are available, fitting event-driven desktop applications, ASP.NET, batch jobs, scheduled integrations and test projects.
 
-## [Add ServiceStack Reference](/add-servicestack-reference)
+## Add ServiceStack Reference
 
-The easiest way to Add a ServiceStack reference to your project is to right-click on your project to bring up [ServiceStackVS's](/create-your-first-webservice) `Add ServiceStack Reference` context-menu item. This opens a dialog where you can add the url of the ServiceStack instance you want to typed DTO's for, as well as the name of the DTO source file that's added to your project.
+Use the cross-platform [`x` tool](/dotnet-tool) from any IDE or build environment:
 
-[![Add ServiceStack Reference](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/StackApis/add-service-ref-flow.png)
+```sh
+dotnet tool install --global x
+x vbnet https://api.example.com
+dotnet add package ServiceStack.Client
+```
 
-After clicking OK, the servers DTO's and [ServiceStack.Client](https://www.nuget.org/packages/ServiceStack.Client) NuGet package are added to the project, providing an instant typed API:
-![VB.Net Console client](https://github.com/ServiceStack/Assets/raw/master/img/apps/StackApis/call-service-vb.png)
+This saves the generated contract to `dtos.vb`. The `vb` alias provides a shorter command:
 
-With the VB.Net code generated on the Server, the role of [ServiceStackVS's](/create-your-first-webservice) **Add ServiceStack Reference** is there just to integrate the remote VB.Net DTO's into the clients VS.NET project. This is just getting the generated DTOs from the server with default options set by the server and adding them locally to your project within Visual Studio.
+```sh
+x vb https://api.example.com
+```
 
-![Add VB.Net ServiceStack Reference Demo](https://github.com/ServiceStack/Assets/raw/master/img/servicestackvs/servicestack%20reference/addref-vbnet.gif)
+Visual Studio users can alternatively use [ServiceStackVS's](/templates/install-servicestackvs) **Add ServiceStack Reference** project context menu, which adds the generated DTOs and `ServiceStack.Client` package.
 
 ## Update ServiceStack Reference
 
-If your server has been updated and you want to update to client DTOs, simply right-click on the DTO file within VS.NET and select `Update ServiceStack Reference`. 
+After the API contract changes, run this from the client solution:
 
-![VBNet update demo](https://github.com/ServiceStack/Assets/raw/master/img/servicestackvs/servicestack%20reference/updateref-vbnet.gif)
-
-### Simple Usage Example
-
-Async Example:
-
-```vb
-Dim client = new JsonApiClient("https://techstacks.io")
-
-Dim response = Await client.SendAsync(New AppOverview())
-response.PrintDump()
+```sh
+x vbnet
 ```
 
-Sync Example:
+The tool finds existing references from the `BaseUrl` in their generated headers and preserves uncommented customization options. You can also update one file directly with `x dtos.vb`. In Visual Studio, use **Update ServiceStack Reference** on the generated file.
 
-```vb
-Dim client = new JsonApiClient("https://techstacks.io")
+Generated files should be treated as replaceable source. Put client-only behavior in separate `Partial Class` files.
 
-Dim response = client.Send(New AppOverview())
-response.PrintDump()
+## What is generated
+
+A `Hello` API is emitted with its routes, supported attributes and inferred response marker:
+
+```vbnet
+<Route("/hello")>
+<Route("/hello/{Name}")>
+Public Partial Class Hello
+    Implements IReturn(Of HelloResponse)
+
+    <Required>
+    Public Overridable Property Name As String
+
+    Public Overridable Property Title As String
+End Class
+
+Public Partial Class HelloResponse
+    Public Overridable Property Result As String
+End Class
 ```
 
-## DTO Customization Options 
+The generated contract provides:
 
-The header comments in the generated DTO's allows for further customization of how they're generated where ServiceStackVS automatically watches for any file changes and updates the generated DTO's with any custom Options provided. Options that are preceded by a VB.Net Class comment `'''` are defaults from the server that can be overridden, e.g:
+- `IReturn(Of HelloResponse)` for compile-time response inference.
+- `<Route>` metadata for custom route selection and path substitution.
+- `IGet`, `IPost`, `IPut`, `IPatch` and `IDelete` markers for `Send`/`SendAsync` HTTP method inference.
+- `IReturnVoid` for commands which intentionally return no response body.
+- Native .NET representations for enums, arrays, `List(Of T)`, dictionaries, inheritance, nested types and interfaces.
+- Supported descriptions and serialization attributes for IntelliSense and wire compatibility.
+
+| Generated contract | Typed VB.NET result |
+| --- | --- |
+| `IReturn(Of String)` | String |
+| `IReturn(Of Item())` | Array |
+| `IReturn(Of List(Of Item))` | Generic collection |
+| `IReturn(Of Dictionary(Of String, Item))` | Typed dictionary |
+| `IReturn(Of QueryResponse(Of Item))` | AutoQuery results, totals and metadata |
+| `IReturn(Of Byte())` | Raw binary response |
+| `IReturn(Of Stream)` | Response stream |
+| `IReturnVoid` | No response body |
+
+## Call generated APIs
+
+Use an explicit HTTP method when the caller should choose it:
+
+```vbnet
+Dim syncResponse = client.Post(New Hello With {.Name = "World"})
+Dim asyncResponse = Await client.PostAsync(
+    New Hello With {.Name = "World"}, cancellationToken)
+```
+
+When the generated request has a verb marker, `SendAsync` chooses it automatically:
+
+```vbnet
+Public Class HelloGet
+    Implements IReturn(Of HelloVerbResponse)
+    Implements IGet
+
+    Public Property Id As Integer
+End Class
+
+Dim response As HelloVerbResponse = Await client.SendAsync(
+    New HelloGet With {.Id = 1}, cancellationToken)
+```
+
+### Current `JsonApiClient` capabilities
+
+`JsonApiClient` is the current `HttpClient`-based implementation for .NET 6+. It uses `/api/` as the fallback route, prefers matching custom routes for explicit HTTP methods, and defaults unmarked `Send` requests to `POST`.
+
+It can be registered with .NET's typed client factory:
+
+```vbnet
+builder.Services.AddJsonApiClient("https://api.example.com")
+```
+
+It also supports:
+
+- Per-call cancellation with `CancellationToken`.
+- Cookie, Basic, Bearer Token and automatic Refresh Token authentication.
+- Request/response filters, custom headers, URL resolvers and request compression.
+- Direct `String`, `Byte()` and `Stream` responses in addition to JSON DTOs.
+- Batching, one-way publishing, file uploads, multipart forms and custom HTTP methods.
+- Both synchronous and asynchronous APIs.
+
+Configure automatic token renewal when an authenticated API returns `401`:
+
+```vbnet
+Dim client = New JsonApiClient("https://api.example.com") With {
+    .BearerToken = auth.BearerToken,
+    .RefreshToken = auth.RefreshToken,
+    .EnableAutoRefreshToken = True
+}
+```
+
+The client's `SessionId` and `Version` are also copied onto generated requests implementing `IHasSessionId` and `IHasVersion`.
+
+### Handle errors as values
+
+`ApiAsync` returns `ApiResult(Of TResponse)` so validation and API failures can remain normal application values:
+
+```vbnet
+Dim api = Await client.ApiAsync(
+    New Hello With {.Name = form.Name}, cancellationToken)
+
+If api.Succeeded Then
+    Console.WriteLine(api.Response.Result)
+Else
+    Console.WriteLine($"{api.Error?.ErrorCode}: {api.ErrorMessage}")
+    Console.WriteLine(api.FieldErrorMessage(NameOf(form.Name)))
+End If
+```
+
+`ApiResult(Of T)` also exposes `Errors`, `ErrorSummary`, `FieldError()`, `FieldErrorMessage()` and `HasFieldError()` for form and validation workflows.
+
+The lower-level client APIs throw `WebServiceException` for failed responses:
+
+```vbnet
+Try
+    Dim response = Await client.PostAsync(
+        New Hello With {.Name = Nothing}, cancellationToken)
+Catch ex As WebServiceException
+    Console.WriteLine($"{ex.StatusCode} {ex.StatusDescription}")
+    Console.WriteLine($"{ex.ResponseStatus.ErrorCode}: {ex.ResponseStatus.Message}")
+End Try
+```
+
+### Batch and one-way requests
+
+Send multiple requests of the same type in a single HTTP request:
+
+```vbnet
+Dim requests = {
+    New Hello With {.Name = "A"},
+    New Hello With {.Name = "B"},
+    New Hello With {.Name = "C"}
+}
+
+Dim responses As List(Of HelloResponse) =
+    Await client.SendAllAsync(requests, cancellationToken)
+```
+
+Use `PublishAsync` or `PublishAllAsync` for one-way commands which do not need a response DTO:
+
+```vbnet
+Await client.PublishAsync(
+    New HelloReturnVoid With {.Id = 1}, cancellationToken)
+```
+
+### Typed AutoQuery
+
+Generated AutoQuery requests retain their generic query contracts:
+
+```vbnet
+<Route("/rockstars", "GET")>
+Public Partial Class QueryRockstars
+    Inherits QueryDb(Of Rockstar)
+    Implements IReturn(Of QueryResponse(Of Rockstar))
+End Class
+```
+
+Use inherited paging, ordering, projection and metadata properties with typed results:
+
+```vbnet
+Dim query = Await client.GetAsync(New QueryRockstars With {
+    .Skip = 0,
+    .Take = 25,
+    .OrderBy = "Age"
+}, cancellationToken)
+
+Console.WriteLine($"Showing {query.Results.Count} of {query.Total}")
+```
+
+`GetLazy()` also provides lazy synchronous enumeration across AutoQuery pages.
+
+### Rich .NET data contracts
+
+Generated DTOs preserve .NET primitives and compound types including nullable values, `Decimal`, `Guid`, `DateTime`, `DateTimeOffset`, `TimeSpan`, `Byte()`, arrays, `List(Of T)` and nested dictionaries. The same serializer handles route, query-string and request-body values, avoiding transport-specific mapping code.
+
+### File uploads
+
+Combine a generated Request DTO with a file stream:
+
+```vbnet
+Using audio = File.OpenRead("recording.wav")
+    Dim response As TextGenerationResponse =
+        Await client.PostFileWithRequestAsync(
+            New SpeechToText With {
+                .RefId = "task-42",
+                .Tag = "meeting"
+            },
+            New UploadFile("recording.wav", audio, NameOf(SpeechToText.Audio)),
+            cancellationToken)
+End Using
+```
+
+Use `PostFilesWithRequestAsync` for multiple streams or `ApiFormAsync` when multipart form failures should be returned as `ApiResult(Of T)`.
+
+### Proxy and API gateway endpoints
+
+The Base URL can include a path prefix, allowing the same generated DTOs to call a downstream ServiceStack API through a proxy or gateway:
+
+```vbnet
+Dim client = New JsonApiClient(
+    "https://gateway.example.com/techstacks")
+
+Dim response = Await client.GetAsync(
+    New GetTechnology With {.Slug = "ServiceStack"}, cancellationToken)
+```
+
+Typed responses and structured `WebServiceException` errors continue to work through the proxy. This is useful for exposing multiple internal services behind one public host or applying tenant-specific routing.
+
+### Integration testing
+
+Generated contracts make black-box API tests concise and representative of production clients:
+
+```vbnet
+<Test>
+Public Async Function EchoesSupportedValues() As Task
+    Dim client = New JsonApiClient(TestConfig.BaseUrl)
+    Dim request = New EchoTypes With {
+        .Int = 3,
+        .Float = 1.1F,
+        .String = "value"
+    }
+
+    Dim response = Await client.PostAsync(request)
+
+    Assert.That(response.Int, [Is].EqualTo(request.Int))
+    Assert.That(response.Float, [Is].EqualTo(request.Float))
+    Assert.That(response.String, [Is].EqualTo(request.String))
+End Function
+```
+
+The same pattern covers authenticated APIs, validation failures, AutoQuery and APIs exposed behind proxy path prefixes.
+
+## Use in any .NET App
+
+Because a ServiceStack Reference is ordinary VB.NET source and `ServiceStack.Client` supports current .NET targets, the same contract and client patterns can be shared across ASP.NET Core, Blazor, MAUI, desktop, console, worker and test projects.
+
+## DTO customization options
+
+The options in each generated file's header control how its VB.NET DTOs are generated. Triple-commented options are server defaults. To override one, change its `'''` prefix to a single `'`, update the value, then run `x vbnet` or use Visual Studio's **Update ServiceStack Reference** action:
 
 ```vb
 ' Options:
-'Date: 2025-06-04 09:53:47
-'Version: 8.80
+'Date: 2026-08-27 12:00:00
+'Version: 10.1.5
 'Tip: To override a DTO option, remove "''" prefix before updating
-'BaseUrl: https://blazor-vue.web-templates.io
+'BaseUrl: https://api.example.com
 '
 '''GlobalNamespace: 
 '''MakePartial: True
@@ -91,13 +323,13 @@ The header comments in the generated DTO's allows for further customization of h
 '''AddDefaultXmlNamespace: http://schemas.servicestack.net/types
 ```
 
-To override these options on the client, the comment has to be changed to start with a single `'` instead of triple `'''`. This convention is due to VB.Net not having block quotes. For example, if we did't want our classes to be partial by default for the VB.Net client, our options would look like below.
+To override an option, change its prefix from triple `'''` to a single `'`. This convention is used because VB.NET has no block comment syntax. For example, this disables partial classes:
 
 ```vb
 ' Options:
-'Date: 2014-10-21 00:45:05
-'Version: 1
-'BaseUrl: https://blazor-vue.web-templates.io
+'Date: 2026-08-27 12:00:00
+'Version: 10.1.5
+'BaseUrl: https://api.example.com
 '
 'MakePartial: False
 '''MakeVirtual: True
@@ -120,20 +352,18 @@ Options that do not start with a `'''` are sent to the server to override any de
 
 ### Change Default Server Configuration
 
-The above defaults are also overridable on the ServiceStack Server by modifying the default config on the `NativeTypesFeature` Plugin, e.g:
+The defaults can also be overridden on the ServiceStack server by modifying the `NativeTypesFeature` configuration:
 
 ```csharp
-//Server example in CSharp
 var nativeTypes = this.GetPlugin<NativeTypesFeature>();
 nativeTypes.MetadataTypesConfig.MakeVirtual = false;
-...
 ```
 
-We'll go through and cover each of the above options to see how they affect the generated DTO's:
+The following options control the generated source.
 
 ### MakePartial
 
-Adds the `partial` modifier to all types, letting you extend generated DTO's with your own class separate from the generated types:
+Adds the `Partial` modifier to generated types, letting you extend DTOs in separate source files:
 
 ```vb
 Public Partial Class GetAnswers
@@ -141,7 +371,7 @@ Public Partial Class GetAnswers
 
 ### MakeVirtual
 
-Adds the `virtual` modifier to all properties:
+Adds the `Overridable` modifier to all properties:
 
 ```vb
 Public Partial Class GetAnswers
@@ -152,7 +382,7 @@ End Class
 
 ### MakeDataContractsExtensible
 
-Add .NET's DataContract's [ExtensionDataObject](http://msdn.microsoft.com/en-us/library/system.runtime.serialization.extensiondataobject(v=vs.110).aspx) to all DTO's:
+Add .NET's DataContract [ExtensionDataObject](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.serialization.extensiondataobject) to all DTOs:
 
 ```vb
 Public Partial Class Hello
@@ -165,18 +395,18 @@ End Class
 
 ### AddReturnMarker
 
-AddReturnMarker annotates Request DTO's with an `IReturn(Of T)` marker referencing the Response type ServiceStack infers your Service to return:
+`AddReturnMarker` annotates Request DTOs with an `IReturn(Of T)` marker referencing the response type ServiceStack infers the Service returns:
 
 ```vb
 Public Partial Class GetAnswers
     Implements IReturn(Of GetAnswersResponse)
 ``` 
 
-> Original DTO doesn't require a return marker as response type can be inferred from Services return type or when using the `%Response` DTO Naming convention
+> The original DTO does not need a return marker. ServiceStack can infer its response from the Service return type or the `%Response` DTO naming convention.
 
 ### AddDescriptionAsComments
 
-Converts any textual Description in `<Description>` attributes as VB.Net class Doc comments which allows your API to add intellisense in client projects:
+Converts text from `<Description>` attributes into VB.NET documentation comments, providing IntelliSense in client projects:
 
 ```vb
 '''<Summary>
@@ -187,7 +417,7 @@ Public Class GetAnswers
 
 ### AddDataContractAttributes
 
-Decorates all DTO types with `<DataContract>` and properties with `<DataMember>` as well as adding default XML namespaces for all VB.Net namespaces used:
+Decorates all DTO types with `<DataContract>` and properties with `<DataMember>`, and adds default XML namespaces for the generated VB.NET namespaces:
 
 ```vb
 <Assembly: ContractNamespace("http://schemas.servicestack.net/types", ClrNamespace:="StackApis.ServiceModel.Types")>
@@ -218,16 +448,16 @@ End Class
 
 ### AddGeneratedCodeAttributes
 
-Emit `<GeneratedCode>` attribute on all generated Types:
+Emits a `<GeneratedCode>` attribute on every generated type:
 
 ```vb
-<GeneratedCode>
+<GeneratedCode("AddServiceStackReference", "10.1.5")>
 Public Partial Class GetAnswers ...
 ```
 
 ### AddResponseStatus
 
-Automatically add a `ResponseStatus` property on all Response DTO's, regardless if it wasn't already defined:
+Automatically adds a `ResponseStatus` property to response DTOs which do not already define one:
 
 ```vb
 Public Partial Class GetAnswers
@@ -238,7 +468,7 @@ End Class
 
 ### AddImplicitVersion
 
-Lets you specify the Version number to be automatically populated in all Request DTO's sent from the client: 
+Specifies the version number automatically populated in every Request DTO sent from the client:
 
 ```vb
 Public Partial Class GetAnswers
@@ -250,29 +480,38 @@ Public Partial Class GetAnswers
 End Class
 ```
 
-This lets you know what Version of the Service Contract that existing clients are using making it easy to implement ServiceStack's [recommended versioning strategy](http://stackoverflow.com/a/12413091/85785). 
+This identifies the service-contract version used by existing clients, making it easier to implement ServiceStack's [recommended versioning strategy](http://stackoverflow.com/a/12413091/85785).
 
 ### InitializeCollections
 
-Lets you automatically initialize collections in Request DTO's:
+Automatically initializes collections in generated DTOs:
 
 ```vb
 Public Partial Class SearchQuestions
-    Public Sub New()
-        Tags = New List(Of String)
-    End Sub
-    Public Overridable Property Tags As List(Of String)
+    Public Overridable Property Tags As List(Of String) = New List(Of String)
     ...
-}
+End Class
+```
+
+### ExportValueTypes
+
+By default custom value types are represented as strings unless they are enums. Enable `ExportValueTypes` to emit and reference their value type definitions instead:
+
+```vbnet
+' Options:
+'ExportValueTypes: True
 ```
 
 ### IncludeTypes
-Is used as a Whitelist that can be used to specify only the types you would like to have code-generated:
+
+Specifies only the types you want generated:
+
+```vbnet
+' Options:
+'IncludeTypes: GetTechnology,GetTechnologyResponse
 ```
-/* Options:
-IncludeTypes: GetTechnology,GetTechnologyResponse
-```
-Will only generate `GetTechnology` and `GetTechnologyResponse` DTO's, e.g:
+
+Only generates the `GetTechnology` and `GetTechnologyResponse` DTOs:
 
 ```vb
 Public Partial Class GetTechnology ...
@@ -283,44 +522,47 @@ Public Partial Class GetTechnologyResponse ...
 
 You can include a Request DTO and all its dependent types with a `.*` suffix on the Request DTO, e.g:
 
-```
-/* Options:
-IncludeTypes: GetTechnology.*
+```vbnet
+' Options:
+'IncludeTypes: GetTechnology.*
 ```
 
-Which will include the `GetTechnology` Request DTO, the `GetTechnologyResponse` Response DTO and all Types that they both reference.
+This includes the `GetTechnology` Request DTO, its `GetTechnologyResponse` Response DTO and all types referenced by either DTO.
 
 #### Include All Types within a C# namespace
 
-If your DTOs are grouped into different namespaces they can be all included using the `/*` suffix, e.g:
+If your DTOs are grouped into different namespaces, include a complete C# namespace with the `/*` suffix:
 
-```
-/* Options:
-IncludeTypes: MyApp.ServiceModel.Admin/*
+```vbnet
+' Options:
+'IncludeTypes: MyApp.ServiceModel.Admin/*
 ```
 
-This will include all DTOs within the `MyApp.ServiceModel.Admin` C# namespace. 
+This includes all DTOs within the `MyApp.ServiceModel.Admin` C# namespace.
 
 ### ExcludeTypes
-Is used as a Blacklist where you can specify which types you would like to exclude from being generated:
+
+Specifies types to exclude from generation:
+
+```vbnet
+' Options:
+'ExcludeTypes: GetTechnology,GetTechnologyResponse
 ```
-/* Options:
-ExcludeTypes: GetTechnology,GetTechnologyResponse
-```
-Will exclude `GetTechnology` and `GetTechnologyResponse` DTO's from being generated.
+
+Excludes the `GetTechnology` and `GetTechnologyResponse` DTOs from generation.
 
 ### AddNamespaces
 
 Include additional VB.NET namespaces, e.g:
 
-```
+```vbnet
 ' Options:
 'AddNamespaces: System.Drawing,MyApp
 ```
 
 Where it will generate the specified namespaces in the generated Types:
 
-```csharp
+```vbnet
 Imports System.Drawing
 Imports MyApp
 ```
@@ -329,7 +571,7 @@ Imports MyApp
 
 This lets you change the default DataContract XML namespace used for all namespaces:
 
-```csharp
+```vbnet
 <Assembly: ContractNamespace("http://my.types.net", ClrNamespace:="StackApis.ServiceModel.Types")>
 <Assembly: ContractNamespace("http://my.types.net", ClrNamespace:="StackApis.ServiceModel")>
 ```
