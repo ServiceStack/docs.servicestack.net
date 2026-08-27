@@ -1,8 +1,10 @@
 ---
-title: PHP Add ServiceStack Reference
+title: PHP ServiceStack Reference
 ---
 
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
 ![ServiceStack and PHP Banner](/img/pages/servicestack-reference/php-reference.png)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PhpStorm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -161,13 +163,13 @@ Using promoted constructors enables DTOs to be populated using a single construc
 which together with the generic `JsonServiceClient` enables end-to-end typed API Requests in a single LOC:
 
 ```php
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 use dtos\Hello;
 
 $client = new JsonServiceClient("https://test.servicestack.net");
 
 /** @var HelloResponse $response */
-$response = client->get(new Hello(name:"World"));
+$response = $client->get(new Hello(name:"World"));
 ```
 
 > The `HelloResponse` optional type hint doesn't change runtime behavior but enables static analysis tools and IDEs like PyCharm to provide rich intelli-sense and development time feedback.
@@ -217,7 +219,7 @@ require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer 
 require_once 'dtos.php';
 
 use dtos\FindTechnologies;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create("https://techstacks.io");
 
@@ -332,8 +334,12 @@ class JsonServiceClient
     public array $cookies = [];
 
     public function __construct(string $baseUrl);
+    public static function create(string $baseUrl): JsonServiceClient;
 
+    public function setBasePath(string $path): void;
     public function setCredentials(?string $userName = null, ?string $password = null) : void;
+    public function setBearerToken(?string $bearerToken): void;
+    public function setRefreshToken(?string $refreshToken): void;
     public function getTokenCookie();
     public function getRefreshTokenCookie();
 
@@ -576,7 +582,7 @@ require_once 'dtos.php';
 
 use dtos\GetTechnology;
 use dtos\GetTechnologyResponse;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create("https://techstacks.io");
 
@@ -588,6 +594,55 @@ $tech = $response->technology; // typed to Technology
 echo "$tech->name by $tech->vendorName from $tech->productUrl\n";
 echo "$tech->name TechStacks:\n";
 print_r($response->technologyStacks);
+```
+
+### Resolving the HTTP Method
+
+`send` uses the HTTP Method its API is annotated with, which generated DTOs return from the `getMethod()` implementation
+that's populated from the API's `@Route` Verb or from its `IGet`, `IPost`, `IPut`, `IPatch`, `IDelete` and `IOptions`
+interface markers:
+
+```php
+// @Route("/technology/{Slug}")
+class GetTechnology implements IReturn, IGet, JsonSerializable
+{
+    //...
+    public function getMethod(): string { return 'GET'; }
+}
+
+// GET /api/GetTechnology?slug=ServiceStack
+/** @var GetTechnologyResponse $response */
+$response = $client->send(new GetTechnology(slug:"ServiceStack"));
+```
+
+Request DTOs that aren't annotated with a Verb default to `POST` (whilst [AutoQuery](/autoquery/) Requests inheriting
+`QueryDb` default to `GET`), which can be overridden per Request by using the explicit `get`, `post`, `put`, `patch`,
+`delete`, `head` and `options` methods:
+
+```php
+$client->get(new SendReturnVoid(id:1));     // GET
+$client->post(new SendReturnVoid(id:2));    // POST
+$client->put(new SendReturnVoid(id:3));     // PUT
+$client->delete(new SendReturnVoid(id:4));  // DELETE
+```
+
+The HTTP Method also determines whether a Request DTO's populated properties are sent in the QueryString or the JSON
+Request Body, where only `GET`, `DELETE`, `HEAD` and `OPTIONS` Requests send their properties in the QueryString.
+
+APIs that don't return a Response Body implement `IReturnVoid` and can be sent with any of the client's methods:
+
+```php
+$client->post(new HelloReturnVoid(id:1));
+```
+
+Use `resolveHttpMethod` to resolve what HTTP Method a Request DTO will be sent with:
+
+```php
+use function ServiceStack\resolveHttpMethod;
+
+resolveHttpMethod(new SendGet());   // GET
+resolveHttpMethod(new SendPost());  // POST
+resolveHttpMethod(new SendPut());   // PUT
 ```
 
 ### PHPDoc Typed Annotations
@@ -634,9 +689,54 @@ $response = $client->post(new Authenticate(
     rememberMe: true));
 ```
 
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a typed `QueryResponse<T>` whose `results` are typed to the Response Type declared
+in the Request DTO's `#[Returns]` annotation, e.g:
+
+```php
+use ServiceStack\QueryResponse;
+use dtos\{FindTechnologies,TechnologyView};
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get(new FindTechnologies(ids:[1,2,3], vendorName:"Google"));
+
+/** @var array<TechnologyView> $results */
+$results = $response->results;
+
+foreach ($results as $tech) {
+    echo "$tech->id $tech->name ($tech->viewCount)\n";
+}
+```
+
+As generated AutoQuery DTOs use promoted constructors for their own properties, the query params they inherit from their
+`QueryDb` base class are populated as properties:
+
+```php
+$request = new FindTechnologies(vendorName:"Google");
+$request->take = 5;
+$request->orderByDesc = "viewCount";
+$request->fields = "id,name,vendorName,viewCount";
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get($request);
+
+echo "Showing " . count($response->results) . " of $response->total\n";
+```
+
+Which can also be called with a custom URL by specifying the generic Response Type with `QueryResponse::create()`:
+
+```php
+$args = ["take" => 3, "vendorName" => "Amazon"];
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->getUrl("/technology/search", args:$args,
+    responseAs: QueryResponse::create(["TechnologyView"]));
+```
+
 ### Sending additional arguments with Typed API Requests
 
-Many AutoQuery Services utilize [implicit conventions](/autoquery-rdbms#implicit-conventions) 
+Many AutoQuery Services utilize [implicit conventions](/autoquery/rdbms#implicit-conventions) 
 to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments 
 with the typed Request DTO, e.g:
 
@@ -655,26 +755,157 @@ $client->getUrl("/technology/ServiceStack", responseAs:new GetTechnologyResponse
 $client->getUrl("https://techstacks.io/technology/ServiceStack", 
     responseAs:new GetTechnologyResponse());
 
-// https://techstacks.io/technology?Slug=ServiceStack
-$args = ["slug" => "ServiceStack"]
-client.getUrl("/technology", args:$args, responseAs:new GetTechnologyResponse()); 
+// https://techstacks.io/technology?slug=ServiceStack
+$args = ["slug" => "ServiceStack"];
+$client->getUrl("/technology", args:$args, responseAs:new GetTechnologyResponse());
 ```
 
 as well as POST Request DTOs to custom urls:
 
 ```php
-$client->postUrl("/custom-path", $request, args:["slug" => "ServiceStack"]);
+$client->postUrl("/custom-path", body:$request, args:["slug" => "ServiceStack"]);
 
-$client->postUrl("http://example.org/custom-path", $request);
+$client->postUrl("http://example.org/custom-path", body:$request);
 ```
+
+Where `responseAs` can be populated with an instance of the Response DTO the Response should be deserialized into, the
+`'string'` Type to return the raw JSON or left unspecified to return the parsed JSON in a PHP associative array:
+
+```php
+// Deserialized into a typed Response DTO
+$response = $client->getUrl("/hello", args:["name" => "World"], responseAs:new HelloResponse());
+echo $response->result;   // Hello, World!
+
+// Raw JSON string
+$json = $client->getUrl("/hello", args:["name" => "World"], responseAs:'string');
+// {"result":"Hello, World!"}
+
+// Associative array
+$obj = $client->postUrl("/hello", body:json_encode(new Hello(name:"World")));
+echo $obj['result'];      // Hello, World!
+```
+
+Sending a Request DTO in the `body` of a `*Url` method uses its Response Type when `responseAs` isn't specified:
+
+```php
+/** @var HelloResponse $response */
+$response = $client->postUrl("/hello", body:new Hello(name:"World"));
+```
+
+### Built-in ServiceStack DTOs
+
+The `servicestack/client` package includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them
+without needing to generate them:
+
+```php
+use ServiceStack\{Authenticate,AuthenticateResponse,AssignRoles,UnAssignRoles,
+    ConvertSessionToToken,GetAccessToken,GetAccessTokenResponse};
+
+// Authentication
+/** @var AuthenticateResponse $auth */
+$auth = $client->post(new Authenticate(
+    provider:"credentials", userName:"test", password:"test", rememberMe:true));
+
+// JWT
+$client->post(new ConvertSessionToToken());  // Session -> JWT Cookies
+
+/** @var GetAccessTokenResponse $access */
+$access = $client->post(new GetAccessToken(refreshToken:$auth->refreshToken));
+
+// Roles and Permissions
+$client->post(new AssignRoles(userName:"user", roles:["Employee"]));
+$client->post(new UnAssignRoles(userName:"user", roles:["Employee"]));
+```
+
+Together with the built-in Response Types, interface markers and base types that generated DTOs reference:
+
+| Type                                                        | Description                                                     |
+|-------------------------------------------------------------|-----------------------------------------------------------------|
+| `ResponseStatus`                                            | ServiceStack's structured error response                         |
+| `ResponseError`                                             | An individual field validation error                             |
+| `EmptyResponse`                                             | Response of APIs that don't return a Response Body               |
+| `IdResponse`                                                | Response returning the Id of the created or updated entity       |
+| `StringResponse` / `StringsResponse`                        | Response returning a single `result` string or `results` array   |
+| `QueryResponse<T>`                                          | Typed Response of [AutoQuery](/autoquery/) Requests              |
+| `QueryDb` `QueryDb2` `QueryData` `QueryData2` `QueryBase`   | Base types of generated AutoQuery Request DTOs                   |
+| `IGet` `IPost` `IPut` `IPatch` `IDelete` `IOptions`         | Interface markers resolving a Request DTO's HTTP Method          |
+| `IReturn` / `IReturnVoid`                                   | Interface markers resolving a Request DTO's Response Type        |
+| `ICreateDb` `IUpdateDb` `IPatchDb` `IDeleteDb` `ISaveDb`    | Interface markers of [AutoQuery CRUD](/autoquery/crud) APIs      |
+| `IHasSessionId` / `IHasBearerToken` / `IHasVersion`         | Interface markers for Requests carrying auth and versioning info |
+| `AuditBase`                                                 | Base type of Tables with [Audit](/autoquery/audit-log) fields    |
+| `KeyValuePair2` / `Tuple2` / `Tuple3`                       | .NET's `KeyValuePair<K,V>`, `Tuple<A,B>` and `Tuple<A,B,C>`      |
+| `ByteArray`                                                 | Binary `byte[]` and `Stream` data, serialized as Base64          |
+| `ArrayList`                                                 | Response of APIs returning a naked collection                    |
+| `UploadFile`                                                | A file uploaded in a `multipart/form-data` Request               |
+| `WebServiceException` / `RefreshTokenException`             | Structured error details of a failed Request                     |
+
+As well as `NavItem` and `GetNavItems`, `Register`, `GetApiKeys`, `RegenerateApiKeys`, `UserApiKey`, `CancelRequest`
+and `UpdateEventSubscriber` DTOs for calling their built-in APIs.
 
 ### Uploading Files
 
-The `post_file_with_request` method can be used to upload a file with an API Request.
+Use `postFileWithRequest` to upload a file with an API Request, where the Request DTO's populated properties are sent
+as form fields alongside the file in a `multipart/form-data` Request:
+
+```php
+use ServiceStack\UploadFile;
+
+/** @var TestFileUploadsResponse $response */
+$response = $client->postFileWithRequest(new TestFileUploads(id:1, refId:"zid"),
+    new UploadFile(
+        filePath: '/path/to/test.txt',
+        fileName: 'test.txt',
+        fieldName: 'file',
+        contentType: 'text/plain'
+    ));
+```
+
+Where `UploadFile` describes each file to upload:
+
+| Property      | Description                                                                   |
+|---------------|-------------------------------------------------------------------------------|
+| `filePath`    | Path of the file to upload                                                     |
+| `fileName`    | File name the file is uploaded with                                            |
+| `fieldName`   | Name of the form field the file is uploaded in, defaults to `upload`           |
+| `contentType` | Content-Type of the file, inferred from its file extension when not specified  |
+
+Use `postFilesWithRequest` to upload multiple files in the same Request:
+
+```php
+$uploads = [
+    new UploadFile(filePath:$textFile, fileName:'test.txt', 
+        fieldName:'audio',   contentType:'text/plain'),
+    new UploadFile(filePath:$mdFile,   fileName:'test.md',  
+        fieldName:'content', contentType:'text/markdown'),
+];
+
+/** @var TestFileUploadsResponse $response */
+$response = $client->postFilesWithRequest(new TestFileUploads(id:1, refId:"zid"), $uploads);
+
+foreach ($response->files as $file) {
+    echo "$file->name $file->fileName $file->contentType $file->contentLength\n";
+}
+```
+
+Or `postFileWithRequestUrl` and `postFilesWithRequestUrl` to upload files to a custom relative or absolute URL:
+
+```php
+$response = $client->postFilesWithRequestUrl('/api/TestFileUploads', 
+    new TestFileUploads(id:1, refId:"zid"), $uploads);
+```
+
+::: info
+`contentType` is optional where it's otherwise inferred from the file name extension, defaulting to `application/octet-stream`
+:::
 
 ### PHP Speech to Text
 
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
 ```php
+$client = JsonServiceClient::create($aiServerUrl);
+$client->setBearerToken($aiServerApiKey);
+
 $audioFile = __DIR__ . '/files/audio.wav';
 
 /** @var GenerationResponse $response */
@@ -685,9 +916,11 @@ $response = $client->postFileWithRequest(new SpeechToText(),
         fieldName: 'audio',
         contentType: 'audio/wav'
     ));
+
+echo $response->textOutputs[0]->text;
 ```
 
-To upload multiple files use `postFilesWithRequest`.
+Which can be used to call any of [AI Server's](/ai-server/) APIs that accept file uploads.
 
 ### Raw Data Responses
 
@@ -703,11 +936,136 @@ Which can then be accessed as normal, with their Response typed to a PHP `string
 
 ```php
 /** @var string $str */ 
-$str = client.get(new ReturnString());
+$str = $client->get(new ReturnString());
 
 /** @var ByteArray $data */ 
-$data = client->get(new ReturnBytes());
+$data = $client->get(new ReturnBytes());
 ```
+
+### Batched Requests
+
+Multiple Request DTOs of the same Type can be sent together in a single Request with `sendAll` which returns all
+their Responses:
+
+```php
+$requests = array_map(fn($name) => new Hello(name:$name), ["foo", "bar", "baz"]);
+
+// POST /api/Hello[]
+$responses = $client->sendAll($requests);
+
+echo implode(", ", array_map(fn($x) => $x->result, $responses));
+// Hello, foo!, Hello, bar!, Hello, baz!
+```
+
+Or use `sendAllOneWay` to send Requests you want to ignore the Responses of:
+
+```php
+$requests = array_map(fn($id) => new HelloReturnVoid(id:$id), [1, 2, 3]);
+
+// POST /api/HelloReturnVoid[]
+$client->sendAllOneWay($requests);
+```
+
+All Requests in a batch are sent to the same `/api/{Request}[]` endpoint (or to `/json/reply/{Request}[]` and
+`/json/oneway/{Request}[]` when the client is configured with `setBasePath('')`) where the Server executes them in order
+and returns the number of Requests it completed in the `X-AutoBatch-Completed` HTTP Response Header:
+
+```php
+$client->responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx->responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+```
+
+### Sending Raw Request Bodies
+
+APIs that accept a custom Request Body can be sent by populating the `body` param, where the Request DTO's properties
+are sent in the QueryString and the `body` is sent as the Request Body:
+
+```php
+// POST /api/SendJson?id=1&name=name {"foo":"bar"}
+$json = $client->post(new SendJson(id:1, name:"name"), body:json_encode(["foo" => "bar"]));
+
+// POST /api/SendText?id=1&name=name foo
+$text = $client->post(new SendText(id:1, name:"name", contentType:"text/plain"), body:"foo");
+```
+
+A `string` body is sent as-is whilst a `JsonSerializable` DTO is serialized to JSON.
+
+### Error Handling
+
+Failed API Requests throw a `WebServiceException` containing the HTTP Status Code and the API's structured
+[ResponseStatus](/error-handling) error:
+
+```php
+use ServiceStack\WebServiceException;
+
+try {
+    $client->put(new ThrowType(type:"NotFound", message:"not here"));
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;                 // 404
+    echo $ex->responseStatus->errorCode;  // NotFound
+    echo $ex->responseStatus->message;    // not here
+}
+```
+
+| Property            | Description                                                                        |
+|---------------------|------------------------------------------------------------------------------------|
+| `statusCode`        | HTTP Status Code of the error Response, e.g. `404`                                  |
+| `statusDescription` | HTTP Status Description, e.g. `"Not Found"`                                         |
+| `responseStatus`    | The API's structured `ResponseStatus` with its `errorCode`, `message` and `errors`  |
+| `getMessage()`      | The `ResponseStatus` Error Message, otherwise the HTTP Status Description            |
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field validation
+error in `errors`, with the first error also captured in the summary `errorCode` and `message`:
+
+```php
+try {
+    $client->post(new ThrowValidation(email:"invalidemail"));
+} catch (WebServiceException $ex) {
+    $status = $ex->responseStatus;
+
+    echo $status->errorCode;  // InclusiveBetween
+    echo $status->message;    // 'Age' must be between 1 and 120. You entered 0.
+
+    foreach ($status->errors as $error) {
+        echo "$error->fieldName: $error->errorCode $error->message\n";
+    }
+    // Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+    // Required: NotEmpty 'Required' must not be empty.
+    // Email: Email 'Email' is not a valid email address.
+}
+```
+
+Requests failing before reaching the Server, e.g. connection errors, also throw a `WebServiceException` with a `500`
+Status Code:
+
+```php
+$client = new JsonServiceClient("http://unknown-zzz.net");
+try {
+    $client->get(new Hello(name:"World"));
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;         // 500
+    echo $ex->statusDescription;  // Request Failed
+}
+```
+
+Whilst Requests to APIs requiring Authentication that the client wasn't able to authenticate with throw a `401`:
+
+```php
+try {
+    $client->post(new RequiresAdmin());
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;                 // 401
+    echo $ex->responseStatus->errorCode;  // 401
+    echo $ex->responseStatus->message;    // Unauthorized
+}
+```
+
+::: info
+Requests that fail to fetch a new JWT with a Refresh Token throw a `RefreshTokenException` which extends `WebServiceException`
+:::
 
 ### Authenticating using Basic Auth
 
@@ -715,13 +1073,13 @@ Basic Auth support is implemented in `JsonServiceClient` and follows the same AP
 
 ```php
 $client = new JsonServiceClient($baseUrl);
-$client->username = user;
-$client->password = pass;
+$client->userName = $user;
+$client->password = $pass;
 
-$response = client->get(new SecureRequest());
+$response = $client->get(new SecureRequest());
 ```
 
-Or use `$client->setCredentials()` to have them set both together.
+Or use `$client->setCredentials($user, $pass)` to have them set both together.
 
 ### Authenticating using Credentials
 
@@ -730,17 +1088,29 @@ Alternatively you can authenticate using userName/password credentials by
 to your remote ServiceStack Instance and sending a populated `Authenticate` Request DTO, e.g:
 
 ```php
-$request = new Authenticate();
-$request->provider = "credentials";
-$request->userName = $userName;
-$request->password = $password;
-$request->remember_me = true;
+use ServiceStack\{Authenticate,AuthenticateResponse};
 
-$response = client->post(request);
+/** @var AuthenticateResponse $response */
+$response = $client->post(new Authenticate(
+    provider: "credentials",
+    userName: $userName,
+    password: $password,
+    rememberMe: true));
+
+echo $response->userId;
+echo $response->sessionId;
 ```
 
 This will populate the `JsonServiceClient` with [Session Cookies](/sessions#cookie-session-ids) 
 which will transparently be sent on subsequent requests to make authenticated requests.
+
+All Cookies the Server returns are maintained in the client's `cookies` property, with the JWT Token and Refresh Token
+Cookies also accessible from:
+
+```php
+$client->getTokenCookie();         // ss-tok
+$client->getRefreshTokenCookie();  // ss-reftok
+```
 
 ### Authenticating using JWT
 
@@ -751,10 +1121,16 @@ using a JWT Token:
 $client->bearerToken = $jwt;
 ```
 
+Which can also be configured with `setBearerToken()`:
+
+```php
+$client->setBearerToken($jwt);
+```
+
 Alternatively you can use just a [Refresh Token](/jwt-authprovider#refresh-tokens) instead:
 
 ```php
-$client->refreshYoken = $refreshToken;
+$client->refreshToken = $refreshToken;
 ```
 
 Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.
@@ -780,33 +1156,49 @@ $authClient = new JsonServiceClient(AUTH_URL);
 $client->onAuthenticationRequired = new class($client, $authClient) implements Callback {
     public function __construct(public JsonServiceClient $client, public JsonServiceClient $authClient) {}
     public function call(): void {
-        $this->authClient->setCredentials("test", "test");
-        $this->client->bearerToken = $this->authClient->get(new Authenticate())->getRefreshTokenCookie();
+        // Authenticate with the Auth Server then use its JWT Token to retry the original Request
+        $this->authClient->post(new Authenticate(
+            provider:"credentials", userName:"test", password:"test"));
+        $this->client->bearerToken = $this->authClient->getTokenCookie();
     }
 };
 
 // Automatically retries requests returning 401 Responses with new bearerToken
-$response = client->get(new Secured());
+$response = $client->get(new Secured());
+```
+
+Which can also be used to re-configure the client itself, e.g. to authenticate with Basic Auth credentials:
+
+```php
+$client->onAuthenticationRequired = new class($client) implements Callback {
+    public function __construct(public JsonServiceClient $client) {}
+    public function call(): void {
+        $this->client->setCredentials("test", "test");
+    }
+};
+
+$response = $client->get(new TestAuth());
 ```
 
 ### Automatically refresh Access Tokens
 
 With the [Refresh Token support in JWT](/jwt-authprovider#refresh-tokens) 
-you can use the `refresh_token` property to instruct the Service Client to automatically fetch new JWT Tokens behind 
+you can use the `refreshToken` property to instruct the Service Client to automatically fetch new JWT Tokens behind 
 the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:
 
 ```php
 // Authenticate to get new Refresh Token
 $authClient = new JsonServiceClient(AUTH_URL);
-$authClient.userName = $userName;
-$authClient.password = $password;
+$authClient->setCredentials($userName, $password);
+
+/** @var AuthenticateResponse $authResponse */
 $authResponse = $authClient->get(new Authenticate());
 
 // Configure client with RefreshToken
 $client->refreshToken = $authResponse->refreshToken;
 
 // Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
-$response = client->get(new Secured());
+$response = $client->get(new Secured());
 ```
 
 Use the `refreshTokenUri` property when refresh tokens need to be sent to a different ServiceStack Server, e.g:
@@ -815,6 +1207,343 @@ Use the `refreshTokenUri` property when refresh tokens need to be sent to a diff
 $client->refreshToken = $refreshToken;
 $client->refreshTokenUri = AUTH_URL . "/access-token";
 ```
+
+Or enable `useTokenCookie` to have the client refresh Access Tokens using the
+[Refresh Token Cookie](/jwt-authprovider#refresh-token-cookies-supported-in-all-service-clients) the Server returned
+instead of needing to manage Tokens yourself:
+
+```php
+$client->useTokenCookie = true;
+```
+
+If the Refresh Token has itself expired or is invalid the client throws a `RefreshTokenException`:
+
+```php
+use ServiceStack\RefreshTokenException;
+
+try {
+    $client->get(new Secured());
+} catch (RefreshTokenException $ex) {
+    echo $ex->responseStatus->errorCode;  // TokenException
+    echo $ex->responseStatus->message;    // Token has expired
+}
+```
+
+### Client Configuration
+
+`JsonServiceClient` sends Requests to ServiceStack's pre-defined `/api` route, use `setBasePath` to change the base
+path Requests are sent to, e.g. for older ServiceStack instances that only have the pre-defined `/json/reply` routes
+enabled:
+
+```php
+$client->setBasePath("");     // /json/reply/{Request} and /json/oneway/{Request}
+$client->setBasePath("api");  // /api/{Request} (default)
+```
+
+Custom headers can be added to all Requests by populating `headers`:
+
+```php
+$client = new JsonServiceClient($baseUrl);
+$client->headers["X-Custom"] = "Value";
+$client->setBearerToken($apiKey);
+```
+
+Whilst `options` lets you customize the [PHP stream context](https://www.php.net/manual/en/context.php) its Requests
+are sent with, e.g. to configure custom SSL options:
+
+```php
+$client->options = [
+    'ssl' => [
+        'cafile' => '/path/to/ca.pem',
+    ],
+];
+```
+
+The client maintains any Cookies the Server returns in its `cookies` property which are sent on subsequent Requests,
+so use a separate client instance where you need to maintain different Authenticated Sessions.
+
+### Request, Response and Exception Filters
+
+Clients can be decorated with generic functionality using instance and static Request, Response and Exception filters,
+useful for logging, adding headers or inspecting Responses. Filters implement the `RequestFilter`, `ResponseFilter` and
+`ExceptionFilter` interfaces which can be implemented inline with an anonymous class:
+
+```php
+use ServiceStack\{RequestFilter,ResponseFilter,ExceptionFilter,SendContext};
+
+// Instance filters only apply to this client
+$client->requestFilter = new class implements RequestFilter {
+    public function call(SendContext $ctx) {
+        echo "$ctx->method $ctx->url\n";
+    }
+};
+$client->responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx->responseHeaders['statusCode'] . "\n";
+    }
+};
+$client->exceptionFilter = new class implements ExceptionFilter {
+    public function call(mixed $response, Exception $e) {
+        echo "ERROR: " . $e->getMessage() . "\n";
+    }
+};
+
+// Static filters apply to all clients
+JsonServiceClient::$globalRequestFilter = $requestFilter;
+JsonServiceClient::$globalResponseFilter = $responseFilter;
+JsonServiceClient::$globalExceptionFilter = $exceptionFilter;
+```
+
+Instance filters are invoked before global filters, where the `SendContext` passed to Request filters lets you inspect
+and modify the Request before it's sent:
+
+| Property          | Description                                                     |
+|-------------------|-----------------------------------------------------------------|
+| `method`          | HTTP Method the Request is sent with                             |
+| `url`             | Absolute URL the Request is sent to, including its QueryString   |
+| `headers`         | The Request Headers, a copy of the client's `headers`            |
+| `cookies`         | The Cookies sent with the Request                                |
+| `request`         | The Request DTO being sent                                       |
+| `body`            | Custom Request Body, when sent                                   |
+| `args`            | Additional untyped arguments sent with the Request               |
+| `responseAs`      | The Type the Response will be deserialized into                  |
+| `responseHeaders` | The Response HTTP Headers, populated in Response Filters         |
+| `responseCookies` | The Cookies returned in the Response                             |
+
+State can be captured by declaring it in the anonymous class constructor, e.g. to capture a custom Response Header:
+
+```php
+$header = '';
+$client->responseFilter = new class($header) implements ResponseFilter {
+    public function __construct(public string &$header) {}
+    public function call(mixed $response, SendContext $ctx) {
+        $this->header = $ctx->responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+```
+
+### Complex Type Support
+
+Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists, Arrays,
+Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent PHP types:
+
+```php
+$request = new AllCollectionTypes(
+    intArray: [1, 2, 3],
+    intList: [4, 5, 6],
+    stringArray: ["A", "B", "C"],
+    stringList: ["D", "E", "F"],
+    byteArray: ByteArray::fromRaw(b"ABC"),                // sent as base64
+    pocoArray: [new Poco(name:"pocoArray")],
+    pocoList: [new Poco(name:"pocoList")],
+    pocoLookup: ["A" => [new Poco(name:"B"), new Poco(name:"C")]],
+    pocoLookupMap: ["A" => [["B" => new Poco(name:"C")], ["D" => new Poco(name:"E")]]]);
+```
+
+.NET's built-in Types are mapped to their closest PHP equivalent, where their different serialization formats are
+transparently converted to and from native PHP types:
+
+| .NET Type                            | PHP Type        | Serialized as                        |
+|--------------------------------------|-----------------|--------------------------------------|
+| `string` / `char`                    | `string`        | `"string"`                            |
+| `bool`                               | `bool`          | `true`                                |
+| `int` `long` `short` `byte` `uint`   | `int`           | `1`                                   |
+| `float` `double` `decimal`           | `float`         | `1.1`                                 |
+| `DateTime` / `DateTimeOffset`        | `DateTime`      | `"/Date(978307200000)/"`              |
+| `TimeSpan`                           | `DateInterval`  | `"PT1H"`                              |
+| `Guid`                               | `string`        | `"ea762009b66c410b9bf5ce21ad519249"`  |
+| `byte[]` / `Stream`                  | `ByteArray`     | base64 encoded `string`               |
+| `List<T>` / `T[]`                    | `array`         | `[1,2,3]`                             |
+| `Dictionary<K,V>`                    | `array`         | `{"A":"B"}`                           |
+| `KeyValuePair<K,V>`                  | `KeyValuePair2` | `{"key":"A","value":"B"}`             |
+
+APIs returning a naked collection are deserialized into an `ArrayList` which can be counted and iterated like an array
+or converted into one with `jsonSerialize()`:
+
+```php
+/** @var ArrayList $response */
+$response = $client->get(new GetNakedItems());
+echo count($response);
+
+$names = array_map(fn($item):string => $item->name, $response->jsonSerialize());
+```
+
+### Enum Support
+
+C# `enum` Types are generated as PHP [backed enums](https://www.php.net/manual/en/language.enumerations.backed.php)
+whose values are sent as strings, using their `[EnumMember]` value where they have one, whilst `[Flags]` enums and enums
+annotated with `[EnumAsInt]` are generated as `int` backed enums which are sent as their integer values:
+
+```php
+enum EnumType : string
+{
+    case Value1 = 'Value1';
+    case Value2 = 'Value2';
+}
+
+enum EnumWithValues : string
+{
+    case None = 'None';
+    case Value1 = 'Member 1';   // [EnumMember(Value = "Member 1")]
+}
+
+// @Flags()
+enum EnumFlags : int
+{
+    case Value1 = 1;
+    case Value2 = 2;
+    case Value3 = 4;
+}
+```
+
+As they're declared as typed properties on generated DTOs they're checked by PHP and static analysis tools when
+populated, then serialized in the format the Server expects:
+
+```php
+// ?enumProp=Value2&enumWithValues=Member+1&enumFlags=2&enumStyle=UPPER
+$client->get(new HelloWithEnum(
+    enumProp: EnumType::Value2,
+    enumWithValues: EnumWithValues::Value1,
+    enumFlags: EnumFlags::Value2,
+    enumStyle: EnumStyle::UPPER));
+```
+
+They can also be used in Lists and Dictionaries of enums, e.g:
+
+```php
+$client->post(new HelloWithEnumMap(
+    enumProp: [EnumType::Value2->name => EnumType::Value2],
+    enumFlags: [EnumFlags::Value2->name => EnumFlags::Value2]));
+// {"enumProp":{"Value2":"Value2"},"enumFlags":{"Value2":2}}
+```
+
+### QueryString Serialization
+
+Request DTO properties sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex types,
+which `qsValue` can be used to inspect:
+
+```php
+use function ServiceStack\qsValue;
+
+qsValue(null);                           // ""
+qsValue("A");                            // "A"
+qsValue(1);                              // "1"
+qsValue(true);                           // "true"
+qsValue([1, 2, 3]);                      // "[1,2,3]"
+qsValue(['a', 'b', 'c']);                // "[a,b,c]"
+qsValue(['a' => 1, 'b' => 2]);           // "{a:1,b:2}"
+qsValue(new SubType(id:1, name:"foo"));  // "{id:1,name:foo}"
+qsValue(ByteArray::fromRaw(b"PHP"));     // "UEhQ" (base64)
+```
+
+Names and values are URL encoded whilst `null` properties are omitted from the QueryString so the Server can apply
+its own defaults.
+
+### Serialization Utils
+
+As all generated DTOs implement `JsonSerializable` they can be serialized with PHP's `json_encode` whilst `fromMap()`
+populates a DTO from a decoded JSON object:
+
+```php
+$json = json_encode(new Hello(name:"World"));    // {"name":"World"}
+
+$dto = new Hello();
+$dto->fromMap(json_decode($json, associative:true));
+```
+
+The `JsonConverters` the client uses to convert .NET Types to and from their native PHP types can also be used
+directly, e.g:
+
+```php
+use ServiceStack\JsonConverters;
+
+/** @var HelloResponse $dto */
+$dto = JsonConverters::from('HelloResponse', json_decode($json, associative:true));
+
+$dtos = JsonConverters::fromArray('Poco', json_decode($jsonArray, associative:true));
+
+JsonConverters::to('DateTime', new DateTime("2001-01-01"));  // /Date(978307200000)/
+JsonConverters::to('DateInterval', new DateInterval("PT1H")); // PT1H
+JsonConverters::to('ByteArray', ByteArray::fromRaw(b"ABC"));  // QUJD
+JsonConverters::toArray('int', [1,2,3]);                      // [1,2,3]
+```
+
+Types are resolved from the `ServiceStack` and `dtos` namespaces by default, DTOs generated into a different
+[GlobalNamespace](#globalnamespace) are automatically registered when they're sent with the client, otherwise they can
+be registered with:
+
+```php
+JsonConverters::registerNamespace("techstacks");
+```
+
+### Logging
+
+The client logs its Requests and Responses through a pluggable `Logger`, use the built-in `ConsoleLogger` and enable
+the `Debug` log level to inspect the raw HTTP Requests and Responses it sends:
+
+```php
+use ServiceStack\{Log,LogLevel,ConsoleLogger};
+
+Log::$logger = new ConsoleLogger();
+Log::$levels[] = LogLevel::Debug;
+```
+
+Which logs each Request's URL and HTTP Options, its Response Status Code, Headers, Cookies and raw JSON Response. Only
+`LogLevel::Warn` and `LogLevel::Error` are enabled by default, implement `Logger` to route logging to your App's
+preferred logging library, e.g:
+
+```php
+use ServiceStack\{Log,LogLevel,Logger};
+
+class ErrorLogLogger implements Logger {
+    function log(LogLevel $logLevel, mixed $message=null, ?Exception $error=null) {
+        error_log("[{$logLevel->value}] " . (is_string($message) ? $message : print_r($message, true)));
+        if (isset($error))
+            error_log("[{$logLevel->value}] ERROR: " . $error->getMessage());
+    }
+}
+
+Log::$logger = new ErrorLogLogger();
+```
+
+### Testing
+
+As `JsonServiceClient` accepts any Base URL, APIs can be tested against a local instance of your App or a remote
+ServiceStack instance without needing to mock the client itself, which is how the client's own
+[test suite](https://github.com/ServiceStack/servicestack-php/tree/main/tests) verifies its Requests against the live
+[test.servicestack.net](https://test.servicestack.net) Services:
+
+```php
+<?php declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once 'dtos.php';
+
+use PHPUnit\Framework\TestCase;
+use ServiceStack\JsonServiceClient;
+use dtos\{Hello,HelloResponse};
+
+final class ClientTests extends TestCase
+{
+    public JsonServiceClient $client;
+
+    protected function setUp(): void {
+        $this->client = new JsonServiceClient("https://test.servicestack.net");
+    }
+
+    public function testCanGetHello() {
+        /** @var HelloResponse $response */
+        $response = $this->client->get(new Hello(name:"World"));
+        $this->assertEquals("Hello, World!", $response->result);
+    }
+}
+```
+
+Which can be run with [PHPUnit](https://phpunit.de):
+
+:::sh
+vendor/bin/phpunit
+:::
 
 ## DTO Customization Options 
 
@@ -1031,6 +1760,37 @@ class ByteArray implements JsonSerializable
 }
 ```
 
+Which is registered as the `ByteArray` Converter so `byte[]` and `Stream` properties are transparently converted
+to and from Base64:
+
+```php
+JsonConverters::registerConverter('ByteArray', new ByteArrayConverter());
+```
+
+Custom Converters implement the `Converter` interface which can be registered for any Type name used in
+generated DTOs, e.g:
+
+```php
+use ServiceStack\{Converter,JsonConverters,TypeContext};
+
+class UnixTimeConverter implements Converter
+{
+    function fromJson($o, TypeContext $ctx): mixed {
+        return (new DateTime())->setTimestamp(intval($o));
+    }
+    function toJson($value, TypeContext $ctx): mixed {
+        return $value->getTimestamp();
+    }
+}
+
+JsonConverters::registerConverter('UnixTime', new UnixTimeConverter());
+```
+
+::: info
+Converters for `string`, `int`, `float`, `bool`, `DateTime`, `DateInterval`, `ByteArray`, Lists, Dictionaries and
+enums are registered by default
+:::
+
 ## Inspect Utils
 
 To help clients with inspecting API Responses the `servicestack/client` library also includes a number of helpful utils 
@@ -1066,7 +1826,7 @@ echo  "Top 3 {$orgName} GitHub Repos:\n";
 Inspect::printDump(array_slice($orgRepos, 0, 3));
 
 echo  "\nTop 10 {$orgName} GitHub Repos:\n";
-Inspect::printDumpTable(array_map(function($x) {
+Inspect::printTable(array_map(function($x) {
     return [
         "name"        => $x["name"],
         "lang"        => $x["lang"],
@@ -1112,7 +1872,7 @@ For tabular result-sets you can use `Inspect::table` to capture and `Inspect::pr
 human-friendly markdown table, e.g:
 
 ```php
-echo "\nTop 10 $orgName Repos:\n"
+echo "\nTop 10 $orgName Repos:\n";
 Inspect::printTable(array_slice($orgRepos, 0, 10));
 ```
 
@@ -1134,4 +1894,22 @@ Top 10 php GitHub Repos:
 | systems        | C          |       41 |    27 |
 | web-wiki       | PHP        |       35 |    29 |
 +------------------------------------------------+
+```
+
+Both `Inspect::printDump` and `Inspect::printTable` accept the same data structures, so they can be used to inspect
+any API Response or its `results` collection, e.g:
+
+```php
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get(new FindTechnologies(ids:[1,2,3], vendorName:"Google"));
+
+Inspect::printDump($response);
+Inspect::printTable($response->results);
+```
+
+Whilst `Inspect::vars` captures a JSON snapshot of any variables to the path in the `INSPECT_VARS` Environment
+Variable, letting you inspect the state of an App's variables from outside the process:
+
+```php
+Inspect::vars(["response" => $response]);
 ```
