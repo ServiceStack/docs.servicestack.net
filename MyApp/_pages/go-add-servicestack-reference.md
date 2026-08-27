@@ -3,6 +3,8 @@ slug: go-add-servicestack-reference
 title: Go Add ServiceStack Reference
 ---
 
+![](/img/pages/servicestack-reference/go-info.png)
+
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.
 
 ### Go - Simple, typed APIs for cloud software
@@ -18,6 +20,8 @@ fmt.Println(res.Result)
 ```
 
 Built on Go's standard library with **no external runtime dependencies**. Provides `context.Context` variants for cancellation and deadlines, structured `ResponseStatus` errors, field validation errors, typed AutoQuery responses, multipart uploads, batched and one-way requests, and authentication using Basic Auth, API Keys, JWTs, refresh tokens or session cookies.
+
+A configured `Client` is safe for concurrent use by multiple goroutines, so a single client can be shared by your App's workers where it benefits from the connection pooling of its underlying `http.Client`.
 
 ### First class development experience
 
@@ -165,6 +169,7 @@ As Go's Generics can't be used on methods, the typed APIs are implemented as fun
 ```go
 // Client configuration
 func NewClient(baseUrl string) *Client            // sends Requests to /api
+func NewJsonApiClient(baseUrl string) *Client     // alias of NewClient
 func NewJsonServiceClient(baseUrl string) *Client // sends Requests to /json/reply
 func (c *Client) SetBasePath(basePath string) *Client
 func (c *Client) SetBearerToken(token string) *Client
@@ -173,6 +178,10 @@ func (c *Client) SetCredentials(userName, password string) *Client
 func (c *Client) SetHeader(name, value string) *Client
 func (c *Client) SetTimeout(timeout time.Duration) *Client
 func (c *Client) SetFollowRedirects(follow bool) *Client
+func (c *Client) BearerToken() string
+func (c *Client) RefreshToken() string
+func (c *Client) ToAbsoluteUrl(pathOrUrl string) string
+func (c *Client) CreateUrlFromDto(method string, request any) string
 func (c *Client) Authenticate(userName, password string) (AuthenticateResponse, error)
 
 // Typed API
@@ -184,6 +193,7 @@ func Patch[T any](client *Client, request IReturn[T], args ...map[string]any) (T
 func Delete[T any](client *Client, request IReturn[T], args ...map[string]any) (T, error)
 func SendVoid(client *Client, request IReturnVoid, args ...map[string]any) error
 func SendAs[T any](client *Client, request any, args ...map[string]any) (T, error)
+func SendMethodAs[T any](client *Client, method string, request any, args ...map[string]any) (T, error)
 func Api[T any](client *Client, request IReturn[T]) ApiResult[T]
 
 // Batched and one-way Requests
@@ -194,6 +204,9 @@ func PublishAll[T any](client *Client, requests []T) error
 // URL API
 func GetUrl[T any](client *Client, path string, args ...map[string]any) (T, error)
 func PostUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func PutUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func PatchUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func DeleteUrl[T any](client *Client, path string, args ...map[string]any) (T, error)
 func SendUrl[T any](client *Client, method, path string, body any, args ...map[string]any) (T, error)
 
 // File Uploads
@@ -201,7 +214,7 @@ func PostFileWithRequest[T any](client *Client, request IReturn[T], file UploadF
 func PostFilesWithRequest[T any](client *Client, request IReturn[T], files []UploadFile) (T, error)
 ```
 
-Every API also has a `*Ctx` variant accepting a `context.Context` as its first argument, e.g. `SendCtx`, `GetCtx`, `ApiCtx`.
+Every API also has a `*Ctx` variant accepting a `context.Context` as its first argument, e.g. `SendCtx`, `GetCtx`, `ApiCtx`, `SendAllCtx`, `PostFilesWithRequestCtx`.
 
 ### Making Typed API Requests
 
@@ -235,10 +248,48 @@ func main() {
 res, err := ss.Post(client, dtos.CreateBooking{Name: "Booking"})
 ```
 
-APIs that don't return a Response Body are sent with `SendVoid`:
+APIs that don't return a Response Body are sent with `SendVoid`, which accepts the Request DTOs generated with a `CreateResponseVoid()` method:
 
 ```go
 err := ss.SendVoid(client, dtos.DeleteBooking{Id: 1})
+```
+
+### Resolving the HTTP Method
+
+The Verb returned by a DTO's generated `HttpMethod()` also determines whether the Request DTO is sent in the QueryString or the JSON Request Body:
+
+```go
+res, err := ss.Send(client, dtos.Hello{Name: "World"})           // GET /api/Hello?name=World
+res, err := ss.Send(client, dtos.CreateBooking{Name: "Booking"}) // POST /api/CreateBooking {"name":"Booking"}
+```
+
+Request DTOs that aren't annotated with a Verb fall back to inferring it from the Request DTO name:
+
+| Request DTO Name                    | HTTP Method |
+|-------------------------------------|-------------|
+| `Get*` `Query*` `Find*` `Search*`   | GET         |
+| `Create*`                           | POST        |
+| `Update*` `Replace*`                | PUT         |
+| `Patch*`                            | PATCH       |
+| `Delete*` `Remove*`                 | DELETE      |
+| *(anything else)*                   | POST        |
+
+Which can be resolved for any Request DTO with:
+
+```go
+method := ss.ResolveHttpMethod(dtos.QueryBookings{}) // "GET"
+```
+
+Use `SendMethodAs` to send any Request DTO with an explicit Verb and Response Type, useful for calling APIs with hand-written DTOs that don't declare their Response Type:
+
+```go
+res, err := ss.SendMethodAs[dtos.HelloResponse](client, ss.HttpGet, MyHello{Name: "World"})
+```
+
+Where `SendAs` does the same using the API's default Verb:
+
+```go
+res, err := ss.SendAs[dtos.HelloResponse](client, MyHello{Name: "World"})
 ```
 
 ### AutoQuery Requests
@@ -254,6 +305,23 @@ res, err := ss.Send(client, dtos.QueryBookings{
 for _, booking := range res.Results { // booking is a dtos.Booking
     fmt.Println(booking.Id, booking.Name, booking.CreatedBy)
 }
+```
+
+As `Skip` and `Take` are `*int` pointers they're only sent when populated, letting the Server apply its own defaults otherwise. In addition to `Results`, `QueryResponse[T]` returns the `Offset` of the current page and the `Total` number of matching results when requested with `Include: "Total"`:
+
+```go
+skip, take := 10, 10
+res, err := ss.Send(client, dtos.QueryBookings{
+    QueryDb: ss.QueryDb{QueryBase: ss.QueryBase{
+        Skip:    &skip,
+        Take:    &take,
+        OrderBy: "id",
+        Include: "Total",       // include the Total of matching results
+        Fields:  "id,name,roomType", // limit the fields returned
+    }},
+})
+
+fmt.Println(res.Offset, res.Total, len(res.Results))
 ```
 
 ### Sending additional arguments with Typed API Requests
@@ -298,7 +366,11 @@ Or send them to a one-way endpoint that ignores their Responses:
 
 ```go
 err := ss.Publish(client, dtos.Hello{Name: "World"})
+
+err := ss.PublishAll(client, []dtos.Hello{{Name: "A"}, {Name: "B"}})
 ```
+
+Which are sent to the Client's one-way base URL, i.e. `/json/oneway` when using `NewJsonServiceClient`.
 
 ### Error Handling
 
@@ -322,6 +394,53 @@ var webEx *ss.WebServiceException
 if errors.As(err, &webEx) { /* ... */ }
 ```
 
+`WebServiceException` includes the HTTP Status Code helpers and structured error accessors you'd expect:
+
+```go
+webEx.StatusCode        // HTTP Status Code, 0 for connection and transport errors
+webEx.StatusDescription // HTTP Status Description
+webEx.ResponseStatus    // structured error, nil when the API didn't return one
+webEx.ResponseBody      // raw error body, e.g. when a HTML or plain text error was returned
+webEx.ErrorCode()       // "NotEmpty"
+webEx.ErrorMessage()    // "'Name' must not be empty."
+webEx.StackTrace()      // Server StackTrace, only populated in DebugMode
+webEx.FieldErrors()     // []ResponseError of all field validation errors
+webEx.FieldError("Name")
+webEx.IsValidationError()   // has field validation errors
+webEx.IsUnauthorized()      // 401
+webEx.IsForbidden()         // 403
+webEx.IsNotFound()          // 404
+webEx.IsAny(429, 502, 503, 504)
+webEx.Unwrap()          // the underlying transport error, if any
+```
+
+Field validation errors are returned in a typed `[]ResponseError` which can be mapped to the fields of your UI:
+
+```go
+for _, fieldError := range webEx.FieldErrors() {
+    fmt.Println(fieldError.FieldName, fieldError.ErrorCode, fieldError.Message)
+}
+```
+
+Connection failures and invalid Responses are also returned as a `*WebServiceException` with a `0` Status Code and the underlying error accessible with `errors.Is`/`errors.Unwrap`, so a single error type can be used to handle all API failures:
+
+```go
+_, err := ss.SendCtx(ctx, client, dtos.Hello{Name: "World"})
+if errors.Is(err, context.Canceled) { /* the Request was cancelled */ }
+```
+
+The API's Status Code and structured error can also be read from any `error` with:
+
+```go
+statusCode := ss.GetStatusCode(err)      // 0 if err wasn't a *WebServiceException
+status := ss.GetResponseStatus(err)      // *ResponseStatus, nil if not returned
+
+// e.g. retry API Requests that failed with a transient error
+if webEx, ok := ss.AsWebServiceException(err); ok && webEx.IsAny(429, 502, 503, 504) {
+    // ...
+}
+```
+
 Alternatively `Api` returns errors in its result instead of a separate `error`, which can be preferable when handling validation errors is part of normal control flow:
 
 ```go
@@ -332,6 +451,8 @@ if api.Failed() {
     fmt.Println(api.Response.Id)
 }
 ```
+
+Where `ApiResult[T]` returns the typed `Response` and any `*ResponseStatus` `Error` alongside `Succeeded()`, `Failed()`, `ErrorCode()`, `ErrorMessage()` and `FieldError()` helpers. As all errors are converted into a `ResponseStatus`, transport errors are also returned in `api.Error` with an `Exception` Error Code.
 
 ### Authenticating using Basic Auth
 
@@ -353,6 +474,19 @@ authRes, err := client.Authenticate(userName, password)
 
 This will populate the `Client` with [Session Cookies](/auth/sessions#cookie-session-ids) which will transparently be sent on subsequent requests to make authenticated requests, as well as using any Bearer Token the Server returns.
 
+Session Cookies are maintained in the `http.Client`'s cookie jar, whilst any Bearer and Refresh Tokens returned are configured on the client and available from `client.BearerToken()` and `client.RefreshToken()`. The `AuthenticateResponse` also returns the authenticated User's info, roles and permissions:
+
+```go
+authRes, err := client.Authenticate("test", "test")
+
+fmt.Println(authRes.UserId, authRes.UserName, authRes.DisplayName, authRes.ProfileUrl)
+fmt.Println(authRes.Roles, authRes.Permissions)
+fmt.Println(client.BearerToken(), client.RefreshToken())
+
+// All subsequent Requests are made with the Authenticated Session
+res, err := ss.Send(client, dtos.HelloSecure{Name: "World"})
+```
+
 ### Authenticating using JWT
 
 Use `SetBearerToken` to Authenticate with a [ServiceStack JWT Provider](/auth/jwt-authprovider) using a JWT Token:
@@ -367,7 +501,19 @@ Alternatively you can use just a [Refresh Token](/auth/jwt-authprovider#refresh-
 client.SetRefreshToken(refreshToken)
 ```
 
-Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.
+Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests, i.e. when a Request fails with a `401 Unauthorized` the client sends its Refresh Token to the [GetAccessToken](/auth/jwt-authprovider#refresh-tokens) API, updates its Bearer Token then transparently retries the original Request:
+
+```
+POST /api/Hello           -> 401 Unauthorized
+POST /api/GetAccessToken  -> 200 { "accessToken": "..." }
+POST /api/Hello           -> 200 { "result": "Hello, World!" }
+```
+
+Use `RefreshTokenUri` to fetch Access Tokens from a different [central Auth Server](/auth/jwt-authprovider#retrieve-token-from-central-auth-server-using-credentials-auth):
+
+```go
+client.RefreshTokenUri = "https://auth.example.org/api/GetAccessToken"
+```
 
 ### Authenticating using an API Key
 
@@ -376,6 +522,49 @@ Use `SetBearerToken` to Authenticate with an [API Key](/auth/api-key-authprovide
 ```go
 client.SetBearerToken(apiKey)
 ```
+
+### Built-in ServiceStack DTOs
+
+The Go client library includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them without needing to generate them:
+
+```go
+// Authentication
+authRes, err := ss.Send(client, ss.Authenticate{Provider: "credentials",
+    UserName: "test", Password: "test", RememberMe: &rememberMe})
+regRes, err := ss.Send(client, ss.Register{UserName: "new-user",
+    Email: "user@example.org", Password: "p@55wOrd", AutoLogin: &autoLogin})
+
+// JWT
+tokenRes, err := ss.Send(client, ss.ConvertSessionToToken{}) // Session -> JWT
+accessRes, err := ss.Send(client, ss.GetAccessToken{RefreshToken: refreshToken})
+
+// API Keys
+keysRes, err := ss.Send(client, ss.GetApiKeys{Environment: "live"})
+newKeys, err := ss.Send(client, ss.RegenerateApiKeys{Environment: "live"})
+
+// Roles and Permissions
+rolesRes, err := ss.Send(client, ss.AssignRoles{UserName: "user", Roles: []string{"Employee"}})
+_, err = ss.Send(client, ss.UnAssignRoles{UserName: "user", Roles: []string{"Employee"}})
+
+// Navigation
+navRes, err := ss.Send(client, ss.GetNavItems{})
+```
+
+Together with the built-in Response Types and base types that generated DTOs reference:
+
+| Type                     | Description                                                             |
+|--------------------------|-------------------------------------------------------------------------|
+| `ss.ResponseStatus`      | ServiceStack's structured error response                                 |
+| `ss.ResponseError`       | An individual field validation error                                     |
+| `ss.EmptyResponse`       | Response of APIs that don't return a Response Body                       |
+| `ss.IdResponse`          | Response returning the Id of the created or updated entity               |
+| `ss.StringResponse`      | Response returning a single `Result` string                              |
+| `ss.StringsResponse`     | Response returning a list of string `Results`                            |
+| `ss.AuditBase`           | Audit fields embedded in [AutoQuery CRUD](/autoquery/crud) data models   |
+| `ss.QueryBase`           | Query params supported by all [AutoQuery](/autoquery/) Requests          |
+| `ss.QueryDb`             | Base type of AutoQuery RDBMS Requests                                    |
+| `ss.QueryData`           | Base type of [AutoQuery Data](/autoquery/data) Requests                  |
+| `ss.QueryResponse[T]`    | Typed Response of AutoQuery Requests                                     |
 
 ### Transparently handle 401 Unauthorized Responses
 
@@ -407,7 +596,18 @@ res, err := ss.PostFileWithRequest(client, dtos.UploadPhoto{Album: "Holiday"}, s
 })
 ```
 
-To upload multiple files use `PostFilesWithRequest`.
+Any populated properties on the Request DTO are sent as form fields alongside the uploaded files, whilst `FieldName` defaults to `file` and `ContentType` is detected by the Server when omitted.
+
+As `Reader` is an `io.Reader`, files can be uploaded from anywhere - a file on disk, an in-memory buffer or a streamed HTTP Response. To upload multiple files use `PostFilesWithRequest`:
+
+```go
+res, err := ss.PostFilesWithRequest(client, dtos.UploadPhotos{Album: "Holiday"}, []ss.UploadFile{
+    {FieldName: "files", FileName: "1.png", ContentType: "image/png", Reader: file1},
+    {FieldName: "files", FileName: "2.txt", Reader: strings.NewReader("file contents")},
+})
+```
+
+Use `PostFilesWithRequestUrlCtx` to upload files to a custom URL, e.g. a [Managed File Upload](/locode/files-overview) route.
 
 ### context.Context
 
@@ -438,6 +638,142 @@ client.HttpClient = &http.Client{Timeout: 30 * time.Second}
 ```
 
 `NewClient` sends Requests to ServiceStack's pre-defined `/api` route. Use `NewJsonServiceClient` for older ServiceStack instances that only have the `/json/reply` routes enabled, or `SetBasePath` for a custom base path.
+
+```go
+apiClient := ss.NewClient("https://example.org")             // /api/Hello
+jsonClient := ss.NewJsonServiceClient("https://example.org") // /json/reply/Hello
+customClient := ss.NewClient("https://example.org").SetBasePath("custom/api") // /custom/api/Hello
+```
+
+### Global Request and Response Filters
+
+In addition to per-client filters, global filters can be registered to inspect or decorate the Requests and Responses of every `Client`, useful for adding tracing headers or logging and diagnostics:
+
+```go
+ss.GlobalRequestFilter = func(req *http.Request) {
+    req.Header.Set("X-Correlation-Id", correlationId())
+}
+ss.GlobalResponseFilter = func(res *http.Response) {
+    log.Println(res.Request.Method, res.Request.URL, res.Status)
+}
+```
+
+### Concurrent API Requests
+
+Go's concurrency is a natural fit for calling APIs in parallel. A configured `Client` is safe for concurrent use by multiple goroutines so a single client should be shared to benefit from the connection pooling of its underlying `http.Client`:
+
+```go
+client := ss.NewClient("https://blazor-vue.web-templates.io") // configure before sharing
+
+var wg sync.WaitGroup
+results := make([]string, len(names))
+for i, name := range names {
+    wg.Add(1)
+    go func(i int, name string) {
+        defer wg.Done()
+        if res, err := ss.SendCtx(ctx, client, dtos.Hello{Name: name}); err == nil {
+            results[i] = res.Result
+        }
+    }(i, name)
+}
+wg.Wait()
+```
+
+Auth Tokens updated with the `Set*` methods (incl. transparent Refresh Token fetches) are guarded, mutating the Client's exported fields whilst Requests are in-flight is not supported.
+
+### QueryString Serialization
+
+Request DTO properties and additional args sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex types, and its Date and TimeSpan formats for `time.Time` and `time.Duration`:
+
+| Go Value                          | QueryString                     |
+|-----------------------------------|---------------------------------|
+| `"World"`                         | `name=World`                    |
+| `true`                            | `enabled=true`                  |
+| `1.5`                             | `rate=1.5`                      |
+| `[]int{1,2,3}`                    | `ids=[1,2,3]`                   |
+| `map[string]int{"a":1,"b":2}`     | `meta={a:1,b:2}`                |
+| `time.Time` of `2001-01-01`       | `date=2001-01-01T00:00:00Z`     |
+| `90 * time.Minute`                | `duration=PT1H30M`              |
+| `nil` / nil pointers              | *(omitted)*                     |
+
+Values are URL encoded, pointers dereferenced and args sorted by name so the same args always generate the same URL - which is also important for caching and testing.
+
+### URL and DTO Utils
+
+The utils the Client uses to construct API Requests are also exported for building your own URLs and integrations:
+
+```go
+ss.NameOf(dtos.Hello{})                          // "Hello"
+ss.ResolveHttpMethod(dtos.QueryBookings{})       // "GET"
+ss.HasRequestBody(ss.HttpGet)                    // false
+ss.CombineWith("https://example.org/", "/api/", "Hello") // "https://example.org/api/Hello"
+ss.AppendQueryString("/api/Hello", map[string]any{"name": "World"}) // "/api/Hello?name=World"
+ss.ToAbsoluteUrl("https://example.org", "/api/Hello") // "https://example.org/api/Hello"
+ss.QsValue([]int{1, 2, 3})                       // "[1,2,3]"
+ss.DtoToMap(dtos.Hello{Name: "World"})           // map[string]any{"name":"World"}
+
+client.CreateUrlFromDto(ss.HttpGet, dtos.Hello{}) // "https://example.org/api/Hello"
+client.ToAbsoluteUrl("/api/Hello")                // "https://example.org/api/Hello"
+```
+
+Along with the HTTP constants used in ServiceStack APIs, e.g. `ss.HttpGet`, `ss.HttpPost`, `ss.HttpPut`, `ss.HttpPatch`, `ss.HttpDelete`, `ss.MimeTypeJson`, `ss.HeaderAccept`, `ss.HeaderContentType` and `ss.HeaderAuthorization`.
+
+### Calling AI Chat and OpenAI compatible APIs
+
+As Request DTOs are just structs, more advanced APIs like [AI Chat](/ai-chat-api)'s OpenAI-compatible `ChatCompletion` API can also be called with typed DTOs, where polymorphic content parts are sent in a `[]any`:
+
+```go
+res, err := ss.Send(client, dtos.ChatCompletion{
+    Model: "openai/gpt-oss-120b",
+    Messages: []dtos.AiMessage{
+        {
+            Role: "user",
+            // Content parts are polymorphic, e.g. text, image_url or input_audio
+            Content: []any{
+                dtos.AiTextContent{
+                    AiContent: dtos.AiContent{Type: "text"},
+                    Text:      "Capital of France? Answer in 3 words",
+                },
+            },
+        },
+    },
+})
+if err != nil {
+    // Handle rate limited or temporarily unavailable LLMs
+    if webEx, ok := ss.AsWebServiceException(err); ok && webEx.IsAny(429, 502, 503, 504) { /* retry */ }
+}
+
+fmt.Println(res.Choices[0].Message.Content)
+```
+
+### Testing
+
+As the `Client` accepts any Base URL and lets you replace its `*http.Client`, APIs can be tested against Go's built-in `httptest` Server without needing to mock the client:
+
+```go
+server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(ss.HeaderContentType, ss.MimeTypeJson)
+    _ = json.NewEncoder(w).Encode(dtos.HelloResponse{Result: "Hello, World!"})
+}))
+defer server.Close()
+
+client := ss.NewClient(server.URL)
+res, err := ss.Send(client, dtos.Hello{Name: "World"})
+```
+
+Which is how the [client's own test suite](https://github.com/ServiceStack/servicestack-go/blob/main/client_test.go) verifies the Requests it sends, in addition to its [integration tests](https://github.com/ServiceStack/servicestack-go/blob/main/integration_test.go) which are run against the live [test.servicestack.net](https://test.servicestack.net) Services:
+
+:::sh
+go test -tags integration ./...
+:::
+
+### Example
+
+The [examples/hello](https://github.com/ServiceStack/servicestack-go/tree/main/examples/hello) command is a small runnable example of calling the live **test.servicestack.net** Services with typed APIs, batched Requests, structured validation errors and authenticated Requests:
+
+:::sh
+go run ./examples/hello
+:::
 
 ## DTO Customization Options
 
