@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T02:08:00.5076909Z'>
+    <meta name='date' content='2026-08-27T02:32:40.8463569Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Ruby Add ServiceStack Reference</title>
+    <title>Ruby ServiceStack Reference</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -1478,15 +1478,17 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Ruby Add ServiceStack Reference
+                            Ruby ServiceStack Reference
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.</p>
+                <div class="content"><div class="shadow -ml-12 w-[940px] rounded-md"><p><img src="/img/pages/servicestack-reference/ruby-info.png" alt="" /></p>
+</div>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.</p>
 <h3 id="ruby-servicestack-productivity-in-a-dynamic-language">Ruby - ServiceStack productivity in a dynamic language<a class="header-anchor" href="javascript:;" onclick="location.hash='#ruby-servicestack-productivity-in-a-dynamic-language'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The <a href="https://rubygems.org/gems/servicestack">servicestack</a> gem provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:</p>
+<p>The <a href="https://rubygems.org/gems/servicestack">servicestack</a> gem (<a href="https://github.com/ServiceStack/servicestack-ruby">source</a>) provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:</p>
 <pre><code class="language-ruby">client = ServiceStack::JsonServiceClient.new(base_url)
 
 response = client.send(Hello.new(name: 'World'))
@@ -1773,6 +1775,7 @@ Updated: dtos.rb
   def send_url(path, method: HttpMethods::GET, body: nil, response_as: nil, args: nil)
   def send_url_string(path, method: HttpMethods::GET, body: nil, args: nil)
   def to_absolute_url(path_or_url)
+  def create_url_from_dto(method, request)
 
   # File Uploads
   def post_file_with_request(request, file, args: nil)
@@ -1883,6 +1886,58 @@ puts response.result
 <p>APIs that don't return a Response Body can be sent with <code>send_void</code>:</p>
 <pre><code class="language-ruby">client.send_void(DeleteBooking.new(id: 1))
 </code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The Verb returned by a DTO's generated <code>get_method</code> also determines whether the Request DTO is sent in the QueryString or the JSON Request Body:</p>
+<pre><code class="language-ruby">client.send(Hello.new(name: 'World'))           # GET /api/Hello?name=World
+client.send(CreateBooking.new(name: 'Booking')) # POST /api/CreateBooking {&quot;name&quot;:&quot;Booking&quot;}
+</code></pre>
+<p>Request DTOs that aren't annotated with a Verb fall back to inferring it from the Request DTO name:</p>
+<table>
+<thead>
+<tr>
+<th>Request DTO Name</th>
+<th>HTTP Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Get*</code> <code>Query*</code> <code>Find*</code> <code>Search*</code></td>
+<td>GET</td>
+</tr>
+<tr>
+<td><code>Create*</code></td>
+<td>POST</td>
+</tr>
+<tr>
+<td><code>Update*</code> <code>Replace*</code></td>
+<td>PUT</td>
+</tr>
+<tr>
+<td><code>Patch*</code></td>
+<td>PATCH</td>
+</tr>
+<tr>
+<td><code>Delete*</code> <code>Remove*</code></td>
+<td>DELETE</td>
+</tr>
+<tr>
+<td><em>(anything else)</em></td>
+<td>POST</td>
+</tr>
+</tbody>
+</table>
+<p>Which is why hand-written DTOs only need to declare what they can't infer, e.g. this Request DTO is sent as a <code>GET</code> to <code>/api/GetWeather?city=Seattle</code> and its JSON Response converted into a typed <code>GetWeatherResponse</code>:</p>
+<pre><code class="language-ruby">class GetWeather
+    include ServiceStack::DTO
+    attr_accessor :city
+
+    def self.properties() = { city: { name: 'city' } }
+    def response_type() = GetWeatherResponse
+end
+</code></pre>
+<p>Any Request DTO can also be sent with an explicit Verb:</p>
+<pre><code class="language-ruby">client.send(request, method: ServiceStack::HttpMethods::PUT)
+</code></pre>
 <h3 id="constructors-initializer">Constructors Initializer<a class="header-anchor" href="javascript:;" onclick="location.hash='#constructors-initializer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>All Ruby DTOs support populating their properties with keyword arguments, so instead of:</p>
 <pre><code class="language-ruby">request = ServiceStack::Authenticate.new
@@ -1908,6 +1963,16 @@ response.results.each do |booking|  # each booking is a Booking
 end
 </code></pre>
 <p>Nested DTOs, Dates and collections are converted using the metadata each generated DTO declares, so <code>booking.discount</code> is a <code>Coupon</code>, <code>booking.booking_start_date</code> is a <code>DateTime</code> and inherited properties like <code>booking.created_by</code> are populated from their <code>createdBy</code> wire names.</p>
+<p>As AutoQuery Request DTOs inherit from <code>ServiceStack::QueryDb</code> (or <code>QueryData</code> for <a href="/autoquery/data">AutoQuery Data</a>) they can use any of the query params supported by all AutoQuery APIs:</p>
+<pre><code class="language-ruby">response = client.send(QueryBookings.new(
+  skip: 10, take: 5,                 # paging
+  order_by_desc: 'id',               # or order_by: 'name'
+  fields: 'id,name,roomType',        # only return these fields
+  include: 'total'))                 # include the total number of results
+
+puts response.offset                 # 10
+puts response.total                  # 25
+</code></pre>
 <h3 id="sending-additional-arguments-with-typed-api-requests">Sending additional arguments with Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-additional-arguments-with-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Many AutoQuery Services utilize <a href="/autoquery/rdbms#implicit-conventions">implicit conventions</a> to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments with the typed Request DTO, e.g:</p>
 <pre><code class="language-ruby">response = client.get(QueryBookings.new, args: { 'nameStartsWith' =&gt; 'A' })
@@ -1995,6 +2060,82 @@ response = client.send(SecureRequest.new)
 <p>Use the <code>bearer_token</code> property to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-ruby">client.set_bearer_token(api_key)
 </code></pre>
+<h3 id="built-in-servicestack-dtos">Built-in ServiceStack DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-servicestack-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>servicestack</code> gem includes typed DTOs for ServiceStack's built-in Auth APIs, letting you call them without needing to generate them:</p>
+<pre><code class="language-ruby"># Authentication
+auth = client.send(ServiceStack::Authenticate.new(provider: 'credentials',
+  user_name: 'test', password: 'test', remember_me: true))
+
+reg = client.send(ServiceStack::Register.new(user_name: 'new-user',
+  email: 'user@example.org', password: 'p@55wOrd', auto_login: true))
+
+# JWT
+token = client.send(ServiceStack::ConvertSessionToToken.new)   # Session -&gt; JWT
+access = client.send(ServiceStack::GetAccessToken.new(refresh_token: refresh_token))
+</code></pre>
+<p>Together with the built-in Response Types and base classes that generated DTOs reference:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServiceStack::ResponseStatus</code></td>
+<td>ServiceStack's structured error response</td>
+</tr>
+<tr>
+<td><code>ServiceStack::ResponseError</code></td>
+<td>An individual field validation error</td>
+</tr>
+<tr>
+<td><code>ServiceStack::EmptyResponse</code></td>
+<td>Response of APIs that don't return a Response Body</td>
+</tr>
+<tr>
+<td><code>ServiceStack::IdResponse</code></td>
+<td>Response returning the Id of the created or updated entity</td>
+</tr>
+<tr>
+<td><code>ServiceStack::StringResponse</code></td>
+<td>Response returning a single <code>result</code> string</td>
+</tr>
+<tr>
+<td><code>ServiceStack::StringsResponse</code></td>
+<td>Response returning a list of string <code>results</code></td>
+</tr>
+<tr>
+<td><code>ServiceStack::AuditBase</code></td>
+<td>Audit fields inherited by <a href="/autoquery/crud">AutoQuery CRUD</a> data models</td>
+</tr>
+<tr>
+<td><code>ServiceStack::QueryBase</code></td>
+<td>Query params supported by all <a href="/autoquery/">AutoQuery</a> Requests</td>
+</tr>
+<tr>
+<td><code>ServiceStack::QueryDb</code></td>
+<td>Base class of AutoQuery RDBMS Requests</td>
+</tr>
+<tr>
+<td><code>ServiceStack::QueryData</code></td>
+<td>Base class of <a href="/autoquery/data">AutoQuery Data</a> Requests</td>
+</tr>
+<tr>
+<td><code>ServiceStack::QueryResponse</code></td>
+<td>Typed Response of AutoQuery Requests, e.g. <code>QueryResponse.of(Booking)</code></td>
+</tr>
+<tr>
+<td><code>ServiceStack::UploadFile</code></td>
+<td>A file uploaded in a <code>multipart/form-data</code> Request</td>
+</tr>
+<tr>
+<td><code>ServiceStack::HttpMethods</code></td>
+<td>The HTTP Verbs used by ServiceStack APIs, e.g. <code>HttpMethods::GET</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the <code>on_authentication_required</code> callback to re-configure the client before automatically retrying the original request, e.g:</p>
 <pre><code class="language-ruby">auth_client = ServiceStack::JsonServiceClient.new(AUTH_URL)
@@ -2021,6 +2162,11 @@ client.set_refresh_token(auth_response.refresh_token)
 # Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
 response = client.send(Secured.new)
 </code></pre>
+<p>i.e. when a Request fails with a <code>401 Unauthorized</code> the client sends its Refresh Token to the <a href="/auth/jwt-authprovider#refresh-tokens">GetAccessToken</a> API, updates its Bearer Token then transparently retries the original Request:</p>
+<pre><code>POST /api/Hello           -&gt; 401 Unauthorized
+POST /api/GetAccessToken  -&gt; 200 { &quot;accessToken&quot;: &quot;...&quot; }
+POST /api/Hello           -&gt; 200 { &quot;result&quot;: &quot;Hello, World!&quot; }
+</code></pre>
 <p>Use the <code>refresh_token_uri</code> property when refresh tokens need to be sent to a different ServiceStack Server, e.g:</p>
 <pre><code class="language-ruby">client.set_refresh_token(refresh_token)
 client.refresh_token_uri = AUTH_URL + '/access-token'
@@ -2040,14 +2186,188 @@ end
 ])
 </code></pre>
 <p>Requires <strong>servicestack v0.1.1+</strong>.</p>
-<h3 id="inspecting-requests-and-responses">Inspecting Requests and Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#inspecting-requests-and-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Requests and Responses can be inspected or modified with instance and static filters:</p>
-<pre><code class="language-ruby">client.request_filter = -&gt;(req) { puts &quot;#{req.method} #{req.path}&quot; }
-client.response_filter = -&gt;(res) { puts res.code }
+<h3 id="serializing-dtos">Serializing DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#serializing-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As DTOs declare the wire name and Type of each of their properties, they can also be used to convert between Ruby objects and the JSON their APIs use outside of any API Request, useful for persisting API Responses, populating DTOs from other sources or testing:</p>
+<pre><code class="language-ruby">request = Hello.new(name: 'World')
+request.to_hash                 # { &quot;name&quot; =&gt; &quot;World&quot; }
+request.to_json                 # {&quot;name&quot;:&quot;World&quot;}
 
-# Applied to all clients
-ServiceStack::JsonServiceClient.global_request_filter = -&gt;(req) { req['X-Trace'] = trace_id }
+res = HelloResponse.from_json('{&quot;result&quot;:&quot;Hello, World!&quot;}')
+res = HelloResponse.from_hash({ 'result' =&gt; 'Hello, World!' })
+res.result                      # &quot;Hello, World!&quot;
 </code></pre>
+<p>Where:</p>
+<ul>
+<li><code>to_hash</code> (aliased <code>to_h</code>) uses each property's wire name and omits any properties that aren't populated</li>
+<li><code>from_hash</code> matches JSON properties on their wire name first, falling back to the DTO's own <code>snake_case</code> name</li>
+<li>Nested DTOs, Arrays, Hashes and Dates are converted using the Types their <code>properties</code> declare, incl. inherited properties</li>
+<li>Dates are parsed from ISO-8601 as well as ServiceStack's <code>/Date(1670000000000)/</code> format</li>
+<li>DTOs implement <code>==</code> and a readable <code>inspect</code> for their populated properties, e.g. <code>#&lt;Hello name=&quot;World&quot;&gt;</code></li>
+</ul>
+<h3 id="client-configuration">Client Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<pre><code class="language-ruby">client = ServiceStack::JsonServiceClient.new('https://example.org')
+client.set_header('X-Custom', 'Value')
+client.timeout = 30                        # open + read timeout in secs (default: 60)
+client.set_bearer_token(api_key)
+
+# Inspect or modify each Request and Response
+client.request_filter = -&gt;(req) { puts &quot;#{req.method} #{req.path}&quot; }
+client.response_filter = -&gt;(res) { puts res.code }
+</code></pre>
+<p>All <code>set_*</code> methods return the client so they can be chained:</p>
+<pre><code class="language-ruby">client = ServiceStack::JsonServiceClient.new(base_url)
+                     .set_bearer_token(jwt)
+                     .set_header('X-Tenant', tenant_id)
+</code></pre>
+<p>Requests are sent to ServiceStack's pre-defined <code>/api</code> route by default, use <code>set_base_path</code> for older ServiceStack instances that only have the <code>/json/reply</code> routes enabled, or to send them to a custom base path:</p>
+<pre><code class="language-ruby">client.set_base_path('')            # /json/reply/Hello and /json/oneway/Hello
+client.set_base_path('custom/api')  # /custom/api/Hello
+</code></pre>
+<p>The client also retains any Session Cookies the Server returns which can be inspected or populated directly, e.g. to resume an existing <a href="/auth/sessions">Session</a>:</p>
+<pre><code class="language-ruby">client.cookies['ss-id']             # &quot;SESSION_ID&quot;
+</code></pre>
+<h3 id="global-request-and-response-filters">Global Request and Response Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#global-request-and-response-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In addition to per-client filters, global filters can be registered to inspect or decorate the <code>Net::HTTP</code> Requests and Responses of every client, useful for adding tracing headers or logging and diagnostics:</p>
+<pre><code class="language-ruby">ServiceStack::JsonServiceClient.global_request_filter = -&gt;(req) {
+  req['X-Correlation-Id'] = correlation_id
+}
+ServiceStack::JsonServiceClient.global_response_filter = -&gt;(res) {
+  logger.info(&quot;#{res.code} #{res.message}&quot;)
+}
+</code></pre>
+<h3 id="querystring-serialization">QueryString Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#querystring-serialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTO properties and additional <code>args</code> sent in the QueryString use ServiceStack's <a href="/js-utils">JS Object</a> notation for complex types and ISO-8601 for Dates:</p>
+<table>
+<thead>
+<tr>
+<th>Ruby Value</th>
+<th>QueryString</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'World'</code></td>
+<td><code>name=World</code></td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td><code>enabled=true</code></td>
+</tr>
+<tr>
+<td><code>1.5</code></td>
+<td><code>rate=1.5</code></td>
+</tr>
+<tr>
+<td><code>[1, 2, 3]</code></td>
+<td><code>ids=[1,2,3]</code></td>
+</tr>
+<tr>
+<td><code>{ 'a' =&gt; 1, 'b' =&gt; 2 }</code></td>
+<td><code>meta={a:1,b:2}</code></td>
+</tr>
+<tr>
+<td><code>DateTime.new(2001, 1, 1)</code></td>
+<td><code>date=2001-01-01T00:00:00+00:00</code></td>
+</tr>
+<tr>
+<td><code>nil</code></td>
+<td><em>(omitted)</em></td>
+</tr>
+</tbody>
+</table>
+<p>Values are URL encoded, whilst <code>nil</code> properties are omitted from both the QueryString and JSON Request Bodies so APIs only receive the properties that were populated.</p>
+<p>Use <code>create_url_from_dto</code> to resolve the URL a Request DTO is sent to, or <code>to_absolute_url</code> to resolve a relative path against the client's Base URL:</p>
+<pre><code class="language-ruby">client.create_url_from_dto('GET', Hello.new(name: 'World'))
+# https://example.org/api/Hello?name=World
+
+client.to_absolute_url('/api/Hello')
+# https://example.org/api/Hello
+</code></pre>
+<h3 id="calling-ai-chat-and-openai-compatible-apis">Calling AI Chat and OpenAI compatible APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#calling-ai-chat-and-openai-compatible-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As Request DTOs are just Ruby classes, more advanced APIs like <a href="/ai-chat-api">AI Chat</a>'s OpenAI-compatible <code>ChatCompletion</code> API can also be called with typed DTOs, where polymorphic content parts are sent in an Array of the DTOs of each content type:</p>
+<pre><code class="language-ruby">request = ChatCompletion.new(
+  model: 'openai/gpt-oss-120b',
+  messages: [
+    AiMessage.new(
+      role: 'user',
+      # Content parts are polymorphic, e.g. text, image_url or input_audio
+      content: [AiTextContent.new(type: 'text', text: 'Capital of France? Answer in 3 words')]
+    )
+  ]
+)
+
+begin
+  res = client.send(request)
+  puts res.choices.first.message.content
+rescue ServiceStack::WebServiceException =&gt; e
+  # A shared LLM can be rate limited or temporarily unavailable
+  warn &quot;ChatCompletion unavailable: #{e.message}&quot; if [429, 502, 503, 504].include?(e.status_code)
+  raise
+end
+</code></pre>
+<h3 id="testing">Testing<a class="header-anchor" href="javascript:;" onclick="location.hash='#testing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As the client accepts any Base URL, APIs can be tested against a local ServiceStack instance or a stubbed HTTP Server without needing to mock the client, e.g. using <a href="https://github.com/bblimke/webmock">WebMock</a> to assert the exact Request each API sends:</p>
+<pre><code class="language-ruby">stub_request(:post, 'https://example.org/api/Hello')
+  .with(body: '{&quot;name&quot;:&quot;World&quot;}', headers: { 'Content-Type' =&gt; 'application/json' })
+  .to_return(body: { result: 'Hello, World!' }.to_json)
+
+client = ServiceStack::JsonServiceClient.new('https://example.org')
+res = client.send(Hello.new(name: 'World'))
+
+assert_equal 'Hello, World!', res.result
+</code></pre>
+<p>Which is how the client's own <a href="https://github.com/ServiceStack/servicestack-ruby/blob/main/test/test_json_service_client.rb">test suite</a> verifies the Requests it sends, in addition to its <a href="https://github.com/ServiceStack/servicestack-ruby/blob/main/test/integration/live_api_test.rb">integration tests</a> which are run against the live <a href="https://test.servicestack.net">test.servicestack.net</a> Services.</p>
+<p>Its unit tests are run with:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>rake test</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Whilst its integration tests are run with:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>rake test:integration</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Use the <code>SERVICESTACK_TEST_URL</code> Environment Variable to run them against a different ServiceStack instance.</p>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated Ruby DTOs as-is, however you can further customize how the DTOs are generated by overriding the default options.</p>
 <p>The header in the generated DTOs show the different options Ruby native types support with their defaults. To override a value, remove the <code>#</code> and specify the value to the right of the <code>:</code>. Any uncommented value will be sent to the server to override any server defaults.</p>
@@ -2239,6 +2559,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Making Typed API Requests
                                                         </span>
                                                     </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
+                                                        </span>
+                                                    </li>
                                                     <li data-id="constructors-initializer" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#constructors-initializer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2305,6 +2631,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Authenticating using an API Key
                                                         </span>
                                                     </li>
+                                                    <li data-id="built-in-servicestack-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#built-in-servicestack-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Built-in ServiceStack DTOs
+                                                        </span>
+                                                    </li>
                                                     <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2323,10 +2655,40 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Uploading Files
                                                         </span>
                                                     </li>
-                                                    <li data-id="inspecting-requests-and-responses" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#inspecting-requests-and-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="serializing-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#serializing-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            Inspecting Requests and Responses
+                                                            Serializing DTOs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="client-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Client Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="global-request-and-response-filters" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#global-request-and-response-filters'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Global Request and Response Filters
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="querystring-serialization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#querystring-serialization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            QueryString Serialization
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="calling-ai-chat-and-openai-compatible-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#calling-ai-chat-and-openai-compatible-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Calling AI Chat and OpenAI compatible APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="testing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#testing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Testing
                                                         </span>
                                                     </li>
                                             </ul>

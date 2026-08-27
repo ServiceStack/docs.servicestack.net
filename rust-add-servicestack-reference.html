@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T02:08:00.5113391Z'>
+    <meta name='date' content='2026-08-27T02:32:40.8495892Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Rust Add ServiceStack Reference</title>
+    <title>Rust ServiceStack Reference</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -1478,15 +1478,17 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Rust Add ServiceStack Reference
+                            Rust ServiceStack Reference
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Rust - providing a simple way to give Rust clients typed access to your ServiceStack Services.</p>
+                <div class="content"><div class="shadow -ml-12 w-[940px] rounded-md"><p><img src="/img/pages/servicestack-reference/rust-info.png" alt="" /></p>
+</div>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Rust - providing a simple way to give Rust clients typed access to your ServiceStack Services.</p>
 <h3 id="rust-correctness-from-the-wire-to-application-code">Rust - Correctness from the wire to application code<a class="header-anchor" href="javascript:;" onclick="location.hash='#rust-correctness-from-the-wire-to-application-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The <a href="https://crates.io/crates/servicestack">servicestack</a> crate brings Rust's priorities to API integration. Generated DTOs implement the traits that associate each request with its response, route and HTTP method:</p>
+<p>The <a href="https://crates.io/crates/servicestack">servicestack</a> crate (<a href="https://github.com/ServiceStack/servicestack-rust">source</a>) brings Rust's priorities to API integration. Generated DTOs implement the traits that associate each request with its response, route and HTTP method:</p>
 <pre><code class="language-rust">let response = client.send(&amp;Hello {
     name: &quot;World&quot;.to_string(),
 }).await?;
@@ -1584,7 +1586,8 @@ impl IReturn for QueryBookings { type Response = QueryResponse&lt;Booking&gt;; }
 servicestack = &quot;0.1&quot;
 serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
 </code></pre>
-<p>Requires <strong>Rust 1.75+</strong>.</p>
+<p>Requires <strong>Rust 1.88+</strong>.</p>
+<p>It's a small dependency with a minimal footprint, built on <a href="https://crates.io/crates/reqwest">reqwest</a> and <a href="https://serde.rs">serde</a> using <strong>rustls</strong> so it doesn't require OpenSSL or any other system dependencies.</p>
 <h3 id="features">Features<a class="header-anchor" href="javascript:;" onclick="location.hash='#features'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <table>
 <thead>
@@ -1751,15 +1754,21 @@ serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
 <p>It includes built-in support for a number of <a href="/auth/authentication-and-authorization">ServiceStack Auth options</a> including <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Auth</a> and stateless Bearer Token Auth Providers like <a href="/auth/api-key-authprovider">API Key</a> and <a href="/auth/jwt-authprovider">JWT Auth</a> as well as <a href="/auth/sessions">stateful Sessions</a> used by the popular <strong>credentials</strong> Auth Provider, whose Session Cookies are maintained in the client's cookie store. <a href="/auth/jwt-authprovider#refresh-tokens">Refresh Tokens</a> are also supported, where expired JWT Bearer Tokens are transparently refreshed behind-the-scenes before automatically retrying the failed Request.</p>
 <p>The client is built on <a href="https://crates.io/crates/reqwest">reqwest</a> and is cheap to clone and safe to share between tasks, where clones share the same connection pool, cookie store and auth tokens:</p>
 <pre><code class="language-rust">impl JsonServiceClient {
-    pub fn new(base_url: &amp;str) -&gt; Self                  // sends Requests to /api
+    // Client Configuration
+    pub fn new(base_url: &amp;str) -&gt; Self                     // sends Requests to /api
     pub fn new_json_service_client(base_url: &amp;str) -&gt; Self // sends Requests to /json/reply
     pub fn with_client(base_url: &amp;str, http: reqwest::Client) -&gt; Self
-
+    pub fn base_url(&amp;self) -&gt; &amp;str
+    pub fn reply_base_url(&amp;self) -&gt; &amp;str
     pub fn set_base_path(&amp;mut self, base_path: &amp;str) -&gt; &amp;mut Self
     pub fn set_bearer_token(&amp;mut self, token: &amp;str) -&gt; &amp;mut Self
+    pub fn bearer_token(&amp;self) -&gt; Option&lt;String&gt;
     pub fn set_refresh_token(&amp;mut self, token: &amp;str) -&gt; &amp;mut Self
+    pub fn set_refresh_token_uri(&amp;mut self, uri: &amp;str) -&gt; &amp;mut Self
     pub fn set_credentials(&amp;mut self, user_name: &amp;str, password: &amp;str) -&gt; &amp;mut Self
     pub fn set_header(&amp;mut self, name: &amp;str, value: &amp;str) -&gt; &amp;mut Self
+    pub fn set_user_agent(&amp;mut self, user_agent: &amp;str) -&gt; &amp;mut Self
+    pub fn set_on_authentication_required&lt;F&gt;(&amp;mut self, callback: F) -&gt; &amp;mut Self
 
     // Typed API
     pub async fn send&lt;T: IReturn&gt;(&amp;self, request: &amp;T) -&gt; Result&lt;T::Response&gt;
@@ -1771,7 +1780,6 @@ serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
     pub async fn send_void&lt;T: IReturnVoid&gt;(&amp;self, request: &amp;T) -&gt; Result&lt;()&gt;
     pub async fn api&lt;T: IReturn&gt;(&amp;self, request: &amp;T) -&gt; ApiResult&lt;T::Response&gt;
     pub async fn authenticate(&amp;self, user_name: &amp;str, password: &amp;str) -&gt; Result&lt;AuthenticateResponse&gt;
-    pub fn set_on_authentication_required&lt;F&gt;(&amp;mut self, callback: F) -&gt; &amp;mut Self
 
     // Batched and one-way Requests
     pub async fn send_all&lt;T: IReturn&gt;(&amp;self, requests: &amp;[T]) -&gt; Result&lt;Vec&lt;T::Response&gt;&gt;
@@ -1779,10 +1787,19 @@ serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
 
     // URL API
     pub async fn get_url&lt;R: DeserializeOwned&gt;(&amp;self, path: &amp;str) -&gt; Result&lt;R&gt;
+    pub async fn get_url_with&lt;R: DeserializeOwned&gt;(&amp;self, path: &amp;str, args: &amp;[(&amp;str,&amp;str)]) -&gt; Result&lt;R&gt;
     pub async fn post_url&lt;R: DeserializeOwned, B: Serialize&gt;(&amp;self, path: &amp;str, body: &amp;B) -&gt; Result&lt;R&gt;
+    pub async fn put_url&lt;R: DeserializeOwned, B: Serialize&gt;(&amp;self, path: &amp;str, body: &amp;B) -&gt; Result&lt;R&gt;
+    pub async fn patch_url&lt;R: DeserializeOwned, B: Serialize&gt;(&amp;self, path: &amp;str, body: &amp;B) -&gt; Result&lt;R&gt;
+    pub async fn delete_url&lt;R: DeserializeOwned&gt;(&amp;self, path: &amp;str) -&gt; Result&lt;R&gt;
+    pub async fn send_url&lt;R: DeserializeOwned, B: Serialize&gt;(&amp;self, method: &amp;str, path: &amp;str, body: Option&lt;&amp;B&gt;) -&gt; Result&lt;R&gt;
     pub async fn get_url_string(&amp;self, path: &amp;str) -&gt; Result&lt;String&gt;
+
+    // File Uploads, requires the `multipart` feature
+    pub async fn post_files_with_request&lt;T: IReturn&gt;(&amp;self, request: &amp;T, files: Vec&lt;UploadFile&gt;) -&gt; Result&lt;T::Response&gt;
 }
 </code></pre>
+<p>The sync <code>servicestack::blocking::JsonServiceClient</code> mirrors the same API without <code>async</code>/<code>await</code>, other than multipart file uploads which are only available on the async client.</p>
 <h3 id="making-typed-api-requests">Making Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Making API Requests in Rust is the same as all other <a href="/clients-overview">ServiceStack's Service Clients</a> by sending a populated Request DTO using a <code>JsonServiceClient</code> which returns a typed Response DTO:</p>
 <pre><code class="language-rust">use servicestack::JsonServiceClient;
@@ -1800,9 +1817,22 @@ async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 <p><code>send</code> uses the HTTP Method the API is annotated with, use <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code> or <code>delete</code> to send a Request DTO with a specific HTTP Method:</p>
 <pre><code class="language-rust">let res = client.post(&amp;CreateBooking { name: Some(&quot;Booking&quot;.into()), ..Default::default() }).await?;
 </code></pre>
-<p>APIs that don't return a Response Body are sent with <code>send_void</code>:</p>
+<p>APIs that don't return a Response Body are sent with <code>send_void</code>, which accepts the Request DTOs generated with an <code>IReturnVoid</code> impl:</p>
 <pre><code class="language-rust">client.send_void(&amp;DeleteBooking { id: 1 }).await?;
 </code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>VERB</code> of a Request DTO's generated <code>IRequest</code> impl also determines whether it's sent in the QueryString or the JSON Request Body, where only <code>GET</code>, <code>DELETE</code>, <code>HEAD</code> and <code>OPTIONS</code> Requests send their populated properties in the QueryString:</p>
+<pre><code class="language-rust">// GET /api/Hello?name=World
+client.send(&amp;Hello { name: Some(&quot;World&quot;.into()) }).await?;
+
+// POST /api/CreateBooking {&quot;name&quot;:&quot;Booking&quot;}
+client.send(&amp;CreateBooking { name: Some(&quot;Booking&quot;.into()), ..Default::default() }).await?;
+</code></pre>
+<p>Request DTOs that aren't annotated with a Verb default to <code>POST</code>, which can be overridden per Request by sending it with an explicit HTTP Method:</p>
+<pre><code class="language-rust">let res = client.get(&amp;Hello { name: Some(&quot;World&quot;.into()) }).await?;   // GET /api/Hello?name=World
+let res = client.post(&amp;Hello { name: Some(&quot;World&quot;.into()) }).await?;  // POST /api/Hello {&quot;name&quot;:&quot;World&quot;}
+</code></pre>
+<p>Batched and one-way Requests are sent to their own routes, i.e. <code>send_all</code> sends its Requests to the API's batched <code>/api/Hello[]</code> route whilst <code>publish</code> sends them to the one-way endpoint, e.g. <code>/json/oneway/Hello</code> when using <code>new_json_service_client</code>.</p>
 <h3 id="sync-client">Sync client<a class="header-anchor" href="javascript:;" onclick="location.hash='#sync-client'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Enable the <code>blocking</code> feature for the same API without <code>async</code>/<code>await</code>, ideal for CLIs and scripts:</p>
 <pre><code class="language-rust">use servicestack::blocking::JsonServiceClient;
@@ -1826,6 +1856,21 @@ for booking in res.results { // booking is a Booking
     println!(&quot;{} {}&quot;, booking.id, booking.name);
 }
 </code></pre>
+<p>As the query params are <code>Option&lt;T&gt;</code> they're only sent when populated, letting the Server apply its own defaults otherwise. In addition to <code>results</code>, <code>QueryResponse&lt;T&gt;</code> returns the <code>offset</code> of the current page and the <code>total</code> number of matching results when requested with <code>include: &quot;Total&quot;</code>:</p>
+<pre><code class="language-rust">let res = client.send(&amp;QueryBookings {
+    query_db: QueryDb {
+        skip: Some(10),
+        take: Some(10),
+        order_by: Some(&quot;id&quot;.into()),
+        include: Some(&quot;Total&quot;.into()),          // include the Total of matching results
+        fields: Some(&quot;id,name,roomType&quot;.into()), // limit the fields returned
+        ..Default::default()
+    },
+    ..Default::default()
+}).await?;
+
+println!(&quot;{} {} {}&quot;, res.offset, res.total, res.results.len());
+</code></pre>
 <p>Properties of a Type's base class are accessed through the field they're flattened into, e.g. a <code>Booking</code> inheriting <code>AuditBase</code> accesses its audit fields with:</p>
 <pre><code class="language-rust">println!(&quot;{:?}&quot;, booking.audit_base.created_by);
 </code></pre>
@@ -1834,6 +1879,19 @@ for booking in res.results { // booking is a Booking
 <pre><code class="language-rust">let res: HelloResponse = client.get_url(&quot;/hello/World&quot;).await?;
 
 let res: HelloResponse = client.post_url(&quot;/custom-path&quot;, &amp;request).await?;
+</code></pre>
+<p>Where relative paths are resolved against the client's Base URL whilst absolute URLs are sent as-is, letting the same client call APIs on different hosts. <code>put_url</code>, <code>patch_url</code> and <code>delete_url</code> are also available, or use <code>send_url</code> to send a Request with any HTTP Method:</p>
+<pre><code class="language-rust">let res: IdResponse = client.put_url(&quot;/bookings/1&quot;, &amp;request).await?;
+let res: EmptyResponse = client.delete_url(&quot;/bookings/1&quot;).await?;
+
+let res: HelloResponse = client
+    .send_url(servicestack::HTTP_POST, &quot;/hello&quot;, Some(&amp;request))
+    .await?;
+</code></pre>
+<p>Use <code>get_url_with</code> to append additional args to the QueryString, which are URL encoded and serialized using the same <a href="#querystring-serialization">QueryString Serialization</a> as Request DTOs:</p>
+<pre><code class="language-rust">let res: HelloResponse = client
+    .get_url_with(&quot;/hello/World&quot;, &amp;[(&quot;field&quot;, &quot;name&quot;), (&quot;comment&quot;, &quot;a b&amp;c&quot;)])
+    .await?;
 </code></pre>
 <h3 id="raw-data-responses">Raw Data Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-data-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>get_url_string</code> to access a raw Response Body, useful for APIs returning content like CSV:</p>
@@ -1845,7 +1903,12 @@ let res: HelloResponse = client.post_url(&quot;/custom-path&quot;, &amp;request)
     Hello { name: Some(&quot;A&quot;.into()) },
     Hello { name: Some(&quot;B&quot;.into()) },
 ]).await?;
+
+for res in responses { // res is a HelloResponse
+    println!(&quot;{}&quot;, res.result);
+}
 </code></pre>
+<p>Which sends them to the API's batched <code>/api/Hello[]</code> route in a single Request, returning a <code>Vec&lt;T::Response&gt;</code> of all their Responses in the same order.</p>
 <p>Or send a Request to a one-way endpoint that ignores its Response:</p>
 <pre><code class="language-rust">client.publish(&amp;Hello { name: Some(&quot;World&quot;.into()) }).await?;
 </code></pre>
@@ -1862,9 +1925,41 @@ let res: HelloResponse = client.post_url(&quot;/custom-path&quot;, &amp;request)
     }
 }
 </code></pre>
-<p>Which also works with the standard <code>errors</code> matching:</p>
-<pre><code class="language-rust">let mut web_ex: &amp;servicestack::WebServiceException;
-if let servicestack::Error::Api(ex) = &amp;err { /* ... */ }
+<p>All failures are returned in a single <code>Error</code> enum, letting a <code>match</code> handle API errors, transport failures and invalid Responses together:</p>
+<pre><code class="language-rust">use servicestack::Error;
+
+match client.send(&amp;Hello::default()).await {
+    Ok(res) =&gt; println!(&quot;{}&quot;, res.result),
+    Err(Error::Api(ex)) =&gt; {          // the API returned an error Response
+        println!(&quot;{} {}&quot;, ex.status_code, ex.error_message());
+        for field_error in ex.field_errors() {
+            println!(&quot;  {}: {}&quot;, field_error.field_name, field_error.message);
+        }
+    }
+    Err(Error::Http(err)) =&gt; println!(&quot;connection failed: {err}&quot;),        // reqwest error
+    Err(Error::Serialization(err)) =&gt; println!(&quot;invalid Response: {err}&quot;), // serde_json error
+}
+</code></pre>
+<p><code>Error::Api</code> holds a boxed <code>WebServiceException</code> with the raw HTTP error Response and the typed accessors you'd expect:</p>
+<pre><code class="language-rust">ex.status_code            // HTTP Status Code, e.g. 400
+ex.status_description     // HTTP Status Description, e.g. &quot;Bad Request&quot;
+ex.response_status        // Option&lt;ResponseStatus&gt;, the API's structured error
+ex.response_body          // raw error body, e.g. when a HTML or plain text error was returned
+ex.error_code()           // &quot;NotEmpty&quot;
+ex.error_message()        // &quot;'Name' must not be empty.&quot;
+ex.field_errors()         // &amp;[ResponseError] of all field validation errors
+ex.field_error(&quot;Name&quot;)    // Some(&quot;'Name' must not be empty.&quot;)
+ex.is_validation_error()  // has field validation errors
+ex.is_unauthorized()      // 401
+ex.is_not_found()         // 404
+</code></pre>
+<p>As it implements <code>std::error::Error</code> and <code>Display</code>, it can be propagated with <code>?</code> and formatted directly, e.g. <code>400 NotEmpty: 'Name' must not be empty.</code> Non JSON error Responses are also converted into a <code>WebServiceException</code> populated from the HTTP Status, so a single error type can be used to handle all API failures.</p>
+<p>Field validation errors are returned in typed <code>ResponseError</code> structs which can be mapped back to the fields of your UI:</p>
+<pre><code class="language-rust">if let Some(status) = err.response_status() {
+    for field_error in &amp;status.errors {
+        println!(&quot;{} {} {}&quot;, field_error.field_name, field_error.error_code, field_error.message);
+    }
+}
 </code></pre>
 <p>Alternatively <code>api</code> returns errors in its result instead of a separate <code>Err</code>, which can be preferable when handling validation errors is part of normal control flow:</p>
 <pre><code class="language-rust">let api = client.api(&amp;CreateBooking::default()).await;
@@ -1872,6 +1967,12 @@ if api.failed() {
     println!(&quot;{:?} {:?}&quot;, api.error_code(), api.field_error(&quot;Name&quot;));
 } else {
     println!(&quot;{}&quot;, api.response().unwrap().id);
+}
+</code></pre>
+<p><code>ApiResult&lt;T&gt;</code> holds the typed <code>response</code> and any <code>ResponseStatus</code> <code>error</code> alongside its <code>succeeded()</code>, <code>failed()</code>, <code>error_code()</code>, <code>error_message()</code>, <code>field_error()</code> and <code>response()</code> helpers. As all errors are converted into a <code>ResponseStatus</code>, transport and serialization failures are also returned in <code>api.error</code> with an <code>HttpError</code> or <code>SerializationException</code> Error Code, whilst <code>into_result()</code> converts it back into a standard <code>Result&lt;T, ResponseStatus&gt;</code>:</p>
+<pre><code class="language-rust">match client.api(&amp;CreateBooking::default()).await.into_result() {
+    Ok(res) =&gt; println!(&quot;{}&quot;, res.id),
+    Err(status) =&gt; println!(&quot;{} {}&quot;, status.error_code, status.message),
 }
 </code></pre>
 <h3 id="authenticating-using-basic-auth">Authenticating using Basic Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-basic-auth'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1885,7 +1986,18 @@ let res = client.send(&amp;SecureRequest::default()).await?;
 <p>Alternatively you can authenticate using userName/password credentials with the <code>authenticate</code> API:</p>
 <pre><code class="language-rust">let auth = client.authenticate(&quot;username&quot;, &quot;password&quot;).await?;
 </code></pre>
-<p>This will populate the <code>JsonServiceClient</code> with <a href="/auth/sessions#cookie-session-ids">Session Cookies</a> which will transparently be sent on subsequent requests to make authenticated requests, as well as using any Bearer Token the Server returns.</p>
+<p>This will populate the <code>JsonServiceClient</code> with <a href="/auth/sessions#cookie-session-ids">Session Cookies</a> which will transparently be sent on subsequent requests to make authenticated requests, as well as using any Bearer and Refresh Tokens the Server returns.</p>
+<p>Session Cookies are maintained in the client's cookie jar whilst its tokens are available from <code>bearer_token()</code>. The <code>AuthenticateResponse</code> also returns the authenticated User's info, roles and permissions:</p>
+<pre><code class="language-rust">let auth = client.authenticate(&quot;test&quot;, &quot;test&quot;).await?;
+
+println!(&quot;{} {} {}&quot;, auth.user_id, auth.user_name, auth.display_name);
+println!(&quot;{:?} {:?}&quot;, auth.roles, auth.permissions);
+println!(&quot;{:?}&quot;, client.bearer_token());
+
+// All subsequent Requests are made with the Authenticated Session
+let res = client.send(&amp;HelloSecure { name: Some(&quot;World&quot;.into()) }).await?;
+</code></pre>
+<p>As the auth state is shared behind a lock, Requests sent through a <code>&amp;self</code> client (and any of its clones) all see the updated tokens.</p>
 <h3 id="authenticating-using-jwt">Authenticating using JWT<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-jwt'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>set_bearer_token</code> to Authenticate with a <a href="/auth/jwt-authprovider">ServiceStack JWT Provider</a> using a JWT Token:</p>
 <pre><code class="language-rust">client.set_bearer_token(&amp;jwt);
@@ -1893,11 +2005,117 @@ let res = client.send(&amp;SecureRequest::default()).await?;
 <p>Alternatively you can use just a <a href="/auth/jwt-authprovider#refresh-tokens">Refresh Token</a> instead:</p>
 <pre><code class="language-rust">client.set_refresh_token(&amp;refresh_token);
 </code></pre>
-<p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.</p>
+<p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests, i.e. when a Request fails with a <code>401 Unauthorized</code> the client sends its Refresh Token to the <a href="/auth/jwt-authprovider#refresh-tokens">GetAccessToken</a> API, updates its Bearer Token then transparently retries the original Request:</p>
+<pre><code>POST /api/Hello           -&gt; 401 Unauthorized
+POST /api/GetAccessToken  -&gt; 200 { &quot;accessToken&quot;: &quot;...&quot; }
+POST /api/Hello           -&gt; 200 { &quot;result&quot;: &quot;Hello, World!&quot; }
+</code></pre>
+<p>Use <code>set_refresh_token_uri</code> to fetch Access Tokens from a different <a href="/auth/jwt-authprovider#retrieve-token-from-central-auth-server-using-credentials-auth">central Auth Server</a>:</p>
+<pre><code class="language-rust">client.set_refresh_token_uri(&quot;https://auth.example.org/api/GetAccessToken&quot;);
+</code></pre>
 <h3 id="authenticating-using-an-api-key">Authenticating using an API Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-an-api-key'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>set_bearer_token</code> to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-rust">client.set_bearer_token(&quot;ak-87949de37e894627a9f6173154e7cafa&quot;);
 </code></pre>
+<h3 id="built-in-servicestack-dtos">Built-in ServiceStack DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-servicestack-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>servicestack</code> crate includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them without needing to generate them:</p>
+<pre><code class="language-rust">use servicestack::*;
+
+// Authentication
+let auth = client.send(&amp;Authenticate {
+    provider: Some(&quot;credentials&quot;.into()),
+    user_name: Some(&quot;test&quot;.into()),
+    password: Some(&quot;test&quot;.into()),
+    remember_me: Some(true),
+    ..Default::default()
+}).await?;
+
+let reg = client.send(&amp;Register {
+    user_name: Some(&quot;new-user&quot;.into()),
+    email: Some(&quot;user@example.org&quot;.into()),
+    password: Some(&quot;p@55wOrd&quot;.into()),
+    auto_login: Some(true),
+    ..Default::default()
+}).await?;
+
+// JWT
+let token = client.send(&amp;ConvertSessionToToken::default()).await?;  // Session -&gt; JWT
+let access = client.send(&amp;GetAccessToken { refresh_token, ..Default::default() }).await?;
+
+// API Keys
+let keys = client.send(&amp;GetApiKeys { environment: &quot;live&quot;.into(), ..Default::default() }).await?;
+let new_keys = client.send(&amp;RegenerateApiKeys { environment: &quot;live&quot;.into(), ..Default::default() }).await?;
+
+// Roles and Permissions
+let roles = client.send(&amp;AssignRoles {
+    user_name: &quot;user&quot;.into(),
+    roles: vec![&quot;Employee&quot;.into()],
+    ..Default::default()
+}).await?;
+client.send(&amp;UnAssignRoles { user_name: &quot;user&quot;.into(), roles: vec![&quot;Employee&quot;.into()], ..Default::default() }).await?;
+
+// Navigation
+let nav = client.send(&amp;GetNavItems::default()).await?;
+</code></pre>
+<p>Together with the built-in Response Types and base types that generated DTOs reference:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ResponseStatus</code></td>
+<td>ServiceStack's structured error response</td>
+</tr>
+<tr>
+<td><code>ResponseError</code></td>
+<td>An individual field validation error</td>
+</tr>
+<tr>
+<td><code>EmptyResponse</code></td>
+<td>Response of APIs that don't return a Response Body</td>
+</tr>
+<tr>
+<td><code>IdResponse</code></td>
+<td>Response returning the Id of the created or updated entity</td>
+</tr>
+<tr>
+<td><code>StringResponse</code></td>
+<td>Response returning a single <code>result</code> string</td>
+</tr>
+<tr>
+<td><code>StringsResponse</code></td>
+<td>Response returning a list of string <code>results</code></td>
+</tr>
+<tr>
+<td><code>AuditBase</code></td>
+<td>Audit fields flattened into <a href="/autoquery/crud">AutoQuery CRUD</a> data models</td>
+</tr>
+<tr>
+<td><code>QueryBase</code></td>
+<td>Query params supported by all <a href="/autoquery/">AutoQuery</a> Requests</td>
+</tr>
+<tr>
+<td><code>QueryDb</code></td>
+<td>Base type of AutoQuery RDBMS Requests</td>
+</tr>
+<tr>
+<td><code>QueryData</code></td>
+<td>Base type of <a href="/autoquery/data">AutoQuery Data</a> Requests</td>
+</tr>
+<tr>
+<td><code>QueryResponse&lt;T&gt;</code></td>
+<td>Typed Response of AutoQuery Requests</td>
+</tr>
+<tr>
+<td><code>NavItem</code></td>
+<td>A <a href="/navigation">Navigation Item</a> returned by <code>GetNavItems</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use <code>set_on_authentication_required</code> to re-configure the client before automatically retrying the original request, e.g:</p>
 <pre><code class="language-rust,ignore">client.set_on_authentication_required(|client| {
@@ -1931,6 +2149,17 @@ let res = client.post_files_with_request(&amp;UploadPhoto { album: &quot;Holiday
     },
 ]).await?;
 </code></pre>
+<p>Any populated properties on the Request DTO are sent as form fields alongside the uploaded files, whilst <code>field_name</code> defaults to <code>file</code> and <code>content_type</code> is detected by the Server when it's <code>None</code>. To upload multiple files just send multiple <code>UploadFile</code>s:</p>
+<pre><code class="language-rust">let res = client.post_files_with_request(&amp;UploadPhotos { album: &quot;Holiday&quot;.into() }, vec![
+    UploadFile { field_name: &quot;files&quot;.into(), file_name: &quot;1.png&quot;.into(),
+                 content_type: Some(&quot;image/png&quot;.into()), data: std::fs::read(&quot;1.png&quot;)? },
+    UploadFile { field_name: &quot;files&quot;.into(), file_name: &quot;2.txt&quot;.into(),
+                 content_type: None, data: b&quot;file contents&quot;.to_vec() },
+]).await?;
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>File uploads are only available on the async client</p>
+</div>
 <h3 id="client-configuration">Client Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-rust">let mut client = JsonServiceClient::new(&quot;https://example.org&quot;);
 client.set_header(&quot;X-Custom&quot;, &quot;Value&quot;);
@@ -1942,7 +2171,232 @@ let http = reqwest::Client::builder()
     .build()?;
 let client = JsonServiceClient::with_client(&quot;https://example.org&quot;, http);
 </code></pre>
-<p><code>JsonServiceClient::new</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route. Use <code>JsonServiceClient::new_json_service_client</code> for older ServiceStack instances that only have the <code>/json/reply</code> routes enabled, or <code>set_base_path</code> for a custom base path.</p>
+<p><code>JsonServiceClient::new</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route. Use <code>JsonServiceClient::new_json_service_client</code> for older ServiceStack instances that only have the <code>/json/reply</code> routes enabled, or <code>set_base_path</code> for a custom base path:</p>
+<pre><code class="language-rust">let api_client = JsonServiceClient::new(&quot;https://example.org&quot;);                  // /api/Hello
+let json_client = JsonServiceClient::new_json_service_client(&quot;https://example.org&quot;); // /json/reply/Hello
+
+let mut custom_client = JsonServiceClient::new(&quot;https://example.org&quot;);
+custom_client.set_base_path(&quot;custom/api&quot;);                                       // /custom/api/Hello
+</code></pre>
+<p>The default <code>reqwest::Client</code> is created with a <strong>60s timeout</strong> and a <strong>cookie store</strong> enabled for maintaining <a href="/auth/sessions#cookie-session-ids">Session Cookies</a>, so supply <code>.cookie_store(true)</code> when configuring your own client if you're using Session-based Auth.</p>
+<h3 id="sharing-the-client-between-tasks">Sharing the Client between tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#sharing-the-client-between-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>JsonServiceClient</code> is cheap to clone and safe to share, where clones share the same connection pool, cookie jar and auth tokens - so a single configured client should be cloned into your App's tasks to benefit from <code>reqwest</code>'s connection pooling and to have any refreshed Bearer Tokens visible to all of them:</p>
+<pre><code class="language-rust">let client = JsonServiceClient::new(&quot;https://blazor-vue.web-templates.io&quot;); // configure before sharing
+
+let mut tasks = Vec::new();
+for name in names {
+    let client = client.clone();
+    tasks.push(tokio::spawn(async move {
+        client.send(&amp;Hello { name: Some(name) }).await
+    }));
+}
+
+for task in tasks {
+    println!(&quot;{}&quot;, task.await??.result);
+}
+</code></pre>
+<p>Requests are sent through a <code>&amp;self</code> client so a shared client only needs to be <code>mut</code> when re-configuring it with its <code>set_*</code> methods.</p>
+<h3 id="querystring-serialization">QueryString Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#querystring-serialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTO properties and args sent in the QueryString use ServiceStack's <a href="/js-utils">JS Object</a> notation for complex types, where each Request DTO is first serialized by <strong>serde</strong> then converted into its QueryString representation:</p>
+<table>
+<thead>
+<tr>
+<th>Rust Value</th>
+<th>QueryString</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Some(&quot;World&quot;)</code></td>
+<td><code>name=World</code></td>
+</tr>
+<tr>
+<td><code>Some(true)</code></td>
+<td><code>enabled=true</code></td>
+</tr>
+<tr>
+<td><code>Some(1.5)</code></td>
+<td><code>rate=1.5</code></td>
+</tr>
+<tr>
+<td><code>vec![1,2,3]</code></td>
+<td><code>ids=[1,2,3]</code></td>
+</tr>
+<tr>
+<td><code>HashMap</code> of <code>{&quot;a&quot;:1,&quot;b&quot;:2}</code></td>
+<td><code>meta={a:1,b:2}</code></td>
+</tr>
+<tr>
+<td><code>None</code></td>
+<td><em>(omitted)</em></td>
+</tr>
+</tbody>
+</table>
+<p>As names and values are percent-encoded, <code>&quot;a b&amp;c&quot;</code> is sent as <code>a+b%26c</code>, whilst <code>None</code> properties generated with <code>#[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</code> are omitted entirely so the Server can apply its own defaults.</p>
+<h3 id="url-utils">URL Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#url-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The utils the client uses to construct its API Requests are also exported in <code>servicestack::url</code> for building your own URLs and integrations:</p>
+<pre><code class="language-rust">use servicestack::url::*;
+
+combine_with(&quot;https://example.org/&quot;, &quot;/api/&quot;)           // &quot;https://example.org/api&quot;
+to_absolute_url(&quot;https://example.org&quot;, &quot;/api/Hello&quot;)    // &quot;https://example.org/api/Hello&quot;
+append_query_string(&quot;/api/Hello&quot;, &amp;[(&quot;name&quot;,&quot;World&quot;)])  // &quot;/api/Hello?name=World&quot;
+qs_value(&amp;serde_json::json!([1,2,3]))                   // &quot;[1,2,3]&quot;
+encode_uri_component(&quot;a b&quot;)                             // &quot;a+b&quot;
+has_request_body(&quot;GET&quot;)                                 // false
+</code></pre>
+<p>Along with the HTTP constants used in ServiceStack APIs, e.g. <code>HTTP_GET</code>, <code>HTTP_POST</code>, <code>HTTP_PUT</code>, <code>HTTP_PATCH</code>, <code>HTTP_DELETE</code>, <code>HTTP_OPTIONS</code>, <code>HTTP_HEAD</code>, <code>MIME_TYPE_JSON</code> and <code>DEFAULT_BASE_PATH</code>.</p>
+<h3 id="calling-ai-chat-and-openai-compatible-apis">Calling AI Chat and OpenAI compatible APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#calling-ai-chat-and-openai-compatible-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As Request DTOs are just structs, more advanced APIs like <a href="/ai-chat-api">AI Chat</a>'s OpenAI-compatible <code>ChatCompletion</code> API can also be called with typed DTOs, where polymorphic content parts are sent as <code>serde_json::Value</code>:</p>
+<pre><code class="language-rust">// The ChatCompletion API requires an authenticated User
+client.authenticate(&quot;username&quot;, &quot;password&quot;).await?;
+
+let request = ChatCompletion {
+    model: &quot;openai/gpt-oss-120b&quot;.to_string(),
+    messages: vec![AiMessage {
+        role: &quot;user&quot;.to_string(),
+        // Content parts are polymorphic, e.g. text, image_url or input_audio
+        content: Some(vec![serde_json::to_value(AiTextContent {
+            ai_content: AiContent { r#type: &quot;text&quot;.to_string() },
+            text: &quot;Capital of France? Answer in 3 words&quot;.to_string(),
+        })?]),
+        ..Default::default()
+    }],
+    ..Default::default()
+};
+
+let res = match client.send(&amp;request).await {
+    Ok(res) =&gt; res,
+    Err(err) =&gt; {
+        // Handle rate limited or temporarily unavailable LLMs
+        if matches!(err.status_code(), Some(429 | 502 | 503 | 504)) { /* retry */ }
+        return Err(err.into());
+    }
+};
+
+println!(&quot;{}&quot;, res.choices[0].message.content);
+</code></pre>
+<h3 id="testing">Testing<a class="header-anchor" href="javascript:;" onclick="location.hash='#testing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As <code>JsonServiceClient</code> accepts any Base URL, APIs can be tested against a mock HTTP Server like <a href="https://crates.io/crates/mockito">mockito</a> without needing to mock the client itself:</p>
+<pre><code class="language-rust">#[tokio::test]
+async fn sends_get_request_in_query_string() {
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock(&quot;GET&quot;, &quot;/api/Hello?name=World&quot;)
+        .with_status(200)
+        .with_header(&quot;content-type&quot;, &quot;application/json&quot;)
+        .with_body(r#&quot;{&quot;result&quot;:&quot;Hello, World!&quot;}&quot;#)
+        .create_async()
+        .await;
+
+    let client = JsonServiceClient::new(&amp;server.url());
+    let res = client.send(&amp;Hello { name: Some(&quot;World&quot;.into()) })
+        .await
+        .expect(&quot;send failed&quot;);
+
+    assert_eq!(res.result, &quot;Hello, World!&quot;);
+    mock.assert_async().await;
+}
+</code></pre>
+<p>Which is how the client's own <a href="https://github.com/ServiceStack/servicestack-rust/blob/main/tests/client_test.rs">async</a> and <a href="https://github.com/ServiceStack/servicestack-rust/blob/main/tests/blocking_test.rs">blocking</a> test suites verify the Requests they send, in addition to its <a href="https://github.com/ServiceStack/servicestack-rust/blob/main/tests/integration_test.rs">integration tests</a> which are run against the live <a href="https://test.servicestack.net">test.servicestack.net</a> Services:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>cargo test --all-features              # unit tests</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>cargo test --all-features -- --ignored # integration tests</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Use the <code>SERVICESTACK_TEST_URL</code> Environment Variable to run the integration tests against a different ServiceStack instance.</p>
+<h3 id="examples">Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://github.com/ServiceStack/servicestack-rust/blob/main/examples/hello.rs">hello</a> example is a small runnable App calling the live <strong>test.servicestack.net</strong> Services with typed APIs, batched Requests, structured validation errors and authenticated Requests, whilst <a href="https://github.com/ServiceStack/servicestack-rust/blob/main/examples/hello_blocking.rs">hello_blocking</a> calls the same API with the sync client:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>cargo run --example hello</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>cargo run --example hello_blocking --features blocking</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated Rust DTOs as-is, however you can further customize how the DTOs are generated by overriding the default options.</p>
 <p>The header in the generated DTOs show the different options Rust native types support with their defaults. To override a value, remove the <code>//</code> and specify the value to the right of the <code>:</code>. Any uncommented value will be sent to the server to override any server defaults.</p>
@@ -2105,6 +2559,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Making Typed API Requests
                                                         </span>
                                                     </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
+                                                        </span>
+                                                    </li>
                                                     <li data-id="sync-client" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#sync-client'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2165,6 +2625,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Authenticating using an API Key
                                                         </span>
                                                     </li>
+                                                    <li data-id="built-in-servicestack-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#built-in-servicestack-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Built-in ServiceStack DTOs
+                                                        </span>
+                                                    </li>
                                                     <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2181,6 +2647,42 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                         <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Client Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sharing-the-client-between-tasks" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sharing-the-client-between-tasks'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sharing the Client between tasks
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="querystring-serialization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#querystring-serialization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            QueryString Serialization
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="url-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#url-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            URL Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="calling-ai-chat-and-openai-compatible-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#calling-ai-chat-and-openai-compatible-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Calling AI Chat and OpenAI compatible APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="testing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#testing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Testing
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="examples" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#examples'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Examples
                                                         </span>
                                                     </li>
                                             </ul>

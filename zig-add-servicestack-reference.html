@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T02:08:00.7383699Z'>
+    <meta name='date' content='2026-08-27T02:32:41.0446471Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>Zig Add ServiceStack Reference</title>
+    <title>Zig ServiceStack Reference</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -1478,13 +1478,15 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            Zig Add ServiceStack Reference
+                            Zig ServiceStack Reference
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Zig - providing a simple way to give Zig clients typed access to your ServiceStack Services.</p>
+                <div class="content"><div class="shadow -ml-12 w-[940px] rounded-md"><p><img src="/img/pages/servicestack-reference/zig-info.png" alt="" /></p>
+</div>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Zig - providing a simple way to give Zig clients typed access to your ServiceStack Services.</p>
 <h3 id="zig-explicit-efficient-apis-for-systems-software">Zig - Explicit, efficient APIs for systems software<a class="header-anchor" href="javascript:;" onclick="location.hash='#zig-explicit-efficient-apis-for-systems-software'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><a href="https://github.com/ServiceStack/servicestack-zig">servicestack-zig</a> uses Zig's standard library with no third-party dependencies, infers the response type at compile time and makes ownership explicit:</p>
 <pre><code class="language-zig">var client = try ss.JsonServiceClient.init(allocator, base_url);
@@ -1495,7 +1497,53 @@ var response = try client.send(dtos.Hello{
 });
 defer response.deinit();
 </code></pre>
-<p>The caller supplies the allocator and owns the parsed response lifecycle, whilst the client still provides structured errors, validation details, authentication, session cookies, typed AutoQuery, batch and one-way requests, custom URLs and multipart uploads.</p>
+<p>The caller supplies the allocator and owns the parsed response lifecycle, whilst the client still provides structured errors, validation details, authentication with transparent token refresh, session cookies, typed AutoQuery, batch and one-way requests, custom URLs and multipart uploads:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zero dependencies</strong></td>
+<td>Only uses the Zig standard library, no C or third-party dependencies</td>
+</tr>
+<tr>
+<td><strong>comptime typed APIs</strong></td>
+<td>Response Types, routes and HTTP Methods resolved from Request DTOs at comptime</td>
+</tr>
+<tr>
+<td><strong>Structured errors</strong></td>
+<td>Typed <code>ResponseStatus</code> errors with field validation errors and Status Code helpers</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td>Basic Auth, API Keys, JWT Bearer Tokens, Refresh Tokens and Session Cookies</td>
+</tr>
+<tr>
+<td><strong>AutoQuery</strong></td>
+<td>Typed <code>QueryResponse(T)</code> Responses with query params flattened into Request DTOs</td>
+</tr>
+<tr>
+<td><strong>File Uploads</strong></td>
+<td><code>multipart/form-data</code> uploads of single and multiple files with a Request DTO</td>
+</tr>
+<tr>
+<td><strong>Batched Requests</strong></td>
+<td>Send multiple Requests in a single call, or one-way Requests ignoring Responses</td>
+</tr>
+<tr>
+<td><strong>Custom URLs</strong></td>
+<td>Call any relative or absolute URL, incl. raw non-JSON Responses like CSV</td>
+</tr>
+<tr>
+<td><strong>Explicit ownership</strong></td>
+<td>Responses are parsed into their own arena freed with a single <code>deinit()</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="first-class-development-experience">First class development experience<a class="header-anchor" href="javascript:;" onclick="location.hash='#first-class-development-experience'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><a href="https://ziglang.org">Zig</a> is a fast-growing systems language offering a simpler alternative to C with compile-time metaprogramming, explicit allocators and no hidden control flow, which sees it increasingly used for performance-critical services, embedded software and cross-compilation toolchains. To maximize the experience for calling ServiceStack APIs from these environments, Zig is supported as a 1st class Add ServiceStack Reference language which gives Zig developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.</p>
 <h3 id="ideal-idiomatic-typed-message-based-api">Ideal idiomatic Typed Message-based API<a class="header-anchor" href="javascript:;" onclick="location.hash='#ideal-idiomatic-typed-message-based-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1542,6 +1590,83 @@ pub const QueryBookings = struct {
 };
 </code></pre>
 <p>The generated <code>ss_name</code>, <code>ss_verb</code> and <code>Response</code> declarations are what enable the end-to-end typed API, letting the client resolve each API's route, HTTP Method and Response Type from its Request DTO at <strong>comptime</strong> - so <code>client.send()</code> returns the correct Response Type with no type arguments and no runtime overhead.</p>
+<h3 id="zig-type-mappings">Zig Type Mappings<a class="header-anchor" href="javascript:;" onclick="location.hash='#zig-type-mappings'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>C# Types are mapped to the closest Zig Type that <code>std.json</code> can parse without any custom (de)serializers, where Types without a native Zig equivalent are emitted as the strings and <code>std.json.Value</code>'s they're serialized in JSON with:</p>
+<table>
+<thead>
+<tr>
+<th>C# Type</th>
+<th>Zig Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string</code></td>
+<td><code>?[]const u8</code></td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td><code>bool</code></td>
+</tr>
+<tr>
+<td><code>byte</code> <code>short</code> <code>int</code> <code>long</code></td>
+<td><code>u8</code> <code>i16</code> <code>i32</code> <code>i64</code></td>
+</tr>
+<tr>
+<td><code>ushort</code> <code>uint</code> <code>ulong</code></td>
+<td><code>u16</code> <code>u32</code> <code>u64</code></td>
+</tr>
+<tr>
+<td><code>float</code> <code>double</code> <code>decimal</code></td>
+<td><code>f32</code> <code>f64</code> <code>f64</code></td>
+</tr>
+<tr>
+<td><code>DateTime</code> <code>DateTimeOffset</code> <code>TimeSpan</code> <code>Guid</code></td>
+<td><code>?[]const u8</code> (ISO-8601 / XSD Duration / GUID strings)</td>
+</tr>
+<tr>
+<td>Nullable Value Types, e.g. <code>int?</code></td>
+<td><code>?i32</code></td>
+</tr>
+<tr>
+<td><code>List&lt;T&gt;</code> and <code>T[]</code></td>
+<td><code>[]T</code></td>
+</tr>
+<tr>
+<td><code>Dictionary&lt;K,V&gt;</code> and <code>object</code></td>
+<td><code>?std.json.Value</code></td>
+</tr>
+<tr>
+<td><code>byte[]</code></td>
+<td><code>?[]const u8</code> (base64)</td>
+</tr>
+<tr>
+<td>C# <code>enum</code></td>
+<td>Zig <code>enum</code></td>
+</tr>
+<tr>
+<td>Abstract Types with sub Types</td>
+<td><code>std.json.Value</code></td>
+</tr>
+</tbody>
+</table>
+<p>Enums are generated as Zig enums whose members are serialized as their string names, whilst <code>[Flags]</code> enums retain their <code>i32</code> values. Members that aren't valid Zig identifiers are emitted with <code>@&quot;&quot;</code> syntax:</p>
+<pre><code class="language-zig">pub const EnumWithValues = enum {
+    None,
+    @&quot;Member 1&quot;,
+    Value2,
+};
+
+// @Flags()
+pub const EnumFlags = enum(i32) {
+    Value0 = 0,
+    Value1 = 1,
+    Value2 = 2,
+    Value3 = 4,
+    Value123 = 7,
+};
+</code></pre>
+<p>Every field is given a default value, i.e. <code>null</code> for optional reference types and <code>0</code> or <code>&amp;.{}</code> for value types and collections, so partial Responses parse cleanly whilst unknown fields the Server returns are ignored - letting you add properties to your APIs without breaking existing Zig clients.</p>
 <h2 id="installation">Installation<a class="header-anchor" href="javascript:;" onclick="location.hash='#installation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The only requirements for Zig Apps to perform typed API Requests are the generated Zig DTOs and the generic <code>JsonServiceClient</code> in the <a href="https://github.com/ServiceStack/servicestack-zig">servicestack-zig</a> module, which only uses the Zig standard library:</p>
 <div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
@@ -1553,7 +1678,7 @@ pub const QueryBookings = struct {
                     <div class="flex items-center gap-3 flex-1 min-w-0">
                         <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
                         <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>zig fetch --save <a href="https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.2.tar.gz">https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.2.tar.gz</a></p>
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>zig fetch --save <a href="https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.3.tar.gz">https://github.com/ServiceStack/servicestack-zig/archive/refs/tags/v0.1.3.tar.gz</a></p>
 </code>
                             </div>
                         </div>
@@ -1733,9 +1858,11 @@ const exe = b.addExecutable(.{
 
     pub fn setBasePath(self: *Self, base_path: []const u8) !void
     pub fn setBearerToken(self: *Self, token: []const u8) void
+    pub fn setOwnedBearerToken(self: *Self, token: []const u8) !void
     pub fn setCredentials(self: *Self, user_name: []const u8, password: []const u8) void
     pub fn setHeader(self: *Self, name: []const u8, value: []const u8) !void
     pub fn getError(self: *Self) ?WebServiceException
+    cookies: CookieJar // Session Cookies returned by the Server
 
     // Typed API
     pub fn send(self: *Self, request: anytype) !std.json.Parsed(ResponseTypeOf(@TypeOf(request)))
@@ -1746,6 +1873,7 @@ const exe = b.addExecutable(.{
     pub fn delete(self: *Self, request: anytype) !std.json.Parsed(...)
     pub fn sendVoid(self: *Self, request: anytype) !void
     pub fn sendAs(self: *Self, comptime ResponseType: type, request: anytype) !std.json.Parsed(ResponseType)
+    pub fn sendMethod(self: *Self, comptime ResponseType: type, method: std.http.Method, request: anytype) !std.json.Parsed(ResponseType)
     pub fn api(self: *Self, request: anytype) !ApiResult(...)
     pub fn authenticate(self: *Self, user_name: []const u8, password: []const u8) !std.json.Parsed(AuthenticateResponse)
     pub fn setRefreshToken(self: *Self, token: []const u8) void
@@ -1754,6 +1882,7 @@ const exe = b.addExecutable(.{
     // File Uploads
     pub fn postFileWithRequest(self: *Self, request: anytype, file: UploadFile) !std.json.Parsed(...)
     pub fn postFilesWithRequest(self: *Self, request: anytype, files: []const UploadFile) !std.json.Parsed(...)
+    pub fn postFilesWithRequestUrl(self: *Self, path: []const u8, request: anytype, files: []const UploadFile) ![]u8
 
     // Batched and one-way Requests
     pub fn sendAll(self: *Self, comptime ResponseType: type, requests: anytype) !std.json.Parsed([]const ResponseType)
@@ -1793,6 +1922,23 @@ defer res.deinit();
 <p>APIs that don't return a Response Body are sent with <code>sendVoid</code>:</p>
 <pre><code class="language-zig">try client.sendVoid(dtos.DeleteBooking{ .id = 1 });
 </code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A Request DTO's <code>ss_verb</code> also determines whether its populated properties are sent in the QueryString or the JSON Request Body, where only <code>GET</code>, <code>DELETE</code>, <code>HEAD</code> and <code>OPTIONS</code> Requests send their properties in the QueryString:</p>
+<pre><code class="language-zig">// GET /api/Hello?name=World
+var res = try client.send(dtos.Hello{ .name = &quot;World&quot; });
+
+// POST /api/CreateBooking {&quot;name&quot;:&quot;Booking&quot;}
+var res = try client.send(dtos.CreateBooking{ .name = &quot;Booking&quot; });
+</code></pre>
+<p>Request DTOs that aren't annotated with a Verb default to <code>POST</code>, which can be overridden per Request with <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code> and <code>delete</code> or by sending it with an explicit <code>std.http.Method</code> and Response Type:</p>
+<pre><code class="language-zig">var res = try client.sendMethod(dtos.HelloResponse, .GET, dtos.Hello{ .name = &quot;World&quot; });
+defer res.deinit();
+</code></pre>
+<p>Whilst <code>sendAs</code> lets you specify the Response Type of Request DTOs that don't declare one, e.g. APIs whose Response Type couldn't be inferred from the Server's metadata:</p>
+<pre><code class="language-zig">var res = try client.sendAs(dtos.HelloResponse, dtos.Hello{ .name = &quot;World&quot; });
+defer res.deinit();
+</code></pre>
+<p>Batched and one-way Requests are sent to their own routes, i.e. <code>sendAll</code> sends its Requests to the API's batched <code>/api/Hello[]</code> route whilst <code>publish</code> sends them to the one-way <code>/json/oneway/Hello</code> endpoint.</p>
 <h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>AutoQuery APIs return a typed <code>ss.QueryResponse(T)</code>, with the query params of their base type flattened into the Request DTO:</p>
 <pre><code class="language-zig">var res = try client.send(dtos.QueryBookings{ .take = 5, .orderByDesc = &quot;id&quot; });
@@ -1807,6 +1953,11 @@ for (res.value.results.?) |booking| { // booking is a dtos.Booking
 <pre><code class="language-zig">var res = try client.getUrl(dtos.HelloResponse, &quot;/hello/World&quot;);
 defer res.deinit();
 </code></pre>
+<p>Use <code>postUrl</code> to POST a Request DTO or any serializable struct to a custom URL:</p>
+<pre><code class="language-zig">var res = try client.postUrl(dtos.HelloResponse, &quot;/hello&quot;, dtos.Hello{ .name = &quot;World&quot; });
+defer res.deinit();
+</code></pre>
+<p>Both accept relative or absolute URLs, so they can also be used to call APIs on a different host to the client's Base URL.</p>
 <h3 id="raw-data-responses">Raw Data Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-data-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>sendUrlString</code> to access a raw Response Body, useful for APIs returning content like CSV:</p>
 <pre><code class="language-zig">const csv = try client.sendUrlString(.GET, &quot;/api/QueryBookings.csv&quot;, null);
@@ -1820,6 +1971,27 @@ defer res.deinit();
 </code></pre>
 <p>Or send a Request to a one-way endpoint that ignores its Response:</p>
 <pre><code class="language-zig">try client.publish(dtos.Hello{ .name = &quot;World&quot; });
+</code></pre>
+<h3 id="request-dtos-that-inherit-a-collection">Request DTOs that inherit a Collection<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-dtos-that-inherit-a-collection'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTOs that inherit a Collection in C#, e.g. <code>List&lt;Rockstar&gt;</code>, are generated with their collection flattened into an <code>items</code> field, annotated with an <code>ss_collection</code> declaration:</p>
+<pre><code class="language-zig">// @Route(&quot;/rockstars&quot;, &quot;POST&quot;)
+pub const StoreRockstars = struct {
+    pub const ss_name = &quot;StoreRockstars&quot;;
+    pub const ss_verb = &quot;POST&quot;;
+    pub const ss_collection = &quot;items&quot;;
+
+    items: []Rockstar = &amp;.{},
+};
+</code></pre>
+<p>Which the client uses to send and parse them as the JSON Array their C# base type is serialized with, instead of a JSON Object:</p>
+<pre><code class="language-zig">const rockstars = [_]dtos.Rockstar{
+    .{ .id = 1, .firstName = &quot;Jimi&quot;, .lastName = &quot;Hendrix&quot; },
+    .{ .id = 2, .firstName = &quot;Jim&quot;, .lastName = &quot;Morrison&quot; },
+};
+
+// Sends [{&quot;id&quot;:1,...},{&quot;id&quot;:2,...}] to /api/StoreRockstars
+var res = try client.sendAs(ss.EmptyResponse, dtos.StoreRockstars{ .items = rockstars[0..] });
+defer res.deinit();
 </code></pre>
 <h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>As Zig errors can't carry a payload, failed API Requests return <code>error.WebServiceException</code> with the HTTP Status Code and the API's structured <a href="/error-handling">ResponseStatus</a> error available from <code>client.getError()</code>:</p>
@@ -1836,6 +2008,82 @@ defer res.deinit();
     std.debug.print(&quot;{}\n&quot;, .{web_ex.isUnauthorized()}); // false
 }
 </code></pre>
+<p><code>WebServiceException</code> includes helpers for inspecting the different error Responses APIs can return:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status_code</code></td>
+<td>HTTP Status Code of the error Response, e.g. <code>400</code></td>
+</tr>
+<tr>
+<td><code>status_description</code></td>
+<td>HTTP Status Description, e.g. <code>&quot;Bad Request&quot;</code></td>
+</tr>
+<tr>
+<td><code>errorCode()</code></td>
+<td>The <code>ErrorCode</code> of the error, e.g. <code>&quot;NotFound&quot;</code></td>
+</tr>
+<tr>
+<td><code>errorMessage()</code></td>
+<td>The error message</td>
+</tr>
+<tr>
+<td><code>fieldError(name)</code></td>
+<td>The validation error message for a field, if it has one</td>
+</tr>
+<tr>
+<td><code>isUnauthorized()</code></td>
+<td>Whether the Request requires Authentication (401)</td>
+</tr>
+<tr>
+<td><code>isForbidden()</code></td>
+<td>Whether the User was denied access to the Request (403)</td>
+</tr>
+<tr>
+<td><code>isNotFound()</code></td>
+<td>Whether the Request returned 404 NotFound</td>
+</tr>
+<tr>
+<td><code>isValidationError()</code></td>
+<td>Whether the Response contains field validation errors</td>
+</tr>
+<tr>
+<td><code>response_status</code></td>
+<td>The API's structured <code>ResponseStatus</code>, if it returned one</td>
+</tr>
+<tr>
+<td><code>response_body</code></td>
+<td>Raw error Response Body, useful for Services returning non JSON errors</td>
+</tr>
+</tbody>
+</table>
+<p>Which lets you handle each class of error appropriately:</p>
+<pre><code class="language-zig">if (client.send(dtos.ThrowType{ .type = &quot;NotFound&quot; })) |res| {
+    res.deinit();
+} else |_| {
+    const web_ex = client.getError().?;
+    if (web_ex.isNotFound()) {
+        std.debug.print(&quot;{s}: {s}\n&quot;, .{ web_ex.errorCode(), web_ex.errorMessage() });
+    } else if (web_ex.isValidationError()) {
+        // Iterate all field validation errors
+        for (web_ex.response_status.?.errors.?) |err| {
+            std.debug.print(&quot;{?s}: {?s}\n&quot;, .{ err.fieldName, err.message });
+        }
+    } else if (web_ex.isUnauthorized()) {
+        // Re-authenticate...
+    }
+}
+</code></pre>
+<p>APIs that return a non JSON error Response, e.g. an HTML error page from an intermediary proxy, can be inspected from the raw <code>response_body</code>.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>The <code>WebServiceException</code> returned by <code>getError()</code> is owned by the client's error arena which is reset on the next failed Request, so <code>dupe()</code> any of its fields you need to retain</p>
+</div>
 <p>Alternatively <code>api</code> returns errors in its result instead of an error union, which can be preferable when handling validation errors is part of normal control flow:</p>
 <pre><code class="language-zig">const api = try client.api(dtos.CreateBooking{});
 defer api.deinit();
@@ -1844,6 +2092,14 @@ if (api.failed()) {
     std.debug.print(&quot;{s} {?s}\n&quot;, .{ api.errorCode(), api.fieldError(&quot;Name&quot;) });
 } else {
     std.debug.print(&quot;{s}\n&quot;, .{api.response.?.id.?});
+}
+</code></pre>
+<p>Unlike <code>getError()</code>, the <code>ApiResult</code> owns its own arena so its <code>error</code> and <code>response</code> remain valid until you <code>deinit()</code> it, with <code>succeeded()</code>, <code>failed()</code>, <code>errorCode()</code>, <code>errorMessage()</code> and <code>fieldError()</code> for inspecting its result:</p>
+<pre><code class="language-zig">const api = try client.api(dtos.HelloSecure{ .name = &quot;World&quot; });
+defer api.deinit();
+
+if (api.failed()) {
+    std.debug.print(&quot;{s}\n&quot;, .{api.errorCode()}); // &quot;Unauthorized&quot;
 }
 </code></pre>
 <h3 id="authenticating-using-basic-auth">Authenticating using Basic Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-basic-auth'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1871,6 +2127,108 @@ defer auth.deinit();
 <p>Use <code>setBearerToken</code> to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-zig">client.setBearerToken(&quot;ak-87949de37e894627a9f6173154e7cafa&quot;);
 </code></pre>
+<h3 id="built-in-servicestack-dtos">Built-in ServiceStack DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-servicestack-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>servicestack</code> module includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them without needing to generate them:</p>
+<pre><code class="language-zig">const ss = @import(&quot;servicestack&quot;);
+
+// Authentication
+var auth = try client.send(ss.Authenticate{
+    .provider = &quot;credentials&quot;,
+    .userName = &quot;test&quot;,
+    .password = &quot;test&quot;,
+    .rememberMe = true,
+});
+defer auth.deinit();
+
+var reg = try client.send(ss.Register{
+    .userName = &quot;new-user&quot;,
+    .email = &quot;user@example.org&quot;,
+    .password = &quot;p@55wOrd&quot;,
+    .autoLogin = true,
+});
+defer reg.deinit();
+
+// JWT
+var token = try client.send(ss.ConvertSessionToToken{});   // Session -&gt; JWT
+defer token.deinit();
+
+var access = try client.send(ss.GetAccessToken{ .refreshToken = refresh_token });
+defer access.deinit();
+
+// API Keys
+var keys = try client.send(ss.GetApiKeys{ .environment = &quot;live&quot; });
+defer keys.deinit();
+
+var new_keys = try client.send(ss.RegenerateApiKeys{ .environment = &quot;live&quot; });
+defer new_keys.deinit();
+
+// Roles and Permissions
+const roles = [_][]const u8{&quot;Employee&quot;};
+var assigned = try client.send(ss.AssignRoles{ .userName = &quot;user&quot;, .roles = roles[0..] });
+defer assigned.deinit();
+
+var unassigned = try client.send(ss.UnAssignRoles{ .userName = &quot;user&quot;, .roles = roles[0..] });
+defer unassigned.deinit();
+</code></pre>
+<p>Together with the built-in Response Types and base types that generated DTOs reference:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ss.ResponseStatus</code></td>
+<td>ServiceStack's structured error response</td>
+</tr>
+<tr>
+<td><code>ss.ResponseError</code></td>
+<td>An individual field validation error</td>
+</tr>
+<tr>
+<td><code>ss.EmptyResponse</code></td>
+<td>Response of APIs that don't return a Response Body</td>
+</tr>
+<tr>
+<td><code>ss.IdResponse</code></td>
+<td>Response returning the Id of the created or updated entity</td>
+</tr>
+<tr>
+<td><code>ss.StringResponse</code></td>
+<td>Response returning a single <code>result</code> string</td>
+</tr>
+<tr>
+<td><code>ss.StringsResponse</code></td>
+<td>Response returning a list of string <code>results</code></td>
+</tr>
+<tr>
+<td><code>ss.QueryResponse(T)</code></td>
+<td>Typed Response of <a href="/autoquery/">AutoQuery</a> Requests</td>
+</tr>
+<tr>
+<td><code>ss.UploadFile</code></td>
+<td>A file uploaded in a <code>multipart/form-data</code> Request</td>
+</tr>
+<tr>
+<td><code>ss.CookieJar</code></td>
+<td>Session Cookies the client retains between Requests</td>
+</tr>
+<tr>
+<td><code>ss.WebServiceException</code></td>
+<td>Structured error details of a failed Request</td>
+</tr>
+</tbody>
+</table>
+<p><code>ResponseStatus</code> also includes <code>fieldError(name)</code> and <code>getFieldError(name)</code> for looking up an individual field's validation error message or its typed <code>ResponseError</code>:</p>
+<pre><code class="language-zig">if (res.value.responseStatus) |status| {
+    std.debug.print(&quot;{?s}\n&quot;, .{status.fieldError(&quot;Name&quot;)});
+    if (status.getFieldError(&quot;Name&quot;)) |err| {
+        std.debug.print(&quot;{?s} {?s}\n&quot;, .{ err.errorCode, err.message });
+    }
+}
+</code></pre>
 <h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>postFileWithRequest</code> to upload a file with an API Request:</p>
 <pre><code class="language-zig">var res = try client.postFileWithRequest(dtos.UploadPhoto{ .album = &quot;Holiday&quot; }, .{
@@ -1888,6 +2246,10 @@ defer res.deinit();
 };
 var res = try client.postFilesWithRequest(dtos.UploadPhoto{ .album = &quot;Holiday&quot; }, files[0..]);
 defer res.deinit();
+</code></pre>
+<p>Or use <code>postFilesWithRequestUrl</code> to upload files to a custom URL, which returns the raw Response Body the caller owns:</p>
+<pre><code class="language-zig">const body = try client.postFilesWithRequestUrl(&quot;/api/UploadPhoto&quot;, dtos.UploadPhoto{ .album = &quot;Holiday&quot; }, files[0..]);
+defer allocator.free(body);
 </code></pre>
 <p>Requires <strong>servicestack v0.1.2+</strong>.</p>
 <h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1913,6 +2275,229 @@ try client.setBasePath(&quot;&quot;);   // use the /json/reply pre-defined route
 client.cookies.clear();       // clear the Session Cookies
 </code></pre>
 <p><code>JsonServiceClient.init</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route. Use <code>setBasePath(&quot;&quot;)</code> for older ServiceStack instances that only have the <code>/json/reply</code> routes enabled.</p>
+<h3 id="memory-management">Memory Management<a class="header-anchor" href="javascript:;" onclick="location.hash='#memory-management'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As with all Zig libraries, memory ownership is explicit. The client takes the allocator it should use in <code>init</code> and owns everything it allocates until <code>deinit()</code>, whilst everything it returns is owned by the caller:</p>
+<table>
+<thead>
+<tr>
+<th>Returns</th>
+<th>Owned by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>std.json.Parsed(T)</code></td>
+<td>The caller's <code>deinit()</code>, which frees the arena its <code>value</code> was parsed into</td>
+</tr>
+<tr>
+<td><code>ApiResult(T)</code></td>
+<td>The caller's <code>deinit()</code>, which frees both its <code>response</code> and <code>error</code></td>
+</tr>
+<tr>
+<td><code>[]u8</code> from <code>sendUrlString</code></td>
+<td>The caller, which should <code>allocator.free()</code> it</td>
+</tr>
+<tr>
+<td><code>WebServiceException</code></td>
+<td>The client's error arena, reset on the next failed Request</td>
+</tr>
+</tbody>
+</table>
+<p>Since Responses are parsed into their own arena, Request DTOs only need to outlive the Request they're sent in, letting you send stack-allocated DTOs referencing string literals or borrowed slices:</p>
+<pre><code class="language-zig">var res = try client.send(dtos.Hello{ .name = &quot;World&quot; });
+defer res.deinit(); // frees the entire Response, incl. every string it parsed
+</code></pre>
+<p>Tokens are the exception, where <code>setBearerToken</code> retains a reference to the token you give it, so use <code>setOwnedBearerToken</code> to have the client copy a token it should own, e.g. one parsed from a Response that's about to be freed:</p>
+<pre><code class="language-zig">try client.setOwnedBearerToken(auth.value.bearerToken.?);
+auth.deinit();
+</code></pre>
+<p><code>authenticate()</code> does this for you, copying any Bearer Token the Server returns into memory the client owns. Its Session Cookies are likewise retained in the client's <code>CookieJar</code>, which <code>std.http.Client</code> doesn't provide.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p><code>JsonServiceClient</code> maintains mutable state so it isn't synchronized for concurrent access - use a client per thread or guard access to a shared client with a <code>std.Thread.Mutex</code></p>
+</div>
+<h3 id="querystring-serialization">QueryString Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#querystring-serialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTO properties sent in the QueryString use ServiceStack's <a href="/js-utils">JS Object</a> notation for complex types, where each Request DTO is first serialized with <code>std.json</code> then converted into its QueryString representation:</p>
+<table>
+<thead>
+<tr>
+<th>Zig Value</th>
+<th>QueryString</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.name = &quot;World&quot;</code></td>
+<td><code>name=World</code></td>
+</tr>
+<tr>
+<td><code>.enabled = true</code></td>
+<td><code>enabled=true</code></td>
+</tr>
+<tr>
+<td><code>.rate = 1.5</code></td>
+<td><code>rate=1.5</code></td>
+</tr>
+<tr>
+<td><code>.ids = &amp;.{1,2,3}</code></td>
+<td><code>ids=[1,2,3]</code></td>
+</tr>
+<tr>
+<td><code>std.json.Value</code> of <code>{&quot;a&quot;:1,&quot;b&quot;:2}</code></td>
+<td><code>meta={a:1,b:2}</code></td>
+</tr>
+<tr>
+<td><code>null</code></td>
+<td><em>(omitted)</em></td>
+</tr>
+</tbody>
+</table>
+<p>As names and values are percent-encoded, <code>&quot;a b&amp;c&quot;</code> is sent as <code>a+b%26c</code>, whilst <code>null</code> properties are omitted entirely so the Server can apply its own defaults.</p>
+<h3 id="url-utils">URL Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#url-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The utils the client uses to construct its API Requests are also exported in <code>ss.url</code> for building your own URLs and integrations:</p>
+<pre><code class="language-zig">const url = @import(&quot;servicestack&quot;).url;
+
+const api = try url.combineWith(allocator, &quot;https://example.org/&quot;, &quot;/api/&quot;);    // &quot;https://example.org/api&quot;
+const abs = try url.toAbsoluteUrl(allocator, &quot;https://example.org&quot;, &quot;/hello&quot;);  // &quot;https://example.org/hello&quot;
+const qs = try url.appendDtoQueryString(allocator, &quot;/api/Hello&quot;, dtos.Hello{ .name = &quot;World&quot; });
+// &quot;/api/Hello?name=World&quot;
+
+url.hasRequestBody(.GET);        // false
+url.parseMethod(&quot;PATCH&quot;);        // std.http.Method.PATCH
+</code></pre>
+<p>Along with <code>url.encodeUriComponent</code> and <code>url.writeQsValue</code> for writing an encoded value or a <code>std.json.Value</code> in its QueryString representation to a <code>std.Io.Writer</code>, and the <code>url.HttpMethods</code> constants used in ServiceStack APIs, e.g. <code>HttpMethods.GET</code>, <code>HttpMethods.POST</code>, <code>HttpMethods.PUT</code>, <code>HttpMethods.PATCH</code>, <code>HttpMethods.DELETE</code>, <code>HttpMethods.OPTIONS</code> and <code>HttpMethods.HEAD</code>.</p>
+<h3 id="calling-ai-chat-and-openai-compatible-apis">Calling AI Chat and OpenAI compatible APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#calling-ai-chat-and-openai-compatible-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As Request DTOs are just structs, more advanced APIs like <a href="/ai-chat-api">AI Chat</a>'s OpenAI-compatible <code>ChatCompletion</code> API can also be called with typed DTOs, where polymorphic content parts are sent as <code>std.json.Value</code>:</p>
+<pre><code class="language-zig">/// Converts a typed DTO into the JSON Value that polymorphic properties hold
+fn jsonValueOf(allocator: std.mem.Allocator, dto: anytype) !std.json.Parsed(std.json.Value) {
+    const json = try std.fmt.allocPrint(allocator, &quot;{f}&quot;, .{
+        std.json.fmt(dto, .{ .emit_null_optional_fields = false }),
+    });
+    defer allocator.free(json);
+    return std.json.parseFromSlice(std.json.Value, allocator, json, .{});
+}
+
+// The ChatCompletion API requires an authenticated User
+var auth = try client.authenticate(&quot;username&quot;, &quot;password&quot;);
+auth.deinit();
+
+// Content parts are polymorphic, e.g. text, image_url or input_audio, so they're
+// held as the JSON Value of the typed content part being sent
+var text_part = try jsonValueOf(allocator, dtos.AiTextContent{
+    .type = &quot;text&quot;,
+    .text = &quot;Capital of France? Answer in 3 words&quot;,
+});
+defer text_part.deinit();
+
+var content = [_]std.json.Value{text_part.value};
+var messages = [_]dtos.AiMessage{.{ .role = &quot;user&quot;, .content = content[0..] }‎};
+
+var res = try client.send(dtos.ChatCompletion{
+    .model = &quot;openai/gpt-oss-120b&quot;,
+    .messages = messages[0..],
+});
+defer res.deinit();
+
+std.debug.print(&quot;{?s}\n&quot;, .{res.value.choices[0].message.?.content});
+</code></pre>
+<p>Where rate limited or temporarily unavailable LLMs can be handled by inspecting the failed Request's Status Code:</p>
+<pre><code class="language-zig">var res = client.send(request) catch |err| {
+    const web_ex = client.getError() orelse return err;
+    switch (web_ex.status_code) {
+        429, 502, 503, 504 =&gt; return error.ChatUnavailable,
+        else =&gt; return err,
+    }
+};
+</code></pre>
+<h3 id="testing">Testing<a class="header-anchor" href="javascript:;" onclick="location.hash='#testing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As <code>JsonServiceClient</code> accepts any Base URL, APIs can be tested against a mock HTTP Server or a local instance of your App without needing to mock the client itself. Which is how the client's own <a href="https://github.com/ServiceStack/servicestack-zig/blob/main/tests/integration.zig">integration tests</a> verify the Requests they send against the live <a href="https://test.servicestack.net">test.servicestack.net</a> Services, in addition to the offline <a href="https://github.com/ServiceStack/servicestack-zig/blob/main/src/client.zig">unit tests</a> covering comptime DTO resolution, JSON serialization, its Cookie Jar and <code>multipart/form-data</code> bodies:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>zig build test</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>zig build test-integration</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Use the <code>SERVICESTACK_TEST_URL</code> Environment Variable to run the integration tests against a different ServiceStack instance.</p>
+<p>As all Zig tests are run with <code>std.testing.allocator</code> which fails tests that leak, the test suite also verifies every API is free of memory leaks:</p>
+<pre><code class="language-zig">test &quot;sends typed request&quot; {
+    const allocator = std.testing.allocator;
+
+    var client = try JsonServiceClient.init(allocator, &quot;https://test.servicestack.net&quot;);
+    defer client.deinit();
+
+    var res = try client.send(dtos.Hello{ .name = &quot;World&quot;, .title = &quot;Mr&quot; });
+    defer res.deinit();
+
+    try std.testing.expectEqualStrings(&quot;Hello, Mr. World!&quot;, res.value.result.?);
+}
+</code></pre>
+<h3 id="examples">Examples<a class="header-anchor" href="javascript:;" onclick="location.hash='#examples'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://github.com/ServiceStack/servicestack-zig/blob/main/examples/hello.zig">hello</a> example is a small runnable App calling the live <strong>test.servicestack.net</strong> Services with typed APIs, batched Requests, structured validation errors and authenticated Requests:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>zig build example</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated Zig DTOs as-is, however you can further customize how the DTOs are generated by overriding the default options.</p>
 <p>The header in the generated DTOs show the different options Zig native types support with their defaults. To override a value, remove a <code>/</code> from its <code>///</code> prefix and specify the value to the right of the <code>:</code>. Any uncommented value will be sent to the server to override any server defaults.</p>
@@ -2058,6 +2643,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Making Typed API Requests
                                                         </span>
                                                     </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
+                                                        </span>
+                                                    </li>
                                                     <li data-id="autoquery-requests" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#autoquery-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2080,6 +2671,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                         <span v-hash="'#batched-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Batched Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="request-dtos-that-inherit-a-collection" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#request-dtos-that-inherit-a-collection'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Request DTOs that inherit a Collection
                                                         </span>
                                                     </li>
                                                     <li data-id="error-handling" class="text-gray-500 hover:text-gray-900">
@@ -2112,6 +2709,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Authenticating using an API Key
                                                         </span>
                                                     </li>
+                                                    <li data-id="built-in-servicestack-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#built-in-servicestack-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Built-in ServiceStack DTOs
+                                                        </span>
+                                                    </li>
                                                     <li data-id="uploading-files" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#uploading-files'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2128,6 +2731,42 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                         <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Client Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="memory-management" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#memory-management'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Memory Management
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="querystring-serialization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#querystring-serialization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            QueryString Serialization
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="url-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#url-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            URL Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="calling-ai-chat-and-openai-compatible-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#calling-ai-chat-and-openai-compatible-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Calling AI Chat and OpenAI compatible APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="testing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#testing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Testing
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="examples" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#examples'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Examples
                                                         </span>
                                                     </li>
                                             </ul>
