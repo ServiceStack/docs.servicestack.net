@@ -1,24 +1,48 @@
 ---
-title: Swift Add ServiceStack Reference 
+title: Swift ServiceStack Reference
 ---
 
-![Swift iOS, XCode and macOS Banner](/img/pages/servicestack-reference/swift-logo-banner.jpg)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![Swift, Xcode, iOS and macOS Banner](/img/pages/servicestack-reference/swift-info.webp)
+:::
 
 ### Swift - Native, async-first APIs for Apple platforms
 
-ServiceStack's **Add ServiceStack Reference** feature lets iOS/macOS developers easily generate an native 
-typed Swift API for your ServiceStack Services using the `npx get-dtos` command-line script.
+ServiceStack's **Add ServiceStack Reference** feature generates a native, typed Swift API for your
+ServiceStack Services using the `npx get-dtos` command-line script.
 
-Added with Swift Package Manager, [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) generates `Codable` DTOs whose request types declare the response they return, letting the client infer the entire call under `async/await`:
+Add the dependency with Swift Package Manager, generate your DTOs, then call your APIs with
+[ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift). Generated request DTOs are
+`Codable` and declare the response they return, so `JsonServiceClient` infers the response type for the
+entire `async/await` call:
 
 ```swift
 let client = JsonServiceClient(baseUrl: baseUrl)
 
-let response = try await client.getAsync(Hello(name: "World"))
+let request = Hello()
+request.name = "World"
+
+let response = try await client.getAsync(request)
 print(response.result)
 ```
 
-For iOS, iPadOS and macOS teams this replaces the usual `URLSession` plumbing and hand-written response structs with a contract that Xcode understands - so a backend change shows up as a Swift compile error rather than a nil field in a shipped App. Structured errors, authentication, typed AutoQuery, batch and one-way requests and multipart uploads.
+This replaces `URLSession` plumbing and hand-written response models with a contract Xcode understands,
+so incompatible server changes become compile-time errors. The Swift 6 package is dependency-free and uses
+Foundation, Swift Concurrency, and `Codable`.
+
+### What you can build
+
+The client and its test suite exercise the same API surface used by production apps:
+
+- Typed `GET`, `POST`, `PUT`, `DELETE`, and `PATCH` requests with sync and `async/await` APIs.
+- HTTP method inference from generated `IGet`, `IPost`, `IPut`, `IDelete`, and `IPatch` markers.
+- Typed AutoQuery requests, including paging, ordering, projected fields, and dynamic query conventions.
+- Structured `ResponseStatus` errors with field-level validation details and global or per-client handlers.
+- Bearer tokens, session IDs, API version propagation, and automatic access-token renewal with refresh tokens.
+- Single and multi-file multipart uploads, including typed request fields alongside uploaded data.
+- Typed custom-route calls, relative or absolute URLs, raw `Data` responses, and request/response filters.
+- `IReturnVoid` requests plus high-fidelity `Codable` support for collections, enums, dates,
+  durations, inheritance, and nested DTOs.
 
 ## Simple command-line utils for ServiceStack
 
@@ -32,7 +56,7 @@ $ npx get-dtos
 
 As it's run with `npx` there's nothing to install, it can be run as-is from within a **Terminal window** at your Xcode project folder, where running it without any arguments displays the available options for adding and updating ServiceStack References.
 
-### Reference ServiceStack.Swift
+## Reference ServiceStack.Swift
 
 To use the latest `JsonServiceClient` you'll need to add a reference to ServiceStack Swift library using your preferred package manager:
 
@@ -73,24 +97,34 @@ dependencies: [
 ],
 ```
 
-### Simple Usage Example
+## Quick start
 
-Async usage example:
+From your Xcode project directory, generate DTOs for a ServiceStack API:
 
-```swift
-import ServiceStack
-
-let response = try await client.getAsync(AppOverview())
-print(response.topTechnologies.count) //= 100
+```bash
+npx get-dtos swift https://test.servicestack.net
 ```
 
-Sync usage example:
+Add the generated `dtos.swift` file to your application target, import `ServiceStack`, then make a typed
+request. Generated DTOs use an empty initializer with mutable properties:
 
 ```swift
 import ServiceStack
 
-let client = JsonServiceClient(baseUrl: "https://techstacks.io")
-let response = client.get(AppOverview())
+let client = JsonServiceClient(baseUrl: "https://test.servicestack.net")
+let request = Hello()
+request.name = "World"
+
+let response = try await client.getAsync(request)
+print(response.result ?? "")
+```
+
+`Hello` implements `IReturn` and declares `HelloResponse` as its return type, which is why no response cast
+or generic type argument is needed. Synchronous APIs are also available for background work and command-line
+applications:
+
+```swift
+let response = try client.get(request)
 ```
 
 ### Add a new ServiceStack Reference
@@ -99,24 +133,25 @@ To Add a new ServiceStack Reference, call `npx get-dtos swift` with the Base URL
 
 ```bash
 $ npx get-dtos swift {BaseUrl}
-$ npx get-dtos swift {BaseUrl} {FileName}
+$ npx get-dtos swift {BaseUrl} {FileName.dtos.swift}
 ```
 
-Where if no FileName is provided, it's inferred from the host name of the remote URL, e.g:
+If no file name is provided, the first reference is saved to `dtos.swift`. If that file already exists,
+the host name is used for the new reference, e.g. `techstacks.dtos.swift`:
 
 ```bash
 $ npx get-dtos swift https://techstacks.io
 ```
 
-Downloads the Typed Swift DTOs for [techstacks.io](https://techstacks.io) and saves them to `dtos.swift`. 
+Downloads the typed Swift DTOs for [techstacks.io](https://techstacks.io) and saves them to `dtos.swift`.
 
 Alternatively you can have it saved to a different FileName with:
 
 ```bash
-$ npx get-dtos swift https://techstacks.io TechStacks
+$ npx get-dtos swift https://techstacks.io TechStacks.dtos.swift
 ```
 
-Which instead saves the DTOs to `dtos.swift`.
+Which instead saves the DTOs to `TechStacks.dtos.swift`.
 
 The generated Server DTOs are used together with the `JsonServiceClient` in the 
 [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) package added above, which contains 
@@ -130,7 +165,7 @@ The easiest way to update all your Swift Server DTOs is to just call `npx get-dt
 $ npx get-dtos swift
 ```
 
-This will go through and update all your `*.dtos.swift` Service References.
+This updates the Swift Service References found in the current directory.
 
 To Update a specific ServiceStack Reference, call `npx get-dtos swift` with the Filename:
 
@@ -166,7 +201,9 @@ SwiftGenerator.DefaultImports.Add("UIKit");
 
 ## Swift Configuration
 
-The header comments in the generated DTO's allows for further customization of how the DTO's are generated which can then be updated with any custom Options provided using the **Update ServiceStack Reference** Menu Item in XCode. Options that are preceded by a Swift single line comment `//` are defaults from the server that can be overridden, e.g:
+The header comment in each generated DTO file records its source URL and code-generation options. These
+options are preserved when the reference is updated with `npx get-dtos swift`. Options prefixed with the
+Swift single-line comment `//` show the server defaults and can be overridden, e.g:
 
 ```swift
 /* Options:
@@ -383,7 +420,7 @@ SwiftGenerator.EnumNameStrategy = SwiftGenerator.SwiftStyleEnums;
 
 ## Swift Client Usage
 
-### [JsonServiceClient.swift](https://github.com/ServiceStack/ServiceStack.Swift/blob/master/dist/JsonServiceClient.swift)
+### [JsonServiceClient.swift](https://github.com/ServiceStack/ServiceStack.Swift/blob/master/Sources/ServiceStack/JsonServiceClient.swift)
 
 The same ideal, high-level API available in [.NET's ServiceClients](/csharp-client) have been translated into idiomatic Swift as seen with its `ServiceClient` protocol definition below:
 
@@ -473,7 +510,9 @@ public protocol ServiceClient {
 
 > Generic type constraints omitted for readability
 
-The minor differences are primarily due to differences in Swift which instead of throwing Exceptions uses error codes and `Optional` return types and its lack of any asynchrony language support led us to embed a lightweight and [well-documented Promises](http://promisekit.org/introduction/) implementation in [PromiseKit](https://github.com/mxcl/PromiseKit) which closely matches the `Task<T>` type used in .NET Async API's.
+The package has no third-party runtime dependencies. Its asynchronous APIs use Swift Concurrency and
+return the generated response type directly with `async throws`; synchronous equivalents are available for
+background threads and command-line applications.
 
 ### JsonServiceClient Usage
 
@@ -483,40 +522,46 @@ If you've ever had to make HTTP requests using Objective-C's `NSURLConnection` o
 A nice benefit of using JsonServiceClient over static classes is that Service calls can be easily substituted and mocked with the above `ServiceClient` protocol, making it easy to test or stub out the external Gateway calls whilst the back-end is under development.
 :::
 
-To illustrate its usage we'll go through some client code to consume [TechStacks](https://github.com/ServiceStackApps/TechStacks) Services after adding a **ServiceStack Reference** to `http://techstaks.io`:
+To illustrate its usage we'll consume [TechStacks](https://github.com/ServiceStackApps/TechStacks) Services
+after adding a **ServiceStack Reference** to `https://techstacks.io`:
 
 ```swift
-var client = JsonServiceClient(baseUrl: "https://techstacks.io")
-var response = client.get(AppOverview())
+let client = JsonServiceClient(baseUrl: "https://techstacks.io")
+let response = try client.get(Overview())
 ```
 
 Essentially usage is the same as it is in .NET ServiceClients - where it just needs the `baseUrl` of the remote ServiceStack instance, which can then be used to consume remote Services by sending typed Request DTO's that respond in kind with the expected Response DTO.
 
 ### Async API Usage
 
-Whilst the sync API's are easy to use their usage should be limited in background threads so they're not blocking the Apps UI whilst waiting for responses. Most of the time when calling services from the Main UI thread you'll want to use the non-blocking async API's, which for the same API looks like:
+Use the non-blocking APIs from application code so network activity doesn't block the UI. The same typed
+request with Swift Concurrency is:
 
 ```swift
-let response = try await client.getAsync(AppOverview())
+let response = try await client.getAsync(Overview())
 Inspect.printDump(response)
 ```
 
 Swift also lets you continue marking it up with explicit Type Information and optional syntax as preferred, e.g: 
 
 ```swift
-let response:AppOverviewResponse = try await client.getAsync(AppOverview())
+let response:OverviewResponse = try await client.getAsync(Overview())
 Inspect.printDump(response)
 ```
 
-Which is very similar to how we'd make async `Task<T>` calls in C# when not using its async/await language syntax sugar. 
+The explicit response annotation is optional when the request implements `IReturn`, but is useful when
+calling a relative or absolute URL where Swift needs the generic response type from context.
 
 ::: info
-Async callbacks are called back on the main thread, ideal for use in iOS Apps. This behavior is also configurable in the Promise's callback API.
+`async` methods don't promise a particular actor for the continuation. Keep UI mutations isolated to
+`@MainActor` or use `await MainActor.run { ... }` after the request completes.
 :::
 
 ### Typed Error Handling
 
-As Swift doesn't provide `try/catch` Exception Handling, Error handling is a little different in Swift which for most failable API's just returns a `nil` Optional to indicate when the operation didn't succeed. When more information about the error is required, API's will typically accept an additional `NSError` pointer argument to populate with more information about the error. Any additional metadata can be attached to NSError's `userInfo` Dictionary. We also follow this same approach to provide our structured error handling in `JsonServiceClient`.
+`JsonServiceClient` throws `NSError` for failed HTTP responses. ServiceStack's structured error payload is
+available as a typed `ResponseStatus`, including its error code, message, stack trace, metadata, and any
+field-level validation errors.
 
 To illustrate exception handling we'll connect to ServiceStack's Test Services and call the `ThrowType` Service to intentionally throw the error specified, e.g:
 
@@ -532,13 +577,12 @@ request.type = "NotFound"
 request.message = "custom message"
 
 do {
-    let response = client.post(request)
-} catch var error as NSError {
-    error.code //= 404
-    //Convert into typed ResponseStatus
-    var status:ResponseStatus = error.convertUserInfo() 
-    status.message //= not here
-    status.stackTrace //= Server Stack Trace
+    _ = try client.post(request)
+} catch let error as NSError {
+    print(error.code) // 404
+    let status = error.responseStatus
+    print(status.errorCode ?? "") // NotFound
+    print(status.message ?? "")   // custom message
 }
 ```
 
@@ -553,7 +597,7 @@ request.email = "invalidemail"
 do {
     let response = try client.post(request)
 } catch let responseError as NSError {    
-    let status:ResponseStatus = responseError.convertUserInfo()!
+    let status = responseError.responseStatus
     status.errors.count //= 3
     let field1 = status.errors[0]
     
@@ -565,16 +609,16 @@ do {
 
 #### Async Error Handling
 
-To handle errors in Async API's we just add a callback on `.error()` API on the returned Promise, e.g:
+Async APIs use the same structured errors with normal `do`/`catch` handling:
 
 ```swift
 let request = ThrowValidation()
 request.email = "invalidemail"
 
 do {
-_ = try await client.postAsync(request)
+    _ = try await client.postAsync(request)
 } catch let responseError as NSError {    
-    let status:ResponseStatus = responseError.convertUserInfo()!
+    let status = responseError.responseStatus
     status.errors.count //= 3
     let field1 = status.errors[0]
     
@@ -593,27 +637,96 @@ client.onError = {(e:NSError) in ... }
 JsonServiceClient.Global.onError = {(e:NSError) in ... }
 ```
 
+### Authentication and automatic token renewal
+
+Set a bearer token once on the client and it is sent in the `Authorization` header of every request:
+
+```swift
+let client = JsonServiceClient(baseUrl: "https://api.example.com")
+client.bearerToken = accessToken
+
+let request = Secured()
+request.name = "test"
+let response = try await client.sendAsync(request)
+```
+
+The client can also propagate `sessionId` and `version` to generated request DTOs that implement
+`IHasSessionId` and `IHasVersion`:
+
+```swift
+client.sessionId = sessionId
+client.version = 2
+```
+
+When `refreshToken` is set, or the server has issued an `ss-reftok` cookie, a `401 Unauthorized` response
+causes `JsonServiceClient` to request a new access token and retry the original request. Both sync and async
+reauthentication paths are supported:
+
+```swift
+client.refreshToken = refreshToken
+let response = try await client.sendAsync(request)
+
+let tokenCookie = client.getTokenCookie()
+let refreshCookie = client.getRefreshTokenCookie()
+```
+
+### Typed AutoQuery
+
+Generated AutoQuery request DTOs inherit the standard paging, ordering, field-selection, and metadata
+properties. Add strongly typed filters directly to the request:
+
+```swift
+let request = FindTechnologies()
+request.vendorName = "Google"
+request.take = 3
+request.orderByDesc = "ViewCount"
+request.fields = "Id,Name,VendorName,Tier,ProductUrl"
+
+let response = try await client.getAsync(request)
+for technology in response.results {
+    print(technology.name ?? "")
+}
+```
+
+You can also add any [implicit AutoQuery convention](/autoquery#implicit-conventions) at call time without
+regenerating DTOs:
+
+```swift
+let response = try client.get(
+    FindTechnologies(),
+    query: ["DescriptionContains": "framework"])
+```
+
+### Requests without response DTOs
+
+Request DTOs that implement `IReturnVoid` use the same typed HTTP APIs without manufacturing an empty
+response model:
+
+```swift
+try await client.postAsync(HelloReturnVoid())
+```
+
 ### Swift HTTP Marker Interfaces
 
 The new `send*` API's take advantage of the HTTP Verb Interface Markers described below to send the Request DTO using the 
 annotated HTTP Method, e.g:
 
 ```swift
-public class HelloByGet : IReturn, IGet 
+public class HelloByGet : IReturn, IGet, Codable
 {
     public typealias Return = HelloResponse
     public var name:String?
+    required public init(){}
 }
-public class HelloByPut : IReturn, IPut 
+public class HelloByPut : IReturn, IPut, Codable
 {
     public typealias Return = HelloResponse
     public var name:String?
+    required public init(){}
 }
 
-let response = try client.send(HelloByGet())  //GET
-
-client.sendAsync(HelloByPut())                //PUT
-    .done { }
+let getResponse = try client.send(HelloByGet())       // GET
+let putResponse = try await client.sendAsync(HelloByPut()) // PUT
 ```
 
 ### Custom Routes
@@ -630,7 +743,7 @@ This also means that the Custom Routes aren't used when making Service Requests 
 But when preferred `JsonServiceClient` can also be used to call Services using Custom Routes, e.g:
 
 ```swift
-var response:GetTechnologyResponse? = client.get("/technology/servicestack")
+let response:GetTechnologyResponse = try client.get("/technology/servicestack")
 ```
 
 ::: info
@@ -642,7 +755,7 @@ the explicit type definition on the return type is required here as Swift uses i
 The `postFileWithRequestAsync` method can be used to upload a file with an API Request.
 
 For example you can request a [Speech to Text](/ai-server/speech-to-text) 
-transcription by sending an audio file to the `SpeechToText` API using the new `postFilesWithRequest` method:
+transcription by sending an audio file to the `SpeechToText` API using `postFileWithRequest`:
 
 ### Calling AI Server to transcribe an Audio Recording
 
@@ -653,7 +766,7 @@ client.bearerToken = apiKey
 let request = SpeechToText()
 request.refId = "uniqueUserIdForRequest"
 
-let response = try client.postFilesWithRequest(request:request, 
+let response = try client.postFileWithRequest(request:request,
     file:UploadFile(fileName:"audio.mp3", data:mp3Data, fieldName:"audio"))
 
 Inspect.printDump(response)
@@ -704,7 +817,12 @@ Other options that can be configured on JsonServiceClient include:
 ```swift
 client.onError = {(e:NSError) in ... }
 client.timeout = ...
-client.cachePolicy = NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData
+client.cachePolicy = .reloadIgnoringLocalCacheData
+client.bearerToken = ...
+client.refreshToken = ...
+client.sessionId = ...
+client.version = ...
+client.basePath = "api"
 client.requestFilter = {(req:URLRequest) in ... }
 client.responseFilter = {(res:URLResponse) in ... }
 
@@ -716,13 +834,12 @@ JsonServiceClient.Global.responseFilter = {(res:URLResponse) in ... }
 
 ## [TechStacks iOS App](https://github.com/ServiceStackApps/TechStacksApp)
 
-To illustrate the ease-of-use and utility of ServiceStack's new Swift support you can checkout the 
-TechStacks native iOS App for [techstacks.io](https://techstacks.io) that has been recently published and is 
-now available to download for free on the AppStore:
+The TechStacks native iOS app for [techstacks.io](https://techstacks.io) illustrates how to structure a
+services-heavy UIKit application around `JsonServiceClient`:
 
 [![TechStacks on AppStore](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/techstacks-appstore.png)](https://itunes.apple.com/us/app/techstacks/id965680615?ls=1&mt=8)
 
-The complete source code for the [TechStacks App is available on GitHub](https://github.com/ServiceStackApps/TechStacks) - providing a good example on how easy it is to take advantage of ServiceStack's Swift support to quickly build a rich and responsive Services-heavy native iOS App. 
+The complete [TechStacks App source is available on GitHub](https://github.com/ServiceStackApps/TechStacksApp).
 
 All remote Service Calls used by the App are encapsulated into a single [AppData.swift](https://github.com/ServiceStackApps/TechStacksApp/blob/master/src/TechStacks/AppData.swift) class and only uses JsonServiceClient's non-blocking Async API's to ensure a Responsive UI is maintained throughout the App.
 
@@ -730,11 +847,14 @@ All remote Service Calls used by the App are encapsulated into a single [AppData
 
 If you've ever had to implement `INotifyPropertyChanged` in .NET, you'll find the built-in model binding capabilities in iOS/macOS a refreshing alternative thanks to Objective-C's underlying `NSObject` which automatically generates change notifications for its KV-compliant properties. UIKit and Cocoa frameworks both leverage this feature to enable its [Model-View-Controller Pattern](https://developer.apple.com/library/mac/documentation/General/Conceptual/DevPedia-CocoaCore/MVC.html). 
 
-As keeping UI's updated with Async API callbacks can get unwieldy, we wanted to go through how we're taking advantage of NSObject's KVO support in Service Responses to simplify maintaining dynamic UI's.
+As keeping UI state updated after asynchronous calls can get unwieldy, this section shows how the sample
+app uses `NSObject` and KVO in its response models. In new SwiftUI apps, the same client can be called from
+an `@Observable` or `ObservableObject` model instead.
 
 ### Enable Key-Value Observing in Swift DTO's
 
-Firstly to enable KVO in your Swift DTO's we'll want to have each DTO inherit from `NSObject` which can be done by uncommenting `BaseObject` option in the header comments as seen below:
+To enable KVO in your Swift DTOs, have each DTO inherit from `NSObject` by overriding the `BaseClass`
+option in the header comment:
 
 ```
 /* Options:
@@ -746,7 +866,7 @@ BaseClass: NSObject
 ...
 */
 ```
-and click the **Update ServiceStack Reference** Menu Option to fetch the updated DTO's.
+Then run `npx get-dtos swift` to update the reference with the customized option.
 
 Then to [enable Key-Value Observing](https://developer.apple.com/library/ios/documentation/Swift/Conceptual/BuildingCocoaApps/AdoptingCocoaDesignPatterns.html#//apple_ref/doc/uid/TP40014216-CH7-XID_8) just mark the response DTO variables with the `dynamic` modifier, e.g:
 
@@ -758,33 +878,30 @@ public dynamic var allTechnologies:[Technology] = []
 public dynamic var allTechnologyStacks:[TechnologyStack] = []
 ```
 
-Which is all that's needed to allow properties to be observed as they'll automatically issue change notifications when they're populated in the Service response async callbacks, e.g:
+This allows the properties to issue change notifications when they're populated after an async request:
 
 ```swift
-func loadOverview() -> Promise<AppOverviewResponse> {
-    return client.getAsync(AppOverview())
-        .done { r in
-            self.overview = r
-            self.allTiers = r.allTiers
-            self.topTechnologies = r.topTechnologies
-            return r
-        }
+@MainActor
+func loadOverview() async throws -> AppOverviewResponse {
+    let response = try await client.getAsync(AppOverview())
+    overview = response
+    allTiers = response.allTiers
+    topTechnologies = response.topTechnologies
+    return response
 }
 
-func loadAllTechnologies() -> Promise<GetAllTechnologiesResponse> {
-    return client.getAsync(GetAllTechnologies())
-        .done { r in
-            self.allTechnologies = r.results
-            return r
-        }
+@MainActor
+func loadAllTechnologies() async throws -> GetAllTechnologiesResponse {
+    let response = try await client.getAsync(GetAllTechnologies())
+    allTechnologies = response.results
+    return response
 }
 
-func loadAllTechStacks() -> Promise<GetAllTechnologyStacksResponse> {
-    return client.getAsync(GetAllTechnologyStacks())
-        .done { r in
-            self.allTechnologyStacks = r.results
-            return r
-        }
+@MainActor
+func loadAllTechStacks() async throws -> GetAllTechnologyStacksResponse {
+    let response = try await client.getAsync(GetAllTechnologyStacks())
+    allTechnologyStacks = response.results
+    return response
 }
 ```
 
@@ -808,7 +925,7 @@ Then in `viewDidLoad()` [start observing the properties](https://github.com/Serv
 override func viewDidLoad() {
     ...
     self.appData.observe(self, properties: ["topTechnologies", "allTiers"])
-    self.appData.loadOverview()
+    Task { try await self.appData.loadOverview() }
 }
 deinit { self.appData.unobserve(self) }
 ```
@@ -830,32 +947,36 @@ override func observeValueForKeyPath(keyPath:String, ofObject object:AnyObject, 
 }
 ```
 
-Now that everything's configured, the observables provide an alternative to manually updating UI elements within async callbacks, instead you can now fire-and-forget your async API's and rely on the pre-configured bindings to automatically update the appropriate UI Controls when their bounded properties are updated, e.g:
+With the bindings configured, start the async request from a task and let the observed properties update
+the relevant UI controls:
 
 ```swift
-self.appData.loadOverview() //Ignore response and use configured KVO Bindings
+Task {
+    try await self.appData.loadOverview()
+}
 ```
 
 ### Images and Custom Binary Requests
 
-In addition to greatly simplifying Web Service Requests, `JsonServiceClient` also makes it easy to fetch any custom HTTP response like Images and other Binary data using the generic `getData()` and `getDataAsync()` NSData API's. This is used in TechStacks to [maintain a cache of all loaded images](https://github.com/ServiceStackApps/TechStacksApp/blob/0fca564e8c06fd1b71f81faee93a2e04c70a219b/src/TechStacks/AppData.swift#L144), reducing number of HTTP requests and load times when navigating between screens:
+In addition to typed Service requests, `JsonServiceClient` can fetch images and other binary responses with
+the `getData()` and `getDataAsync()` APIs. They return both `Data` and the `HTTPURLResponse`, so callers can
+inspect status and headers. This can be used to maintain an in-memory image cache:
 
 ```swift
 var imageCache:[String:UIImage] = [:]
 
-public func loadImageAsync(url:String) -> Promise<UIImage?> {
+public func loadImageAsync(url:String) async throws -> UIImage? {
     if let image = imageCache[url] {
-        return Promise<UIImage?> { (complete, reject) in complete(image) }
+        return image
     }
-    
-    return client.getDataAsync(url)
-        .done { (data:NSData) -> UIImage? in
-            if let image = UIImage(data:data) {
-                self.imageCache[url] = image
-                return image
-            }
-            return nil
-        }
+
+    guard let (data, _) = try await client.getDataAsync(url: url),
+          let image = UIImage(data: data) else {
+        return nil
+    }
+
+    imageCache[url] = image
+    return image
 }
 ```
 
@@ -891,39 +1012,38 @@ The TechStacks Desktop UI is then built around these 2 AutoQuery Services allowi
 
 ![TechStack Desktop Search Type](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/techstacks-desktop-type.png)
 
-Like the TechStacks iOS App all Service Calls are maintained in a single [AppData.swift](https://github.com/ServiceStackApps/TechStacksDesktopApp/blob/master/src/TechStacksDesktop/AppData.swift) class and uses KVO bindings to update its UI which is populated from these 2 services below:
+Like the TechStacks iOS App, its Service calls can be kept in one data model. The model builds additional
+AutoQuery conventions at runtime, calls the typed request, and updates UI-bound results on the main actor:
 
 ```swift
+@MainActor
 func searchTechStacks(query:String, field:String? = nil, operand:String? = nil)
-  -> Promise<QueryResponse<TechnologyStack>> {
+  async throws -> QueryResponse<TechnologyStackView> {
     self.search = query
-    
+
     let queryString = query.count > 0 && field != nil && operand != nil
         ? [createAutoQueryParam(field!, operand!): query]
         : ["NameContains":query, "DescriptionContains":query]
-    
-    let request = FindTechStacks<TechnologyStack>()
-    return client.getAsync(request, query:queryString)
-        .done { (r:QueryResponse<TechnologyStack>) -> QueryResponse<TechnologyStack> in
-            self.filteredTechStacks = r.results
-            return r
-        }
+
+    let request = FindTechStacks()
+    let response = try await client.getAsync(request, query:queryString)
+    filteredTechStacks = response.results
+    return response
 }
 
+@MainActor
 func searchTechnologies(query:String, field:String? = nil, operand:String? = nil)
-  -> Promise<QueryResponse<Technology>> {
+  async throws -> QueryResponse<TechnologyView> {
     self.search = query
 
     let queryString = query.count > 0 && field != nil && operand != nil
         ? [createAutoQueryParam(field!, operand!): query]
         : ["NameContains":query, "DescriptionContains":query]
-    
-    let request = FindTechnologies<Technology>()
-    return client.getAsync(request, query:queryString)
-        .done { (r:QueryResponse<Technology>) -> QueryResponse<Technology> in
-            self.filteredTechnologies = r.results
-            return r
-        }
+
+    let request = FindTechnologies()
+    let response = try await client.getAsync(request, query:queryString)
+    filteredTechnologies = response.results
+    return response
 }
 
 func createAutoQueryParam(field:String, _ operand:String) -> String {
@@ -937,15 +1057,10 @@ Essentially employing the same strategy for both AutoQuery Services where it bui
 
 ### [TechStacks Console App](https://github.com/ServiceStackApps/swift-techstacks-console)
 
-In its quest to become a popular mainstream language, Swift includes a built-in Package Manager 
-to simplify the maintenance, distribution and building of Swift code. Swift Package Manager can be used to
-build native statically-linked modules or Console Apps but currently has no support for iOS, watchOS, 
-or tvOS platforms.
- 
-Nevertheless it's simple console and text-based programming model provides a great way to quickly develop 
-prototypes or Console-based Swift Apps like [swiftref](https://github.com/ServiceStack/swiftref) 
-using your favorite text editor. To support this environment we've packaged ServiceStack's Swift Service 
-clients into a **ServiceStackClient** package so it can be easily referenced in Swift PM projects.
+Swift Package Manager works in Xcode and from the command line, so the same `ServiceStack` package and
+generated DTOs can be used by Apple-platform apps, libraries, tests, and command-line executables. The
+package conditionally imports `FoundationNetworking`, enabling the client to build on platforms where
+networking APIs aren't part of Foundation itself.
 
 Together with **Swift Add ServiceStack Reference** we now have a productive development workflow for 
 building statically-linked native executables that consume Typed ServiceStack Services as seen in the new 
@@ -954,20 +1069,23 @@ step-by-step guide below showing how to create a simple
 
 ## Swift Generated DTO Types
 
-With Swift support our goal was to ensure a high-fidelity, idiomatic translation within the constraints of Swift language and built-in libraries, where the .NET Server DTO's are translated into clean Swift POSO's (Plain Old Swift Objects :) having their .NET built-in types mapped to their equivalent Swift data type. 
+ServiceStack translates .NET service contracts into clean Swift classes and enums using the closest
+built-in Swift types. Request DTOs implement `IReturn` and declare their response with a `typealias`, while
+all generated models use `Codable` for serialization.
 
 To see what this ended up looking like, we'll peel back behind the covers and look at a couple of the [Generated Swift Test Models](https://test.servicestack.net/types/swift) to see how they're translated in Swift:
 
 ```swift
-public class AllTypes
+public class AllTypes : IReturn, Codable
 {
-    required public init(){}
+    public typealias Return = AllTypes
+
     public var id:Int?
     public var nullableId:Int?
-    public var byte:Int8?
+    public var byte:UInt8?
     public var short:Int16?
     public var int:Int?
-    public var long:Int64?
+    public var long:Int?
     public var uShort:UInt16?
     public var uInt:UInt32?
     public var uLong:UInt64?
@@ -975,23 +1093,26 @@ public class AllTypes
     public var double:Double?
     public var decimal:Double?
     public var string:String?
-    public var dateTime:NSDate?
-    public var timeSpan:NSTimeInterval?
-    public var dateTimeOffset:NSDate?
+    public var dateTime:Date?
+    @TimeSpan public var timeSpan:TimeInterval?
+    public var dateTimeOffset:Date?
     public var guid:String?
-    public var char:Character?
-    public var nullableDateTime:NSDate?
-    public var nullableTimeSpan:NSTimeInterval?
+    public var char:String?
+    public var nullableDateTime:Date?
+    @TimeSpan public var nullableTimeSpan:TimeInterval?
     public var stringList:[String] = []
     public var stringArray:[String] = []
     public var stringMap:[String:String] = [:]
     public var intStringMap:[Int:String] = [:]
     public var subType:SubType?
+
+    required public init(){}
 }
 
-public class AllCollectionTypes
+public class AllCollectionTypes : IReturn, Codable
 {
-    required public init(){}
+    public typealias Return = AllCollectionTypes
+
     public var intArray:[Int] = []
     public var intList:[Int] = []
     public var stringArray:[String] = []
@@ -999,38 +1120,50 @@ public class AllCollectionTypes
     public var pocoArray:[Poco] = []
     public var pocoList:[Poco] = []
     public var pocoLookup:[String:[Poco]] = [:]
-    public var pocoLookupMap:[String:[String:Poco]] = [:]
+    public var pocoLookupMap:[String:[[String:Poco]]] = [:]
+
+    required public init(){}
 }
 
-public enum EnumType : Int
+public enum EnumType : String, Codable
 {
     case Value1
     case Value2
+    case Value3
 }
 ```
 
-As seen above, properties are essentially mapped to their optimal Swift equivalent. As DTO's can be partially complete all properties are `Optional` except for enumerables which default to an empty collection - making them easier to work with and despite their semantic differences, .NET enums are translated into typed Swift enums.
+Properties are mapped to their Swift equivalents. DTOs can be partially populated, so scalar and nested
+properties are optional by default, while collections are initialized empty. Configuration options let you
+change collection initialization and property optionality. Tests also cover JSON round trips for inherited
+and nested DTOs, ISO-8601 and WCF JSON dates, XSD durations, dictionaries, arrays, and typed enums.
 
 ### Swift Code Generation
 
-As we were already using code-gen to generate the Swift types we could extend it without impacting the Developer UX has been expanded to also include what's essentially an **explicit Reflection API** for each type with API's to support serializing to and from JSON. Thanks to Swift's rich support for extending types we were able to leverage its Type extensions so the implementation details could remain disconnected from the clean Swift type definitions allowing improved readability when inspecting the remote DTO schema's.
-
-We can look at `AllCollectionTypes` to see an example of the code-gen that's generated for each type, essentially emitting explicit readable/writable closures for each property: 
+Simple DTOs rely on synthesized `Codable` conformance. For inherited DTOs, the generator emits explicit
+`CodingKeys`, decoder, and encoder implementations so base and derived properties round-trip correctly:
 
 ```swift
-extension AllCollectionTypes : JsonSerializable
+public class HelloWithInheritance : HelloBase, IReturn
 {
-    public static var typeName:String { return "AllCollectionTypes" }
-    public static var metadata = Metadata.create([
-            Type<AllCollectionTypes>.arrayProperty("intArray", get: { $0.intArray }, set: { $0.intArray = $1 }),
-            Type<AllCollectionTypes>.arrayProperty("intList", get: { $0.intList }, set: { $0.intList = $1 }),
-            Type<AllCollectionTypes>.arrayProperty("stringArray", get: { $0.stringArray }, set: { $0.stringArray = $1 }),
-            Type<AllCollectionTypes>.arrayProperty("stringList", get: { $0.stringList }, set: { $0.stringList = $1 }),
-            Type<AllCollectionTypes>.arrayProperty("pocoArray", get: { $0.pocoArray }, set: { $0.pocoArray = $1 }),
-            Type<AllCollectionTypes>.arrayProperty("pocoList", get: { $0.pocoList }, set: { $0.pocoList = $1 }),
-            Type<AllCollectionTypes>.objectProperty("pocoLookup", get: { $0.pocoLookup }, set: { $0.pocoLookup = $1 }),
-            Type<AllCollectionTypes>.objectProperty("pocoLookupMap", get: { $0.pocoLookupMap }, set: { $0.pocoLookupMap = $1 }),
-        ])
+    public typealias Return = HelloWithInheritanceResponse
+    public var name:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey { case name }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if name != nil { try container.encode(name, forKey: .name) }
+    }
 }
 ```
 
@@ -1049,6 +1182,3 @@ As Swift doesn't support extension inheritance, when using inheritance in DTO's 
 
 #### All DTO Type Names must be unique
 Required as there are no namespaces in Swift (Also required for F# and TypeScript). ServiceStack only requires Request DTO's to be unique, but our recommendation is for all DTO names to be unique.
-
-#### IReturn not added for Array Responses
-As Swift doesn't allow extending generic Arrays with public protocols, the `IReturn` marker that enables the typed ServiceClient API isn't available for Requests returning Array responses. You can workaround this limitation by wrapping the array in a Response DTO whilst we look at other solutions to support this in future.
