@@ -1,13 +1,17 @@
 ---
 slug: ruby-add-servicestack-reference
-title: Ruby Add ServiceStack Reference
+title: Ruby ServiceStack Reference
 ---
+
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/ruby-info.png)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.
 
 ### Ruby - ServiceStack productivity in a dynamic language
 
-The [servicestack](https://rubygems.org/gems/servicestack) gem provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:
+The [servicestack](https://rubygems.org/gems/servicestack) gem ([source](https://github.com/ServiceStack/servicestack-ruby)) provides generated DTOs with explicit properties and API metadata, giving editors and developers a discoverable model of every request and response:
 
 ```ruby
 client = ServiceStack::JsonServiceClient.new(base_url)
@@ -220,6 +224,7 @@ class ServiceStack::JsonServiceClient
   def send_url(path, method: HttpMethods::GET, body: nil, response_as: nil, args: nil)
   def send_url_string(path, method: HttpMethods::GET, body: nil, args: nil)
   def to_absolute_url(path_or_url)
+  def create_url_from_dto(method, request)
 
   # File Uploads
   def post_file_with_request(request, file, args: nil)
@@ -331,6 +336,44 @@ APIs that don't return a Response Body can be sent with `send_void`:
 client.send_void(DeleteBooking.new(id: 1))
 ```
 
+### Resolving the HTTP Method
+
+The Verb returned by a DTO's generated `get_method` also determines whether the Request DTO is sent in the QueryString or the JSON Request Body:
+
+```ruby
+client.send(Hello.new(name: 'World'))           # GET /api/Hello?name=World
+client.send(CreateBooking.new(name: 'Booking')) # POST /api/CreateBooking {"name":"Booking"}
+```
+
+Request DTOs that aren't annotated with a Verb fall back to inferring it from the Request DTO name:
+
+| Request DTO Name                    | HTTP Method |
+|-------------------------------------|-------------|
+| `Get*` `Query*` `Find*` `Search*`   | GET         |
+| `Create*`                           | POST        |
+| `Update*` `Replace*`                | PUT         |
+| `Patch*`                            | PATCH       |
+| `Delete*` `Remove*`                 | DELETE      |
+| *(anything else)*                   | POST        |
+
+Which is why hand-written DTOs only need to declare what they can't infer, e.g. this Request DTO is sent as a `GET` to `/api/GetWeather?city=Seattle` and its JSON Response converted into a typed `GetWeatherResponse`:
+
+```ruby
+class GetWeather
+    include ServiceStack::DTO
+    attr_accessor :city
+
+    def self.properties() = { city: { name: 'city' } }
+    def response_type() = GetWeatherResponse
+end
+```
+
+Any Request DTO can also be sent with an explicit Verb:
+
+```ruby
+client.send(request, method: ServiceStack::HttpMethods::PUT)
+```
+
 ### Constructors Initializer
 
 All Ruby DTOs support populating their properties with keyword arguments, so instead of:
@@ -367,6 +410,19 @@ end
 ```
 
 Nested DTOs, Dates and collections are converted using the metadata each generated DTO declares, so `booking.discount` is a `Coupon`, `booking.booking_start_date` is a `DateTime` and inherited properties like `booking.created_by` are populated from their `createdBy` wire names.
+
+As AutoQuery Request DTOs inherit from `ServiceStack::QueryDb` (or `QueryData` for [AutoQuery Data](/autoquery/data)) they can use any of the query params supported by all AutoQuery APIs:
+
+```ruby
+response = client.send(QueryBookings.new(
+  skip: 10, take: 5,                 # paging
+  order_by_desc: 'id',               # or order_by: 'name'
+  fields: 'id,name,roomType',        # only return these fields
+  include: 'total'))                 # include the total number of results
+
+puts response.offset                 # 10
+puts response.total                  # 25
+```
 
 ### Sending additional arguments with Typed API Requests
 
@@ -510,6 +566,41 @@ Use the `bearer_token` property to Authenticate with an [API Key](/auth/api-key-
 client.set_bearer_token(api_key)
 ```
 
+### Built-in ServiceStack DTOs
+
+The `servicestack` gem includes typed DTOs for ServiceStack's built-in Auth APIs, letting you call them without needing to generate them:
+
+```ruby
+# Authentication
+auth = client.send(ServiceStack::Authenticate.new(provider: 'credentials',
+  user_name: 'test', password: 'test', remember_me: true))
+
+reg = client.send(ServiceStack::Register.new(user_name: 'new-user',
+  email: 'user@example.org', password: 'p@55wOrd', auto_login: true))
+
+# JWT
+token = client.send(ServiceStack::ConvertSessionToToken.new)   # Session -> JWT
+access = client.send(ServiceStack::GetAccessToken.new(refresh_token: refresh_token))
+```
+
+Together with the built-in Response Types and base classes that generated DTOs reference:
+
+| Type                                | Description                                                            |
+|-------------------------------------|------------------------------------------------------------------------|
+| `ServiceStack::ResponseStatus`      | ServiceStack's structured error response                                |
+| `ServiceStack::ResponseError`       | An individual field validation error                                    |
+| `ServiceStack::EmptyResponse`       | Response of APIs that don't return a Response Body                      |
+| `ServiceStack::IdResponse`          | Response returning the Id of the created or updated entity              |
+| `ServiceStack::StringResponse`      | Response returning a single `result` string                             |
+| `ServiceStack::StringsResponse`     | Response returning a list of string `results`                           |
+| `ServiceStack::AuditBase`           | Audit fields inherited by [AutoQuery CRUD](/autoquery/crud) data models |
+| `ServiceStack::QueryBase`           | Query params supported by all [AutoQuery](/autoquery/) Requests         |
+| `ServiceStack::QueryDb`             | Base class of AutoQuery RDBMS Requests                                  |
+| `ServiceStack::QueryData`           | Base class of [AutoQuery Data](/autoquery/data) Requests                |
+| `ServiceStack::QueryResponse`       | Typed Response of AutoQuery Requests, e.g. `QueryResponse.of(Booking)`  |
+| `ServiceStack::UploadFile`          | A file uploaded in a `multipart/form-data` Request                      |
+| `ServiceStack::HttpMethods`         | The HTTP Verbs used by ServiceStack APIs, e.g. `HttpMethods::GET`       |
+
 ### Transparently handle 401 Unauthorized Responses
 
 If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the `on_authentication_required` callback to re-configure the client before automatically retrying the original request, e.g:
@@ -546,6 +637,14 @@ client.set_refresh_token(auth_response.refresh_token)
 response = client.send(Secured.new)
 ```
 
+i.e. when a Request fails with a `401 Unauthorized` the client sends its Refresh Token to the [GetAccessToken](/auth/jwt-authprovider#refresh-tokens) API, updates its Bearer Token then transparently retries the original Request:
+
+```
+POST /api/Hello           -> 401 Unauthorized
+POST /api/GetAccessToken  -> 200 { "accessToken": "..." }
+POST /api/Hello           -> 200 { "result": "Hello, World!" }
+```
+
 Use the `refresh_token_uri` property when refresh tokens need to be sent to a different ServiceStack Server, e.g:
 
 ```ruby
@@ -576,17 +675,157 @@ client.post_files_with_request(UploadPhoto.new(album: 'Holiday'), [
 
 Requires **servicestack v0.1.1+**.
 
-### Inspecting Requests and Responses
+### Serializing DTOs
 
-Requests and Responses can be inspected or modified with instance and static filters:
+As DTOs declare the wire name and Type of each of their properties, they can also be used to convert between Ruby objects and the JSON their APIs use outside of any API Request, useful for persisting API Responses, populating DTOs from other sources or testing:
 
 ```ruby
+request = Hello.new(name: 'World')
+request.to_hash                 # { "name" => "World" }
+request.to_json                 # {"name":"World"}
+
+res = HelloResponse.from_json('{"result":"Hello, World!"}')
+res = HelloResponse.from_hash({ 'result' => 'Hello, World!' })
+res.result                      # "Hello, World!"
+```
+
+Where:
+
+ - `to_hash` (aliased `to_h`) uses each property's wire name and omits any properties that aren't populated
+ - `from_hash` matches JSON properties on their wire name first, falling back to the DTO's own `snake_case` name
+ - Nested DTOs, Arrays, Hashes and Dates are converted using the Types their `properties` declare, incl. inherited properties
+ - Dates are parsed from ISO-8601 as well as ServiceStack's `/Date(1670000000000)/` format
+ - DTOs implement `==` and a readable `inspect` for their populated properties, e.g. `#<Hello name="World">`
+
+### Client Configuration
+
+```ruby
+client = ServiceStack::JsonServiceClient.new('https://example.org')
+client.set_header('X-Custom', 'Value')
+client.timeout = 30                        # open + read timeout in secs (default: 60)
+client.set_bearer_token(api_key)
+
+# Inspect or modify each Request and Response
 client.request_filter = ->(req) { puts "#{req.method} #{req.path}" }
 client.response_filter = ->(res) { puts res.code }
-
-# Applied to all clients
-ServiceStack::JsonServiceClient.global_request_filter = ->(req) { req['X-Trace'] = trace_id }
 ```
+
+All `set_*` methods return the client so they can be chained:
+
+```ruby
+client = ServiceStack::JsonServiceClient.new(base_url)
+                     .set_bearer_token(jwt)
+                     .set_header('X-Tenant', tenant_id)
+```
+
+Requests are sent to ServiceStack's pre-defined `/api` route by default, use `set_base_path` for older ServiceStack instances that only have the `/json/reply` routes enabled, or to send them to a custom base path:
+
+```ruby
+client.set_base_path('')            # /json/reply/Hello and /json/oneway/Hello
+client.set_base_path('custom/api')  # /custom/api/Hello
+```
+
+The client also retains any Session Cookies the Server returns which can be inspected or populated directly, e.g. to resume an existing [Session](/auth/sessions):
+
+```ruby
+client.cookies['ss-id']             # "SESSION_ID"
+```
+
+### Global Request and Response Filters
+
+In addition to per-client filters, global filters can be registered to inspect or decorate the `Net::HTTP` Requests and Responses of every client, useful for adding tracing headers or logging and diagnostics:
+
+```ruby
+ServiceStack::JsonServiceClient.global_request_filter = ->(req) {
+  req['X-Correlation-Id'] = correlation_id
+}
+ServiceStack::JsonServiceClient.global_response_filter = ->(res) {
+  logger.info("#{res.code} #{res.message}")
+}
+```
+
+### QueryString Serialization
+
+Request DTO properties and additional `args` sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex types and ISO-8601 for Dates:
+
+| Ruby Value                       | QueryString                        |
+|----------------------------------|------------------------------------|
+| `'World'`                        | `name=World`                       |
+| `true`                           | `enabled=true`                     |
+| `1.5`                            | `rate=1.5`                         |
+| `[1, 2, 3]`                      | `ids=[1,2,3]`                      |
+| `{ 'a' => 1, 'b' => 2 }`         | `meta={a:1,b:2}`                   |
+| `DateTime.new(2001, 1, 1)`       | `date=2001-01-01T00:00:00+00:00`   |
+| `nil`                            | *(omitted)*                        |
+
+Values are URL encoded, whilst `nil` properties are omitted from both the QueryString and JSON Request Bodies so APIs only receive the properties that were populated.
+
+Use `create_url_from_dto` to resolve the URL a Request DTO is sent to, or `to_absolute_url` to resolve a relative path against the client's Base URL:
+
+```ruby
+client.create_url_from_dto('GET', Hello.new(name: 'World'))
+# https://example.org/api/Hello?name=World
+
+client.to_absolute_url('/api/Hello')
+# https://example.org/api/Hello
+```
+
+### Calling AI Chat and OpenAI compatible APIs
+
+As Request DTOs are just Ruby classes, more advanced APIs like [AI Chat](/ai-chat-api)'s OpenAI-compatible `ChatCompletion` API can also be called with typed DTOs, where polymorphic content parts are sent in an Array of the DTOs of each content type:
+
+```ruby
+request = ChatCompletion.new(
+  model: 'openai/gpt-oss-120b',
+  messages: [
+    AiMessage.new(
+      role: 'user',
+      # Content parts are polymorphic, e.g. text, image_url or input_audio
+      content: [AiTextContent.new(type: 'text', text: 'Capital of France? Answer in 3 words')]
+    )
+  ]
+)
+
+begin
+  res = client.send(request)
+  puts res.choices.first.message.content
+rescue ServiceStack::WebServiceException => e
+  # A shared LLM can be rate limited or temporarily unavailable
+  warn "ChatCompletion unavailable: #{e.message}" if [429, 502, 503, 504].include?(e.status_code)
+  raise
+end
+```
+
+### Testing
+
+As the client accepts any Base URL, APIs can be tested against a local ServiceStack instance or a stubbed HTTP Server without needing to mock the client, e.g. using [WebMock](https://github.com/bblimke/webmock) to assert the exact Request each API sends:
+
+```ruby
+stub_request(:post, 'https://example.org/api/Hello')
+  .with(body: '{"name":"World"}', headers: { 'Content-Type' => 'application/json' })
+  .to_return(body: { result: 'Hello, World!' }.to_json)
+
+client = ServiceStack::JsonServiceClient.new('https://example.org')
+res = client.send(Hello.new(name: 'World'))
+
+assert_equal 'Hello, World!', res.result
+```
+
+Which is how the client's own [test suite](https://github.com/ServiceStack/servicestack-ruby/blob/main/test/test_json_service_client.rb) verifies the Requests it sends, in addition to its [integration tests](https://github.com/ServiceStack/servicestack-ruby/blob/main/test/integration/live_api_test.rb) which are run against the live [test.servicestack.net](https://test.servicestack.net) Services.
+
+Its unit tests are run with:
+
+:::sh
+rake test
+:::
+
+Whilst its integration tests are run with:
+
+:::sh
+rake test:integration
+:::
+
+Use the `SERVICESTACK_TEST_URL` Environment Variable to run them against a different ServiceStack instance.
 
 ## DTO Customization Options
 
