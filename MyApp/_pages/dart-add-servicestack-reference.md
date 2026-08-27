@@ -5,7 +5,7 @@ title: Dart Add ServiceStack Reference
 
 ![Dart Banner](/img/pages/dart/dart.png)
 
-ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [@servicestack/cli command-line utility](https://github.com/ServiceStack/servicestack-cli#servicestackcli) - providing a simple way to give clients typed access to your ServiceStack Services.
+ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [npx get-dtos command-line script](/npx-get-dtos) - providing a simple way to give clients typed access to your ServiceStack Services.
 
 ### Dart - One typed client for every Flutter target
 
@@ -34,22 +34,20 @@ Due to the lack of reflection and Mirror support, consuming JSON APIs can be qui
 
 ### Install
 
-You can use the same [x dotnet tool](/dotnet-tool) simple command-line utility to easily Add and Update ServiceStack References for all supported languages:
-
-Install [.NET SDK](https://dotnet.microsoft.com/download) then install the `x` dotnet tool:
+You can use the same cross-platform [get-dtos](/npx-get-dtos) script to easily Add and Update ServiceStack References for all supported languages, which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Example Usage
 
-You can then execute `x dart` with the URL of the remote ServiceStack Instance you want to generated DTOs for, e.g:
+You can then execute `npx get-dtos dart` with the URL of the remote ServiceStack Instance you want to generated DTOs for, e.g:
 
 :::sh
-`x dart https://techstacks.io`
+`npx get-dtos dart https://techstacks.io`
 :::
 
 This will generate Dart DTOs for the [entire TechStacks API](https://techstacks.io/metadata):
@@ -388,12 +386,12 @@ Then to use `JsonServiceClient` add the `servicestack` dependency to your apps [
 
 Saving `pubspec.yaml` automatically runs [flutter packages get](https://flutter.io/using-packages/) to install any new dependencies in your App. 
 
-Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `x` command-line utility:
+Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `get-dtos` script:
 
 ```bash
 cd lib
-x dart https://techstacks.io
-x dart https://test.servicestack.net test
+npx get-dtos dart https://techstacks.io
+npx get-dtos dart https://test.servicestack.net test
 ```
 
 Which will save the DTOs for each endpoint in different files:
@@ -403,10 +401,10 @@ Saved to: dtos.dart
 Saved to: test.dtos.dart
 ```
 
-Incidentally you can get the latest version for all Dart Service References by running `x dart` without arguments:
+Incidentally you can get the latest version for all Dart Service References by running `npx get-dtos dart` without arguments:
 
 :::sh
-x dart
+npx get-dtos dart
 :::
 
 Which updates all Dart references in the current directory, including any customization options available in the header of each file:

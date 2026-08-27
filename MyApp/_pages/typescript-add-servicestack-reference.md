@@ -71,12 +71,12 @@ Where the `r` param in the returned `then()` Promise callback is typed to `Store
 Despite generating Typed TypeScript DTOs, the generic `JsonServiceClient` and generated TypeScript DTOs can also be utilized in
 JavaScript-Only development environments like [React Native](https://youtu.be/T3KTDPdovOw) or in the [Nuxt Templates](/templates/nuxt)
 which doesn't use TypeScript in its build, but can be easily integrated by adding an npm script to using the 
-[dotnet tools](/dotnet-tool) to generate the DTOs and the global `typescript` npm tool to compile it into the module we want,
+[get-dtos](/npx-get-dtos) script to generate the DTOs and the global `typescript` npm tool to compile it into the module we want,
 which in React Native projects would look like:
 
 ```json
 "scripts": {
-    "dtos": "cd src/shared && x typescript && tsc -m ES6 dtos.ts",
+    "dtos": "cd src/shared && npx get-dtos typescript && tsc -m ES6 dtos.ts",
 }
 ```
 
@@ -99,22 +99,21 @@ You can get both concrete types and interface definitions for your Services at t
 
 ## Simple command-line utilities for TypeScript
 
-The [dotnet tools](/dotnet-tool) include built in support for generating TypeScript references from the command-line:
-
-### Installation
+The cross-platform [get-dtos](/npx-get-dtos) script includes built in support for generating TypeScript references 
+from the command-line, which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x 
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a TypeScript ServiceStack Reference just call `x typescript` with the URL of a remote ServiceStack instance:
+To Add a TypeScript ServiceStack Reference just call `npx get-dtos typescript` with the URL of a remote ServiceStack instance:
 
 :::sh
-`x typescript https://techstacks.io`
+`npx get-dtos typescript https://techstacks.io`
 :::
 
 Result:
@@ -123,10 +122,10 @@ Result:
 Saved to: dtos.ts
 ```
 
-Calling `x typescript` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos typescript` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-`x typescript https://techstacks.io Tech`
+`npx get-dtos typescript https://techstacks.io Tech`
 :::
 
 Result:
@@ -137,10 +136,10 @@ Saved to: Tech.dtos.ts
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x typescript` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos typescript` with the Filename:
 
 :::sh
-x typescript dtos.ts
+npx get-dtos typescript dtos.ts
 :::
 
 Result:
@@ -153,10 +152,10 @@ Which will update the File with the latest TypeScript Server DTOs from [techstac
 
 ### Updating all TypeScript DTOs
 
-Calling `x typescript` without any arguments will update all TypeScript DTOs in the current directory:
+Calling `npx get-dtos typescript` without any arguments will update all TypeScript DTOs in the current directory:
 
 :::sh
-x typescript
+npx get-dtos typescript
 :::
 
 Result:
@@ -166,10 +165,15 @@ Updated: Tech.dtos.ts
 Updated: dtos.ts
 ```
 
-### npm tools
+### dotnet tools
 
-The `x` dotnet tools require .NET Core installed, a pure npm-based alternative is to install the [@servicestack/cli](https://github.com/ServiceStack/servicestack-cli)
- npm package containing the `typescript-ref` (or wrist-friendly `ts-ref` alias) commands which can be used instead of `x typescript`.
+An alternative to `npx get-dtos` for .NET developers is the [x dotnet tool](/dotnet-tool) which requires the .NET SDK installed:
+
+:::sh
+dotnet tool install --global x 
+:::
+
+Where any `npx get-dtos <lang>` command can be replaced with `x <lang>`, e.g. `x typescript`.
 
 ## Add TypeScript Reference
 

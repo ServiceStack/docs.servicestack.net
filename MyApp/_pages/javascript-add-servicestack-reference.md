@@ -101,10 +101,10 @@ on('#txtName', {
 
 ### Enable static analysis and intelli-sense 
 
-For better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the [x dotnet tool](/dotnet-tool):
+For better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-x mjs
+npx get-dtos mjs
 :::
 
 Then reference it instead to enable IDE static analysis when calling Typed APIs from JavaScript:
@@ -122,8 +122,6 @@ npm install -D @servicestack/client
 
 Where only its TypeScript definitions are used by the IDE during development to enable its type-checking and intelli-sense.
 
-::include npx-get-dtos.md::
-
 ### Rich intelli-sense support
 
 Where you'll be able to benefit from rich intelli-sense support in smart IDEs like [Rider](https://www.jetbrains.com/rider/) for 
@@ -140,7 +138,7 @@ As well as your App's server generated DTOs:
 A new ServiceStack reference containing the APIs typed DTOs can be added using the **BaseUrl** of the ServiceStack App, e.g:
 
 :::sh
-`x mjs https://localhost:5001`
+`npx get-dtos mjs https://localhost:5001`
 :::
 
 ### Update ServiceStack References
@@ -148,7 +146,7 @@ A new ServiceStack reference containing the APIs typed DTOs can be added using t
 All existing ServiceStack References can later be updated with:
 
 :::sh
-x mjs
+npx get-dtos mjs
 :::
 
 

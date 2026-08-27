@@ -7,7 +7,7 @@ title: Swift Add ServiceStack Reference
 ### Swift - Native, async-first APIs for Apple platforms
 
 ServiceStack's **Add ServiceStack Reference** feature lets iOS/macOS developers easily generate an native 
-typed Swift API for your ServiceStack Services using the `x` dotnet command-line tool.
+typed Swift API for your ServiceStack Services using the `npx get-dtos` command-line script.
 
 Added with Swift Package Manager, [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) generates `Codable` DTOs whose request types declare the response they return, letting the client infer the entire call under `async/await`:
 
@@ -22,17 +22,15 @@ For iOS, iPadOS and macOS teams this replaces the usual `URLSession` plumbing an
 
 ## Simple command-line utils for ServiceStack
 
-The [x dotnet tool](/dotnet-tool) provides a simple command-line UX to easily Add and Update Swift ServiceStack References.
+The cross-platform [get-dtos](/npx-get-dtos) script provides a simple command-line UX to easily Add and Update Swift ServiceStack References.
 
-Prerequisites: Install [.NET Core](https://dotnet.microsoft.com/download).
+Prerequisites: Install [Node.js](https://nodejs.org).
 
 ```bash
-$ dotnet tool install --global x 
+$ npx get-dtos
 ```
 
-This will make the `x` dotnet tool available in your `$PATH` which can now be used from within a **Terminal window** at your Xcode project folder.
-
-::include npx-get-dtos.md::
+As it's run with `npx` there's nothing to install, it can be run as-is from within a **Terminal window** at your Xcode project folder, where running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Reference ServiceStack.Swift
 
@@ -97,17 +95,17 @@ let response = client.get(AppOverview())
 
 ### Add a new ServiceStack Reference
 
-To Add a new ServiceStack Reference, call `x swift` with the Base URL to a remote ServiceStack instance:
+To Add a new ServiceStack Reference, call `npx get-dtos swift` with the Base URL to a remote ServiceStack instance:
 
 ```bash
-$ x swift {BaseUrl}
-$ x swift {BaseUrl} {FileName}
+$ npx get-dtos swift {BaseUrl}
+$ npx get-dtos swift {BaseUrl} {FileName}
 ```
 
 Where if no FileName is provided, it's inferred from the host name of the remote URL, e.g:
 
 ```bash
-$ x swift https://techstacks.io
+$ npx get-dtos swift https://techstacks.io
 ```
 
 Downloads the Typed Swift DTOs for [techstacks.io](https://techstacks.io) and saves them to `dtos.swift`. 
@@ -115,35 +113,35 @@ Downloads the Typed Swift DTOs for [techstacks.io](https://techstacks.io) and sa
 Alternatively you can have it saved to a different FileName with:
 
 ```bash
-$ x swift https://techstacks.io TechStacks
+$ npx get-dtos swift https://techstacks.io TechStacks
 ```
 
 Which instead saves the DTOs to `dtos.swift`.
 
-`x swift` also downloads [ServiceStack's Swift Client](https://github.com/ServiceStack/ServiceStack.Swift) 
-and saves it to `JsonServiceClient.swift` which together with the Server DTOs contains all the dependencies 
-required to consume Typed Web Services in Swift.
+The generated Server DTOs are used together with the `JsonServiceClient` in the 
+[ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) package added above, which contains 
+all the dependencies required to consume Typed Web Services in Swift.
 
 #### Update an existing ServiceStack Reference
 
-The easiest way to update all your Swift Server DTOs is to just call `x swift` without any arguments:
+The easiest way to update all your Swift Server DTOs is to just call `npx get-dtos swift` without any arguments:
 
 ```bash
-$ x swift
+$ npx get-dtos swift
 ```
 
 This will go through and update all your `*.dtos.swift` Service References.
 
-To Update a specific ServiceStack Reference, call `x swift` with the Filename:
+To Update a specific ServiceStack Reference, call `npx get-dtos swift` with the Filename:
 
 ```bash
-$ x swift {FileName.dtos.swift}
+$ npx get-dtos swift {FileName.dtos.swift}
 ```
 
 As an example, you can Update the Server DTOs added in the previous command with:
 
 ```bash
-$ x swift dtos.swift
+$ npx get-dtos swift dtos.swift
 ```
 
 Which also includes any 
