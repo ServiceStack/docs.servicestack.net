@@ -87,6 +87,22 @@ function clone(value) {
         : JSON.parse(JSON.stringify(value))
 }
 
+const escapeHtml = value => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+function highlightCode(code, language) {
+    const source = String(code ?? '')
+    const hljs = globalThis.hljs
+    try {
+        if (hljs?.getLanguage(language)) {
+            return hljs.highlight(source, { language, ignoreIllegals: true }).value
+        }
+    } catch { /* fall through to escaped text */ }
+    return escapeHtml(source)
+}
+
 function absoluteSchemaIds(value, baseUrl) {
     if (Array.isArray(value)) return value.map(x => absoluteSchemaIds(x, baseUrl))
     if (!value || typeof value !== 'object') return value
@@ -185,7 +201,7 @@ export const SchemaForm = {
         </div>
     </div>`,
     setup() {
-        const demo = useDemo()
+        const demo = inject(DEMO, null) ?? { formData: ref(clone(initialFormData)) }
         const form = ref(null)
         const message = ref('')
         function validate() {
@@ -211,7 +227,9 @@ export const SchemaTypes = {
                 </select>
             </label>
         </div>
-        <div class="max-h-[36rem] overflow-auto whitespace-pre rounded-lg bg-gray-900 p-5 font-mono text-sm leading-relaxed text-gray-100">{{ generated.content }}</div>
+        <div class="max-h-[36rem] overflow-auto rounded-lg bg-gray-900 p-5 text-sm leading-relaxed text-gray-100"><code
+            class="block w-max min-w-full whitespace-pre bg-transparent p-0 font-mono"
+            v-html="highlighted"></code></div>
         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Generated file: <code>{{ generated.path }}</code></p>
     </div>`,
     setup() {
@@ -223,7 +241,8 @@ export const SchemaTypes = {
             json: demo.formData.value,
             language: language.value,
         }))
-        return { language, languages: TYPE_LANGUAGES, generated }
+        const highlighted = computed(() => highlightCode(generated.value.content, language.value))
+        return { language, languages: TYPE_LANGUAGES, generated, highlighted }
     },
 }
 
