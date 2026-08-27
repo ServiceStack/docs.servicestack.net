@@ -20,6 +20,9 @@ export default {
         <div class="pt-4 pb-16">
             <div class="mx-auto">
                 <NavList title="">
+                    <NavListItem title="JsonSchemaForm" href="/vue/json-schema" :iconSvg="Icons.Code">
+                        Render complete forms and typed models from JSON Schema
+                    </NavListItem>
                     <NavListItem title="AutoQueryGrid" href="/vue/autoquerygrid" :iconSvg="Icons.AutoQueryGrid">
                         Instant customizable UIs for calling AutoQuery CRUD APIs
                     </NavListItem>
