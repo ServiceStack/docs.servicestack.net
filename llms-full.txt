@@ -24153,12 +24153,12 @@ Where the `r` param in the returned `then()` Promise callback is typed to `Store
 Despite generating Typed TypeScript DTOs, the generic `JsonServiceClient` and generated TypeScript DTOs can also be utilized in
 JavaScript-Only development environments like [React Native](https://youtu.be/T3KTDPdovOw) or in the [Nuxt Templates](/templates/nuxt)
 which doesn't use TypeScript in its build, but can be easily integrated by adding an npm script to using the 
-[dotnet tools](/dotnet-tool) to generate the DTOs and the global `typescript` npm tool to compile it into the module we want,
+[get-dtos](/npx-get-dtos) script to generate the DTOs and the global `typescript` npm tool to compile it into the module we want,
 which in React Native projects would look like:
 
 ```json
 "scripts": {
-    "dtos": "cd src/shared && x typescript && tsc -m ES6 dtos.ts",
+    "dtos": "cd src/shared && npx get-dtos typescript && tsc -m ES6 dtos.ts",
 }
 ```
 
@@ -24181,22 +24181,21 @@ You can get both concrete types and interface definitions for your Services at t
 
 ## Simple command-line utilities for TypeScript
 
-The [dotnet tools](/dotnet-tool) include built in support for generating TypeScript references from the command-line:
-
-### Installation
+The cross-platform [get-dtos](/npx-get-dtos) script includes built in support for generating TypeScript references 
+from the command-line, which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x 
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a TypeScript ServiceStack Reference just call `x typescript` with the URL of a remote ServiceStack instance:
+To Add a TypeScript ServiceStack Reference just call `npx get-dtos typescript` with the URL of a remote ServiceStack instance:
 
 :::sh
-`x typescript https://techstacks.io`
+`npx get-dtos typescript https://techstacks.io`
 :::
 
 Result:
@@ -24205,10 +24204,10 @@ Result:
 Saved to: dtos.ts
 ```
 
-Calling `x typescript` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos typescript` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-`x typescript https://techstacks.io Tech`
+`npx get-dtos typescript https://techstacks.io Tech`
 :::
 
 Result:
@@ -24219,10 +24218,10 @@ Saved to: Tech.dtos.ts
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x typescript` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos typescript` with the Filename:
 
 :::sh
-x typescript dtos.ts
+npx get-dtos typescript dtos.ts
 :::
 
 Result:
@@ -24235,10 +24234,10 @@ Which will update the File with the latest TypeScript Server DTOs from [techstac
 
 ### Updating all TypeScript DTOs
 
-Calling `x typescript` without any arguments will update all TypeScript DTOs in the current directory:
+Calling `npx get-dtos typescript` without any arguments will update all TypeScript DTOs in the current directory:
 
 :::sh
-x typescript
+npx get-dtos typescript
 :::
 
 Result:
@@ -24248,10 +24247,15 @@ Updated: Tech.dtos.ts
 Updated: dtos.ts
 ```
 
-### npm tools
+### dotnet tools
 
-The `x` dotnet tools require .NET Core installed, a pure npm-based alternative is to install the [@servicestack/cli](https://github.com/ServiceStack/servicestack-cli)
- npm package containing the `typescript-ref` (or wrist-friendly `ts-ref` alias) commands which can be used instead of `x typescript`.
+An alternative to `npx get-dtos` for .NET developers is the [x dotnet tool](/dotnet-tool) which requires the .NET SDK installed:
+
+:::sh
+dotnet tool install --global x 
+:::
+
+Where any `npx get-dtos <lang>` command can be replaced with `x <lang>`, e.g. `x typescript`.
 
 ## Add TypeScript Reference
 
@@ -25282,10 +25286,10 @@ on('#txtName', {
 
 ### Enable static analysis and intelli-sense 
 
-For better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the [x dotnet tool](/dotnet-tool):
+For better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-x mjs
+npx get-dtos mjs
 :::
 
 Then reference it instead to enable IDE static analysis when calling Typed APIs from JavaScript:
@@ -25303,8 +25307,6 @@ npm install -D @servicestack/client
 
 Where only its TypeScript definitions are used by the IDE during development to enable its type-checking and intelli-sense.
 
-::include npx-get-dtos.md::
-
 ### Rich intelli-sense support
 
 Where you'll be able to benefit from rich intelli-sense support in smart IDEs like [Rider](https://www.jetbrains.com/rider/) for 
@@ -25321,7 +25323,7 @@ As well as your App's server generated DTOs:
 A new ServiceStack reference containing the APIs typed DTOs can be added using the **BaseUrl** of the ServiceStack App, e.g:
 
 :::sh
-`x mjs https://localhost:5001`
+`npx get-dtos mjs https://localhost:5001`
 :::
 
 ### Update ServiceStack References
@@ -25329,7 +25331,7 @@ A new ServiceStack reference containing the APIs typed DTOs can be added using t
 All existing ServiceStack References can later be updated with:
 
 :::sh
-x mjs
+npx get-dtos mjs
 :::
 
 
@@ -26476,7 +26478,7 @@ thanks to its flexibility, embeddability and ease of customization.
 To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports PHP as a 
 1st class Add ServiceStack Reference supported language which gives PHP developers an end-to-end typed API for consuming 
 ServiceStack APIs, complete with IDE integration in [PhpStorm](https://www.jetbrains.com/phpstorm/) as well as 
-[built-in support in x dotnet tool](/dotnet-tool#addupdate-servicestack-references) 
+[built-in support in the get-dtos script](/npx-get-dtos) 
 to generate Typed and annotated PHP DTOs for a remote ServiceStack instance from a single command-line.
 
 ### Ideal idiomatic Typed Message-based API
@@ -26676,31 +26678,29 @@ If any of the the remote APIs change their DTOs can be updated by right-clicking
 
 ### Simple command-line utility for PHP
 
-Developers using other PHP IDEs and Text Editors like VS Code can utilize the cross-platform [`x` command line utility](/dotnet-tool) for generating PHP DTOs from the command-line.
-
-To install first install the [latest .NET SDK](https://dotnet.microsoft.com/download) for your OS then install the [`x` dotnet tool](/dotnet-tool) with:
+Developers using other PHP IDEs and Text Editors like VS Code can generate PHP DTOs from the command-line with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 ```bash
-$ dotnet tool install --global x 
+$ npx get-dtos
 ```
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a PHP ServiceStack Reference just call `x php` with the URL of a remote ServiceStack instance:
+To Add a PHP ServiceStack Reference just call `npx get-dtos php` with the URL of a remote ServiceStack instance:
 
 ```bash
-$ x php https://techstacks.io
+$ npx get-dtos php https://techstacks.io
 ```
 
 Result:
 
     Saved to: dtos.php
 
-Calling `x php` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos php` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
-    $ x php https://techstacks.io Tech
+    $ npx get-dtos php https://techstacks.io Tech
 
 Result:
 
@@ -26708,9 +26708,9 @@ Result:
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x php` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos php` with the Filename:
 
-    $ x php dtos.php
+    $ npx get-dtos php dtos.php
 
 Result:
 
@@ -26721,10 +26721,10 @@ You can also customize how DTOs are generated by uncommenting the [PHP DTO Custo
 
 ### Updating all PHP DTOs
 
-Calling `x php` without any arguments will update all PHP DTOs in the current directory:
+Calling `npx get-dtos php` without any arguments will update all PHP DTOs in the current directory:
 
 ```bash
-$ x php
+$ npx get-dtos php
 ```
 
 Result:
@@ -27589,7 +27589,7 @@ Source: https://docs.servicestack.net/swift-add-servicestack-reference
 ### Swift - Native, async-first APIs for Apple platforms
 
 ServiceStack's **Add ServiceStack Reference** feature lets iOS/macOS developers easily generate an native 
-typed Swift API for your ServiceStack Services using the `x` dotnet command-line tool.
+typed Swift API for your ServiceStack Services using the `npx get-dtos` command-line script.
 
 Added with Swift Package Manager, [ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) generates `Codable` DTOs whose request types declare the response they return, letting the client infer the entire call under `async/await`:
 
@@ -27604,17 +27604,15 @@ For iOS, iPadOS and macOS teams this replaces the usual `URLSession` plumbing an
 
 ## Simple command-line utils for ServiceStack
 
-The [x dotnet tool](/dotnet-tool) provides a simple command-line UX to easily Add and Update Swift ServiceStack References.
+The cross-platform [get-dtos](/npx-get-dtos) script provides a simple command-line UX to easily Add and Update Swift ServiceStack References.
 
-Prerequisites: Install [.NET Core](https://dotnet.microsoft.com/download).
+Prerequisites: Install [Node.js](https://nodejs.org).
 
 ```bash
-$ dotnet tool install --global x 
+$ npx get-dtos
 ```
 
-This will make the `x` dotnet tool available in your `$PATH` which can now be used from within a **Terminal window** at your Xcode project folder.
-
-::include npx-get-dtos.md::
+As it's run with `npx` there's nothing to install, it can be run as-is from within a **Terminal window** at your Xcode project folder, where running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Reference ServiceStack.Swift
 
@@ -27679,17 +27677,17 @@ let response = client.get(AppOverview())
 
 ### Add a new ServiceStack Reference
 
-To Add a new ServiceStack Reference, call `x swift` with the Base URL to a remote ServiceStack instance:
+To Add a new ServiceStack Reference, call `npx get-dtos swift` with the Base URL to a remote ServiceStack instance:
 
 ```bash
-$ x swift {BaseUrl}
-$ x swift {BaseUrl} {FileName}
+$ npx get-dtos swift {BaseUrl}
+$ npx get-dtos swift {BaseUrl} {FileName}
 ```
 
 Where if no FileName is provided, it's inferred from the host name of the remote URL, e.g:
 
 ```bash
-$ x swift https://techstacks.io
+$ npx get-dtos swift https://techstacks.io
 ```
 
 Downloads the Typed Swift DTOs for [techstacks.io](https://techstacks.io) and saves them to `dtos.swift`. 
@@ -27697,35 +27695,35 @@ Downloads the Typed Swift DTOs for [techstacks.io](https://techstacks.io) and sa
 Alternatively you can have it saved to a different FileName with:
 
 ```bash
-$ x swift https://techstacks.io TechStacks
+$ npx get-dtos swift https://techstacks.io TechStacks
 ```
 
 Which instead saves the DTOs to `dtos.swift`.
 
-`x swift` also downloads [ServiceStack's Swift Client](https://github.com/ServiceStack/ServiceStack.Swift) 
-and saves it to `JsonServiceClient.swift` which together with the Server DTOs contains all the dependencies 
-required to consume Typed Web Services in Swift.
+The generated Server DTOs are used together with the `JsonServiceClient` in the 
+[ServiceStack.Swift](https://github.com/ServiceStack/ServiceStack.Swift) package added above, which contains 
+all the dependencies required to consume Typed Web Services in Swift.
 
 #### Update an existing ServiceStack Reference
 
-The easiest way to update all your Swift Server DTOs is to just call `x swift` without any arguments:
+The easiest way to update all your Swift Server DTOs is to just call `npx get-dtos swift` without any arguments:
 
 ```bash
-$ x swift
+$ npx get-dtos swift
 ```
 
 This will go through and update all your `*.dtos.swift` Service References.
 
-To Update a specific ServiceStack Reference, call `x swift` with the Filename:
+To Update a specific ServiceStack Reference, call `npx get-dtos swift` with the Filename:
 
 ```bash
-$ x swift {FileName.dtos.swift}
+$ npx get-dtos swift {FileName.dtos.swift}
 ```
 
 As an example, you can Update the Server DTOs added in the previous command with:
 
 ```bash
-$ x swift dtos.swift
+$ npx get-dtos swift dtos.swift
 ```
 
 Which also includes any 
@@ -30571,7 +30569,7 @@ Source: https://docs.servicestack.net/dart-add-servicestack-reference
 
 ![Dart Banner](/img/pages/dart/dart.png)
 
-ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [@servicestack/cli command-line utility](https://github.com/ServiceStack/servicestack-cli#servicestackcli) - providing a simple way to give clients typed access to your ServiceStack Services.
+ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [npx get-dtos command-line script](/npx-get-dtos) - providing a simple way to give clients typed access to your ServiceStack Services.
 
 ### Dart - One typed client for every Flutter target
 
@@ -30600,22 +30598,20 @@ Due to the lack of reflection and Mirror support, consuming JSON APIs can be qui
 
 ### Install
 
-You can use the same [x dotnet tool](/dotnet-tool) simple command-line utility to easily Add and Update ServiceStack References for all supported languages:
-
-Install [.NET SDK](https://dotnet.microsoft.com/download) then install the `x` dotnet tool:
+You can use the same cross-platform [get-dtos](/npx-get-dtos) script to easily Add and Update ServiceStack References for all supported languages, which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Example Usage
 
-You can then execute `x dart` with the URL of the remote ServiceStack Instance you want to generated DTOs for, e.g:
+You can then execute `npx get-dtos dart` with the URL of the remote ServiceStack Instance you want to generated DTOs for, e.g:
 
 :::sh
-`x dart https://techstacks.io`
+`npx get-dtos dart https://techstacks.io`
 :::
 
 This will generate Dart DTOs for the [entire TechStacks API](https://techstacks.io/metadata):
@@ -30954,12 +30950,12 @@ Then to use `JsonServiceClient` add the `servicestack` dependency to your apps [
 
 Saving `pubspec.yaml` automatically runs [flutter packages get](https://flutter.io/using-packages/) to install any new dependencies in your App. 
 
-Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `x` command-line utility:
+Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `get-dtos` script:
 
 ```bash
 cd lib
-x dart https://techstacks.io
-x dart https://test.servicestack.net test
+npx get-dtos dart https://techstacks.io
+npx get-dtos dart https://test.servicestack.net test
 ```
 
 Which will save the DTOs for each endpoint in different files:
@@ -30969,10 +30965,10 @@ Saved to: dtos.dart
 Saved to: test.dtos.dart
 ```
 
-Incidentally you can get the latest version for all Dart Service References by running `x dart` without arguments:
+Incidentally you can get the latest version for all Dart Service References by running `npx get-dtos dart` without arguments:
 
 :::sh
-x dart
+npx get-dtos dart
 :::
 
 Which updates all Dart references in the current directory, including any customization options available in the header of each file:
