@@ -14,7 +14,7 @@ export default {
                  @click="openLightbox">
                 <img :src="imageUrl" 
                      :alt="imageAlt"
-                     :class="imageClass || 'w-full h-auto block'"
+                     :class="imageClass || 'shadow rounded-md w-full h-auto block'"
                      loading="lazy">
                      
                 <!-- Zoom icon overlay on hover -->

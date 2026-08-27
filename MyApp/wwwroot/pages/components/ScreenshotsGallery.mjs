@@ -2,6 +2,7 @@ export default {
     props: {
         images: Object,
         gridClass: String,
+        imageClass: String,
     },
     template:`
         <div class="not-prose my-8">
@@ -17,7 +18,7 @@ export default {
                         <!-- Image -->
                         <img :src="imageUrl" 
                              :alt="title"
-                             class="w-full h-auto block"
+                             :class="imageClass || 'shadow rounded-md w-full h-auto block'"
                              loading="lazy">
                         
                         <!-- Zoom icon overlay on hover -->
