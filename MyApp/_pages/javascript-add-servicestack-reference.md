@@ -1,6 +1,10 @@
 ---
-title: ES6 Class Add ServiceStack Reference
+title: JavaScript Add ServiceStack Reference
 ---
+
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/javascript-info.webp)
+:::
 
 In addition to [TypeScript](/typescript-add-servicestack-reference) support for generating typed Data Transfer Objects (DTOs), JavaScript is now supported in the form of [JSDoc](https://jsdoc.app) annotated typed ES6 classes that can be referenced natively from [JavaScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
 
@@ -37,9 +41,9 @@ import { Hello } from '/types/mjs'
 
 const client = new JsonServiceClient()
 
-const api = client.api(new Hello({ name:'World' }))
+const api = await client.api(new Hello({ name:'World' }))
 if (api.succeeded) {
-    console.log(api.response)
+    console.log(api.response.result)
 }
 </script>
 ```
@@ -149,6 +153,359 @@ All existing ServiceStack References can later be updated with:
 npx get-dtos mjs
 :::
 
+
+## Calling Typed APIs
+
+The generated ES6 class DTOs are used with the same
+[@servicestack/client](https://www.npmjs.com/package/@servicestack/client) `JsonServiceClient` used in TypeScript
+projects, whose complete feature-set is documented in
+[TypeScript Add ServiceStack Reference](/typescript-add-servicestack-reference). The difference in JavaScript is that
+its types are inferred from the JSDoc annotations in the generated DTOs instead of TypeScript's type system, so you
+get the same intelli-sense and static analysis without generic type parameters or a build step.
+
+### Creating a Service Client
+
+Apps served from the same origin as their APIs can create a client without any arguments:
+
+```js
+import { JsonApiClient } from '@servicestack/client'
+
+const client = JsonApiClient.create()
+```
+
+Which configures the client to send Requests to ServiceStack's
+[JSON /api pre-defined route](/routing#json-api-pre-defined-route) without any JSON HTTP Headers so Browser Requests
+can avoid the additional [CORS preflight request](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflight_requests).
+
+Whilst APIs hosted on a different domain should specify their **BaseUrl**, which also accepts a configuration lambda:
+
+```js
+const client = JsonApiClient.create('https://example.org', c => {
+    c.bearerToken = apiKey
+})
+```
+
+Alternatively all other Apps can use the `JsonServiceClient` constructor:
+
+```js
+import { JsonServiceClient } from '@servicestack/client'
+
+const client = new JsonServiceClient('https://example.org')
+```
+
+Both send Requests to the `/api` route by default, which older ServiceStack instances that only have the
+`/json/reply` pre-defined routes registered can revert to with:
+
+```js
+const client = new JsonServiceClient(baseUrl).useBasePath()
+```
+
+### The api Method
+
+The `api` method returns an `ApiResult` "Value Result" containing either the API's Typed Response or a structured
+API Error in its `error` `ResponseStatus`, letting you handle both success and error responses without `try/catch`:
+
+```js
+const api = await client.api(new Hello({ name }))
+if (api.succeeded) {
+    console.log(api.response.result)
+} else {
+    console.log(`${api.errorCode}: ${api.errorMessage}`)
+}
+```
+
+Where an `ApiResult` provides access to both its Response and any structured Error information:
+
+| Member                     | Description                                                                    |
+|----------------------------|--------------------------------------------------------------------------------|
+| `response`                 | The Response DTO of a successful API Request                                    |
+| `error`                    | The structured `ResponseStatus` of a failed API Request                         |
+| `succeeded`                | `true` when the API returned a Response and no Error                            |
+| `failed`                   | `true` when the API returned an Error                                           |
+| `completed`                | `true` when the API returned either a Response or an Error                      |
+| `errorCode`                | The Error's `errorCode`, e.g. `NotFound`                                        |
+| `errorMessage`             | The Error's summary error message                                               |
+| `errors`                   | The collection of `ResponseError` field validation errors                       |
+| `fieldError(name)`         | The `ResponseError` for the specified field, if any (case-insensitive)          |
+| `fieldErrorMessage(name)`  | The error message for the specified field, if any                               |
+| `hasFieldError(name)`      | Whether the specified field has an error                                        |
+| `showSummary(except)`      | Whether to show the summary message, excluding fields displaying their own error |
+| `summaryMessage(except)`   | The summary error message to display, excluding the specified fields            |
+
+APIs annotated with `IReturnVoid` should use `apiVoid`, which returns an `ApiResult` with an `EmptyResponse`:
+
+```js
+const api = await client.apiVoid(new DeleteContact({ id }))
+if (api.failed) console.log(api.errorMessage)
+```
+
+Both accept optional `args` for sending additional QueryString arguments and a `method` to override the HTTP Method
+the Request is sent with:
+
+```js
+const api = await client.api(new Hello({ name }), null, 'GET')
+```
+
+Alternatively the `get`, `post`, `put`, `patch`, `delete` and `send` methods return the Response DTO directly and
+throw an `ErrorResponse` on failure:
+
+```js
+try {
+    const r = await client.post(new Hello({ name }))
+    console.log(r.result)
+} catch (e) {
+    console.log(e.responseStatus.message)
+}
+```
+
+### Binding Validation Errors to HTML
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field validation
+error in `errors`, with the first error also captured in the summary `errorCode` and `errorMessage`, which UIs can
+bind to individual inputs with `fieldError()`, `fieldErrorMessage()` and `hasFieldError()`:
+
+```html
+<form>
+    <input type="text" id="email">
+    <div id="emailError" class="text-red-500"></div>
+    <div id="summaryError" class="text-red-500"></div>
+    <button type="submit">Submit</button>
+</form>
+
+<script type="module">
+import { JsonApiClient, $1, on } from '@servicestack/client'
+import { CreateContact } from '/types/mjs'
+
+const client = JsonApiClient.create()
+
+on('form', {
+    async submit(e) {
+        e.preventDefault()
+
+        const api = await client.api(new CreateContact({ email: $1('#email').value }))
+
+        $1('#emailError').innerHTML = api.fieldErrorMessage('email') ?? ''
+        $1('#summaryError').innerHTML = api.showSummary(['email'])
+            ? api.summaryMessage(['email'])
+            : ''
+    }
+})
+</script>
+```
+
+Where `summaryMessage()` displays the summary error message only for errors that aren't already being displayed next
+to their own field inputs.
+
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a `QueryResponse` containing the `results` matching the query and the `total`
+number of matching results, where filters for properties not explicitly defined on the Request DTO can be sent as
+additional untyped `args`:
+
+```js
+// GET /api/FindTechnologies?take=3&orderBy=-viewCount&nameStartsWith=Am
+const api = await client.api(new FindTechnologies({ take:3, orderBy:'-viewCount' }), {
+    nameStartsWith: 'Am'
+})
+
+console.log(api.response.total)
+console.log(api.response.results.map(x => x.name).join(', '))
+```
+
+### Uploading Files
+
+HTML Forms can be submitted with their typed Request DTO using `apiForm` which benefits from
+[FormData's](https://developer.mozilla.org/en-US/docs/Web/API/FormData) native integration in browsers where it can be
+populated directly from an HTML Form:
+
+```js
+const api = await client.apiForm(new CreateContact(), new FormData(document.forms[0]))
+```
+
+Or by constructing the `FormData` programmatically:
+
+```js
+const formData = new FormData()
+formData.append('avatar', fileInput.files[0])
+
+const api = await client.apiForm(new CreateContact({ name }), formData)
+```
+
+Where `apiFormVoid` can be used for `IReturnVoid` API Requests.
+
+### Batched Requests
+
+Multiple Request DTOs of the same Type can be sent together in a single Request with `sendAll` which returns all
+their Responses:
+
+```js
+const requests = ["foo","bar","baz"].map(name => new Hello({ name }))
+
+// POST /api/Hello[]
+const responses = await client.sendAll(requests)
+
+console.log(responses.map(x => x.result).join(', '))
+// Hello, foo!, Hello, bar!, Hello, baz!
+```
+
+Or `sendAllOneWay` to send Requests you want to ignore the Responses of, whilst individual Requests can be sent to the
+one-way endpoint with `publish`:
+
+```js
+await client.sendAllOneWay(requests)
+
+await client.publish(new HelloReturnVoid({ id:1 }))
+```
+
+### Authentication
+
+Apps using [API Keys](/auth/api-key-authprovider) or [JWT](/auth/jwt-authprovider) can populate the client's
+`bearerToken`:
+
+```js
+client.bearerToken = apiKey
+```
+
+Whilst Apps using [Session Cookies](/auth/sessions#cookie-session-ids) can authenticate by sending a populated
+`Authenticate` Request DTO, after which the Browser transparently sends its Session Cookies on subsequent Requests:
+
+```js
+const api = await client.api(new Authenticate({
+    provider: 'credentials',
+    userName,
+    password,
+    rememberMe: true,
+}))
+```
+
+HTTP Basic Auth credentials can be set with:
+
+```js
+client.setCredentials(userName, password)
+```
+
+### Client Configuration and Filters
+
+Custom Headers can be added to all Requests by populating the client's
+[Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) collection, whilst its Request, Response,
+Exception and URL filters let you decorate clients with generic functionality:
+
+```js
+client.headers.set('X-Custom','Value')
+
+client.requestFilter = req => console.log(`${req.method} ${req.url}`)
+client.responseFilter = res => console.log(res.status, res.headers.get('X-Args'))
+client.exceptionFilter = (res,error) => console.log('ERROR:', error.responseStatus.message)
+client.urlFilter = url => console.log('URL:', url)
+
+// Static filters apply to all clients
+JsonServiceClient.globalRequestFilter = req => req.headers.set('X-Custom','Value')
+JsonServiceClient.globalResponseFilter = res => console.log(res.status)
+```
+
+Where `requestFilter` is passed the W3C [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+`RequestInit` extended with the `url` the Request will be sent to, letting you modify a Request before it's sent:
+
+```js
+client.requestFilter = req => req.url += "?jsconfig=EmitCamelCaseNames:false"
+```
+
+## DOM Utils
+
+As `@servicestack/client` is already loaded in no-build-step Apps, it also includes a number of dependency-free DOM
+utils that reduce the need for additional JavaScript libraries.
+
+### Selectors and Event Handlers
+
+`$1` returns the first matching element and `$$` returns an Array of all matching elements, whilst `on` registers
+event handlers on every matching element (where `this` is bound to the element the handler is registered on):
+
+```js
+import { $1, $$, on } from '@servicestack/client'
+
+$1('#result').innerHTML = api.response.result
+$$('.btn').forEach(el => el.classList.add('btn-primary'))
+
+on('#txtName', {
+    keyup(e) {
+        console.log(e.target.value)
+    }
+})
+```
+
+Alternatively `bindHandlers` uses declarative `data-{event}` attributes to invoke named handlers, letting you register
+all your page's behavior in a single call:
+
+```html
+<input type="text" data-keyup="sayHello">
+<button data-click="reset">Reset</button>
+```
+
+```js
+import { bindHandlers } from '@servicestack/client'
+
+bindHandlers({
+    async sayHello(e) {
+        const api = await client.api(new Hello({ name: e.target.value }))
+        $1('#result').innerHTML = api.response.result
+    },
+    reset() {
+        $1('#result').innerHTML = ''
+    }
+})
+```
+
+Handlers can also be invoked with arguments using a `handler:arg1,arg2` syntax, e.g `data-click="setColor:red"`.
+
+### Creating Elements and Loading Scripts
+
+```js
+import { createElement, addScript, delaySet } from '@servicestack/client'
+
+const el = createElement('div', {
+    attrs: { className:'alert', id:'alert' },
+    events: { click: () => el.remove() },
+})
+document.body.appendChild(el)
+```
+
+Where `attrs` accepts the `className` and `htmlFor` aliases and `events` registers event handlers on the new element,
+which can also be inserted into the DOM directly with the `insertAfter` option.
+
+Scripts can be lazily loaded on-demand with `addScript` which resolves after the script has loaded:
+
+```js
+await addScript('/js/analytics.js')
+```
+
+Where `delaySet` is useful for avoiding flickering loading indicators for fast API calls by only showing them if the
+Request takes longer than **300ms**:
+
+```js
+const done = delaySet(loading => $1('#spinner').style.display = loading ? 'block' : 'none')
+const api = await client.api(new Hello({ name }))
+done()
+```
+
+### Form Utils
+
+```js
+import { serializeToObject, serializeToUrlEncoded, serializeToFormData, populateForm } from '@servicestack/client'
+
+const form = document.forms[0]
+
+serializeToObject(form)      // { name:'World', title:'Dr' }
+serializeToUrlEncoded(form)  // name=World&title=Dr
+serializeToFormData(form)    // FormData
+
+populateForm(form, { name:'World', title:'Dr' })
+```
+
+### Other Utils
+
+The library's remaining utils - URL, String, Date, Object and Serialization utils, the `Inspect` API Response
+visualizers, `JSV`, `StringBuffer` and its Event Bus - are the same in JavaScript as they are in TypeScript and are
+documented in [TypeScript Client Utils](/typescript-add-servicestack-reference#client-utils).
 
 ## DTO Customization Options
 
