@@ -2,12 +2,15 @@
 title: AutoQuery CRUD UI
 ---
 
+<screenshot src="/img/pages/autoquery-schema/autoquery-schema-info.webp"></screenshot>
+
 If your App has [AutoQuery](/autoquery/rdbms) APIs, open `/auto` in any **.NET 8+** ServiceStack App and you already have an admin application: a searchable list of your data models, and behind each one a working CRUD app with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.
 
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+<screenshots-gallery-view grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Searchable data model gallery': '/img/pages/autoquery-schema/auto-gallery.webp',
-    'Populated Booking CRUD grid': '/img/pages/autoquery-schema/booking-grid.webp',
-}"></screenshots-gallery>
+    'Job Applications': '/img/pages/autoquery-schema/auto-job-applications.webp',
+    'Job Application': '/img/pages/autoquery-schema/auto-job-application.webp',
+}"></screenshots-gallery-view>
 
 No frontend project, no generated source files, no scaffolding step. Every action it offers is one the signed-in user is **authorized** to perform, because the page is assembled at runtime from your APIs and the current session.
 
@@ -117,10 +120,12 @@ Query state is kept in the URL, so a filtered view can be bookmarked, refreshed 
 
 That URL is not a screenshot of transient client state - it's a durable link back to the same server-side query.
 
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+<screenshots-gallery-view class="not-prose mb-8" grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Grid filters, ordering and pagination': '/img/pages/autoquery-schema/grid-filters.webp',
-    'Per-model query preferences': '/img/pages/autoquery-schema/query-preferences.webp',
-}"></screenshots-gallery>
+    'Query preferences': '/img/pages/autoquery-schema/query-preferences.webp',
+    'Grid filters dialog': '/img/pages/autoquery-schema/grid-filters-dialog.webp',
+    'Grid filtered results': '/img/pages/autoquery-schema/grid-filters-results.webp',
+}"></screenshots-gallery-view>
 
 ## Schema-driven Create, Edit and Delete
 

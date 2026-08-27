@@ -134,7 +134,7 @@ Once your AutoQuery APIs exist you don't need to build an admin UI for them - op
 
 <screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
     'Searchable data model gallery': '/img/pages/autoquery-schema/auto-gallery.webp',
-    'Populated Booking CRUD grid': '/img/pages/autoquery-schema/booking-grid.webp',
+    'Job Applications': '/img/pages/autoquery-schema/auto-job-applications.webp',
 }"></screenshots-gallery>
 
 There's no frontend project, no generated source files and no scaffolding step. The page is assembled at runtime from your APIs and the current session, so every action it offers is one the signed-in user is **authorized** to perform - a model is only listed when its Query API is accessible, and Create, Edit and Delete controls appear only when the corresponding AutoQuery CRUD APIs exist and are authorized.
