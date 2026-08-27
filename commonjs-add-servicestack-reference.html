@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T08:20:23.6654906Z'>
+    <meta name='date' content='2026-08-27T08:23:52.2464745Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ES3 Common.js Add ServiceStack Reference</title>
@@ -1488,6 +1488,11 @@ mount('#header', Header)
 <p>Unlike TypeScript, JavaScript generated DTOs can be used directly from the browser, removing the need to keep your DTOs in sync with extra tooling by including a direct reference in your HTML Page:</p>
 <pre><code class="language-html">&lt;script src=&quot;/types/js&quot;&gt;&lt;/script&gt;
 </code></pre>
+<h3 id="es3-common.js-typed-apis-without-modules">ES3 Common.js - Typed APIs without modules<a class="header-anchor" href="javascript:;" onclick="location.hash='#es3-common.js-typed-apis-without-modules'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Where <a href="/javascript-add-servicestack-reference">/types/mjs</a> generates modern ES Module DTOs, <strong>/types/js</strong> generates
+downlevel <strong>ES3</strong> Common.js DTOs designed for pages that can't use JavaScript Modules - legacy browsers, <code>file://</code>
+pages, CMS and CRM template systems, embedded WebViews and anywhere <code>&lt;script&gt;</code> tags are the only option. Everything is
+served by <strong>ServiceStack.dll</strong> itself, so a fully typed API client needs no npm, no bundler and no external CDN.</p>
 <p>To make typed API Requests from web pages, you need only include:</p>
 <ul>
 <li><strong>/js/require.js</strong> - containing a simple <code>require()</code> to load <strong>CommonJS</strong> libraries</li>
@@ -1500,15 +1505,273 @@ mount('#header', Header)
 &lt;script src=&quot;/types/js&quot;&gt;&lt;/script&gt;
 
 &lt;script&gt;
-var { JsonServiceClient, Hello } = exports
+var JsonServiceClient = exports.JsonServiceClient, Hello = exports.Hello
 
 var client = new JsonServiceClient()
-client.api(new Hello({ name }))
-    .then(api =&gt; console.log(api.response))
+client.api(new Hello({ name: 'World' }))
+    .then(function (api) {
+        document.getElementById('result').innerHTML = api.response.result
+    })
 &lt;/script&gt;    
 </code></pre>
+<p>Where modern browsers can use the more succinct destructuring and arrow function syntax:</p>
+<pre><code class="language-js">var { JsonServiceClient, Hello } = exports
+
+client.api(new Hello({ name })).then(api =&gt; console.log(api.response))
+</code></pre>
+<h3 id="how-it-works">How it works<a class="header-anchor" href="javascript:;" onclick="location.hash='#how-it-works'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><strong>/js/require.js</strong> is a 4 line shim that creates the global <code>exports</code> and <code>module</code> objects that Common.js modules
+assign their exports to:</p>
+<pre><code class="language-js">let exports = { __esModule:true }, module = { exports:exports }
+function require(name) { 
+    return exports[name] || window[name] 
+}
+</code></pre>
+<p>Both <strong>/js/servicestack-client.js</strong> (whose UMD wrapper detects the <code>module</code> global) and <strong>/types/js</strong> then register
+themselves on that shared <code>exports</code> object - which is why <strong>require.js must be included first</strong>, before the client
+library and your DTOs.</p>
 <p>Using <strong>/types/js</strong> has the same behavior as using <code>dtos.js</code> generated from <code>$ tsc dtos.ts</code> whose outputs are identical, i.e. both containing your API DTOs generated in CommonJS format. It's feasible to simulate the TypeScript compiler's output in this instance as ServiceStack only needs to generate DTO Types and Enums to enable its end-to-end API, and not any other of TypeScript's vast feature set.</p>
-<h3 id="enhanced-dev-time-productivity-with-typescript">Enhanced Dev Time productivity with TypeScript<a class="header-anchor" href="javascript:;" onclick="location.hash='#enhanced-dev-time-productivity-with-typescript'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The generated DTOs are ES3 prototype-based classes with the same partial constructor and type hint methods as their
+TypeScript and ES6 counterparts, e.g. <code>/types/js?IncludeTypes=Hello.*</code> returns:</p>
+<pre><code class="language-js">var HelloResponse = /** @class */ (function () {
+    function HelloResponse(init) {
+        Object.assign(this, init);
+    }
+    return HelloResponse;
+}());
+exports.HelloResponse = HelloResponse;
+var Hello = /** @class */ (function () {
+    function Hello(init) {
+        Object.assign(this, init);
+    }
+    Hello.prototype.getTypeName = function () { return 'Hello'; };
+    Hello.prototype.getMethod = function () { return 'POST'; };
+    Hello.prototype.createResponse = function () { return new HelloResponse(); };
+    return Hello;
+}());
+exports.Hello = Hello;
+</code></pre>
+<p>Where <code>getTypeName()</code>, <code>getMethod()</code> and <code>createResponse()</code> are the type hints the <code>JsonServiceClient</code> uses to send
+each Request to the right URL with the API's preferred HTTP Method.</p>
+<h3 id="runtime-requirements">Runtime Requirements<a class="header-anchor" href="javascript:;" onclick="location.hash='#runtime-requirements'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Whilst the generated DTOs and the UMD <code>@servicestack/client</code> both use downlevel ES3/ES5 syntax, they still rely on
+modern JavaScript built-ins at runtime - <code>fetch</code>, <code>Headers</code>, <code>Promise</code>, <code>FormData</code> and <code>Object.assign</code> - as does
+<code>/js/require.js</code> which uses a <code>let</code> declaration. All are available in every browser released in the last decade, whilst
+genuinely old browsers can add polyfills for them before including the client library:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://unpkg.com/promise-polyfill@8/dist/polyfill.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;https://unpkg.com/whatwg-fetch@3/dist/fetch.umd.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/js/require.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/js/servicestack-client.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;/types/js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h2 id="calling-typed-apis">Calling Typed APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#calling-typed-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Since the same <a href="https://www.npmjs.com/package/@servicestack/client">@servicestack/client</a> library is used, the entire
+client feature-set documented in <a href="/typescript-add-servicestack-reference">TypeScript Add ServiceStack Reference</a> is
+available - the only difference is APIs are called with <code>.then()</code> callbacks instead of <code>async/await</code>, and everything is
+resolved off the global <code>exports</code> object instead of <code>import</code> statements.</p>
+<h3 id="the-api-method">The api Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-api-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>api</code> method resolves an <code>ApiResult</code> containing either the API's Response DTO in <code>response</code> or a structured API
+Error in <code>error</code>, letting you handle both success and error responses in the same callback without <code>.catch()</code>:</p>
+<pre><code class="language-js">client.api(new Hello({ name: 'World' }))
+    .then(function (api) {
+        if (api.succeeded) {
+            console.log(api.response.result)
+        } else {
+            console.log(api.errorCode + ': ' + api.errorMessage)
+        }
+    })
+</code></pre>
+<p>Where an <code>ApiResult</code> provides access to both its Response and any structured Error information:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>response</code></td>
+<td>The Response DTO of a successful API Request</td>
+</tr>
+<tr>
+<td><code>error</code></td>
+<td>The structured <code>ResponseStatus</code> of a failed API Request</td>
+</tr>
+<tr>
+<td><code>succeeded</code></td>
+<td><code>true</code> when the API returned a Response and no Error</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td><code>true</code> when the API returned an Error</td>
+</tr>
+<tr>
+<td><code>completed</code></td>
+<td><code>true</code> when the API returned either a Response or an Error</td>
+</tr>
+<tr>
+<td><code>errorCode</code></td>
+<td>The Error's <code>errorCode</code>, e.g. <code>NotFound</code></td>
+</tr>
+<tr>
+<td><code>errorMessage</code></td>
+<td>The Error's summary error message</td>
+</tr>
+<tr>
+<td><code>errors</code></td>
+<td>The collection of <code>ResponseError</code> field validation errors</td>
+</tr>
+<tr>
+<td><code>fieldError(name)</code></td>
+<td>The <code>ResponseError</code> for the specified field, if any (case-insensitive)</td>
+</tr>
+<tr>
+<td><code>fieldErrorMessage(name)</code></td>
+<td>The error message for the specified field, if any</td>
+</tr>
+<tr>
+<td><code>hasFieldError(name)</code></td>
+<td>Whether the specified field has an error</td>
+</tr>
+<tr>
+<td><code>showSummary(except)</code></td>
+<td>Whether to show the summary message, excluding fields displaying their own error</td>
+</tr>
+<tr>
+<td><code>summaryMessage(except)</code></td>
+<td>The summary error message to display, excluding the specified fields</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>apiVoid</code> for APIs annotated with <code>IReturnVoid</code>, whilst both accept optional <code>args</code> for sending additional
+QueryString arguments and a <code>method</code> to override the HTTP Method the Request is sent with:</p>
+<pre><code class="language-js">client.apiVoid(new DeleteContact({ id: id }))
+    .then(function (api) {
+        if (api.failed) console.log(api.errorMessage)
+    })
+
+client.api(new Hello({ name: name }), null, 'GET')
+</code></pre>
+<h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Alternatively the <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>, <code>delete</code> and <code>send</code> methods resolve the Response DTO directly and
+reject with an <code>ErrorResponse</code> containing the API's structured <code>ResponseStatus</code>:</p>
+<pre><code class="language-js">client.get(new Hello({ name: 'World' }))
+    .then(function (r) {
+        document.getElementById('result').innerHTML = r.result
+    })
+    .catch(function (e) {
+        console.log(e.responseStatus.errorCode, e.responseStatus.message)
+        console.log(e.responseStatus.errors)    // field validation errors
+    })
+</code></pre>
+<p>Field validation errors returned by <a href="/declarative-validation">Declarative Validation</a> or FluentValidation rules can be
+bound to individual inputs with the <code>ApiResult</code> field error methods:</p>
+<pre><code class="language-js">client.api(new CreateContact({ email: email }))
+    .then(function (api) {
+        document.getElementById('emailError').innerHTML = api.fieldErrorMessage('email') || ''
+        document.getElementById('summaryError').innerHTML = api.showSummary(['email'])
+            ? api.summaryMessage(['email'])
+            : ''
+    })
+</code></pre>
+<h3 id="declarative-events">Declarative Events<a class="header-anchor" href="javascript:;" onclick="location.hash='#declarative-events'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Pages can register all their behavior in a single <code>bindHandlers</code> call, where handlers are invoked by elements
+annotated with <code>data-{event}={handler}</code> attributes - which continues working for dynamically added elements without
+needing to rebind event handlers:</p>
+<pre><code class="language-html">&lt;input type=&quot;text&quot; data-keyup=&quot;sayHello&quot;&gt;
+&lt;div id=&quot;result&quot;&gt;&lt;/div&gt;
+</code></pre>
+<pre><code class="language-js">var bindHandlers = exports.bindHandlers
+
+bindHandlers({
+    sayHello: function (e) {
+        client.api(new Hello({ name: e.target.value }))
+            .then(function (api) {
+                document.getElementById('result').innerHTML = api.response.result
+            })
+    }
+})
+</code></pre>
+<p>Which together with <code>bootstrapForm</code> for ajaxifying HTML Forms and binding their validation errors, is covered in more
+detail in <a href="/servicestack-client-umd">Embedded UMD @servicestack/client</a>.</p>
+<h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><a href="/autoquery/">AutoQuery</a> APIs resolve a <code>QueryResponse</code> containing the <code>results</code> matching the query and the <code>total</code>
+number of matching results, where filters for properties not explicitly defined on the Request DTO can be sent as
+additional untyped <code>args</code>:</p>
+<pre><code class="language-js">// GET /api/FindTechnologies?take=3&amp;orderBy=-viewCount&amp;nameStartsWith=Am
+client.api(new FindTechnologies({ take:3, orderBy:'-viewCount' }), { nameStartsWith:'Am' })
+    .then(function (api) {
+        console.log(api.response.total)
+        console.log(api.response.results.map(function (x) { return x.name }).join(', '))
+    })
+</code></pre>
+<h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>HTML Forms can be submitted with their typed Request DTO using <code>apiForm</code>, which benefits from
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/FormData">FormData's</a> native integration in browsers where it can be
+populated directly from an HTML Form:</p>
+<pre><code class="language-js">client.apiForm(new CreateContact(), new FormData(document.forms[0]))
+    .then(function (api) {
+        console.log(api.succeeded)
+    })
+</code></pre>
+<p>Where <code>apiFormVoid</code> can be used for <code>IReturnVoid</code> API Requests.</p>
+<h3 id="batched-requests">Batched Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#batched-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Multiple Request DTOs of the same Type can be sent together in a single Request with <code>sendAll</code> which resolves all
+their Responses:</p>
+<pre><code class="language-js">var requests = [&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;].map(function (name) { return new Hello({ name: name }) })
+
+// POST /api/Hello[]
+client.sendAll(requests)
+    .then(function (responses) {
+        console.log(responses.map(function (x) { return x.result }).join(', '))
+        // Hello, foo!, Hello, bar!, Hello, baz!
+    })
+</code></pre>
+<p>Or <code>sendAllOneWay</code> to send Requests you want to ignore the Responses of, whilst individual Requests can be sent to the
+one-way endpoint with <code>publish</code>.</p>
+<h3 id="authentication">Authentication<a class="header-anchor" href="javascript:;" onclick="location.hash='#authentication'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Apps using <a href="/auth/api-key-authprovider">API Keys</a> or <a href="/auth/jwt-authprovider">JWT</a> can populate the client's
+<code>bearerToken</code>, whilst HTTP Basic Auth credentials can be set with <code>setCredentials</code>:</p>
+<pre><code class="language-js">client.bearerToken = apiKey
+
+client.setCredentials(userName, password)
+</code></pre>
+<p>Whilst Apps using <a href="/auth/sessions#cookie-session-ids">Session Cookies</a> can authenticate by sending a populated
+<code>Authenticate</code> Request DTO, after which the Browser transparently sends its Session Cookies on subsequent Requests:</p>
+<pre><code class="language-js">client.api(new Authenticate({
+    provider: 'credentials',
+    userName: userName,
+    password: password,
+    rememberMe: true
+}))
+</code></pre>
+<h3 id="client-configuration-and-filters">Client Configuration and Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-configuration-and-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Custom Headers can be added to all Requests by populating the client's <code>headers</code> collection, whilst its Request,
+Response, Exception and URL filters let you decorate clients with generic functionality:</p>
+<pre><code class="language-js">client.headers.set('X-Custom','Value')
+
+client.requestFilter = function (req) { console.log(req.method, req.url) }
+client.responseFilter = function (res) { console.log(res.status) }
+client.exceptionFilter = function (res, error) { console.log('ERROR:', error.responseStatus.message) }
+client.urlFilter = function (url) { console.log('URL:', url) }
+</code></pre>
+<p>By default Requests are sent to ServiceStack's <a href="/routing#json-api-pre-defined-route">/api pre-defined route</a>, which
+older ServiceStack instances that only have the <code>/json/reply</code> routes registered can revert to with:</p>
+<pre><code class="language-js">client.basePath = null
+</code></pre>
+<h3 id="other-utils">Other Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#other-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Everything else exported by <code>@servicestack/client</code> is available on the same <code>exports</code> object, including its URL,
+String, Date and Object utils, the <code>Inspect</code> API Response visualizers, <code>JSV</code>, <code>StringBuffer</code> and its Event Bus - all
+of which are documented in <a href="/typescript-add-servicestack-reference#client-utils">TypeScript Client Utils</a>, e.g:</p>
+<pre><code class="language-js">var Inspect = exports.Inspect, humanify = exports.humanify
+
+client.api(new FindTechnologies({ take:10 }))
+    .then(function (api) {
+        Inspect.printDumpTable(api.response.results)
+    })
+</code></pre>
+<h2 id="enhanced-dev-time-productivity-with-typescript">Enhanced Dev Time productivity with TypeScript<a class="header-anchor" href="javascript:;" onclick="location.hash='#enhanced-dev-time-productivity-with-typescript'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Even when no longer using TypeScript DTOs in your Apps, it's still useful to have TypeScript's <code>dtos.ts</code> included in your project (inc. Vanilla JS projects) to serve as optional type annotations enabling rich intelli-sense and static analysis in IDEs that support it, but as it's no longer used at runtime you're free to generate it at optimal times that don't interrupt your dev workflow.</p>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated JavaScript DTO's as-is, however you can further customize how
@@ -1549,12 +1812,21 @@ nativeTypes.MetadataTypesConfig.IgnoreTypesInNamespaces = &quot;test&quot;;
 IncludeTypes: Hello, HelloResponse
 </code></pre>
 <p>Will only generate <code>Hello</code> and <code>HelloResponse</code> DTOs:</p>
-<pre><code class="language-csharp">var HelloResponse = /** @class */ (function () {
-    ...
+<pre><code class="language-js">var HelloResponse = /** @class */ (function () {
+    function HelloResponse(init) {
+        Object.assign(this, init);
+    }
+    return HelloResponse;
 }());
 exports.HelloResponse = HelloResponse;
 var Hello = /** @class */ (function () {
-    ...
+    function Hello(init) {
+        Object.assign(this, init);
+    }
+    Hello.prototype.getTypeName = function () { return 'Hello'; };
+    Hello.prototype.getMethod = function () { return 'POST'; };
+    Hello.prototype.createResponse = function () { return new HelloResponse(); };
+    return Hello;
 }());
 exports.Hello = Hello;
 </code></pre>
@@ -1590,7 +1862,7 @@ ExcludeTypes: GetTechnology,GetTechnologyResponse
 </code></pre>
 <p>Will exclude <code>GetTechnology</code> and <code>GetTechnologyResponse</code> DTOs from being generated.</p>
 <h3 id="cache">Cache<a class="header-anchor" href="javascript:;" onclick="location.hash='#cache'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>When using <code>/types/js</code> directly from a <code>script</code> tag, the server will cache the result by default when not running in <code>HostContext.DebugMode</code>.</p>
+<p>When using <code>/types/js</code> directly from a <code>script</code> tag, the server will cache the result by default when not running in <a href="/debugging#debugmode">DebugMode</a>.</p>
 <p>This caching process can be disabled if required by using <code>?cache=false</code>.</p>
 </div>
 
@@ -1634,6 +1906,72 @@ ExcludeTypes: GetTechnology,GetTechnologyResponse
                                 On This Page
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#calling-typed-apis'" data-id="calling-typed-apis" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Calling Typed APIs
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="the-api-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-api-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            The api Method
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="error-handling" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#error-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Error Handling
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="declarative-events" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#declarative-events'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Declarative Events
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="autoquery-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="uploading-files" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#uploading-files'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Uploading Files
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="batched-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#batched-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Batched Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="authentication" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#authentication'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Authentication
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="client-configuration-and-filters" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#client-configuration-and-filters'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Client Configuration and Filters
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="other-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#other-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Other Utils
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#enhanced-dev-time-productivity-with-typescript'" data-id="enhanced-dev-time-productivity-with-typescript" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Enhanced Dev Time productivity with TypeScript
+                                        </span>
+                                    </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#dto-customization-options'" data-id="dto-customization-options" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             DTO Customization Options
