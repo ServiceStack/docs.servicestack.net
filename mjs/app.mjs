@@ -64,6 +64,7 @@ const Components = {
     ProjectCreator,
     TextBlock,
     VibeTemplate,
+    ScreenshotsGallery,
     ScreenshotsGalleryView,
     Screenshot,
 }
