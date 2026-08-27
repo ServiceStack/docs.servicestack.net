@@ -25476,10 +25476,12 @@ When using `/types/mjs` directly from a `script` tag, the server will cache the 
 This caching process can be disabled if required by using **?cache=false**.
 
 
-# Python Add ServiceStack Reference
+# Python ServiceStack Reference
 Source: https://docs.servicestack.net/python-add-servicestack-reference
 
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
 ![ServiceStack and Python Banner](./img/pages/servicestack-reference/python-reference.png)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PyCharm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -25500,7 +25502,7 @@ That makes it a natural fit for the parts of an organization that live outside t
 
 ### First class development experience
 
-[Python](https://python.org) is one of the worlds most popular programming languages thanks to its ease of use and comprehensive libraries which sees it excels in many industries from education where it's often the first language taught in school to data science, machine learning and AI where it's often the dominant language used. To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports Python as a 1st class Add ServiceStack Reference supported language which gives Python developers an end-to-end typed API for consuming ServiceStack APIs, complete with IDE integration in [PyCharm](https://www.jetbrains.com/pycharm/) as well as [built-in support in x dotnet tool](/dotnet-tool#addupdate-servicestack-references) to generate Python DTOs for a remote ServiceStack instance from a single command-line.
+[Python](https://python.org) is one of the worlds most popular programming languages thanks to its ease of use and comprehensive libraries which sees it excels in many industries from education where it's often the first language taught in school to data science, machine learning and AI where it's often the dominant language used. To maximize the experience for calling ServiceStack APIs within these environments ServiceStack now supports Python as a 1st class Add ServiceStack Reference supported language which gives Python developers an end-to-end typed API for consuming ServiceStack APIs, complete with IDE integration in [PyCharm](https://www.jetbrains.com/pycharm/) as well as [built-in support in the get-dtos script](/npx-get-dtos) to generate Python DTOs for a remote ServiceStack instance from a single command-line.
 
 ### Ideal idiomatic Typed Message-based API
 
@@ -25636,22 +25638,20 @@ If any of the the remote APIs change their DTOs can be updated by right-clicking
 
 ### Simple command-line utility for Python
 
-Developers using other Python IDEs and Text Editors like VS Code can utilize the cross-platform [`x` command line utility](/dotnet-tool) for generating Python DTOs from the command-line.
-
-To install first install the [latest .NET SDK](https://dotnet.microsoft.com/download) for your OS then install the [`x` dotnet tool](/dotnet-tool) with:
+Developers using other Python IDEs and Text Editors like VS Code can generate Python DTOs from the command-line with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x 
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a Python ServiceStack Reference just call `x python` with the URL of a remote ServiceStack instance:
+To Add a Python ServiceStack Reference just call `npx get-dtos python` with the URL of a remote ServiceStack instance:
 
 :::sh
-x python https://techstacks.io
+npx get-dtos python https://techstacks.io
 :::
 
 Result:
@@ -25660,10 +25660,10 @@ Result:
 Saved to: dtos.py
 ```
 
-Calling `x python` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos python` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-x python https://techstacks.io Tech
+npx get-dtos python https://techstacks.io Tech
 :::
 
 Result:
@@ -25674,10 +25674,10 @@ Saved to: Tech.dtos.py
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x python` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos python` with the Filename:
 
 :::sh
-x python dtos.py
+npx get-dtos python dtos.py
 :::
 
 Result:
@@ -25690,10 +25690,10 @@ Which will update the File with the latest Python Server DTOs from [techstacks.i
 
 ### Updating all Python DTOs
 
-Calling `x python` without any arguments will update all Python DTOs in the current directory:
+Calling `npx get-dtos python` without any arguments will update all Python DTOs in the current directory:
 
 :::sh
-x python
+npx get-dtos python
 :::
 
 Result:
@@ -25736,7 +25736,10 @@ class JsonServiceClient:
 
     def __init__(self, base_url)
 
+    def set_base_path(self, base_path: str = '')
     def set_credentials(self, username, password)
+    def set_bearer_token(self, bearer_token: str)
+    def set_refresh_token(self, refresh_token: str)
     @property def token_cookie(self)
     @property def refresh_token_cookie(self)
 
@@ -25758,6 +25761,10 @@ class JsonServiceClient:
     def patch_url(self, path: str, body: Any = None, response_as: Type = None, args: Dict[str, Any] = None)
     def send_url(self, path: str, method: str = None, response_as: Type = None, body: Any = None,
                  args: Dict[str, Any] = None)
+
+    def post_file_with_request(self, request: IReturn[T], file: UploadFile) -> T
+    def post_files_with_request(self, request: IReturn[T], files: List[UploadFile]) -> T
+    def post_files_with_request_url(self, request_uri: str, request: Any, files: List[UploadFile]) -> T
 
     def send_all(self, request_dtos: List[IReturn[T]])  # Auto Batch Reply Requests
     def send_all_oneway(self, request_dtos: list)       # Auto Batch Oneway Requests
@@ -25921,6 +25928,48 @@ print(f"{tech.name} by {tech.vendor_name} ({tech.product_url})")
 print(f"`{tech.name} TechStacks: {r.technology_stacks}")
 ```
 
+### Resolving the HTTP Method
+
+`send` uses the HTTP Method its API is annotated with, which generated DTOs inherit from their `IGet`, `IPost`,
+`IPut`, `IPatch`, `IDelete` and `IOptions` interface markers:
+
+```python
+# @Route("/technology/{Slug}")
+class GetTechnology(IReturn[GetTechnologyResponse], IGet):
+    slug: Optional[str] = None
+
+# GET /api/GetTechnology?slug=ServiceStack
+r: GetTechnologyResponse = client.send(GetTechnology(slug="ServiceStack"))
+```
+
+Request DTOs that aren't annotated with a Verb default to `POST`, which can be overridden per Request by using the
+explicit `get`, `post`, `put`, `patch`, `delete`, `head` and `options` methods:
+
+```python
+client.get(SendReturnVoid(id=1))     # GET
+client.post(SendReturnVoid(id=2))    # POST
+client.put(SendReturnVoid(id=3))     # PUT
+client.delete(SendReturnVoid(id=4))  # DELETE
+```
+
+The HTTP Method also determines whether a Request DTO's populated properties are sent in the QueryString or the
+JSON Request Body, where only `GET`, `DELETE`, `HEAD` and `OPTIONS` Requests send their properties in the QueryString.
+
+APIs that don't return a Response Body implement `IReturnVoid` and can be sent with any of the client's methods:
+
+```python
+client.post(HelloReturnVoid(id=1))
+```
+
+Use `resolve_httpmethod` to resolve what HTTP Method a Request DTO will be sent with:
+
+```python
+from servicestack import resolve_httpmethod
+
+resolve_httpmethod(SendGet())   # GET
+resolve_httpmethod(SendPost())  # POST
+```
+
 ### Constructors Initializer
 
 All Python Reference dataclass DTOs also implements **__init__** making them much nicer to populate using a constructor expression with named params syntax we're used to in C#, so instead of:
@@ -25942,6 +25991,37 @@ response = client.post(Authenticate(
     user_name=user_name,
     password=password,
     remember_me=remember_me))
+```
+
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a typed `QueryResponse[T]` with the query params of their base types
+flattened into the Request DTO, so `skip`, `take`, `order_by`, `order_by_desc`, `include` and `fields` can be
+populated in the same constructor expression:
+
+```python
+from servicestack import JsonServiceClient, QueryResponse
+from .dtos import *
+
+client = JsonServiceClient("https://techstacks.io")
+
+response: QueryResponse[TechnologyView] = client.get(FindTechnologies(
+    ids=[1, 2, 3],
+    vendor_name="Google",
+    take=5,
+    order_by_desc="viewCount",
+    fields='id,name,vendorName,viewCount,favCount'))
+
+for tech in response.results:  # typed to TechnologyView
+    print(f"{tech.id} {tech.name} ({tech.view_count})")
+```
+
+Which can also be called with a custom URL by specifying the generic Response Type in `response_as`:
+
+```python
+args = {"Take": 3, "VendorName": "Amazon"}
+response = client.get_url("/technology/search", args=args,
+                          response_as=QueryResponse[TechnologyView])
 ```
 
 ### Sending additional arguments with Typed API Requests
@@ -25991,6 +26071,111 @@ Which can then be accessed as normal, with their Response typed to a JavaScript 
 str:str = client.get(ReturnString())
 
 data:bytes = client.get(ReturnBytes())
+```
+
+### Batched Requests
+
+Multiple Request DTOs of the same Type can be sent together in a single Request with `send_all` which returns
+all their Responses:
+
+```python
+requests = [Hello(name=name) for name in ["foo", "bar", "baz"]]
+
+responses = client.send_all(requests)  # POST /api/Hello[]
+
+print([r.result for r in responses])
+# ['Hello, foo!', 'Hello, bar!', 'Hello, baz!']
+```
+
+Or use `send_all_oneway` to send Requests you want to ignore the Responses of:
+
+```python
+client.send_all_oneway(requests)
+```
+
+::: info
+Auto Batched Requests use `list[T]` generics which requires **Python 3.9+**
+:::
+
+### Sending Raw Request Bodies
+
+APIs that accept a custom Request Body can be sent by populating the `body` param, where the Request DTO's
+properties are sent in the QueryString and the `body` is sent as the Request Body:
+
+```python
+from servicestack import to_json
+
+# POST /api/SendJson?id=1&name=name {"foo":"bar"}
+json_str = client.post(SendJson(id=1, name="name"), body=to_json({"foo": "bar"}))
+
+# POST /api/SendText?id=1&name=name foo
+text = client.post(SendText(id=1, name="name", content_type="text/plain"), body="foo")
+```
+
+A `str` body is sent as-is whilst any other value is serialized to JSON.
+
+### Error Handling
+
+Failed API Requests raise a `WebServiceException` containing the HTTP Status Code and the API's structured
+[ResponseStatus](/error-handling) error:
+
+```python
+from servicestack import WebServiceException
+
+try:
+    client.put(ThrowType(type="NotFound", message="not here"))
+except WebServiceException as e:
+    print(e.status_code)                  # 404
+    print(e.response_status.error_code)   # NotFound
+    print(e.response_status.message)      # not here
+```
+
+| Property             | Description                                                                                     |
+|----------------------|-------------------------------------------------------------------------------------------------|
+| `status_code`        | HTTP Status Code of the error Response, e.g. `400`                                               |
+| `status_description` | HTTP Status Description, e.g. `"Bad Request"`                                                    |
+| `response_status`    | The API's structured `ResponseStatus` with its `error_code`, `message` and field `errors`        |
+| `inner_exception`    | The underlying Exception the error was created from                                              |
+| `type`               | `WebServiceExceptionType.REFRESH_TOKEN_EXCEPTION` for Refresh Token errors, otherwise `DEFAULT`  |
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field
+validation error in `errors`, with the first error also captured in the summary `error_code` and `message`:
+
+```python
+try:
+    client.post(ThrowValidation(email="invalidemail"))
+except WebServiceException as e:
+    status = e.response_status
+
+    print(status.error_code)  # InclusiveBetween
+    print(status.message)     # 'Age' must be between 1 and 120. You entered 0.
+
+    for error in status.errors:
+        print(f"{error.field_name}: {error.error_code} {error.message}")
+    # Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+    # Required: NotEmpty 'Required' must not be empty.
+    # Email: Email 'Email' is not a valid email address.
+```
+
+Requests failing before reaching the Server, e.g. connection errors, are also raised as a `WebServiceException`
+with a `500` Status Code and the underlying error in `status_description`:
+
+```python
+client = JsonServiceClient("http://unknown-zzz.net")
+try:
+    client.get(Hello(name="World"))
+except WebServiceException as e:
+    print(e.status_code)         # 500
+    print(e.status_description)  # Max retries exceeded with url...
+```
+
+Whilst Requests to APIs requiring Authentication that the client wasn't able to authenticate with raise a `401`:
+
+```python
+try:
+    client.post(RequiresAdmin())
+except WebServiceException as e:
+    print(e.status_code)  # 401
 ```
 
 ### Authenticating using Basic Auth
@@ -26094,21 +26279,370 @@ client.refresh_token = refresh_token
 client.refresh_token_uri = AUTH_URL + "/access-token"
 ```
 
+### Built-in ServiceStack DTOs
+
+The `servicestack` package includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them
+without needing to generate them:
+
+```python
+from servicestack import Authenticate, AuthenticateResponse, AssignRoles, UnAssignRoles, \
+    ConvertSessionToToken, ConvertSessionToTokenResponse, GetAccessToken, GetAccessTokenResponse
+
+# Authentication
+auth: AuthenticateResponse = client.post(Authenticate(
+    provider="credentials", user_name="test", password="test", remember_me=True))
+
+# JWT
+token: ConvertSessionToTokenResponse = client.post(ConvertSessionToToken())  # Session -> JWT
+access: GetAccessTokenResponse = client.post(GetAccessToken(refresh_token=refresh_token))
+
+# Roles and Permissions
+client.post(AssignRoles(user_name="user", roles=["Employee"]))
+client.post(UnAssignRoles(user_name="user", roles=["Employee"]))
+```
+
+Together with the built-in Response Types, interface markers and base types that generated DTOs reference:
+
+| Type                                                             | Description                                                       |
+|------------------------------------------------------------------|-------------------------------------------------------------------|
+| `ResponseStatus`                                                 | ServiceStack's structured error response                           |
+| `ResponseError`                                                  | An individual field validation error                               |
+| `EmptyResponse`                                                  | Response of APIs that don't return a Response Body                 |
+| `IdResponse`                                                     | Response returning the Id of the created or updated entity         |
+| `StringResponse` / `StringsResponse`                             | Response returning a single `result` string or list of `results`   |
+| `QueryResponse[T]`                                               | Typed Response of [AutoQuery](/autoquery/) Requests                |
+| `QueryDb[T]`, `QueryDb2[From,Into]`, `QueryData[T]`              | Base types of generated AutoQuery Request DTOs                     |
+| `IGet` `IPost` `IPut` `IPatch` `IDelete` `IOptions`              | Interface markers resolving a Request DTO's HTTP Method            |
+| `IReturn[T]` / `IReturnVoid`                                     | Interface markers resolving a Request DTO's Response Type          |
+| `ICreateDb[T]` `IUpdateDb[T]` `IPatchDb[T]` `IDeleteDb[T]`       | Interface markers of [AutoQuery CRUD](/autoquery/crud) APIs        |
+| `IHasSessionId` / `IHasBearerToken` / `IHasVersion`              | Interface markers for Requests carrying auth and versioning info   |
+| `AuditBase`                                                      | Base type of Tables with [Audit](/autoquery/audit-log) fields      |
+| `KeyValuePair[K,V]`                                              | .NET's `KeyValuePair<K,V>`                                         |
+| `UploadFile`                                                     | A file uploaded in a `multipart/form-data` Request                 |
+| `WebServiceException`                                            | Structured error details of a failed Request                       |
+
+As well as the DTOs for querying and managing [Background Jobs](/background-jobs), e.g. `BackgroundJob`,
+`JobSummary`, `BackgroundJobOptions`, `ScheduledTask`, `CompletedJob`, `FailedJob`, `BackgroundJobState`,
+`JobStatSummary`, `HourSummary` and `WorkerStats`.
+
 ### Uploading Files
 
-The `post_file_with_request` method can be used to upload a file with an API Request.
+Use `post_file_with_request` to upload a file with an API Request, where the Request DTO's populated properties
+are sent as form fields alongside the file in a `multipart/form-data` Request:
+
+```python
+from servicestack import UploadFile
+
+with open("files/test_image.png", "rb") as image:
+    response = client.post_file_with_request(
+        request=TestUploadWithDto(int_=1, string="string", poco_list=[Poco(name="poco")]),
+        file=UploadFile(
+            field_name="image",
+            file_name="test_image.png",
+            content_type="image/png",
+            stream=image))
+```
+
+Complex Request DTO properties like Lists, Dictionaries and nested POCOs are serialized using the
+[JSV Format](/jsv-format) so they can be sent as form fields in the same Request.
+
+`content_type` is optional where it's otherwise inferred from the file name, defaulting to
+`application/octet-stream`:
+
+```python
+UploadFile(field_name="image", file_name="test_image.png", stream=image)
+```
+
+Use `post_files_with_request` to upload multiple files:
+
+```python
+with open("a.png", "rb") as a, open("b.png", "rb") as b:
+    response = client.post_files_with_request(UploadPhotos(album="Holiday"), [
+        UploadFile(field_name="file1", file_name="a.png", stream=a),
+        UploadFile(field_name="file2", file_name="b.png", stream=b),
+    ])
+```
+
+Or `post_files_with_request_url` to upload files to a custom relative or absolute URL:
+
+```python
+response = client.post_files_with_request_url("/api/UploadPhotos", UploadPhotos(album="Holiday"), files)
+```
+
+::: info
+All file streams are closed after the Request is sent
+:::
 
 ### Python Speech to Text
 
 Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
 
 ```python
+client = JsonServiceClient(AI_SERVER_URL)
+client.set_bearer_token(AI_SERVER_API_KEY)
+
 with open("files/audio.wav", "rb") as audio:
-  response = client.post_file_with_request(SpeechToText(), 
-    UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+    response: GenerationResponse = client.post_file_with_request(SpeechToText(),
+        UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
+
+print(response.text_outputs[0].text)
 ```
 
-To upload multiple files use `post_files_with_request`.
+Which can be used to call any of [AI Server's](/ai-server/) APIs that accept file uploads, e.g:
+
+```python
+request = ImageToImage(model="sdxl-lightning",
+                       positive_prompt="A beautiful landscape painting",
+                       negative_prompt="A pixelated image")
+
+with open("files/test_image.png", "rb") as image:
+    response: GenerationResponse = client.post_file_with_request(request,
+        UploadFile(field_name="image", file_name="test_image.png",
+                   content_type="image/png", stream=image))
+
+print(response.outputs[0].url)
+```
+
+### Client Configuration
+
+`JsonServiceClient` sends Requests to ServiceStack's pre-defined `/api` route, use `set_base_path` to change
+the base path Requests are sent to, e.g. for older ServiceStack instances that only have the pre-defined
+`/json/reply` routes enabled:
+
+```python
+client.set_base_path("")          # /json/reply/{Request} and /json/oneway/{Request}
+client.set_base_path("api")       # /api/{Request} (default)
+```
+
+Custom headers can be added to all Requests by populating `headers`, whilst `set_credentials`,
+`set_bearer_token` and `set_refresh_token` are chainable to allow configuring a client in a single expression:
+
+```python
+client = JsonServiceClient(BASE_URL)
+client.headers["X-Custom"] = "Value"
+client.set_bearer_token(api_key)
+```
+
+As the client maintains its Cookies in a `requests.Session`, use a separate client instance where you need to
+maintain different Authenticated Sessions.
+
+### Request, Response and Exception Filters
+
+Clients can be decorated with generic functionality using instance and static Request, Response and Exception
+filters, useful for logging, adding headers or inspecting Responses:
+
+```python
+# Instance filters only apply to this client
+client.request_filter = lambda info: print(f"{info.method} {info.url}")
+client.response_filter = lambda res: print(f"{res.status_code} {res.headers}")
+client.exception_filter = lambda res, e: print(f"ERROR: {e}")
+
+# Static filters apply to all clients
+JsonServiceClient.global_request_filter = lambda info: log_request(info)
+JsonServiceClient.global_response_filter = lambda res: log_response(res)
+JsonServiceClient.global_exception_filter = lambda res, e: log_error(res, e)
+```
+
+Instance filters are invoked before global filters, where the `SendContext` passed to Request filters lets you
+inspect and modify the Request before it's sent:
+
+| Property      | Description                                                            |
+|---------------|------------------------------------------------------------------------|
+| `method`      | HTTP Method the Request is sent with                                    |
+| `url`         | Absolute URL the Request is sent to, including its QueryString          |
+| `headers`     | The Request Headers, a copy of the client's `headers`                   |
+| `request`     | The Request DTO being sent                                              |
+| `body`        | Custom Request Body, when sent                                          |
+| `args`        | Additional untyped arguments sent with the Request                      |
+| `response_as` | The Type the Response will be deserialized into                          |
+
+Whilst Response filters are passed the `requests.Response` the API returned, e.g. to inspect its Headers:
+
+```python
+client.response_filter = lambda res: print(res.headers["X-AutoBatch-Completed"])
+```
+
+### Complex Type Support
+
+Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists,
+Arrays, Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent
+Python types:
+
+```python
+request = AllCollectionTypes(
+    int_array=[1, 2, 3],
+    int_list=[1, 2, 3],
+    string_array=["A", "B", "C"],
+    string_list=["D", "E", "F"],
+    byte_array=b"ABC",  # sent as base64
+    poco_array=[Poco(name="poco")],
+    poco_lookup={"A": [Poco(name="B"), Poco(name="C")]},
+    poco_lookup_map={"A": [{"B": Poco(name="C"), "D": Poco(name="E")}]})
+```
+
+.NET's built-in Types are mapped to their closest Python equivalent, where their different serialization
+formats are transparently converted to and from native Python types:
+
+| .NET Type                            | Python Type                    | Serialized as                    |
+|--------------------------------------|--------------------------------|----------------------------------|
+| `string`                             | `str`                          | `"string"`                       |
+| `bool`                               | `bool`                         | `true`                           |
+| `int` `long` `short` `byte` `uint`   | `int`                          | `1`                              |
+| `float` `double`                     | `float`                        | `1.1`                            |
+| `decimal`                            | `decimal.Decimal`              | `3.0`                            |
+| `DateTime` / `DateTimeOffset`        | `datetime.datetime`            | `"/Date(978307200000)/"`         |
+| `TimeSpan`                           | `datetime.timedelta`           | `"PT1H"`                         |
+| `Guid`                               | `str`                          | `"ea762009b66c410b9bf5ce21ad519249"` |
+| `byte[]` / `Stream`                  | `bytes`                        | base64 encoded `str`             |
+| `List<T>` / `T[]`                    | `List[T]`                      | `[1,2,3]`                        |
+| `Dictionary<K,V>`                    | `Dict[K,V]`                    | `{"A":"B"}`                      |
+
+Properties that clash with a Python keyword or built-in are generated with a `_` suffix which are mapped back
+to their original name on the wire, e.g. `int_` is sent as `int`:
+
+```python
+response: EchoTypes = client.post(EchoTypes(int_=1, string="foo"))
+```
+
+### Enum Support
+
+C# `enum` Types are generated as Python `str, Enum` types whose values are sent as strings, using their
+`[EnumMember]` value where they have one, whilst `[Flags]` enums and enums annotated with `[EnumAsInt]` are
+generated as an `IntEnum` which are sent as their integer values:
+
+```python
+class TechnologyTier(str, Enum):
+    PROGRAMMING_LANGUAGE = 'ProgrammingLanguage'
+    CLIENT = 'Client'
+
+# @Flags()
+class EnumFlags(IntEnum):
+    VALUE1 = 1
+    VALUE2 = 2
+    VALUE3 = 4
+```
+
+Which can be populated in Request DTOs as well as in Lists and Dictionaries of enums, where they're serialized
+in the format the Server expects:
+
+```python
+client.get(HelloWithEnum(
+    enum_prop=EnumType.VALUE2,          # ?enumProp=Value2
+    enum_flags=EnumFlags.VALUE1,        # &enumFlags=1
+    enum_style=EnumStyle.UPPER))        # &enumStyle=UPPER
+
+client.get(HelloWithEnumList(
+    enum_flags=[EnumFlags.VALUE1, EnumFlags.VALUE2],  # ?enumFlags=[1,2]
+    enum_style=[EnumStyle.LOWER, EnumStyle.UPPER]))   # &enumStyle=[lower,UPPER]
+```
+
+### QueryString Serialization
+
+Request DTO properties sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex
+types, which `qsvalue` can be used to inspect:
+
+```python
+from servicestack import qsvalue
+
+qsvalue("A")                # "A"
+qsvalue(1)                  # "1"
+qsvalue(True)               # "true"
+qsvalue(b"Python")          # "UHl0aG9u"  (base64)
+qsvalue([1, 2, 3])          # "[1,2,3]"
+qsvalue(EnumStyle.UPPER)    # "UPPER"
+```
+
+Names and values are URL encoded whilst `None` properties are omitted from the QueryString so the Server can
+apply its own defaults, `False` and `0` are sent as-is:
+
+```python
+# /api/HelloTypes?bool=false&int=0
+client.get(HelloTypes(bool_=False, int_=0))
+```
+
+### Serialization Utils
+
+The same utils the client uses to serialize DTOs are also exported for use in your own integrations:
+
+```python
+from servicestack import to_json, from_json, convert, to_dict, to_jsv_data
+
+to_json(Hello(name="A"))                   # '{"name": "A"}'
+to_json([Hello(name="A"), Hello(name="B")])
+to_json({'a': Hello(name="A")})
+
+from_json(HelloResponse, '{"result":"Hello, World!"}')  # HelloResponse DTO
+convert(HelloResponse, {"result": "Hello, World!"})     # from a JSON object
+
+to_dict(Hello(name="A"))                   # {'name': 'A'}
+to_jsv_data(Hello(name="A"))               # JSV encoded form fields
+```
+
+`to_dict` accepts a `key_case` to convert property names into a different naming convention, e.g. to display
+API Responses with .NET's PascalCase property names:
+
+```python
+from servicestack import to_dict, titlecase, camelcase, pascalcase, snakecase
+
+to_dict(response.results, key_case=titlecase)
+```
+
+### JWT Utils
+
+Use `inspect_jwt` to decode a JWT's header, payload and expiry date, useful for inspecting the JWT Tokens and
+Session Cookies used to authenticate Requests:
+
+```python
+from servicestack import inspect_jwt
+
+head, body, expiry = inspect_jwt(client.token_cookie)
+print(body['sub'], expiry)
+```
+
+### String Utils
+
+The client's string utils for converting between different naming conventions and parsing strings are also
+exported for reuse:
+
+```python
+from servicestack import snakecase, camelcase, pascalcase, titlecase, \
+    left_part, right_part, last_left_part, last_right_part, split_on_first, split_on_last
+
+snakecase("vendorName")     # vendor_name
+camelcase("vendor_name")    # vendorName
+pascalcase("vendor_name")   # VendorName
+titlecase("vendor_name")    # Vendor Name
+
+left_part("user@email.com", "@")   # user
+right_part("user@email.com", "@")  # email.com
+```
+
+### Testing
+
+As `JsonServiceClient` accepts any Base URL, APIs can be tested against a local instance of your App or a
+remote ServiceStack instance without needing to mock the client itself, which is how the client's own
+[test suite](https://github.com/ServiceStack/servicestack-python/tree/main/tests) verifies its Requests
+against the live [test.servicestack.net](https://test.servicestack.net) Services:
+
+```python
+import unittest
+from servicestack import JsonServiceClient
+from .dtos import *
+
+client = JsonServiceClient("https://test.servicestack.net")
+
+class TestApi(unittest.TestCase):
+
+    def test_can_get_hello(self):
+        response: HelloResponse = client.get(Hello(name="World"))
+        self.assertEqual(response.result, "Hello, World!")
+```
+
+Which can be run with [pytest](https://docs.pytest.org):
+
+:::sh
+python -m pytest
+:::
 
 ## DTO Customization Options 
 
@@ -26349,6 +26883,20 @@ TypeConverters.serializers[bytes] = to_bytearray
 TypeConverters.deserializers[bytes] = from_bytearray
 ```
 
+Which can also be registered together with `TypeConverters.register()`:
+
+```python
+from servicestack import TypeConverters
+from servicestack.utils import to_bytearray, from_bytearray
+
+TypeConverters.register(bytes, serializer=to_bytearray, deserializer=from_bytearray)
+```
+
+::: info
+`bytes`, `bytearray`, `datetime` and `timedelta` conversions are registered by default, so `byte[]`, `Stream`,
+`DateTime`, `DateTimeOffset` and `TimeSpan` properties can be populated with their native Python types
+:::
+
 ## Inspect Utils
 
 To help clients with inspecting API Responses the `servicestack` library also includes a number of helpful utils to quickly visualizing API outputs.
@@ -26438,15 +26986,36 @@ Top 10 python Repos:
 +--------------+-----------+------------+---------+
 ```
 
+Both `printdump` and `printtable` accept the same data structures, so they can be used to inspect any API
+Response, its `results` collection or a `to_dict()` view of it in a different naming convention:
+
+```python
+response = client.send(FindTechnologies(ids=[1, 2, 3], vendor_name="Google", take=5))
+
+printdump(response)
+printtable(response.results)
+printtable(response.results, headers=['id', 'name', 'vendor_name', 'view_count'])
+printtable(to_dict(response.results, key_case=titlecase))
+```
+
+Whilst `inspect_vars` captures a JSON snapshot of any variables to the path in the `INSPECT_VARS` Environment
+Variable, letting you inspect the state of an App's variables from outside the process:
+
+```python
+inspect_vars({"response": response})
+```
+
 Alternatively you can use `htmldump` to generate API responses in a HTML UI which is especially useful in [Python Jupyter Notebooks](/jupyter-notebooks-python) to easily visualize API responses, e.g:
 
 [![](./img/pages/apps/jupyterlab-mybinder-techstacks.png)](https://github.com/ServiceStack/jupyter-notebooks/blob/main/techstacks.io-FindTechnologies.ipynb)
 
 
-# PHP Add ServiceStack Reference
+# PHP ServiceStack Reference
 Source: https://docs.servicestack.net/php-add-servicestack-reference
 
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
 ![ServiceStack and PHP Banner](/img/pages/servicestack-reference/php-reference.png)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PhpStorm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -26605,13 +27174,13 @@ Using promoted constructors enables DTOs to be populated using a single construc
 which together with the generic `JsonServiceClient` enables end-to-end typed API Requests in a single LOC:
 
 ```php
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 use dtos\Hello;
 
 $client = new JsonServiceClient("https://test.servicestack.net");
 
 /** @var HelloResponse $response */
-$response = client->get(new Hello(name:"World"));
+$response = $client->get(new Hello(name:"World"));
 ```
 
 > The `HelloResponse` optional type hint doesn't change runtime behavior but enables static analysis tools and IDEs like PyCharm to provide rich intelli-sense and development time feedback.
@@ -26661,7 +27230,7 @@ require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer 
 require_once 'dtos.php';
 
 use dtos\FindTechnologies;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create("https://techstacks.io");
 
@@ -26776,8 +27345,12 @@ class JsonServiceClient
     public array $cookies = [];
 
     public function __construct(string $baseUrl);
+    public static function create(string $baseUrl): JsonServiceClient;
 
+    public function setBasePath(string $path): void;
     public function setCredentials(?string $userName = null, ?string $password = null) : void;
+    public function setBearerToken(?string $bearerToken): void;
+    public function setRefreshToken(?string $refreshToken): void;
     public function getTokenCookie();
     public function getRefreshTokenCookie();
 
@@ -27020,7 +27593,7 @@ require_once 'dtos.php';
 
 use dtos\GetTechnology;
 use dtos\GetTechnologyResponse;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create("https://techstacks.io");
 
@@ -27032,6 +27605,55 @@ $tech = $response->technology; // typed to Technology
 echo "$tech->name by $tech->vendorName from $tech->productUrl\n";
 echo "$tech->name TechStacks:\n";
 print_r($response->technologyStacks);
+```
+
+### Resolving the HTTP Method
+
+`send` uses the HTTP Method its API is annotated with, which generated DTOs return from the `getMethod()` implementation
+that's populated from the API's `@Route` Verb or from its `IGet`, `IPost`, `IPut`, `IPatch`, `IDelete` and `IOptions`
+interface markers:
+
+```php
+// @Route("/technology/{Slug}")
+class GetTechnology implements IReturn, IGet, JsonSerializable
+{
+    //...
+    public function getMethod(): string { return 'GET'; }
+}
+
+// GET /api/GetTechnology?slug=ServiceStack
+/** @var GetTechnologyResponse $response */
+$response = $client->send(new GetTechnology(slug:"ServiceStack"));
+```
+
+Request DTOs that aren't annotated with a Verb default to `POST` (whilst [AutoQuery](/autoquery/) Requests inheriting
+`QueryDb` default to `GET`), which can be overridden per Request by using the explicit `get`, `post`, `put`, `patch`,
+`delete`, `head` and `options` methods:
+
+```php
+$client->get(new SendReturnVoid(id:1));     // GET
+$client->post(new SendReturnVoid(id:2));    // POST
+$client->put(new SendReturnVoid(id:3));     // PUT
+$client->delete(new SendReturnVoid(id:4));  // DELETE
+```
+
+The HTTP Method also determines whether a Request DTO's populated properties are sent in the QueryString or the JSON
+Request Body, where only `GET`, `DELETE`, `HEAD` and `OPTIONS` Requests send their properties in the QueryString.
+
+APIs that don't return a Response Body implement `IReturnVoid` and can be sent with any of the client's methods:
+
+```php
+$client->post(new HelloReturnVoid(id:1));
+```
+
+Use `resolveHttpMethod` to resolve what HTTP Method a Request DTO will be sent with:
+
+```php
+use function ServiceStack\resolveHttpMethod;
+
+resolveHttpMethod(new SendGet());   // GET
+resolveHttpMethod(new SendPost());  // POST
+resolveHttpMethod(new SendPut());   // PUT
 ```
 
 ### PHPDoc Typed Annotations
@@ -27078,9 +27700,54 @@ $response = $client->post(new Authenticate(
     rememberMe: true));
 ```
 
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a typed `QueryResponse<T>` whose `results` are typed to the Response Type declared
+in the Request DTO's `#[Returns]` annotation, e.g:
+
+```php
+use ServiceStack\QueryResponse;
+use dtos\{FindTechnologies,TechnologyView};
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get(new FindTechnologies(ids:[1,2,3], vendorName:"Google"));
+
+/** @var array<TechnologyView> $results */
+$results = $response->results;
+
+foreach ($results as $tech) {
+    echo "$tech->id $tech->name ($tech->viewCount)\n";
+}
+```
+
+As generated AutoQuery DTOs use promoted constructors for their own properties, the query params they inherit from their
+`QueryDb` base class are populated as properties:
+
+```php
+$request = new FindTechnologies(vendorName:"Google");
+$request->take = 5;
+$request->orderByDesc = "viewCount";
+$request->fields = "id,name,vendorName,viewCount";
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get($request);
+
+echo "Showing " . count($response->results) . " of $response->total\n";
+```
+
+Which can also be called with a custom URL by specifying the generic Response Type with `QueryResponse::create()`:
+
+```php
+$args = ["take" => 3, "vendorName" => "Amazon"];
+
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->getUrl("/technology/search", args:$args,
+    responseAs: QueryResponse::create(["TechnologyView"]));
+```
+
 ### Sending additional arguments with Typed API Requests
 
-Many AutoQuery Services utilize [implicit conventions](/autoquery-rdbms#implicit-conventions) 
+Many AutoQuery Services utilize [implicit conventions](/autoquery/rdbms#implicit-conventions) 
 to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments 
 with the typed Request DTO, e.g:
 
@@ -27099,26 +27766,157 @@ $client->getUrl("/technology/ServiceStack", responseAs:new GetTechnologyResponse
 $client->getUrl("https://techstacks.io/technology/ServiceStack", 
     responseAs:new GetTechnologyResponse());
 
-// https://techstacks.io/technology?Slug=ServiceStack
-$args = ["slug" => "ServiceStack"]
-client.getUrl("/technology", args:$args, responseAs:new GetTechnologyResponse()); 
+// https://techstacks.io/technology?slug=ServiceStack
+$args = ["slug" => "ServiceStack"];
+$client->getUrl("/technology", args:$args, responseAs:new GetTechnologyResponse());
 ```
 
 as well as POST Request DTOs to custom urls:
 
 ```php
-$client->postUrl("/custom-path", $request, args:["slug" => "ServiceStack"]);
+$client->postUrl("/custom-path", body:$request, args:["slug" => "ServiceStack"]);
 
-$client->postUrl("http://example.org/custom-path", $request);
+$client->postUrl("http://example.org/custom-path", body:$request);
 ```
+
+Where `responseAs` can be populated with an instance of the Response DTO the Response should be deserialized into, the
+`'string'` Type to return the raw JSON or left unspecified to return the parsed JSON in a PHP associative array:
+
+```php
+// Deserialized into a typed Response DTO
+$response = $client->getUrl("/hello", args:["name" => "World"], responseAs:new HelloResponse());
+echo $response->result;   // Hello, World!
+
+// Raw JSON string
+$json = $client->getUrl("/hello", args:["name" => "World"], responseAs:'string');
+// {"result":"Hello, World!"}
+
+// Associative array
+$obj = $client->postUrl("/hello", body:json_encode(new Hello(name:"World")));
+echo $obj['result'];      // Hello, World!
+```
+
+Sending a Request DTO in the `body` of a `*Url` method uses its Response Type when `responseAs` isn't specified:
+
+```php
+/** @var HelloResponse $response */
+$response = $client->postUrl("/hello", body:new Hello(name:"World"));
+```
+
+### Built-in ServiceStack DTOs
+
+The `servicestack/client` package includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them
+without needing to generate them:
+
+```php
+use ServiceStack\{Authenticate,AuthenticateResponse,AssignRoles,UnAssignRoles,
+    ConvertSessionToToken,GetAccessToken,GetAccessTokenResponse};
+
+// Authentication
+/** @var AuthenticateResponse $auth */
+$auth = $client->post(new Authenticate(
+    provider:"credentials", userName:"test", password:"test", rememberMe:true));
+
+// JWT
+$client->post(new ConvertSessionToToken());  // Session -> JWT Cookies
+
+/** @var GetAccessTokenResponse $access */
+$access = $client->post(new GetAccessToken(refreshToken:$auth->refreshToken));
+
+// Roles and Permissions
+$client->post(new AssignRoles(userName:"user", roles:["Employee"]));
+$client->post(new UnAssignRoles(userName:"user", roles:["Employee"]));
+```
+
+Together with the built-in Response Types, interface markers and base types that generated DTOs reference:
+
+| Type                                                        | Description                                                     |
+|-------------------------------------------------------------|-----------------------------------------------------------------|
+| `ResponseStatus`                                            | ServiceStack's structured error response                         |
+| `ResponseError`                                             | An individual field validation error                             |
+| `EmptyResponse`                                             | Response of APIs that don't return a Response Body               |
+| `IdResponse`                                                | Response returning the Id of the created or updated entity       |
+| `StringResponse` / `StringsResponse`                        | Response returning a single `result` string or `results` array   |
+| `QueryResponse<T>`                                          | Typed Response of [AutoQuery](/autoquery/) Requests              |
+| `QueryDb` `QueryDb2` `QueryData` `QueryData2` `QueryBase`   | Base types of generated AutoQuery Request DTOs                   |
+| `IGet` `IPost` `IPut` `IPatch` `IDelete` `IOptions`         | Interface markers resolving a Request DTO's HTTP Method          |
+| `IReturn` / `IReturnVoid`                                   | Interface markers resolving a Request DTO's Response Type        |
+| `ICreateDb` `IUpdateDb` `IPatchDb` `IDeleteDb` `ISaveDb`    | Interface markers of [AutoQuery CRUD](/autoquery/crud) APIs      |
+| `IHasSessionId` / `IHasBearerToken` / `IHasVersion`         | Interface markers for Requests carrying auth and versioning info |
+| `AuditBase`                                                 | Base type of Tables with [Audit](/autoquery/audit-log) fields    |
+| `KeyValuePair2` / `Tuple2` / `Tuple3`                       | .NET's `KeyValuePair<K,V>`, `Tuple<A,B>` and `Tuple<A,B,C>`      |
+| `ByteArray`                                                 | Binary `byte[]` and `Stream` data, serialized as Base64          |
+| `ArrayList`                                                 | Response of APIs returning a naked collection                    |
+| `UploadFile`                                                | A file uploaded in a `multipart/form-data` Request               |
+| `WebServiceException` / `RefreshTokenException`             | Structured error details of a failed Request                     |
+
+As well as `NavItem` and `GetNavItems`, `Register`, `GetApiKeys`, `RegenerateApiKeys`, `UserApiKey`, `CancelRequest`
+and `UpdateEventSubscriber` DTOs for calling their built-in APIs.
 
 ### Uploading Files
 
-The `post_file_with_request` method can be used to upload a file with an API Request.
+Use `postFileWithRequest` to upload a file with an API Request, where the Request DTO's populated properties are sent
+as form fields alongside the file in a `multipart/form-data` Request:
+
+```php
+use ServiceStack\UploadFile;
+
+/** @var TestFileUploadsResponse $response */
+$response = $client->postFileWithRequest(new TestFileUploads(id:1, refId:"zid"),
+    new UploadFile(
+        filePath: '/path/to/test.txt',
+        fileName: 'test.txt',
+        fieldName: 'file',
+        contentType: 'text/plain'
+    ));
+```
+
+Where `UploadFile` describes each file to upload:
+
+| Property      | Description                                                                   |
+|---------------|-------------------------------------------------------------------------------|
+| `filePath`    | Path of the file to upload                                                     |
+| `fileName`    | File name the file is uploaded with                                            |
+| `fieldName`   | Name of the form field the file is uploaded in, defaults to `upload`           |
+| `contentType` | Content-Type of the file, inferred from its file extension when not specified  |
+
+Use `postFilesWithRequest` to upload multiple files in the same Request:
+
+```php
+$uploads = [
+    new UploadFile(filePath:$textFile, fileName:'test.txt', 
+        fieldName:'audio',   contentType:'text/plain'),
+    new UploadFile(filePath:$mdFile,   fileName:'test.md',  
+        fieldName:'content', contentType:'text/markdown'),
+];
+
+/** @var TestFileUploadsResponse $response */
+$response = $client->postFilesWithRequest(new TestFileUploads(id:1, refId:"zid"), $uploads);
+
+foreach ($response->files as $file) {
+    echo "$file->name $file->fileName $file->contentType $file->contentLength\n";
+}
+```
+
+Or `postFileWithRequestUrl` and `postFilesWithRequestUrl` to upload files to a custom relative or absolute URL:
+
+```php
+$response = $client->postFilesWithRequestUrl('/api/TestFileUploads', 
+    new TestFileUploads(id:1, refId:"zid"), $uploads);
+```
+
+::: info
+`contentType` is optional where it's otherwise inferred from the file name extension, defaulting to `application/octet-stream`
+:::
 
 ### PHP Speech to Text
 
+Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+
 ```php
+$client = JsonServiceClient::create($aiServerUrl);
+$client->setBearerToken($aiServerApiKey);
+
 $audioFile = __DIR__ . '/files/audio.wav';
 
 /** @var GenerationResponse $response */
@@ -27129,9 +27927,11 @@ $response = $client->postFileWithRequest(new SpeechToText(),
         fieldName: 'audio',
         contentType: 'audio/wav'
     ));
+
+echo $response->textOutputs[0]->text;
 ```
 
-To upload multiple files use `postFilesWithRequest`.
+Which can be used to call any of [AI Server's](/ai-server/) APIs that accept file uploads.
 
 ### Raw Data Responses
 
@@ -27147,11 +27947,136 @@ Which can then be accessed as normal, with their Response typed to a PHP `string
 
 ```php
 /** @var string $str */ 
-$str = client.get(new ReturnString());
+$str = $client->get(new ReturnString());
 
 /** @var ByteArray $data */ 
-$data = client->get(new ReturnBytes());
+$data = $client->get(new ReturnBytes());
 ```
+
+### Batched Requests
+
+Multiple Request DTOs of the same Type can be sent together in a single Request with `sendAll` which returns all
+their Responses:
+
+```php
+$requests = array_map(fn($name) => new Hello(name:$name), ["foo", "bar", "baz"]);
+
+// POST /api/Hello[]
+$responses = $client->sendAll($requests);
+
+echo implode(", ", array_map(fn($x) => $x->result, $responses));
+// Hello, foo!, Hello, bar!, Hello, baz!
+```
+
+Or use `sendAllOneWay` to send Requests you want to ignore the Responses of:
+
+```php
+$requests = array_map(fn($id) => new HelloReturnVoid(id:$id), [1, 2, 3]);
+
+// POST /api/HelloReturnVoid[]
+$client->sendAllOneWay($requests);
+```
+
+All Requests in a batch are sent to the same `/api/{Request}[]` endpoint (or to `/json/reply/{Request}[]` and
+`/json/oneway/{Request}[]` when the client is configured with `setBasePath('')`) where the Server executes them in order
+and returns the number of Requests it completed in the `X-AutoBatch-Completed` HTTP Response Header:
+
+```php
+$client->responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx->responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+```
+
+### Sending Raw Request Bodies
+
+APIs that accept a custom Request Body can be sent by populating the `body` param, where the Request DTO's properties
+are sent in the QueryString and the `body` is sent as the Request Body:
+
+```php
+// POST /api/SendJson?id=1&name=name {"foo":"bar"}
+$json = $client->post(new SendJson(id:1, name:"name"), body:json_encode(["foo" => "bar"]));
+
+// POST /api/SendText?id=1&name=name foo
+$text = $client->post(new SendText(id:1, name:"name", contentType:"text/plain"), body:"foo");
+```
+
+A `string` body is sent as-is whilst a `JsonSerializable` DTO is serialized to JSON.
+
+### Error Handling
+
+Failed API Requests throw a `WebServiceException` containing the HTTP Status Code and the API's structured
+[ResponseStatus](/error-handling) error:
+
+```php
+use ServiceStack\WebServiceException;
+
+try {
+    $client->put(new ThrowType(type:"NotFound", message:"not here"));
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;                 // 404
+    echo $ex->responseStatus->errorCode;  // NotFound
+    echo $ex->responseStatus->message;    // not here
+}
+```
+
+| Property            | Description                                                                        |
+|---------------------|------------------------------------------------------------------------------------|
+| `statusCode`        | HTTP Status Code of the error Response, e.g. `404`                                  |
+| `statusDescription` | HTTP Status Description, e.g. `"Not Found"`                                         |
+| `responseStatus`    | The API's structured `ResponseStatus` with its `errorCode`, `message` and `errors`  |
+| `getMessage()`      | The `ResponseStatus` Error Message, otherwise the HTTP Status Description            |
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field validation
+error in `errors`, with the first error also captured in the summary `errorCode` and `message`:
+
+```php
+try {
+    $client->post(new ThrowValidation(email:"invalidemail"));
+} catch (WebServiceException $ex) {
+    $status = $ex->responseStatus;
+
+    echo $status->errorCode;  // InclusiveBetween
+    echo $status->message;    // 'Age' must be between 1 and 120. You entered 0.
+
+    foreach ($status->errors as $error) {
+        echo "$error->fieldName: $error->errorCode $error->message\n";
+    }
+    // Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+    // Required: NotEmpty 'Required' must not be empty.
+    // Email: Email 'Email' is not a valid email address.
+}
+```
+
+Requests failing before reaching the Server, e.g. connection errors, also throw a `WebServiceException` with a `500`
+Status Code:
+
+```php
+$client = new JsonServiceClient("http://unknown-zzz.net");
+try {
+    $client->get(new Hello(name:"World"));
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;         // 500
+    echo $ex->statusDescription;  // Request Failed
+}
+```
+
+Whilst Requests to APIs requiring Authentication that the client wasn't able to authenticate with throw a `401`:
+
+```php
+try {
+    $client->post(new RequiresAdmin());
+} catch (WebServiceException $ex) {
+    echo $ex->statusCode;                 // 401
+    echo $ex->responseStatus->errorCode;  // 401
+    echo $ex->responseStatus->message;    // Unauthorized
+}
+```
+
+::: info
+Requests that fail to fetch a new JWT with a Refresh Token throw a `RefreshTokenException` which extends `WebServiceException`
+:::
 
 ### Authenticating using Basic Auth
 
@@ -27159,13 +28084,13 @@ Basic Auth support is implemented in `JsonServiceClient` and follows the same AP
 
 ```php
 $client = new JsonServiceClient($baseUrl);
-$client->username = user;
-$client->password = pass;
+$client->userName = $user;
+$client->password = $pass;
 
-$response = client->get(new SecureRequest());
+$response = $client->get(new SecureRequest());
 ```
 
-Or use `$client->setCredentials()` to have them set both together.
+Or use `$client->setCredentials($user, $pass)` to have them set both together.
 
 ### Authenticating using Credentials
 
@@ -27174,17 +28099,29 @@ Alternatively you can authenticate using userName/password credentials by
 to your remote ServiceStack Instance and sending a populated `Authenticate` Request DTO, e.g:
 
 ```php
-$request = new Authenticate();
-$request->provider = "credentials";
-$request->userName = $userName;
-$request->password = $password;
-$request->remember_me = true;
+use ServiceStack\{Authenticate,AuthenticateResponse};
 
-$response = client->post(request);
+/** @var AuthenticateResponse $response */
+$response = $client->post(new Authenticate(
+    provider: "credentials",
+    userName: $userName,
+    password: $password,
+    rememberMe: true));
+
+echo $response->userId;
+echo $response->sessionId;
 ```
 
 This will populate the `JsonServiceClient` with [Session Cookies](/sessions#cookie-session-ids) 
 which will transparently be sent on subsequent requests to make authenticated requests.
+
+All Cookies the Server returns are maintained in the client's `cookies` property, with the JWT Token and Refresh Token
+Cookies also accessible from:
+
+```php
+$client->getTokenCookie();         // ss-tok
+$client->getRefreshTokenCookie();  // ss-reftok
+```
 
 ### Authenticating using JWT
 
@@ -27195,10 +28132,16 @@ using a JWT Token:
 $client->bearerToken = $jwt;
 ```
 
+Which can also be configured with `setBearerToken()`:
+
+```php
+$client->setBearerToken($jwt);
+```
+
 Alternatively you can use just a [Refresh Token](/jwt-authprovider#refresh-tokens) instead:
 
 ```php
-$client->refreshYoken = $refreshToken;
+$client->refreshToken = $refreshToken;
 ```
 
 Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.
@@ -27224,33 +28167,49 @@ $authClient = new JsonServiceClient(AUTH_URL);
 $client->onAuthenticationRequired = new class($client, $authClient) implements Callback {
     public function __construct(public JsonServiceClient $client, public JsonServiceClient $authClient) {}
     public function call(): void {
-        $this->authClient->setCredentials("test", "test");
-        $this->client->bearerToken = $this->authClient->get(new Authenticate())->getRefreshTokenCookie();
+        // Authenticate with the Auth Server then use its JWT Token to retry the original Request
+        $this->authClient->post(new Authenticate(
+            provider:"credentials", userName:"test", password:"test"));
+        $this->client->bearerToken = $this->authClient->getTokenCookie();
     }
 };
 
 // Automatically retries requests returning 401 Responses with new bearerToken
-$response = client->get(new Secured());
+$response = $client->get(new Secured());
+```
+
+Which can also be used to re-configure the client itself, e.g. to authenticate with Basic Auth credentials:
+
+```php
+$client->onAuthenticationRequired = new class($client) implements Callback {
+    public function __construct(public JsonServiceClient $client) {}
+    public function call(): void {
+        $this->client->setCredentials("test", "test");
+    }
+};
+
+$response = $client->get(new TestAuth());
 ```
 
 ### Automatically refresh Access Tokens
 
 With the [Refresh Token support in JWT](/jwt-authprovider#refresh-tokens) 
-you can use the `refresh_token` property to instruct the Service Client to automatically fetch new JWT Tokens behind 
+you can use the `refreshToken` property to instruct the Service Client to automatically fetch new JWT Tokens behind 
 the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:
 
 ```php
 // Authenticate to get new Refresh Token
 $authClient = new JsonServiceClient(AUTH_URL);
-$authClient.userName = $userName;
-$authClient.password = $password;
+$authClient->setCredentials($userName, $password);
+
+/** @var AuthenticateResponse $authResponse */
 $authResponse = $authClient->get(new Authenticate());
 
 // Configure client with RefreshToken
 $client->refreshToken = $authResponse->refreshToken;
 
 // Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
-$response = client->get(new Secured());
+$response = $client->get(new Secured());
 ```
 
 Use the `refreshTokenUri` property when refresh tokens need to be sent to a different ServiceStack Server, e.g:
@@ -27259,6 +28218,343 @@ Use the `refreshTokenUri` property when refresh tokens need to be sent to a diff
 $client->refreshToken = $refreshToken;
 $client->refreshTokenUri = AUTH_URL . "/access-token";
 ```
+
+Or enable `useTokenCookie` to have the client refresh Access Tokens using the
+[Refresh Token Cookie](/jwt-authprovider#refresh-token-cookies-supported-in-all-service-clients) the Server returned
+instead of needing to manage Tokens yourself:
+
+```php
+$client->useTokenCookie = true;
+```
+
+If the Refresh Token has itself expired or is invalid the client throws a `RefreshTokenException`:
+
+```php
+use ServiceStack\RefreshTokenException;
+
+try {
+    $client->get(new Secured());
+} catch (RefreshTokenException $ex) {
+    echo $ex->responseStatus->errorCode;  // TokenException
+    echo $ex->responseStatus->message;    // Token has expired
+}
+```
+
+### Client Configuration
+
+`JsonServiceClient` sends Requests to ServiceStack's pre-defined `/api` route, use `setBasePath` to change the base
+path Requests are sent to, e.g. for older ServiceStack instances that only have the pre-defined `/json/reply` routes
+enabled:
+
+```php
+$client->setBasePath("");     // /json/reply/{Request} and /json/oneway/{Request}
+$client->setBasePath("api");  // /api/{Request} (default)
+```
+
+Custom headers can be added to all Requests by populating `headers`:
+
+```php
+$client = new JsonServiceClient($baseUrl);
+$client->headers["X-Custom"] = "Value";
+$client->setBearerToken($apiKey);
+```
+
+Whilst `options` lets you customize the [PHP stream context](https://www.php.net/manual/en/context.php) its Requests
+are sent with, e.g. to configure custom SSL options:
+
+```php
+$client->options = [
+    'ssl' => [
+        'cafile' => '/path/to/ca.pem',
+    ],
+];
+```
+
+The client maintains any Cookies the Server returns in its `cookies` property which are sent on subsequent Requests,
+so use a separate client instance where you need to maintain different Authenticated Sessions.
+
+### Request, Response and Exception Filters
+
+Clients can be decorated with generic functionality using instance and static Request, Response and Exception filters,
+useful for logging, adding headers or inspecting Responses. Filters implement the `RequestFilter`, `ResponseFilter` and
+`ExceptionFilter` interfaces which can be implemented inline with an anonymous class:
+
+```php
+use ServiceStack\{RequestFilter,ResponseFilter,ExceptionFilter,SendContext};
+
+// Instance filters only apply to this client
+$client->requestFilter = new class implements RequestFilter {
+    public function call(SendContext $ctx) {
+        echo "$ctx->method $ctx->url\n";
+    }
+};
+$client->responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx->responseHeaders['statusCode'] . "\n";
+    }
+};
+$client->exceptionFilter = new class implements ExceptionFilter {
+    public function call(mixed $response, Exception $e) {
+        echo "ERROR: " . $e->getMessage() . "\n";
+    }
+};
+
+// Static filters apply to all clients
+JsonServiceClient::$globalRequestFilter = $requestFilter;
+JsonServiceClient::$globalResponseFilter = $responseFilter;
+JsonServiceClient::$globalExceptionFilter = $exceptionFilter;
+```
+
+Instance filters are invoked before global filters, where the `SendContext` passed to Request filters lets you inspect
+and modify the Request before it's sent:
+
+| Property          | Description                                                     |
+|-------------------|-----------------------------------------------------------------|
+| `method`          | HTTP Method the Request is sent with                             |
+| `url`             | Absolute URL the Request is sent to, including its QueryString   |
+| `headers`         | The Request Headers, a copy of the client's `headers`            |
+| `cookies`         | The Cookies sent with the Request                                |
+| `request`         | The Request DTO being sent                                       |
+| `body`            | Custom Request Body, when sent                                   |
+| `args`            | Additional untyped arguments sent with the Request               |
+| `responseAs`      | The Type the Response will be deserialized into                  |
+| `responseHeaders` | The Response HTTP Headers, populated in Response Filters         |
+| `responseCookies` | The Cookies returned in the Response                             |
+
+State can be captured by declaring it in the anonymous class constructor, e.g. to capture a custom Response Header:
+
+```php
+$header = '';
+$client->responseFilter = new class($header) implements ResponseFilter {
+    public function __construct(public string &$header) {}
+    public function call(mixed $response, SendContext $ctx) {
+        $this->header = $ctx->responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+```
+
+### Complex Type Support
+
+Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists, Arrays,
+Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent PHP types:
+
+```php
+$request = new AllCollectionTypes(
+    intArray: [1, 2, 3],
+    intList: [4, 5, 6],
+    stringArray: ["A", "B", "C"],
+    stringList: ["D", "E", "F"],
+    byteArray: ByteArray::fromRaw(b"ABC"),                // sent as base64
+    pocoArray: [new Poco(name:"pocoArray")],
+    pocoList: [new Poco(name:"pocoList")],
+    pocoLookup: ["A" => [new Poco(name:"B"), new Poco(name:"C")]],
+    pocoLookupMap: ["A" => [["B" => new Poco(name:"C")], ["D" => new Poco(name:"E")]]]);
+```
+
+.NET's built-in Types are mapped to their closest PHP equivalent, where their different serialization formats are
+transparently converted to and from native PHP types:
+
+| .NET Type                            | PHP Type        | Serialized as                        |
+|--------------------------------------|-----------------|--------------------------------------|
+| `string` / `char`                    | `string`        | `"string"`                            |
+| `bool`                               | `bool`          | `true`                                |
+| `int` `long` `short` `byte` `uint`   | `int`           | `1`                                   |
+| `float` `double` `decimal`           | `float`         | `1.1`                                 |
+| `DateTime` / `DateTimeOffset`        | `DateTime`      | `"/Date(978307200000)/"`              |
+| `TimeSpan`                           | `DateInterval`  | `"PT1H"`                              |
+| `Guid`                               | `string`        | `"ea762009b66c410b9bf5ce21ad519249"`  |
+| `byte[]` / `Stream`                  | `ByteArray`     | base64 encoded `string`               |
+| `List<T>` / `T[]`                    | `array`         | `[1,2,3]`                             |
+| `Dictionary<K,V>`                    | `array`         | `{"A":"B"}`                           |
+| `KeyValuePair<K,V>`                  | `KeyValuePair2` | `{"key":"A","value":"B"}`             |
+
+APIs returning a naked collection are deserialized into an `ArrayList` which can be counted and iterated like an array
+or converted into one with `jsonSerialize()`:
+
+```php
+/** @var ArrayList $response */
+$response = $client->get(new GetNakedItems());
+echo count($response);
+
+$names = array_map(fn($item):string => $item->name, $response->jsonSerialize());
+```
+
+### Enum Support
+
+C# `enum` Types are generated as PHP [backed enums](https://www.php.net/manual/en/language.enumerations.backed.php)
+whose values are sent as strings, using their `[EnumMember]` value where they have one, whilst `[Flags]` enums and enums
+annotated with `[EnumAsInt]` are generated as `int` backed enums which are sent as their integer values:
+
+```php
+enum EnumType : string
+{
+    case Value1 = 'Value1';
+    case Value2 = 'Value2';
+}
+
+enum EnumWithValues : string
+{
+    case None = 'None';
+    case Value1 = 'Member 1';   // [EnumMember(Value = "Member 1")]
+}
+
+// @Flags()
+enum EnumFlags : int
+{
+    case Value1 = 1;
+    case Value2 = 2;
+    case Value3 = 4;
+}
+```
+
+As they're declared as typed properties on generated DTOs they're checked by PHP and static analysis tools when
+populated, then serialized in the format the Server expects:
+
+```php
+// ?enumProp=Value2&enumWithValues=Member+1&enumFlags=2&enumStyle=UPPER
+$client->get(new HelloWithEnum(
+    enumProp: EnumType::Value2,
+    enumWithValues: EnumWithValues::Value1,
+    enumFlags: EnumFlags::Value2,
+    enumStyle: EnumStyle::UPPER));
+```
+
+They can also be used in Lists and Dictionaries of enums, e.g:
+
+```php
+$client->post(new HelloWithEnumMap(
+    enumProp: [EnumType::Value2->name => EnumType::Value2],
+    enumFlags: [EnumFlags::Value2->name => EnumFlags::Value2]));
+// {"enumProp":{"Value2":"Value2"},"enumFlags":{"Value2":2}}
+```
+
+### QueryString Serialization
+
+Request DTO properties sent in the QueryString use ServiceStack's [JS Object](/js-utils) notation for complex types,
+which `qsValue` can be used to inspect:
+
+```php
+use function ServiceStack\qsValue;
+
+qsValue(null);                           // ""
+qsValue("A");                            // "A"
+qsValue(1);                              // "1"
+qsValue(true);                           // "true"
+qsValue([1, 2, 3]);                      // "[1,2,3]"
+qsValue(['a', 'b', 'c']);                // "[a,b,c]"
+qsValue(['a' => 1, 'b' => 2]);           // "{a:1,b:2}"
+qsValue(new SubType(id:1, name:"foo"));  // "{id:1,name:foo}"
+qsValue(ByteArray::fromRaw(b"PHP"));     // "UEhQ" (base64)
+```
+
+Names and values are URL encoded whilst `null` properties are omitted from the QueryString so the Server can apply
+its own defaults.
+
+### Serialization Utils
+
+As all generated DTOs implement `JsonSerializable` they can be serialized with PHP's `json_encode` whilst `fromMap()`
+populates a DTO from a decoded JSON object:
+
+```php
+$json = json_encode(new Hello(name:"World"));    // {"name":"World"}
+
+$dto = new Hello();
+$dto->fromMap(json_decode($json, associative:true));
+```
+
+The `JsonConverters` the client uses to convert .NET Types to and from their native PHP types can also be used
+directly, e.g:
+
+```php
+use ServiceStack\JsonConverters;
+
+/** @var HelloResponse $dto */
+$dto = JsonConverters::from('HelloResponse', json_decode($json, associative:true));
+
+$dtos = JsonConverters::fromArray('Poco', json_decode($jsonArray, associative:true));
+
+JsonConverters::to('DateTime', new DateTime("2001-01-01"));  // /Date(978307200000)/
+JsonConverters::to('DateInterval', new DateInterval("PT1H")); // PT1H
+JsonConverters::to('ByteArray', ByteArray::fromRaw(b"ABC"));  // QUJD
+JsonConverters::toArray('int', [1,2,3]);                      // [1,2,3]
+```
+
+Types are resolved from the `ServiceStack` and `dtos` namespaces by default, DTOs generated into a different
+[GlobalNamespace](#globalnamespace) are automatically registered when they're sent with the client, otherwise they can
+be registered with:
+
+```php
+JsonConverters::registerNamespace("techstacks");
+```
+
+### Logging
+
+The client logs its Requests and Responses through a pluggable `Logger`, use the built-in `ConsoleLogger` and enable
+the `Debug` log level to inspect the raw HTTP Requests and Responses it sends:
+
+```php
+use ServiceStack\{Log,LogLevel,ConsoleLogger};
+
+Log::$logger = new ConsoleLogger();
+Log::$levels[] = LogLevel::Debug;
+```
+
+Which logs each Request's URL and HTTP Options, its Response Status Code, Headers, Cookies and raw JSON Response. Only
+`LogLevel::Warn` and `LogLevel::Error` are enabled by default, implement `Logger` to route logging to your App's
+preferred logging library, e.g:
+
+```php
+use ServiceStack\{Log,LogLevel,Logger};
+
+class ErrorLogLogger implements Logger {
+    function log(LogLevel $logLevel, mixed $message=null, ?Exception $error=null) {
+        error_log("[{$logLevel->value}] " . (is_string($message) ? $message : print_r($message, true)));
+        if (isset($error))
+            error_log("[{$logLevel->value}] ERROR: " . $error->getMessage());
+    }
+}
+
+Log::$logger = new ErrorLogLogger();
+```
+
+### Testing
+
+As `JsonServiceClient` accepts any Base URL, APIs can be tested against a local instance of your App or a remote
+ServiceStack instance without needing to mock the client itself, which is how the client's own
+[test suite](https://github.com/ServiceStack/servicestack-php/tree/main/tests) verifies its Requests against the live
+[test.servicestack.net](https://test.servicestack.net) Services:
+
+```php
+<?php declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once 'dtos.php';
+
+use PHPUnit\Framework\TestCase;
+use ServiceStack\JsonServiceClient;
+use dtos\{Hello,HelloResponse};
+
+final class ClientTests extends TestCase
+{
+    public JsonServiceClient $client;
+
+    protected function setUp(): void {
+        $this->client = new JsonServiceClient("https://test.servicestack.net");
+    }
+
+    public function testCanGetHello() {
+        /** @var HelloResponse $response */
+        $response = $this->client->get(new Hello(name:"World"));
+        $this->assertEquals("Hello, World!", $response->result);
+    }
+}
+```
+
+Which can be run with [PHPUnit](https://phpunit.de):
+
+:::sh
+vendor/bin/phpunit
+:::
 
 ## DTO Customization Options 
 
@@ -27475,6 +28771,37 @@ class ByteArray implements JsonSerializable
 }
 ```
 
+Which is registered as the `ByteArray` Converter so `byte[]` and `Stream` properties are transparently converted
+to and from Base64:
+
+```php
+JsonConverters::registerConverter('ByteArray', new ByteArrayConverter());
+```
+
+Custom Converters implement the `Converter` interface which can be registered for any Type name used in
+generated DTOs, e.g:
+
+```php
+use ServiceStack\{Converter,JsonConverters,TypeContext};
+
+class UnixTimeConverter implements Converter
+{
+    function fromJson($o, TypeContext $ctx): mixed {
+        return (new DateTime())->setTimestamp(intval($o));
+    }
+    function toJson($value, TypeContext $ctx): mixed {
+        return $value->getTimestamp();
+    }
+}
+
+JsonConverters::registerConverter('UnixTime', new UnixTimeConverter());
+```
+
+::: info
+Converters for `string`, `int`, `float`, `bool`, `DateTime`, `DateInterval`, `ByteArray`, Lists, Dictionaries and
+enums are registered by default
+:::
+
 ## Inspect Utils
 
 To help clients with inspecting API Responses the `servicestack/client` library also includes a number of helpful utils 
@@ -27510,7 +28837,7 @@ echo  "Top 3 {$orgName} GitHub Repos:\n";
 Inspect::printDump(array_slice($orgRepos, 0, 3));
 
 echo  "\nTop 10 {$orgName} GitHub Repos:\n";
-Inspect::printDumpTable(array_map(function($x) {
+Inspect::printTable(array_map(function($x) {
     return [
         "name"        => $x["name"],
         "lang"        => $x["lang"],
@@ -27556,7 +28883,7 @@ For tabular result-sets you can use `Inspect::table` to capture and `Inspect::pr
 human-friendly markdown table, e.g:
 
 ```php
-echo "\nTop 10 $orgName Repos:\n"
+echo "\nTop 10 $orgName Repos:\n";
 Inspect::printTable(array_slice($orgRepos, 0, 10));
 ```
 
@@ -27578,6 +28905,24 @@ Top 10 php GitHub Repos:
 | systems        | C          |       41 |    27 |
 | web-wiki       | PHP        |       35 |    29 |
 +------------------------------------------------+
+```
+
+Both `Inspect::printDump` and `Inspect::printTable` accept the same data structures, so they can be used to inspect
+any API Response or its `results` collection, e.g:
+
+```php
+/** @var QueryResponse<TechnologyView> $response */
+$response = $client->get(new FindTechnologies(ids:[1,2,3], vendorName:"Google"));
+
+Inspect::printDump($response);
+Inspect::printTable($response->results);
+```
+
+Whilst `Inspect::vars` captures a JSON snapshot of any variables to the path in the `INSPECT_VARS` Environment
+Variable, letting you inspect the state of an App's variables from outside the process:
+
+```php
+Inspect::vars(["response" => $response]);
 ```
 
 
@@ -30564,10 +31909,12 @@ repository for a nice overview of how it leverages Kotlin Native Types and iOS-i
 develop services-heavy Mobile Apps.
 
 
-# Dart Add ServiceStack Reference
+# Dart ServiceStack Reference
 Source: https://docs.servicestack.net/dart-add-servicestack-reference
 
-![Dart Banner](/img/pages/dart/dart.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![Dart Banner](/img/pages/dart/dart.webp)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from a simple [npx get-dtos command-line script](/npx-get-dtos) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -30582,7 +31929,7 @@ var response = await client.get(Hello(name: 'World'));
 print(response.result);
 ```
 
-That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with `dart:io` and `dart:html` implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
+That's the real leverage for a team that chose Flutter to build one App for several platforms: one API contract, one client and one set of DTOs behind all of them, with native `dart:io` and Browser implementations sharing the same `IServiceClient` interface. Structured errors, authentication, typed AutoQuery, batch and one-way requests and file uploads.
 
 ## Dart Android Example using Android Studio
 
@@ -30591,10 +31938,10 @@ That's the real leverage for a team that chose Flutter to build one App for seve
 
 ### Dart ServiceStack Reference
 
-Dart ServiceStack Reference supports **all Dart 2.0 platforms**, including Flutter and AngularDart or Dart Web Apps - in the same optimal development workflow pioneered in [Add ServiceStack Reference](/add-servicestack-reference) where it doesn't requiring any additional tooling, transformers or build steps. 
+Dart ServiceStack Reference supports **all Dart 3 platforms**, including Flutter and AngularDart or Dart Web Apps - in the same optimal development workflow pioneered in [Add ServiceStack Reference](/add-servicestack-reference) where it doesn't requiring any additional tooling, transformers or build steps. 
 
-Due to the lack of reflection and Mirror support, consuming JSON APIs can be quite [cumbersome in Flutter](https://flutter.io/cookbook/networking/fetch-data/). But we've been able to achieve the same productive development experience available in [all supported languages](/add-servicestack-reference) where you can use the generated Dart DTOs from any remote v5.1+ ServiceStack endpoint with ServiceStack's Smart generic
-[JsonServiceClient](https://pub.dartlang.org/documentation/servicestack/0.0.7/client/JsonServiceClient-class.html) available in the [servicestack Dart package](https://pub.dartlang.org/packages/servicestack#-installing-tab-), to enable an end-to-end Typed API for calling Services by [sending and receiving native DTOs](/architecture-overview#client-architecture).
+Due to the lack of reflection and Mirror support, consuming JSON APIs can be quite [cumbersome in Flutter](https://docs.flutter.dev/cookbook/networking/fetch-data). But we've been able to achieve the same productive development experience available in [all supported languages](/add-servicestack-reference) where you can use the generated Dart DTOs from any remote v5.1+ ServiceStack endpoint with ServiceStack's Smart generic
+[JsonServiceClient](https://pub.dev/documentation/servicestack/latest/client/JsonServiceClient-class.html) available in the [servicestack Dart package](https://pub.dev/packages/servicestack), to enable an end-to-end Typed API for calling Services by [sending and receiving native DTOs](/architecture-overview#client-architecture).
 
 ### Install
 
@@ -30624,11 +31971,11 @@ Saved to: dtos.dart
 If no name is specified in the 2nd argument, it uses `dtos` if it doesn't exist, otherwise falls back to infer it from the URL
 :::
 
-To make API calls we need to use the `JsonServiceClient`, installed by adding the [servicestack](https://pub.dartlang.org/packages/servicestack#-installing-tab-) package to our Dart projects `pubspec.yaml`:
+To make API calls we need to use the `JsonServiceClient`, installed by adding the [servicestack](https://pub.dev/packages/servicestack) package to our Dart projects `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  servicestack: ^2.0.1
+  servicestack: ^3.0.3
 ```
 
 Saving `pubspec.yaml` in VS Code with the [Dart Code Extension](https://dartcode.org) automatically calls `pub get` or `flutter packages get` (in Flutter projects) to add any new dependencies to your project.
@@ -30652,7 +31999,7 @@ Like C#, Dart has Generics and Type Inference so the `response` returned is the 
 
 ### Platform neutral usage
 
-Both **dart:io** `JsonServiceClient` and **dart:html** `JsonWebClient` implement the same shared `IServiceClient` interface which support a platform-neutral source-compatible API using the
+Both **dart:io** `JsonServiceClient` and Browser `JsonWebClient` implement the same shared `IServiceClient` interface which support a platform-neutral source-compatible API using the
 `ClientFactory` APIs, e.g: 
 
 ```dart
@@ -30756,12 +32103,38 @@ fetchTechnologies(IServiceClient client) async {
 
 ### Rich Generated Models
 
-Thanks to the direct C# to Dart model code generation we're able to create the ideal idiomatic message-based APIs utilizing rich typed models with broad support for many of the C#/.NET features used when defining DTOs inc. Generics, Inheritance, multiple Interfaces, Enums (inc. int and Flag Enums), Tuples, metadata Attributes emitted in comments (emitting additional documentation in the generated models) whilst also taking care of mapping built-in C# Types like `DateTime`, `TimeSpan`, `byte[]` and `Stream` into their equivalent native Dart [DateTime](https://api.dartlang.org/stable/1.24.3/dart-core/DateTime-class.html), [Duration](https://api.dartlang.org/stable/1.24.3/dart-core/Duration-class.html) and [Uint8List](https://api.dartlang.org/stable/1.24.3/dart-typed_data/Uint8List-class.html) types, C# generic collections are also converted into their equivalent Dart generic collection Type.
+Thanks to the direct C# to Dart model code generation we're able to create the ideal idiomatic message-based APIs utilizing rich typed models with broad support for many of the C#/.NET features used when defining DTOs inc. Generics, Inheritance, multiple Interfaces, Enums (inc. int and Flag Enums), Tuples, metadata Attributes emitted in comments (emitting additional documentation in the generated models) whilst also taking care of mapping built-in C# Types like `DateTime`, `TimeSpan`, `byte[]` and `Stream` into their equivalent native Dart [DateTime](https://api.dart.dev/dart-core/DateTime-class.html), [Duration](https://api.dart.dev/dart-core/Duration-class.html) and [Uint8List](https://api.dart.dev/dart-typed_data/Uint8List-class.html) types, C# generic collections are also converted into their equivalent Dart generic collection Type.
+
+#### Dart Type Mappings
+
+C# DTOs are mapped to their closest equivalent Dart Type:
+
+| C# Type                       | Dart Type                     |
+|-------------------------------|-------------------------------|
+| `string`                      | `String`                      |
+| `bool`                        | `bool`                        |
+| `char`                        | `String`                      |
+| `byte` `short` `int` `long`   | `int`                         |
+| `ushort` `uint` `ulong`       | `int`                         |
+| `float` `double` `decimal`    | `double`                      |
+| `Guid`                        | `String`                      |
+| `DateTime` `DateTimeOffset`   | `DateTime`                    |
+| `TimeSpan`                    | `Duration`                    |
+| `byte[]` `Stream`             | `Uint8List`                   |
+| `T[]` `List<T>`               | `List<T>`                     |
+| `Dictionary<K,V>`             | `Map<K,V>`                    |
+| `KeyValuePair<K,V>`           | `KeyValuePair<K,V>`           |
+| `Tuple<T1,T2>`                | `Tuple2<T1,T2>`               |
+| `enum`                        | `enum`                        |
+| `[Flags] enum`                | `class` with `int` values     |
+| `Nullable<T>`                 | `T?`                          |
+
+Where all C# `enum` types are supported, including `[Flags]` enums (generated as classes of `int` constants), enums with explicit values and enums using custom [Enum Styles](/system-text-json#custom-enum-serialization), which are all serializable in Enum properties, `List<Enum>` and `Map<Enum,Enum>` collections.
 
 
 #### JsonCodec compatible
 
-The generated DTOs follow Dart's [JsonCodec](https://api.dartlang.org/stable/1.24.3/dart-convert/JsonCodec-class.html) pattern allowing them to be individually serializable with Dart's universal JSON encode/decode APIs, e.g:
+The generated DTOs follow Dart's [JsonCodec](https://api.dart.dev/dart-convert/JsonCodec-class.html) pattern allowing them to be individually serializable with Dart's universal JSON encode/decode APIs, e.g:
 
 ```dart
 //Serialization
@@ -30803,7 +32176,7 @@ abstract class IConvertible
 }
 ```
 
-The conversion logic that handles the behind-the-scenes conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dartlang.org/documentation/servicestack/0.0.7/client/JsonConverters/Converters.html) class which lets you replace built-in converters with your own implementation or register new Converters when you want to take over handling of specific types.
+The conversion logic that handles the behind-the-scenes conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dev/documentation/servicestack/latest/servicestack/JsonConverters-class.html) class which lets you replace built-in converters with your own implementation or register new Converters when you want to take over handling of specific types.
 
 ### JsonServiceClient
 
@@ -30814,14 +32187,18 @@ The `JsonServiceClient` is a smart full-featured Service Client implementation w
  - [JWT, including using RefreshTokens to auto-fetch new JWT Bearer Tokens](/auth/jwt-authprovider)
  - [Structured Error Handling](/error-handling)
  - [Auto Batched Requests](/auto-batched-requests)
- - Global and per-instance Request, Response and Exception Filters
+ - Global and per-instance Request, Response, URL and Exception Filters
  - `onAuthenticationRequired` hook to handle re-authentication and transparent replay of failed 401 requests
+ - `api()` and `apiVoid()` APIs returning a typed `ApiResult<T>` encapsulating an API Response or Error
+ - Typed and untyped APIs for calling any HTTP Verb, custom URLs and raw `String` and `Uint8List` responses
+ - `multipart/form-data` File Uploads with a typed Request DTO
+ - Configurable Base Path for calling either the `/api` or legacy `/json/reply` [pre-defined routes](/endpoint-routing)
 
-Behind the scenes `JsonServiceClient` leverages the optimal [`HttpClient` in dart:io](https://docs.flutter.io/flutter/dart-io/HttpClient-class.html) to perform HTTP Requests in Flutter and Dart VM Apps.
+Behind the scenes `JsonServiceClient` leverages the optimal [`HttpClient` in dart:io](https://api.flutter.dev/flutter/dart-io/HttpClient-class.html) to perform HTTP Requests in Flutter and Dart VM Apps.
 
 ### JsonWebClient
 
-The `JsonWebClient` performs HTTP Requests using [dart:html BrowserClient](https://webdev.dartlang.org/angular/guide/server-communication) to use the browsers built-in `XMLHttpRequest` object. Despite their implementation differences `JsonWebClient` also supports the same feature-set as the Dart VM's `JsonServiceClient` above. 
+The `JsonWebClient` performs HTTP Requests using [package:http's BrowserClient](https://pub.dev/documentation/http/latest/browser_client/BrowserClient-class.html) which uses the browsers built-in `XMLHttpRequest` object. Despite their implementation differences `JsonWebClient` also supports the same feature-set as the Dart VM's `JsonServiceClient` above. 
 
 AngularDart or Dart Web Apps can use `JsonWebClient` by importing `web_client.dart`, e.g: 
 
@@ -30908,47 +32285,603 @@ var webClient = JsonWebClient(baseUrl)
     ..responseFilter = (res) => print(res.headers["X-Args"]);
 ```
 
-### Uploading Files
+### Making Typed API Requests
 
-The `postFileWithRequest` method can be used to upload a file with an API Request.
-
-### Dart Speech to Text
-
-Here's an example calling [AI Server's](/ai-server/) `SpeechToText` API:
+Each `IServiceClient` supports sending a Request DTO with any HTTP Verb where the typed Response DTO is inferred from the `IReturn<T>` marker on the Request DTO:
 
 ```dart
-var audioFile = new File('audio.wav');
-var uploadFile = new UploadFile(
+var client = JsonServiceClient("https://test.servicestack.net");
+
+HelloResponse response = await client.get(Hello(name: "World"));
+response = await client.post(Hello(name: "World"));
+response = await client.put(Hello(name: "World"));
+response = await client.patch(Hello(name: "World"));
+response = await client.delete(Hello(name: "World"));
+```
+
+Where all URLs, QueryStrings and JSON Request Bodies are handled for you, e.g. `GET` and `DELETE` requests send all populated properties on the QueryString whilst `POST`, `PUT` and `PATCH` requests send them in a JSON Request Body.
+
+Unicode is supported throughout, e.g. sending `Hello(name: "üöäß")` returns `"Hello, üöäß!"`.
+
+### Resolving the HTTP Method
+
+Instead of specifying the HTTP Method yourself you can use `send()` which uses the [HTTP Verb interface marker](/csharp-client#http-verb-interface-markers) on the Request DTO to resolve which HTTP Method to send it with, which you can inspect with `resolveHttpMethod()`:
+
+```dart
+resolveHttpMethod(SendGet());   //= GET
+resolveHttpMethod(SendPost());  //= POST
+resolveHttpMethod(SendPut());   //= PUT
+
+var response = await client.send(SendGet(id: 1)); // sent as GET
+```
+
+Request DTOs without a Verb interface marker are sent as a `POST` request.
+
+### The api() and apiVoid() APIs
+
+Whilst the `get/post/put/patch/delete` APIs throw a `WebServiceException` for error responses, the `api()` and `apiVoid()` APIs return a typed `ApiResult<T>` which encapsulates either a successful Response or a structured API Error - ideal for Flutter Apps where displaying validation errors next to their Form fields is part of normal control flow:
+
+```dart
+var api = await client.api(Hello(name: "World"));
+
+if (api.succeeded) {
+    print(api.response!.result);      // Hello, World!
+} else {
+    print(api.errorMessage);
+}
+```
+
+You can override which HTTP Method it's sent with using the optional `method` argument, e.g. `client.api(request, method:"PUT")` whilst `apiVoid()` should be used for `IReturnVoid` APIs which returns an `ApiResult<EmptyResponse>`.
+
+The `ApiResult<T>` includes a number of APIs for inspecting an API Error Response:
+
+| Property / Method            | Description                                                            |
+|------------------------------|------------------------------------------------------------------------|
+| `response`                   | The typed Response DTO, `null` if the API failed                        |
+| `error`                      | The structured [ResponseStatus](/error-handling) error, if it failed     |
+| `succeeded`                  | Whether the API returned a successful Response                           |
+| `failed`                     | Whether the API returned an error                                        |
+| `completed`                  | Whether the API returned either a Response or an Error                   |
+| `errorCode`                  | The `ErrorCode` of the error, e.g. `NotFound`                            |
+| `errorMessage`               | The error message                                                        |
+| `errors`                     | All field validation errors                                              |
+| `fieldError(name)`           | The `ResponseError` for a field, if it has one                           |
+| `fieldErrorMessage(name)`    | The validation error message for a field, if it has one                  |
+| `hasFieldError(name)`        | Whether a field has a validation error                                   |
+| `errorSummary`               | The error message when it's not a field validation error                 |
+| `showSummary([exceptFields])`| Whether to display a summary error message for the specified fields       |
+| `addFieldError(name,message)`| Add a client-side validation error to the result                         |
+
+Which lets you handle each class of error appropriately:
+
+```dart
+var api = await client.api(ThrowValidation(email: "invalidemail"));
+
+if (api.failed) {
+    // Display validation errors next to their fields
+    print(api.fieldErrorMessage("Email")); //= 'Email' is not a valid email address.
+    print(api.hasFieldError("Age"));       //= true
+
+    for (var error in api.errors) {
+        print("${error.fieldName}: ${error.errorCode} - ${error.message}");
+    }
+
+    // Only show the summary message when the field errors aren't displayed
+    if (api.showSummary(["Email"])) {
+        print(api.errorSummary);
+    }
+}
+```
+
+Whilst `errorCode` lets you handle different classes of errors, e.g. APIs that require Authentication return a `401` error code:
+
+```dart
+var api = await client.api(RequiresAdmin());
+if (api.errorCode == "401") {
+    // Re-authenticate...
+}
+```
+
+### Error Handling
+
+All non `api()` requests throw a structured `WebServiceException` containing the same information available in [ServiceStack's structured Error Responses](/error-handling):
+
+```dart
+try {
+    await client.post(ThrowType(type: "NotFound", message: "not here"));
+} on WebServiceException catch (e) {
+    print(e.statusCode);         //= 404
+    print(e.statusDescription);  //= Not Found
+    print(e.message);            //= not here
+    var status = e.responseStatus!;
+    print(status.errorCode);     //= NotFound
+    print(status.message);       //= not here
+    print(status.stackTrace);
+}
+```
+
+Where APIs with failed [Validation Rules](/validation) return all field validation errors in `responseStatus.errors`:
+
+```dart
+try {
+    await client.post(ThrowValidation(email: "invalidemail"));
+} on WebServiceException catch (e) {
+    var errors = e.responseStatus!.errors!;
+    print(errors[0].errorCode);  //= InclusiveBetween
+    print(errors[0].fieldName);  //= Age
+    print(errors[0].message);    //= 'Age' must be between 1 and 120. You entered 0.
+    print(errors[2].errorCode);  //= Email
+    print(errors[2].fieldName);  //= Email
+    print(errors[2].message);    //= 'Email' is not a valid email address.
+}
+```
+
+Connection and transport errors are also surfaced as a `WebServiceException` (with a `500` status code) so failed requests can be handled the same way, e.g:
+
+```dart
+var client = JsonServiceClient("http://unknown-zzz.net")
+    ..connectionTimeout = Duration(seconds: 1);
+
+var api = await client.api(Hello(name: "World"));
+print(api.error!.errorCode); //= 500
+print(api.error!.message);   //= SocketException: ...
+```
+
+Should you need to inspect **all** errors in a single place you can register a client `exceptionFilter`:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..exceptionFilter = (res, e) {
+        if (e is WebServiceException) {
+            print("ERROR: ${json.encode(e.responseStatus)}");
+        }
+    };
+```
+
+Or handle every error in your App with the `JsonServiceClient.globalExceptionFilter`.
+
+### Sending Runtime Arguments
+
+Every `IServiceClient` API supports an optional `args` parameter for sending additional arguments that aren't defined on the typed Request DTO which are sent on the QueryString, useful for calling [AutoQuery](/autoquery/rdbms) APIs with any of its supported [Implicit Conventions](/autoquery/rdbms#implicit-conventions):
+
+```dart
+var response = await client.get(FindTechnologies()..take = 3,
+    args: {"VendorName": "Amazon"});
+```
+
+It can also be used to send [JS Config](/customize-json-responses) options to change how the Response is serialized, e.g:
+
+```dart
+var api = await client.api(ThrowValidation(),
+    args: {"jsconfig": "EmitCamelCaseNames:true"});
+```
+
+### Calling APIs with Custom URLs
+
+APIs can also be called with any relative or absolute URL where their JSON Response is returned in a `Map<String,dynamic>` that can be converted into a typed DTO with its `fromJson()` constructor:
+
+```dart
+// Any of the different ways to call the same API:
+var jsonObj = await client.getUrl("/hello/World");                              // Path Info
+var jsonObj = await client.getUrl("https://test.servicestack.net/hello/World"); // Absolute URL
+var jsonObj = await client.getUrl("/hello", args: {"name": "World"});           // QueryString
+
+var response = HelloResponse.fromJson(jsonObj);
+```
+
+Alternatively use the `*As` APIs with a `responseAs` instance to have the Response deserialized into a typed DTO, `String` or `Uint8List`:
+
+```dart
+HelloResponse dto = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: HelloResponse());
+
+String jsonStr = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: TypeAs.string);
+
+Uint8List bytes = await client.getAs("/hello",
+    args: {"name": "World"}, responseAs: TypeAs.bytes);
+```
+
+The same APIs are available for each HTTP Verb, e.g. `postToUrl`, `postAs`, `putToUrl`, `putAs`, `patchToUrl`, `patchAs`, `deleteUrl` and `deleteAs`, which can also send custom JSON or plain text Request Bodies:
+
+```dart
+// Send a Map as the JSON Request Body
+var jsonObj = await client.postToUrl("/sendjson", {"foo": "bar"},
+    args: toMap(SendJson(id: 1, name: "name")));
+
+// Send a raw JSON String Request Body with a typed Request DTO
+var jsonStr = await client.post(SendJson(id: 1, name: "name"),
+    body: json.encode({"foo": "bar"}));
+
+// Send a raw text Request Body
+var str = await client.post(
+    SendText(id: 1, name: "name", contentType: "text/plain"), body: "foo");
+```
+
+Generic Response Types can be deserialized by initializing them with the `context` of your generated DTOs:
+
+```dart
+var response = await client.getAs("/technology/search",
+    args: {"Take": 3, "VendorName": "Amazon"},
+    responseAs: QueryResponse<Technology>()..context = FindTechnologies().context);
+```
+
+### Raw Data Responses
+
+Services that [return raw data](/service-return-types) are also seamlessly supported where APIs implementing `IReturn<String>` return the raw HTTP Body in a `String` whilst `IReturn<byte[]>` and `IReturn<Stream>` APIs return a `Uint8List`:
+
+```dart
+String str = await client.get(HelloString(name: "World"));
+
+Uint8List bytes = await client.get(HelloImage(name: "Flutter",
+    fontFamily: "Roboto", background: "#0091EA", width: 500, height: 170));
+```
+
+Which in Flutter can be rendered directly with the [Image widget](https://api.flutter.dev/flutter/widgets/Image-class.html), e.g. `Image.memory(bytes)`.
+
+### Batched Requests
+
+The `sendAll` and `sendAllOneWay` APIs let you use ServiceStack's [Auto Batched Requests](/auto-batched-requests) feature to send multiple Request DTOs of the same Type in a single Request (sent to `/api/Hello[]`), that returns all their Responses in a single Response:
+
+```dart
+var requests = ["foo", "bar", "baz"].map((name) => Hello(name: name));
+
+List<HelloResponse> responses = await client.sendAll(requests);
+//= [Hello, foo!, Hello, bar!, Hello, baz!]
+```
+
+Use `sendAllOneWay` for fire-and-forget batched requests that ignore their Responses, which also supports `IReturnVoid` Request DTOs:
+
+```dart
+await client.sendAllOneWay([1, 2, 3].map((id) => HelloReturnVoid(id: id)));
+```
+
+### Authentication
+
+The Service Clients support all of ServiceStack's [Authentication](/auth/authentication-and-authorization) options.
+
+#### HTTP Basic Auth
+
+Use `setCredentials()` to send [HTTP Basic Auth](/auth/client-auth) credentials on each request:
+
+```dart
+client.setCredentials("test", "test");
+var response = await client.get(TestAuth());
+```
+
+#### Credentials Auth
+
+Alternatively you can authenticate using the [Credentials Auth Provider](/auth/authentication-and-authorization#credentials-auth-providers) by sending an `Authenticate` Request DTO, where any [Session Cookies](/auth/sessions) or Tokens returned are automatically retained on the client instance and re-sent on subsequent requests:
+
+```dart
+var authResponse = await client.post(Authenticate(
+    provider: "credentials", userName: "test", password: "test"));
+
+print(authResponse.userId);      //= 1
+print(authResponse.sessionId);
+print(authResponse.bearerToken);
+print(authResponse.refreshToken);
+
+// Client is now authenticated
+var response = await client.get(TestAuth());
+```
+
+Sign out by sending a `logout` Authenticate request, e.g. `await client.post(Authenticate(provider:"logout"))`.
+
+#### JWT and API Keys
+
+Populate `bearerToken` to authenticate with a [JWT Token](/auth/jwt-authprovider) or an [API Key](/auth/api-key-authprovider):
+
+```dart
+client.bearerToken = jwt;             // JWT Bearer Token
+client.bearerToken = "ak-3d3...4f6";  // API Key
+```
+
+#### Refresh Tokens
+
+Instead of a JWT you can populate the client with just a long-lived [Refresh Token](/auth/jwt-authprovider#refresh-tokens) where the client will transparently fetch a new JWT Bearer Token and replay any requests that returned `401 Unauthorized`:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..refreshToken = authResponse.refreshToken;
+
+var response = await client.get(TestAuth()); // Auto fetches JWT + retries
+```
+
+The same transparent behavior is also applied when the Server returns [Token Cookies](/auth/jwt-authprovider#jwt-token-cookies) where an expired `ss-tok` Access Token Cookie is automatically refreshed using its `ss-reftok` Refresh Token Cookie which you can access with:
+
+```dart
+var accessToken = client.getTokenCookie();        // ss-tok
+var refreshToken = client.getRefreshTokenCookie(); // ss-reftok
+```
+
+Should the Refresh Token itself be invalid or expired, a `WebServiceException` with a `RefreshTokenException` type is thrown so your App can prompt the User to sign in again:
+
+```dart
+try {
+    await client.get(TestAuth());
+} on WebServiceException catch (e) {
+    if (e.type == WebServiceExceptionType.RefreshTokenException) {
+        // Refresh Token invalid or expired, sign in again...
+    }
+}
+```
+
+#### Transparently handle 401 Unauthorized Responses
+
+The `onAuthenticationRequired` async callback lets you handle re-authenticating your client where the failed request is transparently replayed with the new authenticated client, e.g:
+
+```dart
+client.onAuthenticationRequired = () async {
+    client.userName = "test";
+    client.password = "test";
+};
+
+// Fails with 401, re-authenticates then transparently retries the request
+var response = await client.get(TestAuth());
+```
+
+Use `client.clearCookies()` to clear any Session and Token Cookies retained on the client.
+
+### Request, Response and URL Filters
+
+Each client supports both instance and global filters for inspecting and modifying HTTP Requests and Responses, e.g. to add a custom HTTP Header on all requests or to inspect the HTTP Headers returned:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..requestFilter = (req) => req.headers.add("X-Custom", "Value")
+    ..responseFilter = (res) => print(res.headers["X-Args"]);
+
+JsonServiceClient.globalRequestFilter = (req) => print(req.uri);
+JsonServiceClient.globalResponseFilter = (res) => print(res.statusCode);
+```
+
+Instance filters are invoked before their global counterparts, i.e. `requestFilter`, `globalRequestFilter`, `responseFilter`, `globalResponseFilter`.
+
+The `urlFilter` can be used to inspect the URL each API is sent to which is useful for debugging and verifying which URLs are being called:
+
+```dart
+client.urlFilter = (url) => print(url);
+```
+
+::: info
+As the Request/Response filters have different Type signatures in the Dart VM (`HttpClientRequest`/`HttpClientResponse`) and Web (`Request`/`Response`) clients they're not declared on the shared `IServiceClient` interface, but thanks to Dart's type inference most filter source code remains source-compatible between both clients
+:::
+
+### Client Configuration
+
+#### JSON /api Route
+
+`JsonServiceClient` and `JsonWebClient` are configured to call the modern [/api pre-defined route](/endpoint-routing#api-pre-defined-route) by default, i.e:
+
+```dart
+var client = JsonServiceClient("https://test.servicestack.net");
+client.replyBaseUrl;   //= https://test.servicestack.net/api/
+client.oneWayBaseUrl;  //= https://test.servicestack.net/api/
+```
+
+To call older ServiceStack Servers you can use the `legacy()` constructors (or set `basePath = null`) to use the pre-existing `/json/reply` and `/json/oneway` routes:
+
+```dart
+var client = JsonServiceClient.legacy("https://test.servicestack.net");
+// or with the platform-neutral factory:
+// var client = ClientFactory.legacy("https://test.servicestack.net");
+
+client.replyBaseUrl;   //= https://test.servicestack.net/json/reply/
+client.oneWayBaseUrl;  //= https://test.servicestack.net/json/oneway/
+```
+
+Or change it at anytime with the `basePath` setter, e.g. `client.basePath = "api"`.
+
+#### Configuring Clients
+
+Both concrete clients support additional configuration for customizing behavior of their underlying HTTP Clients:
+
+```dart
+var client = JsonServiceClient(baseUrl)
+    ..headers = {HttpHeaders.acceptHeader: "application/json"} // Default Headers
+    ..connectionTimeout = Duration(seconds: 10)
+    ..maxRetries = 5;      // Max retries for failed connections
+
+client.close();            // Close the client and its open connections
+```
+
+#### Ignoring Self-Signed Certificates
+
+`ClientOptions` lets you create clients that ignore the self-signed certificates used in local development, either for its `baseUrl` with `ignoreCert:true` or for a specific list of hosts:
+
+```dart
+// Ignore the self-signed certificate of the client's baseUrl
+var client = ClientFactory.createWith(ClientOptions(
+    baseUrl: 'https://dev.servicestack.com:5001', ignoreCert: true));
+
+// Or ignore the certificates of a specific list of hosts
+var options = ClientOptions(baseUrl: 'https://dev.servicestack.com:5001')
+    ..ignoreCertificatesFor.addAll([
+        'https://dev.servicestack.com:5001',
+        'http://local.servicestack.com',
+    ]);
+var devClient = ClientFactory.createWith(options);
+```
+
+### Uploading Files
+
+`postFileWithRequest` lets you upload a file with a populated Request DTO which is sent as a `multipart/form-data` request where all populated Request DTO properties are sent as form fields alongside the file:
+
+```dart
+var audioFile = File('audio.wav');
+
+var response = await client.postFileWithRequest(SpeechToText(), UploadFile(
     fieldName: 'audio',
     fileName: audioFile.uri.pathSegments.last,
     contentType: 'audio/wav',
-    contents: await audioFile.readAsBytes()
-);
-
-var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
+    contents: await audioFile.readAsBytes()));
 ```
 
-To upload multiple files use `postFilesWithRequest`.
+This example calls [AI Server's](/ai-server/) `SpeechToText` API, use `postFilesWithRequest` to upload multiple files in the same request:
 
+```dart
+var request = TestFileUploads()
+    ..id = 1
+    ..refId = "zid";
 
-#### Comprehensive Test Suite
+var files = [
+    UploadFile(fieldName: 'audio', fileName: 'test.txt',
+        contentType: 'text/plain', contents: utf8.encode("Hello World")),
+    UploadFile(fieldName: 'content', fileName: 'test.md',
+        contentType: 'text/markdown', contents: utf8.encode("## Heading")),
+];
 
-To ensure a high quality implementation we've ported the [TypeScript @servicestack/client](https://github.com/ServiceStack/servicestack-client) test suite over to Dart which is itself a good resource for discovering [different supported features and flexible HTTP Request options](https://github.com/ServiceStack/servicestack-dart/tree/master/test) available. 
+var response = await client.postFilesWithRequest(request, files);
+
+print(response.files![0].fileName);      //= test.txt
+print(response.files![0].contentLength); //= 11
+```
+
+Both APIs accept optional `requestFilter` and `responseFilter` arguments for customizing the multipart Request whilst `postFilesWithRequestAs` lets you upload files to a custom URL:
+
+```dart
+var response = await client.postFilesWithRequestAs("/custom/path", request, files,
+    responseAs: TestFileUploadsResponse());
+```
+
+::: info
+File Uploads are implemented in the `dart:io` `JsonServiceClient`
+:::
+
+### Built-in ServiceStack DTOs
+
+The `servicestack` package includes typed DTOs for ServiceStack's built-in APIs letting you call them without needing to generate them, including `Authenticate`, `Register`, `AssignRoles`, `UnAssignRoles`, `GetApiKeys`, `RegenerateApiKeys`, `ConvertSessionToToken`, `GetAccessToken` and `GetNavItems` as well as the built-in `ResponseStatus`, `ResponseError`, `QueryResponse<T>`, `EmptyResponse`, `IdResponse`, `StringResponse`, `StringsResponse`, `KeyValuePair<K,V>` and `Tuple<T1,T2>` types:
+
+```dart
+import 'package:servicestack/client.dart';
+
+var authResponse = await client.post(Authenticate(
+    provider: "credentials", userName: "test", password: "test"));
+
+var apiKeys = await client.get(GetApiKeys());
+var navItems = await client.get(GetNavItems());
+```
+
+[Background Jobs](/background-jobs) DTOs like `BackgroundJob`, `JobSummary`, `ScheduledTask`, `CompletedJob` and `FailedJob` are also included.
+
+### Inspecting API Responses
+
+The `Inspect` utils are useful for quickly viewing the contents of API Responses and Dart collections during development, where `Inspect.dump()` renders any object graph in a human-friendly format that ignores `null` properties:
+
+```dart
+import 'package:servicestack/inspect.dart';
+
+var response = await client.get(FindTechnologies()
+    ..vendorName = "Google"
+    ..take = 3
+    ..orderByDesc = "ViewCount"
+    ..fields = "Id,Name,VendorName,Tier");
+
+print(Inspect.dump(response.results!.first));
+```
+
+```
+{
+    id: 7,
+    name: AngularJS,
+    vendorName: Google,
+    tier: Client
+}
+```
+
+Whilst `Inspect.dumpTable()` renders any `Iterable` of records into a text table with auto-aligned columns:
+
+```dart
+print(Inspect.dumpTable(response.results!));
+```
+
+```
++----------------------------------------------------------+
+| id |       name       | vendorName |        tier         |
+|----------------------------------------------------------|
+|  7 | AngularJS        | Google     | Client              |
+| 18 | Go               | Google     | ProgrammingLanguage |
+| 77 | Protocol Buffers | Google     | Server              |
++----------------------------------------------------------+
+```
+
+Use `Inspect.printDump()` and `Inspect.printDumpTable()` to print them directly or `Inspect.vars()` to dump the state of multiple variables at once:
+
+```dart
+Inspect.vars({'response': response, 'results': response.results});
+```
+
+### Logging
+
+Both clients log to the `Log` abstraction which by default only logs `Warn` and `Error` messages to the Console. Enable debug logging to troubleshoot Type resolution and serialization issues:
+
+```dart
+Log.levels = [LogLevel.Debug, LogLevel.Info, LogLevel.Warn, LogLevel.Error];
+Log.logger = ConsoleLogger();   // or NullLogger() to disable logging
+```
+
+### Custom JSON Converters
+
+The conversion into and out of Dart Types is maintained in the extensible [JsonConverters](https://pub.dev/documentation/servicestack/latest/servicestack/JsonConverters-class.html) class where you can replace built-in converters with your own implementation or register new converters to take over handling of specific types:
+
+```dart
+class MyDateConverter implements IConverter {
+    @override
+    dynamic toJson(dynamic value, TypeContext context) => ...;
+    @override
+    dynamic fromJson(dynamic value, TypeContext context) => ...;
+}
+
+JsonConverters.Converters['DateTime'] = MyDateConverter();
+```
+
+Built-in converters include `DateTimeConverter` (ISO 8601 and WCF `/Date(…)/` formats), `ByteArrayConverter` (Base64), `KeyValuePairConverter`, `MapConverter`, `ListConverter` and `EnumConverter` which handles C# `enum`, `[Flags]` enums, enums with values and custom Enum Styles.
+
+C# `TimeSpan` properties are converted to Dart `Duration` using the XSD duration format which you can convert manually with:
+
+```dart
+fromTimeSpan("P11DT2H3M4.123S"); //= Duration(days:11,hours:2,minutes:3,seconds:4,milliseconds:123)
+toTimeSpan(Duration(hours: 1));  //= PT1H
+```
+
+### Comprehensive Test Suite
+
+To ensure a high quality implementation we've ported the [TypeScript @servicestack/client](https://github.com/ServiceStack/servicestack-client) test suite over to Dart which is itself a good resource for discovering [different supported features and flexible HTTP Request options](https://github.com/ServiceStack/servicestack-dart/tree/master/test) available, including:
+
+| Test Suite                                                                                                                       | Description                                                    |
+|----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| [client_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_test.dart)                           | All HTTP Verbs, custom URLs, raw responses, batching, uploads   |
+| [client_api_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_api_test.dart)                   | `api()` / `apiVoid()` and `ApiResult<T>` error handling          |
+| [client_auth_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/client_auth_test.dart)                 | JWT, Refresh Tokens, Token Cookies and re-authentication         |
+| [test_auth_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/test_auth_test.dart)                     | Basic Auth and Credentials Auth                                  |
+| [serization_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/serization_test.dart)                   | Serializing all C# Types, collections and inheritance            |
+| [enum_serization_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/enum_serization_test.dart)         | Enums, `[Flags]` Enums, Enum Lists and Maps                      |
+| [converter_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/converter_test.dart)                     | `DateTime` and XSD `Duration` conversions                        |
+| [techstacks_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/techstacks_test.dart)                   | AutoQuery requests with runtime args                             |
+| [aiserver_client_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/aiserver_client_test.dart)         | [AI Server](/ai-server/) file uploads, e.g. Speech to Text       |
+| [inspect_test.dart](https://github.com/ServiceStack/servicestack-dart/blob/master/test/inspect_test.dart)                         | `Inspect.dump()` and `Inspect.dumpTable()` utils                 |
+
+Which you can run after cloning the repo with:
+
+:::sh
+dart test
+:::
 
 ### HelloFlutter App
 
 To showcase popular API Requests in action we've created a basic [HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) App that mimics functionality in the [HelloMobile](https://github.com/ServiceStackApps/HelloMobile) App used to provide working examples of the same ServiceStack Service Client features running in the different supported Mobile and Desktop platforms.
 
-[HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) was created in VS Code with the [DartCode extension](https://dartcode.org) using the [Flutter: New Project](https://flutter.io/get-started/test-drive/#vscode) action in VS Code's Command Palette.
+[HelloFlutter](https://github.com/ServiceStackApps/HelloFlutter) was created in VS Code with the [DartCode extension](https://dartcode.org) using the [Flutter: New Project](https://docs.flutter.dev/get-started/test-drive?tab=vscode) action in VS Code's Command Palette.
 
 This creates a basic Flutter App which you can run in your Android Device or Android Emulator where it's automatically picked and made visible in the **bottom right** of VS Code's status bar.
 
 Then to use `JsonServiceClient` add the `servicestack` dependency to your apps [pubspec.yaml](https://github.com/ServiceStackApps/HelloFlutter/blob/master/pubspec.yaml):
 
   dependencies:
-    servicestack: ^2.0.1
+    servicestack: ^3.0.3
 
-Saving `pubspec.yaml` automatically runs [flutter packages get](https://flutter.io/using-packages/) to install any new dependencies in your App. 
+Saving `pubspec.yaml` automatically runs [flutter packages get](https://docs.flutter.dev/packages-and-plugins/using-packages) to install any new dependencies in your App. 
 
 Our App will be making API calls to 2 different ServiceStack instances which we'll need to get typed DTOs for using the `get-dtos` script:
 
@@ -31235,7 +33168,7 @@ result != null && result != ""
     : Image.memory(imageBytes, width:500.0, height:170.0),
 ```
 
-To display the image we assign the response to the `imageBytes` field within the stateful widget's `setState()` which triggers a re-render of the UI containing the generated Image displayed using the [Image widget](https://docs.flutter.io/flutter/widgets/Image-class.html):
+To display the image we assign the response to the `imageBytes` field within the stateful widget's `setState()` which triggers a re-render of the UI containing the generated Image displayed using the [Image widget](https://api.flutter.dev/flutter/widgets/Image-class.html):
 
 ![](/img/pages/dart/flutter/helloflutter-06.png)
 

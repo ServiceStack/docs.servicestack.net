@@ -6,10 +6,10 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T02:56:58.3183967Z'>
+    <meta name='date' content='2026-08-27T03:19:56.3148615Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
-    <title>PHP Add ServiceStack Reference</title>
+    <title>PHP ServiceStack Reference</title>
     <script>
     if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
     if (location.search === "?light") localStorage.removeItem('color-scheme') 
@@ -1478,13 +1478,14 @@ mount('#header', Header)
                 
                     <section class="not-prose mb-16 md:mb-12">
                         <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-                            PHP Add ServiceStack Reference
+                            PHP ServiceStack Reference
                         </h1>
                     </section>
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p><img src="/img/pages/servicestack-reference/php-reference.png" alt="ServiceStack and PHP Banner" /></p>
+                <div class="content"><div class="shadow -ml-12 w-[940px] rounded-md"><p><img src="/img/pages/servicestack-reference/php-reference.png" alt="ServiceStack and PHP Banner" /></p>
+</div>
 <p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types from directly within PhpStorm using <a href="https://plugins.jetbrains.com/plugin/7749-servicestack/">ServiceStack IntelliJ Plugin</a> - providing a simple way to give clients typed access to your ServiceStack Services.</p>
 <div class="flex justify-center">
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
@@ -1624,13 +1625,13 @@ packagist package enables the same productive, typed API development experience 
 client platforms.</p>
 <p>Using promoted constructors enables DTOs to be populated using a single constructor expression utilizing named parameters
 which together with the generic <code>JsonServiceClient</code> enables end-to-end typed API Requests in a single LOC:</p>
-<pre><code class="language-php">use Servicestack\JsonServiceClient;
+<pre><code class="language-php">use ServiceStack\JsonServiceClient;
 use dtos\Hello;
 
 $client = new JsonServiceClient(&quot;https://test.servicestack.net&quot;);
 
 /** @var HelloResponse $response */
-$response = client-&gt;get(new Hello(name:&quot;World&quot;));
+$response = $client-&gt;get(new Hello(name:&quot;World&quot;));
 </code></pre>
 <blockquote>
 <p>The <code>HelloResponse</code> optional type hint doesn't change runtime behavior but enables static analysis tools and IDEs like PyCharm to provide rich intelli-sense and development time feedback.</p>
@@ -1663,7 +1664,7 @@ require_once __DIR__ . '/vendor/autoload.php'; // Autoload files using Composer 
 require_once 'dtos.php';
 
 use dtos\FindTechnologies;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create(&quot;https://techstacks.io&quot;);
 
@@ -1748,8 +1749,12 @@ support where it will transparently fetch new JWT Bearer Tokens automatically be
     public array $cookies = [];
 
     public function __construct(string $baseUrl);
+    public static function create(string $baseUrl): JsonServiceClient;
 
+    public function setBasePath(string $path): void;
     public function setCredentials(?string $userName = null, ?string $password = null) : void;
+    public function setBearerToken(?string $bearerToken): void;
+    public function setRefreshToken(?string $refreshToken): void;
     public function getTokenCookie();
     public function getRefreshTokenCookie();
 
@@ -1948,7 +1953,7 @@ require_once 'dtos.php';
 
 use dtos\GetTechnology;
 use dtos\GetTechnologyResponse;
-use Servicestack\JsonServiceClient;
+use ServiceStack\JsonServiceClient;
 
 $client = JsonServiceClient::create(&quot;https://techstacks.io&quot;);
 
@@ -1960,6 +1965,41 @@ $tech = $response-&gt;technology; // typed to Technology
 echo &quot;$tech-&gt;name by $tech-&gt;vendorName from $tech-&gt;productUrl\n&quot;;
 echo &quot;$tech-&gt;name TechStacks:\n&quot;;
 print_r($response-&gt;technologyStacks);
+</code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>send</code> uses the HTTP Method its API is annotated with, which generated DTOs return from the <code>getMethod()</code> implementation
+that's populated from the API's <code>@Route</code> Verb or from its <code>IGet</code>, <code>IPost</code>, <code>IPut</code>, <code>IPatch</code>, <code>IDelete</code> and <code>IOptions</code>
+interface markers:</p>
+<pre><code class="language-php">// @Route(&quot;/technology/{Slug}&quot;)
+class GetTechnology implements IReturn, IGet, JsonSerializable
+{
+    //...
+    public function getMethod(): string { return 'GET'; }
+}
+
+// GET /api/GetTechnology?slug=ServiceStack
+/** @var GetTechnologyResponse $response */
+$response = $client-&gt;send(new GetTechnology(slug:&quot;ServiceStack&quot;));
+</code></pre>
+<p>Request DTOs that aren't annotated with a Verb default to <code>POST</code> (whilst <a href="/autoquery/">AutoQuery</a> Requests inheriting
+<code>QueryDb</code> default to <code>GET</code>), which can be overridden per Request by using the explicit <code>get</code>, <code>post</code>, <code>put</code>, <code>patch</code>,
+<code>delete</code>, <code>head</code> and <code>options</code> methods:</p>
+<pre><code class="language-php">$client-&gt;get(new SendReturnVoid(id:1));     // GET
+$client-&gt;post(new SendReturnVoid(id:2));    // POST
+$client-&gt;put(new SendReturnVoid(id:3));     // PUT
+$client-&gt;delete(new SendReturnVoid(id:4));  // DELETE
+</code></pre>
+<p>The HTTP Method also determines whether a Request DTO's populated properties are sent in the QueryString or the JSON
+Request Body, where only <code>GET</code>, <code>DELETE</code>, <code>HEAD</code> and <code>OPTIONS</code> Requests send their properties in the QueryString.</p>
+<p>APIs that don't return a Response Body implement <code>IReturnVoid</code> and can be sent with any of the client's methods:</p>
+<pre><code class="language-php">$client-&gt;post(new HelloReturnVoid(id:1));
+</code></pre>
+<p>Use <code>resolveHttpMethod</code> to resolve what HTTP Method a Request DTO will be sent with:</p>
+<pre><code class="language-php">use function ServiceStack\resolveHttpMethod;
+
+resolveHttpMethod(new SendGet());   // GET
+resolveHttpMethod(new SendPost());  // POST
+resolveHttpMethod(new SendPut());   // PUT
 </code></pre>
 <h3 id="phpdoc-typed-annotations">PHPDoc Typed Annotations<a class="header-anchor" href="javascript:;" onclick="location.hash='#phpdoc-typed-annotations'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Whilst PHP is a dynamic language with limited support for static typing and generics included in the PHP language itself,
@@ -1994,8 +2034,43 @@ $response = $client-&gt;post($request);
     password: &quot;test&quot;,
     rememberMe: true));
 </code></pre>
+<h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><a href="/autoquery/">AutoQuery</a> APIs return a typed <code>QueryResponse&lt;T&gt;</code> whose <code>results</code> are typed to the Response Type declared
+in the Request DTO's <code>#[Returns]</code> annotation, e.g:</p>
+<pre><code class="language-php">use ServiceStack\QueryResponse;
+use dtos\{FindTechnologies,TechnologyView};
+
+/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;get(new FindTechnologies(ids:[1,2,3], vendorName:&quot;Google&quot;));
+
+/** @var array&lt;TechnologyView&gt; $results */
+$results = $response-&gt;results;
+
+foreach ($results as $tech) {
+    echo &quot;$tech-&gt;id $tech-&gt;name ($tech-&gt;viewCount)\n&quot;;
+}
+</code></pre>
+<p>As generated AutoQuery DTOs use promoted constructors for their own properties, the query params they inherit from their
+<code>QueryDb</code> base class are populated as properties:</p>
+<pre><code class="language-php">$request = new FindTechnologies(vendorName:&quot;Google&quot;);
+$request-&gt;take = 5;
+$request-&gt;orderByDesc = &quot;viewCount&quot;;
+$request-&gt;fields = &quot;id,name,vendorName,viewCount&quot;;
+
+/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;get($request);
+
+echo &quot;Showing &quot; . count($response-&gt;results) . &quot; of $response-&gt;total\n&quot;;
+</code></pre>
+<p>Which can also be called with a custom URL by specifying the generic Response Type with <code>QueryResponse::create()</code>:</p>
+<pre><code class="language-php">$args = [&quot;take&quot; =&gt; 3, &quot;vendorName&quot; =&gt; &quot;Amazon&quot;];
+
+/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;getUrl(&quot;/technology/search&quot;, args:$args,
+    responseAs: QueryResponse::create([&quot;TechnologyView&quot;]));
+</code></pre>
 <h3 id="sending-additional-arguments-with-typed-api-requests">Sending additional arguments with Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-additional-arguments-with-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Many AutoQuery Services utilize <a href="/autoquery-rdbms#implicit-conventions">implicit conventions</a>
+<p>Many AutoQuery Services utilize <a href="/autoquery/rdbms#implicit-conventions">implicit conventions</a>
 to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments
 with the typed Request DTO, e.g:</p>
 <pre><code class="language-php">/** @var QueryResponse&lt;TechnologyView&gt; $response */
@@ -2008,19 +2083,204 @@ $response = $client-&gt;get(new FindTechnologies(), args:[&quot;vendorName&quot;
 $client-&gt;getUrl(&quot;https://techstacks.io/technology/ServiceStack&quot;, 
     responseAs:new GetTechnologyResponse());
 
-// https://techstacks.io/technology?Slug=ServiceStack
-$args = [&quot;slug&quot; =&gt; &quot;ServiceStack&quot;]
-client.getUrl(&quot;/technology&quot;, args:$args, responseAs:new GetTechnologyResponse()); 
+// https://techstacks.io/technology?slug=ServiceStack
+$args = [&quot;slug&quot; =&gt; &quot;ServiceStack&quot;];
+$client-&gt;getUrl(&quot;/technology&quot;, args:$args, responseAs:new GetTechnologyResponse());
 </code></pre>
 <p>as well as POST Request DTOs to custom urls:</p>
-<pre><code class="language-php">$client-&gt;postUrl(&quot;/custom-path&quot;, $request, args:[&quot;slug&quot; =&gt; &quot;ServiceStack&quot;]);
+<pre><code class="language-php">$client-&gt;postUrl(&quot;/custom-path&quot;, body:$request, args:[&quot;slug&quot; =&gt; &quot;ServiceStack&quot;]);
 
-$client-&gt;postUrl(&quot;http://example.org/custom-path&quot;, $request);
+$client-&gt;postUrl(&quot;http://example.org/custom-path&quot;, body:$request);
 </code></pre>
+<p>Where <code>responseAs</code> can be populated with an instance of the Response DTO the Response should be deserialized into, the
+<code>'string'</code> Type to return the raw JSON or left unspecified to return the parsed JSON in a PHP associative array:</p>
+<pre><code class="language-php">// Deserialized into a typed Response DTO
+$response = $client-&gt;getUrl(&quot;/hello&quot;, args:[&quot;name&quot; =&gt; &quot;World&quot;], responseAs:new HelloResponse());
+echo $response-&gt;result;   // Hello, World!
+
+// Raw JSON string
+$json = $client-&gt;getUrl(&quot;/hello&quot;, args:[&quot;name&quot; =&gt; &quot;World&quot;], responseAs:'string');
+// {&quot;result&quot;:&quot;Hello, World!&quot;}
+
+// Associative array
+$obj = $client-&gt;postUrl(&quot;/hello&quot;, body:json_encode(new Hello(name:&quot;World&quot;)));
+echo $obj['result'];      // Hello, World!
+</code></pre>
+<p>Sending a Request DTO in the <code>body</code> of a <code>*Url</code> method uses its Response Type when <code>responseAs</code> isn't specified:</p>
+<pre><code class="language-php">/** @var HelloResponse $response */
+$response = $client-&gt;postUrl(&quot;/hello&quot;, body:new Hello(name:&quot;World&quot;));
+</code></pre>
+<h3 id="built-in-servicestack-dtos">Built-in ServiceStack DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-servicestack-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <code>servicestack/client</code> package includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them
+without needing to generate them:</p>
+<pre><code class="language-php">use ServiceStack\{Authenticate,AuthenticateResponse,AssignRoles,UnAssignRoles,
+    ConvertSessionToToken,GetAccessToken,GetAccessTokenResponse};
+
+// Authentication
+/** @var AuthenticateResponse $auth */
+$auth = $client-&gt;post(new Authenticate(
+    provider:&quot;credentials&quot;, userName:&quot;test&quot;, password:&quot;test&quot;, rememberMe:true));
+
+// JWT
+$client-&gt;post(new ConvertSessionToToken());  // Session -&gt; JWT Cookies
+
+/** @var GetAccessTokenResponse $access */
+$access = $client-&gt;post(new GetAccessToken(refreshToken:$auth-&gt;refreshToken));
+
+// Roles and Permissions
+$client-&gt;post(new AssignRoles(userName:&quot;user&quot;, roles:[&quot;Employee&quot;]));
+$client-&gt;post(new UnAssignRoles(userName:&quot;user&quot;, roles:[&quot;Employee&quot;]));
+</code></pre>
+<p>Together with the built-in Response Types, interface markers and base types that generated DTOs reference:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ResponseStatus</code></td>
+<td>ServiceStack's structured error response</td>
+</tr>
+<tr>
+<td><code>ResponseError</code></td>
+<td>An individual field validation error</td>
+</tr>
+<tr>
+<td><code>EmptyResponse</code></td>
+<td>Response of APIs that don't return a Response Body</td>
+</tr>
+<tr>
+<td><code>IdResponse</code></td>
+<td>Response returning the Id of the created or updated entity</td>
+</tr>
+<tr>
+<td><code>StringResponse</code> / <code>StringsResponse</code></td>
+<td>Response returning a single <code>result</code> string or <code>results</code> array</td>
+</tr>
+<tr>
+<td><code>QueryResponse&lt;T&gt;</code></td>
+<td>Typed Response of <a href="/autoquery/">AutoQuery</a> Requests</td>
+</tr>
+<tr>
+<td><code>QueryDb</code> <code>QueryDb2</code> <code>QueryData</code> <code>QueryData2</code> <code>QueryBase</code></td>
+<td>Base types of generated AutoQuery Request DTOs</td>
+</tr>
+<tr>
+<td><code>IGet</code> <code>IPost</code> <code>IPut</code> <code>IPatch</code> <code>IDelete</code> <code>IOptions</code></td>
+<td>Interface markers resolving a Request DTO's HTTP Method</td>
+</tr>
+<tr>
+<td><code>IReturn</code> / <code>IReturnVoid</code></td>
+<td>Interface markers resolving a Request DTO's Response Type</td>
+</tr>
+<tr>
+<td><code>ICreateDb</code> <code>IUpdateDb</code> <code>IPatchDb</code> <code>IDeleteDb</code> <code>ISaveDb</code></td>
+<td>Interface markers of <a href="/autoquery/crud">AutoQuery CRUD</a> APIs</td>
+</tr>
+<tr>
+<td><code>IHasSessionId</code> / <code>IHasBearerToken</code> / <code>IHasVersion</code></td>
+<td>Interface markers for Requests carrying auth and versioning info</td>
+</tr>
+<tr>
+<td><code>AuditBase</code></td>
+<td>Base type of Tables with <a href="/autoquery/audit-log">Audit</a> fields</td>
+</tr>
+<tr>
+<td><code>KeyValuePair2</code> / <code>Tuple2</code> / <code>Tuple3</code></td>
+<td>.NET's <code>KeyValuePair&lt;K,V&gt;</code>, <code>Tuple&lt;A,B&gt;</code> and <code>Tuple&lt;A,B,C&gt;</code></td>
+</tr>
+<tr>
+<td><code>ByteArray</code></td>
+<td>Binary <code>byte[]</code> and <code>Stream</code> data, serialized as Base64</td>
+</tr>
+<tr>
+<td><code>ArrayList</code></td>
+<td>Response of APIs returning a naked collection</td>
+</tr>
+<tr>
+<td><code>UploadFile</code></td>
+<td>A file uploaded in a <code>multipart/form-data</code> Request</td>
+</tr>
+<tr>
+<td><code>WebServiceException</code> / <code>RefreshTokenException</code></td>
+<td>Structured error details of a failed Request</td>
+</tr>
+</tbody>
+</table>
+<p>As well as <code>NavItem</code> and <code>GetNavItems</code>, <code>Register</code>, <code>GetApiKeys</code>, <code>RegenerateApiKeys</code>, <code>UserApiKey</code>, <code>CancelRequest</code>
+and <code>UpdateEventSubscriber</code> DTOs for calling their built-in APIs.</p>
 <h3 id="uploading-files">Uploading Files<a class="header-anchor" href="javascript:;" onclick="location.hash='#uploading-files'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>The <code>post_file_with_request</code> method can be used to upload a file with an API Request.</p>
+<p>Use <code>postFileWithRequest</code> to upload a file with an API Request, where the Request DTO's populated properties are sent
+as form fields alongside the file in a <code>multipart/form-data</code> Request:</p>
+<pre><code class="language-php">use ServiceStack\UploadFile;
+
+/** @var TestFileUploadsResponse $response */
+$response = $client-&gt;postFileWithRequest(new TestFileUploads(id:1, refId:&quot;zid&quot;),
+    new UploadFile(
+        filePath: '/path/to/test.txt',
+        fileName: 'test.txt',
+        fieldName: 'file',
+        contentType: 'text/plain'
+    ));
+</code></pre>
+<p>Where <code>UploadFile</code> describes each file to upload:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>filePath</code></td>
+<td>Path of the file to upload</td>
+</tr>
+<tr>
+<td><code>fileName</code></td>
+<td>File name the file is uploaded with</td>
+</tr>
+<tr>
+<td><code>fieldName</code></td>
+<td>Name of the form field the file is uploaded in, defaults to <code>upload</code></td>
+</tr>
+<tr>
+<td><code>contentType</code></td>
+<td>Content-Type of the file, inferred from its file extension when not specified</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>postFilesWithRequest</code> to upload multiple files in the same Request:</p>
+<pre><code class="language-php">$uploads = [
+    new UploadFile(filePath:$textFile, fileName:'test.txt', 
+        fieldName:'audio',   contentType:'text/plain'),
+    new UploadFile(filePath:$mdFile,   fileName:'test.md',  
+        fieldName:'content', contentType:'text/markdown'),
+];
+
+/** @var TestFileUploadsResponse $response */
+$response = $client-&gt;postFilesWithRequest(new TestFileUploads(id:1, refId:&quot;zid&quot;), $uploads);
+
+foreach ($response-&gt;files as $file) {
+    echo &quot;$file-&gt;name $file-&gt;fileName $file-&gt;contentType $file-&gt;contentLength\n&quot;;
+}
+</code></pre>
+<p>Or <code>postFileWithRequestUrl</code> and <code>postFilesWithRequestUrl</code> to upload files to a custom relative or absolute URL:</p>
+<pre><code class="language-php">$response = $client-&gt;postFilesWithRequestUrl('/api/TestFileUploads', 
+    new TestFileUploads(id:1, refId:&quot;zid&quot;), $uploads);
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p><code>contentType</code> is optional where it's otherwise inferred from the file name extension, defaulting to <code>application/octet-stream</code></p>
+</div>
 <h3 id="php-speech-to-text">PHP Speech to Text<a class="header-anchor" href="javascript:;" onclick="location.hash='#php-speech-to-text'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<pre><code class="language-php">$audioFile = __DIR__ . '/files/audio.wav';
+<p>Here's an example calling <a href="/ai-server/">AI Server's</a> <code>SpeechToText</code> API:</p>
+<pre><code class="language-php">$client = JsonServiceClient::create($aiServerUrl);
+$client-&gt;setBearerToken($aiServerApiKey);
+
+$audioFile = __DIR__ . '/files/audio.wav';
 
 /** @var GenerationResponse $response */
 $response = $client-&gt;postFileWithRequest(new SpeechToText(),
@@ -2030,8 +2290,10 @@ $response = $client-&gt;postFileWithRequest(new SpeechToText(),
         fieldName: 'audio',
         contentType: 'audio/wav'
     ));
+
+echo $response-&gt;textOutputs[0]-&gt;text;
 </code></pre>
-<p>To upload multiple files use <code>postFilesWithRequest</code>.</p>
+<p>Which can be used to call any of <a href="/ai-server/">AI Server's</a> APIs that accept file uploads.</p>
 <h3 id="raw-data-responses">Raw Data Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#raw-data-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The <code>JsonServiceClient</code> also supports Raw Data responses like <code>string</code> and <code>byte[]</code> which also get a Typed API once
 declared on Request DTOs using the <code>IReturn&lt;T&gt;</code> marker:</p>
@@ -2040,41 +2302,168 @@ public class ReturnBytes : IReturn&lt;byte[]&gt; {}
 </code></pre>
 <p>Which can then be accessed as normal, with their Response typed to a PHP <code>string</code> or <code>ByteArray</code> for raw <code>byte[]</code> responses:</p>
 <pre><code class="language-php">/** @var string $str */ 
-$str = client.get(new ReturnString());
+$str = $client-&gt;get(new ReturnString());
 
 /** @var ByteArray $data */ 
-$data = client-&gt;get(new ReturnBytes());
+$data = $client-&gt;get(new ReturnBytes());
 </code></pre>
+<h3 id="batched-requests">Batched Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#batched-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Multiple Request DTOs of the same Type can be sent together in a single Request with <code>sendAll</code> which returns all
+their Responses:</p>
+<pre><code class="language-php">$requests = array_map(fn($name) =&gt; new Hello(name:$name), [&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]);
+
+// POST /api/Hello[]
+$responses = $client-&gt;sendAll($requests);
+
+echo implode(&quot;, &quot;, array_map(fn($x) =&gt; $x-&gt;result, $responses));
+// Hello, foo!, Hello, bar!, Hello, baz!
+</code></pre>
+<p>Or use <code>sendAllOneWay</code> to send Requests you want to ignore the Responses of:</p>
+<pre><code class="language-php">$requests = array_map(fn($id) =&gt; new HelloReturnVoid(id:$id), [1, 2, 3]);
+
+// POST /api/HelloReturnVoid[]
+$client-&gt;sendAllOneWay($requests);
+</code></pre>
+<p>All Requests in a batch are sent to the same <code>/api/{Request}[]</code> endpoint (or to <code>/json/reply/{Request}[]</code> and
+<code>/json/oneway/{Request}[]</code> when the client is configured with <code>setBasePath('')</code>) where the Server executes them in order
+and returns the number of Requests it completed in the <code>X-AutoBatch-Completed</code> HTTP Response Header:</p>
+<pre><code class="language-php">$client-&gt;responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx-&gt;responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+</code></pre>
+<h3 id="sending-raw-request-bodies">Sending Raw Request Bodies<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-raw-request-bodies'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>APIs that accept a custom Request Body can be sent by populating the <code>body</code> param, where the Request DTO's properties
+are sent in the QueryString and the <code>body</code> is sent as the Request Body:</p>
+<pre><code class="language-php">// POST /api/SendJson?id=1&amp;name=name {&quot;foo&quot;:&quot;bar&quot;}
+$json = $client-&gt;post(new SendJson(id:1, name:&quot;name&quot;), body:json_encode([&quot;foo&quot; =&gt; &quot;bar&quot;]));
+
+// POST /api/SendText?id=1&amp;name=name foo
+$text = $client-&gt;post(new SendText(id:1, name:&quot;name&quot;, contentType:&quot;text/plain&quot;), body:&quot;foo&quot;);
+</code></pre>
+<p>A <code>string</code> body is sent as-is whilst a <code>JsonSerializable</code> DTO is serialized to JSON.</p>
+<h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Failed API Requests throw a <code>WebServiceException</code> containing the HTTP Status Code and the API's structured
+<a href="/error-handling">ResponseStatus</a> error:</p>
+<pre><code class="language-php">use ServiceStack\WebServiceException;
+
+try {
+    $client-&gt;put(new ThrowType(type:&quot;NotFound&quot;, message:&quot;not here&quot;));
+} catch (WebServiceException $ex) {
+    echo $ex-&gt;statusCode;                 // 404
+    echo $ex-&gt;responseStatus-&gt;errorCode;  // NotFound
+    echo $ex-&gt;responseStatus-&gt;message;    // not here
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>statusCode</code></td>
+<td>HTTP Status Code of the error Response, e.g. <code>404</code></td>
+</tr>
+<tr>
+<td><code>statusDescription</code></td>
+<td>HTTP Status Description, e.g. <code>&quot;Not Found&quot;</code></td>
+</tr>
+<tr>
+<td><code>responseStatus</code></td>
+<td>The API's structured <code>ResponseStatus</code> with its <code>errorCode</code>, <code>message</code> and <code>errors</code></td>
+</tr>
+<tr>
+<td><code>getMessage()</code></td>
+<td>The <code>ResponseStatus</code> Error Message, otherwise the HTTP Status Description</td>
+</tr>
+</tbody>
+</table>
+<p>APIs with <a href="/declarative-validation">Declarative Validation</a> or FluentValidation rules return each field validation
+error in <code>errors</code>, with the first error also captured in the summary <code>errorCode</code> and <code>message</code>:</p>
+<pre><code class="language-php">try {
+    $client-&gt;post(new ThrowValidation(email:&quot;invalidemail&quot;));
+} catch (WebServiceException $ex) {
+    $status = $ex-&gt;responseStatus;
+
+    echo $status-&gt;errorCode;  // InclusiveBetween
+    echo $status-&gt;message;    // 'Age' must be between 1 and 120. You entered 0.
+
+    foreach ($status-&gt;errors as $error) {
+        echo &quot;$error-&gt;fieldName: $error-&gt;errorCode $error-&gt;message\n&quot;;
+    }
+    // Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+    // Required: NotEmpty 'Required' must not be empty.
+    // Email: Email 'Email' is not a valid email address.
+}
+</code></pre>
+<p>Requests failing before reaching the Server, e.g. connection errors, also throw a <code>WebServiceException</code> with a <code>500</code>
+Status Code:</p>
+<pre><code class="language-php">$client = new JsonServiceClient(&quot;http://unknown-zzz.net&quot;);
+try {
+    $client-&gt;get(new Hello(name:&quot;World&quot;));
+} catch (WebServiceException $ex) {
+    echo $ex-&gt;statusCode;         // 500
+    echo $ex-&gt;statusDescription;  // Request Failed
+}
+</code></pre>
+<p>Whilst Requests to APIs requiring Authentication that the client wasn't able to authenticate with throw a <code>401</code>:</p>
+<pre><code class="language-php">try {
+    $client-&gt;post(new RequiresAdmin());
+} catch (WebServiceException $ex) {
+    echo $ex-&gt;statusCode;                 // 401
+    echo $ex-&gt;responseStatus-&gt;errorCode;  // 401
+    echo $ex-&gt;responseStatus-&gt;message;    // Unauthorized
+}
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>Requests that fail to fetch a new JWT with a Refresh Token throw a <code>RefreshTokenException</code> which extends <code>WebServiceException</code></p>
+</div>
 <h3 id="authenticating-using-basic-auth">Authenticating using Basic Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-basic-auth'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Basic Auth support is implemented in <code>JsonServiceClient</code> and follows the same API made available in the C# Service Clients where the <code>userName/password</code> properties can be set individually, e.g:</p>
 <pre><code class="language-php">$client = new JsonServiceClient($baseUrl);
-$client-&gt;username = user;
-$client-&gt;password = pass;
+$client-&gt;userName = $user;
+$client-&gt;password = $pass;
 
-$response = client-&gt;get(new SecureRequest());
+$response = $client-&gt;get(new SecureRequest());
 </code></pre>
-<p>Or use <code>$client-&gt;setCredentials()</code> to have them set both together.</p>
+<p>Or use <code>$client-&gt;setCredentials($user, $pass)</code> to have them set both together.</p>
 <h3 id="authenticating-using-credentials">Authenticating using Credentials<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-credentials'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Alternatively you can authenticate using userName/password credentials by
 <a href="#add-php-reference">adding a PHP Reference</a>
 to your remote ServiceStack Instance and sending a populated <code>Authenticate</code> Request DTO, e.g:</p>
-<pre><code class="language-php">$request = new Authenticate();
-$request-&gt;provider = &quot;credentials&quot;;
-$request-&gt;userName = $userName;
-$request-&gt;password = $password;
-$request-&gt;remember_me = true;
+<pre><code class="language-php">use ServiceStack\{Authenticate,AuthenticateResponse};
 
-$response = client-&gt;post(request);
+/** @var AuthenticateResponse $response */
+$response = $client-&gt;post(new Authenticate(
+    provider: &quot;credentials&quot;,
+    userName: $userName,
+    password: $password,
+    rememberMe: true));
+
+echo $response-&gt;userId;
+echo $response-&gt;sessionId;
 </code></pre>
 <p>This will populate the <code>JsonServiceClient</code> with <a href="/sessions#cookie-session-ids">Session Cookies</a>
 which will transparently be sent on subsequent requests to make authenticated requests.</p>
+<p>All Cookies the Server returns are maintained in the client's <code>cookies</code> property, with the JWT Token and Refresh Token
+Cookies also accessible from:</p>
+<pre><code class="language-php">$client-&gt;getTokenCookie();         // ss-tok
+$client-&gt;getRefreshTokenCookie();  // ss-reftok
+</code></pre>
 <h3 id="authenticating-using-jwt">Authenticating using JWT<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-jwt'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use the <code>bearerToken</code> property to Authenticate with a <a href="/jwt-authprovider">ServiceStack JWT Provider</a>
 using a JWT Token:</p>
 <pre><code class="language-php">$client-&gt;bearerToken = $jwt;
 </code></pre>
+<p>Which can also be configured with <code>setBearerToken()</code>:</p>
+<pre><code class="language-php">$client-&gt;setBearerToken($jwt);
+</code></pre>
 <p>Alternatively you can use just a <a href="/jwt-authprovider#refresh-tokens">Refresh Token</a> instead:</p>
-<pre><code class="language-php">$client-&gt;refreshYoken = $refreshToken;
+<pre><code class="language-php">$client-&gt;refreshToken = $refreshToken;
 </code></pre>
 <p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.</p>
 <h3 id="authenticating-using-an-api-key">Authenticating using an API Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-an-api-key'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -2091,34 +2480,423 @@ $authClient = new JsonServiceClient(AUTH_URL);
 $client-&gt;onAuthenticationRequired = new class($client, $authClient) implements Callback {
     public function __construct(public JsonServiceClient $client, public JsonServiceClient $authClient) {}
     public function call(): void {
-        $this-&gt;authClient-&gt;setCredentials(&quot;test&quot;, &quot;test&quot;);
-        $this-&gt;client-&gt;bearerToken = $this-&gt;authClient-&gt;get(new Authenticate())-&gt;getRefreshTokenCookie();
+        // Authenticate with the Auth Server then use its JWT Token to retry the original Request
+        $this-&gt;authClient-&gt;post(new Authenticate(
+            provider:&quot;credentials&quot;, userName:&quot;test&quot;, password:&quot;test&quot;));
+        $this-&gt;client-&gt;bearerToken = $this-&gt;authClient-&gt;getTokenCookie();
     }
 };
 
 // Automatically retries requests returning 401 Responses with new bearerToken
-$response = client-&gt;get(new Secured());
+$response = $client-&gt;get(new Secured());
+</code></pre>
+<p>Which can also be used to re-configure the client itself, e.g. to authenticate with Basic Auth credentials:</p>
+<pre><code class="language-php">$client-&gt;onAuthenticationRequired = new class($client) implements Callback {
+    public function __construct(public JsonServiceClient $client) {}
+    public function call(): void {
+        $this-&gt;client-&gt;setCredentials(&quot;test&quot;, &quot;test&quot;);
+    }
+};
+
+$response = $client-&gt;get(new TestAuth());
 </code></pre>
 <h3 id="automatically-refresh-access-tokens">Automatically refresh Access Tokens<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-refresh-access-tokens'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>With the <a href="/jwt-authprovider#refresh-tokens">Refresh Token support in JWT</a>
-you can use the <code>refresh_token</code> property to instruct the Service Client to automatically fetch new JWT Tokens behind
+you can use the <code>refreshToken</code> property to instruct the Service Client to automatically fetch new JWT Tokens behind
 the scenes before automatically retrying failed requests due to invalid or expired JWTs, e.g:</p>
 <pre><code class="language-php">// Authenticate to get new Refresh Token
 $authClient = new JsonServiceClient(AUTH_URL);
-$authClient.userName = $userName;
-$authClient.password = $password;
+$authClient-&gt;setCredentials($userName, $password);
+
+/** @var AuthenticateResponse $authResponse */
 $authResponse = $authClient-&gt;get(new Authenticate());
 
 // Configure client with RefreshToken
 $client-&gt;refreshToken = $authResponse-&gt;refreshToken;
 
 // Call authenticated Services and clients will automatically retrieve new JWT Tokens as needed
-$response = client-&gt;get(new Secured());
+$response = $client-&gt;get(new Secured());
 </code></pre>
 <p>Use the <code>refreshTokenUri</code> property when refresh tokens need to be sent to a different ServiceStack Server, e.g:</p>
 <pre><code class="language-php">$client-&gt;refreshToken = $refreshToken;
 $client-&gt;refreshTokenUri = AUTH_URL . &quot;/access-token&quot;;
 </code></pre>
+<p>Or enable <code>useTokenCookie</code> to have the client refresh Access Tokens using the
+<a href="/jwt-authprovider#refresh-token-cookies-supported-in-all-service-clients">Refresh Token Cookie</a> the Server returned
+instead of needing to manage Tokens yourself:</p>
+<pre><code class="language-php">$client-&gt;useTokenCookie = true;
+</code></pre>
+<p>If the Refresh Token has itself expired or is invalid the client throws a <code>RefreshTokenException</code>:</p>
+<pre><code class="language-php">use ServiceStack\RefreshTokenException;
+
+try {
+    $client-&gt;get(new Secured());
+} catch (RefreshTokenException $ex) {
+    echo $ex-&gt;responseStatus-&gt;errorCode;  // TokenException
+    echo $ex-&gt;responseStatus-&gt;message;    // Token has expired
+}
+</code></pre>
+<h3 id="client-configuration">Client Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#client-configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>JsonServiceClient</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route, use <code>setBasePath</code> to change the base
+path Requests are sent to, e.g. for older ServiceStack instances that only have the pre-defined <code>/json/reply</code> routes
+enabled:</p>
+<pre><code class="language-php">$client-&gt;setBasePath(&quot;&quot;);     // /json/reply/{Request} and /json/oneway/{Request}
+$client-&gt;setBasePath(&quot;api&quot;);  // /api/{Request} (default)
+</code></pre>
+<p>Custom headers can be added to all Requests by populating <code>headers</code>:</p>
+<pre><code class="language-php">$client = new JsonServiceClient($baseUrl);
+$client-&gt;headers[&quot;X-Custom&quot;] = &quot;Value&quot;;
+$client-&gt;setBearerToken($apiKey);
+</code></pre>
+<p>Whilst <code>options</code> lets you customize the <a href="https://www.php.net/manual/en/context.php">PHP stream context</a> its Requests
+are sent with, e.g. to configure custom SSL options:</p>
+<pre><code class="language-php">$client-&gt;options = [
+    'ssl' =&gt; [
+        'cafile' =&gt; '/path/to/ca.pem',
+    ],
+];
+</code></pre>
+<p>The client maintains any Cookies the Server returns in its <code>cookies</code> property which are sent on subsequent Requests,
+so use a separate client instance where you need to maintain different Authenticated Sessions.</p>
+<h3 id="request-response-and-exception-filters">Request, Response and Exception Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#request-response-and-exception-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Clients can be decorated with generic functionality using instance and static Request, Response and Exception filters,
+useful for logging, adding headers or inspecting Responses. Filters implement the <code>RequestFilter</code>, <code>ResponseFilter</code> and
+<code>ExceptionFilter</code> interfaces which can be implemented inline with an anonymous class:</p>
+<pre><code class="language-php">use ServiceStack\{RequestFilter,ResponseFilter,ExceptionFilter,SendContext};
+
+// Instance filters only apply to this client
+$client-&gt;requestFilter = new class implements RequestFilter {
+    public function call(SendContext $ctx) {
+        echo &quot;$ctx-&gt;method $ctx-&gt;url\n&quot;;
+    }
+};
+$client-&gt;responseFilter = new class implements ResponseFilter {
+    public function call(mixed $response, SendContext $ctx) {
+        echo $ctx-&gt;responseHeaders['statusCode'] . &quot;\n&quot;;
+    }
+};
+$client-&gt;exceptionFilter = new class implements ExceptionFilter {
+    public function call(mixed $response, Exception $e) {
+        echo &quot;ERROR: &quot; . $e-&gt;getMessage() . &quot;\n&quot;;
+    }
+};
+
+// Static filters apply to all clients
+JsonServiceClient::$globalRequestFilter = $requestFilter;
+JsonServiceClient::$globalResponseFilter = $responseFilter;
+JsonServiceClient::$globalExceptionFilter = $exceptionFilter;
+</code></pre>
+<p>Instance filters are invoked before global filters, where the <code>SendContext</code> passed to Request filters lets you inspect
+and modify the Request before it's sent:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>method</code></td>
+<td>HTTP Method the Request is sent with</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>Absolute URL the Request is sent to, including its QueryString</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td>The Request Headers, a copy of the client's <code>headers</code></td>
+</tr>
+<tr>
+<td><code>cookies</code></td>
+<td>The Cookies sent with the Request</td>
+</tr>
+<tr>
+<td><code>request</code></td>
+<td>The Request DTO being sent</td>
+</tr>
+<tr>
+<td><code>body</code></td>
+<td>Custom Request Body, when sent</td>
+</tr>
+<tr>
+<td><code>args</code></td>
+<td>Additional untyped arguments sent with the Request</td>
+</tr>
+<tr>
+<td><code>responseAs</code></td>
+<td>The Type the Response will be deserialized into</td>
+</tr>
+<tr>
+<td><code>responseHeaders</code></td>
+<td>The Response HTTP Headers, populated in Response Filters</td>
+</tr>
+<tr>
+<td><code>responseCookies</code></td>
+<td>The Cookies returned in the Response</td>
+</tr>
+</tbody>
+</table>
+<p>State can be captured by declaring it in the anonymous class constructor, e.g. to capture a custom Response Header:</p>
+<pre><code class="language-php">$header = '';
+$client-&gt;responseFilter = new class($header) implements ResponseFilter {
+    public function __construct(public string &amp;$header) {}
+    public function call(mixed $response, SendContext $ctx) {
+        $this-&gt;header = $ctx-&gt;responseHeaders['X-AutoBatch-Completed'];
+    }
+};
+</code></pre>
+<h3 id="complex-type-support">Complex Type Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#complex-type-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists, Arrays,
+Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent PHP types:</p>
+<pre><code class="language-php">$request = new AllCollectionTypes(
+    intArray: [1, 2, 3],
+    intList: [4, 5, 6],
+    stringArray: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+    stringList: [&quot;D&quot;, &quot;E&quot;, &quot;F&quot;],
+    byteArray: ByteArray::fromRaw(b&quot;ABC&quot;),                // sent as base64
+    pocoArray: [new Poco(name:&quot;pocoArray&quot;)],
+    pocoList: [new Poco(name:&quot;pocoList&quot;)],
+    pocoLookup: [&quot;A&quot; =&gt; [new Poco(name:&quot;B&quot;), new Poco(name:&quot;C&quot;)]],
+    pocoLookupMap: [&quot;A&quot; =&gt; [[&quot;B&quot; =&gt; new Poco(name:&quot;C&quot;)], [&quot;D&quot; =&gt; new Poco(name:&quot;E&quot;)]]]);
+</code></pre>
+<p>.NET's built-in Types are mapped to their closest PHP equivalent, where their different serialization formats are
+transparently converted to and from native PHP types:</p>
+<table>
+<thead>
+<tr>
+<th>.NET Type</th>
+<th>PHP Type</th>
+<th>Serialized as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string</code> / <code>char</code></td>
+<td><code>string</code></td>
+<td><code>&quot;string&quot;</code></td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>int</code> <code>long</code> <code>short</code> <code>byte</code> <code>uint</code></td>
+<td><code>int</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>float</code> <code>double</code> <code>decimal</code></td>
+<td><code>float</code></td>
+<td><code>1.1</code></td>
+</tr>
+<tr>
+<td><code>DateTime</code> / <code>DateTimeOffset</code></td>
+<td><code>DateTime</code></td>
+<td><code>&quot;/Date(978307200000)/&quot;</code></td>
+</tr>
+<tr>
+<td><code>TimeSpan</code></td>
+<td><code>DateInterval</code></td>
+<td><code>&quot;PT1H&quot;</code></td>
+</tr>
+<tr>
+<td><code>Guid</code></td>
+<td><code>string</code></td>
+<td><code>&quot;ea762009b66c410b9bf5ce21ad519249&quot;</code></td>
+</tr>
+<tr>
+<td><code>byte[]</code> / <code>Stream</code></td>
+<td><code>ByteArray</code></td>
+<td>base64 encoded <code>string</code></td>
+</tr>
+<tr>
+<td><code>List&lt;T&gt;</code> / <code>T[]</code></td>
+<td><code>array</code></td>
+<td><code>[1,2,3]</code></td>
+</tr>
+<tr>
+<td><code>Dictionary&lt;K,V&gt;</code></td>
+<td><code>array</code></td>
+<td><code>{&quot;A&quot;:&quot;B&quot;}</code></td>
+</tr>
+<tr>
+<td><code>KeyValuePair&lt;K,V&gt;</code></td>
+<td><code>KeyValuePair2</code></td>
+<td><code>{&quot;key&quot;:&quot;A&quot;,&quot;value&quot;:&quot;B&quot;}</code></td>
+</tr>
+</tbody>
+</table>
+<p>APIs returning a naked collection are deserialized into an <code>ArrayList</code> which can be counted and iterated like an array
+or converted into one with <code>jsonSerialize()</code>:</p>
+<pre><code class="language-php">/** @var ArrayList $response */
+$response = $client-&gt;get(new GetNakedItems());
+echo count($response);
+
+$names = array_map(fn($item):string =&gt; $item-&gt;name, $response-&gt;jsonSerialize());
+</code></pre>
+<h3 id="enum-support">Enum Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#enum-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>C# <code>enum</code> Types are generated as PHP <a href="https://www.php.net/manual/en/language.enumerations.backed.php">backed enums</a>
+whose values are sent as strings, using their <code>[EnumMember]</code> value where they have one, whilst <code>[Flags]</code> enums and enums
+annotated with <code>[EnumAsInt]</code> are generated as <code>int</code> backed enums which are sent as their integer values:</p>
+<pre><code class="language-php">enum EnumType : string
+{
+    case Value1 = 'Value1';
+    case Value2 = 'Value2';
+}
+
+enum EnumWithValues : string
+{
+    case None = 'None';
+    case Value1 = 'Member 1';   // [EnumMember(Value = &quot;Member 1&quot;)]
+}
+
+// @Flags()
+enum EnumFlags : int
+{
+    case Value1 = 1;
+    case Value2 = 2;
+    case Value3 = 4;
+}
+</code></pre>
+<p>As they're declared as typed properties on generated DTOs they're checked by PHP and static analysis tools when
+populated, then serialized in the format the Server expects:</p>
+<pre><code class="language-php">// ?enumProp=Value2&amp;enumWithValues=Member+1&amp;enumFlags=2&amp;enumStyle=UPPER
+$client-&gt;get(new HelloWithEnum(
+    enumProp: EnumType::Value2,
+    enumWithValues: EnumWithValues::Value1,
+    enumFlags: EnumFlags::Value2,
+    enumStyle: EnumStyle::UPPER));
+</code></pre>
+<p>They can also be used in Lists and Dictionaries of enums, e.g:</p>
+<pre><code class="language-php">$client-&gt;post(new HelloWithEnumMap(
+    enumProp: [EnumType::Value2-&gt;name =&gt; EnumType::Value2],
+    enumFlags: [EnumFlags::Value2-&gt;name =&gt; EnumFlags::Value2]));
+// {&quot;enumProp&quot;:{&quot;Value2&quot;:&quot;Value2&quot;},&quot;enumFlags&quot;:{&quot;Value2&quot;:2}‎}
+</code></pre>
+<h3 id="querystring-serialization">QueryString Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#querystring-serialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTO properties sent in the QueryString use ServiceStack's <a href="/js-utils">JS Object</a> notation for complex types,
+which <code>qsValue</code> can be used to inspect:</p>
+<pre><code class="language-php">use function ServiceStack\qsValue;
+
+qsValue(null);                           // &quot;&quot;
+qsValue(&quot;A&quot;);                            // &quot;A&quot;
+qsValue(1);                              // &quot;1&quot;
+qsValue(true);                           // &quot;true&quot;
+qsValue([1, 2, 3]);                      // &quot;[1,2,3]&quot;
+qsValue(['a', 'b', 'c']);                // &quot;[a,b,c]&quot;
+qsValue(['a' =&gt; 1, 'b' =&gt; 2]);           // &quot;{a:1,b:2}&quot;
+qsValue(new SubType(id:1, name:&quot;foo&quot;));  // &quot;{id:1,name:foo}&quot;
+qsValue(ByteArray::fromRaw(b&quot;PHP&quot;));     // &quot;UEhQ&quot; (base64)
+</code></pre>
+<p>Names and values are URL encoded whilst <code>null</code> properties are omitted from the QueryString so the Server can apply
+its own defaults.</p>
+<h3 id="serialization-utils">Serialization Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#serialization-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As all generated DTOs implement <code>JsonSerializable</code> they can be serialized with PHP's <code>json_encode</code> whilst <code>fromMap()</code>
+populates a DTO from a decoded JSON object:</p>
+<pre><code class="language-php">$json = json_encode(new Hello(name:&quot;World&quot;));    // {&quot;name&quot;:&quot;World&quot;}
+
+$dto = new Hello();
+$dto-&gt;fromMap(json_decode($json, associative:true));
+</code></pre>
+<p>The <code>JsonConverters</code> the client uses to convert .NET Types to and from their native PHP types can also be used
+directly, e.g:</p>
+<pre><code class="language-php">use ServiceStack\JsonConverters;
+
+/** @var HelloResponse $dto */
+$dto = JsonConverters::from('HelloResponse', json_decode($json, associative:true));
+
+$dtos = JsonConverters::fromArray('Poco', json_decode($jsonArray, associative:true));
+
+JsonConverters::to('DateTime', new DateTime(&quot;2001-01-01&quot;));  // /Date(978307200000)/
+JsonConverters::to('DateInterval', new DateInterval(&quot;PT1H&quot;)); // PT1H
+JsonConverters::to('ByteArray', ByteArray::fromRaw(b&quot;ABC&quot;));  // QUJD
+JsonConverters::toArray('int', [1,2,3]);                      // [1,2,3]
+</code></pre>
+<p>Types are resolved from the <code>ServiceStack</code> and <code>dtos</code> namespaces by default, DTOs generated into a different
+<a href="#globalnamespace">GlobalNamespace</a> are automatically registered when they're sent with the client, otherwise they can
+be registered with:</p>
+<pre><code class="language-php">JsonConverters::registerNamespace(&quot;techstacks&quot;);
+</code></pre>
+<h3 id="logging">Logging<a class="header-anchor" href="javascript:;" onclick="location.hash='#logging'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The client logs its Requests and Responses through a pluggable <code>Logger</code>, use the built-in <code>ConsoleLogger</code> and enable
+the <code>Debug</code> log level to inspect the raw HTTP Requests and Responses it sends:</p>
+<pre><code class="language-php">use ServiceStack\{Log,LogLevel,ConsoleLogger};
+
+Log::$logger = new ConsoleLogger();
+Log::$levels[] = LogLevel::Debug;
+</code></pre>
+<p>Which logs each Request's URL and HTTP Options, its Response Status Code, Headers, Cookies and raw JSON Response. Only
+<code>LogLevel::Warn</code> and <code>LogLevel::Error</code> are enabled by default, implement <code>Logger</code> to route logging to your App's
+preferred logging library, e.g:</p>
+<pre><code class="language-php">use ServiceStack\{Log,LogLevel,Logger};
+
+class ErrorLogLogger implements Logger {
+    function log(LogLevel $logLevel, mixed $message=null, ?Exception $error=null) {
+        error_log(&quot;[{$logLevel-&gt;value}] &quot; . (is_string($message) ? $message : print_r($message, true)));
+        if (isset($error))
+            error_log(&quot;[{$logLevel-&gt;value}] ERROR: &quot; . $error-&gt;getMessage());
+    }
+}
+
+Log::$logger = new ErrorLogLogger();
+</code></pre>
+<h3 id="testing">Testing<a class="header-anchor" href="javascript:;" onclick="location.hash='#testing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As <code>JsonServiceClient</code> accepts any Base URL, APIs can be tested against a local instance of your App or a remote
+ServiceStack instance without needing to mock the client itself, which is how the client's own
+<a href="https://github.com/ServiceStack/servicestack-php/tree/main/tests">test suite</a> verifies its Requests against the live
+<a href="https://test.servicestack.net">test.servicestack.net</a> Services:</p>
+<pre><code class="language-php">&lt;?php declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once 'dtos.php';
+
+use PHPUnit\Framework\TestCase;
+use ServiceStack\JsonServiceClient;
+use dtos\{Hello,HelloResponse};
+
+final class ClientTests extends TestCase
+{
+    public JsonServiceClient $client;
+
+    protected function setUp(): void {
+        $this-&gt;client = new JsonServiceClient(&quot;https://test.servicestack.net&quot;);
+    }
+
+    public function testCanGetHello() {
+        /** @var HelloResponse $response */
+        $response = $this-&gt;client-&gt;get(new Hello(name:&quot;World&quot;));
+        $this-&gt;assertEquals(&quot;Hello, World!&quot;, $response-&gt;result);
+    }
+}
+</code></pre>
+<p>Which can be run with <a href="https://phpunit.de">PHPUnit</a>:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>vendor/bin/phpunit</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated PHP DTO's as-is, however you can further customize how the DTO's are generated
 by overriding the default options.</p>
@@ -2261,6 +3039,30 @@ class ByteArray implements JsonSerializable
     }
 }
 </code></pre>
+<p>Which is registered as the <code>ByteArray</code> Converter so <code>byte[]</code> and <code>Stream</code> properties are transparently converted
+to and from Base64:</p>
+<pre><code class="language-php">JsonConverters::registerConverter('ByteArray', new ByteArrayConverter());
+</code></pre>
+<p>Custom Converters implement the <code>Converter</code> interface which can be registered for any Type name used in
+generated DTOs, e.g:</p>
+<pre><code class="language-php">use ServiceStack\{Converter,JsonConverters,TypeContext};
+
+class UnixTimeConverter implements Converter
+{
+    function fromJson($o, TypeContext $ctx): mixed {
+        return (new DateTime())-&gt;setTimestamp(intval($o));
+    }
+    function toJson($value, TypeContext $ctx): mixed {
+        return $value-&gt;getTimestamp();
+    }
+}
+
+JsonConverters::registerConverter('UnixTime', new UnixTimeConverter());
+</code></pre>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>Converters for <code>string</code>, <code>int</code>, <code>float</code>, <code>bool</code>, <code>DateTime</code>, <code>DateInterval</code>, <code>ByteArray</code>, Lists, Dictionaries and
+enums are registered by default</p>
+</div>
 <h2 id="inspect-utils">Inspect Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#inspect-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>To help clients with inspecting API Responses the <code>servicestack/client</code> library also includes a number of helpful utils
 to quickly visualizing API outputs.</p>
@@ -2292,7 +3094,7 @@ echo  &quot;Top 3 {$orgName} GitHub Repos:\n&quot;;
 Inspect::printDump(array_slice($orgRepos, 0, 3));
 
 echo  &quot;\nTop 10 {$orgName} GitHub Repos:\n&quot;;
-Inspect::printDumpTable(array_map(function($x) {
+Inspect::printTable(array_map(function($x) {
     return [
         &quot;name&quot;        =&gt; $x[&quot;name&quot;],
         &quot;lang&quot;        =&gt; $x[&quot;lang&quot;],
@@ -2332,7 +3134,7 @@ Inspect::printDumpTable(array_map(function($x) {
 </code></pre>
 <p>For tabular result-sets you can use <code>Inspect::table</code> to capture and <code>Inspect::printTable</code> to print API result-sets in a
 human-friendly markdown table, e.g:</p>
-<pre><code class="language-php">echo &quot;\nTop 10 $orgName Repos:\n&quot;
+<pre><code class="language-php">echo &quot;\nTop 10 $orgName Repos:\n&quot;;
 Inspect::printTable(array_slice($orgRepos, 0, 10));
 </code></pre>
 <p>Output:</p>
@@ -2351,6 +3153,18 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
 | systems        | C          |       41 |    27 |
 | web-wiki       | PHP        |       35 |    29 |
 +------------------------------------------------+
+</code></pre>
+<p>Both <code>Inspect::printDump</code> and <code>Inspect::printTable</code> accept the same data structures, so they can be used to inspect
+any API Response or its <code>results</code> collection, e.g:</p>
+<pre><code class="language-php">/** @var QueryResponse&lt;TechnologyView&gt; $response */
+$response = $client-&gt;get(new FindTechnologies(ids:[1,2,3], vendorName:&quot;Google&quot;));
+
+Inspect::printDump($response);
+Inspect::printTable($response-&gt;results);
+</code></pre>
+<p>Whilst <code>Inspect::vars</code> captures a JSON snapshot of any variables to the path in the <code>INSPECT_VARS</code> Environment
+Variable, letting you inspect the state of an App's variables from outside the process:</p>
+<pre><code class="language-php">Inspect::vars([&quot;response&quot; =&gt; $response]);
 </code></pre>
 </div>
 
@@ -2465,6 +3279,12 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
                                                             Making Typed API Requests
                                                         </span>
                                                     </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
+                                                        </span>
+                                                    </li>
                                                     <li data-id="phpdoc-typed-annotations" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#phpdoc-typed-annotations'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2477,6 +3297,12 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
                                                             Constructors Initializer
                                                         </span>
                                                     </li>
+                                                    <li data-id="autoquery-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#autoquery-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            AutoQuery Requests
+                                                        </span>
+                                                    </li>
                                                     <li data-id="sending-additional-arguments-with-typed-api-requests" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#sending-additional-arguments-with-typed-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2487,6 +3313,12 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
                                                         <span v-hash="'#making-api-requests-with-urls'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Making API Requests with URLs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="built-in-servicestack-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#built-in-servicestack-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Built-in ServiceStack DTOs
                                                         </span>
                                                     </li>
                                                     <li data-id="uploading-files" class="text-gray-500 hover:text-gray-900">
@@ -2505,6 +3337,24 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
                                                         <span v-hash="'#raw-data-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Raw Data Responses
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="batched-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#batched-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Batched Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sending-raw-request-bodies" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sending-raw-request-bodies'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Sending Raw Request Bodies
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="error-handling" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#error-handling'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Error Handling
                                                         </span>
                                                     </li>
                                                     <li data-id="authenticating-using-basic-auth" class="text-gray-500 hover:text-gray-900">
@@ -2541,6 +3391,54 @@ Inspect::printTable(array_slice($orgRepos, 0, 10));
                                                         <span v-hash="'#automatically-refresh-access-tokens'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Automatically refresh Access Tokens
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="client-configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Client Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="request-response-and-exception-filters" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#request-response-and-exception-filters'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Request, Response and Exception Filters
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="complex-type-support" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#complex-type-support'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Complex Type Support
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="enum-support" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#enum-support'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Enum Support
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="querystring-serialization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#querystring-serialization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            QueryString Serialization
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="serialization-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#serialization-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Serialization Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="logging" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#logging'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Logging
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="testing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#testing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Testing
                                                         </span>
                                                     </li>
                                             </ul>
