@@ -134,7 +134,7 @@ Set `Safety` explicitly when the verb lies about the consequences - a POST that 
 
 Reads execute immediately. Writes and destructive operations pause and render an **editable, schema-generated approval form** in the Chat UI, so the user sees the exact request that will be sent and can correct it before approving.
 
-<screenshot src="/img/pages/chat/api-approval.webp" title="Schema-generated approval form for a proposed tool call"></screenshot>
+<screenshot src="/img/pages/chat/chat-approval.webp" title="Schema-generated approval form for a proposed tool call"></screenshot>
 
 No tool-specific Chat component has to be written - the form comes from the tool's own JSON Schema, so every tool you add later gets the same treatment. See [API Schemas](/releases/v10_01#api-schemas) for how that rendering works.
 

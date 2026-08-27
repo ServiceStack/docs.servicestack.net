@@ -352,7 +352,7 @@ The most valuable property of this design is that the schema isn't tied to the b
 
 Because the renderer is generic, [AI Chat](/chat/api-tools) creates a Request preview and Approval UI on demand for **any API it can discover**. When a Model proposes a write operation the arguments are rendered with the same schema components used by the standalone API UI, so the user sees an editable form instead of an opaque JSON blob.
 
-<screenshot src="/img/pages/api-schema/chat-approval.webp" title="CoffeeShop schema approval form in AI Chat"></screenshot>
+<screenshot src="/img/pages/chat/chat-approval.webp" title="CoffeeShop schema approval form in AI Chat"></screenshot>
 
 New APIs gain the same preview and approval capability as soon as their schema is available - there's no per-DTO Chat component to write.
 

@@ -314,7 +314,7 @@ This supports experiences such as:
 - *"Create a follow-up task for every high-priority support case assigned to me."*
 - *"Find products below their reorder threshold and prepare updates for approval."*
 
-<screenshot src="/img/pages/autoquery-schema/chat-approval.webp" title="Schema-generated approval form"></screenshot>
+<screenshot src="/img/pages/chat/chat-approval.webp" title="Schema-generated approval form"></screenshot>
 
 The grid UI and AI Assistant are two clients over the same typed capability layer: one starts with visual exploration, the other with natural language.
 
