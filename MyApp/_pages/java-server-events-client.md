@@ -8,19 +8,19 @@ title: Java Server Events Client
 The Java `ServerEventClient` is an idiomatic port of ServiceStack's 
 [C# Server Events Client](/csharp-server-events-client) to Java providing a productive 
 client to consume ServiceStack's [real-time Server Events](/server-events) that can be used in any 
-Java/JVM (JRE 7+) Client/Server Applications or Java/Kotlin Android applications.
+Java/JVM (Java 8+) Client/Server Applications or Java/Kotlin Android applications.
 
 ## Install
 
 The `AndroidServerEventsClient` for Android is available in the 
-[net.servicestack:android](https://bintray.com/servicestack/maven/ServiceStack.Android) package which 
+[net.servicestack:android](https://mvnrepository.com/artifact/net.servicestack/android) package which 
 can be installed in your 
 [build.gradle](https://github.com/ServiceStackApps/AndroidJavaChat/blob/master/src/androidchat/app/build.gradle)
 with:
 
 ```groovy
 dependencies {
-    implementation 'net.servicestack:android:1.1.0'
+    implementation 'net.servicestack:android:1.1.5'
     ...
 }
 ```
@@ -31,17 +31,16 @@ Or in Maven with:
 <dependency>
   <groupId>net.servicestack</groupId>
   <artifactId>android</artifactId>
-  <version>1.1.0</version>
-  <type>pom</type>
+  <version>1.1.5</version>
 </dependency>
 ```
 
-Other Java/JVM languages running on the JVM (JRE 7+) can use the `ServerEventsClient` in the 
-[net.servicestack:client](https://bintray.com/servicestack/maven/ServiceStack.Client) package which can 
+Other languages running on the JVM can use the `ServerEventsClient` in the 
+[net.servicestack:client](https://mvnrepository.com/artifact/net.servicestack/client) package which can 
 be installed using Gradle:
 
-```
-compile 'net.servicestack:client:1.0.48'
+```groovy
+implementation 'net.servicestack:client:1.1.5'
 ```
 
 Or Maven:
@@ -50,8 +49,7 @@ Or Maven:
 <dependency>
   <groupId>net.servicestack</groupId>
   <artifactId>client</artifactId>
-  <version>1.0.48</version>
-  <type>pom</type>
+  <version>1.1.5</version>
 </dependency>
 ```
 
