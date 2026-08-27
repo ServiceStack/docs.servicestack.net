@@ -3,7 +3,9 @@ slug: typescript-add-servicestack-reference
 title: TypeScript Add ServiceStack Reference
 ---
 
-![ServiceStack and TypeScript Banner](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/servicestack-heart-typescript.png)
+:::{.shadow .-ml-12 .w-[940px] .rounded-md}
+![](/img/pages/servicestack-reference/typescript-info.webp)
+:::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within VS.NET using [ServiceStackVS VS.NET Extension](/create-your-first-webservice) - providing a simple way to give clients typed access to your ServiceStack Services.
 
@@ -40,31 +42,34 @@ productive, typed API development experience available in our other 1st-class su
 
 ServiceStack embeds additional type hints in each Request DTO in order to achieve the ideal typed, 
 message-based API. You can see an example of this is below which shows how to create a C# Gist in 
-[Gislyn](http://gistlyn.com) after adding a ServiceStack Reference to `gistlyn.com` and installing the 
+[Gistlyn](https://gistlyn.com) after adding a ServiceStack Reference to `gistlyn.com` and installing the 
 [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) npm package: 
 
 ```ts
-import { JsonServiceClient } from 'servicestack-client';
-import { StoreGist, GithubFile } from './Gistlyn.dtos';
+import { JsonApiClient } from '@servicestack/client'
+import { StoreGist, GithubFile } from './dtos'
 
-var client = new JsonServiceClient("http://gistlyn.com");
+const client = JsonApiClient.create("https://gistlyn.com")
 
-var request = new StoreGist();
-var file = new GithubFile();
-file.filename = "main.cs";
-file.content = 'var greeting = "Hi, from TypeScript!";';
-request.files = { [file.filename]: file };
+const request = new StoreGist({
+    files: {
+        'main.cs': new GithubFile({
+            filename: 'main.cs',
+            content: 'var greeting = "Hi, from TypeScript!";'
+        })
+    }
+})
 
-try {
-    var r = await client.post(request); // r:StoreGistResponse
-    console.log(`New C# Gist was created with id: ${r.gist}`);
-    location.href = `http://gistlyn.com?gist=${r.gist}`;
-} catch (e) {
-    console.log("Failed to create Gist: ", e.responseStatus);
+const api = await client.api(request)  // ApiResult<StoreGistResponse>
+if (api.succeeded) {
+    console.log(`New C# Gist was created with id: ${api.response.gist}`)
+} else {
+    console.log("Failed to create Gist: ", api.errorMessage)
 }
 ```
 
-Where the `r` param in the returned `then()` Promise callback is typed to `StoreGistResponse` DTO Type.
+Where `api.response` is typed to the `StoreGistResponse` DTO Type whilst `api.error` contains the structured
+`ResponseStatus` of any error - letting you handle both success and error responses without any `try/catch` handling.
 
 ### Supports JavaScript only Environments
 
@@ -368,6 +373,49 @@ i.e. will use **camelCase** properties when the `AppHost` is configured with:
 JsConfig.Init(new Config { TextCase = TextCase.CamelCase });
 ```
 
+### Creating a Service Client
+
+Modern **v6+** ServiceStack Apps should use `JsonApiClient.create()` to create clients configured to use the
+[JSON /api pre-defined route](/routing#json-api-pre-defined-route):
+
+```ts
+import { JsonApiClient } from '@servicestack/client'
+
+const client = JsonApiClient.create("https://example.org")
+```
+
+Which is configured to not send any JSON HTTP Headers so Browser requests can avoid the additional
+[CORS preflight request](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflight_requests). It also accepts a
+configuration lambda for customizing the client it creates:
+
+```ts
+const client = JsonApiClient.create(baseUrl, c => {
+    c.bearerToken = apiKey
+    c.headers.set('X-Custom','Value')
+})
+```
+
+Apps hosted at the same origin as their APIs can omit the **baseUrl** to have APIs sent to the same server:
+
+```ts
+const client = JsonApiClient.create()
+```
+
+Alternatively all other Apps can use the `JsonServiceClient` constructor:
+
+```ts
+import { JsonServiceClient } from '@servicestack/client'
+
+const client = new JsonServiceClient("https://example.org")
+```
+
+Which also defaults to sending requests to the `/api` route, that older ServiceStack instances which only have the
+`/json/reply` pre-defined routes registered can revert to with:
+
+```ts
+const client = new JsonServiceClient(baseUrl).useBasePath()
+```
+
 ### Making Typed API Requests
 
 Making API Requests in TypeScript is the same as all other
@@ -378,20 +426,23 @@ So the only things we need to make any API Request is the `JsonServiceClient` fr
 package and any DTO's we're using from generated TypeScript ServiceStack Reference, e.g:
 
 ```ts
-import { JsonServiceClient } from '@servicestack/client';
-import { GetTechnology } from './dtos';
+import { JsonServiceClient } from '@servicestack/client'
+import { GetTechnology } from './dtos'
 
-const client = new JsonServiceClient("https://techstacks.io");
+const client = new JsonServiceClient("https://techstacks.io")
 
-const request = new GetTechnology();
-request.Slug = "ServiceStack";
+const request = new GetTechnology({ slug: "ServiceStack" })
 
-var r = await client.get(request);  // typed to GetTechnologyResponse
-cont tech = r.Technology;           // typed to Technology
+const r = await client.get(request)  // typed to GetTechnologyResponse
+const tech = r.technology            // typed to Technology
 
-console.log(`${tech.Name} by ${tech.VendorName} (${tech.ProductUrl})`);
-console.log(`${tech.Name} TechStacks:`, r.TechnologyStacks);
+console.log(`${tech.name} by ${tech.vendorName} (${tech.productUrl})`)
+console.log(`${tech.name} TechStacks:`, r.technologyStacks)
 ```
+
+The `get`, `post`, `put`, `patch`, `delete` and `send` methods return the Typed Response DTO directly and throw an
+`ErrorResponse` on failure, whilst the `api` methods below return an `ApiResult<T>` "Value Result" which contains
+either the Typed Response or a structured API Error, letting you handle both without `try/catch`.
 
 ### Partial Constructors
 
@@ -418,6 +469,157 @@ const response = await client.post(new Authenticate({
 }));
 ```
 
+### The api Method
+
+The `api` method returns a typed `ApiResult<TResponse>` "Value Result" that encapsulates either a Typed Response or
+a structured API Error populated in its `error` `ResponseStatus`, allowing you to handle API responses
+programmatically without `try/catch` handling:
+
+```ts
+const api = await client.api(new Hello({ name }))
+if (api.succeeded) {
+    console.log(`API Says: ${api.response.result}`)
+} else {
+    console.log(`${api.errorCode}: ${api.errorMessage}`)
+}
+```
+
+Where an `ApiResult<T>` provides access to both its Typed Response and any structured Error information:
+
+| Member                     | Description                                                                    |
+|----------------------------|--------------------------------------------------------------------------------|
+| `response`                 | The Typed Response DTO of a successful API Request                              |
+| `error`                    | The structured `ResponseStatus` of a failed API Request                         |
+| `succeeded`                | `true` when the API returned a Response and no Error                            |
+| `failed`                   | `true` when the API returned an Error                                           |
+| `completed`                | `true` when the API returned either a Response or an Error                      |
+| `errorCode`                | The Error's `errorCode`, e.g. `NotFound`                                        |
+| `errorMessage`             | The Error's summary error message                                               |
+| `errors`                   | The collection of `ResponseError` field validation errors                       |
+| `errorSummary`             | The summary error message, only when there are no field errors                  |
+| `fieldError(name)`         | The `ResponseError` for the specified field, if any (case-insensitive)          |
+| `fieldErrorMessage(name)`  | The error message for the specified field, if any                               |
+| `hasFieldError(name)`      | Whether the specified field has an error                                        |
+| `showSummary(except)`      | Whether to show the summary message, excluding fields displaying their own error |
+| `summaryMessage(except)`   | The summary error message to display, excluding the specified fields            |
+| `addFieldError(name,msg)`  | Add or update a field error on the result's existing `error`                    |
+
+APIs annotated with `IReturnVoid` should use `apiVoid` which returns an `ApiResult<EmptyResponse>`:
+
+```ts
+const api = await client.apiVoid(new DeleteContact({ id }))
+if (api.failed) console.log(api.errorMessage)
+```
+
+Both accept optional `args` for sending additional QueryString arguments and a `method` to override the HTTP Method
+the Request is sent with, e.g:
+
+```ts
+const api = await client.apiVoid(new HelloReturnVoid({ id:1 }), null, 'GET')
+```
+
+### Simplified API Handling
+
+Being able to treat errors as values greatly increases the ability to programmatically handle and genericize API
+handling, simplifying functionality needing to handle both successful and error responses like binding to UI
+components.
+
+An example of this is below where we're able to concurrently fire off multiple unrelated async requests in parallel,
+wait for them all to complete, print out the ones that have succeeded or failed then access their strong typed
+responses:
+
+```ts
+import { JsonServiceClient, ApiRequest, ApiResponse } from '@servicestack/client'
+
+const client = new JsonServiceClient("https://techstacks.io")
+
+let requests:ApiRequest[] = [
+    new AppOverview(),            // GET  => AppOverviewResponse
+    new DeleteTechnology(),       // DELETE => IReturnVoid (requires auth)
+    new GetAllTechnologies(),     // GET  => GetAllTechnologiesResponse
+    new GetAllTechnologyStacks(), // GET  => GetAllTechnologyStacksResponse
+]
+
+let results = await Promise.all(requests.map(async (request) =>
+    ({ request, api: await client.api(request) as ApiResponse }) ))
+
+let failed = results.filter(x => x.api.failed)
+console.log(`${failed.length} failed:`)
+failed.forEach(x =>
+    console.log(`    ${x.request.getTypeName()} Request Failed: ${x.api.errorMessage}`))
+
+let succeeded = results.filter(x => x.api.succeeded)
+console.log(`\n${succeeded.length} succeeded: ${succeeded.map(x => x.request.getTypeName()).join(', ')}`)
+
+let r = succeeded.find(x => x.request.getTypeName() == 'AppOverview')?.api.response as AppOverviewResponse
+if (r) console.log(`Top 5 Technologies: ${r.topTechnologies.slice(0,5).map(tech => tech.name).join(', ')}`)
+```
+
+Output:
+
+```
+1 failed:
+    DeleteTechnology Request Failed: Unauthorized
+
+3 succeeded: AppOverview, GetAllTechnologies, GetAllTechnologyStacks
+Top 5 Technologies: Redis, MySQL, Python, PostgreSQL, node.js
+```
+
+Being able to treat Errors as values has dramatically reduced the effort required to accomplish the same feat if
+needing to handle errors with `try/catch`.
+
+### Binding Validation Errors to UI
+
+APIs with [Declarative Validation](/declarative-validation) or FluentValidation rules return each field validation
+error in `errors`, with the first error also captured in the summary `errorCode` and `errorMessage`:
+
+```ts
+const api = await client.api(new ThrowValidation({ email:'invalidemail' }))
+
+console.log(api.errorCode)     // InclusiveBetween
+console.log(api.errorMessage)  // 'Age' must be between 1 and 120. You entered 0.
+
+api.errors.forEach(x => console.log(`${x.fieldName}: ${x.errorCode} ${x.message}`))
+// Age: InclusiveBetween 'Age' must be between 1 and 120. You entered 0.
+// Required: NotEmpty 'Required' must not be empty.
+// Email: Email 'Email' is not a valid email address.
+```
+
+Which UI components can bind to individual field errors with `fieldError()` and `hasFieldError()`, e.g:
+
+```ts
+if (api.hasFieldError('email')) {
+    emailError.textContent = api.fieldErrorMessage('email')
+}
+```
+
+Whilst `showSummary()` and `summaryMessage()` let you display the summary error message for any errors that aren't
+already being displayed next to their field inputs:
+
+```ts
+const displayedFields = ['email','age']
+if (api.showSummary(displayedFields)) {
+    summaryError.textContent = api.summaryMessage(displayedFields)
+}
+```
+
+Client-side validation errors can be surfaced through the same UI components by creating an `ApiResult` populated
+with `createErrorStatus()` for summary errors or `createFieldError()` for field validation errors:
+
+```ts
+import { ApiResult, createErrorStatus, createFieldError } from '@servicestack/client'
+
+const failed = new ApiResult({ error: createErrorStatus("Not Authorized", "Unauthorized") })
+failed.errorCode     // Unauthorized
+failed.errorMessage  // Not Authorized
+
+const invalid = new ApiResult({ error: createFieldError('confirmPassword', 'Passwords do not match') })
+invalid.fieldErrorMessage('confirmPassword')  // Passwords do not match
+```
+
+Where `addFieldError()` can add additional field errors to an `ApiResult` that already has a populated `errors`
+collection.
+
 ### Sending additional arguments with Typed API Requests
 
 Many AutoQuery Services utilize [implicit conventions](/autoquery/rdbms#implicit-conventions) to 
@@ -428,6 +630,53 @@ additional arguments with the typed Request DTO, e.g:
 const request = new FindTechStacks();
 
 var r = client.get(request, { VendorName: "ServiceStack" }); // typed to QueryResponse<TechnologyStack>
+```
+
+### AutoQuery Requests
+
+[AutoQuery](/autoquery/) APIs return a typed `QueryResponse<T>` containing the `results` matching the query, the
+`total` number of matching results and any `meta` data returned:
+
+```ts
+const api = await client.api(new FindTechnologies({ take:3 }), { VendorName: "Amazon" })
+
+const r = api.response  // typed to QueryResponse<Technology>
+console.log(r.total)    // 20
+console.log(r.results.map(x => x.name).join(', '))
+// Amazon EC2, AWS RDS, Amazon DynamoDB
+```
+
+Where all [AutoQuery filters](/autoquery/rdbms#implicit-conventions) can be sent in the typed Request DTO for
+explicitly defined properties, or in the untyped `args` for querying any other field, e.g:
+
+```ts
+// GET /api/FindTechnologies?take=3&orderBy=-viewCount&nameStartsWith=Am
+const api = await client.api(new FindTechnologies({ take:3, orderBy:'-viewCount' }), {
+    nameStartsWith: 'Am'
+})
+```
+
+### Resolving the HTTP Method
+
+Request DTOs annotated with a `IVerb` interface marker (i.e. `IGet`, `IPost`, `IPut`, `IPatch`, `IDelete`) generate a
+`getMethod()` method on the DTO which `api()` uses to send the Request with the API's preferred HTTP Method,
+defaulting to `POST` when unspecified:
+
+```ts
+import { getMethod } from '@servicestack/client'
+
+getMethod(new Hello())          // POST  (no IVerb marker)
+getMethod(new GetTechnology())  // GET   (implements IGet)
+getMethod(new Hello(), 'GET')   // GET   (explicit override)
+```
+
+Which can be overridden by passing an explicit `method` to `api()`, or by calling the HTTP Method's client method
+directly:
+
+```ts
+const api = await client.api(new Hello({ name }), null, 'GET')
+
+const response = await client.get(new Hello({ name }))
 ```
 
 ### Making API Requests with URLs
@@ -500,32 +749,239 @@ let str:string = await client.get(new ReturnString());
 let data:Uint8Array = await client.get(new ReturnBytes());
 ```
 
-### Access Request / Response Headers
+### Batched Requests
 
-You can use [JsonServiceClient](https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts) instance 
-`requestFilter` and `responseFilter` to inspect the underlying 
-[fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API's:
+Multiple Request DTOs of the same Type can be sent together in a single Request with `sendAll` which returns all
+their Responses:
 
 ```ts
-export declare class JsonServiceClient {
-    //...
-    requestFilter: (req: IRequestInit) => void;
-    responseFilter: (res: Response) => void;
+const requests = ["foo","bar","baz"].map(name => new Hello({ name }))
+
+// POST /api/Hello[]
+const responses = await client.sendAll(requests)
+
+console.log(responses.map(x => x.result).join(', '))
+// Hello, foo!, Hello, bar!, Hello, baz!
+```
+
+Or use `sendAllOneWay` to send Requests you want to ignore the Responses of:
+
+```ts
+const requests = [1,2,3].map(id => new HelloReturnVoid({ id }))
+
+// POST /api/HelloReturnVoid[]
+await client.sendAllOneWay(requests)
+```
+
+All Requests in a batch are sent to the same `/api/{Request}[]` endpoint (or `/json/reply/{Request}[]` and
+`/json/oneway/{Request}[]` when the client is configured with `useBasePath()`) where the Server executes them in order
+and returns the number of Requests it completed in the `X-AutoBatch-Completed` HTTP Response Header:
+
+```ts
+client.responseFilter = res => console.log(res.headers.get('X-AutoBatch-Completed'))  // 3
+```
+
+### One-way Requests
+
+APIs whose Responses you're not interested in can be sent to the one-way endpoint with `publish` for `IReturnVoid`
+APIs or `sendOneWay` for APIs returning a Response, e.g:
+
+```ts
+await client.publish(new HelloReturnVoid({ id:1 }))
+
+await client.sendOneWay(new Hello({ name:'World' }))
+```
+
+### Sending Raw Request Bodies
+
+APIs that accept a custom Request Body can be sent with `postBody`, `putBody` and `patchBody` where the Request DTO's
+properties are sent in the QueryString and the `body` is sent as the HTTP Request Body:
+
+```ts
+// POST /api/SendJson?id=1&name=name {"foo":"bar"}
+const json = await client.postBody(new SendJson({ id:1, name:"name" }), { foo:"bar" })
+
+// POST /api/SendText?id=1&name=name foo
+const text = await client.postBody(new SendText({ id:1, name:"name", contentType:"text/plain" }), "foo")
+```
+
+Where an object body is serialized to JSON whilst a `string` body is sent as-is.
+
+### Error Handling
+
+The `api` methods return any structured error information in its `ApiResult` `error` `ResponseStatus` which is
+populated for both Application Errors and transport errors like `401 Unauthorized` responses:
+
+```ts
+const api = await client.api(new ThrowType({ type:"NotFound", message:"not here" }))
+
+console.log(api.failed)        // true
+console.log(api.errorCode)     // NotFound
+console.log(api.errorMessage)  // not here
+```
+
+Whilst the `get/post/put/patch/delete/send` methods instead throw an `ErrorResponse` containing the API's structured
+`ResponseStatus` in its `responseStatus` property:
+
+```ts
+try {
+    await client.post(new ThrowType({ type:"NotFound", message:"not here" }))
+} catch (e) {
+    console.log(e.responseStatus.errorCode)  // NotFound
+    console.log(e.responseStatus.message)    // not here
+    console.log(e.responseStatus.errors)     // field validation errors
 }
 ```
 
-To inspect the underlying W3C 
-[fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) 
-API's [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) and 
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) objects, e.g:
+Which can be more conveniently accessed with `getResponseStatus()` that returns a normalized `ResponseStatus` from
+an Error Response DTO, a bare `ResponseStatus` or a JavaScript `Error`:
 
-```js
-let client = new JsonServiceClient()
-client.responseFilter = res => {
-    console.log(res.headers)
+```ts
+import { getResponseStatus } from '@servicestack/client'
+
+const status = getResponseStatus(e)
+```
+
+Failed Requests using a [Refresh Token](/auth/jwt-authprovider#refresh-tokens) that was invalid or expired throw an
+`ErrorResponse` with its `type` set to `RefreshTokenException`:
+
+```ts
+client.refreshToken = "Invalid.Refresh.Token"
+try {
+    await client.get(new Secured())
+} catch (e) {
+    console.log(e.type)                      // RefreshTokenException
+    console.log(e.responseStatus.errorCode)  // ArgumentException
+    console.log(e.responseStatus.message)    // Illegal base64url string!
 }
+```
 
-var response = await client.get(new MyRequest())
+Use the `exceptionFilter` to inspect all Error Responses, useful for logging or generically handling API errors:
+
+```ts
+client.exceptionFilter = (res, error) => {
+    console.log(`${res.status}: ${error.responseStatus.message}`)
+}
+```
+
+### Access Request / Response Headers
+
+You can use the [JsonServiceClient](https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts)
+instance `requestFilter` and `responseFilter` to inspect the underlying W3C
+[fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API's
+[Request](https://developer.mozilla.org/en-US/docs/Web/API/Request) and
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) objects, e.g. to send a custom Request Header
+and read a custom Response Header:
+
+```ts
+const client = new JsonServiceClient(baseUrl)
+client.requestFilter = req => req.headers.set('X-Custom','Value')
+client.responseFilter = res => console.log(res.headers.get('X-Args'))
+
+const response = await client.get(new MyRequest())
+```
+
+Where `requestFilter` is passed an `IRequestInit` which extends fetch's `RequestInit` with the `url` the Request will
+be sent to:
+
+```ts
+export interface IRequestInit extends RequestInit {
+    url?: string;
+    compress?: boolean;
+}
+```
+
+### Request, Response and Exception Filters
+
+Clients can be decorated with generic functionality using instance and static Request, Response and Exception filters,
+useful for logging, adding headers or inspecting Responses:
+
+```ts
+// Instance filters only apply to this client
+client.requestFilter = req => req.headers.set('X-Custom','Value')
+client.responseFilter = res => console.log(res.status, res.headers)
+client.exceptionFilter = (res,error) => console.log('ERROR:', error.responseStatus.message)
+client.urlFilter = url => console.log('URL:', url)
+
+// Static filters apply to all clients
+JsonServiceClient.globalRequestFilter = req => console.log(`${req.method} ${req.url}`)
+JsonServiceClient.globalResponseFilter = res => console.log(res.status)
+```
+
+Request Filters can modify the Request's URL, HTTP Method, Headers and Body before it's sent, e.g. this appends a
+[JS Config](/customize-json-responses) QueryString to every Request:
+
+```ts
+client.requestFilter = req => req.url += "?jsconfig=EmitCamelCaseNames:false"
+```
+
+Instance filters are invoked before their global counterparts. The `urlFilter` is invoked with the absolute URL of
+each Request which is useful for logging or inspecting the URLs your typed API Requests are sent to:
+
+```ts
+client.urlFilter = url => console.log(url)
+
+await client.sendAll(["foo","bar","baz"].map(name => new Hello({ name })))
+// https://test.servicestack.net/api/Hello[]
+```
+
+### Client Configuration
+
+The `JsonServiceClient` sends Requests to ServiceStack's pre-defined `/api` route, which can be changed with
+`basePath` or `useBasePath()`:
+
+```ts
+const client = new JsonServiceClient("https://test.servicestack.net")
+client.replyBaseUrl   // https://test.servicestack.net/api/
+client.oneWayBaseUrl  // https://test.servicestack.net/api/
+
+client.basePath = null
+client.replyBaseUrl   // https://test.servicestack.net/json/reply/
+client.oneWayBaseUrl  // https://test.servicestack.net/json/oneway/
+```
+
+Use `apply()` to configure a client inline as it's created:
+
+```ts
+const client = new JsonServiceClient(baseUrl)
+    .apply(c => {
+        c.basePath = '/api'
+        c.headers = new Headers()
+        c.bearerToken = apiKey
+    })
+```
+
+Custom Headers can be added to all Requests by populating its `headers`
+[Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) collection:
+
+```ts
+client.headers.set('X-Custom','Value')
+```
+
+Other client properties available for customizing how Requests are sent:
+
+| Property                 | Description                                                                                 |
+|--------------------------|---------------------------------------------------------------------------------------------|
+| `baseUrl`                | The Base URL Requests are sent to                                                            |
+| `basePath`               | The path APIs are sent to, e.g. `api` (default), `null` uses `/json/reply` & `/json/oneway`  |
+| `headers`                | HTTP Headers sent with each Request                                                          |
+| `mode`                   | The fetch [Request Mode](https://developer.mozilla.org/en-US/docs/Web/API/Request/mode), e.g. `cors` |
+| `credentials`            | The fetch [credentials](https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials) policy, e.g. `include` |
+| `userName` / `password`  | Credentials to send with HTTP Basic Auth                                                     |
+| `bearerToken`            | JWT or API Key to send in the `Authorization: Bearer` HTTP Header                             |
+| `refreshToken`           | Refresh Token used to automatically fetch new JWT Access Tokens                              |
+| `refreshTokenUri`        | Alternate URL to send Refresh Token Requests to                                              |
+| `enableAutoRefreshToken` | Whether to automatically fetch new Access Tokens (default `true`)                            |
+| `manageCookies`          | Whether the client should manage Cookies itself (default in Node.js)                          |
+| `cookies`                | The Cookies the client is managing, keyed by Cookie name                                     |
+| `parseJson`              | Override how JSON Responses are parsed                                                        |
+
+In Node.js (where there's no browser Cookie jar) the client manages the Cookies the Server returns itself in its
+`cookies` collection which are sent on subsequent Requests - so use a separate client instance for each Authenticated
+Session you want to maintain. Individual cookies can be removed with:
+
+```ts
+client.deleteCookie('ss-pid')
 ```
 
 ### TypeScript Nullable properties
@@ -599,7 +1055,11 @@ client.password = pass;
 const response = await client.get(new SecureRequest());
 ```
 
-Or use `client.setCredentials()` to have them set both together.
+Or use `client.setCredentials()` to have them set both together:
+
+```ts
+client.setCredentials(user, pass);
+```
 
 ### Authenticating using Credentials
 
@@ -687,6 +1147,126 @@ Use the `refreshTokenUri` property when refresh tokens need to be sent to a diff
 ```ts
 client.refreshToken = refreshToken;
 client.refreshTokenUri = authBaseUrl + "/access-token";
+```
+
+When authenticating against Apps using [JWT Token Cookies](/auth/jwt-authprovider#json-web-tokens) the client
+automatically switches to using its `ss-tok` and `ss-reftok` Cookies to fetch new Access Tokens, which is reflected in
+its `useTokenCookie` property:
+
+```ts
+const authResponse = await client.post(new Authenticate({
+    provider:"credentials", userName, password }))
+
+client.useTokenCookie // true
+```
+
+Automatically fetching new Access Tokens can be disabled with:
+
+```ts
+client.enableAutoRefreshToken = false
+```
+
+### Complex Type Support
+
+Generated DTOs support the full breadth of .NET Types used in ServiceStack APIs, including nested POCOs, Lists,
+Arrays, Dictionaries and Dictionaries of Lists of POCOs which are all serialized into their equivalent JavaScript
+types:
+
+```ts
+const request = new HelloAllTypes({
+    name: "name",
+    allTypes: new AllTypes({
+        id: 1,
+        int: 4,
+        double: 2.2,
+        string: "string",
+        dateTime: toDateTime(new Date(Date.UTC(2001,0,1))),
+        timeSpan: "PT1H",
+        guid: "ea762009b66c410b9bf5ce21ad519249",
+        stringList: ["A", "B", "C"],
+        stringArray: ["D", "E", "F"],
+        stringMap: { A:"D", B:"E", C:"F" },
+        intStringMap: { 1:"A", 2:"B", 3:"C" },
+        subType: new SubType({ id:1, name:"name" }),
+    }),
+    allCollectionTypes: new AllCollectionTypes({
+        intArray: [1,2,3],
+        intList: [4,5,6],
+        byteArray: toBase64String("ABC"),
+        pocoArray: [new Poco({ name:"pocoArray" })],
+        pocoLookup: { A: [new Poco({ name:"B" }), new Poco({ name:"C" })] },
+        pocoLookupMap: { A: [{ B: new Poco({ name:"C" }), D: new Poco({ name:"E" }) }] },
+    })
+})
+
+const api = await client.api(request)
+```
+
+### Serialization Utils
+
+.NET Types without a native JavaScript equivalent are serialized as strings which can be converted to and from their
+JavaScript types using the built-in conversion functions:
+
+```ts
+import {
+    toDateTime, fromDateTime,
+    toTimeSpan, fromTimeSpan,
+    toGuid, fromGuid,
+    toByteArray, fromByteArray,
+    toBase64String,
+} from '@servicestack/client'
+```
+
+| .NET Type          | Serialized as                             | Convert with                    |
+|--------------------|-------------------------------------------|---------------------------------|
+| `DateTime`         | WCF JSON Date, e.g. `/Date(978307200000)/`| `toDateTime()` / `fromDateTime()` |
+| `DateTimeOffset`   | WCF JSON Date                              | `toDateTime()` / `fromDateTime()` |
+| `TimeSpan`         | XSD Duration, e.g. `PT1H`                  | `toTimeSpan()` / `fromTimeSpan()` |
+| `Guid`             | String, e.g. `ea762009b66c410b9bf5ce21ad519249` | `toGuid()` / `fromGuid()`  |
+| `byte[]`           | Base64 String                              | `toByteArray()` / `fromByteArray()` |
+
+E.g. converting a JS `Date` to a .NET `DateTime` and back:
+
+```ts
+const dateTime = toDateTime(new Date(Date.UTC(2001,0,1)))  // /Date(978307200000)/
+const date = fromDateTime(dateTime)                        // Date
+```
+
+Whilst `toDate()` can parse a .NET `DateTime` from any of its serialized formats:
+
+```ts
+import { toDate, dateFmt, toLocalISOString } from '@servicestack/client'
+
+toDate('/Date(978307200000)/')
+toDate('2001-01-01T00:00:00.0000000Z')
+
+dateFmt(new Date(Date.UTC(2001,0,1)))  // 2001/01/01
+toLocalISOString(new Date())           // ISO 8601 date in local time
+```
+
+### Node.js and Deno
+
+As `fetch` is built into Node.js v18+ LTS, `@servicestack/client` **v2+** is dependency-free and can be used as-is in
+Node.js, Deno, Bun and Browser Apps. Node.js projects using
+[ServerEventsClient](/typescript-server-events-client) (e.g. in tests) will need to polyfill `EventSource`:
+
+:::sh
+npm install eventsource
+:::
+
+```ts
+globalThis.EventSource = require("eventsource")
+```
+
+Older Node.js runtimes can continue using the **v1.x** version of `@servicestack/client` or polyfill `fetch` with
+[cross-fetch](https://www.npmjs.com/package/cross-fetch):
+
+:::sh
+npm install cross-fetch
+:::
+
+```js
+require('cross-fetch/polyfill')
 ```
 
 ## DTO Customization Options 
@@ -949,7 +1529,7 @@ Here we're using the built-in `createUrl()` servicestack client API to create th
 using the Route definition for the API you want to call and the Request DTO which results in:
 
 ```
-/hello/World?title=Dr
+hello/World?title=Dr
 ```
 
 We're also able to use the `HelloResponse` type definition to take advantage of typed DTO compile time safety in TypeScript code bases.
@@ -1046,6 +1626,246 @@ const client = new ServerEventsClient("/", channels, {
 
 When publishing a DTO Type for your Server Events message, your clients will be able to benefit from 
 the generated DTOs in [TypeScript ServiceStack References](/typescript-add-servicestack-reference).
+
+## Client Utils
+
+In addition to its API Clients, `@servicestack/client` is a dependency-free library of utils useful in any TypeScript
+or JavaScript App, all of which are documented in its
+[index.d.ts](https://github.com/ServiceStack/servicestack-client/blob/master/src/index.d.ts) TypeScript definition.
+
+### Inspect Utils
+
+To help with inspecting API Responses the `Inspect` class includes utils for quickly visualizing API outputs.
+
+For a basic indented object graph use `Inspect.dump()` to capture and `Inspect.printDump()` to print the output of any
+API Response, e.g:
+
+```ts
+import { Inspect } from '@servicestack/client'
+
+const orgName = "nodejs"
+const orgRepos = (await (await fetch(`https://api.github.com/orgs/${orgName}/repos`)).json())
+    .map(x => ({
+        name: x.name,
+        description: x.description,
+        lang: x.language,
+        watchers: x.watchers_count,
+        forks: x.forks
+    }))
+
+orgRepos.sort((a, b) => b.watchers - a.watchers)
+
+console.log(`Top 3 ${orgName} GitHub Repos:`)
+Inspect.printDump(orgRepos.slice(0, 3))
+```
+
+Output:
+
+```
+Top 3 nodejs GitHub Repos:
+[
+    {
+        name: node,
+        description: Node.js JavaScript runtime ✨🐢🚀✨,
+        lang: JavaScript,
+        watchers: 119635,
+        forks: 36612
+    },
+    {
+        name: node-v0.x-archive,
+        description: Moved to https://github.com/nodejs/node,
+        lang: null,
+        watchers: 34286,
+        forks: 7219
+    },
+    {
+        name: node-gyp,
+        description: Node.js native addon build tool,
+        lang: Python,
+        watchers: 10685,
+        forks: 1878
+    }
+]
+```
+
+For tabular result-sets use `Inspect.dumpTable()` to capture and `Inspect.printDumpTable()` to print result-sets in a
+human-friendly markdown table, e.g:
+
+```ts
+console.log(`\nTop 10 ${orgName} GitHub Repos:`)
+Inspect.printDumpTable(orgRepos.map(x => ({
+    name: x.name, lang: x.lang, watchers: x.watchers, forks: x.forks
+})).slice(0, 10))
+```
+
+Output:
+
+```
+Top 10 nodejs GitHub Repos:
++-----------------------------------------------------+
+|        name         |    lang    | watchers | forks |
+|-----------------------------------------------------|
+| node                | JavaScript |   119635 | 36612 |
+| node-v0.x-archive   | null       |    34286 |  7219 |
+| node-gyp            | Python     |    10685 |  1878 |
+| docker-node         | Dockerfile |     8585 |  1985 |
+| http-parser         | C          |     6446 |  1522 |
+| nan                 | C++        |     3353 |   529 |
+| node-addon-examples | C++        |     2589 |   602 |
+| readable-stream     | JavaScript |     1048 |   240 |
+| diagnostics         | null       |      550 |    69 |
+| build               | Jinja      |      541 |   183 |
++-----------------------------------------------------+
+```
+
+Both accept the same data structures so they can be used to inspect any API Response or its `results` collection, e.g:
+
+```ts
+const api = await client.api(new FindTechnologies({ take:10 }))
+Inspect.printDumpTable(api.response.results)
+```
+
+### URL Utils
+
+Utils for constructing URLs from your API's Route definitions and QueryStrings:
+
+```ts
+import { combinePaths, createUrl, createPath, appendQueryString, setQueryString, queryString } from '@servicestack/client'
+
+combinePaths('/api','Hello')                     // /api/Hello
+createPath('/hello/{Name}', { name:'World' })    // hello/World
+createUrl('/hello/{Name}', { name:'World', title:'Dr' })  // hello/World?title=Dr
+appendQueryString('/hello', { name:'World' })    // /hello?name=World
+setQueryString('/hello?name=Foo', { name:'World' })       // /hello?name=World
+queryString('/hello?name=World&title=Dr')        // { name:'World', title:'Dr' }
+```
+
+### String Utils
+
+```ts
+import { humanify, humanize, toPascalCase, toCamelCase, toKebabCase,
+         splitOnFirst, splitOnLast, leftPart, rightPart, lastLeftPart, lastRightPart } from '@servicestack/client'
+
+humanify('TheIDWithWord')   // The ID With Word
+humanize('the_id')          // The Id
+toPascalCase('theId')       // TheId
+toCamelCase('TheId')        // theId
+toKebabCase('TheId')        // the-id
+
+splitOnFirst('a:b:c', ':')  // ['a','b:c']
+splitOnLast('a:b:c', ':')   // ['a:b','c']
+leftPart('a:b:c', ':')      // a
+rightPart('a:b:c', ':')     // b:c
+lastLeftPart('a:b:c', ':')  // a:b
+lastRightPart('a:b:c', ':') // c
+```
+
+Where `humanify()` is useful for converting DTO property names into human-friendly form labels.
+
+### Date and Time Utils
+
+```ts
+import { toDate, dateFmt, dateFmtHM, timeFmt12, toLocalISOString, toTime, msToTime,
+         fromXsdDuration, toXsdDuration } from '@servicestack/client'
+
+toDate('/Date(978307200000)/')  // Date
+toDate('2001-01-01T00:00:00Z')  // Date
+
+dateFmt(new Date(Date.UTC(2001,0,1)))  // 2001/01/01
+toLocalISOString(new Date())           // ISO 8601 date in local time
+
+fromXsdDuration('PT1H')         // 3600 (total seconds)
+toXsdDuration(3600)             // PT1H
+toTime(3600000)                 // 01:00:00
+```
+
+### Object Utils
+
+```ts
+import { pick, omit, omitEmpty, uniq, flatMap, each, apply, map, classNames } from '@servicestack/client'
+
+pick({ a:1, b:2, c:3 }, ['a','c'])   // { a:1, c:3 }
+omit({ a:1, b:2, c:3 }, ['b'])       // { a:1, c:3 }
+omitEmpty({ a:1, b:null, c:'' })     // { a:1 }
+uniq(['b','a','b'])                  // ['a','b']
+flatMap(x => [x,x], [1,2])           // [1,1,2,2]
+
+classNames('btn', isActive && 'active', { 'btn-lg':isLarge })
+```
+
+Where `apply()` is useful for configuring objects inline, e.g:
+
+```ts
+const client = apply(new JsonServiceClient(baseUrl), c => c.basePath = '/api')
+```
+
+### Form Utils
+
+Browser Apps can use the built-in Form utils to serialize and populate HTML Forms:
+
+```ts
+import { serializeToObject, serializeToUrlEncoded, serializeToFormData, populateForm, toFormData } from '@servicestack/client'
+
+const form = document.forms[0]
+
+serializeToObject(form)      // { name:'World', title:'Dr' }
+serializeToUrlEncoded(form)  // name=World&title=Dr
+serializeToFormData(form)    // FormData
+toFormData({ name:'World' }) // FormData
+
+populateForm(form, { name:'World', title:'Dr' })
+```
+
+Which can be sent with the API's typed Request DTO using `apiForm`:
+
+```ts
+const api = await client.apiForm(new CreateContact(), new FormData(document.forms[0]))
+```
+
+### Event Bus
+
+A minimal pub/sub `EventBus` is included for loosely-coupled communication between components:
+
+```ts
+import { createBus } from '@servicestack/client'
+
+const bus = createBus()
+
+const sub = bus.subscribe('theEvent', arg => console.log('got', arg))
+
+bus.publish('theEvent', 1)   // got 1
+
+sub.unsubscribe()
+bus.publish('theEvent', 2)   // (no handlers)
+```
+
+### JSV Format
+
+APIs using the [JSV Format](/jsv-format) can serialize objects into their compact JSV representation with:
+
+```ts
+import { JSV } from '@servicestack/client'
+
+JSV.stringify({ Id:1234, Name:"TEST", Obj:[{ Id:1, Key:"Value" }] })
+// {Id:1234,Name:TEST,Obj:[{Id:1,Key:Value}]}
+```
+
+### StringBuffer
+
+An efficient `StringBuffer` for building large strings:
+
+```ts
+import { StringBuffer } from '@servicestack/client'
+
+const sb = new StringBuffer()
+sb.append('Four score')
+sb.append(' ')
+sb.append('and seven years ago.')
+
+sb.toString()    // Four score and seven years ago.
+sb.getLength()   // 31
+sb.clear()
+```
 
 ## ServiceStackIDEA plugin
 
