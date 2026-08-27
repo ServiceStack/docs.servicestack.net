@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-08-27T01:47:12.4910113Z'>
+    <meta name='date' content='2026-08-27T02:08:00.1637037Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Go Add ServiceStack Reference</title>
@@ -1484,7 +1484,8 @@ mount('#header', Header)
 
                 <div class="not-prose"></div>
 
-                <div class="content"><p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.</p>
+                <div class="content"><p><img src="/img/pages/servicestack-reference/go-info.png" alt="" /></p>
+<p>ServiceStack's <strong>Add ServiceStack Reference</strong> feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.</p>
 <h3 id="go-simple-typed-apis-for-cloud-software">Go - Simple, typed APIs for cloud software<a class="header-anchor" href="javascript:;" onclick="location.hash='#go-simple-typed-apis-for-cloud-software'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>The new <a href="https://github.com/ServiceStack/servicestack-go">servicestack-go</a> client preserves everything that makes Go appealing: simplicity, fast builds and straightforward deployment. Generated Request DTOs carry their response type and HTTP method, allowing Go's generic client to infer the complete API call:</p>
 <pre><code class="language-go">res, err := ss.Send(client, dtos.Hello{Name: &quot;World&quot;})
@@ -1494,6 +1495,7 @@ if err != nil {
 fmt.Println(res.Result)
 </code></pre>
 <p>Built on Go's standard library with <strong>no external runtime dependencies</strong>. Provides <code>context.Context</code> variants for cancellation and deadlines, structured <code>ResponseStatus</code> errors, field validation errors, typed AutoQuery responses, multipart uploads, batched and one-way requests, and authentication using Basic Auth, API Keys, JWTs, refresh tokens or session cookies.</p>
+<p>A configured <code>Client</code> is safe for concurrent use by multiple goroutines, so a single client can be shared by your App's workers where it benefits from the connection pooling of its underlying <code>http.Client</code>.</p>
 <h3 id="first-class-development-experience">First class development experience<a class="header-anchor" href="javascript:;" onclick="location.hash='#first-class-development-experience'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p><a href="https://go.dev">Go</a> has become the language of choice for cloud infrastructure, CLI tooling and high-throughput network services thanks to its fast compile times, first-class concurrency and single-binary deployments. To maximize the experience for calling ServiceStack APIs from these environments, Go is supported as a 1st class Add ServiceStack Reference language which gives Go developers an end-to-end typed API for consuming ServiceStack APIs, with DTOs generated from a single command-line.</p>
 <h3 id="ideal-idiomatic-typed-message-based-api">Ideal idiomatic Typed Message-based API<a class="header-anchor" href="javascript:;" onclick="location.hash='#ideal-idiomatic-typed-message-based-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
@@ -1723,6 +1725,7 @@ func (QueryBookings) HttpMethod() string                            { return &qu
 <p>As Go's Generics can't be used on methods, the typed APIs are implemented as functions accepting the <code>*Client</code> as their first argument:</p>
 <pre><code class="language-go">// Client configuration
 func NewClient(baseUrl string) *Client            // sends Requests to /api
+func NewJsonApiClient(baseUrl string) *Client     // alias of NewClient
 func NewJsonServiceClient(baseUrl string) *Client // sends Requests to /json/reply
 func (c *Client) SetBasePath(basePath string) *Client
 func (c *Client) SetBearerToken(token string) *Client
@@ -1731,6 +1734,10 @@ func (c *Client) SetCredentials(userName, password string) *Client
 func (c *Client) SetHeader(name, value string) *Client
 func (c *Client) SetTimeout(timeout time.Duration) *Client
 func (c *Client) SetFollowRedirects(follow bool) *Client
+func (c *Client) BearerToken() string
+func (c *Client) RefreshToken() string
+func (c *Client) ToAbsoluteUrl(pathOrUrl string) string
+func (c *Client) CreateUrlFromDto(method string, request any) string
 func (c *Client) Authenticate(userName, password string) (AuthenticateResponse, error)
 
 // Typed API
@@ -1742,6 +1749,7 @@ func Patch[T any](client *Client, request IReturn[T], args ...map[string]any) (T
 func Delete[T any](client *Client, request IReturn[T], args ...map[string]any) (T, error)
 func SendVoid(client *Client, request IReturnVoid, args ...map[string]any) error
 func SendAs[T any](client *Client, request any, args ...map[string]any) (T, error)
+func SendMethodAs[T any](client *Client, method string, request any, args ...map[string]any) (T, error)
 func Api[T any](client *Client, request IReturn[T]) ApiResult[T]
 
 // Batched and one-way Requests
@@ -1752,13 +1760,16 @@ func PublishAll[T any](client *Client, requests []T) error
 // URL API
 func GetUrl[T any](client *Client, path string, args ...map[string]any) (T, error)
 func PostUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func PutUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func PatchUrl[T any](client *Client, path string, body any, args ...map[string]any) (T, error)
+func DeleteUrl[T any](client *Client, path string, args ...map[string]any) (T, error)
 func SendUrl[T any](client *Client, method, path string, body any, args ...map[string]any) (T, error)
 
 // File Uploads
 func PostFileWithRequest[T any](client *Client, request IReturn[T], file UploadFile) (T, error)
 func PostFilesWithRequest[T any](client *Client, request IReturn[T], files []UploadFile) (T, error)
 </code></pre>
-<p>Every API also has a <code>*Ctx</code> variant accepting a <code>context.Context</code> as its first argument, e.g. <code>SendCtx</code>, <code>GetCtx</code>, <code>ApiCtx</code>.</p>
+<p>Every API also has a <code>*Ctx</code> variant accepting a <code>context.Context</code> as its first argument, e.g. <code>SendCtx</code>, <code>GetCtx</code>, <code>ApiCtx</code>, <code>SendAllCtx</code>, <code>PostFilesWithRequestCtx</code>.</p>
 <h3 id="making-typed-api-requests">Making Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#making-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Making API Requests in Go is the same as all other <a href="/clients-overview">ServiceStack's Service Clients</a> by sending a populated Request DTO using a <code>Client</code> which returns a typed Response DTO:</p>
 <pre><code class="language-go">package main
@@ -1784,8 +1795,57 @@ func main() {
 <p><code>Send</code> uses the HTTP Method the API is annotated with, use <code>Get</code>, <code>Post</code>, <code>Put</code>, <code>Patch</code> or <code>Delete</code> to send a Request DTO with a specific HTTP Method:</p>
 <pre><code class="language-go">res, err := ss.Post(client, dtos.CreateBooking{Name: &quot;Booking&quot;})
 </code></pre>
-<p>APIs that don't return a Response Body are sent with <code>SendVoid</code>:</p>
+<p>APIs that don't return a Response Body are sent with <code>SendVoid</code>, which accepts the Request DTOs generated with a <code>CreateResponseVoid()</code> method:</p>
 <pre><code class="language-go">err := ss.SendVoid(client, dtos.DeleteBooking{Id: 1})
+</code></pre>
+<h3 id="resolving-the-http-method">Resolving the HTTP Method<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-the-http-method'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The Verb returned by a DTO's generated <code>HttpMethod()</code> also determines whether the Request DTO is sent in the QueryString or the JSON Request Body:</p>
+<pre><code class="language-go">res, err := ss.Send(client, dtos.Hello{Name: &quot;World&quot;})           // GET /api/Hello?name=World
+res, err := ss.Send(client, dtos.CreateBooking{Name: &quot;Booking&quot;}) // POST /api/CreateBooking {&quot;name&quot;:&quot;Booking&quot;}
+</code></pre>
+<p>Request DTOs that aren't annotated with a Verb fall back to inferring it from the Request DTO name:</p>
+<table>
+<thead>
+<tr>
+<th>Request DTO Name</th>
+<th>HTTP Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Get*</code> <code>Query*</code> <code>Find*</code> <code>Search*</code></td>
+<td>GET</td>
+</tr>
+<tr>
+<td><code>Create*</code></td>
+<td>POST</td>
+</tr>
+<tr>
+<td><code>Update*</code> <code>Replace*</code></td>
+<td>PUT</td>
+</tr>
+<tr>
+<td><code>Patch*</code></td>
+<td>PATCH</td>
+</tr>
+<tr>
+<td><code>Delete*</code> <code>Remove*</code></td>
+<td>DELETE</td>
+</tr>
+<tr>
+<td><em>(anything else)</em></td>
+<td>POST</td>
+</tr>
+</tbody>
+</table>
+<p>Which can be resolved for any Request DTO with:</p>
+<pre><code class="language-go">method := ss.ResolveHttpMethod(dtos.QueryBookings{}) // &quot;GET&quot;
+</code></pre>
+<p>Use <code>SendMethodAs</code> to send any Request DTO with an explicit Verb and Response Type, useful for calling APIs with hand-written DTOs that don't declare their Response Type:</p>
+<pre><code class="language-go">res, err := ss.SendMethodAs[dtos.HelloResponse](client, ss.HttpGet, MyHello{Name: &quot;World&quot;})
+</code></pre>
+<p>Where <code>SendAs</code> does the same using the API's default Verb:</p>
+<pre><code class="language-go">res, err := ss.SendAs[dtos.HelloResponse](client, MyHello{Name: &quot;World&quot;})
 </code></pre>
 <h3 id="autoquery-requests">AutoQuery Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#autoquery-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>AutoQuery APIs return a typed <code>QueryResponse[T]</code>, with the query params of their base type available on the embedded <code>ss.QueryDb</code>:</p>
@@ -1797,6 +1857,20 @@ res, err := ss.Send(client, dtos.QueryBookings{
 for _, booking := range res.Results { // booking is a dtos.Booking
     fmt.Println(booking.Id, booking.Name, booking.CreatedBy)
 }
+</code></pre>
+<p>As <code>Skip</code> and <code>Take</code> are <code>*int</code> pointers they're only sent when populated, letting the Server apply its own defaults otherwise. In addition to <code>Results</code>, <code>QueryResponse[T]</code> returns the <code>Offset</code> of the current page and the <code>Total</code> number of matching results when requested with <code>Include: &quot;Total&quot;</code>:</p>
+<pre><code class="language-go">skip, take := 10, 10
+res, err := ss.Send(client, dtos.QueryBookings{
+    QueryDb: ss.QueryDb{QueryBase: ss.QueryBase{
+        Skip:    &amp;skip,
+        Take:    &amp;take,
+        OrderBy: &quot;id&quot;,
+        Include: &quot;Total&quot;,       // include the Total of matching results
+        Fields:  &quot;id,name,roomType&quot;, // limit the fields returned
+    }‎},
+})
+
+fmt.Println(res.Offset, res.Total, len(res.Results))
 </code></pre>
 <h3 id="sending-additional-arguments-with-typed-api-requests">Sending additional arguments with Typed API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#sending-additional-arguments-with-typed-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Many AutoQuery Services utilize <a href="/autoquery/rdbms#implicit-conventions">implicit conventions</a> to query fields that aren't explicitly defined on AutoQuery Request DTOs, these can be queried by specifying additional arguments with the typed Request DTO, e.g:</p>
@@ -1822,7 +1896,10 @@ data, err := ss.GetUrl[[]byte](client, &quot;/api/QueryBookings.csv&quot;)
 </code></pre>
 <p>Or send them to a one-way endpoint that ignores their Responses:</p>
 <pre><code class="language-go">err := ss.Publish(client, dtos.Hello{Name: &quot;World&quot;})
+
+err := ss.PublishAll(client, []dtos.Hello{‎{Name: &quot;A&quot;}, {Name: &quot;B&quot;}‎})
 </code></pre>
+<p>Which are sent to the Client's one-way base URL, i.e. <code>/json/oneway</code> when using <code>NewJsonServiceClient</code>.</p>
 <h3 id="error-handling">Error Handling<a class="header-anchor" href="javascript:;" onclick="location.hash='#error-handling'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Failed API Requests return a <code>*WebServiceException</code> containing the HTTP Status Code and the API's structured <a href="/error-handling">ResponseStatus</a> error:</p>
 <pre><code class="language-go">_, err := ss.Send(client, dtos.CreateBooking{})
@@ -1838,6 +1915,41 @@ if webEx, ok := ss.AsWebServiceException(err); ok {
 <pre><code class="language-go">var webEx *ss.WebServiceException
 if errors.As(err, &amp;webEx) { /* ... */ }
 </code></pre>
+<p><code>WebServiceException</code> includes the HTTP Status Code helpers and structured error accessors you'd expect:</p>
+<pre><code class="language-go">webEx.StatusCode        // HTTP Status Code, 0 for connection and transport errors
+webEx.StatusDescription // HTTP Status Description
+webEx.ResponseStatus    // structured error, nil when the API didn't return one
+webEx.ResponseBody      // raw error body, e.g. when a HTML or plain text error was returned
+webEx.ErrorCode()       // &quot;NotEmpty&quot;
+webEx.ErrorMessage()    // &quot;'Name' must not be empty.&quot;
+webEx.StackTrace()      // Server StackTrace, only populated in DebugMode
+webEx.FieldErrors()     // []ResponseError of all field validation errors
+webEx.FieldError(&quot;Name&quot;)
+webEx.IsValidationError()   // has field validation errors
+webEx.IsUnauthorized()      // 401
+webEx.IsForbidden()         // 403
+webEx.IsNotFound()          // 404
+webEx.IsAny(429, 502, 503, 504)
+webEx.Unwrap()          // the underlying transport error, if any
+</code></pre>
+<p>Field validation errors are returned in a typed <code>[]ResponseError</code> which can be mapped to the fields of your UI:</p>
+<pre><code class="language-go">for _, fieldError := range webEx.FieldErrors() {
+    fmt.Println(fieldError.FieldName, fieldError.ErrorCode, fieldError.Message)
+}
+</code></pre>
+<p>Connection failures and invalid Responses are also returned as a <code>*WebServiceException</code> with a <code>0</code> Status Code and the underlying error accessible with <code>errors.Is</code>/<code>errors.Unwrap</code>, so a single error type can be used to handle all API failures:</p>
+<pre><code class="language-go">_, err := ss.SendCtx(ctx, client, dtos.Hello{Name: &quot;World&quot;})
+if errors.Is(err, context.Canceled) { /* the Request was cancelled */ }
+</code></pre>
+<p>The API's Status Code and structured error can also be read from any <code>error</code> with:</p>
+<pre><code class="language-go">statusCode := ss.GetStatusCode(err)      // 0 if err wasn't a *WebServiceException
+status := ss.GetResponseStatus(err)      // *ResponseStatus, nil if not returned
+
+// e.g. retry API Requests that failed with a transient error
+if webEx, ok := ss.AsWebServiceException(err); ok &amp;&amp; webEx.IsAny(429, 502, 503, 504) {
+    // ...
+}
+</code></pre>
 <p>Alternatively <code>Api</code> returns errors in its result instead of a separate <code>error</code>, which can be preferable when handling validation errors is part of normal control flow:</p>
 <pre><code class="language-go">api := ss.Api(client, dtos.CreateBooking{})
 if api.Failed() {
@@ -1846,6 +1958,7 @@ if api.Failed() {
     fmt.Println(api.Response.Id)
 }
 </code></pre>
+<p>Where <code>ApiResult[T]</code> returns the typed <code>Response</code> and any <code>*ResponseStatus</code> <code>Error</code> alongside <code>Succeeded()</code>, <code>Failed()</code>, <code>ErrorCode()</code>, <code>ErrorMessage()</code> and <code>FieldError()</code> helpers. As all errors are converted into a <code>ResponseStatus</code>, transport errors are also returned in <code>api.Error</code> with an <code>Exception</code> Error Code.</p>
 <h3 id="authenticating-using-basic-auth">Authenticating using Basic Auth<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-basic-auth'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Basic Auth support is implemented in <code>Client</code> and follows the same API made available in the C# Service Clients:</p>
 <pre><code class="language-go">client.SetCredentials(user, pass)
@@ -1857,6 +1970,16 @@ res, err := ss.Send(client, dtos.SecureRequest{})
 <pre><code class="language-go">authRes, err := client.Authenticate(userName, password)
 </code></pre>
 <p>This will populate the <code>Client</code> with <a href="/auth/sessions#cookie-session-ids">Session Cookies</a> which will transparently be sent on subsequent requests to make authenticated requests, as well as using any Bearer Token the Server returns.</p>
+<p>Session Cookies are maintained in the <code>http.Client</code>'s cookie jar, whilst any Bearer and Refresh Tokens returned are configured on the client and available from <code>client.BearerToken()</code> and <code>client.RefreshToken()</code>. The <code>AuthenticateResponse</code> also returns the authenticated User's info, roles and permissions:</p>
+<pre><code class="language-go">authRes, err := client.Authenticate(&quot;test&quot;, &quot;test&quot;)
+
+fmt.Println(authRes.UserId, authRes.UserName, authRes.DisplayName, authRes.ProfileUrl)
+fmt.Println(authRes.Roles, authRes.Permissions)
+fmt.Println(client.BearerToken(), client.RefreshToken())
+
+// All subsequent Requests are made with the Authenticated Session
+res, err := ss.Send(client, dtos.HelloSecure{Name: &quot;World&quot;})
+</code></pre>
 <h3 id="authenticating-using-jwt">Authenticating using JWT<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-jwt'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>SetBearerToken</code> to Authenticate with a <a href="/auth/jwt-authprovider">ServiceStack JWT Provider</a> using a JWT Token:</p>
 <pre><code class="language-go">client.SetBearerToken(jwt)
@@ -1864,11 +1987,96 @@ res, err := ss.Send(client, dtos.SecureRequest{})
 <p>Alternatively you can use just a <a href="/auth/jwt-authprovider#refresh-tokens">Refresh Token</a> instead:</p>
 <pre><code class="language-go">client.SetRefreshToken(refreshToken)
 </code></pre>
-<p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests.</p>
+<p>Where the client will automatically fetch a new JWT Bearer Token using the Refresh Token for authenticated requests, i.e. when a Request fails with a <code>401 Unauthorized</code> the client sends its Refresh Token to the <a href="/auth/jwt-authprovider#refresh-tokens">GetAccessToken</a> API, updates its Bearer Token then transparently retries the original Request:</p>
+<pre><code>POST /api/Hello           -&gt; 401 Unauthorized
+POST /api/GetAccessToken  -&gt; 200 { &quot;accessToken&quot;: &quot;...&quot; }
+POST /api/Hello           -&gt; 200 { &quot;result&quot;: &quot;Hello, World!&quot; }
+</code></pre>
+<p>Use <code>RefreshTokenUri</code> to fetch Access Tokens from a different <a href="/auth/jwt-authprovider#retrieve-token-from-central-auth-server-using-credentials-auth">central Auth Server</a>:</p>
+<pre><code class="language-go">client.RefreshTokenUri = &quot;https://auth.example.org/api/GetAccessToken&quot;
+</code></pre>
 <h3 id="authenticating-using-an-api-key">Authenticating using an API Key<a class="header-anchor" href="javascript:;" onclick="location.hash='#authenticating-using-an-api-key'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Use <code>SetBearerToken</code> to Authenticate with an <a href="/auth/api-key-authprovider">API Key</a>:</p>
 <pre><code class="language-go">client.SetBearerToken(apiKey)
 </code></pre>
+<h3 id="built-in-servicestack-dtos">Built-in ServiceStack DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#built-in-servicestack-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The Go client library includes typed Request DTOs for ServiceStack's built-in APIs, letting you call them without needing to generate them:</p>
+<pre><code class="language-go">// Authentication
+authRes, err := ss.Send(client, ss.Authenticate{Provider: &quot;credentials&quot;,
+    UserName: &quot;test&quot;, Password: &quot;test&quot;, RememberMe: &amp;rememberMe})
+regRes, err := ss.Send(client, ss.Register{UserName: &quot;new-user&quot;,
+    Email: &quot;user@example.org&quot;, Password: &quot;p@55wOrd&quot;, AutoLogin: &amp;autoLogin})
+
+// JWT
+tokenRes, err := ss.Send(client, ss.ConvertSessionToToken{}) // Session -&gt; JWT
+accessRes, err := ss.Send(client, ss.GetAccessToken{RefreshToken: refreshToken})
+
+// API Keys
+keysRes, err := ss.Send(client, ss.GetApiKeys{Environment: &quot;live&quot;})
+newKeys, err := ss.Send(client, ss.RegenerateApiKeys{Environment: &quot;live&quot;})
+
+// Roles and Permissions
+rolesRes, err := ss.Send(client, ss.AssignRoles{UserName: &quot;user&quot;, Roles: []string{&quot;Employee&quot;}‎})
+_, err = ss.Send(client, ss.UnAssignRoles{UserName: &quot;user&quot;, Roles: []string{&quot;Employee&quot;}‎})
+
+// Navigation
+navRes, err := ss.Send(client, ss.GetNavItems{})
+</code></pre>
+<p>Together with the built-in Response Types and base types that generated DTOs reference:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ss.ResponseStatus</code></td>
+<td>ServiceStack's structured error response</td>
+</tr>
+<tr>
+<td><code>ss.ResponseError</code></td>
+<td>An individual field validation error</td>
+</tr>
+<tr>
+<td><code>ss.EmptyResponse</code></td>
+<td>Response of APIs that don't return a Response Body</td>
+</tr>
+<tr>
+<td><code>ss.IdResponse</code></td>
+<td>Response returning the Id of the created or updated entity</td>
+</tr>
+<tr>
+<td><code>ss.StringResponse</code></td>
+<td>Response returning a single <code>Result</code> string</td>
+</tr>
+<tr>
+<td><code>ss.StringsResponse</code></td>
+<td>Response returning a list of string <code>Results</code></td>
+</tr>
+<tr>
+<td><code>ss.AuditBase</code></td>
+<td>Audit fields embedded in <a href="/autoquery/crud">AutoQuery CRUD</a> data models</td>
+</tr>
+<tr>
+<td><code>ss.QueryBase</code></td>
+<td>Query params supported by all <a href="/autoquery/">AutoQuery</a> Requests</td>
+</tr>
+<tr>
+<td><code>ss.QueryDb</code></td>
+<td>Base type of AutoQuery RDBMS Requests</td>
+</tr>
+<tr>
+<td><code>ss.QueryData</code></td>
+<td>Base type of <a href="/autoquery/data">AutoQuery Data</a> Requests</td>
+</tr>
+<tr>
+<td><code>ss.QueryResponse[T]</code></td>
+<td>Typed Response of AutoQuery Requests</td>
+</tr>
+</tbody>
+</table>
 <h3 id="transparently-handle-401-unauthorized-responses">Transparently handle 401 Unauthorized Responses<a class="header-anchor" href="javascript:;" onclick="location.hash='#transparently-handle-401-unauthorized-responses'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>If the server returns a 401 Unauthorized Response either because the client was Unauthenticated or the configured Bearer Token or API Key used had expired or was invalidated, you can use the <code>OnAuthenticationRequired</code> callback to re-configure the client before automatically retrying the original request, e.g:</p>
 <pre><code class="language-go">client.OnAuthenticationRequired = func(c *ss.Client) error {
@@ -1891,7 +2099,14 @@ res, err := ss.PostFileWithRequest(client, dtos.UploadPhoto{Album: &quot;Holiday
     Reader:      file,
 })
 </code></pre>
-<p>To upload multiple files use <code>PostFilesWithRequest</code>.</p>
+<p>Any populated properties on the Request DTO are sent as form fields alongside the uploaded files, whilst <code>FieldName</code> defaults to <code>file</code> and <code>ContentType</code> is detected by the Server when omitted.</p>
+<p>As <code>Reader</code> is an <code>io.Reader</code>, files can be uploaded from anywhere - a file on disk, an in-memory buffer or a streamed HTTP Response. To upload multiple files use <code>PostFilesWithRequest</code>:</p>
+<pre><code class="language-go">res, err := ss.PostFilesWithRequest(client, dtos.UploadPhotos{Album: &quot;Holiday&quot;}, []ss.UploadFile{
+    {FieldName: &quot;files&quot;, FileName: &quot;1.png&quot;, ContentType: &quot;image/png&quot;, Reader: file1},
+    {FieldName: &quot;files&quot;, FileName: &quot;2.txt&quot;, Reader: strings.NewReader(&quot;file contents&quot;)},
+})
+</code></pre>
+<p>Use <code>PostFilesWithRequestUrlCtx</code> to upload files to a custom URL, e.g. a <a href="/locode/files-overview">Managed File Upload</a> route.</p>
 <h3 id="context.context">context.Context<a class="header-anchor" href="javascript:;" onclick="location.hash='#context.context'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Every API has a <code>*Ctx</code> variant accepting a <code>context.Context</code> for cancellation and timeouts:</p>
 <pre><code class="language-go">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -1914,6 +2129,183 @@ client.ResponseFilter = func(res *http.Response) { log.Println(res.Status) }
 client.HttpClient = &amp;http.Client{Timeout: 30 * time.Second}
 </code></pre>
 <p><code>NewClient</code> sends Requests to ServiceStack's pre-defined <code>/api</code> route. Use <code>NewJsonServiceClient</code> for older ServiceStack instances that only have the <code>/json/reply</code> routes enabled, or <code>SetBasePath</code> for a custom base path.</p>
+<pre><code class="language-go">apiClient := ss.NewClient(&quot;https://example.org&quot;)             // /api/Hello
+jsonClient := ss.NewJsonServiceClient(&quot;https://example.org&quot;) // /json/reply/Hello
+customClient := ss.NewClient(&quot;https://example.org&quot;).SetBasePath(&quot;custom/api&quot;) // /custom/api/Hello
+</code></pre>
+<h3 id="global-request-and-response-filters">Global Request and Response Filters<a class="header-anchor" href="javascript:;" onclick="location.hash='#global-request-and-response-filters'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>In addition to per-client filters, global filters can be registered to inspect or decorate the Requests and Responses of every <code>Client</code>, useful for adding tracing headers or logging and diagnostics:</p>
+<pre><code class="language-go">ss.GlobalRequestFilter = func(req *http.Request) {
+    req.Header.Set(&quot;X-Correlation-Id&quot;, correlationId())
+}
+ss.GlobalResponseFilter = func(res *http.Response) {
+    log.Println(res.Request.Method, res.Request.URL, res.Status)
+}
+</code></pre>
+<h3 id="concurrent-api-requests">Concurrent API Requests<a class="header-anchor" href="javascript:;" onclick="location.hash='#concurrent-api-requests'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Go's concurrency is a natural fit for calling APIs in parallel. A configured <code>Client</code> is safe for concurrent use by multiple goroutines so a single client should be shared to benefit from the connection pooling of its underlying <code>http.Client</code>:</p>
+<pre><code class="language-go">client := ss.NewClient(&quot;https://blazor-vue.web-templates.io&quot;) // configure before sharing
+
+var wg sync.WaitGroup
+results := make([]string, len(names))
+for i, name := range names {
+    wg.Add(1)
+    go func(i int, name string) {
+        defer wg.Done()
+        if res, err := ss.SendCtx(ctx, client, dtos.Hello{Name: name}); err == nil {
+            results[i] = res.Result
+        }
+    }(i, name)
+}
+wg.Wait()
+</code></pre>
+<p>Auth Tokens updated with the <code>Set*</code> methods (incl. transparent Refresh Token fetches) are guarded, mutating the Client's exported fields whilst Requests are in-flight is not supported.</p>
+<h3 id="querystring-serialization">QueryString Serialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#querystring-serialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Request DTO properties and additional args sent in the QueryString use ServiceStack's <a href="/js-utils">JS Object</a> notation for complex types, and its Date and TimeSpan formats for <code>time.Time</code> and <code>time.Duration</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Go Value</th>
+<th>QueryString</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&quot;World&quot;</code></td>
+<td><code>name=World</code></td>
+</tr>
+<tr>
+<td><code>true</code></td>
+<td><code>enabled=true</code></td>
+</tr>
+<tr>
+<td><code>1.5</code></td>
+<td><code>rate=1.5</code></td>
+</tr>
+<tr>
+<td><code>[]int{1,2,3}</code></td>
+<td><code>ids=[1,2,3]</code></td>
+</tr>
+<tr>
+<td><code>map[string]int{&quot;a&quot;:1,&quot;b&quot;:2}</code></td>
+<td><code>meta={a:1,b:2}</code></td>
+</tr>
+<tr>
+<td><code>time.Time</code> of <code>2001-01-01</code></td>
+<td><code>date=2001-01-01T00:00:00Z</code></td>
+</tr>
+<tr>
+<td><code>90 * time.Minute</code></td>
+<td><code>duration=PT1H30M</code></td>
+</tr>
+<tr>
+<td><code>nil</code> / nil pointers</td>
+<td><em>(omitted)</em></td>
+</tr>
+</tbody>
+</table>
+<p>Values are URL encoded, pointers dereferenced and args sorted by name so the same args always generate the same URL - which is also important for caching and testing.</p>
+<h3 id="url-and-dto-utils">URL and DTO Utils<a class="header-anchor" href="javascript:;" onclick="location.hash='#url-and-dto-utils'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The utils the Client uses to construct API Requests are also exported for building your own URLs and integrations:</p>
+<pre><code class="language-go">ss.NameOf(dtos.Hello{})                          // &quot;Hello&quot;
+ss.ResolveHttpMethod(dtos.QueryBookings{})       // &quot;GET&quot;
+ss.HasRequestBody(ss.HttpGet)                    // false
+ss.CombineWith(&quot;https://example.org/&quot;, &quot;/api/&quot;, &quot;Hello&quot;) // &quot;https://example.org/api/Hello&quot;
+ss.AppendQueryString(&quot;/api/Hello&quot;, map[string]any{&quot;name&quot;: &quot;World&quot;}) // &quot;/api/Hello?name=World&quot;
+ss.ToAbsoluteUrl(&quot;https://example.org&quot;, &quot;/api/Hello&quot;) // &quot;https://example.org/api/Hello&quot;
+ss.QsValue([]int{1, 2, 3})                       // &quot;[1,2,3]&quot;
+ss.DtoToMap(dtos.Hello{Name: &quot;World&quot;})           // map[string]any{&quot;name&quot;:&quot;World&quot;}
+
+client.CreateUrlFromDto(ss.HttpGet, dtos.Hello{}) // &quot;https://example.org/api/Hello&quot;
+client.ToAbsoluteUrl(&quot;/api/Hello&quot;)                // &quot;https://example.org/api/Hello&quot;
+</code></pre>
+<p>Along with the HTTP constants used in ServiceStack APIs, e.g. <code>ss.HttpGet</code>, <code>ss.HttpPost</code>, <code>ss.HttpPut</code>, <code>ss.HttpPatch</code>, <code>ss.HttpDelete</code>, <code>ss.MimeTypeJson</code>, <code>ss.HeaderAccept</code>, <code>ss.HeaderContentType</code> and <code>ss.HeaderAuthorization</code>.</p>
+<h3 id="calling-ai-chat-and-openai-compatible-apis">Calling AI Chat and OpenAI compatible APIs<a class="header-anchor" href="javascript:;" onclick="location.hash='#calling-ai-chat-and-openai-compatible-apis'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As Request DTOs are just structs, more advanced APIs like <a href="/ai-chat-api">AI Chat</a>'s OpenAI-compatible <code>ChatCompletion</code> API can also be called with typed DTOs, where polymorphic content parts are sent in a <code>[]any</code>:</p>
+<pre><code class="language-go">res, err := ss.Send(client, dtos.ChatCompletion{
+    Model: &quot;openai/gpt-oss-120b&quot;,
+    Messages: []dtos.AiMessage{
+        {
+            Role: &quot;user&quot;,
+            // Content parts are polymorphic, e.g. text, image_url or input_audio
+            Content: []any{
+                dtos.AiTextContent{
+                    AiContent: dtos.AiContent{Type: &quot;text&quot;},
+                    Text:      &quot;Capital of France? Answer in 3 words&quot;,
+                },
+            },
+        },
+    },
+})
+if err != nil {
+    // Handle rate limited or temporarily unavailable LLMs
+    if webEx, ok := ss.AsWebServiceException(err); ok &amp;&amp; webEx.IsAny(429, 502, 503, 504) { /* retry */ }
+}
+
+fmt.Println(res.Choices[0].Message.Content)
+</code></pre>
+<h3 id="testing">Testing<a class="header-anchor" href="javascript:;" onclick="location.hash='#testing'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>As the <code>Client</code> accepts any Base URL and lets you replace its <code>*http.Client</code>, APIs can be tested against Go's built-in <code>httptest</code> Server without needing to mock the client:</p>
+<pre><code class="language-go">server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(ss.HeaderContentType, ss.MimeTypeJson)
+    _ = json.NewEncoder(w).Encode(dtos.HelloResponse{Result: &quot;Hello, World!&quot;})
+}))
+defer server.Close()
+
+client := ss.NewClient(server.URL)
+res, err := ss.Send(client, dtos.Hello{Name: &quot;World&quot;})
+</code></pre>
+<p>Which is how the <a href="https://github.com/ServiceStack/servicestack-go/blob/main/client_test.go">client's own test suite</a> verifies the Requests it sends, in addition to its <a href="https://github.com/ServiceStack/servicestack-go/blob/main/integration_test.go">integration tests</a> which are run against the live <a href="https://test.servicestack.net">test.servicestack.net</a> Services:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>go test -tags integration ./...</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<h3 id="example">Example<a class="header-anchor" href="javascript:;" onclick="location.hash='#example'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The <a href="https://github.com/ServiceStack/servicestack-go/tree/main/examples/hello">examples/hello</a> command is a small runnable example of calling the live <strong>test.servicestack.net</strong> Services with typed APIs, batched Requests, structured validation errors and authenticated Requests:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>go run ./examples/hello</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
 <h2 id="dto-customization-options">DTO Customization Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#dto-customization-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>In most cases you'll just use the generated Go DTOs as-is, however you can further customize how the DTOs are generated by overriding the default options.</p>
 <p>The header in the generated DTOs show the different options Go native types support with their defaults. To override a value, remove the <code>//</code> and specify the value to the right of the <code>:</code>. Any uncommented value will be sent to the server to override any server defaults.</p>
@@ -2069,6 +2461,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Making Typed API Requests
                                                         </span>
                                                     </li>
+                                                    <li data-id="resolving-the-http-method" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#resolving-the-http-method'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Resolving the HTTP Method
+                                                        </span>
+                                                    </li>
                                                     <li data-id="autoquery-requests" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#autoquery-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2129,6 +2527,12 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                             Authenticating using an API Key
                                                         </span>
                                                     </li>
+                                                    <li data-id="built-in-servicestack-dtos" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#built-in-servicestack-dtos'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Built-in ServiceStack DTOs
+                                                        </span>
+                                                    </li>
                                                     <li data-id="transparently-handle-401-unauthorized-responses" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#transparently-handle-401-unauthorized-responses'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
@@ -2151,6 +2555,48 @@ nativeTypes.MetadataTypesConfig.AddResponseStatus = true;
                                                         <span v-hash="'#client-configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Client Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="global-request-and-response-filters" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#global-request-and-response-filters'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Global Request and Response Filters
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="concurrent-api-requests" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#concurrent-api-requests'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Concurrent API Requests
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="querystring-serialization" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#querystring-serialization'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            QueryString Serialization
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="url-and-dto-utils" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#url-and-dto-utils'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            URL and DTO Utils
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="calling-ai-chat-and-openai-compatible-apis" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#calling-ai-chat-and-openai-compatible-apis'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Calling AI Chat and OpenAI compatible APIs
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="testing" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#testing'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Testing
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="example" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#example'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Example
                                                         </span>
                                                     </li>
                                             </ul>
