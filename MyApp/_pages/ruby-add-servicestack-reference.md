@@ -4,7 +4,7 @@ title: Ruby ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![](/img/pages/servicestack-reference/ruby-info.png)
+![](/img/pages/servicestack-reference/ruby-info.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Ruby - providing a simple way to give Ruby clients typed access to your ServiceStack Services.

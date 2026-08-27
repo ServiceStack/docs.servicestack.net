@@ -4,7 +4,7 @@ title: Rust ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![](/img/pages/servicestack-reference/rust-info.png)
+![](/img/pages/servicestack-reference/rust-info.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Rust - providing a simple way to give Rust clients typed access to your ServiceStack Services.

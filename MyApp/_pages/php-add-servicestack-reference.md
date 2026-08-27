@@ -3,7 +3,7 @@ title: PHP ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![ServiceStack and PHP Banner](/img/pages/servicestack-reference/php-reference.png)
+![ServiceStack and PHP Banner](/img/pages/servicestack-reference/php-reference.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PhpStorm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.

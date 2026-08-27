@@ -4,7 +4,7 @@ title: Go ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![](/img/pages/servicestack-reference/go-info.png)
+![](/img/pages/servicestack-reference/go-info.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Go - providing a simple way to give Go clients typed access to your ServiceStack Services.

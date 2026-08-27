@@ -4,7 +4,7 @@ title: Python ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![ServiceStack and Python Banner](./img/pages/servicestack-reference/python-reference.png)
+![ServiceStack and Python Banner](./img/pages/servicestack-reference/python-reference.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types from directly within PyCharm using [ServiceStack IntelliJ Plugin](https://plugins.jetbrains.com/plugin/7749-servicestack/) - providing a simple way to give clients typed access to your ServiceStack Services.

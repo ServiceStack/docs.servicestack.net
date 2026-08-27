@@ -4,7 +4,7 @@ title: Zig ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
-![](/img/pages/servicestack-reference/zig-info.png)
+![](/img/pages/servicestack-reference/zig-info.webp)
 :::
 
 ServiceStack's **Add ServiceStack Reference** feature allows clients to generate Native Types for Zig - providing a simple way to give Zig clients typed access to your ServiceStack Services.
