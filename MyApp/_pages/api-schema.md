@@ -47,10 +47,10 @@ These routes belong to the existing [Metadata feature](/metadata-page), so there
 
 The built-in API browser is a fast searchable launcher designed for large applications. APIs can be filtered by Request DTO name, title, description, tag and HTTP verb, with fuzzy matching that understands the PascalCase names used by Request DTOs.
 
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+<screenshots-gallery-view :images="{
     'Search and discover every API available to the current user': '/img/pages/api-schema/api-schema-browser.webp',
     'Filtered by the CoffeeShop tag': '/img/pages/api-schema/coffee-shop-filter.webp',
-}"></screenshots-gallery>
+}"></screenshots-gallery-view>
 
 APIs excluded from metadata or unavailable to the caller are omitted, so signing in can change the catalog when additional role- or permission-protected APIs become available.
 
@@ -227,14 +227,14 @@ Each response can be viewed 3 different ways, switchable from the tabs in the re
 - **JSON** - the syntax-highlighted raw JSON response
 - **Headers** - the HTTP response headers returned by the server
 
-<screenshot src="/img/pages/api-schema/curl-response-headers.webp" title="Response headers returned by the API"></screenshot>
+<screenshots-gallery-view :images="{
+    'Generated curl request and response': '/img/pages/api-schema/curl-response.webp',
+    'Maximized results grid': '/img/pages/api-schema/curl-response-maximize-data.webp',
+    'Maximized JSON response': '/img/pages/api-schema/curl-response-maximize-json.webp',
+    'Response headers returned by the API': '/img/pages/api-schema/curl-response-headers.webp',
+}"></screenshots-gallery-view>
 
-Responses can also be maximized to inspect larger results, expanding the response panel over the request form whilst retaining the same **Data** / **JSON** / **Headers** views:
-
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
-  'Maximized results grid': '/img/pages/api-schema/curl-response-maximize-data.webp',
-  'Maximized JSON response': '/img/pages/api-schema/curl-response-maximize-json.webp',
-}"></screenshots-gallery>
+Responses can also be maximized to inspect larger results, expanding the response panel over the request form whilst retaining the same **Data** / **JSON** / **Headers** views.
 
 The page remains a normal client of the API. All authentication, authorization, request filters and validation still run on the server when the request is submitted.
 
