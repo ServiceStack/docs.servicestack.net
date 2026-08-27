@@ -106,22 +106,20 @@ Requires **Ruby 3.0+**.
 
 ### Simple command-line utility for Ruby
 
-Ruby DTOs can be generated from the command-line with the cross-platform [`x` command line utility](/dotnet-tool).
-
-To install first install the [latest .NET SDK](https://dotnet.microsoft.com/download) for your OS then install the [`x` dotnet tool](/dotnet-tool) with:
+Ruby DTOs can be generated from the command-line with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
-To Add a Ruby ServiceStack Reference just call `x ruby` with the URL of a remote ServiceStack instance:
+To Add a Ruby ServiceStack Reference just call `npx get-dtos ruby` with the URL of a remote ServiceStack instance:
 
 :::sh
-x ruby https://blazor-vue.web-templates.io
+npx get-dtos ruby https://blazor-vue.web-templates.io
 :::
 
 Result:
@@ -130,10 +128,10 @@ Result:
 Saved to: dtos.rb
 ```
 
-Calling `x ruby` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos ruby` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-x ruby https://blazor-vue.web-templates.io Bookings
+npx get-dtos ruby https://blazor-vue.web-templates.io Bookings
 :::
 
 Result:
@@ -144,10 +142,10 @@ Saved to: Bookings.dtos.rb
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x ruby` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos ruby` with the Filename:
 
 :::sh
-x ruby dtos.rb
+npx get-dtos ruby dtos.rb
 :::
 
 Result:
@@ -160,10 +158,10 @@ Which will update the File with the latest Ruby Server DTOs. You can also custom
 
 ### Updating all Ruby DTOs
 
-Calling `x ruby` without any arguments will update all Ruby DTOs in the current directory:
+Calling `npx get-dtos ruby` without any arguments will update all Ruby DTOs in the current directory:
 
 :::sh
-x ruby
+npx get-dtos ruby
 :::
 
 Result:

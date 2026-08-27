@@ -94,22 +94,20 @@ Requires **Go 1.21+**.
 
 ### Simple command-line utility for Go
 
-Go DTOs can be generated from the command-line with the cross-platform [`x` command line utility](/dotnet-tool).
-
-To install first install the [latest .NET SDK](https://dotnet.microsoft.com/download) for your OS then install the [`x` dotnet tool](/dotnet-tool) with:
+Go DTOs can be generated from the command-line with the cross-platform [get-dtos](/npx-get-dtos) script which can be run with [Node.js](https://nodejs.org) without needing to install anything:
 
 :::sh
-dotnet tool install --global x
+npx get-dtos
 :::
 
-::include npx-get-dtos.md::
+Running it without any arguments displays the available options for adding and updating ServiceStack References.
 
 ### Adding a ServiceStack Reference
 
 Generated Go DTOs use the `dtos` package by default, so they're typically generated into their own folder:
 
 :::sh
-mkdir dtos && cd dtos && x go https://blazor-vue.web-templates.io
+mkdir dtos && cd dtos && npx get-dtos go https://blazor-vue.web-templates.io
 :::
 
 Result:
@@ -118,10 +116,10 @@ Result:
 Saved to: dtos.go
 ```
 
-Calling `x go` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
+Calling `npx get-dtos go` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
 
 :::sh
-x go https://blazor-vue.web-templates.io Bookings
+npx get-dtos go https://blazor-vue.web-templates.io Bookings
 :::
 
 Result:
@@ -134,10 +132,10 @@ Use the `GlobalNamespace` option to generate DTOs in a different Go package.
 
 ### Updating a ServiceStack Reference
 
-To Update an existing ServiceStack Reference, call `x go` with the Filename:
+To Update an existing ServiceStack Reference, call `npx get-dtos go` with the Filename:
 
 :::sh
-x go dtos.go
+npx get-dtos go dtos.go
 :::
 
 Result:
@@ -150,10 +148,10 @@ Which will update the File with the latest Go Server DTOs. You can also customiz
 
 ### Updating all Go DTOs
 
-Calling `x go` without any arguments will update all Go DTOs in the current directory:
+Calling `npx get-dtos go` without any arguments will update all Go DTOs in the current directory:
 
 :::sh
-x go
+npx get-dtos go
 :::
 
 ### Smart Generic Client
