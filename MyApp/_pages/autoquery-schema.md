@@ -114,6 +114,14 @@ The results grid calls the schema's Query API and provides:
 - Deep links through query-string state
 - Responsive light/dark modes
 
+This live example loads the `Booking` AutoQuery Schema from
+[Blazor Gallery](https://blazor-gallery.servicestack.net/auto/Booking) and renders it with the same `AutoQuerySchema`
+component available to your Apps. Try filtering, sorting, paging and changing the visible columns:
+
+<div class="not-prose prose-table mb-12">
+<schema-auto-query></schema-auto-query>
+</div>
+
 Query state is kept in the URL, so a filtered view can be bookmarked, refreshed or shared:
 
 <text-block text="/auto/Booking?RoomType=Queen&amp;orderBy=-BookingStartDate&amp;skip=20"></text-block>
