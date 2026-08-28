@@ -1,4 +1,4 @@
-import Default from './why-servicestack.mjs'
+import FeatureExplorer from "./components/FeatureExplorer.mjs"
 
 const OtherProducts = {
   template: `<div>
@@ -313,6 +313,9 @@ const OtherProducts = {
   `
 }
 
-Default.components['OtherProducts'] = OtherProducts
-
-export default Default
+export default {
+    components: {
+        FeatureExplorer,
+        OtherProducts,
+    }
+}

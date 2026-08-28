@@ -1,6 +1,7 @@
 import VideoGallery from "./components/VideoGallery.mjs"
 import WorkflowShowcase from "./components/WorkflowShowcase.mjs"
 import TabbedFeatureShowcase from "./components/TabbedFeatureShowcase.mjs"
+import DtoDeck from "./components/DtoDeck.mjs"
 
 const svg = name => `/img/pages/svg/${name}.svg`
 
@@ -89,8 +90,20 @@ const ServicifyVideos = {
     }
 }
 
+/** The one-contract deck, framed for APIs AutoGen generated from an existing database */
+const ServicifyDeck = {
+    components: { DtoDeck },
+    template: `<DtoDeck
+        eyebrow="What the generated contract unlocks"
+        title="What each generated Request DTO is worth"
+        description="AutoGen writes contracts like this one from your existing tables, with your App's conventions baked in. Everything that follows comes from that - exactly as it would for a DTO you wrote by hand."
+        contract-label="The generated Request DTO"
+        contract-badge="AutoGen + your conventions" />`,
+}
+
 export default {
     components: {
+        ServicifyDeck,
         ServicifySteps,
         ServicifyUnlocks,
         ServicifyVideos,
