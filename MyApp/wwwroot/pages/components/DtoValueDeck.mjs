@@ -81,7 +81,24 @@ function splitHighlightedLines(html) {
  *                             img:{ src:'…', alt:'…', w:1280, h:720 },
  *                             href:'/docs', linkText:'…' }]" />
  */
+/** Prev/next arrows - rendered in both the deck header and the footer bar */
+const DeckNav = {
+    emits: ['step'],
+    template: `
+    <div class="flex shrink-0 items-center gap-2">
+      <button type="button" @click="$emit('step', -1)" aria-label="Previous slide"
+        class="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-indigo-600 hover:ring-indigo-300 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-indigo-400">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button type="button" @click="$emit('step', 1)" aria-label="Next slide"
+        class="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-indigo-600 hover:ring-indigo-300 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-indigo-400">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>`,
+}
+
 export default {
+    components: { DeckNav },
     props: {
         eyebrow: String,
         title: String,
@@ -93,7 +110,7 @@ export default {
     },
     template: `
     <section tabindex="0" @keydown.left.prevent="step(-1)" @keydown.right.prevent="step(1)" :aria-label="title"
-             class="not-prose my-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm outline-none ring-indigo-500/40 focus-visible:ring-2 dark:border-slate-700 dark:bg-slate-900">
+             class="@container not-prose my-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm outline-none ring-indigo-500/40 focus-visible:ring-2 dark:border-slate-700 dark:bg-slate-900">
 
       <div class="border-b border-slate-200 px-6 py-5 dark:border-slate-700 sm:px-8">
         <div class="flex items-start justify-between gap-6">
@@ -103,28 +120,21 @@ export default {
           </div>
           <div class="flex shrink-0 items-center gap-2">
             <span class="tabular-nums text-xs font-bold text-slate-400 dark:text-slate-500">{{index_ + 1}} / {{slides.length}}</span>
-            <button type="button" @click="step(-1)" aria-label="Previous slide"
-              class="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-indigo-600 hover:ring-indigo-300 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-indigo-400">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button type="button" @click="step(1)" aria-label="Next slide"
-              class="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-indigo-600 hover:ring-indigo-300 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700 dark:hover:text-indigo-400">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-            </button>
+            <DeckNav @step="step" />
           </div>
         </div>
         <p v-if="description" class="mt-2 max-w-3xl text-pretty leading-7 text-slate-600 dark:text-slate-300">{{description}}</p>
       </div>
 
-      <div class="grid lg:grid-cols-5">
+      <div class="grid @min-[60rem]:grid-cols-7">
 
         <!-- The contract: pinned, identical on every slide -->
-        <div class="flex min-w-0 flex-col border-b border-slate-200 bg-slate-950 dark:border-slate-700 lg:col-span-2 lg:border-b-0 lg:border-r">
+        <div class="flex min-w-0 flex-col border-b border-slate-200 bg-slate-950 dark:border-slate-700 @min-[60rem]:col-span-3 @min-[60rem]:border-b-0 @min-[60rem]:border-r">
           <div class="flex items-center justify-between gap-3 border-b border-white/10 px-5 py-3">
             <span class="text-xs font-bold uppercase tracking-[.14em] text-slate-400">{{contract.label || 'The contract'}}</span>
             <span v-if="contract.badge" class="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-bold text-slate-300">{{contract.badge}}</span>
           </div>
-          <div class="flex-1 overflow-x-auto py-4 lg:sticky lg:top-24">
+          <div class="flex-1 overflow-x-auto py-4 @min-[60rem]:sticky @min-[60rem]:top-24">
             <code class="block w-max min-w-full bg-transparent p-0 font-mono text-[12px] leading-[1.7] text-slate-300">
               <div v-for="(line,index) in contractLines" :key="index"
                    :class="['whitespace-pre border-l-2 pl-3.5 pr-4 transition-all duration-300',
@@ -141,7 +151,7 @@ export default {
         </div>
 
         <!-- What you get -->
-        <div v-if="active" class="flex min-w-0 flex-col lg:col-span-3">
+        <div v-if="active" class="flex min-w-0 flex-col @min-[60rem]:col-span-4">
           <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-700 dark:bg-slate-800/60">
             <div class="flex min-w-0 items-center gap-2.5">
               <span aria-hidden="true" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-[12px] font-bold text-white">{{active.icon}}</span>
@@ -195,9 +205,12 @@ export default {
 
       <!-- Deck controls -->
       <div class="border-t border-slate-200 bg-slate-50 px-5 py-4 dark:border-slate-700 dark:bg-slate-800/40 sm:px-6">
-        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">
-          <span class="tabular-nums text-slate-900 dark:text-white">{{index_ + 1}}</span> / {{slides.length}} things you didn't have to write
-        </p>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">
+            <span class="tabular-nums text-slate-900 dark:text-white">{{index_ + 1}}</span> / {{slides.length}} things you didn't have to write
+          </p>
+          <DeckNav @step="step" />
+        </div>
         <div class="mt-3 flex flex-wrap gap-1.5">
           <button v-for="(slide,index) in slides" :key="slide.name" type="button" @click="index_ = index"
             :class="['rounded-full px-3 py-1.5 text-xs font-bold transition', index_ === index
