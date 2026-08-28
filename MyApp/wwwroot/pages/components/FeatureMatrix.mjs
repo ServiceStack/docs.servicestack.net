@@ -17,6 +17,7 @@ export default {
         /** [{ name, category, text, href, badge, keywords }] */
         features: { type: Array, default: () => [] },
         placeholder: { type: String, default: 'Search features…' },
+        baseUrl: { type: String, default: '' }
     },
     template: `
     <section class="not-prose my-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8">
@@ -50,7 +51,7 @@ export default {
       </div>
 
       <div v-if="results.length" class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <a v-for="feature in results" :key="feature.name" :href="feature.href"
+        <a v-for="feature in results" :key="feature.name" :href="baseUrl + feature.href"
            class="group flex flex-col rounded-xl border border-slate-200 bg-slate-50/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-indigo-600 dark:hover:bg-slate-800">
           <div class="flex items-start justify-between gap-2">
             <span class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{feature.name}}</span>
