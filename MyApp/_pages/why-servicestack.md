@@ -30,8 +30,8 @@ public class QueryBookings : QueryDb<Booking>
 
 That single Request DTO gives you a REST API with filtering, paging and sorting, an executable API Explorer UI, a portable JSON Schema, an entry in your OpenAPI spec, a Locode CRUD App, an AI-callable tool and native typed clients in **15 languages** - with no Service implementation, no controller, no DTO mapping and no SDK project.
 
-<div class="not-prose my-8">
-<img src="/img/pages/svg/servicify.svg" width="100%" alt="One Service, many consumers">
+<div class="not-prose">
+<dto-deck></dto-deck>
 </div>
 
 <div class="not-prose">
