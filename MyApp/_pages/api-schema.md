@@ -299,7 +299,6 @@ For `GET` APIs, opening a populated link can execute the request immediately. Af
 
 The built-in pages aren't a separate UI framework - they're composed from the same components published in `@servicestack/vue` and `@servicestack/react`.
 
-<div class="not-prose mt-10 flex items-center gap-4">
     <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40">
         <img src="/img/svgs/vue.svg" alt="Vue" class="h-9 w-10">
     </div>
