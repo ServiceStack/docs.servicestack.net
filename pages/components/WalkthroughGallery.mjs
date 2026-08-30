@@ -7,15 +7,6 @@ export default {
         <section :class="className || 'not-prose'" @keydown="onGalleryKeydown"
                  aria-label="Screenshot walkthrough">
             <div v-if="current" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-                <div class="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50 px-4 py-3 sm:px-5 dark:border-slate-700 dark:bg-slate-800/70">
-                    <span class="rounded-full bg-rose-100 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
-                        {{ current.phase }}
-                    </span>
-                    <span class="font-mono text-xs tabular-nums text-slate-500 dark:text-slate-400">
-                        Step {{ activeIndex + 1 }} of {{ slides.length }}
-                    </span>
-                </div>
-
                 <div class="group relative bg-slate-950">
                     <button ref="imageButton" type="button" @click="openLightbox"
                             class="block w-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500"
@@ -46,22 +37,32 @@ export default {
 
                 <div class="grid gap-5 px-5 py-5 sm:px-7 sm:py-6 lg:grid-cols-[1fr_auto] lg:items-end" aria-live="polite">
                     <div>
-                        <h3 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-white">
-                            {{ current.title }}
-                        </h3>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                            <h3 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-white">
+                                {{ current.title }}
+                            </h3>
+                            <span class="rounded-full bg-rose-100 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
+                                {{ current.phase }}
+                            </span>
+                        </div>
                         <p class="mt-2 max-w-4xl text-base leading-7 text-slate-600 dark:text-slate-300">
                             {{ current.caption }}
                         </p>
                     </div>
-                    <div v-if="slides.length > 1" class="flex gap-2">
-                        <button type="button" @click="previous"
-                                class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
-                            <span aria-hidden="true">&larr;</span> Previous
-                        </button>
-                        <button type="button" @click="next"
-                                class="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 dark:ring-offset-slate-900">
-                            Next <span aria-hidden="true">&rarr;</span>
-                        </button>
+                    <div v-if="slides.length > 1" class="flex flex-col items-end gap-2 justify-self-end">
+                        <span class="font-mono text-xs tabular-nums text-slate-500 dark:text-slate-400">
+                            Step {{ activeIndex + 1 }} of {{ slides.length }}
+                        </span>
+                        <div class="flex gap-2">
+                            <button type="button" @click="previous"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+                                <span aria-hidden="true">&larr;</span> Previous
+                            </button>
+                            <button type="button" @click="next"
+                                    class="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 dark:ring-offset-slate-900">
+                                Next <span aria-hidden="true">&rarr;</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
