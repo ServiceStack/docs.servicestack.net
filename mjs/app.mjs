@@ -14,6 +14,7 @@ import TextBlock from "./components/TextBlock.mjs"
 import VibeTemplate from "../pages/components/VibeTemplate.mjs"
 import ScreenshotsGallery from "../pages/components/ScreenshotsGallery.mjs"
 import ScreenshotsGalleryView from "../pages/components/ScreenshotsGalleryView.mjs"
+import WalkthroughGallery from "../pages/components/WalkthroughGallery.mjs"
 import Screenshot from "../pages/components/Screenshot.mjs"
 
 let client = null, Apps = []
@@ -66,6 +67,7 @@ const Components = {
     VibeTemplate,
     ScreenshotsGallery,
     ScreenshotsGalleryView,
+    WalkthroughGallery,
     Screenshot,
 }
 const CustomElements = [
