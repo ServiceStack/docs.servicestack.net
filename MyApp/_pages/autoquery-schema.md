@@ -2,7 +2,9 @@
 title: AutoQuery CRUD UI
 ---
 
-<screenshot src="/img/pages/autoquery-schema/autoquery-schema-info.webp"></screenshot>
+:::youtube M6KYkZFIM-8
+AutoQuery Schema: Instant CRUD Apps from JSON Schemas
+:::
 
 If your App has [AutoQuery](/autoquery/rdbms) APIs, open `/auto` in any **.NET 8+** ServiceStack App and you already have an admin application: a searchable list of your data models, and behind each one a working CRUD app with a results grid, paging, sorting, filters, saved preferences, Create and Edit forms, reference lookups and guarded Delete actions.
 
