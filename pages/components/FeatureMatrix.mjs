@@ -17,7 +17,9 @@ export default {
         /** [{ name, category, text, href, badge, keywords }] */
         features: { type: Array, default: () => [] },
         placeholder: { type: String, default: 'Search features…' },
-        baseUrl: { type: String, default: '' }
+        baseUrl: { type: String, default: '' },
+        /** Category rendered before All in a distinct amber colour */
+        specialCategory: { type: String, default: '' }
     },
     template: `
     <section class="not-prose my-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8">
@@ -36,11 +38,18 @@ export default {
       </div>
 
       <div class="mt-5 flex flex-wrap gap-2">
+        <button v-if="specialCategory" type="button" @click="category = category === specialCategory ? '' : specialCategory"
+          class="recent-tab rounded-full px-3.5 py-1.5 text-xs font-bold transition"
+          :class="category === specialCategory
+            ? 'bg-emerald-600 text-white'
+            : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/50'">
+          {{specialCategory}}
+        </button>
         <button type="button" @click="category=''"
           :class="['rounded-full px-3.5 py-1.5 text-xs font-bold transition', category === ''
             ? 'bg-indigo-600 text-white'
             : 'bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700']">
-          All <span class="opacity-60">{{features.length}}</span>
+          All <span class="opacity-60">{{allCount}}</span>
         </button>
         <button v-for="cat in categories" :key="cat.name" type="button" @click="category = category === cat.name ? '' : cat.name"
           :class="['rounded-full px-3.5 py-1.5 text-xs font-bold transition', category === cat.name
@@ -57,7 +66,7 @@ export default {
             <span class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{feature.name}}</span>
             <span v-if="feature.badge" class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{feature.badge}}</span>
           </div>
-          <p class="mt-1.5 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{{feature.text}}</p>
+          <p v-if="feature.category !== specialCategory" class="mt-1.5 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{{feature.text}}</p>
           <span class="mt-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{feature.category}}</span>
         </a>
       </div>
@@ -70,19 +79,32 @@ export default {
         const query = ref('')
         const category = ref('')
 
+        const specialCategoryCount = computed(() =>
+            props.features.filter(x => x.category === props.specialCategory).length)
+
+        // "All" count excludes the special category entries to avoid double-counting
+        const allCount = computed(() =>
+            props.features.filter(x => x.category !== props.specialCategory).length)
+
         const categories = computed(() => {
             const counts = new Map()
-            props.features.forEach(x => counts.set(x.category, (counts.get(x.category) ?? 0) + 1))
+            props.features.forEach(x => {
+                if (x.category === props.specialCategory) return
+                counts.set(x.category, (counts.get(x.category) ?? 0) + 1)
+            })
             return [...counts].map(([name, count]) => ({ name, count }))
         })
 
         const results = computed(() => {
             const q = query.value.trim().toLowerCase()
-            return props.features.filter(x =>
-                (!category.value || x.category === category.value) &&
-                (!q || `${x.name} ${x.category} ${x.text ?? ''} ${x.keywords ?? ''}`.toLowerCase().includes(q)))
+            // When no category filter is set, hide special-category entries from All view
+            return props.features.filter(x => {
+                if (!category.value && props.specialCategory && x.category === props.specialCategory) return false
+                return (!category.value || x.category === category.value) &&
+                    (!q || `${x.name} ${x.category} ${x.text ?? ''} ${x.keywords ?? ''}`.toLowerCase().includes(q))
+            })
         })
 
-        return { query, category, categories, results }
+        return { query, category, categories, results, specialCategoryCount, allCount }
     }
 }

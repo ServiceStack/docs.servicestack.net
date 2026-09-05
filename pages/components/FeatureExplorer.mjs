@@ -1,3 +1,4 @@
+import { ref } from "vue"
 import FeatureMatrix from "./FeatureMatrix.mjs"
 
 /** Searchable index of everything in the box */
@@ -7,7 +8,8 @@ export default {
         eyebrow="Everything in the box"
         title="Explore the feature set"
         description="Search or filter the capabilities included with ServiceStack. Every card links to its documentation."
-        :features="features" />`,
+        specialCategory="Recently Updated"
+        :features="allFeatures" />`,
     setup() {
         const features = [
             // APIs
@@ -122,6 +124,33 @@ export default {
             { category: 'Tooling', name: 'Servicify', href: '/servicify', keywords: 'legacy modernize',
               text: 'Put a typed, documented API in front of existing systems and databases.' },
         ]
-        return { features }
+
+        // Build a lookup map from href → feature entry for fast matching
+        const featureByHref = {}
+        features.forEach(f => { featureByHref[f.href] = f })
+
+        // allFeatures starts with just the base features; recent entries are prepended once loaded
+        const allFeatures = ref([...features])
+
+        import('/mjs/data/latest.mjs')
+            .then(m => {
+                const recent = (m.latestPages || []).map(page => {
+                    const match = featureByHref[page.href]
+                    if (match) {
+                        return { ...match, category: 'Recently Updated' }
+                    }
+                    return {
+                        category: 'Recently Updated',
+                        name: page.name,
+                        href: page.href,
+                        text: page.text,
+                        badge: page.badge,
+                    }
+                })
+                allFeatures.value = [...recent, ...features]
+            })
+            .catch(() => { /* latest.mjs not yet generated — Recent tab stays hidden */ })
+
+        return { allFeatures }
     }
 }
