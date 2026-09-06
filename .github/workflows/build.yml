@@ -22,7 +22,7 @@ jobs:
 
       - name: build
         working-directory: ./MyApp
-        run: dotnet build .
+        run: dotnet build -c Release
 
       - name: Assign default GitHub URL base path
         env:
@@ -58,16 +58,19 @@ jobs:
 
       - name: prerender
         working-directory: ./MyApp
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+          DOTNET_ENVIRONMENT: Production
         run: |
           site_base_href=${{ env.ssg_base_href }}
           site_base_url="https://${{ env.custom_domain }}"
           if [ ! -z "$site_base_href" ]
           then
             echo "Prerendering for deployment to $site_base_href"
-            dotnet run --AppTasks=prerender --environment Production --BaseHref "$site_base_href"
+            dotnet run -c Release --no-launch-profile --AppTasks=prerender --BaseHref "$site_base_href"
           else
             echo "Prerendering for deployment to $custom_domain"
-            dotnet run --AppTasks=prerender --environment Production --BaseUrl "$site_base_url"
+            dotnet run -c Release --no-launch-profile --AppTasks=prerender --BaseUrl "$site_base_url"
           fi
 
       # Deploy UI to GitHub Pages
