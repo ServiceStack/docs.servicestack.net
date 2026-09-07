@@ -113,7 +113,7 @@ export default {
             return this.current[1]
         },
         imageAlt() {
-            return this.alt ? `${this.alt} — ${this.currentTitle}` : this.currentTitle
+            return this.alt ? `${this.alt} - ${this.currentTitle}` : this.currentTitle
         },
     },
     methods: {
