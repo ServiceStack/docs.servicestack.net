@@ -183,7 +183,7 @@ export default {
                 <span aria-hidden="true" class="mt-0.5 shrink-0 text-emerald-500">✓</span>
                 <div class="min-w-0">
                   <span class="text-sm font-semibold text-slate-900 dark:text-white" v-html="inline(item.title)"></span>
-                  <span v-if="item.text" class="text-sm leading-6 text-slate-500 dark:text-slate-400"> — <span v-html="inline(item.text)"></span></span>
+                  <span v-if="item.text" class="text-sm leading-6 text-slate-500 dark:text-slate-400"> - <span v-html="inline(item.text)"></span></span>
                 </div>
               </li>
             </ul>

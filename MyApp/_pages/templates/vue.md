@@ -56,11 +56,11 @@ Context is king when developing with AI models. The better the context, the high
 
 ### Declarative Typed APIs
 
-All ServiceStack APIs follow a flat, declarative structure—The contract is explicit and consistent and LLMs don't need to guess what APIs accept or return.
+All ServiceStack APIs follow a flat, declarative structure-The contract is explicit and consistent and LLMs don't need to guess what APIs accept or return.
 
 ### End-to-End Type Safety
 
-Context quality directly impacts generated code quality. ServiceStack's TypeScript integration provides complete static analysis of what APIs accept, return, and how to bind responses—giving AI models the full context they need.
+Context quality directly impacts generated code quality. ServiceStack's TypeScript integration provides complete static analysis of what APIs accept, return, and how to bind responses-giving AI models the full context they need.
 The static analysis feedback also directs models to identify and correct any errors in the generated code.
 
 ### Zero-Ambiguity Integration
@@ -73,11 +73,11 @@ AI models thrive on consistency. ServiceStack removes guesswork with a single pa
 
 ### TypeScript
 
-Whilst TypeScript is often excluded in one-prompt solutions catering to non-developers, it's still a critical part of the AI development workflow. It provides a type system that helps AI models generate more accurate and maintainable code and TypeScript's static analysis also helps identify errors in the generated code which AI Models have have become really good at correcting—as such it's an integral part in all our SPA templates.
+Whilst TypeScript is often excluded in one-prompt solutions catering to non-developers, it's still a critical part of the AI development workflow. It provides a type system that helps AI models generate more accurate and maintainable code and TypeScript's static analysis also helps identify errors in the generated code which AI Models have have become really good at correcting-as such it's an integral part in all our SPA templates.
 
 ### Intuitive Project Structure
 
-ServiceStack's [physical project structure](/physical-project-structure) provides clear separation of concerns, with the entire API surface area contained in [the ServiceModel project](/physical-project-structure#servicemodel-project)—making codebases easy for AI models to navigate and understand.
+ServiceStack's [physical project structure](/physical-project-structure) provides clear separation of concerns, with the entire API surface area contained in [the ServiceModel project](/physical-project-structure#servicemodel-project)-making codebases easy for AI models to navigate and understand.
 
 ### Minimal Code Surface
 

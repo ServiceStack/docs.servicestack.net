@@ -93,7 +93,7 @@ public class RequestLogsHostedService(ILogger<RequestLogsHostedService> log, IRe
 
 When using a remote RDBMS, network latency becomes a primary concern that any solution needs to be designed around, 
 as such the API Request Logs are initially maintained in an in memory collection before being flushed to the database 
-**every 3 seconds** — configurable in the `PeriodicTimer` interval above.
+**every 3 seconds** - configurable in the `PeriodicTimer` interval above.
 
 To reduce the number of round-trips to the database, the `DbRequestLogger` batches all pending logs into a single 
 request using [OrmLite's Bulk Inserts](/ormlite/bulk-inserts) which is supported by all 

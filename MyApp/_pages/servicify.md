@@ -4,7 +4,7 @@ title: Instantly Servicify existing Systems
 
 Most legacy systems don't need a rewrite so much as a **contract**. ServiceStack's
 [AutoGen](/autoquery/autogen) reads an existing database's schema at startup and generates a complete,
-typed API over it — Request DTOs, data models, implementations and human-friendly pluralized routes —
+typed API over it - Request DTOs, data models, implementations and human-friendly pluralized routes -
 without migrating a single row.
 
 From there the whole framework applies: [instant UIs](/api-explorer), [typed clients in 15 languages](/add-servicestack-reference),
@@ -35,7 +35,7 @@ From there the whole framework applies: [instant UIs](/api-explorer), [typed cli
 <servicify-steps></servicify-steps>
 </div>
 
-Enabling it is a single plugin option — AutoGen inspects the registered connection and registers
+Enabling it is a single plugin option - AutoGen inspects the registered connection and registers
 AutoQuery and CRUD Services for each table it finds:
 
 ```csharp
@@ -53,14 +53,14 @@ services.AddPlugin(new AutoQueryFeature {
 
 ::: info
 Prefer to review the models before they become APIs? [okai TypeScript Data Models](/autoquery/okai-db) takes the
-other route — export the DB schema to editable TypeScript models first, then generate the APIs, C# data models and
+other route - export the DB schema to editable TypeScript models first, then generate the APIs, C# data models and
 migrations from those.
 :::
 
 ## Your conventions, not just ours
 
 AutoGen's code generation is programmatically customizable. Generated types can be augmented with declarative
-attributes so your App's existing conventions — authorization, validation rules, tags, descriptions, formatting —
+attributes so your App's existing conventions - authorization, validation rules, tags, descriptions, formatting -
 are baked into the generated Services rather than bolted on afterwards.
 
 When the conventions are right, the generated classes can be **ejected** into code-first C# and developed as
@@ -73,7 +73,7 @@ normal. AutoGen is a way in, not something you're stuck with.
 ## Reachable from everywhere
 
 Because AutoGen produces ordinary ServiceStack Services, they inherit every endpoint and client the framework
-supports. That makes it the fastest route to putting **gRPC** in front of an existing system — which in turn opens it
+supports. That makes it the fastest route to putting **gRPC** in front of an existing system - which in turn opens it
 to [every language in gRPC's protoc universe](https://grpc.io/docs/languages/).
 
 <div class="not-prose my-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -108,7 +108,7 @@ to [every language in gRPC's protoc universe](https://grpc.io/docs/languages/).
 </div>
 
 The [Smart, Generic C# / F# / VB.NET Service Clients](/grpc/generic) still give the best UX for consuming gRPC
-Services, but the [protoc-generated Dart client](/grpc/dart) is a close second — a high-level language with
+Services, but the [protoc-generated Dart client](/grpc/dart) is a close second - a high-level language with
 native-class performance and script-like productivity, which makes it an ideal way to explore a freshly
 servicified system. And anything Dart reaches, [Flutter](https://flutter.dev) reaches too.
 

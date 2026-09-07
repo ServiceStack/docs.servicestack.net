@@ -565,10 +565,10 @@ Typed expressions are preferred when a corresponding Data Model is available:
 | Array length | `Sql.Json<T>(json).Items.Count` | `Sql.JsonArrayLength(json[, path])` |
 | Scalar array membership | `Sql.Json<T>(json).Items.Contains(value)` | `Sql.JsonArrayContains(json[, path], value)` |
 | Array indexing | `Sql.Json<T>(json).Items[index]` | Include `[index]` in the path |
-| Validate JSON | — | `Sql.IsJson(json)` |
-| Path exists | — | `Sql.JsonExists(json, path)` |
-| Read JSON type | — | `Sql.JsonType(json[, path])` |
-| Document containment | — | `Sql.JsonContains(json, candidate[, path])` |
+| Validate JSON | - | `Sql.IsJson(json)` |
+| Path exists | - | `Sql.JsonExists(json, path)` |
+| Read JSON type | - | `Sql.JsonType(json[, path])` |
+| Document containment | - | `Sql.JsonContains(json, candidate[, path])` |
 
 The providers translate these APIs to their native functions:
 
@@ -581,7 +581,7 @@ The providers translate these APIs to their native functions:
 | Type | `json_type` | `jsonb_typeof` | `OPENJSON` | `JSON_TYPE` |
 | Array length | `json_array_length` | `jsonb_array_length` | `OPENJSON` | `JSON_LENGTH` |
 | Array membership | `json_each` | `jsonb` containment | `OPENJSON` | `JSON_CONTAINS` |
-| Document containment | — | `@>` | — | `JSON_CONTAINS` |
+| Document containment | - | `@>` | - | `JSON_CONTAINS` |
 
 ## Inspect generated SQL
 

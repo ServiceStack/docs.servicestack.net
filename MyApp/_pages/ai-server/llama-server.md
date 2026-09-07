@@ -31,7 +31,7 @@ allows for optimized self-hosting of authorized models.
 This direct approach eliminates unnecessary layers that might introduce latency or unexpected 
 behaviors, providing a more consistent and predictable experience necessary for production environments. 
 For DevOps teams and system administrators, this translates to fewer surprises during deployment 
-and operation — a crucial factor when incorporating self-hosting AI solutions into critical business applications.
+and operation - a crucial factor when incorporating self-hosting AI solutions into critical business applications.
 
 ## Hosting llama-server with Docker
 

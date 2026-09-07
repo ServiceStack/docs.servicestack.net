@@ -149,7 +149,7 @@ export default {
                 })
                 allFeatures.value = [...recent, ...features]
             })
-            .catch(() => { /* latest.mjs not yet generated — Recent tab stays hidden */ })
+            .catch(() => { /* latest.mjs not yet generated - Recent tab stays hidden */ })
 
         return { allFeatures }
     }

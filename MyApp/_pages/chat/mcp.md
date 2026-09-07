@@ -138,7 +138,7 @@ Read-only operations (`IGet`, `QueryBase`, etc.) execute immediately without req
 
 #### Production deployment
 
-- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated — tokens won't survive restarts and are rejected across load-balanced instances.
+- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated - tokens won't survive restarts and are rejected across load-balanced instances.
 - **Distributed cache**: Register a shared `ICacheClient` (Redis, `OrmLiteCacheClient`, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.
 
 ### Fail-closed: Reject
@@ -194,5 +194,5 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 - Name only the tool groups external Assistants should reach.
 - Configure `SigningSecret` with a shared value (≥ 32 bytes) when using `ConfirmationToken` mode in production.
 - Register a distributed `ICacheClient` for single-use token replay protection across instances.
-- Keep `[Tool(Safety)]` accurate — it drives both confirmation token requirements and MCP safety annotations.
+- Keep `[Tool(Safety)]` accurate - it drives both confirmation token requirements and MCP safety annotations.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.
