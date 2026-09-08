@@ -8,7 +8,7 @@ export const latestPages = [
     { name:"ServiceStack v6", href:"/releases/v6_00", text:"Shortly after adding [1st-class net6.0 support](/releases/v513), we\u0027re starting off 2022 eclipsing an impressive mile\u2026", badge:"releases" },
     { name:"JSON Support", href:"/ormlite/json", text:"OrmLite provides a portable, typed API for querying JSON stored in SQLite, PostgreSQL, SQL Server and MySQL.", badge:"ormlite" },
     { name:"MCP Server", href:"/chat/mcp", text:"AI Chat includes a built-in Model Context Protocol server that exposes selected Chat tools to external AI Assistants \u2026", badge:"chat" },
-    { name:"Gemini RAG, Search \u0026 Analytics", href:"/chat/gemini-vnext", text:"Gemini RAG turns your documents into a managed knowledge system built on Google Gemini\u0027s", badge:"chat" },
+    { name:"Gemini RAG, Search \u0026 Analytics", href:"/chat/gemini-rag", text:"Gemini RAG turns your documents into a managed knowledge system built on Google Gemini\u0027s", badge:"chat" },
     { name:"Self-host LLMs in production with llama.cpp llama-server", href:"/ai-server/llama-server", text:"have become popular choices for AI enthusiasts looking to run large language models", badge:"ai-server" },
     { name:"Instantly Servicify existing Systems", href:"/servicify", text:"Most legacy systems don\u0027t need a rewrite so much as a contract. ServiceStack\u0027s", badge:null },
     { name:"JSON Lines Data Format", href:"/jsonl-format", text:"like Unix shell pipelines, whose streamable properties is making it a popular data format for maintaining large datasets", badge:null },
