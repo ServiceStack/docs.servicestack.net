@@ -1,5 +1,5 @@
 ---
-title: AutoQuery CRUD UI
+title: AutoQuery Schema UI
 ---
 
 :::youtube M6KYkZFIM-8
