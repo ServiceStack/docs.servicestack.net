@@ -1,6 +1,6 @@
 ---
-title: Gemini RAG
-description: Build reliable Gemini knowledge bases from files, folders, and websites; query them with metadata-scoped RAG; and publish citation-backed AI Assistants on any website.
+title: Gemini RAG, Search & Analytics
+description: Import and synchronize managed knowledge bases, query them with Gemini RAG, and publish model-free Search or citation-backed AI Assistant widgets on any website.
 ---
 
 Gemini RAG turns your documents into a managed knowledge system built on Google Gemini's
@@ -8,11 +8,21 @@ Gemini RAG turns your documents into a managed knowledge system built on Google 
 or entire websites into isolated **File Stores**, organize them with categories and metadata, then
 ask questions over exactly the documents you choose.
 
-The same knowledge base can power private research chats and public, embeddable **Website
-Assistants**. Responses stay grounded in your indexed content and can include citations that lead
-readers back to the original source.
+The same knowledge base can power private research chats and two independent public experiences:
+a fast, model-free **Website Search** and a citation-backed **Website Assistant**. Search runs
+against your App's RDBMS without calling Gemini, while Assistant responses stay grounded in the
+Gemini index and can include citations that lead readers back to the original source.
 
-<screenshot src="/img/pages/chat/gemini/gemini-02-filestore.webp" title="Gemini File Store showing the Explore, Import, and Assistants workspaces"></screenshot>
+<screenshot src="/img/pages/chat/gemini/gemini-02-filestore.webp" title="Gemini File Store management workspace"></screenshot>
+
+This is the canonical reference for the complete Gemini extension. The focused guides below cover
+each major workflow in more depth:
+
+- [Import and synchronize documents](/chat/gemini-imports)
+- [Publish Website Search](/chat/gemini-search)
+- [Publish grounded AI Assistants](/chat/gemini-assistants)
+- [Search and website analytics](/chat/gemini-analytics)
+- [Operations, index health, and diagnostics](/chat/gemini-operations)
 
 ## What you can build
 
@@ -22,8 +32,11 @@ readers back to the original source.
 | **Repeatable ingestion** | Upload files, synchronize local folders, or crawl websites into clean Markdown. |
 | **Precise retrieval** | Scope searches by category, document type, status, locale, product, version, and tags. |
 | **Verifiable answers** | Grounded responses with inline citations and inspectable source excerpts. |
+| **Website Search** | Publish a branded, keyboard-accessible Search widget backed by the local RDBMS index. |
 | **Website Assistants** | Publish a branded Shadow DOM chat widget using one script tag. |
-| **Operational visibility** | Preview changes, watch upload progress, audit coverage, and reconcile local and Gemini state. |
+| **Search analytics** | Review popular queries, missing results, click-through rates, and frequently selected documents. |
+| **Website analytics** | Optionally capture and chart first-party page traffic from the Search widget. |
+| **Operational visibility** | Preview changes, watch indexing progress, audit coverage, and reconcile local and Gemini state. |
 
 ## Enable and configure
 
@@ -31,7 +44,7 @@ Gemini RAG is a built-in AI Chat extension. It installs automatically when AI Ch
 
 1. a Gemini API key; and
 2. the App's `IDbConnectionFactory`, used by OrmLite to persist File Stores, documents, imports,
-   Assistants, conversations, and citations.
+   Search indexes and analytics, Assistants, conversations, and citations.
 
 Create an API key in [Google AI Studio](https://aistudio.google.com/) and add either variable to the
 App's environment:
@@ -53,6 +66,9 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
+The Gemini integration is a native AI Chat extension and talks directly to Gemini's HTTP APIs. No
+Google client SDK or additional Gemini package is required.
+
 Restart the App after changing its environment. You also need at least one Google Gemini chat
 model configured in AI Chat; the Gemini model selector only lists compatible Google chat models.
 Without an API key or database connection, the extension logs why and disables its routes and UI.
@@ -66,9 +82,10 @@ services.AddPlugin(new ChatFeature {
 ```
 
 :::info Local catalogue, remote retrieval
-AI Chat keeps the document catalogue, cached source files, imports, metadata, Assistants, and
-conversation history locally. Gemini File Search Stores hold the indexed copies used for semantic
-retrieval. Upload and sync states describe the relationship between those two systems.
+AI Chat keeps the document catalogue, cached source files, imports, metadata, local Search index,
+published widgets, search analytics, Assistants, and conversation history locally. Gemini File
+Search Stores hold the indexed copies used for semantic retrieval. Upload and sync states describe
+the relationship between those two systems.
 :::
 
 ### Upload tuning and MIME type overrides
@@ -105,15 +122,17 @@ stable name such as `docs.example.com`, or use the chat icon to immediately quer
 
 <screenshot src="/img/pages/chat/gemini/gemini-01-filestores.webp" title="Gemini File Stores overview with store creation and chat actions"></screenshot>
 
-Opening a store exposes three deep-linkable workspaces:
+Opening a store exposes four deep-linkable workspaces:
 
 - **Explore** - browse categories, search documents, apply metadata filters, edit metadata, inspect
   coverage, monitor uploads, and start grounded chats.
 - **Import** - upload files, synchronize folders, or stage a website crawl.
 - **Assistants** - design, publish, and review website chat Assistants grounded in the store.
+- **Search** - tune and publish model-free website Search widgets backed by the local index.
 
-The selected workspace, Import subsection, Explorer category, saved crawl, Assistant, and
-conversation are preserved in the URL, so a reload or shared link returns to the same view.
+The selected workspace, Import subsection, Explorer category, saved crawl, Assistant, Search
+widget, and conversation are preserved in the URL, so a reload or shared link returns to the same
+view.
 
 ## Quick start
 
@@ -124,6 +143,7 @@ conversation are preserved in the URL, so a reload or shared link returns to the
 5. In **Explore**, choose **New Chat** to query the whole store-or apply filters and choose
    **Ask about this**.
 6. Expand **Sources** below an answer to inspect the evidence Gemini retrieved.
+7. Optionally open **Search**, test the local index, and publish a standalone Search widget.
 
 That is the smallest useful RAG workflow. The sections below show how to turn it into a repeatable,
 curated knowledge pipeline.
@@ -144,6 +164,13 @@ Choose the ingestion path that matches the source:
 
 The upload drop zone accepts PDF, Markdown/MDX, plain text, HTML, reStructuredText, AsciiDoc, CSV,
 JSON, YAML, and ZIP archives containing supported files.
+
+HTML files are converted to Markdown before they are cached, indexed, and uploaded. Razor
+`.cshtml` files use the same conversion after removing server-only lines whose first non-whitespace
+character is `@`, and code blocks beginning with `{` through the matching `}` at the same or lower
+indentation. This keeps rendered page content searchable without leaking Razor directives into
+result snippets. When an HTML document has no explicit title, its generated display name uses the
+`.md` extension.
 
 <screenshot src="/img/pages/chat/gemini/gemini-22-import-upload-files.webp" title="Upload files and ZIP archives into a Gemini File Store"></screenshot>
 
@@ -215,7 +242,8 @@ uploading content, or incurring embedding work.
 Only **Import N documents** applies the preview. Progress updates naturally-for example,
 `Uploading 16/21 documents to docs.example.com…`-and **View uploads** opens Explorer at the
 destination category sorted by active uploads. Pending uploads resume when the application starts
-again after an interruption.
+again after an interruption. The same confirmed import queues each changed document for the local
+Search index, so one synchronization updates both Website Search and Gemini RAG.
 
 #### Saved imports
 
@@ -224,9 +252,11 @@ preview alone does not create a saved import; it appears only after the import i
 
 <screenshot src="/img/pages/chat/gemini/gemini-20-import-saved.webp" title="Saved recurring imports with preview results and trusted folder configuration"></screenshot>
 
-Re-running a saved import compares normalized content and metadata independently. Unchanged files
-are not embedded again. Content changes and metadata-only changes both require re-indexing because
-Gemini cannot patch indexed metadata in place.
+Re-running a saved import compares normalized content and metadata independently. The saved source
+key identifies the same document on later runs, while content and metadata hashes determine whether
+it changed. Unchanged files are not embedded or locally indexed again. Content changes and
+metadata-only changes queue both indexes because Gemini cannot patch indexed metadata in place and
+Search ranking or filtering may depend on the changed metadata.
 
 When an upstream file disappears, the import removes its Gemini copy and retains a local
 `removed upstream` tombstone so the change remains visible. A deletion safety rail refuses an
@@ -410,12 +440,47 @@ For `docs/guides/auth.md` with Category root `docs`:
 | `{ext}` | `md` | Extension without a leading dot. |
 | `{category}` | `guides` | Final category, including any destination prefix. |
 | `{title}` | `auth.md` | Source title, or filename when no title exists. |
+| `{route}` | `/add-servicestack-reference` | Route extracted from a quoted Razor `.cshtml` `@page` directive. |
 
 ```text
 https://docs.example.com/{pathNoExt}
 ```
 
 resolves to `https://docs.example.com/guides/auth`.
+
+For a Razor page beginning with `@page "/add-servicestack-reference"`, use the site's base URL with
+the extracted route:
+
+```text
+https://servicestack.net{route}
+```
+
+A trailing slash on the base URL is safe, so `https://servicestack.net/{route}` produces the same
+URL instead of `https://servicestack.net//add-servicestack-reference`.
+
+Route extraction is limited to static routes. Dynamic templates containing `{` or `}`, such as
+`@page "/products/{id}"`, do not produce a `{route}` value because they cannot resolve to a single
+canonical Source URL.
+
+Documents without an extracted route omit their Source URL and log a warning when `{route}` is
+required; they do not stop the preview or import.
+
+Select **Require a Source URL** in the import form to exclude those documents instead. Preview
+reports them as skipped, and subsequent runs of a recurring import remove previously indexed
+documents that no longer resolve to a Source URL.
+
+Each placeholder can optionally apply a regular expression using
+`{variable:/pattern/}`. When the expression contains a capture group, the first group becomes the
+placeholder value; otherwise the whole match is used. For example, this removes a leading date and
+underscore from a filename such as `2026-09-04_servicestack-pdf.md`:
+
+```text
+https://servicestack.net/posts/{name:/^[^_]+_(.+)$/}
+```
+
+The result is `https://servicestack.net/posts/servicestack-pdf`. A pattern is validated when the
+template is saved. If it does not match a particular document, that document's Source URL is
+omitted and a warning is logged; previewing or importing the remaining documents continues.
 
 :::tip Citations should lead somewhere useful
 Set Source URL metadata to the public documentation page whenever possible. Without it, a citation
@@ -450,6 +515,11 @@ Each document row can:
 - retry a failed or pending Gemini upload;
 - start a chat scoped to that document; or
 - delete the local and Gemini copies.
+
+Folder rows also provide a recursive delete action. It previews the exact number and a sample of
+documents that will be removed from that category and every nested category before asking for
+confirmation. A recurring folder import can restore those documents on its next run, so update the
+source's include or exclude rules as well when the deletion should be permanent.
 
 Work in progress remains visible: uploads show activity, failures show their provider message, and
 a document being deleted displays a red struck-through name with a spinner.
@@ -537,6 +607,189 @@ changed.
 
 ---
 
+## Publish Website Search
+
+The **Search** workspace publishes a conventional documentation search experience from the same
+documents as Gemini RAG. It is a separate component from the Assistant: queries run entirely
+against the App's local RDBMS index and do not call a Gemini model.
+
+The local index is maintained for every File Store whether or not a Search widget has been created.
+This keeps ingestion simple and lets you add Search later without changing import definitions.
+Existing File Stores are detected and queued for indexing when the App starts; **Rebuild index** can
+also explicitly queue every current document.
+
+### Local indexing and RDBMS support
+
+Text documents are converted into small, heading-aware `ChatSearchSection` rows. This is the
+authoritative searchable content and retains the frontmatter title when supplied, heading
+hierarchy, generated anchor, source URL, content, and filterable metadata. SQLite mirrors the text
+fields into its `ChatSearchSectionFts` virtual table; PostgreSQL, SQL Server, MySQL, and MariaDB
+build their native full-text indexes directly over `ChatSearchSection`. Search snippets remove
+fenced code, raw HTML, container directives, and other display noise while preserving useful prose
+and inline code.
+
+The C# extension selects its search implementation from the configured OrmLite dialect provider's
+`DbKind`:
+
+| RDBMS | Native search | Status when active | Fallback |
+| --- | --- | --- | --- |
+| **SQLite** | FTS5 virtual table | `sqlite-fts5` | `sqlite-like` |
+| **PostgreSQL** | GIN index over `to_tsvector('simple', ...)` | `postgresql-fts` | `postgresql-like` |
+| **SQL Server** | Full-Text Catalog and `CONTAINSTABLE` | `sqlserver-fulltext` | `sqlserver-like` |
+| **MySQL** | `FULLTEXT` index with Boolean mode | `mysql-fulltext` | `mysql-like` |
+| **MariaDB** | `FULLTEXT` index with Boolean mode | `mariadb-fulltext` | `mariadb-like` |
+
+Native full-text support is initialized automatically. If the database feature is unavailable,
+cannot be created with the current permissions, or a native query fails, Search transparently uses
+a bounded `LIKE` query over document titles, headings, and content. SQL Server's Full-Text Search is
+an optional server component and must be installed in the SQL Server instance to use the native
+provider.
+
+PDF, Word, PowerPoint, and Excel documents can still be uploaded to Gemini, but are not locally
+searchable unless their text is first converted into a supported text or Markdown document. Their
+local Search status explains why no sections were created.
+
+:::info One import updates both retrieval systems
+The local Search worker uses durable desired and completed hashes. A change to content, title,
+Source URL, extractor version, or filterable metadata marks the document for re-indexing. Work is
+idempotent and pending documents resume after an application restart, independently of the Gemini
+upload worker.
+:::
+
+### Create and tune a Search widget
+
+Choose **New Search** and configure its visitor-facing title, input placeholder, optional launcher
+tooltip, and no-results message. **Document scope** uses the same category, doc type, status,
+locale, product, version, and tag dropdowns as Assistants. The server enforces this scope, so a host
+page cannot expand it.
+
+Search first asks the active database provider for matching candidates, then applies one consistent
+ranking model across every RDBMS. You can tune each part while the **Test the local index** results
+refresh automatically:
+
+| Ranking control | Effect |
+| --- | --- |
+| **Title weight** | Promotes terms found in the document title. |
+| **Heading weight** | Promotes matching section headings. |
+| **Content weight** | Controls the contribution from body text. |
+| **Phrase boost** | Rewards the complete query appearing together. |
+| **Exact title boost** | Strongly promotes an exact document-title match. |
+| **Freshness weight** | Promotes `sourceUpdatedAt`, falling back to upload or creation time. |
+| **Freshness half-life** | Sets how many days it takes for the freshness boost to halve. |
+| **Database relevance weight** | Retains a controlled preference for the native provider's order. |
+| **Document type preference** | Promotes or demotes individual doc types with positive or negative values. |
+
+The same saved ranking configuration is used by the test panel, live preview, and published widget.
+Changing a weight issues a fresh query, providing immediate feedback without merely reordering an
+incomplete client-side result set.
+
+### Search interaction and result behavior
+
+The Search dialog queries as the visitor types, debounces requests, cancels superseded work, and
+keeps the previous result list visible until the next response is ready. Matching text is bold and
+underlined in light themes and bold white in dark themes by default; its highlight color can be
+overridden.
+
+Results are grouped by document and use the Markdown frontmatter title when available. Visitors can:
+
+- open Search by clicking the launcher, pressing `Ctrl/⌘+K`, or pressing `/`;
+- move through results with Up and Down and open the selection with Enter;
+- load additional results automatically by scrolling;
+- press Escape or the **esc** button to close the active layer;
+- return from an open document with Escape or the left-arrow button; and
+- revisit recently opened documents, retained in that browser's `localStorage`.
+
+When a result has a Source URL, the published widget navigates to that canonical page and anchor.
+The administrative live preview opens it in a new browser window. When a Markdown document has no
+Source URL, the widget opens a second dialog containing a sanitized rendered copy; Escape closes
+that document first and returns focus to the Search results.
+
+If Search and Assistant widgets are embedded on the same page, Search keeps `Ctrl/⌘+K` and the
+Assistant automatically moves to `Ctrl/⌘+Shift+K`. The `/` shortcut can be enabled or disabled
+independently. Shortcuts do not fire from editable inputs.
+
+### Appearance and embedding
+
+Search uses Shadow DOM isolation and serves its saved configuration together with the widget as one
+self-contained classic script:
+
+```html
+<script
+  src="https://app.example.com/chat/ext/gemini/public/searches/widget.js?g=abc123"
+  async>
+</script>
+```
+
+Customize **Auto**, **Light**, **Dark**, **Nord**, **Matrix**, or **Soft Pink**, the font family,
+highlight color, launcher style, corner, and top/right/bottom/left offsets. Auto first follows the
+host page's `color-scheme` value in `localStorage` when it is `light` or `dark`, then falls back to
+the visitor's operating-system preference.
+
+As with Assistants, the launcher can float in any corner or render inside a host element using its
+saved **Mount element** selector or a `data-mount` override:
+
+```html
+<span id="search-slot"></span>
+<script
+  src="https://app.example.com/chat/ext/gemini/public/searches/widget.js?g=abc123"
+  data-mount="#search-slot"
+  async>
+</script>
+```
+
+Set exact or wildcard **Allowed origins** and a per-client request limit before publishing. Search
+uses the same familiar deployment lifecycle as Assistants: **Save draft**, **Publish**,
+**Unpublish**, **Regenerate ID**, **Archive**, **Restore**, and typed confirmation before permanent
+deletion. Regenerating the ID invalidates every old embed immediately.
+
+### Analyze customer searches
+
+**View Searches** provides demand and quality signals without adding model usage. It shows:
+
+- total searches, result clicks, and search click-through rate;
+- related search intents grouped by normalized wording and conservative stemming;
+- frequency, average result count, clicks, CTR, and no-result count for each intent;
+- the latest searches with their originating page; and
+- popular documents with click count, unique searches, average clicked position, and last-clicked
+  time.
+
+Only interactions from a published widget are included. The administrative test and live-preview
+panels do not inflate customer metrics. Click reporting is fire-and-forget so analytics can never
+delay navigation or document preview.
+
+### Optional website traffic analytics
+
+Because the Search script is normally present on every page, it can also provide a lightweight
+first-party view of website traffic. This is disabled by default. Use **Capture Analytics** on a
+saved Search deployment to opt in, or **Disable Analytics** to stop collecting new page views.
+Configure retention (90 days by default), IP anonymization, Do Not Track handling, bot exclusion,
+optional consent, denied user-agent substrings, exact IP/CIDR ranges, and excluded page-path globs
+before publishing. IPv4 wildcards such as `114.119.*` are accepted and normalized to CIDR. These
+rules are enforced server-side before geo resolution or persistence and also omit matching customer
+searches and clicks. **Clear retained analytics** permanently removes that Search deployment's
+queries, clicks, and page views immediately.
+
+The **Website traffic** panel can switch between the last 24 hours, 7 days, 30 days, and 90 days.
+It charts page views and visitors, and reports sessions, pages per session, bounce rate, average
+load time, top pages and referrers, campaigns, languages, time zones, devices, platforms, and
+connection types. Visitor and 30-minute session identifiers are random values scoped to that
+Search deployment and retained in the visitor's `localStorage`.
+
+Collection is a non-blocking `text/plain` request made after page load. It includes navigation
+timings, page URL and title, the browser-supplied referrer, UTM values, locale, screen and viewport
+dimensions, device characteristics, and available Network Information API values. It does not read
+cookies or request precise location. In C#, an optional resolver can enrich the request IP with
+geography; the stored IP is anonymized by default to an IPv4 `/24` or IPv6 `/48`. Python stores no
+IP or geo fields. See [Analytics & Privacy](/chat/gemini-analytics) for resolver and consent setup.
+
+:::warning Treat search telemetry as customer data
+Search records query text and operational request context such as the origin, referring page, and
+user agent. Result selections are correlated to their search and document. Apply the same access,
+retention, and privacy review used for Assistant conversations.
+:::
+
+---
+
 ## Publish a Website Assistant
 
 The **Assistants** workspace turns a File Store-or a filtered slice of it-into a branded,
@@ -589,8 +842,11 @@ rules for retrieval, grounding, prompt-injection resistance, conflicting documen
 context, fallback behavior, and response formatting.
 
 Choose **Concise**, **Balanced**, or **Detailed**, require grounded answers, enable citations, and
-customize the fallback and conversation-review notice. A custom Gemini model can be selected per
-Assistant; leaving it unset uses the server default.
+customize the fallback and conversation-review notice. **Require retrieved evidence** adds a
+server-enforced citation threshold: when Gemini returns fewer than **Minimum citations**, the
+Assistant returns the configured fallback instead of exposing an unsupported answer. Strict
+grounding defaults to one citation and buffers streaming answers until evidence is checked. A
+custom Gemini model can be selected per Assistant; leaving it unset uses the server default.
 
 Assistants open only when initiated by default. They can instead open after page load or when the
 visitor reaches the bottom of the page. **Open with Ctrl/⌘+K** is enabled for new Assistants and
@@ -608,8 +864,9 @@ publishing the Assistant.
 
 ### 2. Design the widget
 
-Choose **Auto**, **Light**, **Dark**, **Nord**, **Matrix**, or **Soft Pink**. Auto follows the
-visitor's `prefers-color-scheme` and uses your independently saved Light or Dark customizations.
+Choose **Auto**, **Light**, **Dark**, **Nord**, **Matrix**, or **Soft Pink**. Auto first follows a
+`light` or `dark` value in the host page's `color-scheme` localStorage key, then the visitor's
+`prefers-color-scheme`, and uses your independently saved Light or Dark customizations.
 
 <screenshots-gallery-view :images="{
     'Light': '/img/pages/chat/gemini/gemini-44-assistant-appearance-light.webp',
@@ -692,7 +949,41 @@ The host page may override presentation choices without changing retrieval behav
 </script>
 ```
 
-The host cannot override document scope, prompts, model, origin rules, or rate limits. Invalid or
+The host cannot override document scope, prompts, model, origin rules, or rate limits.
+
+#### Mounting the launcher inside your own layout
+
+By default the launcher is a floating button anchored to a corner of the viewport. Set a
+**Mount element** CSS selector in the Assistant's Appearance settings, or `data-mount` on the script
+tag, to render the launcher inside an element you control instead - a nav bar, toolbar, or sidebar:
+
+```html
+<nav>
+  <a href="/docs">Docs</a>
+  <span id="assistant-slot"></span>
+</nav>
+
+<script
+  src="https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123"
+  data-mount="#assistant-slot"
+  async>
+</script>
+```
+
+The launcher becomes an inline element inside the target, so it participates in that container's
+layout like any other button, and the panel is anchored to it - opening below the launcher, or above
+it when the viewport has more room there. The panel itself is always rendered from `document.body`,
+so it overlays the page without affecting its layout, and it cannot be trapped inside a mount
+container that establishes a containing block (a `transform`, `filter`, or `backdrop-filter`
+ancestor, common in sticky headers).
+
+`data-mount` on the script tag wins over the saved **Mount element** setting; pass `data-mount="none"`
+to force the floating launcher on a page whose layout has no slot for it. If the selector is invalid
+or matches nothing the widget writes a console warning and falls back to the floating launcher.
+
+The Search widget accepts the same **Mount element** setting and `data-mount` attribute, so a
+documentation site can place a `⌘K` search button and an **Ask AI** button side by side in its
+header while both dialogs still overlay the page. Invalid or
 unavailable deployments return JavaScript that writes a useful error to the browser console rather
 than a JSON response that fails silently.
 
@@ -706,6 +997,9 @@ The widget supports:
 - a scrollable conversation thread;
 - clearing the current thread without confirmation; and
 - browser-local session continuity across page loads.
+
+When an Assistant and Search widget share a page, Search uses `Ctrl/⌘+K` and the Assistant
+automatically uses `Ctrl/⌘+Shift+K`, avoiding competing global shortcuts.
 
 ### Review customer conversations
 
@@ -742,8 +1036,9 @@ for your deployment. The notice can be hidden, but doing so does not disable ser
   Assistant name.
 
 Deleting a File Store is broader: it removes the remote Gemini store, local and remote documents,
-saved imports and runs, Assistants, conversations, and messages. Its dedicated impact summary and
-typed store-name confirmation are intentionally difficult to bypass.
+local Search sections, Search widgets, query and click analytics, saved imports and runs,
+Assistants, conversations, and messages. Its dedicated impact summary and typed store-name
+confirmation are intentionally difficult to bypass.
 
 ---
 
@@ -771,6 +1066,13 @@ re-imports, and push metadata changes after correcting URLs so Gemini retrieves 
 Pending documents remain queued in the local catalogue and resume after application startup. To
 inspect them, open Explorer at the destination category and sort by **Uploading**. Sort by
 **Failed** to review provider errors and retry individual documents.
+
+The local Search queue is independent and follows the same durable desired/completed-hash model.
+Open **Search** to see index health, document, indexed, pending, stale, failed and section counts,
+last successful indexing time, oldest pending work, and recent failures. Use **Rebuild index** to
+regenerate every local section after changing extraction or database configuration. Each Search
+and Assistant deployment also provides **Run diagnostics**, which checks publication, public store
+access, indexed knowledge, origin restrictions, model selection, and its public widget endpoint.
 
 ---
 
@@ -818,6 +1120,19 @@ cards can resolve locally, but future filtered retrieval uses the newly indexed 
 Run **Sync Store**. Use its issue links to open the relevant store-wide filter, push intentional
 metadata changes, retry missing uploads, and prune duplicates when reported.
 
+### Search is using a `*-like` provider
+
+The native full-text feature could not be initialized or a native query failed, so Search safely
+fell back to `LIKE`. Confirm the database supports its full-text feature and that the application
+user can create or use the required index. SQL Server additionally requires the optional
+Full-Text Search component. Restart the App or rebuild the index after correcting the database.
+
+### A document is missing from Search
+
+Open **Search** and inspect the pending and failed counts. Text, Markdown, HTML, and Razor content
+are locally indexed; PDF, Word, PowerPoint, and Excel require conversion to a text-based format for
+local Search. A Source URL affects where a result opens, not whether its content can match.
+
 ## Storage and access
 
 When authentication is enabled, write operations require a signed-in user. A deployment can also
@@ -827,7 +1142,10 @@ Structured Gemini state is stored in the App's configured OrmLite database. `Aut
 creates and updates these tables automatically:
 
 - `ChatFilestore` and `ChatDocument` for the local Gemini catalogue;
-- `ChatSource` and `ChatSourceRun` for recurring imports and their history; and
+- `ChatSource` and `ChatSourceRun` for recurring imports and their history;
+- `ChatSearchSection` for heading-aware indexed content, `ChatSearchWidget` for deployments, and
+  `ChatSearchQuery`, `ChatSearchClick`, and `ChatSearchPageView` for Search and optional website
+  traffic analytics; and
 - `ChatAssistant`, `ChatAssistantConversation`, and `ChatAssistantMessage` for published Assistants
   and retained customer conversations.
 
