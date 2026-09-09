@@ -43,6 +43,12 @@ StartupTasks.Register("dtos", () =>
     appHost.GetPlugin<NativeTypesFeature>().GenerateDtos());
 ```
 
+The easiest way to add it to existing projects is to run:
+
+:::sh
+npx add-in startup-dtos
+:::
+
 Generation happens in-process without HTTP or Node.js, preserves each reference's existing options and doesn't rewrite
 unchanged files - so a contract change shows up in your client build immediately, without triggering a needless frontend
 rebuild. All project templates with TypeScript `.ts` or JavaScript `.mjs` client DTOs ship with it configured. See

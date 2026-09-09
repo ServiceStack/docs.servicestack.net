@@ -18,9 +18,15 @@ In ASP.NET Core Apps, ServiceStack enables `DebugMode` when the host environment
 
 ## Automatically regenerate client DTOs
 
-ServiceStack projects can register a Startup Task that finds existing `dtos.*` [ServiceStack References](/add-servicestack-reference) and regenerates them from the current server's metadata:
+ServiceStack projects can register a Startup Task that finds existing `dtos.*` [ServiceStack References](/add-servicestack-reference) and regenerates them from the current server's metadata.
 
-Add the registration in its own `Configure.StartupTasks.GeneratedDtos.cs` file:
+The easiest way to add it to existing projects is to run:
+
+:::sh
+npx add-in startup-dtos
+:::
+
+Which adds the registration in its own `Configure.StartupTasks.GeneratedDtos.cs` file:
 
 ```csharp
 public class ConfigureGeneratedDtos : IHostingStartup
