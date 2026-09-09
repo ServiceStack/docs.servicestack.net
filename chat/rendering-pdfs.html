@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-09-07T19:06:17.4316898Z'>
+    <meta name='date' content='2026-09-09T11:04:54.6187816Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Rendering PDFs</title>
@@ -575,7 +575,7 @@ mount('#header', Header)
 </tbody>
 </table>
 <h2 id="generate-typed-c-contracts">Generate typed C# contracts<a class="header-anchor" href="javascript:;" onclick="location.hash='#generate-typed-c-contracts'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The <code>.ui.json</code> schema generates strongly typed C# models - the same source <code>dotnet run --AppTasks=pdf</code> writes, so what you copy from the browser matches what lands in your project.</p>
+<p>The <code>.ui.json</code> schema generates strongly typed C# models - the same source the <code>pdf</code> Startup Task writes, so what you copy from the browser matches what lands in your project.</p>
 <pre><code class="language-csharp">public class LineItem
 {
     [JsonPropertyName(&quot;description&quot;)]
@@ -600,11 +600,12 @@ public class Invoice
 public class PdfAttribute(string template) : AttributeBase
 {
     public string Template { get; set; }   // published name, without .typ
+    public string? Namespace { get; set; } // optional per-template generated namespace
     public string? FileName { get; set; }  // download name, default &quot;{Template}.pdf&quot;
 }
 </code></pre>
 <p>Dates, UUIDs, decimals, enums, required members and documentation are <strong>inferred from the schema</strong> rather than guessed from sample JSON.</p>
-<h3 id="the-pdf-apptask">The pdf AppTask<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-pdf-apptask'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<h3 id="the-pdf-startup-task">The pdf Startup Task<a class="header-anchor" href="javascript:;" onclick="location.hash='#the-pdf-startup-task'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <pre><code class="language-csharp">services.AddPlugin(new PdfFeature {
     PdfCodeGen = new() {
         Namespace = &quot;MyApp.ServiceModel.Pdf&quot;,
@@ -614,33 +615,9 @@ public class PdfAttribute(string template) : AttributeBase
     }
 });
 
-AppTasks.Register(&quot;pdf&quot;, _ =&gt; appHost.GetPlugin&lt;PdfFeature&gt;().GeneratePdfs());
+StartupTasks.Register(&quot;pdf&quot;, () =&gt; appHost.GetPlugin&lt;PdfFeature&gt;().GeneratePdfs());
 </code></pre>
-<p>Regenerate after publishing template changes:</p>
-<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
-                <!-- Background pattern -->
-                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
-
-                <div class="relative flex items-center justify-between px-4 py-3">
-                    <!-- Left side - Terminal icon and command -->
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>dotnet run --AppTasks=pdf</p>
-</code>
-                            </div>
-                        </div>
-
-                        <!-- Right side - Copy button -->
-                        <div class="flex items-center gap-2 ml-4">
-                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
-                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-</div>
+<p>It runs after each development restart, keeping generated models synchronized with published template changes.</p>
 <table>
 <thead>
 <tr>
@@ -671,13 +648,23 @@ AppTasks.Register(&quot;pdf&quot;, _ =&gt; appHost.GetPlugin&lt;PdfFeature&gt;()
 </tr>
 <tr>
 <td><code>PreserveModified</code></td>
-<td>A generated file that's been edited is skipped rather than overwritten</td>
+<td>Existing files without an <code>&lt;auto-generated&gt;</code> marker are preserved</td>
 </tr>
 </tbody>
 </table>
-<p>Generated files contain content hashes, so if a developer adopts and edits one, later generation skips it instead of destroying their work.</p>
+<p>The opening <code>&lt;auto-generated&gt;</code> comment is an explicit ownership marker. While it remains, the generator
+may replace the file when its schema changes. Remove that opening marker to take ownership of a hand-tuned
+model; later runs skip and report the unmarked file. An unchanged run compares the expected source with the
+existing file directly; it doesn't invoke Typst or rewrite unchanged files.</p>
+<p>To isolate generic generated names like <code>Item</code>, <code>From</code> or <code>Details</code> for one template, populate its
+<code>PdfAttribute.Namespace</code>. Generation uses the override for every class from that template without changing
+the configured output folder:</p>
+<pre><code class="language-csharp">[Pdf(&quot;invoice&quot;, Namespace = &quot;MyApp.ServiceModel.Pdf.Invoices&quot;)]
+public class Invoice { /* ... */ }
+</code></pre>
+<p>Generated source preserves the namespace override on subsequent runs.</p>
 <div class="info custom-block">
-            <p class="custom-block-title">INFO</p><p>Nothing is ever written outside <code>GeneratePdfs()</code> - code generation is an explicit task the App runs, in the same spirit as OrmLite Migrations, not something the server does behind your back.</p>
+            <p class="custom-block-title">INFO</p><p>Nothing is written in Production: <code>StartupTasks</code> only run in <code>DebugMode</code>, which maps to ASP.NET Core's <code>Development</code> environment.</p>
 </div>
 <h2 id="rendering-from-an-api">Rendering from an API<a class="header-anchor" href="javascript:;" onclick="location.hash='#rendering-from-an-api'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <pre><code class="language-csharp">[Route(&quot;/orders/{Id}/invoice&quot;)]
@@ -889,10 +876,10 @@ public class SendInvoiceEmailCommand(
                                             Generate typed C# contracts
                                         </span>
                                             <ul class="ml-4">
-                                                    <li data-id="the-pdf-apptask" class="text-gray-500 hover:text-gray-900">
-                                                        <span v-hash="'#the-pdf-apptask'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                    <li data-id="the-pdf-startup-task" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#the-pdf-startup-task'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
-                                                            The pdf AppTask
+                                                            The pdf Startup Task
                                                         </span>
                                                     </li>
                                             </ul>

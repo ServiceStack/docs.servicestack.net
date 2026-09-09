@@ -9073,7 +9073,7 @@ The annotated [World Validation Docs](/world-validation) walks through and showc
 approaches and **Client UI rendered** technologies which are able all to use the same single suite of ServiceStack Services.
 
 
-# AutoQuery CRUD UI
+# AutoQuery Schema UI
 Source: https://docs.servicestack.net/autoquery-schema
 
 :::youtube M6KYkZFIM-8
@@ -23909,121 +23909,134 @@ letting you scale, deploy and maintain it independently from the rest of the sys
 # Add ServiceStack Reference
 Source: https://docs.servicestack.net/add-servicestack-reference-overview
 
-ServiceStack's **Add ServiceStack Reference** feature allows adding generated Native Types for the most popular typed languages and client platforms directly from within most major IDE's starting with [ServiceStackVS](/create-your-first-webservice#step-1-download-and-install-servicestackvs) - providing a simpler, cleaner and more versatile alternative to WCF's legacy **Add Service Reference** feature built into VS.NET.
+**Add ServiceStack Reference** gives every consumer of your API an end-to-end typed client, generated from a single URL.
 
-Add ServiceStack Reference now supports 
-[C#](/csharp-add-servicestack-reference), 
-[TypeScript](/typescript-add-servicestack-reference), 
-[JavaScript](/javascript-add-servicestack-reference),
-[Python](/python-add-servicestack-reference),
-[PHP](/php-add-servicestack-reference),
-[Swift](/swift-add-servicestack-reference), 
-[Java](/java-add-servicestack-reference), 
-[Kotlin](/kotlin-add-servicestack-reference), 
-[Dart](/dart-add-servicestack-reference), 
-[F#](/fsharp-add-servicestack-reference),
-[VB.NET](/vbnet-add-servicestack-reference) and
-[ES3 Common.js](/commonjs-add-servicestack-reference) including integration with most leading IDE's to provide a flexible alternative than sharing your DTO assembly with clients. Clients can now easily add a reference to a remote ServiceStack url and update DTOs directly from within VS.NET, Xamarin Studio, Xcode, Android Studio, IntelliJ and Eclipse. We plan on expanding on this foundation into adding seamless, typed, end-to-end integration with other languages - Add a [feature request for your favorite language](https://servicestack.net/ideas) to prioritize support for it sooner!
+Your C# Request and Response DTOs are the only contract that exists. From them ServiceStack can emit native DTOs for
+**15 languages**, which drop into a client project alongside that language's generic Service Client to give it a fully
+typed API - with no schema to maintain, no build-time code generation and no DTO assembly to distribute.
 
-Native Types provides an alternative for sharing DTO dlls, that can enable a better dev workflow for external clients who are now able to generate (and update) Typed APIs for your Services from a single remote url directly within their favorite IDE - reducing the burden and effort required to consume ServiceStack Services whilst benefiting from clients native language strong-typing feedback.
+<language-grid>
+</language-grid>
 
-### Supported Languages
+## How it works
 
-<table class="table table-bordered w-full" style="text-align:center">
-    <tr>
-        <td><a href="/csharp-add-servicestack-reference">C#</a></td>
-        <td><a href="/typescript-add-servicestack-reference">TypeScript</a></td>
-        <td><a href="/javascript-add-servicestack-reference">JavaScript</a></td>
-        <td><a href="/python-add-servicestack-reference">Python</a></td>
-        <td><a href="/php-add-servicestack-reference">PHP</a></td>
-        <td><a href="/swift-add-servicestack-reference">Swift</a></td>
-        <td><a href="/java-add-servicestack-reference">Java</a></td>
-        <td><a href="/kotlin-add-servicestack-reference">Kotlin</a></td>
-        <td><a href="/dart-add-servicestack-reference">Dart</a></td>
-        <td><a href="/fsharp-add-servicestack-reference">F#</a></td>
-        <td><a href="/vbnet-add-servicestack-reference">VB.NET</a></td>
-    </tr>
-</table>
+<reference-flow>
+</reference-flow>
 
-![](./img/pages/add-ss-ref.svg)
+Behind the scenes ServiceStack captures the metadata on your Service DTOs - routes, the `IReturn<T>` response type,
+sub-classes, attributes and textual descriptions - into a serializable model published at `/types/metadata`, which each
+language generator renders as idiomatic source code. Adding a reference is a plain HTTP request to `/types/<lang>`; the
+options used are written into a comment header at the top of the generated file so a later update reproduces them.
 
-### IDE Integration
+Native Types is enabled by default. It can be removed with:
 
-To provide a seamless Development Experience, Add ServiceStack Reference is available as a plugin in most major IDEs which will allow your API Consumers to 
-be able easily add a typed Service Reference to your Services with just its URL in their preferred language from within JetBrains Rider, VS.NET, Android Studio, PyCharm, IntelliJ IDEA, RubyMine, PhpStorm, WebStorm and Eclipse:
+```csharp
+Plugins.RemoveAll(x => x is NativeTypesFeature);
+```
+
+## Adding and updating a reference
+
+<sync-options>
+</sync-options>
+
+### Keeping your own clients in sync automatically
+
+If the client lives in the same solution as the API, you don't need to run anything. Registering the built-in `dtos`
+[Startup Task](/startup-tasks) regenerates the App's own DTO references every time it restarts in development:
+
+```csharp
+StartupTasks.Register("dtos", () =>
+    appHost.GetPlugin<NativeTypesFeature>().GenerateDtos());
+```
+
+Generation happens in-process without HTTP or Node.js, preserves each reference's existing options and doesn't rewrite
+unchanged files - so a contract change shows up in your client build immediately, without triggering a needless frontend
+rebuild. All project templates with TypeScript `.ts` or JavaScript `.mjs` client DTOs ship with it configured. See
+[Startup Tasks](/startup-tasks) for DTO discovery, `BaseUrl` matching and generation options.
+
+### From the command-line
+
+::include npx-get-dtos.md::
+
+The [x dotnet tool](/dotnet-tool) provides the same commands for .NET developers who already have the SDK installed,
+where `x <lang>` is interchangeable with `npx get-dtos <lang>`:
+
+:::sh
+dotnet tool install --global x 
+:::
+
+Both tools follow the same three usages - **add** a reference from a URL, **update** one by filename, or update
+**all** references in the current directory (recursively) by passing only the language:
+
+:::sh
+npx get-dtos ts https://blazor-vue.web-templates.io
+:::
+
+```
+Saved to: dtos.ts
+```
+
+Pass a name as the 2nd argument to save it under a different file, e.g. when a project consumes more than one API:
+
+:::sh
+npx get-dtos ts https://blazor-vue.web-templates.io Bookings
+:::
+
+```
+Saved to: Bookings.dtos.ts
+```
+
+Then later update every TypeScript reference in the directory with:
+
+:::sh
+npx get-dtos ts
+:::
+
+```
+Updated: Bookings.dtos.ts
+Updated: dtos.ts
+```
+
+### From your IDE
+
+Add ServiceStack Reference is available as a plugin for JetBrains Rider, IntelliJ IDEA, Android Studio, PyCharm,
+WebStorm, PhpStorm, RubyMine and Eclipse, letting API consumers add and update a typed reference from the IDE's context
+menu with just a URL:
 
 [![](./img/pages/servicestack-reference/ide-plugins-splash.png)](https://www.youtube.com/watch?v=JKsgrstNnYY)
 
-Here's a quick walk through installing the **ServiceStack** plugin and using it to add a remote ServiceStack Reference in a new C# Application:
-
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="JKsgrstNnYY" style="background-image: url('https://img.youtube.com/vi/JKsgrstNnYY/maxresdefault.jpg')"></lite-youtube>
 
-:::tip
-VSCode and other IDEs will be able to use the [Simple Command Line Utility](#simple-command-line-utilities) to add and update multiple Services references with a single command.
-:::
+## What you get with the DTOs
 
-### Call ServiceStack APIs from a Flutter App with native Dart client and DTOs
+<client-features>
+</client-features>
 
-Walk through showing how you can use ServiceStack's Dart client library with your Flutter Android application to quickly get up and running with Add ServiceStack Reference.
+The generated DTOs are just data - they're not coupled to an endpoint or format, so the same file works with every
+[built-in Service Client](/clients-overview) in that language. In .NET that includes the JSON, JSV, MessagePack and
+ProtoBuf clients, all sharing the same interface so swapping between them is a one-line change.
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ocH5L-CikQ0" style="background-image: url('https://img.youtube.com/vi/ocH5L-CikQ0/maxresdefault.jpg')"></lite-youtube>
+Because only DTOs are generated, the client library itself is reusable: DTOs generated against a hosted instance work
+against any deployment of that API, and the same client instance can call any other ServiceStack API.
 
-### C# Xamarin.Android Example in VS.NET
+### Multiple file uploads
 
-Using C# to develop native Mobile and Desktop Apps provides a number of benefits including maximum reuse of your investments across multiple Client Apps where they're able to reuse shared functionality, libraries, knowledge, development workflow and environment in both Client and Server Apps. 
+Every language's client supports uploading files alongside a typed Request DTO, which is what makes APIs like
+[AI Server](/ai-server/)'s `SpeechToText` callable from anywhere:
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="cbYuem1b2tg" style="background-image: url('https://img.youtube.com/vi/cbYuem1b2tg/maxresdefault.jpg')"></lite-youtube>
+```csharp
+using var fsAudio = File.OpenRead("audio.wav");
+var response = client.PostFileWithRequest(new SpeechToText(),
+    new UploadFile("audio.wav", fsAudio, "audio"));
+```
 
-### Call ServiceStack APIs from Python
+A `PostFilesWithRequest` variant accepts multiple files in a single request. See each language's reference page for its
+idiomatic equivalent.
 
-This video tutorial looks at how we can leverage Add ServiceStack Reference for Python in PyCharm, VSCode and [Python Jupyter Notebooks](/jupyter-notebooks-python).
+## Customizing what's generated
 
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="WjbhfH45i5k" style="background-image: url('https://img.youtube.com/vi/WjbhfH45i5k/maxresdefault.jpg')"></lite-youtube>
-
-### Call ServiceStack APIs from PHP
-
-This video tutorial looks at how we can easily integrate .NET Typed APIs to extend popular PHP Applications like Wordpress, Drupal or Laravel with [PHP Add ServiceStack Reference](/php-add-servicestack-reference).
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="ZLVdaJ38vwc" style="background-image: url('https://img.youtube.com/vi/ZLVdaJ38vwc/maxresdefault.jpg')"></lite-youtube>
-
-### Instant Client Apps
-
-[Instant Client Apps](https://apps.servicestack.net/) is a free tool to jump start your native client application development using a wide range of languages and platforms including: C#, NodeJS, Dart, Java, Kotlin, Swift, VB .NET and F#:
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="GTnuMhvUayg" style="background-image: url('https://img.youtube.com/vi/GTnuMhvUayg/maxresdefault.jpg')"></lite-youtube>
-
-## gRPC
-
-[ServiceStack gRPC](/grpc/) enables a highly productive development environment for developing high-performance gRPC HTTP/2 Services by making ServiceStack's existing typed Services available from ASP.NET's gRPC endpoints where ServiceStack offers a simplified development model for gRPC Clients for streamlined end-to-end productivity.
-
-<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="UQlYodNS1xc" style="background-image: url('https://img.youtube.com/vi/UQlYodNS1xc/maxresdefault.jpg')"></lite-youtube>
-## C# Mobile and Desktop Apps
-
-[![](https://raw.githubusercontent.com/ServiceStackApps/HelloMobile/master/screenshots/splash-900.png)](https://github.com/ServiceStackApps/HelloMobile)
-
-The generated DTOs provides a highly productive development workflow and enables a succinct end-to-end Typed API that can be used in both **.NET Framework** and **.NET Standard 2.0** [Generic Service Clients](/csharp-client) to facilitate Rapid Development in .NET's most popular Mobile and Desktop platforms:
-
- - WPF
- - UWP
- - Xamarin.Android
- - Xamarin.iOS
- - Xamarin.OSX
- - Xamarin.Forms
-   - iOS
-   - Android
-   - UWP
-
-The [HelloMobile](https://github.com/ServiceStackApps/HelloMobile) project contains multiple versions of the same App in all the above platforms demonstrating a number of different calling conventions, service integrations and reuse possibilities.
-
-ServiceStack also allows for the maximum reuse possible by letting you reuse the same POCO DTOs used to define the Services contract with, in Clients Apps to provide its end-to-end typed API without any additional custom build tools, code-gen or any other artificial machinery, using just the DTOs in the shared `ServiceModel.dll` with any of the available highly performant [.NET generic Service Clients](/csharp-client) that be design encourages development of [resilient message-based Services](/what-is-a-message-based-web-service) for enabling [highly decoupled](/service-gateway) and easily [substitutable and mockable](/csharp-client#built-in-clients) Service Integrations.
-
-## Utilize Native SDKs and Languages
-
-Add ServiceStack Reference lets you utilize the native SDK's and development environment whilst maintaining the same productive development experience made possible with native idiomatic Service Clients in Web and across the most popular Mobile and Desktop platforms. App Developers can generate Typed DTOs for any ServiceStack Service in Android Apps using either [Java](/java-add-servicestack-reference) and [Kotlin](/kotlin-add-servicestack-reference), or use the [Swift](/swift-add-servicestack-reference) for development of native iOS or OSX Apps or [TypeScript](/typescript-add-servicestack-reference) for calling Services from [React Native, Node.js or Web Apps](https://github.com/ServiceStackApps/typescript-server-events).
-
-### Flexible Customizations
-
-Options for the generated DTOs can be further customized by updating the commented section in the header of the file. Each language will have different options for leveraging features native to each Language. See the specific language documentation for details on available options:
+Consumers customize their own output by uncommenting options in the header of their generated file - each language
+exposes the options that make sense for it. See the language pages for the full list:
 
 * [C# Options](/csharp-add-servicestack-reference#change-default-server-configuration)
 * [TypeScript Options](./typescript-add-servicestack-reference.md#customize-dto-type-generation)
@@ -24034,551 +24047,67 @@ Options for the generated DTOs can be further customized by updating the comment
 * [Kotlin Options](/kotlin-add-servicestack-reference#kotlin-configuration)
 * [Dart Options](/dart-add-servicestack-reference#change-default-server-configuration)
 * [F# Options](/fsharp-add-servicestack-reference#change-default-server-configuration)
-* [VB.Net Options](/vbnet-add-servicestack-reference)
+* [VB.NET Options](/vbnet-add-servicestack-reference)
 
-## Simple command-line utilities
+<server-controls>
+</server-controls>
 
-The [x dotnet tool](/dotnet-tool) provides simple command-line utilities to easily Add and Update ServiceStack References for all of ServiceStack's supported languages.
-
-## Installation
-
-:::sh
-dotnet tool install --global x 
-:::
-
-::include npx-get-dtos.md::
-
-This will make the following utilities available from your command-line which will let you download the Server DTO classes for a remote ServiceStack endpoint in your chosen language which you can use with ServiceStack's generic Service clients to be able to make end-to-end API calls.
-
-<table class="table table-bordered">
-<tr>
-    <th>Script</th>
-    <th>Alias</th>
-    <th>Language</th>
-</tr>
-<tr>
-    <td>x csharp</td>
-    <td>x cs</td>
-    <td>C#</td>
-</tr>
-<tr>
-    <td>x typescript</td>
-    <td>x ts</td>
-    <td>TypeScript</td>
-</tr>
-<tr>
-    <td>x mjs</td>
-    <td></td>
-    <td>JavaScript</td>
-</tr>
-<tr>
-    <td>x python</td>
-    <td>x py</td>
-    <td>Python</td>
-</tr>
-<tr>
-    <td>x java</td>
-    <td></td>
-    <td>Java</td>
-</tr>
-<tr>
-    <td>x kotlin</td>
-    <td>x kt</td>
-    <td>Kotlin</td>
-</tr>
-<tr>
-    <td>x swift</td>
-    <td></td>
-    <td>Swift</td>
-</tr>
-<tr>
-    <td>x dart</td>
-    <td></td>
-    <td>Dart</td>
-</tr>
-<tr>
-    <td>x vbnet</td>
-    <td>x vb</td>
-    <td>VB.NET</td>
-</tr>
-<tr>
-    <td>x fsharp</td>
-    <td>x fs</td>
-    <td>F#</td>
-</tr>
-</table>
-
-## Usage
-
-We'll walkthrough an example using TypeScript to download Server Types from the [techstacks.io](https://techstacks.io) ServiceStack Website to see how this works:
-
-### Adding a ServiceStack Reference
-
-To Add a TypeScript ServiceStack Reference just call `x typescript` with the URL of 
-a remote ServiceStack instance:
-
-:::sh
-x typescript https://techstacks.io
-:::
-
-
-Result:
-
-```
-Saved to: dtos.ts
-```
-
-Calling `x typescript` with just a URL will save the DTOs using the Host name, you can override this by specifying a FileName as the 2nd argument:
-
-:::sh
-x typescript https://techstacks.io Tech
-:::
-
-Result:
-
-```
-Saved to: Tech.dtos.ts
-```
-
-### Updating a ServiceStack Reference
-
-To Update an existing ServiceStack Reference, call `x typescript` with the Filename:
-
-:::sh
-x typescript dtos.ts
-:::
-
-Result:
-
-```
-Updated: dtos.ts
-```
-
-Which will update the File with the latest TypeScript Server DTOs from [techstacks.io](https://techstacks.io). You can also customize how DTOs are generated by uncommenting the [TypeScript DTO Customization Options](/typescript-add-servicestack-reference#dto-customization-options) and updating them again.
-
-#### Updating all TypeScript DTOs
-
-Calling `x typescript` without any arguments will update **all TypeScript DTOs** in the current directory:
-
-:::sh
-x typescript
-:::
-
-Result:
-
-```
-Updated: Tech.dtos.ts
-Updated: dtos.ts
-```
-
-To make it more wrist-friendly you can also use the shorter `x ts` alias instead of `x typescript`.
-
-### Installing Generic Service Client
-
-Now we have our TechStacks Server DTOs we can use them with the generic `JsonServiceClient` in the [@servicestack/client](https://www.npmjs.com/package/@servicestack/client) npm package to make Typed API Calls.
-
-:::sh
-npm install @servicestack/client
-:::
-
-#### TechStacks Example
-
-Once installed create a `demo.ts` file with the example below using both the `JsonServiceClient` from the **@servicestack/client** npm package and the Server DTOs we 
-want to use from our local `dtos.ts` above:
-
-```ts
-import { JsonServiceClient } from '@servicestack/client';
-import { GetTechnology, GetTechnologyResponse } from './dtos';
-
-var client = new JsonServiceClient("https://techstacks.io")
-
-async function main() {
-    let request = new GetTechnology()
-    request.Slug = "ServiceStack"
-
-    const response = await client.get(request)
-    console.log(response.Technology.VendorUrl)
-}
-
-main()
-```
-
-The `JsonServiceClient` is populated with the **BaseUrl** of the remote ServiceStack instance we wish to call. Once initialized we can send populated Request DTOs and handle
-the Typed Response DTOs in Promise callbacks.
-
-To run our TypeScript example we just need to compile it with TypeScript:
-
-:::sh
-tsc demo.ts
-:::
-
-Which will generate the compiled `demo.js` (and `typescript.dtos.js`) which we can then run with node:
-
-:::sh
-node demo.js
-:::
-
-Result:
-
-```
-https://servicestack.net
-```
-
-
-#### [Invoke ServiceStack APIs from the command-line](/post-command)
-
-Easily inspect and invoke C# .NET Web APIs from the command-line with Post Command which allows you to both inspect and
-call any ServiceStack API with just its name and a JS Object literal. API Responses returned in human-friendly markdown tables by default or 
-optionally as JSON & raw HTTP.
-
-### Built in Authentication
-
-One of the benefits of utilizing smart generic Service Clients is being able to embed high-level generic functionality like 
-Authentication that would be tedious and error prone for all API Consumers to have to implement manually.
-
-All smart generic Service Clients have support for most of [built-in Authentication](/auth/authentication-and-authorization) options
-including [OAuth Providers](https://github.com/ServiceStackApps/AndroidJavaChat) and [Sign In with Apple](/auth/signin-with-apple)
-that are able to take advantage of the integrated and transparent JWT and Refresh Token Cookie support.
-
-### Refresh Token Cookies supported in all Service Clients
-
-::include jwt-service-clients.md::
-
-### Integrate with Visual Studio
-
-You can also easily integrate this within your VS.NET dev workflows by [adding it as an External Tool](https://docs.microsoft.com/en-us/visualstudio/ide/managing-external-tools?view=vs-2019) in the **External Tools** dialog box by choosing `Tools > External Tools`:
-
-![](/img/pages/servicestack-reference/tool-ts-reference.png)
-
-|  ||
-|-|-|
-| Title             | Update TypeScript &Reference |
-| Command           | web.exe |
-| Arguments         | ts |
-| Initial directory | $(ProjectDir) |
-|  ||
-
-Which will then let you update all your `*dtos.ts` TypeScript References in your project by clicking on `Tools > Update TypeScript Reference` 
-or using the `ALT+T R` keyboard shortcut.
-
-If you wanted to Update your `*dtos.cs` **C# ServiceStack References** instead, just change Arguments to `cs`:
-
-![](/img/pages/servicestack-reference/tool-cs-reference.png)
-
-|  ||
-|-|-|
-| **Title**             | Update C# &Reference |
-| **Command**           | web.exe |
-| **Arguments**         | cs |
-| **Initial directory** | $(ProjectDir) |
-|  ||
-
-Refer to the [x usage output](#usage) above for the arguments or aliases for all other supported languages.
-
-### Integrate with Rider
-
-Just like with VS.NET above you can [add an External Tool](https://www.jetbrains.com/help/rider/Settings_Tools_External_Tools.html) 
-in [JetBrains Rider](https://www.jetbrains.com/rider/) by opening the Settings dialog with `CTRL+ALT+S` then searching for `external tools` 
-under the **Tools** category:
-
-![](/img/pages/servicestack-reference/rider-tool-ts-reference.png)
-
-|  ||
-|-|-|
-| **Name**              | Update TypeScript Reference |
-| **Command**           | web.exe |
-| **Arguments**         | ts |
-| **Working directory** | $FileParentDir$ |
-|  ||
-
-Now you can update your `*dtos.ts` TypeScript References in your project by clicking on `External Tools > Update TypeScript Reference`
-in the right-click context menu:
-
-![](/img/pages/servicestack-reference/rider-tool-ts-reference-run.png)
-
-If you're updating references frequently you can save time by [assigning it a keyboard shortcut](https://www.jetbrains.com/help/rider/Configuring_Keyboard_and_Mouse_Shortcuts.html).
-
-
-## Multiple File Upload Support with API Requests supported in all languages
-
-To be able to call [AI Server](/ai-server/) APIs requiring file uploads we've added multiple file upload support with API Requests to the generic service clients for all our supported languages.
-
-Here's what that looks like for different languages calling AI Server's `SpeechToText` API:
-
-### C# Speech to Text
+Restricting a type is the important one - an API annotated with `[Restrict(InternalOnly = true)]` is generated for a
+reference added from your internal network but is invisible to an external consumer, so internal APIs can't leak into a
+public client. `Metadata.ForceInclude` goes the other way, overriding the default rules for types you do want emitted:
 
 ```csharp
-using var fsAudio = File.OpenRead("audio.wav");
-var response = client.PostFileWithRequest(new SpeechToText(),
-    new UploadFile("audio.wav", fsAudio, "audio"));
+Metadata.ForceInclude = new() {
+    typeof(AdminQueryUsers),
+    typeof(AdminGetUser),
+    typeof(AdminCreateUser),
+};
 ```
 
-### Dart Speech to Text
+## Why code-first
 
-```dart
-var audioFile = new File('audio.wav');
-var uploadFile = new UploadFile(
-    fieldName: 'audio',
-    fileName: audioFile.uri.pathSegments.last,
-    contentType: 'audio/wav',
-    contents: await audioFile.readAsBytes()
-);
+Add ServiceStack Reference exists because a message-based API doesn't need a client generated for it - only its DTOs do.
+Everything else is a reusable generic client, which is what keeps the generated output small enough to read and review.
 
-var response = await client.postFileWithRequest(new SpeechToText(), uploadFile);
-```
-
-### Python Speech to Text
-
-```python
-with open("files/audio.wav", "rb") as audio:
-  response = client.post_file_with_request(SpeechToText(), 
-    UploadFile(field_name="audio", file_name="audio.wav", content_type="audio/wav", stream=audio))
-```
-
-### PHP Speech to Text
-
-```php
-$audioFile = __DIR__ . '/files/audio.wav';
-
-/** @var GenerationResponse $response */
-$response = $client->postFileWithRequest(new SpeechToText(),
-    new UploadFile(
-        filePath: $audioFile,
-        fileName: 'audio.wav',
-        fieldName: 'audio',
-        contentType: 'audio/wav'
-    ));
-```
-
-### Swift Speech to Text
-
-```swift
-guard let audioURL = Bundle.module.url(forResource: "audio.wav", withExtension: nil) else {
-    return
-}
-
-let audioData = try Data(contentsOf: audioURL)
-let response: TextGenerationResponse = try await client.postFileWithRequestAsync(
-    request:SpeechToText(), 
-    file:UploadFile(fileName: "audio.wav", data:audioData, fieldName:"audio"))
-```
-
-### Kotlin Speech to Text
-
-```kotlin
-val audioBytes = Files.readAllBytes(Paths.get("audio.wav"))
-val response = client.postFileWithRequest(SpeechToText(),
-    UploadFile("audio", "audio.wav", "audio/wav", audioBytes))
-```
-
-### Java Speech to Text
-
-```java
-byte[] audioBytes = Files.readAllBytes(Paths.get("audio.wav"));
-var response = client.postFileWithRequest(request,
-    new UploadFile("audio", "audio.wav", "audio/wav", audioBytes));
-```
-
-### TypeScript Speech to Text
-
-```js
-// Create FormData and append the file
-const formData = new FormData()
-const audioFile = fs.readFileSync('audio.wav')
-const blob = new Blob([audioFile], { type: 'audio/wav' })
-
-// Explicitly set the field name as 'audio'
-formData.append('audio', blob, 'audio.wav')
-
-const api = await client.apiForm(new SpeechToText(), formData)
-```
-
-### Multiple File Uploads
-
-All languages also support a `postFilesWithRequest` variant for uploading multiple files with an API Request.
-E.g. here's an example of using `PostFilesWithRequest` to generate a video with a Watermark:
-
-### C# Watermark Video
+C# is a good language to define an API contract in: POCO data models are about as terse as a DSL, but come with real IDE
+support and can carry richer metadata than a schema - attributes, interfaces, doc comments and response types:
 
 ```csharp
-using var fsVideo = File.OpenRead("video.mp4");
-using var fsWatermark = File.OpenRead("watermark.png");
-var response = client.PostFilesWithRequest(new QueueWatermarkVideo {
-        Position = WatermarkPosition.BottomRight
-    }, [
-        new UploadFile("video.mp4", fsVideo, "video"),
-        new UploadFile("watermark.png", fsWatermark, "watermark")
-    ]);
-```
-
-## Advantages over WCF
-
- - **Simple** Server provides DTOs based on metadata and options provided. No heavy client side tools, just a HTTP request!
- - **Versatile** Clean DTOs works in all JSON, XML, JSV, MsgPack and ProtoBuf [generic service clients](/csharp-client#built-in-clients)
- - **Reusable** Generated DTOs are not coupled to any endpoint or format. Defaults are both partial and virtual for maximum re-use 
- - **Resilient** Messaging-based services offer a number of [advantages over RPC Services](/advantages-of-message-based-web-services)
- - **Flexible** DTO generation is customizable, Server and Clients can override built-in defaults
- - **Integrated** Rich Service metadata annotated on DTO's, [Internal Services](/auth/restricting-services) are excluded when accessed externally
-
-## In Contrast with WCF's Add Service Reference
-
-WCF's **Add Service Reference** also allows generating a typed client from a single url, and whilst it's a great idea, the complexity upon what it's built-on and the friction it imposes were the primary reasons we actively avoided using it (pre-ServiceStack). We instead opted to reuse our server DTO types and created Generic WCF Proxies, to provide a cleaner and simpler solution when consuming our own WCF services. 
-
-## ServiceStack's Native Types Feature
-
-As with any ServiceStack feature one of our primary goals is to [minimize unnecessary complexity](/autoquery#why-not-complexity) by opting for approaches that yield maximum value and minimal complexity, favoring re-use and simple easy to reason about solutions over opaque heavy black-box tools.
-
-We can already see from the WCF scenario how ServiceStack already benefits from its message-based design, where as it's able to reuse any [Generic Service Client](/clients-overview), only application-specific DTO's ever need to be generated, resulting in a much cleaner, simpler and friction-less solution.
-
-Code-first is another approach that lends itself to simpler solutions, which saves the effort and inertia from adapting to interim schemas/specs, often with impedance mismatches and reduced/abstract functionality. In ServiceStack your code-first DTOs are the master authority where all other features are projected off. 
-
-C# also has great language support for defining POCO Data Models, that's as terse as a DSL but benefits from great IDE support and minimal boilerplate, e.g:
-
-```csharp
-[Route("/path")]
-public class Request : IReturn<Response>
+[Route("/technology/{Slug}")]
+public class GetTechnology : IReturn<GetTechnologyResponse>
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    ...
+    public string Slug { get; set; }
 }
 ```
 
-Starting from a C# model, whilst naturally a better programmatic fit also ends up being richer and more expressive than XSD's which supports additional metadata annotations like Attributes and Interfaces. 
+Starting from that model rather than an interim schema avoids the impedance mismatch of adapting your types to a spec
+and then adapting them back again. In ServiceStack your code-first DTOs are the master authority that every other
+feature - [OpenAPI](/openapi), [gRPC](/grpc/), [Locode](/locode/) and Add ServiceStack Reference - is projected
+from.
 
-### Remove Native Types Feature
+## Language paths
 
-Native Types is enabled by default in ServiceStack projects. It can be disabled by removing the `NativeTypesFeature` plugin:
-
-```csharp
-Plugins.RemoveAll(x => x is NativeTypesFeature);
-```
-
-### Excluding Types from Add ServiceStack Reference
-
-To remove a type from the metadata and code generation you can annotate Request DTOs with `[ExcludeMetadata]`, e.g:
-
-```csharp
-[ExcludeMetadata]
-public class ExcludedFromMetadata
-{
-    public int Id { get; set; }
-}
-```
-
-An alternative is it add it to the `IgnoreTypes` collection in the NativeTypes Feature Metadata Config in your AppHost:
-
-```csharp
-var nativeTypes = this.GetPlugin<NativeTypesFeature>();
-nativeTypes.MetadataTypesConfig.IgnoreTypes.Add(typeof(TypeToIgnore));
-```
-
-If you only want to limit code generation based on where the reference is being added from you can use the 
-[Restrict Attribute](/auth/restricting-services), 
-E.g you can limit types to only appear when the reference is added from localhost:
-
-```csharp
-[Restrict(LocalhostOnly = true)]
-public class RestrictedToLocalhost { }
-```
-
-Or when added from within an internal network:
-
-```csharp
-[Restrict(InternalOnly = true)]
-public class RestrictedToInternalNetwork { }
-```
-
-There's also the rarer option when you only want a service accessible from external requests with:
-
-```csharp
-[Restrict(ExternalOnly = true)]
-public class RestrictedToExternalRequests { }
-```
-
-### Export Types
-
-By default the `NativeTypeFeature` doesn't emit any **System** types built into the Base Class Libraries, these can be 
-emitted for non-.NET Languages with the new `ExportTypes` list, e.g. if your DTO's exposes the `DayOfWeek` System Enum it can
-be exported by adding it to the pre-registered NativeTypesFeature's Plugin with:
-
-```csharp
-var nativeTypes = this.GetPlugin<NativeTypesFeature>();
-nativeTypes.MetadataTypesConfig.ExportTypes.Add(typeof(DayOfWeek));
-```
-
-If any of your DTO's has a `DayOfWeek` property it will emitted in the generated DTO's, Java example:
-
-```java
-public static enum DayOfWeek
-{
-    Sunday,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday;
-}
-```
-
-### Force Include Types in Native Types DTOs
-
-ServiceStack's Add ServiceStack Reference feature carefully limits which DTOs it generates based on just the DTOs needed by different clients packages to call APIs. There's many reasons why Types aren't generated, e.g. they already exist in service client library, the APIs have [Visibility or Access restrictions](/auth/restricting-services), their built-in APIs purposefully hidden by ServiceStack to reduce bloat, etc.
-
-We can override these rules for specific Types by including them in `Metadata.ForceInclude`, e.g:
-
-```csharp
-public override void Configure(Container container)
-{
-    Metadata.ForceInclude = new() {
-        typeof(MetadataApp),
-        typeof(AppMetadata),
-        typeof(AdminQueryUsers),
-        typeof(AdminGetUser),
-        typeof(AdminCreateUser),
-        typeof(AdminUpdateUser),
-        typeof(AdminDeleteUser),
-    };
-}
-```
-
-### Enable Versioning
-
-You can implement our [recommended Versioning strategy](http://stackoverflow.com/a/12413091/85785) 
-and embed a version number to all generated Request DTOs by specifying an `AddImplicitVersion`, 
-either globally on the Server in your AppHost:
-
-```csharp
-var nativeTypes = this.GetPlugin<NativeTypesFeature>();
-nativeTypes.MetadataTypesConfig.AddImplicitVersion = 1;
-```
-
-Alternatively you can configure [AddImplicitVersion in client Options](/csharp-add-servicestack-reference#addimplicitversion).
-
-### Generating Types from Metadata
-
-Behind the scenes ServiceStack captures all metadata on your Services DTOs including Sub -classes, Routes, `IReturn` marker, C# Attributes, textual Description as well as desired configuration into a serializable object model accessible from `/types/metadata`: 
-
-## How it works
-
-The Add ServiceStack Reference dialog just takes the URL provided and requests the appropriate route for the current project. Eg, for C#, the path used is at `/types/csharp`. The defaults are specified by the server and the resultant DTOs are saved and added the the project as `<Name>.dtos.<ext>`. The `Update ServiceStack Reference` menu is available when any file matches same naming convention of `<Name>.dtos.<ext>`. An update then looks at the comments at the top of the file and parses them to provide overrides when requesting new DTOs from the server. ServiceStackVS also watches these DTO files for updates, so just by saving them these files are updated from the server.
-
-### Language Paths
+Each generator is served directly, so you can inspect what a client will receive from a browser:
 
 | Path                | Language |
 | --                  | -- |
 | /types/csharp       | C# |
 | /types/typescript   | TypeScript |
 | /types/typescript.d | Ambient TypeScript Definitions |
-| /types/js           | CommonJS |
+| /types/mjs          | JavaScript (ES Modules) |
+| /types/js           | ES3 Common.js |
 | /types/python       | Python |
+| /types/php          | PHP |
 | /types/swift        | Swift |
 | /types/java         | Java |
 | /types/kotlin       | Kotlin |
 | /types/dart         | Dart |
+| /types/go           | Go |
+| /types/rust         | Rust |
+| /types/ruby         | Ruby |
+| /types/zig          | Zig |
 | /types/fsharp       | F# |
-| /types/vbnet        | VB .NET  |
+| /types/vbnet        | VB.NET  |
 | /types/metadata     | Metadata |
 
 ::include add-servicestack-reference-footer.md::
@@ -25402,7 +24931,7 @@ This lets you change the default DataContract XML namespace used for all C# name
 > Requires AddDataContractAttributes=true
 
 
-# TypeScript Add ServiceStack Reference
+# TypeScript ServiceStack Reference
 Source: https://docs.servicestack.net/typescript-add-servicestack-reference
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
@@ -27324,7 +26853,7 @@ To make API requests using TypeScript's async/await feature you'll need to creat
 ```
 
 
-# JavaScript Add ServiceStack Reference
+# JavaScript ServiceStack Reference
 Source: https://docs.servicestack.net/javascript-add-servicestack-reference
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
@@ -42189,7 +41718,7 @@ This lets you change the default DataContract XML namespace used for all namespa
 > Requires AddDataContractAttributes=true
 
 
-# ES3 Common.js Add ServiceStack Reference
+# ES3 Common.js ServiceStack Reference
 Source: https://docs.servicestack.net/commonjs-add-servicestack-reference
 
 In addition to [TypeScript](/typescript-add-servicestack-reference) support for generating typed Data Transfer Objects (DTOs), JavaScript is now supported.
@@ -78118,6 +77647,9 @@ Limitations on encoders, decoders, and filters may apply.
 # Service Clients Authentication
 Source: https://docs.servicestack.net/auth/client-auth
 
+<client-auth-modes>
+</client-auth-modes>
+
 ## Authenticating with JavaScript or TypeScript Service Clients
 
 Typically when using ServiceStack's **@servicestack/client** `JsonServiceClient` it will utilize the browser's authenticated
@@ -78221,7 +77753,9 @@ To Authenticate against your registered **Credentials** Auth Provider you can **
 Source: https://docs.servicestack.net/auth/restricting-services
 
 You can change the Visibility and Access restrictions on any service using the `[Restrict]` attribute. This is a class based attribute and should be placed on your Service class.
-Visibility affects whether or not the service shows up on the public `/metadata` pages, whilst access restrictions limits the accessibility of your services. 
+
+<restrict-dials>
+</restrict-dials>
 
 ## Named Configurations
 
@@ -78334,6 +77868,9 @@ One of the benefits of adopting a message-based design is being able to easily l
 enables a secure channel for all Services (inc Auto Batched Requests :) offering protection to clients who can now easily send and receive encrypted messages over unsecured HTTP!
 
 ## Encrypted Messaging Overview
+
+<encryption-overview>
+</encryption-overview>
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/encrypted-messaging.png)
 
@@ -78726,6 +78263,9 @@ Identity v2 password hashing format, which should let you migrate your users to 
 
 ## ServiceStack's Identity Auth Integration
 
+<identity-bridge>
+</identity-bridge>
+
 ServiceStack's Identity Auth integration is focused on high compatibility so existing ServiceStack Customers
 require minimal effort to migrate existing code bases to use the new Identity Auth integration, despite Identity Auth
 being an entirely different Auth Provider model and implementation.
@@ -78758,14 +78298,12 @@ The `AuthFeature` works by registering the following Identity Auth Providers:
 
 ### Identity Auth Providers
 
-- [IdentityApplicationAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs) - Converts an Identity Auth `ClaimsPrincipal` into a ServiceStack Session
-- [IdentityCredentialsAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityCredentialsAuthProvider.cs) - Implements ServiceStack's `Authenticate` API using Identity Auth
-- [IdentityJwtAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityJwtAuthProvider.cs) - Converts an Identity Auth JWT into an Authenticated ServiceStack Session
+<identity-providers>
+</identity-providers>
 
-Only the `IdentityApplicationAuthProvider` is registered by default which is required to convert Identity Auth's `ClaimPrincipal`
-into an Authenticated ServiceStack [Session](/auth/sessions). The other Auth Providers are required if you want to enable authentication with
-ServiceStack's endpoints. E.g. ServiceStack's [Built-in UIs](https://servicestack.net/auto-ui) would require the Credentials Auth
-to be enabled to authenticate via the built-in Sign In dialogs.
+Source: [IdentityApplicationAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs) ·
+[IdentityCredentialsAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityCredentialsAuthProvider.cs) ·
+[IdentityJwtAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityJwtAuthProvider.cs)
 
 ### Configuring Auth Providers
 
@@ -79040,6 +78578,9 @@ or perform any I/O to validate a token. As such,
 [JWTs are a popular choice for Microservices](/auth/jwt-authprovider#stateless-auth-microservices)
 as they only need to configured with confidential keys to validate access.
 
+<stateless-auth>
+</stateless-auth>
+
 ### ASP.NET Core JWT Authentication
 
 ServiceStack's JWT Identity Auth reimplements many of the existing [ServiceStack JWT AuthProvider](/auth/jwt-authprovider)
@@ -79274,6 +78815,9 @@ API Keys are a simple and effective way to authenticate and authorize access to 
 API Keys are often used to control access to specific resources or features in your API, providing a simple way 
 to manage access control.
 
+<api-key-redesign>
+</api-key-redesign>
+
 ### Redesigning API Keys
 
 Building on our experience with API Keys in previous versions of ServiceStack, we've taken the opportunity to redesign how API Keys work to provide a more flexible and powerful way to manage access control for your APIs.
@@ -79358,6 +78902,9 @@ public class MyRequest {}
 ### Use API Keys with our without Users and Authentication
 
 API Keys can optionally be associated with a User, but they don't have to be, nor do they run in the context of a User or are able to invoke any Authenticated APIs on their own. Users who create them can also limit their scope to only call APIs they have access to, which can be done with user-defined scopes:
+
+<key-controls>
+</key-controls>
 
 ### Scopes
 
@@ -79751,15 +79298,8 @@ services.AddPlugin(new ApiKeysFeature {
 # Simple Auth for .NET 10 Apps
 Source: https://docs.servicestack.net/auth/admin-apikeys
 
-With ServiceStack now fully [integrated with ASP.NET Identity Auth](/auth/identity-auth),
-our latest [.NET 10 Tailwind Templates](/start) offer a full-featured Auth Configuration complete with User Registration, 
-Login, Password Recovery, Two Factory Auth, and more.
-
-Whilst great for Web Applications that need it, it neglects the class of Apps which don't need User Auth and
-the additional complexity it brings inc. Identity and Password Management, EF Migrations, Token Expirations, OAuth Integrations, etc. 
-
-For these stand-alone Apps, Microservices and Docker Appliances that would still like to restrict Access to their APIs
-but don't need the complexity of ASP .NET Core's Authentication machinery, a simpler Auth Story would be preferred.
+<simple-auth-choice>
+</simple-auth-choice>
 
 With the introduction of API Keys in this release we're able to provide a simpler Auth Story for .NET 10 Microservices 
 that's easy for **Admin** Users to manage and control which trusted clients and B2B Integrations can access their functionality.
@@ -80112,12 +79652,11 @@ Source: https://docs.servicestack.net/auth/migrate-to-identity-auth
 
 ## Migrate from ServiceStack Auth to Identity Auth
 
-Migrating from ServiceStack Auth to Identity Auth should be relatively straight-forward as ServiceStack uses a compatible
-Identity v2 password hashing format, which should let you migrate your users to Identity Auth without them noticing.
+<migration-path>
+</migration-path>
 
-:::info TIP
-Please ensure your App database is backed up before performing any migrations
-:::
+<migration-safety>
+</migration-safety>
 
 ### 1. Rename old AppUser table
 
@@ -80484,6 +80023,12 @@ that Admins can use to assign Roles/Permissions to existing users.
   </h3>
   <servicestack-auth-templates></servicestack-auth-templates>
 </div>
+
+<provider-catalog>
+</provider-catalog>
+
+<auth-lifetimes>
+</auth-lifetimes>
 
 ### Highly customizable and versatile
 
@@ -81590,7 +81135,13 @@ Otherwise you can use the `IRequest req` parameter to check against a white list
 # Auth Repository
 Source: https://docs.servicestack.net/auth/auth-repository
 
-ServiceStack Auth supports using your own persistence back-ends but for the most part you should be able to reuse one of the existing [IAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/IAuthRepository.cs): 
+ServiceStack Auth supports using your own persistence back-ends but for the most part you should be able to reuse one of the existing [IAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/IAuthRepository.cs):
+
+<repo-catalog>
+</repo-catalog>
+
+<user-auth-schema>
+</user-auth-schema>
 
   - **OrmLite**: `OrmLiteAuthRepository` in [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server)
     - [OrmLiteAuthRepositoryMultitenancy](/multitenancy#multitenancy-rdbms-authprovider)
@@ -82138,6 +81689,10 @@ Users that don't have Digest Auth Hashes will require logging in again in order 
 # Using ServiceStack Auth in MVC
 Source: https://docs.servicestack.net/auth/identity-servicestack
 
+<doc-status status="legacy" title="A .NET 6 MVC template using ServiceStack Auth"
+  text="This walkthrough uses the legacy mvcauth template. New MVC projects should start from the current Identity Auth templates, which use the same Identity configuration as Microsoft's own."
+  :links="[{ text:'Identity Auth', href:'/auth/identity-auth' }, { text:'Authentication Overview', href:'/auth/' }]"></doc-status>
+
 [mvcauth](https://github.com/LegacyTemplates/mvcauth) is a .NET 6.0 MVC Website integrated with ServiceStack Auth:
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcauth.png)](https://github.com/LegacyTemplates/mvcauth)
@@ -82269,6 +81824,12 @@ public override void Configure(Container container)
     Plugins.Add(new SessionFeature());
 }
 ```
+
+<session-anatomy>
+</session-anatomy>
+
+<session-hooks>
+</session-hooks>
 
 ## Cookie Session Ids
 
@@ -82746,7 +82307,15 @@ When using [ASP.NET Core Identity Auth](/auth/identity-auth) refer to [JWT Ident
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="NTCUT7atoLo" style="background-image: url('https://img.youtube.com/vi/NTCUT7atoLo/maxresdefault.jpg')"></lite-youtube>
 
-The `JwtAuthProvider` is our integrated Auth solution for the popular [JSON Web Tokens](https://jwt.io/) (JWT) industry standard which is easily enabled by registering the `JwtAuthProvider` with the `AuthFeature` plugin:
+The `JwtAuthProvider` is our integrated Auth solution for the popular [JSON Web Tokens](https://jwt.io/) (JWT) industry standard.
+
+<jwt-tradeoffs>
+</jwt-tradeoffs>
+
+<token-pair>
+</token-pair>
+
+It's easily enabled by registering the `JwtAuthProvider` with the `AuthFeature` plugin:
 
 ```csharp
 Plugins.Add(new AuthFeature(...,
@@ -83954,21 +83523,14 @@ and [JWT Token Cookie Example](https://github.com/ServiceStack/ServiceStack/blob
 # API Key Auth Provider
 Source: https://docs.servicestack.net/auth/api-key-authprovider
 
-The API Key Auth Provider provides an alternative method for allowing external 3rd Parties access to 
-your protected Services without needing to specify a password. API Keys is the preferred approach for 
-many well-known public API providers used in system-to-system scenarios for several reasons:
+The API Key Auth Provider provides an alternative method for allowing external 3rd Parties access to
+your protected Services without needing to specify a password.
 
- - **Simple** - It integrates easily with existing HTTP Auth functionality
- - **Independent from Password** - Limits exposure to the much more sensitive master user passwords that 
- should ideally never be stored in plain-text. Resetting User's Password or password reset strategies 
- wont invalidate existing systems configured to use API Keys
- - **Entropy** - API Keys are typically much more secure than most normal User Passwords. The configurable 
-default has **24 bytes** of entropy (Guids have 16 bytes) generated from a secure random number generator 
-that encodes to **32 chars** using URL-safe Base64 (Same as Stripe)
- - **Performance** - Thanks to their much greater entropy and independence from user-chosen passwords,
- API Keys are validated as fast as possible using a datastore Index. This is contrast to validating hashed 
- user passwords which as a goal require usage of slower and more computationally expensive algorithms to 
- try make brute force attacks infeasible
+<key-rationale>
+</key-rationale>
+
+The configurable default has **24 bytes** of entropy generated from a secure random number generator that
+encodes to **32 chars** using URL-safe Base64 (the same as Stripe).
 
 Like most ServiceStack providers the new API Key Auth Provider is simple to use, integrates seamlessly with
 ServiceStack existing Auth model and includes Typed end-to-end client/server support. 
@@ -84336,6 +83898,9 @@ Source: https://docs.servicestack.net/auth/signin-with-apple
 ServiceStack Sign In with Apple Auth Provider docs & Integration docs from [github.com/NetCoreApps/AppleSignIn](https://github.com/NetCoreApps/AppleSignIn).
 
 ![](/img/pages/dev/web-signin-with-apple-login.png)
+
+<apple-requirements>
+</apple-requirements>
 
 ## Sign In with Apple Requirements
 
@@ -85074,6 +84639,13 @@ public class AppleAuthProvider
 # Anti Forgery
 Source: https://docs.servicestack.net/auth/anti-forgery
 
+<doc-status status="legacy" title="ASP.NET MVC's AntiForgery API is .NET Framework only"
+  text="This page covers ServiceStack validating ASP.NET MVC's AntiForgery token on .NET Framework. ASP.NET Core Apps use its own built-in antiforgery services instead."
+  :links="[{ text:'Authentication Overview', href:'/auth/' }]"></doc-status>
+
+<csrf-overview>
+</csrf-overview>
+
 You can leverage ASP.NET MVC's AntiForgery token support your Razor pages by embedding the token in your HTML Forms with:
 
 ## Example
@@ -85110,7 +84682,7 @@ ASP.NET MVC's AntiForgery API is only available in the .NET Framework
 :::
 
 
-# AutoQuery CRUD UI
+# AutoQuery Schema UI
 Source: https://docs.servicestack.net/autoquery-schema
 
 :::youtube M6KYkZFIM-8
@@ -94733,7 +94305,7 @@ Every Admin PDF API requires the `Admin` role:
 
 ## Generate typed C# contracts
 
-The `.ui.json` schema generates strongly typed C# models - the same source `dotnet run --AppTasks=pdf` writes, so what you copy from the browser matches what lands in your project.
+The `.ui.json` schema generates strongly typed C# models - the same source the `pdf` Startup Task writes, so what you copy from the browser matches what lands in your project.
 
 ```csharp
 public class LineItem
@@ -94763,13 +94335,14 @@ public class Invoice
 public class PdfAttribute(string template) : AttributeBase
 {
     public string Template { get; set; }   // published name, without .typ
+    public string? Namespace { get; set; } // optional per-template generated namespace
     public string? FileName { get; set; }  // download name, default "{Template}.pdf"
 }
 ```
 
 Dates, UUIDs, decimals, enums, required members and documentation are **inferred from the schema** rather than guessed from sample JSON.
 
-### The pdf AppTask
+### The pdf Startup Task
 
 ```csharp
 services.AddPlugin(new PdfFeature {
@@ -94781,14 +94354,10 @@ services.AddPlugin(new PdfFeature {
     }
 });
 
-AppTasks.Register("pdf", _ => appHost.GetPlugin<PdfFeature>().GeneratePdfs());
+StartupTasks.Register("pdf", () => appHost.GetPlugin<PdfFeature>().GeneratePdfs());
 ```
 
-Regenerate after publishing template changes:
-
-:::sh
-dotnet run --AppTasks=pdf
-:::
+It runs after each development restart, keeping generated models synchronized with published template changes.
 
 | `PdfCodeGenConfig` | Description |
 | --- | --- |
@@ -94797,12 +94366,26 @@ dotnet run --AppTasks=pdf
 | `Include` | Only these templates. Empty generates all |
 | `Exclude` | Templates to leave alone |
 | `ResolveFileName` | Names the file a template generates into. Default `"invoice"` → `Invoice.cs` |
-| `PreserveModified` | A generated file that's been edited is skipped rather than overwritten |
+| `PreserveModified` | Existing files without an `<auto-generated>` marker are preserved |
 
-Generated files contain content hashes, so if a developer adopts and edits one, later generation skips it instead of destroying their work.
+The opening `<auto-generated>` comment is an explicit ownership marker. While it remains, the generator
+may replace the file when its schema changes. Remove that opening marker to take ownership of a hand-tuned
+model; later runs skip and report the unmarked file. An unchanged run compares the expected source with the
+existing file directly; it doesn't invoke Typst or rewrite unchanged files.
+
+To isolate generic generated names like `Item`, `From` or `Details` for one template, populate its
+`PdfAttribute.Namespace`. Generation uses the override for every class from that template without changing
+the configured output folder:
+
+```csharp
+[Pdf("invoice", Namespace = "MyApp.ServiceModel.Pdf.Invoices")]
+public class Invoice { /* ... */ }
+```
+
+Generated source preserves the namespace override on subsequent runs.
 
 :::info
-Nothing is ever written outside `GeneratePdfs()` - code generation is an explicit task the App runs, in the same spirit as OrmLite Migrations, not something the server does behind your back.
+Nothing is written in Production: `StartupTasks` only run in `DebugMode`, which maps to ASP.NET Core's `Development` environment.
 :::
 
 ## Rendering from an API
@@ -102909,6 +102492,9 @@ Source: https://docs.servicestack.net/ormlite/installation
 
 OrmLite packages are available on NuGet and can be installed using your IDE or by adding a `PackageReference` in your `.csproj`
 
+<provider-packages>
+</provider-packages>
+
 ## PostgreSQL
 
 Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)
@@ -103016,7 +102602,10 @@ Source: https://docs.servicestack.net/ormlite/getting-started
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
 </div>
 
-After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to. 
+After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to.
+
+<first-query-path>
+</first-query-path>
 
 ## Fluent Configuration Model
 
@@ -103849,6 +103438,9 @@ OrmLite's APIs are minimal, providing basic shortcuts for the primitive SQL stat
 OrmLite makes available most of its functionality via extension methods to add enhancements over ADO.NET's `IDbConnection`, providing
 a Typed RDBMS-agnostic API that transparently handles differences in each supported RDBMS provider.
 
+<api-naming>
+</api-naming>
+
 ## Create Tables Schemas
 
 OrmLite is able to **CREATE**, **DROP** and **ALTER** RDBMS Tables from your code-first Data Models with rich annotations for
@@ -104089,6 +103681,9 @@ Feel free to continue experimenting with [this Example Live on Gistlyn](https://
 
 ## Query Examples
 
+<query-styles>
+</query-styles>
+
 If your SQL doesn't start with a **SELECT** statement, it is assumed a `WHERE` clause is being provided, e.g:
 
 ```csharp
@@ -104184,6 +103779,9 @@ var tracks = db.SelectByIds<Track>(new[]{ 1,2,3 });
 # OrmLite Async API
 Source: https://docs.servicestack.net/ormlite/async-apis
 
+<async-rule>
+</async-rule>
+
 A quick overview of Async API's can be seen in the class diagram below:
 
 ![OrmLite Async APIs](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/ormlite/OrmLiteApiAsync.png)
@@ -104243,9 +103841,11 @@ OrmLite DB Migrations advances OrmLite's light-weight code-first development app
 
 ## Introduction
 
-In contrast to [state-based migration](https://www.prisma.io/dataguide/types/relational/what-are-database-migrations#state-based-migrations) solutions which relies on tooling to generate state changes from a snapshot of a DB at a point-in-time with schema changes made out-of-band, OrmLite's DB migrations are instead designed to capture and execute the schema changes developers want to make, so when the Migrations are checked-in with the feature that needs them, the same exact changes are run by CI integration servers and other developers syncing their code-base with the new feature.
+<migration-philosophy>
+</migration-philosophy>
 
-Instead of relying on generation by an opaque tool, this code-first approach treats DB Migrations like any other maintainable & logically structured code written by developers where it maintains a connected audit history in source control together with the feature that needs the schema changes.
+<migration-mechanics>
+</migration-mechanics>
 
 ## Getting Started
 
@@ -104964,6 +104564,9 @@ One of ServiceStack's primary goals is delivering great value and performance, a
 
 This also happens to be the cheapest to place to host its static files, taking load away from more expensive .NET App Servers and move them to free Cloudflare or GitHub CDNs, which all Jamstack Live Demos take advantage of to enable their [**$0.40 /mo** TCO](https://jamstacks.net/posts/jamstacks_hosting) for hosting their .NET Docker Apps which are only needed to serve the JSON APIs used to power their Jamstack UIs.
 
+<replication-model>
+</replication-model>
+
 ## Expensive Managed Databases
 
 Having achieved the ideal architecture for max value and performance, the last expensive vital component used in most Web Apps is hosting of their expensive managed databases. Despite most RDBMS's being OSS and free of licensing costs, major cloud companies continue to charge artificially high hosting costs to provide redundant hosting of App data. The effect of which adds an artificial barrier to entry discouraging new Indie developers from building & hosting their dream Apps that could form self sustaining business models that should ideally be accessible to anyone with access to a Computer with the Internet.
@@ -105457,6 +105060,9 @@ can be sorted and filtered as needed:
 
 ![](https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/admin-db-postgres-coupons.png)
 
+<named-connections>
+</named-connections>
+
 ## Named database connections
 
 Named connections can be opened by its name from the registered `IDbConnectionFactory`:
@@ -105584,6 +105190,9 @@ With [litestream.io](https://litestream.io) taking care of real-time replication
 we just need to workaround SQLite's single concurrent writer to unlock the value, performance and 
 unique features of SQLite in our Apps which we cover in this release with integrated support for
 Database Locks and Sync Commands.
+
+<sqlite-tradeoff>
+</sqlite-tradeoff>
 
 ## Single Concurrent Writer
 
@@ -105959,7 +105568,12 @@ Source: https://docs.servicestack.net/ormlite/apis/select
 OrmLite has extensive support for Querying exposing an intuitive 1:1 Typed API that maps cleanly and has a high affinity with SQL that's not only natural to write and easy to predict what SQL it generates.
 
 OrmLite provides terse and intuitive typed APIs for database querying from simple lambda expressions to more complex LINQ-Like Typed SQL Expressions which 
-you can use to construct more complex queries. To give you a flavour here are some examples:
+you can use to construct more complex queries.
+
+<select-shapes>
+</select-shapes>
+
+To give you a flavour here are some examples:
 
 
 ## Querying with SELECT
@@ -106275,6 +105889,9 @@ when the Schema is unknown or unavailable.
 # OrmLite INSERT APIs
 Source: https://docs.servicestack.net/ormlite/apis/insert
 
+<insert-chooser>
+</insert-chooser>
+
 ## Insert Examples
 
 In most cases INSERT's in OrmLite is as straight forward as passing the POCO you want inserted:
@@ -106447,6 +106064,9 @@ public class Track
     public override string ToString() => Name;
 }
 ```
+
+<update-scope>
+</update-scope>
 
 ## Updates
 
@@ -106723,6 +106343,9 @@ var noOfTracksDeleted = db.DeleteAll<Track>();
 
 # Schema, Table &amp; Column APIs
 Source: https://docs.servicestack.net/ormlite/apis/schema
+
+<schema-lifecycle>
+</schema-lifecycle>
 
 ## Create Table APIs
 
@@ -107355,19 +106978,8 @@ db.BulkInsert(rows);
 
 ## Bulk Insert Implementations
 
-Which uses the optimal implementation available for each RDBMS:
-
-- **PostgreSQL** - Uses PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html)
-  command via Npgsql's [Binary Copy](https://www.npgsql.org/doc/copy.html) import
-- **MySql** - Uses [MySqlBulkLoader](https://dev.mysql.com/doc/connector-net/en/connector-net-programming-bulk-loader.html)
-  feature where data is written to a temporary **CSV** file that's imported directly by `MySqlBulkLoader`
-- **MySqlConnector** - Uses [MySqlConnector's MySqlBulkLoader](https://mysqlconnector.net/api/mysqlconnector/mysqlbulkloadertype/)
-  implementation which makes use of its `SourceStream` feature to avoid writing to a temporary file
-- **SQL Server** - Uses SQL Server's `SqlBulkCopy` feature which imports data written to an in-memory `DataTable`
-- **SQLite** - SQLite doesn't have a specific import feature, instead Bulk Inserts are performed using batches of [Multiple Rows Inserts](https://www.tutorialscampus.com/sql/insert-multiple-rows.htm)
-  to reduce I/O calls down to a configurable batch size
-- **Firebird** - Is also implemented using **Multiple Rows Inserts** within an [EXECUTE BLOCK](https://firebirdsql.org/refdocs/langrefupd20-execblock.html)
-  configurable up to Firebird's maximum of **256** statements
+<bulk-paths>
+</bulk-paths>
 
 ## SQL Multiple Row Inserts
 
@@ -107449,11 +107061,12 @@ is an order of magnitude slower than using `SqlBulkCopy`.
 # RDBMS Async Tasks Builder
 Source: https://docs.servicestack.net/ormlite/async-tasks-builder
 
+<sequential-vs-parallel>
+</sequential-vs-parallel>
+
 ### Sequential Async DB Access
 
-Async improves I/O thread utilization in multi-threaded apps like Web Servers. However, it doesn't improve the performance 
-of individual API Requests that need to execute multiple independent DB Requests. These are often written to run async 
-db access sequentially like this:
+Multiple independent DB Requests in one API Request are often written to run sequentially like this:
 
 ```csharp
 var rockstars = await Db.SelectAsync<Rockstar>();
@@ -107602,7 +107215,12 @@ catch (Exception e)
 # Reference Support, POCO style
 Source: https://docs.servicestack.net/ormlite/reference-support
 
-OrmLite lets you Store and Load related entities in separate tables using `[Reference]` attributes in primary tables in conjunction with `{Parent}Id` property convention in child tables, e.g:
+OrmLite lets you Store and Load related entities in separate tables using `[Reference]` attributes in primary tables in conjunction with `{Parent}Id` property convention in child tables.
+
+<blob-or-reference>
+</blob-or-reference>
+
+For example:
 
 ```csharp
 public class Customer
@@ -107881,6 +107499,9 @@ More code examples of References and Joined tables are available in:
 Source: https://docs.servicestack.net/ormlite/typed-joins
 
 Whilst OrmLite aims to provide a light-weight typed wrapper around SQL, it offers a number of convenient features that makes working with relational databases a clean and enjoyable experience.
+
+<join-resolution>
+</join-resolution>
 
 Starting with the most basic example you can simply specify the table you want to join with:
 
@@ -108167,7 +107788,10 @@ Which would return the same results as a **SELECT DISTINCT** on all columns of `
 # Dynamic Result Sets
 Source: https://docs.servicestack.net/ormlite/dynamic-result-sets
 
-In addition to populating Typed POCOs, OrmLite has a number of flexible options for accessing dynamic resultsets with adhoc schemas:
+In addition to populating Typed POCOs, OrmLite has a number of flexible options for accessing dynamic resultsets with adhoc schemas.
+
+<result-shapes>
+</result-shapes>
 
 ## Dynamic Results Examples
 
@@ -108340,6 +107964,9 @@ Dictionary<string,string> rows = db.Dictionary<string,string>(q);
 # Database Transactions
 Source: https://docs.servicestack.net/ormlite/transactions
 
+<transaction-scope>
+</transaction-scope>
+
 As a Micro ORM OrmLite has direct access to ADO.NET's `IDbConnection` classes, where starting a transaction can be done with 
 `OpenTransaction` to create a new transaction and attach it to its containing executed ADO.NET commands:
 
@@ -108451,7 +108078,10 @@ Source: https://docs.servicestack.net/ormlite/type-converters
 OrmLite has become a lot more customizable and extensible thanks to the internal redesign decoupling all
 custom logic for handling different Field Types into individual Type Converters.
 
-This use of individual decoupled Type Converters makes it possible to enhance or entirely replace how .NET Types are handled and can also be extended to support new Types it has no knowledge about, a feature taken advantage of by the [SQL Server Types](/ormlite/sql-server-features#sql-server-types) support.
+<converter-flow>
+</converter-flow>
+
+This is the feature the [SQL Server Types](/ormlite/sql-server-features#sql-server-types) support is built on.
 
 ![OrmLite Converters](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/ormlite-converters.png)
 
@@ -108863,6 +108493,9 @@ LogManager.LogFactory = new ConsoleLogFactory(debugEnabled:true);
 
 Where it will log the generated SQL and Params OrmLite executes to the Console.
 
+<see-the-sql>
+</see-the-sql>
+
 ## BeforeExecFilter and AfterExecFilter filters
 
 An alternative to debug logging which can easily get lost in the noisy stream of other debug messages is to use the `BeforeExecFilter` and `AfterExecFilter` filters where you can inspect executed commands with a custom lambda expression before and after each query is executed. So if one of your a queries are failing you can put a breakpoint in `BeforeExecFilter` to inspect the populated `IDbCommand` object before it's executed or use the `.GetDebugString()` extension method for an easy way to print the Generated SQL and DB Params to the Console:
@@ -108905,7 +108538,7 @@ Which ServiceStack uses internally to tag DB Connections with the feature execut
 Services it will tag it with the Request DTO Name.
 
 :::{.wideshot}
-![](/img/pages/release-notes/v8.9/ormlite-tags.webp)
+<screenshot src="/img/pages/release-notes/v8.9/ormlite-tags.webp" title="Tagged SQL in the Profiling UI"></screenshot>
 :::
 
 If a tag is configured, it's also included in OrmLite's Debug Logging output, e.g:
@@ -109097,7 +108730,12 @@ By default, all dialects use the existing `JsvStringSerializer`, except for Post
 # OrmLite Filters
 Source: https://docs.servicestack.net/ormlite/filters
 
-Similar to interceptors in some heavy ORMs, Insert and Update filters get fired just before any **INSERT** or **UPDATE** operation using OrmLite's typed API's (i.e. not dynamic SQL or partial updates using anon types). This functionality can be used for easily auto-maintaining Audit information for your POCO data models, e.g:
+Similar to interceptors in some heavy ORMs, Insert and Update filters get fired just before any **INSERT** or **UPDATE** operation using OrmLite's typed APIs.
+
+<filter-scope>
+</filter-scope>
+
+This is most often used to auto-maintain Audit information on your POCO data models, e.g:
 
 ```csharp
 public interface IAudit 
@@ -109144,6 +108782,9 @@ db.Insert(new AuditTable { ModifiedBy = "Me!" }); //succeeds
 
 # Custom SQL
 Source: https://docs.servicestack.net/ormlite/custom-sql
+
+<escape-hatches>
+</escape-hatches>
 
 OrmLite's Expression support satisfies the most common RDBMS queries with a strong-typed API.
 For more complex queries you can easily fall back to raw SQL where the Custom SQL APIs
@@ -109583,6 +109224,9 @@ db.Delete<Rockstar>(new Dictionary<string, object> {
 # SQL Server Features
 Source: https://docs.servicestack.net/ormlite/sql-server-features
 
+<sql-server-extras>
+</sql-server-extras>
+
 ## SQL Server 2012 Sequences
 
 The `[Sequence]` attribute can be used as an alternative to `[AutoIncrement]` for inserting rows with an auto incrementing integer value populated by SQL Server, but instead of needing an `IDENTITY` column it can populate a normal `INT` column from a user-defined Sequence, e.g:
@@ -109751,6 +109395,9 @@ Output:
 
 # PostgreSQL Features
 Source: https://docs.servicestack.net/ormlite/postgres-features
+
+<postgres-extras>
+</postgres-extras>
 
 ## PostgreSQL Rich Data Types
 
@@ -109954,6 +109601,9 @@ PgSql.Array(new[]{"A","B","C"}, nullIfEmpty:true) //= ARRAY['A','B','C']
 
 # Optimistic Concurrency
 Source: https://docs.servicestack.net/ormlite/optimistic-concurrency
+
+<lost-update>
+</lost-update>
 
 Optimistic concurrency can be added to any table by adding the `ulong RowVersion { get; set; }` property, e.g:
 
@@ -110816,6 +110466,9 @@ Source code for example can be found on our [AwsGettingStarted](https://github.c
 
 # Limitations
 Source: https://docs.servicestack.net/ormlite/limitations
+
+<known-limits>
+</known-limits>
 
 ## Single Primary Key
 
@@ -112655,11 +112308,17 @@ Source: https://docs.servicestack.net/redis/getting-started
 
 Redis, standing for REmote DIctionary Server, is an open-source, in-memory data structure store. It's widely used as a database, cache, and message broker. With its unique set of features and unparalleled speed, it's a crucial tool for a modern developer's toolkit.
 
+<redis-quickstart>
+</redis-quickstart>
+
 ## Key Features of Redis
 
 Redis supports various kinds of data structures like [strings](https://redis.io/docs/data-types/strings), [hashes](https://redis.io/docs/data-types/hashes), [lists](https://redis.io/docs/data-types/lists), [sets](https://redis.io/docs/data-types/sets), [sorted sets with range queries](https://redis.io/docs/data-types/sorted-sets), [bitmaps](https://redis.io/docs/data-types/bitmaps), [hyperloglogs](https://redis.io/docs/data-types/hyperloglogs), and geospatial indexes with [radius queries](https://redis.io/docs/data-types/geospatial). This wide array of data types and its ability to perform [atomic operations](https://redis.io/docs/manual/transactions/) make Redis extremely versatile for solving a myriad of problems.
 
 ![](../img/pages/redis/getting-started/key-features.png)
+
+<redis-pillars>
+</redis-pillars>
 
 ## High Performance and Speed
 
@@ -113103,6 +112762,9 @@ settings in a single connection string (akin to DB Connection strings).
 Redis Connection Strings supports multiple URI-like formats, from a simple **hostname** or **IP Address and port** pair to a
 fully-qualified **URI** with multiple options specified on the QueryString.
 
+<connection-anatomy>
+</connection-anatomy>
+
 Some examples of supported formats:
 
 ```
@@ -113189,6 +112851,9 @@ we've added a new
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class.
+
+<manager-picker>
+</manager-picker>
 
 ### RedisManagerPool
 
@@ -113515,6 +113180,9 @@ More examples are available in the [RedisExamples Redis examples page] and in th
 [test suite](https://github.com/ServiceStack/ServiceStack.Redis/tree/master/tests/ServiceStack.Redis.Tests)
 
 
+<data-structure-tour>
+</data-structure-tour>
+
 ## Speed
 One of the best things about Redis is the speed - it is quick.
 
@@ -113568,6 +113236,9 @@ Took 132.0076ms to get the entire Northwind database (3202 records)
 
 Note: The total time taken includes an extra Redis operation for each record to store the id in a Redis set for each
 type as well as serializing and de-serializing each record using Service Stack's TypeSerializer.
+
+<advanced-apis>
+</advanced-apis>
 
 ## Lex Operations
 
@@ -113718,6 +113389,9 @@ public class MyDep(IRedisClientsManagerAsync manager)
 }
 ```
 
+<async-pairs>
+</async-pairs>
+
 ## Usage in ServiceStack
 
 Inside ServiceStack Services & Controllers we recommend using `GetRedisAsync()` to resolve an `IRedisClientAsync`:
@@ -113769,6 +113443,9 @@ public interface IRedisNativeClient
     RedisData RawCommand(params byte[][] cmdWithBinaryArgs);
 }
 ```
+
+<custom-command-apis>
+</custom-command-apis>
 
 ## Examples
 
@@ -113841,6 +113518,9 @@ published to specific [Redis Pub/Sub](http://redis.io/commands#pubsub) channels.
 `RedisPubSubServer` processes messages in a managed background thread that **automatically reconnects**
 when the redis-server connection fails and works like an independent background Service that can be
 stopped and started on command.
+
+<pub-sub-server-lifecycle>
+</pub-sub-server-lifecycle>
 
 ## API
 
@@ -113918,6 +113598,12 @@ redis instances providing clients a centeral repositorty to discover available i
 Support for Redis Sentinel is available with the `RedisSentinel` class which listens to the available
 Sentinels to source its list of available master, slave and other sentinel redis instances which it uses
 to configure and maintain the Redis Client Managers, initiating any failovers as they're reported.
+
+<sentinel-topology>
+</sentinel-topology>
+
+<failover-sequence>
+</failover-sequence>
 
 ## Usage
 
@@ -114227,6 +113913,9 @@ public interface IRedisClient
 }
 ```
 
+<lua-strategies>
+</lua-strategies>
+
 ## Efficient SCAN in LUA
 
 The C# API below returns the first 10 results matching the `key:*` pattern:
@@ -114285,6 +113974,9 @@ string json = redis.ExecLuaAsString(FastScanScript, "key:*", "10");
 ::: info
 This is also the approach used in Redis React's [RedisServices](https://github.com/ServiceStackApps/RedisReact/blob/a1b66603d52d2f18b96227fc455ecb5323e424c8/src/RedisReact/RedisReact.ServiceInterface/RedisServices.cs#L60).
 :::
+
+<cached-lua-flow>
+</cached-lua-flow>
 
 ## ExecCachedLua
 
@@ -114398,6 +114090,9 @@ When you have a high-performance, scalable network data structure server like Re
 With Redis this becomes a trivial task as you get simplified access to rich atomic server operations that complete within a fraction of a millisecond. So the same normally CPU-intensive load generated by distributed locking when using a remote filesystem or RDBMS is barely noticeable on a Redis server.
 
 [ServiceStack's C# Redis Client](https://github.com/ServiceStack/ServiceStack.Redis) takes advantage of the convenience and safety offered by .NET's IDisposable interface and Redis's [SETNX operation](https://redis.io/commands/setnx) to provide a simple API to implement your own **custom distributed locks**, ensuring at all times that only 1 client at a time can execute the protected logic. While one of the Redis clients obtains the lock, the other clients enter into an 'exponential retry back-off multiplier state' continually retrying to obtain the lock at random intervals until they are finally successful.
+
+<lock-lifecycle>
+</lock-lifecycle>
 
 ## Simple API Usage 
 
@@ -114529,6 +114224,9 @@ Source: https://docs.servicestack.net/redis/troubleshooting
 
 ## Debugging Data Corruption Issues
 
+<shared-client-pitfall>
+</shared-client-pitfall>
+
 An issue that can be hard to debug is if the same `RedisClient` instance is shared across multiple threads which can result in returning corrupted data.
 Typically, this is a result of using `IRedisClient` field in a singleton instance or sharing it as a static instance. To prevent this, each Thread that
 uses Redis should retrieve the redis client within a using statement, e.g:
@@ -114553,11 +114251,8 @@ If it does detect the client is being accessed from a different thread it will t
 
 What to look out for in your code-base to prevent against multiple concurrent usage of a `IRedisClient` instance:
 
-- Use `IRedisClient` redis instance client within a `using` statement
-- Never use a client instance after it has been disposed
-- Never use (or return) a "server collection or resource" (e.g. [Redis.Lists](#simple-example-using-redis-lists), lock) after the client has been disposed
-- Never keep a Singleton or `static` instance to a redis client (just the `IRedisClientsManager` factory)
-- Never use the same redis client in multiple threads, i.e. have each thread resolve their own client from the factory
+<diagnosis-checklist>
+</diagnosis-checklist>
 
 
 # Redis Client
@@ -114571,6 +114266,9 @@ This is a friendly, more descriptive API implemented by the [ServiceStack.Redis 
 that provides access to key values as strings (or collection of strings for Redis lists and sets).
 
 Use this API if you just need to access values as strings or you want to have control over your own text serialization format.
+
+<client-api-map>
+</client-api-map>
 
 ## API
 
@@ -114877,6 +114575,9 @@ using (var redisClient = new RedisClient())
 The redis variable now holds a strongly-typed generic client that allows Redis value operations to apply against `MyPocoType`.
 The interface below lists all available operations:
 
+<typed-client-map>
+</typed-client-map>
+
 ## API
 
 ```csharp
@@ -115074,6 +114775,9 @@ From there you 'Queue' up all operations you want to be a part of the transactio
 
 If you don't call the `Commit()` before the end of the using block, `Dispose()` method will automatically invokes `Rollback()` that will send the 'DISCARD' command disposing of the current transaction and resetting the Redis client connection back to its previous state.
 
+<transaction-flow>
+</transaction-flow>
+
 ## Redis Transaction Examples
 
 Below is a simple example showing how to queue up Redis operations with and without a callback.
@@ -115197,6 +114901,9 @@ The [Redis Transactions](./transactions.md) interface implemented by [ServiceSta
 Redis transaction interface provides useful overloads that let you Queue-up any [IRedisTypedClient](./typed-client.md) operation within a single transaction.
 The API provides support for a callback so you also have access to any return values returned as part of the transaction as well.
 
+<typed-transaction-map>
+</typed-transaction-map>
+
 ## Usage
 
 Below is a simple example showing how to access, use and commit the transaction.
@@ -115267,53 +114974,8 @@ Source: https://docs.servicestack.net/redis/stats
 The [RedisStats](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/src/ServiceStack.Redis/RedisStats.cs)
 class provides better visibility and introspection into your running instances:
 
-<table>
-    <tr>
-        <td><b>TotalCommandsSent</b></td> <td>Total number of commands sent</td>
-    </tr>
-    <tr>
-        <td><b>TotalFailovers</b></td> <td>Number of times the Redis Client Managers have FailoverTo() either by sentinel or manually</td>
-    </tr>
-    <tr>
-        <td><b>TotalDeactivatedClients</b></td> <td>Number of times a Client was deactivated from the pool, either by FailoverTo() or exceptions on client</td>
-    </tr>
-    <tr>
-        <td><b>TotalFailedSentinelWorkers</b></td> <td>Number of times connecting to a Sentinel has failed</td>
-    </tr>
-    <tr>
-        <td><b>TotalForcedMasterFailovers</b></td> <td>Number of times we've forced Sentinel to failover to another master due to consecutive errors</td>
-    </tr>
-    <tr>
-        <td><b>TotalInvalidMasters</b></td> <td>Number of times a connecting to a reported Master wasn't actually a Master</td>
-    </tr>
-    <tr>
-        <td><b>TotalNoMastersFound</b></td> <td>Number of times no Masters could be found in any of the configured hosts</td>
-    </tr>
-    <tr>
-        <td><b>TotalClientsCreated</b></td> <td>Number of Redis Client instances created with RedisConfig.ClientFactory</td>
-    </tr>
-    <tr>
-        <td><b>TotalClientsCreatedOutsidePool</b></td> <td>Number of times a Redis Client was created outside of pool, either due to overflow or reserved slot was overridden</td>
-    </tr>
-    <tr>
-        <td><b>TotalSubjectiveServersDown</b></td> <td>Number of times Redis Sentinel reported a Subjective Down (sdown)</td>
-    </tr>
-    <tr>
-        <td><b>TotalObjectiveServersDown</b></td> <td>Number of times Redis Sentinel reported an Objective Down (odown)</td>
-    </tr>
-    <tr>
-        <td><b>TotalRetryCount</b></td> <td>Number of times a Redis Request was retried due to Socket or Retryable exception</td>
-    </tr>
-    <tr>
-        <td><b>TotalRetrySuccess</b></td> <td>Number of times a Request succeeded after it was retried</td>
-    </tr>
-    <tr>
-        <td><b>TotalRetryTimedout</b></td> <td>Number of times a Retry Request failed after exceeding RetryTimeout</td>
-    </tr>
-    <tr>
-        <td><b>TotalPendingDeactivatedClients</b></td> <td>Total number of deactivated clients that are pending being disposed</td>
-    </tr>
-</table>
+<stats-groups>
+</stats-groups>
 
 ## Redis Stats in Admin UI Dashboard
 
@@ -115339,9 +115001,8 @@ Source: https://docs.servicestack.net/redis/profiling
 
 The easiest way to view your App's executed Redis commands is by enabling the [Admin Profiling UI](/admin-ui-features#request-logging-profiling) where it's built-in [Redis Profiling](/admin-ui-profiling#redis-profiling) will show generated queries in context with your other App events:
 
-<a href="/admin-ui-profiling#redis-profiling" class="block flex justify-center items-center">
-    <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling-redis-CommandAfter.png">
-</a>
+<screenshot src="/img/pages/admin-ui/profiling-redis-CommandAfter.png" title="Redis commands in the Admin Profiling UI">
+</screenshot>
 
 ## Logging Executed Redis Commands
 
@@ -115366,6 +115027,9 @@ Source: https://docs.servicestack.net/redis/automatic-retries
 
 One feature that improves the resilience of `RedisClient` connections is Auto Retry where the RedisClient will transparently retry failed Redis operations due to Socket and I/O Exceptions in an exponential backoff starting from
 **10ms** up until the `RetryTimeout` of **10000ms**. These defaults can be tweaked with:
+
+<retry-timeline>
+</retry-timeline>
 
 ## Usage
 
@@ -115402,6 +115066,9 @@ I will be re-factoring this solution in what I consider a 'best practices approa
 [BlogPostBestPractice.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BestPractice/BlogPostBestPractice.cs)
 
 ## Modeling Entities in a NoSQL Database
+
+<nosql-modeling>
+</nosql-modeling>
 
 If you've spent a lot of time building solutions with an RDBMS back-end it can be hard to know which part of your schema is due to the problem domain and which part is the result of an implementation constraint trying to map your ideal domain model onto a relational tabular structure.
 
@@ -115474,6 +115141,9 @@ Ayende has outlined a few scenarios that the Blog application should support.
 * Categories page: show all posts for category
 
 The full source code for the Redis solution for each of these scenarios is [available here](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BlogPostExample.cs). Although I will go through each solution in a little more detail below.
+
+<index-patterns>
+</index-patterns>
 
 ### Main page: show list of blogs
 Before we can show a list of blogs, we need to add some first.
@@ -115969,6 +115639,9 @@ To illustrate what can be achieved in practice, I will run through two different
 * Using a custom translation - using application level logic to customize the translation between the old and new types.
 
 The full runnable source code for this example are [available here](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BestPractice/BlogPostMigrations.cs).
+
+<migration-strategies>
+</migration-strategies>
 
 ## Example Code
 To demonstrate a typical migration scenario, I'm using the `BlogPost` type defined on the previous page to project it to a fundamentally different `New.BlogPost` type. The full definition of the old and new types are shown below:
