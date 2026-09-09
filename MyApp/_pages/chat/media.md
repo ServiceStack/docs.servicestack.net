@@ -6,6 +6,9 @@ Text is only one AI modality. AI Chat supports voice-to-text input, image genera
 
 <screenshot src="/img/pages/chat/voice-and-media.webp" title="AI Chat voice and media controls"></screenshot>
 
+<media-pipeline>
+</media-pipeline>
+
 ## Voice input
 
 The `voice` extension adds speech-to-text at `POST /chat/transcribe`, accepting multipart audio.
@@ -14,11 +17,8 @@ It picks the first available option from the `LLMS_VOICE` environment variable, 
 
 <text-block text="voxtype,transcribe,voxtral-mini-latest"></text-block>
 
-| Option | Requires |
-| --- | --- |
-| `voxtype` | The `voxtype` CLI on `PATH`, plus `ffmpeg` |
-| `transcribe` | The `transcribe` CLI on `PATH`, plus `ffmpeg` |
-| `voxtral-*` | The `mistral` provider enabled with `MISTRAL_API_KEY` |
+<voice-options>
+</voice-options>
 
 ```bash
 # prefer Mistral's hosted transcription over local CLIs
@@ -139,6 +139,9 @@ The look of all of this is controlled by the active theme - see [Themes](/chat/t
 ## Controlling what's available
 
 The same modular provider system lets an organization enable only approved vendors and models. A creative team can expose image and speech models, whilst a regulated workflow restricts users to text models hosted inside its approved boundary:
+
+<media-controls>
+</media-controls>
 
 ```csharp
 services.AddPlugin(new ChatFeature {

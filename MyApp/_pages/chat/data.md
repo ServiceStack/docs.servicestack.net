@@ -4,6 +4,9 @@ title: Data & Storage
 
 AI Chat stores everything inside your application: structured data in your App's database via OrmLite, and files under `App_Data`. There is no external service holding your conversation history.
 
+<storage-overview>
+</storage-overview>
+
 ## Database tables
 
 Tables are created on startup when `AutoInitSchema` is true (the default), using the host's `IDbConnectionFactory` - or a named connection if you'd rather keep chat data separate:
@@ -46,7 +49,7 @@ The generated and uploaded media catalog - name, type, prompt, model, cost, seed
 
 ### Gemini tables
 
-The `gemini` extension owns its own document catalog tables, created the same way. See [Gemini File Search](/chat/gemini).
+The `gemini` extension owns its own document catalog tables, created the same way. See [Gemini RAG, Search & Analytics](/chat/gemini-rag).
 
 ### Querying
 
@@ -93,7 +96,8 @@ Path resolution is guarded: any relative path that would escape `App_Data/chat` 
 
 ### The content-addressed cache
 
-Attachments, generated images and audio, and Gemini document uploads are all hashed with SHA-256 and stored once under `cache/{first 2 chars}/{sha256}.{ext}`. The same file uploaded twice costs one copy.
+<content-addressed>
+</content-addressed>
 
 Cache writes fire the `cache_saved` filters, which is how the gallery records media and how an App can hook uploads:
 
@@ -136,14 +140,12 @@ A database backup on its own is not sufficient: media rows reference cache files
 
 **Deployment notes:**
 
-- `App_Data` must be on durable storage. On an ephemeral filesystem, mount a volume or set `AppDataPath` to one.
-- In a multi-instance deployment, `App_Data/chat` and `App_Data/pdf` need to be a **shared** volume - user workspaces, the cache and published templates are all filesystem state.
-- Pin the Typst version and deploy the same fonts used during template validation.
-- Consider a disk quota on `App_Data/chat/user` so a runaway Agent can't fill the disk.
+<deployment-checklist>
+</deployment-checklist>
 
 ## Retention
 
-AI Chat doesn't expire data on your behalf. Threads, requests and media persist until deleted, which suits audit requirements but means retention policy is yours to implement:
+AI Chat doesn't expire data on your behalf, so retention policy is yours to implement:
 
 ```csharp
 // example: delete threads untouched for a year

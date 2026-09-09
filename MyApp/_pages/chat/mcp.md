@@ -55,7 +55,8 @@ Protocol revision `2025-06-18` is offered, negotiating down to earlier supported
 
 ## Authentication
 
-MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `ChatFeature.OnRequestAsync` resolves it onto the request, so tools execute against your APIs with **that user's** access rather than as the App itself.
+<mcp-identity>
+</mcp-identity>
 
 ```json
 {
@@ -104,18 +105,16 @@ See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration example
 
 ## What the server publishes
 
-For each exposed tool the server publishes:
+<mcp-exposure>
+</mcp-exposure>
 
-- Its input JSON Schema (the same OpenAI function schema the Chat UI uses)
-- Its output schema, where one was registered
-- Structured results
-- Safety annotations derived from `ToolSafety`
-
-Images and audio are inlined as base64 when small enough - an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above `MaxInlineResourceBytes` is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.
+An external Agent has no session with your App, so a link to its cache may be unfetchable - which is why small
+images and audio are inlined rather than linked.
 
 ## Approval across the MCP boundary
 
-The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses a configurable `ApprovalMode`.
+<approval-modes>
+</approval-modes>
 
 ### Default: Two-Phase Confirmation Token
 
@@ -138,8 +137,8 @@ Read-only operations (`IGet`, `QueryBase`, etc.) execute immediately without req
 
 #### Production deployment
 
-- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated - tokens won't survive restarts and are rejected across load-balanced instances.
-- **Distributed cache**: Register a shared `ICacheClient` (Redis, `OrmLiteCacheClient`, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.
+<mcp-production>
+</mcp-production>
 
 ### Fail-closed: Reject
 

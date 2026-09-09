@@ -54,20 +54,8 @@ services.AddPlugin(new PdfFeature());
 
 ## Publish is a controlled promotion boundary
 
-Design work stays private until an administrator chooses **Publish**, which does substantially more than copy files:
-
-- Follows JSON data, Typst includes, images, assets and versioned libraries
-- Flattens folder-based authoring into a self-contained runtime artifact set
-- Rewrites local references for the flattened result
-- Validates example data and named fixtures against `.ui.json`
-- Exercises C# model generation
-- Checks statically visible data paths
-- Compiles **every fixture** through the actual flattened Typst template
-- Generates the gallery preview
-- Records publisher and source metadata
-- Prevents silent takeover of a name published by another user
-- **Rolls back** the publish if validation or compilation fails
-- Saves every successful publish as an **immutable revision**
+<publish-gate>
+</publish-gate>
 
 <screenshot src="/img/pages/chat/pdf/publish-dialog.webp" title="PDF Studio publishing workflow"></screenshot>
 
@@ -353,23 +341,16 @@ Queue an **identifier, not rendered PDF bytes** - the worker loads current data 
 
 ## Deterministic by construction
 
-At runtime:
-
-1. The `[Pdf]` model selects the template.
-2. The model serializes to its JSON contract.
-3. `IPdfRenderer` invokes the published Typst template.
-4. **No LLM is called.**
-5. **No personal Studio workspace is read.**
-6. Only the live files in `App_Data/pdf` are used.
+<deterministic-runtime>
+</deterministic-runtime>
 
 ## Production controls
 
-PDF rendering starts external Typst processes, so `PdfFeature` includes practical operational limits: render and preview timeouts, maximum concurrent renders, maximum data payload size, a restricted Typst root directory, flat validated template names, Admin role requirements on every Admin PDF API, per-user path-checked Studio workspaces and publish-time validation on by default.
+<production-controls>
+</production-controls>
 
 :::info
-Pin the Typst version and deploy the same fonts used during validation. Put application fonts in `App_Data/pdf/fonts` and back up live artifacts, `.published.json` and `.versions` together.
-
-Typst's root restriction limits document file access but is **not** an operating-system sandbox. Organizations compiling untrusted templates should isolate compilation in an appropriate container or worker.
+Put application fonts in `App_Data/pdf/fonts` and back up live artifacts, `.published.json` and `.versions` together.
 :::
 
 ## Scope

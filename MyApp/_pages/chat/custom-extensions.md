@@ -4,6 +4,9 @@ title: Custom Extensions
 
 Adding your own capability to AI Chat means writing a `ChatExtension`. It's the same API the built-in extensions use - routes, tools, filters, providers, UI and background workers all register through the `ExtensionContext` passed to `Install`.
 
+<extension-api>
+</extension-api>
+
 ```csharp
 services.AddPlugin(new ChatFeature {
     Extensions = {

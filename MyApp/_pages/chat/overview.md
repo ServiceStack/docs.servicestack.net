@@ -8,28 +8,17 @@ title: AI Chat Overview
 
 ## What you get
 
-| Capability | Where it lives |
-| --- | --- |
-| Multi-provider Chat UI | `/chat` |
-| OpenAI-compatible Chat Completions API | `POST /v1/chat/completions` |
-| In-process client for your own C# code | `IChatClient` |
-| Discovery + invocation of your App's own APIs | [API Tools](/chat/api-tools) |
-| MCP Server for external AI Assistants | `/chat/mcp` |
-| Managed RAG over your documents | [Gemini File Search](/chat/gemini) |
-| PDF template designer | `/chat/rendering-pdfs` |
-| Production PDF rendering | `IPdfRenderer` + `PdfFeature` |
-| Cost, token and activity reporting | `/admin-ui/chat` |
+<chat-anatomy>
+</chat-anatomy>
 
 ## Two plugins
 
 AI Chat ships as two independent plugins in the **ServiceStack.AI.Chat** package:
 
-| Plugin | Provides | Requires |
-| --- | --- | --- |
-| `ChatFeature` | Chat UI, providers, tools, API Tools, MCP, RAG, PDF Studio | An AI provider API key |
-| `PdfFeature` | Published PDF template management + rendering | The `typst` CLI |
+<two-plugins>
+</two-plugins>
 
-`PdfFeature` has no dependency on `ChatFeature` - an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/rendering-pdfs).
+See [Rendering PDFs](/chat/rendering-pdfs) to deploy production rendering on its own.
 
 ## Architecture
 
@@ -53,26 +42,15 @@ A disabled extension registers no routes, no tools and no UI components. See [Ex
 
 ## Where state lives
 
-| State | Location |
-| --- | --- |
-| Threads, requests, media | Your App's database via OrmLite (`ChatThread`, `ChatRequest`, `ChatMedia`) |
-| Config | `App_Data/chat/llms.json`, `App_Data/chat/providers.json` |
-| Per-user files | `App_Data/chat/user/{user}/` |
-| Content-addressed cache | `App_Data/chat/cache/` |
-| Published PDF templates | `App_Data/pdf/` |
+<state-map>
+</state-map>
 
 Nothing is stored outside your application. See [Data & Storage](/chat/data).
 
 ## Security posture
 
-| Question | Answer |
-| --- | --- |
-| Who can reach `/chat`? | Whoever `RequireAuth` and `RequiredRole` allow, enforced by your existing auth |
-| Can one user see another's threads, media or projects? | No - state is scoped to the authenticated identity |
-| What can an Agent call? | Only APIs the **signed-in user** is authorized to call |
-| Can it write files or run code? | Only if you enable those tools, and only within configured directories |
-| What is exposed over MCP? | Nothing until you name tool groups |
-| Does it require an outbound AI provider? | Only the providers you configure |
+<security-posture>
+</security-posture>
 
 See [Integrated Auth](/chat/auth).
 

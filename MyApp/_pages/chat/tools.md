@@ -20,6 +20,9 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
+<tool-posture>
+</tool-posture>
+
 | Property | Default | Description |
 | --- | --- | --- |
 | `EnableApiTools` | `true` | Let Models discover and call the App's own ServiceStack APIs |
@@ -114,12 +117,8 @@ public class BookingToolsExtension() : ChatExtension("booking_tools")
 
 `ToolSafety` classifies how much damage a call can do, which determines whether an Agent may make it unattended:
 
-| Value | Meaning |
-| --- | --- |
-| `Auto` *(default)* | Inferred from the API's HTTP verb - GET/HEAD is read-only, DELETE is destructive, everything else is a write |
-| `ReadOnly` | Only reads data. Safe to call unattended and safe to retry |
-| `Write` | Creates or updates data. Recoverable, but retrying may duplicate the change |
-| `Destructive` | Deletes data or triggers a real-world side effect. Should require approval |
+<safety-ladder>
+</safety-ladder>
 
 ```csharp
 [Tool("the user has finished choosing an order and wants to place it",

@@ -14,14 +14,13 @@ This page covers **authoring**. For publishing, production rendering and typed C
 Turn Any PDF into a Dynamic API with AI, Typst & ServiceStack
 :::
 
-<text-block text="AI Chat PDF Studio → Publish → Admin PDF → Generate C# → Render in your App"></text-block>
+<pdf-lifecycle>
+</pdf-lifecycle>
 
 PDF Studio is only the authoring half. Everything after Publish is a controlled software artifact, and **production rendering never calls an LLM**.
 
-| Capability | Plugin | Runtime dependencies |
-| --- | --- | --- |
-| AI-assisted authoring and live preview | `ChatFeature` PDF extension | Typst and an AI provider |
-| Published template management and rendering | `PdfFeature` | Typst |
+<pdf-plugins>
+</pdf-plugins>
 
 ## Requirements
 

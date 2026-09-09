@@ -4,6 +4,9 @@ title: Install AI Chat
 
 AI Chat is delivered by the **ServiceStack.AI.Chat** NuGet package and requires a **.NET 8+** ServiceStack App.
 
+<install-journey>
+</install-journey>
+
 ## Add the plugin
 
 The fastest way to add AI Chat is with the `add-in` npx script, which adds the package, registers both plugins and writes a starting configuration:
@@ -56,14 +59,11 @@ services.AddPlugin(new ChatFeature());
 
 ## Requirements
 
-| Requirement | Needed for | Notes |
-| --- | --- | --- |
-| .NET 8+ | Everything | `net8.0` and `net10.0` builds |
-| `IDbConnectionFactory` | Threads, analytics, media, Gemini | Registered by every ServiceStack App template |
-| At least one provider API key | Talking to a model | See [Providers & Models](/chat/providers) |
-| `AuthFeature` or Identity Auth | `RequireAuth = true` | See [Integrated Auth](/chat/auth) |
-| `typst` CLI | PDF Studio + PDF rendering | Optional - self-disables when missing |
-| `ffmpeg` or Mistral | Voice transcription | Optional - self-disables when missing |
+<requirements>
+</requirements>
+
+See [Providers & Models](/chat/providers) for enabling a provider and [Integrated Auth](/chat/auth) for
+choosing an `AuthType`.
 
 :::info
 AI Chat resolves its OrmLite connection from the host's `IDbConnectionFactory` and creates its tables when `AutoInitSchema` is true (the default). Without a registered `IDbConnectionFactory`, threads aren't persisted and the `gemini` extension disables itself.

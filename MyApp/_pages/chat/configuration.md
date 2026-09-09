@@ -4,6 +4,9 @@ title: ChatFeature Configuration
 
 Every AI Chat capability is configured from a single `ChatFeature` plugin registration. Extension-specific options are reached through the extension properties it exposes (`Tools`, `ApiTools`, `Mcp`, `Publish`, `Pdf`, …), so a complete configuration reads as one object graph.
 
+<config-explorer>
+</config-explorer>
+
 ```csharp
 services.AddPlugin(new ChatFeature {
     RequireAuth = true,
@@ -43,6 +46,7 @@ services.AddPlugin(new ChatFeature {
 | `AutoInitSchema` | `true` | Create the OrmLite tables on startup |
 | `NamedConnection` | `null` | Use a named OrmLite connection for chat data instead of the default |
 | `DisableAdminUi` | `false` | Removes the `/admin-ui/chat` Admin UI and its APIs |
+| `IncludeInGeneratedDtos` | `false` | Include `ServiceStack.AI` APIs and supporting types in generated client DTOs |
 | `SvgIcon` | AI Chat icon | Icon used for the Admin UI link |
 
 ### Mounting at the site root
@@ -207,13 +211,8 @@ Setup = ctx => {
 
 ## Tool sandboxing
 
-| Property | Default | Description |
-| --- | --- | --- |
-| `Tools.EnableApiTools` | `true` | Let Models discover and call the App's own ServiceStack APIs |
-| `Tools.EnableFilesystemTools` | `false` | Read/write/edit/search files within allowed directories |
-| `Tools.EnableCodeExecution` | `false` | `run_bash` and the `run_*` code execution tools |
-| `Tools.AllowedDirectories` | `[]` | Directories filesystem/code tools may access |
-| `Tools.ToolTimeout` | `60s` | Per tool-call timeout |
+<safe-defaults>
+</safe-defaults>
 
 ```csharp
 Tools = {
@@ -227,6 +226,21 @@ Higher-risk capabilities are opt-in. Filesystem and code execution tools stay un
 ## AI Chat and the OpenAI API
 
 `ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
+
+### Generated client DTOs
+
+AI Chat clients typically use its OpenAI-compatible API directly, so `ChatFeature` excludes its
+`ServiceStack.AI` APIs and supporting types from generated [ServiceStack client DTOs](/add-servicestack-reference)
+by default. The APIs remain registered and callable; this only keeps AI Chat's large contract from being
+added to Apps which don't consume it through a generated ServiceStack client.
+
+Opt in when your App needs strongly typed AI Chat DTOs:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    IncludeInGeneratedDtos = true,
+});
+```
 
 ## Full configuration reference
 
@@ -242,6 +256,7 @@ services.AddPlugin(new ChatFeature {
     AutoInitSchema = true,
     NamedConnection = null,
     DisableAdminUi = false,
+    IncludeInGeneratedDtos = false,
 
     // ── Extensions ──
     DisableExtensions = [],

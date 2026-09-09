@@ -6,7 +6,8 @@ title: Projects
 
 <screenshot src="/img/pages/chat/projects.webp" title="AI Chat project workspace selector"></screenshot>
 
-This is what allows capable coding and document Agents without granting them ambient access to the whole server.
+<project-boundary>
+</project-boundary>
 
 ## How the boundary works
 

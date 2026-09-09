@@ -11,10 +11,8 @@ Enterprise AI needs observability. AI Chat records every completion - provider, 
 
 ## Two places to look
 
-| Surface | Audience | Location |
-| --- | --- | --- |
-| Analytics extension | Admins, inside the Chat UI | `/chat` → Analytics |
-| Chat Admin UI | Admins, inside ServiceStack's Admin UI | `/admin-ui/chat` |
+<analytics-flow>
+</analytics-flow>
 
 Both read the same `ChatRequest` rows, so the numbers agree.
 
@@ -75,12 +73,8 @@ services.AddPlugin(new ChatFeature {
 
 It's backed by typed ServiceStack APIs you can also call directly:
 
-| API | Purpose |
-| --- | --- |
-| `AdminQueryChatRequests` | AutoQuery over `ChatRequest` - filter, sort, page by any field |
-| `AdminMonthlyChatAnalytics` | Monthly rollup |
-| `AdminDailyChatAnalytics` | Daily rollup |
-| `AdminGetChatThread` | A thread's messages and per-request stats for operational review |
+<admin-apis>
+</admin-apis>
 
 Because `AdminQueryChatRequests` is an AutoQuery API, the whole of [AutoQuery](/autoquery/rdbms)'s conventions apply:
 

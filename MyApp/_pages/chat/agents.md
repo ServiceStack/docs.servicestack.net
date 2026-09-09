@@ -11,22 +11,13 @@ One system prompt cannot be ideal for every task. **Agent Profiles** package a m
 
 ## Built-in profiles
 
-| Profile | Purpose |
-| --- | --- |
-| `chat` | General-purpose assistant |
-| `planner` | Decomposes a goal and writes `PLAN.md` |
-| `coder` | Implements an approved plan with the tools allowed in the selected Project |
-
-Bundled profiles are read-only until a user saves their own copy of the same name, at which point the user's version takes precedence.
+<profile-anatomy>
+</profile-anatomy>
 
 ## Where profiles live
 
-Profiles are resolved from three roots, lowest precedence first:
-
-<text-block :rows="[
-  ['(bundled)','chat/profiles/** shipped with the package'],
-  ['App_Data/chat/user/default/profiles/','Shared profiles for every user'],
-  ['App_Data/chat/user/{user}/profiles/','The signed-in user’s own profiles']]"></text-block>
+<profile-precedence>
+</profile-precedence>
 
 A profile is a folder:
 

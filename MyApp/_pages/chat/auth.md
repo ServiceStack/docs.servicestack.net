@@ -4,6 +4,9 @@ title: Integrated Auth
 
 AI Chat is installed **inside** your ServiceStack App, so it doesn't need a separate user directory, a second login experience or a new identity silo. Existing users sign in with the account they already have, and every user-facing capability is scoped to that identity.
 
+<identity-scope>
+</identity-scope>
+
 <screenshot src="/img/pages/chat/auth/signin.webp" title="Signing in to AI Chat with the host App's users"></screenshot>
 
 ## Choosing an AuthType
@@ -15,11 +18,8 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-| `ChatAuthType` | Sign-in experience | Requires |
-| --- | --- | --- |
-| `Credentials` *(default)* | Username/password form rendered **inside** the Chat UI | `AuthFeature` with `CredentialsAuth()`, or Identity Auth |
-| `OAuth` | Redirects to the host's Identity login page at `SignInUrl` | ASP.NET Identity Auth |
-| `ApiKey` | `GET /auth` with an `Authorization: Bearer` header | [`ApiKeysFeature`](/auth/apikeys) |
+<auth-types>
+</auth-types>
 
 ### Credentials
 

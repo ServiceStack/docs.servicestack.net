@@ -17,18 +17,8 @@ AI Chat ships eight themes users can switch between, and the theming system is o
 
 ## Bundled themes
 
-| Theme | `colorScheme` | Background image |
-| --- | --- | --- |
-| `light` | light | - |
-| `light_sky` | light | ✓ |
-| `light_slate` | light | ✓ |
-| `soft_pink` | light | ✓ |
-| `dark` | dark | - |
-| `nord` | dark | ✓ |
-| `matrix` | dark | ✓ |
-| `blue_smoke` | dark | ✓ |
-
-The theme picker splits them into **Light Themes** and **Dark Themes** columns based on each theme's `colorScheme`, with `light` and `dark` pinned first in their respective columns and the rest sorted by display name. Each entry renders a miniature chrome preview from the theme's own `preview` values.
+<theme-gallery>
+</theme-gallery>
 
 ## Anatomy of a theme
 
@@ -108,13 +98,8 @@ A theme only needs to define the slots it wants to change - everything else fall
 
 ## How a theme is resolved
 
-Themes are layered, so a custom theme can be as small as a handful of overrides:
-
-<text-block :rows="[
-  ['1. Built-in defaults','colorScheme + a transparent --background-image'],
-  ['2. shared.json','vars + styles every theme inherits'],
-  ['3. Base theme','The built-in light or dark, chosen by colorScheme'],
-  ['4. The theme itself','Its own vars + styles win']]"></text-block>
+<theme-layers>
+</theme-layers>
 
 `preview` is taken from the theme when it defines one; otherwise it's derived by looking up each of the base theme's preview keys in the resolved `styles`.
 

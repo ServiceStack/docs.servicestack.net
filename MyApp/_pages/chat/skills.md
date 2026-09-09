@@ -8,7 +8,10 @@ title: Skills
 
 ## Progressive disclosure
 
-A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it. This keeps prompts small and helps specialists remain specialists - a Model with fifty available skills pays for fifty one-line descriptions, not fifty procedure documents.
+A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it.
+
+<progressive-disclosure>
+</progressive-disclosure>
 
 ## Anatomy of a skill
 
@@ -45,13 +48,8 @@ asks how to run an incident.
 ...
 ```
 
-| Frontmatter key | Purpose |
-| --- | --- |
-| `name` | Skill identifier. Defaults to the folder name |
-| `description` | The one line the Model sees before deciding to load the skill |
-| `license` | Optional license attribution |
-| `allowed-tools` | Tools this skill expects to be available |
-| `metadata.*` | Arbitrary additional properties |
+<skill-manifest>
+</skill-manifest>
 
 The `description` is doing the selection work - write it as the situation the skill applies to, the same way you'd write `[Tool(WhenToUse)]`.
 

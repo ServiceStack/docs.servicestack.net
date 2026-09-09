@@ -4,6 +4,9 @@ title: Chat API
 
 Registering `ChatFeature` gives your App an OpenAI-compatible Chat Completions endpoint and an in-process client, both running the **same pipeline**: provider selection, retry and failover, the tool-execution loop, usage and cost accounting, and every registered extension filter.
 
+<api-surfaces>
+</api-surfaces>
+
 ## POST /v1/chat/completions
 
 The typed `ChatCompletion` service is mounted **unprefixed** at the standard OpenAI path, regardless of `RoutePrefix`:
@@ -138,13 +141,8 @@ The Chat UI can set a whitelisted set of per-thread request arguments, which are
 
 ## The pipeline in brief
 
-1. `OnRequestAsync` resolves any Bearer API key onto the request and runs first-request-per-user setup handlers.
-2. `ValidateRequest` may reject the request.
-3. Chat request filters run, letting extensions mutate the outgoing request.
-4. A provider is selected for the requested model, with retry and failover per `Limits.Retries`.
-5. Tool calls are executed in a loop, bounded by `Limits.MaxIterations`, pausing for approval where required.
-6. Streamed responses are checkpointed every `Limits.StreamCheckpointInterval` into `ChatThread.StreamingMessage`, kept out of the durable `Messages` so a failed stream can't damage the conversation.
-7. Chat response filters run, and usage and cost are recorded as a `ChatRequest` row.
+<request-pipeline>
+</request-pipeline>
 
 Cancellation is cooperative - `ShouldCancelThread` consults the thread's state, so cancelling in the UI stops the loop.
 

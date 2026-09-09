@@ -12,11 +12,8 @@ Your existing C# DTO is the AI Contract - enable API + MCP tools for your APIs
 
 Sending every API schema to a Model on every request would be expensive, slow and confusing - a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:
 
-| Tool | Purpose |
-| --- | --- |
-| `api_search` | Find APIs relevant to the user's intent from a compact index |
-| `api_describe` | Return complete schemas and workflow metadata for selected APIs |
-| `api_call` | Invoke an API using its typed Request DTO, **as the current user** |
+<three-tools>
+</three-tools>
 
 <screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
 
@@ -26,14 +23,8 @@ Only the search index is loaded eagerly; a Model pays for an API's schema only w
 
 ### Progressive discovery, end to end
 
-For a request like *"two grande hot oat milk lattes with light vanilla syrup for Sam"* the Model:
-
-1. `api_search` for APIs related to ordering coffee
-2. `api_describe` the menu, preview and create-order APIs it found
-3. `api_call` the menu API to resolve the current product Id, supported sizes and available options
-4. `api_call` the preview API to apply defaults, validate customizations and calculate the current price
-5. Present the proposed `CreateCoffeeShopOrder` for approval
-6. Submit the approved request and report the persisted order number
+<discovery-journey>
+</discovery-journey>
 
 Nothing about the menu was memorized from a prompt. The Model isn't given a snapshot of your application, it's taught how to find and use its live capabilities - so the same conversation keeps working as products, prices, options and APIs change.
 
@@ -270,16 +261,10 @@ API Tools remove most of the integration work but not the value of thoughtful AP
 
 ## Where API Tools fit
 
-CoffeeShop is deliberately easy to follow, but any workflow expressible as well-designed APIs can be reached in natural language:
+<use-cases>
+</use-cases>
 
-- **Customer service** - look up a customer's recent orders, inspect delivery status, issue an approved refund or add an account note, still bounded by that staff member's permissions
-- **Bookings & scheduling** - search availability, resolve customers and resources, preview a booking, then approve before committing it
-- **Commerce & procurement** - find products from live inventory, price them, validate quantities and submit an approved purchase, with no catalog snapshot in the prompt
-- **Business intelligence** - focused read-only reporting and AutoQuery APIs answer questions in natural language, with `Fields` and `Take` keeping results within useful context limits
-- **Internal operations** - create tickets, update CRM records, run reports or start deployment workflows, with destructive actions explicitly classified and guarded
-- **Vertical assistants** - package the domain knowledge already in your APIs into specialised assistants; the App stays responsible for deterministic validation and authorization, the Model for language and orchestration
-
-Because the [Tool Registry](/chat/tools) is shared, API Tools run alongside AI Chat's other tools in the same conversation - so your business APIs can be combined with search, files, images, audio, [custom extensions](/chat/custom-extensions) and ServiceStack Commands. That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
+That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
 
 ## Example App
 

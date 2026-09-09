@@ -10,54 +10,24 @@ AI Chat solves this with a shared extension architecture spanning the server and
 
 ## Built-in extensions
 
-| Extension | What it adds |
-| --- | --- |
-| `app` | Threads, history, avatars and the core conversation UI |
-| `agents` | [Agent Profiles](/chat/agents) and the Profile Manager |
-| `analytics` | [Cost, token and activity reporting](/chat/analytics) for admins |
-| `api_tools` | [Discovery and invocation](/chat/api-tools) of the App's own ServiceStack APIs |
-| `computer` | Filesystem tools and `run_bash` - **off by default** |
-| `core_tools` | Utilities, math and code execution tools |
-| `credentials` | Username/password sign-in for the Chat UI |
-| `custom` | Your App's own UI + routes, served from `chat/custom/**` |
-| `gallery` | Browsable catalog of generated images and audio |
-| `gemini` | [Gemini File Search](/chat/gemini) stores for RAG |
-| `identity` | Sign-in using the host App's ASP.NET Identity users |
-| `katex` | Mathematical typesetting |
-| `mcp` | The built-in [MCP Server](/chat/mcp) at `/chat/mcp` |
-| `pdf` | [PDF Studio](/chat/pdf-studio) at `/chat/pdf-studio` |
-| `projects` | [Per-user workspaces](/chat/projects) and directory boundaries |
-| `publish` | Sharing threads, projects and media - **off by default** |
-| `skills` | [Skill](/chat/skills) management, search, install and authoring |
-| `system_prompts` | The system prompt library |
-| `tools` | The shared [Tool Registry](/chat/tools) and tools panel |
-| `voice` | [Voice input](/chat/media) and transcription |
+<extension-catalog>
+</extension-catalog>
 
 ## What an extension can contribute
 
-Each extension can register only what it needs:
-
-- ServiceStack routes and APIs, under `/{RoutePrefix}/ext/{name}/`
-- Model tools and tool groups
-- UI components and pages
-- Sidebar and toolbar actions
-- Chat request, tool, approval, status, response and error filters
-- Import maps and client dependencies
-- Per-user files and preferences
-- Database tables and background workers
-- Startup and shutdown lifecycle hooks
-
-The entire UI is assembled from registered Vue components, so an extension can add a new component or deliberately **replace** an existing building block by registering the same component name.
+<extension-surface>
+</extension-surface>
 
 ## Disabling extensions
+
+<disable-routes>
+</disable-routes>
 
 ```csharp
 services.AddPlugin(new ChatFeature {
     DisableExtensions = ["computer", "publish", "katex"],
 });
 ```
-
-`DisableExtensions` removes the capability from the server **and** the UI together - a disabled extension registers no routes, no tools and no components.
 
 The same list can be set in `App_Data/chat/llms.json`, which is merged with the programmatic list:
 

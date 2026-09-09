@@ -11,32 +11,8 @@ AI Chat normalizes commercial, open and locally-hosted providers behind one mode
 
 ## Built-in providers
 
-| Provider | `llms.json` key | API Key |
-| --- | --- | --- |
-| OpenAI | `openai` | `OPENAI_API_KEY` |
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` |
-| Google Gemini | `google` | `GEMINI_API_KEY` |
-| Groq | `groq` | `GROQ_API_KEY` |
-| xAI | `xai` | `XAI_API_KEY` |
-| Cerebras | `cerebras` | `CEREBRAS_API_KEY` |
-| Mistral | `mistral` | `MISTRAL_API_KEY` |
-| Codestral | `codestral` | `CODESTRAL_API_KEY` |
-| OpenRouter | `openrouter` | `OPENROUTER_API_KEY` |
-| Fireworks | `fireworks-ai` | `FIREWORKS_API_KEY` |
-| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` |
-| Moonshot | `moonshotai` | `MOONSHOT_API_KEY` |
-| Z.ai | `zai` / `zai-coding-plan` | `ZAI_API_KEY` / `ZHIPU_API_KEY` |
-| MiniMax | `minimax` | `MINIMAX_API_KEY` |
-| Nvidia | `nvidia` | `NVIDIA_API_KEY` |
-| Chutes | `chutes` | `CHUTES_API_KEY` |
-| Alibaba | `alibaba` | - |
-| Hugging Face | `huggingface` | - |
-| GitHub Copilot / Models | `github-copilot`, `github-models` | - |
-| Ollama | `ollama` | none (local) |
-| Ollama Cloud | `ollama-cloud` | `OLLAMA_API_KEY` |
-| LM Studio | `lmstudio` | none (local) |
-| OpenAI-compatible (local) | `openai-local` | - |
-| llms.py | `llmspy` | - |
+<provider-catalog>
+</provider-catalog>
 
 The `ChatApiKey` static class names every environment variable AI Chat looks for:
 
@@ -48,19 +24,8 @@ ChatApiKey.Gemini      // "GEMINI_API_KEY"
 
 ## How a provider becomes live
 
-A provider is created and registered when **all** of these hold:
-
-1. It has an entry in `llms.json`'s `providers` object.
-2. It is enabled - either `"enabled": true` in its definition, or named in `ChatFeature.EnableProviders`.
-3. Its `npm` sdk id resolves to a factory in `ChatFeature.ProviderTypes`.
-4. `provider.Test()` passes, which normally means an API key was resolved.
-
-API keys are resolved in this order:
-
-<text-block :rows="[
-  ['ChatFeature.Variables','Programmatic values, checked first'],
-  ['Environment variables','$OPENAI_API_KEY etc.'],
-  ['api_key in llms.json','A literal value, or a $VAR reference resolved as above']]"></text-block>
+<provider-lifecycle>
+</provider-lifecycle>
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -71,11 +36,10 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-:::tip
-Providers that can't resolve a key are simply skipped with an informational log entry - a missing key never fails startup.
-:::
-
 ## Restricting the providers users can reach
+
+<provider-lockdown>
+</provider-lockdown>
 
 `EnableProviders` overrides every `enabled` flag in `llms.json`, which makes it the simplest way to pin a deployment to an approved set:
 

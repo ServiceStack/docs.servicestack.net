@@ -4,6 +4,9 @@ title: Connect MCP Clients
 
 MCP clients can register a ServiceStack MCP server via a single CLI command or by configuring their respective MCP settings.
 
+<client-matrix>
+</client-matrix>
+
 ## Claude Code
 
 Add via the Claude Code CLI:
