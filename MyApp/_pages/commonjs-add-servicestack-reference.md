@@ -1,5 +1,5 @@
 ---
-title: ES3 Common.js Add ServiceStack Reference
+title: ES3 Common.js ServiceStack Reference
 ---
 
 In addition to [TypeScript](/typescript-add-servicestack-reference) support for generating typed Data Transfer Objects (DTOs), JavaScript is now supported.

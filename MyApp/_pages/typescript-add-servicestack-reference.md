@@ -1,6 +1,6 @@
 ---
 slug: typescript-add-servicestack-reference
-title: TypeScript Add ServiceStack Reference
+title: TypeScript ServiceStack Reference
 ---
 
 :::{.shadow .-ml-12 .w-[940px] .rounded-md}
