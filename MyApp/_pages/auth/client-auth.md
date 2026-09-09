@@ -2,6 +2,9 @@
 title: Service Clients Authentication
 ---
 
+<client-auth-modes>
+</client-auth-modes>
+
 ## Authenticating with JavaScript or TypeScript Service Clients
 
 Typically when using ServiceStack's **@servicestack/client** `JsonServiceClient` it will utilize the browser's authenticated

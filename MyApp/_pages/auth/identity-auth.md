@@ -74,6 +74,9 @@ Identity v2 password hashing format, which should let you migrate your users to 
 
 ## ServiceStack's Identity Auth Integration
 
+<identity-bridge>
+</identity-bridge>
+
 ServiceStack's Identity Auth integration is focused on high compatibility so existing ServiceStack Customers
 require minimal effort to migrate existing code bases to use the new Identity Auth integration, despite Identity Auth
 being an entirely different Auth Provider model and implementation.
@@ -106,14 +109,12 @@ The `AuthFeature` works by registering the following Identity Auth Providers:
 
 ### Identity Auth Providers
 
-- [IdentityApplicationAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs) - Converts an Identity Auth `ClaimsPrincipal` into a ServiceStack Session
-- [IdentityCredentialsAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityCredentialsAuthProvider.cs) - Implements ServiceStack's `Authenticate` API using Identity Auth
-- [IdentityJwtAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityJwtAuthProvider.cs) - Converts an Identity Auth JWT into an Authenticated ServiceStack Session
+<identity-providers>
+</identity-providers>
 
-Only the `IdentityApplicationAuthProvider` is registered by default which is required to convert Identity Auth's `ClaimPrincipal`
-into an Authenticated ServiceStack [Session](/auth/sessions). The other Auth Providers are required if you want to enable authentication with
-ServiceStack's endpoints. E.g. ServiceStack's [Built-in UIs](https://servicestack.net/auto-ui) would require the Credentials Auth
-to be enabled to authenticate via the built-in Sign In dialogs.
+Source: [IdentityApplicationAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityApplicationAuthProvider.cs) ·
+[IdentityCredentialsAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityCredentialsAuthProvider.cs) ·
+[IdentityJwtAuthProvider](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Extensions/Auth/IdentityJwtAuthProvider.cs)
 
 ### Configuring Auth Providers
 

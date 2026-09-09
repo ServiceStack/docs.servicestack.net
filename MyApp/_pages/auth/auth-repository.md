@@ -3,7 +3,13 @@ slug: auth-repository
 title: Auth Repository
 ---
 
-ServiceStack Auth supports using your own persistence back-ends but for the most part you should be able to reuse one of the existing [IAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/IAuthRepository.cs): 
+ServiceStack Auth supports using your own persistence back-ends but for the most part you should be able to reuse one of the existing [IAuthRepository](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack/Auth/IAuthRepository.cs):
+
+<repo-catalog>
+</repo-catalog>
+
+<user-auth-schema>
+</user-auth-schema>
 
   - **OrmLite**: `OrmLiteAuthRepository` in [ServiceStack.Server](https://nuget.org/packages/ServiceStack.Server)
     - [OrmLiteAuthRepositoryMultitenancy](/multitenancy#multitenancy-rdbms-authprovider)

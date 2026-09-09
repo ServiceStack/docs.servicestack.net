@@ -3,21 +3,14 @@ slug: api-key-authprovider
 title: API Key Auth Provider
 ---
 
-The API Key Auth Provider provides an alternative method for allowing external 3rd Parties access to 
-your protected Services without needing to specify a password. API Keys is the preferred approach for 
-many well-known public API providers used in system-to-system scenarios for several reasons:
+The API Key Auth Provider provides an alternative method for allowing external 3rd Parties access to
+your protected Services without needing to specify a password.
 
- - **Simple** - It integrates easily with existing HTTP Auth functionality
- - **Independent from Password** - Limits exposure to the much more sensitive master user passwords that 
- should ideally never be stored in plain-text. Resetting User's Password or password reset strategies 
- wont invalidate existing systems configured to use API Keys
- - **Entropy** - API Keys are typically much more secure than most normal User Passwords. The configurable 
-default has **24 bytes** of entropy (Guids have 16 bytes) generated from a secure random number generator 
-that encodes to **32 chars** using URL-safe Base64 (Same as Stripe)
- - **Performance** - Thanks to their much greater entropy and independence from user-chosen passwords,
- API Keys are validated as fast as possible using a datastore Index. This is contrast to validating hashed 
- user passwords which as a goal require usage of slower and more computationally expensive algorithms to 
- try make brute force attacks infeasible
+<key-rationale>
+</key-rationale>
+
+The configurable default has **24 bytes** of entropy generated from a secure random number generator that
+encodes to **32 chars** using URL-safe Base64 (the same as Stripe).
 
 Like most ServiceStack providers the new API Key Auth Provider is simple to use, integrates seamlessly with
 ServiceStack existing Auth model and includes Typed end-to-end client/server support. 

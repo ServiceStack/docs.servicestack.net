@@ -3,11 +3,11 @@ slug: openid
 title: OpenId 2.0 Auth Providers
 ---
 
-::: warning DEPRECATED
-Development of the **[DotNetOpenAuth](https://github.com/DotNetOpenAuth/DotNetOpenAuth)** this package relies on has been abandon and has consequently **ServiceStack.Authentication.OpenId** package has been removed in **v6**.
+<doc-status status="deprecated" title="Removed in v6"
+  text="DotNetOpenAuth, which this package relied on, was abandoned - so ServiceStack.Authentication.OpenId was removed in v6. To keep using it, copy the v4.5 source into your own project. New Apps should use the built-in OAuth providers or Identity Auth."
+  :links="[{ text:'ServiceStack Auth Providers', href:'/auth/authentication-and-authorization' }, { text:'Identity Auth', href:'/auth/identity-auth' }]"></doc-status>
 
-To continue using it you can copy the existing **[ServiceStack.Authentication.OpenId](https://github.com/ServiceStack/ServiceStack/tree/fx45/src/ServiceStack.Authentication.OpenId)** source code into your project
-:::
+To continue using it you can copy the existing **[ServiceStack.Authentication.OpenId](https://github.com/ServiceStack/ServiceStack/tree/fx45/src/ServiceStack.Authentication.OpenId)** source code into your project.
 
 
 Contained in the [ServiceStack.Authentication.OpenId](http://nuget.org/packages/ServiceStack.Authentication.OpenId) NuGet package is ServiceStack's support of OpenId 2.0 Authentication. This allows ServiceStack-enabled ASP.NET / MVC sites and web services to authenticate and accept registration from any OpenId 2.0 Authentication provider. Like most .NET OpenId libraries, we leverage the de-facto and excellent [DotNetOpenAuth](http://www.dotnetopenauth.net/) library to enable our OpenId and OAuth2 support. 

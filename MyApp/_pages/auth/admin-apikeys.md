@@ -2,15 +2,8 @@
 title: Simple Auth for .NET 10 Apps
 ---
 
-With ServiceStack now fully [integrated with ASP.NET Identity Auth](/auth/identity-auth),
-our latest [.NET 10 Tailwind Templates](/start) offer a full-featured Auth Configuration complete with User Registration, 
-Login, Password Recovery, Two Factory Auth, and more.
-
-Whilst great for Web Applications that need it, it neglects the class of Apps which don't need User Auth and
-the additional complexity it brings inc. Identity and Password Management, EF Migrations, Token Expirations, OAuth Integrations, etc. 
-
-For these stand-alone Apps, Microservices and Docker Appliances that would still like to restrict Access to their APIs
-but don't need the complexity of ASP .NET Core's Authentication machinery, a simpler Auth Story would be preferred.
+<simple-auth-choice>
+</simple-auth-choice>
 
 With the introduction of API Keys in this release we're able to provide a simpler Auth Story for .NET 10 Microservices 
 that's easy for **Admin** Users to manage and control which trusted clients and B2B Integrations can access their functionality.

@@ -12,6 +12,12 @@ public override void Configure(Container container)
 }
 ```
 
+<session-anatomy>
+</session-anatomy>
+
+<session-hooks>
+</session-hooks>
+
 ## Cookie Session Ids
 
 When the `SessionFeature` is enabled, a [Global RequestFilter](/request-and-response-filters) is added to ServiceStack to ensure that all requests have a Temporary `ss-id` and a Permanent `ss-pid` session cookies set. These Session Cookies contain a unique Random Base64-encoded Id. The `ss-opt` cookie stores the users preference on whether they want their current session to be temporary (`ss-opt=temp`) or permanent (`ss-opt=perm`) - i.e. to **RememberMe** or not - The Default is Temporary. 

@@ -4,12 +4,11 @@ title: Migrate to ASP.NET Core Identity Auth
 
 ## Migrate from ServiceStack Auth to Identity Auth
 
-Migrating from ServiceStack Auth to Identity Auth should be relatively straight-forward as ServiceStack uses a compatible
-Identity v2 password hashing format, which should let you migrate your users to Identity Auth without them noticing.
+<migration-path>
+</migration-path>
 
-:::info TIP
-Please ensure your App database is backed up before performing any migrations
-:::
+<migration-safety>
+</migration-safety>
 
 ### 1. Rename old AppUser table
 

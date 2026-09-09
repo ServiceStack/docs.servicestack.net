@@ -3,6 +3,10 @@ slug: authentication-identity-servicestack
 title: Using ServiceStack Auth in MVC
 ---
 
+<doc-status status="legacy" title="A .NET 6 MVC template using ServiceStack Auth"
+  text="This walkthrough uses the legacy mvcauth template. New MVC projects should start from the current Identity Auth templates, which use the same Identity configuration as Microsoft's own."
+  :links="[{ text:'Identity Auth', href:'/auth/identity-auth' }, { text:'Authentication Overview', href:'/auth/' }]"></doc-status>
+
 [mvcauth](https://github.com/LegacyTemplates/mvcauth) is a .NET 6.0 MVC Website integrated with ServiceStack Auth:
 
 [![](https://raw.githubusercontent.com/ServiceStack/Assets/master/csharp-templates/mvcauth.png)](https://github.com/LegacyTemplates/mvcauth)

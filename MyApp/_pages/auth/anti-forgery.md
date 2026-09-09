@@ -3,6 +3,13 @@ title: Anti Forgery
 slug: anti-forgery
 ---
 
+<doc-status status="legacy" title="ASP.NET MVC's AntiForgery API is .NET Framework only"
+  text="This page covers ServiceStack validating ASP.NET MVC's AntiForgery token on .NET Framework. ASP.NET Core Apps use its own built-in antiforgery services instead."
+  :links="[{ text:'Authentication Overview', href:'/auth/' }]"></doc-status>
+
+<csrf-overview>
+</csrf-overview>
+
 You can leverage ASP.NET MVC's AntiForgery token support your Razor pages by embedding the token in your HTML Forms with:
 
 ## Example

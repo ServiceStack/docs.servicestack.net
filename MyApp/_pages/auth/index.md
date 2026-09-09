@@ -6,8 +6,11 @@ title: Authentication Overview
 
 As of [ServiceStack v8](/releases/v8_00) there are 2 main Authentication Models available to ServiceStack Apps:
 
- - [ASP .NET Core Identity](/auth/identity-auth) - Recommended for .NET 10+ Apps
- - [ServiceStack Auth](/auth/authentication-and-authorization) - Universal Auth Model compatible with all ServiceStack Apps  (e.g. .NET or .NET Framework)
+<auth-models>
+</auth-models>
+
+<auth-doc-map>
+</auth-doc-map>
 
 ### ASP.NET Core Identity Auth now default from ServiceStack v8
 
@@ -43,15 +46,8 @@ The recommended way to protect your ServiceStack APIs is to continue to use the 
 attributes which are decoupled from any implementation so be safely annotated on Request DTOs without adding
 any implementation dependencies, where they're also accessible to Clients and UIs using the Request DTOs to invoke your APIs.
 
-The available Typed Authorization Attributes include:
-
-| Attribute                   | Description                                            |
-|-----------------------------|--------------------------------------------------------|
-| `[ValidateIsAuthenticated]` | Restrict access toAuthenticated Users only             |
-| `[ValidateIsAdmin]`         | Restrict access to Admin Users only                    |
-| `[ValidateHasRole]`         | Restrict access to only Users assigned with this Role  |
-| `[ValidateHasClaim]`        | Restrict access to only Users assigned with this Claim |
-| `[ValidateHasScope]`        | Restrict access to only Users assigned with this Scope |
+<authorization-attributes>
+</authorization-attributes>
 
 That can be annotated on **Request DTOs** to protect APIs:
 
@@ -150,6 +146,9 @@ public class MyServices : Service
 These attributes can also be applied to Request DTOs however as they would add a dependency to **ServiceStack.dll**, it's recommended to
 
 ## Enabling Authentication at different levels
+
+<protection-levels>
+</protection-levels>
 
 ### Using the [Authenticate] Attribute
 

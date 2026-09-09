@@ -3,9 +3,9 @@ slug: authentication-identity-aspnet
 title: ASP.NET Identity Auth in ServiceStack (Legacy)
 ---
 
-:::info
-For new projects we recommend starting with the new [ASP.NET Core Identity Auth](/identity-auth) templates.
-:::
+<doc-status status="legacy" title="ASP.NET Identity in a legacy MVC template"
+  text="This page documents integrating ServiceStack with an existing ASP.NET Identity user database in a .NET 6 MVC template. For a new project, start from ServiceStack's current Identity Auth integration instead."
+  :links="[{ text:'Identity Auth', href:'/auth/identity-auth' }, { text:'Authentication Overview', href:'/auth/' }]"></doc-status>
 
 ---
 

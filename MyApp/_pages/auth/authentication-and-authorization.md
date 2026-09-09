@@ -25,6 +25,12 @@ that Admins can use to assign Roles/Permissions to existing users.
   <servicestack-auth-templates></servicestack-auth-templates>
 </div>
 
+<provider-catalog>
+</provider-catalog>
+
+<auth-lifetimes>
+</auth-lifetimes>
+
 ### Highly customizable and versatile
 
 ServiceStack's Authentication is also highly customizable and versatile from being able to choose from the plethora of Auth Providers

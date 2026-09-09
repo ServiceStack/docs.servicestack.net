@@ -6,6 +6,9 @@ API Keys are a simple and effective way to authenticate and authorize access to 
 API Keys are often used to control access to specific resources or features in your API, providing a simple way 
 to manage access control.
 
+<api-key-redesign>
+</api-key-redesign>
+
 ### Redesigning API Keys
 
 Building on our experience with API Keys in previous versions of ServiceStack, we've taken the opportunity to redesign how API Keys work to provide a more flexible and powerful way to manage access control for your APIs.
@@ -90,6 +93,9 @@ public class MyRequest {}
 ### Use API Keys with our without Users and Authentication
 
 API Keys can optionally be associated with a User, but they don't have to be, nor do they run in the context of a User or are able to invoke any Authenticated APIs on their own. Users who create them can also limit their scope to only call APIs they have access to, which can be done with user-defined scopes:
+
+<key-controls>
+</key-controls>
 
 ### Scopes
 

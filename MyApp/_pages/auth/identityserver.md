@@ -3,9 +3,9 @@ slug: authentication-identityserver
 title: Using IdentityServer4 Auth in ServiceStack
 ---
 
-:::warning DEPRECATED
-This article refers to IdentityServer4 which is no longer actively maintained.
-:::
+<doc-status status="deprecated" title="IdentityServer4 is no longer actively maintained"
+  text="This article is retained for existing systems. New Apps delegating authentication to an external identity provider should use ASP.NET Core Identity Auth, which ServiceStack integrates with directly."
+  :links="[{ text:'Identity Auth', href:'/auth/identity-auth' }, { text:'JWT Identity Auth', href:'/auth/jwt-identity-auth' }]"></doc-status>
 
 [mvcidentityserver](https://github.com/LegacyTemplates/mvcidentityserver) .NET 6.0 MVC Website integrated with IdentityServer4 Auth and ServiceStack:
 

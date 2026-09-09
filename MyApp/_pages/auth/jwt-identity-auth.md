@@ -7,6 +7,9 @@ or perform any I/O to validate a token. As such,
 [JWTs are a popular choice for Microservices](/auth/jwt-authprovider#stateless-auth-microservices)
 as they only need to configured with confidential keys to validate access.
 
+<stateless-auth>
+</stateless-auth>
+
 ### ASP.NET Core JWT Authentication
 
 ServiceStack's JWT Identity Auth reimplements many of the existing [ServiceStack JWT AuthProvider](/auth/jwt-authprovider)

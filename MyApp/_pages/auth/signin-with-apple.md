@@ -7,6 +7,9 @@ ServiceStack Sign In with Apple Auth Provider docs & Integration docs from [gith
 
 ![](/img/pages/dev/web-signin-with-apple-login.png)
 
+<apple-requirements>
+</apple-requirements>
+
 ## Sign In with Apple Requirements
 
  - Membership **Team ID** from [developer.apple.com/account/#/membership/](https://developer.apple.com/account/#/membership/)

@@ -8,6 +8,9 @@ enables a secure channel for all Services (inc Auto Batched Requests :) offering
 
 ## Encrypted Messaging Overview
 
+<encryption-overview>
+</encryption-overview>
+
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/encrypted-messaging.png)
 
 ### Configuration
