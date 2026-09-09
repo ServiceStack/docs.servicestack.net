@@ -20,6 +20,9 @@ LogManager.LogFactory = new ConsoleLogFactory(debugEnabled:true);
 
 Where it will log the generated SQL and Params OrmLite executes to the Console.
 
+<see-the-sql>
+</see-the-sql>
+
 ## BeforeExecFilter and AfterExecFilter filters
 
 An alternative to debug logging which can easily get lost in the noisy stream of other debug messages is to use the `BeforeExecFilter` and `AfterExecFilter` filters where you can inspect executed commands with a custom lambda expression before and after each query is executed. So if one of your a queries are failing you can put a breakpoint in `BeforeExecFilter` to inspect the populated `IDbCommand` object before it's executed or use the `.GetDebugString()` extension method for an easy way to print the Generated SQL and DB Params to the Console:
@@ -62,7 +65,7 @@ Which ServiceStack uses internally to tag DB Connections with the feature execut
 Services it will tag it with the Request DTO Name.
 
 :::{.wideshot}
-![](/img/pages/release-notes/v8.9/ormlite-tags.webp)
+<screenshot src="/img/pages/release-notes/v8.9/ormlite-tags.webp" title="Tagged SQL in the Profiling UI"></screenshot>
 :::
 
 If a tag is configured, it's also included in OrmLite's Debug Logging output, e.g:

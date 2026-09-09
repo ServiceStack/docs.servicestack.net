@@ -5,7 +5,10 @@ title: OrmLite Type Converters
 OrmLite has become a lot more customizable and extensible thanks to the internal redesign decoupling all
 custom logic for handling different Field Types into individual Type Converters.
 
-This use of individual decoupled Type Converters makes it possible to enhance or entirely replace how .NET Types are handled and can also be extended to support new Types it has no knowledge about, a feature taken advantage of by the [SQL Server Types](/ormlite/sql-server-features#sql-server-types) support.
+<converter-flow>
+</converter-flow>
+
+This is the feature the [SQL Server Types](/ormlite/sql-server-features#sql-server-types) support is built on.
 
 ![OrmLite Converters](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/release-notes/ormlite-converters.png)
 

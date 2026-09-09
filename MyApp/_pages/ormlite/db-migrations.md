@@ -10,9 +10,11 @@ OrmLite DB Migrations advances OrmLite's light-weight code-first development app
 
 ## Introduction
 
-In contrast to [state-based migration](https://www.prisma.io/dataguide/types/relational/what-are-database-migrations#state-based-migrations) solutions which relies on tooling to generate state changes from a snapshot of a DB at a point-in-time with schema changes made out-of-band, OrmLite's DB migrations are instead designed to capture and execute the schema changes developers want to make, so when the Migrations are checked-in with the feature that needs them, the same exact changes are run by CI integration servers and other developers syncing their code-base with the new feature.
+<migration-philosophy>
+</migration-philosophy>
 
-Instead of relying on generation by an opaque tool, this code-first approach treats DB Migrations like any other maintainable & logically structured code written by developers where it maintains a connected audit history in source control together with the feature that needs the schema changes.
+<migration-mechanics>
+</migration-mechanics>
 
 ## Getting Started
 

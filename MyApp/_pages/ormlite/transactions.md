@@ -2,6 +2,9 @@
 title: Database Transactions
 ---
 
+<transaction-scope>
+</transaction-scope>
+
 As a Micro ORM OrmLite has direct access to ADO.NET's `IDbConnection` classes, where starting a transaction can be done with 
 `OpenTransaction` to create a new transaction and attach it to its containing executed ADO.NET commands:
 

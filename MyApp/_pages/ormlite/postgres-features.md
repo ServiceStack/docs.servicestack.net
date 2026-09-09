@@ -2,6 +2,9 @@
 title: PostgreSQL Features
 ---
 
+<postgres-extras>
+</postgres-extras>
+
 ## PostgreSQL Rich Data Types
 
 The `[PgSql*]` specific attributes lets you use attributes to define PostgreSQL rich data types, e.g:

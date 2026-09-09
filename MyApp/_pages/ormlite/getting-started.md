@@ -6,7 +6,10 @@ title: Getting started with OrmLite
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
 </div>
 
-After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to. 
+After [installing OrmLite](installation) we now need to configure OrmLite's DB Connection Factory containing the RDBMS Dialect you want to use and the primary DB connection string you wish to connect to.
+
+<first-query-path>
+</first-query-path>
 
 ## Fluent Configuration Model
 

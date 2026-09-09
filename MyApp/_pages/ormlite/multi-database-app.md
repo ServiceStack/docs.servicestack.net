@@ -137,6 +137,9 @@ can be sorted and filtered as needed:
 
 ![](https://servicestack.net/img/posts/postgres-mysql-sqlserver-on-apple-silicon/admin-db-postgres-coupons.png)
 
+<named-connections>
+</named-connections>
+
 ## Named database connections
 
 Named connections can be opened by its name from the registered `IDbConnectionFactory`:

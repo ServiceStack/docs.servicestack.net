@@ -2,6 +2,9 @@
 title: Schema, Table & Column APIs
 ---
 
+<schema-lifecycle>
+</schema-lifecycle>
+
 ## Create Table APIs
 
 OrmLite's `CreateTable` APIs can be used to create RDBMS tables from your C# POCO Data Models.

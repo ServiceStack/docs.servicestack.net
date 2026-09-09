@@ -14,6 +14,9 @@ One of ServiceStack's primary goals is delivering great value and performance, a
 
 This also happens to be the cheapest to place to host its static files, taking load away from more expensive .NET App Servers and move them to free Cloudflare or GitHub CDNs, which all Jamstack Live Demos take advantage of to enable their [**$0.40 /mo** TCO](https://jamstacks.net/posts/jamstacks_hosting) for hosting their .NET Docker Apps which are only needed to serve the JSON APIs used to power their Jamstack UIs.
 
+<replication-model>
+</replication-model>
+
 ## Expensive Managed Databases
 
 Having achieved the ideal architecture for max value and performance, the last expensive vital component used in most Web Apps is hosting of their expensive managed databases. Despite most RDBMS's being OSS and free of licensing costs, major cloud companies continue to charge artificially high hosting costs to provide redundant hosting of App data. The effect of which adds an artificial barrier to entry discouraging new Indie developers from building & hosting their dream Apps that could form self sustaining business models that should ideally be accessible to anyone with access to a Computer with the Internet.

@@ -2,6 +2,9 @@
 title: OrmLite INSERT APIs
 ---
 
+<insert-chooser>
+</insert-chooser>
+
 ## Insert Examples
 
 In most cases INSERT's in OrmLite is as straight forward as passing the POCO you want inserted:

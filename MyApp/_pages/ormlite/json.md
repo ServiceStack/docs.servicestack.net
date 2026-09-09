@@ -6,6 +6,9 @@ OrmLite provides a portable, typed API for querying JSON stored in SQLite, Postg
 JSON expressions are exposed from the `Sql.*` class and compose with normal `SqlExpression<T>` queries, so JSON
 properties can be filtered, selected and ordered without embedding provider-specific SQL.
 
+<json-api-choice>
+</json-api-choice>
+
 When the shape of a JSON document is known, the preferred API is `Sql.Json<T>()`. It translates normal C# member access
 into the native JSON functions of the configured database:
 
@@ -35,16 +38,8 @@ var q = db.From<OrderEvent>()
 
 The portable JSON API targets current versions of the primary databases supported by OrmLite:
 
-| Database | Recommended version | Notes |
-| --- | --- | --- |
-| SQLite | Current SQLite with JSON functions | Uses SQLite's built-in `json_*` functions |
-| PostgreSQL | PostgreSQL 16+ | `Sql.IsJson()` uses `IS JSON`; other operations use `jsonb` and SQL/JSON paths |
-| SQL Server | SQL Server 2022+ | `Sql.JsonExists()` and full JSON-value validation require SQL Server 2022 |
-| MySQL | MySQL 8.0+ | Uses MySQL's native `JSON_*` functions |
-
-All APIs on this page are supported by all four providers except `Sql.JsonContains()`, which is supported by PostgreSQL
-and MySQL. Calling an unsupported operation throws `NotSupportedException` whilst building the SQL expression instead
-of generating SQL with different semantics.
+<json-support>
+</json-support>
 
 ::: info
 SQL Server 2016-2019 can use `Sql.JsonValue()`, `Sql.JsonQuery()`, `Sql.JsonType()`, `Sql.JsonArrayLength()` and

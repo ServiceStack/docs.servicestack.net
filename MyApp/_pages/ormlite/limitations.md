@@ -2,6 +2,9 @@
 title: Limitations
 ---
 
+<known-limits>
+</known-limits>
+
 ## Single Primary Key
 
 For simplicity, and to be able to have the same POCO class persisted in db4o, memcached, redis or on the filesystem (i.e. providers included in ServiceStack), each model must have a single primary key, by convention OrmLite expects it

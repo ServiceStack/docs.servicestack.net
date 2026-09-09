@@ -9,6 +9,9 @@ OrmLite's APIs are minimal, providing basic shortcuts for the primitive SQL stat
 OrmLite makes available most of its functionality via extension methods to add enhancements over ADO.NET's `IDbConnection`, providing
 a Typed RDBMS-agnostic API that transparently handles differences in each supported RDBMS provider.
 
+<api-naming>
+</api-naming>
+
 ## Create Tables Schemas
 
 OrmLite is able to **CREATE**, **DROP** and **ALTER** RDBMS Tables from your code-first Data Models with rich annotations for
@@ -248,6 +251,9 @@ Which uses the [Dump Utils](/dump-utils) to quickly display the populated data t
 Feel free to continue experimenting with [this Example Live on Gistlyn](https://gistlyn.com/?gist=840bc7f09292ad5753d07cef6063893e&collection=991db51e44674ad01d3d318b24cf0934).
 
 ## Query Examples
+
+<query-styles>
+</query-styles>
 
 If your SQL doesn't start with a **SELECT** statement, it is assumed a `WHERE` clause is being provided, e.g:
 

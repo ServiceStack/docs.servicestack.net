@@ -193,26 +193,5 @@ OrmLite will then use its Primary-Key existence check and insert/update fallback
 
 ## Choosing Upsert, Save, Insert or Update
 
-Use `Upsert` when:
-
-- The Data Model has a known Primary Key and should be inserted or updated in one operation.
-- An import, synchronization process or event handler may receive both new and existing rows.
-- A job may be retried and should converge on the same persisted row.
-- You want the native database's efficient, atomic conflict handling.
-- You only want selected fields changed when a row already exists.
-
-Use `Insert` when the row must be new. A duplicate Primary Key should remain an error instead of silently becoming an
-update.
-
-Use `Update` or `UpdateOnly` when the row must already exist, or when the update condition is something other than its
-Primary Key. `UpdateOnly` also supports updating multiple rows selected by a `WHERE` expression, whereas `Upsert` always
-targets a single row by its Primary Key.
-
-Use `Save` when its higher-level behavior is more important than minimizing database round trips, particularly when
-saving `[Reference]` data with `references:true`. `Save` queries for an existing row before choosing an insert or update;
-native `Upsert` normally performs the decision inside one database statement and does not save referenced Data Models.
-
-::: warning
-Upsert is not a replacement for optimistic concurrency. If an update must fail when another process has changed the row,
-use OrmLite's [Optimistic Concurrency](/ormlite/optimistic-concurrency) support with a `[RowVersion]` field.
-:::
+<write-chooser>
+</write-chooser>

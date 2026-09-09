@@ -2,11 +2,12 @@
 title: RDBMS Async Tasks Builder
 ---
 
+<sequential-vs-parallel>
+</sequential-vs-parallel>
+
 ### Sequential Async DB Access
 
-Async improves I/O thread utilization in multi-threaded apps like Web Servers. However, it doesn't improve the performance 
-of individual API Requests that need to execute multiple independent DB Requests. These are often written to run async 
-db access sequentially like this:
+Multiple independent DB Requests in one API Request are often written to run sequentially like this:
 
 ```csharp
 var rockstars = await Db.SelectAsync<Rockstar>();

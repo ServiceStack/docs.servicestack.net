@@ -2,7 +2,12 @@
 title: OrmLite Filters
 ---
 
-Similar to interceptors in some heavy ORMs, Insert and Update filters get fired just before any **INSERT** or **UPDATE** operation using OrmLite's typed API's (i.e. not dynamic SQL or partial updates using anon types). This functionality can be used for easily auto-maintaining Audit information for your POCO data models, e.g:
+Similar to interceptors in some heavy ORMs, Insert and Update filters get fired just before any **INSERT** or **UPDATE** operation using OrmLite's typed APIs.
+
+<filter-scope>
+</filter-scope>
+
+This is most often used to auto-maintain Audit information on your POCO data models, e.g:
 
 ```csharp
 public interface IAudit 

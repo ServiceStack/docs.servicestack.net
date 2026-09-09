@@ -4,6 +4,9 @@ title: OrmLite Installation
 
 OrmLite packages are available on NuGet and can be installed using your IDE or by adding a `PackageReference` in your `.csproj`
 
+<provider-packages>
+</provider-packages>
+
 ## PostgreSQL
 
 Supports **.NET 6+**, .NET Framework **v4.7.2+** and **.NET Standard 2.0** (.NET 5 and lower)

@@ -26,6 +26,9 @@ public class Track
 }
 ```
 
+<update-scope>
+</update-scope>
+
 ## Updates
 
 Updating any model without any filters will update every field, except the **Id** which

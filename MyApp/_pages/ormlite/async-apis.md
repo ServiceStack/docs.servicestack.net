@@ -2,6 +2,9 @@
 title: OrmLite Async API
 ---
 
+<async-rule>
+</async-rule>
+
 A quick overview of Async API's can be seen in the class diagram below:
 
 ![OrmLite Async APIs](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/ormlite/OrmLiteApiAsync.png)

@@ -27,6 +27,9 @@ we just need to workaround SQLite's single concurrent writer to unlock the value
 unique features of SQLite in our Apps which we cover in this release with integrated support for
 Database Locks and Sync Commands.
 
+<sqlite-tradeoff>
+</sqlite-tradeoff>
+
 ## Single Concurrent Writer
 
 The primary limitation of SQLite is that it only supports a single concurrent writer, which means if you 

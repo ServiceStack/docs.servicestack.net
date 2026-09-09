@@ -5,7 +5,12 @@ title: OrmLite SELECT APIs
 OrmLite has extensive support for Querying exposing an intuitive 1:1 Typed API that maps cleanly and has a high affinity with SQL that's not only natural to write and easy to predict what SQL it generates.
 
 OrmLite provides terse and intuitive typed APIs for database querying from simple lambda expressions to more complex LINQ-Like Typed SQL Expressions which 
-you can use to construct more complex queries. To give you a flavour here are some examples:
+you can use to construct more complex queries.
+
+<select-shapes>
+</select-shapes>
+
+To give you a flavour here are some examples:
 
 
 ## Querying with SELECT

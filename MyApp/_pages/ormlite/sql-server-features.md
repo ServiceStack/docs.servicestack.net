@@ -2,6 +2,9 @@
 title: SQL Server Features
 ---
 
+<sql-server-extras>
+</sql-server-extras>
+
 ## SQL Server 2012 Sequences
 
 The `[Sequence]` attribute can be used as an alternative to `[AutoIncrement]` for inserting rows with an auto incrementing integer value populated by SQL Server, but instead of needing an `IDENTITY` column it can populate a normal `INT` column from a user-defined Sequence, e.g:

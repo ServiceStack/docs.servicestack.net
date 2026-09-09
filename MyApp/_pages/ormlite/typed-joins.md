@@ -4,6 +4,9 @@ title: Typed SqlExpression support for JOINs
 
 Whilst OrmLite aims to provide a light-weight typed wrapper around SQL, it offers a number of convenient features that makes working with relational databases a clean and enjoyable experience.
 
+<join-resolution>
+</join-resolution>
+
 Starting with the most basic example you can simply specify the table you want to join with:
 
 ```csharp

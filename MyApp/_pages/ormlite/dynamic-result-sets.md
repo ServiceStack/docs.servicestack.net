@@ -2,7 +2,10 @@
 title: Dynamic Result Sets
 ---
 
-In addition to populating Typed POCOs, OrmLite has a number of flexible options for accessing dynamic resultsets with adhoc schemas:
+In addition to populating Typed POCOs, OrmLite has a number of flexible options for accessing dynamic resultsets with adhoc schemas.
+
+<result-shapes>
+</result-shapes>
 
 ## Dynamic Results Examples
 

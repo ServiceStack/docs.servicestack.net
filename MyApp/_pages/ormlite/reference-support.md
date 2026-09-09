@@ -2,7 +2,12 @@
 title: Reference Support, POCO style
 ---
 
-OrmLite lets you Store and Load related entities in separate tables using `[Reference]` attributes in primary tables in conjunction with `{Parent}Id` property convention in child tables, e.g:
+OrmLite lets you Store and Load related entities in separate tables using `[Reference]` attributes in primary tables in conjunction with `{Parent}Id` property convention in child tables.
+
+<blob-or-reference>
+</blob-or-reference>
+
+For example:
 
 ```csharp
 public class Customer

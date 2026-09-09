@@ -2,6 +2,9 @@
 title: Custom SQL
 ---
 
+<escape-hatches>
+</escape-hatches>
+
 OrmLite's Expression support satisfies the most common RDBMS queries with a strong-typed API.
 For more complex queries you can easily fall back to raw SQL where the Custom SQL APIs
 let you map custom SqlExpressions into different responses:

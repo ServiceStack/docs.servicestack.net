@@ -15,19 +15,8 @@ db.BulkInsert(rows);
 
 ## Bulk Insert Implementations
 
-Which uses the optimal implementation available for each RDBMS:
-
-- **PostgreSQL** - Uses PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html)
-  command via Npgsql's [Binary Copy](https://www.npgsql.org/doc/copy.html) import
-- **MySql** - Uses [MySqlBulkLoader](https://dev.mysql.com/doc/connector-net/en/connector-net-programming-bulk-loader.html)
-  feature where data is written to a temporary **CSV** file that's imported directly by `MySqlBulkLoader`
-- **MySqlConnector** - Uses [MySqlConnector's MySqlBulkLoader](https://mysqlconnector.net/api/mysqlconnector/mysqlbulkloadertype/)
-  implementation which makes use of its `SourceStream` feature to avoid writing to a temporary file
-- **SQL Server** - Uses SQL Server's `SqlBulkCopy` feature which imports data written to an in-memory `DataTable`
-- **SQLite** - SQLite doesn't have a specific import feature, instead Bulk Inserts are performed using batches of [Multiple Rows Inserts](https://www.tutorialscampus.com/sql/insert-multiple-rows.htm)
-  to reduce I/O calls down to a configurable batch size
-- **Firebird** - Is also implemented using **Multiple Rows Inserts** within an [EXECUTE BLOCK](https://firebirdsql.org/refdocs/langrefupd20-execblock.html)
-  configurable up to Firebird's maximum of **256** statements
+<bulk-paths>
+</bulk-paths>
 
 ## SQL Multiple Row Inserts
 

@@ -2,6 +2,9 @@
 title: Optimistic Concurrency
 ---
 
+<lost-update>
+</lost-update>
+
 Optimistic concurrency can be added to any table by adding the `ulong RowVersion { get; set; }` property, e.g:
 
 ```csharp

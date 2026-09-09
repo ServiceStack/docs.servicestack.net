@@ -12,29 +12,20 @@ implicit N+1 queries and leaky data access prevalent in Heavy Object Relational 
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
 </div>
 
-OrmLite was designed with a focus on the core objectives:
+<design-goals>
+</design-goals>
 
-* Provide a set of light-weight C# extension methods around .NET's impl-agnostic `System.Data.*` interfaces
-* Map a POCO class 1:1 to an RDBMS table, cleanly by conventions, without any attributes required.
-* Create/Drop DB Table schemas using nothing but POCO class definitions
-* Simplicity - typed, wrist friendly API for common data access patterns.
-* High performance - with support for indexes, text blobs, etc.
-    * Amongst the [fastest Micro ORMs](https://servicestackv3.github.io/Mono/src/Mono/benchmarks/default.htm) for .NET.
-* Expressive power and flexibility - with access to `IDbCommand` and raw SQL
-* Cross-platform - supports multiple dbs (currently: Sql Server, Sqlite, MySql, PostgreSQL, Firebird) running on both .NET Framework and .NET Core platforms.
+<one-class-one-table>
+</one-class-one-table>
 
-In OrmLite: **1 Class = 1 Table**. There should be no surprising or hidden behaviour, the Typed API
-that produces the Query
-[doesn't impact how results get intuitively mapped](http://stackoverflow.com/a/37443162/85785)
-to the returned POCO's which could be different to the POCO used to create the query, e.g. containing only
-a subset of the fields you want populated.
+Complex properties are blobbed using any of the
+[pluggable text serializers](introspection#pluggable-complex-type-serializers), and
+[POCO-friendly references](reference-support) provide a convenient API for persisting related models.
+OrmLite is amongst the [fastest Micro ORMs](https://servicestackv3.github.io/Mono/src/Mono/benchmarks/default.htm)
+for .NET and runs on both .NET Framework and .NET.
 
-Any non-scalar properties (i.e. complex types) are text blobbed by default in a schema-less text field
-using any of the [available pluggable text serializers](introspection#pluggable-complex-type-serializers).
-Support for [POCO-friendly references](reference-support) is also available to provide
-a convenient API to persist related models. Effectively this allows you to create a table from any
-POCO type, and it should persist as expected in a DB Table with columns for each of the classes 1st
-level public properties.
+<ormlite-doc-map>
+</ormlite-doc-map>
 
 ## Getting Started
 
