@@ -63,7 +63,7 @@ export default {
         <a v-for="feature in results" :key="feature.name" :href="baseUrl + feature.href"
            class="group flex flex-col rounded-xl border border-slate-200 bg-slate-50/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-indigo-600 dark:hover:bg-slate-800">
           <div class="flex items-start justify-between gap-2">
-            <span class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{feature.name}}</span>
+            <span :title="feature.name" class="min-w-0 truncate font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{feature.name}}</span>
             <span v-if="feature.badge" class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{feature.badge}}</span>
           </div>
           <p v-if="feature.category !== specialCategory" class="mt-1.5 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-400">{{feature.text}}</p>
