@@ -43,6 +43,9 @@ public interface IRedisClient
 }
 ```
 
+<lua-strategies>
+</lua-strategies>
+
 ## Efficient SCAN in LUA
 
 The C# API below returns the first 10 results matching the `key:*` pattern:
@@ -101,6 +104,9 @@ string json = redis.ExecLuaAsString(FastScanScript, "key:*", "10");
 ::: info
 This is also the approach used in Redis React's [RedisServices](https://github.com/ServiceStackApps/RedisReact/blob/a1b66603d52d2f18b96227fc455ecb5323e424c8/src/RedisReact/RedisReact.ServiceInterface/RedisServices.cs#L60).
 :::
+
+<cached-lua-flow>
+</cached-lua-flow>
 
 ## ExecCachedLua
 

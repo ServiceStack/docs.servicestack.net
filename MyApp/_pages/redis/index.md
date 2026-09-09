@@ -20,6 +20,9 @@ For most cases if you require access to Redis specific functionality you would w
 
 The interfaces work cleanly with any IOC and allows your app logic to bind to implementation-free interfaces which can easily be mocked and substituted.
 
+<interface-picker>
+</interface-picker>
+
 An overview of class hierarchy for the C# Redis clients looks like:
 
 ```
@@ -32,6 +35,9 @@ With each client providing different layers of abstraction:
 * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
 * The RedisTypedClient provides a generic interface allowing you to add POCO values. POCOs are serialized using [ServiceStack.Text](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.Text/src/ServiceStack.Text) which is then converted to UTF8 bytes and sent to Redis.
 
+<client-layers>
+</client-layers>
+
 ## API Overview
 
 <a href="https://reference.servicestack.net/api/ServiceStack.Redis/"><div class="mx-auto max-w-screen-lg block flex justify-center shadow hover:shadow-lg rounded py-1"><img class="p-4" src="/img/pages/redis/redis-reference.png"></div></a>
@@ -41,3 +47,6 @@ With each client providing different layers of abstraction:
 <div class="my-8 flex justify-center">
   <a class="max-w-4xl" href="/img/pages/redis/redis-annotated.png"><img src="/img/pages/redis/redis-annotated.png"></a>
 </div>
+
+<redis-doc-map>
+</redis-doc-map>

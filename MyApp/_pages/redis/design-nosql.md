@@ -26,6 +26,9 @@ I will be re-factoring this solution in what I consider a 'best practices approa
 
 ## Modeling Entities in a NoSQL Database
 
+<nosql-modeling>
+</nosql-modeling>
+
 If you've spent a lot of time building solutions with an RDBMS back-end it can be hard to know which part of your schema is due to the problem domain and which part is the result of an implementation constraint trying to map your ideal domain model onto a relational tabular structure.
 
 My approach before designing any system is to map out the ideal domain model we need to build in order before I reach for an IDE or a db gui schema creator. Unfortunately creating POCO types is just so damn quick in VS.NET/C#/R# that I've ditched the pencil and paper a long time ago and jump right into using C# automatic properties like a kind of light-weight DSL ripping out entities quicker than I can draw crows feet :)
@@ -97,6 +100,9 @@ Ayende has outlined a few scenarios that the Blog application should support.
 * Categories page: show all posts for category
 
 The full source code for the Redis solution for each of these scenarios is [available here](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BlogPostExample.cs). Although I will go through each solution in a little more detail below.
+
+<index-patterns>
+</index-patterns>
 
 ### Main page: show list of blogs
 Before we can show a list of blogs, we need to add some first.

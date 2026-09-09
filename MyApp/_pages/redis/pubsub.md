@@ -12,6 +12,9 @@ published to specific [Redis Pub/Sub](http://redis.io/commands#pubsub) channels.
 when the redis-server connection fails and works like an independent background Service that can be
 stopped and started on command.
 
+<pub-sub-server-lifecycle>
+</pub-sub-server-lifecycle>
+
 ## API
 
 The public API is captured in the [IRedisPubSubServer](https://github.com/ServiceStack/ServiceStack/blob/master/src/ServiceStack.Interfaces/Redis/IRedisPubSubServer.cs) interface:

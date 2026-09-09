@@ -19,6 +19,9 @@ using (var redisClient = new RedisClient())
 The redis variable now holds a strongly-typed generic client that allows Redis value operations to apply against `MyPocoType`.
 The interface below lists all available operations:
 
+<typed-client-map>
+</typed-client-map>
+
 ## API
 
 ```csharp

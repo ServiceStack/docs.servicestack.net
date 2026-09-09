@@ -6,6 +6,9 @@ title: Automatic Retries
 One feature that improves the resilience of `RedisClient` connections is Auto Retry where the RedisClient will transparently retry failed Redis operations due to Socket and I/O Exceptions in an exponential backoff starting from
 **10ms** up until the `RetryTimeout` of **10000ms**. These defaults can be tweaked with:
 
+<retry-timeline>
+</retry-timeline>
+
 ## Usage
 
 ```csharp

@@ -6,9 +6,8 @@ title: Redis Profiling
 
 The easiest way to view your App's executed Redis commands is by enabling the [Admin Profiling UI](/admin-ui-features#request-logging-profiling) where it's built-in [Redis Profiling](/admin-ui-profiling#redis-profiling) will show generated queries in context with your other App events:
 
-<a href="/admin-ui-profiling#redis-profiling" class="block flex justify-center items-center">
-    <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling-redis-CommandAfter.png">
-</a>
+<screenshot src="/img/pages/admin-ui/profiling-redis-CommandAfter.png" title="Redis commands in the Admin Profiling UI">
+</screenshot>
 
 ## Logging Executed Redis Commands
 

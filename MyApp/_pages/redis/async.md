@@ -37,6 +37,9 @@ public class MyDep(IRedisClientsManagerAsync manager)
 }
 ```
 
+<async-pairs>
+</async-pairs>
+
 ## Usage in ServiceStack
 
 Inside ServiceStack Services & Controllers we recommend using `GetRedisAsync()` to resolve an `IRedisClientAsync`:

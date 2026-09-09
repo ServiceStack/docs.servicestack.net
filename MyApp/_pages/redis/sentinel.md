@@ -14,6 +14,12 @@ Support for Redis Sentinel is available with the `RedisSentinel` class which lis
 Sentinels to source its list of available master, slave and other sentinel redis instances which it uses
 to configure and maintain the Redis Client Managers, initiating any failovers as they're reported.
 
+<sentinel-topology>
+</sentinel-topology>
+
+<failover-sequence>
+</failover-sequence>
+
 ## Usage
 
 To use the new Sentinel support, instead of populating the Redis Client Managers with the connection string

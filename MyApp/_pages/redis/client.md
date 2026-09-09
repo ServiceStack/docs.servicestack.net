@@ -12,6 +12,9 @@ that provides access to key values as strings (or collection of strings for Redi
 
 Use this API if you just need to access values as strings or you want to have control over your own text serialization format.
 
+<client-api-map>
+</client-api-map>
+
 ## API
 
 ```csharp

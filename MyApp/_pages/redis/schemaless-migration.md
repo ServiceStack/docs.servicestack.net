@@ -26,6 +26,9 @@ To illustrate what can be achieved in practice, I will run through two different
 
 The full runnable source code for this example are [available here](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/Examples/BestPractice/BlogPostMigrations.cs).
 
+<migration-strategies>
+</migration-strategies>
+
 ## Example Code
 To demonstrate a typical migration scenario, I'm using the `BlogPost` type defined on the previous page to project it to a fundamentally different `New.BlogPost` type. The full definition of the old and new types are shown below:
 

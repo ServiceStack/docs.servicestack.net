@@ -5,6 +5,9 @@ title: Troubleshooting issues
 
 ## Debugging Data Corruption Issues
 
+<shared-client-pitfall>
+</shared-client-pitfall>
+
 An issue that can be hard to debug is if the same `RedisClient` instance is shared across multiple threads which can result in returning corrupted data.
 Typically, this is a result of using `IRedisClient` field in a singleton instance or sharing it as a static instance. To prevent this, each Thread that
 uses Redis should retrieve the redis client within a using statement, e.g:
@@ -29,8 +32,5 @@ If it does detect the client is being accessed from a different thread it will t
 
 What to look out for in your code-base to prevent against multiple concurrent usage of a `IRedisClient` instance:
 
-- Use `IRedisClient` redis instance client within a `using` statement
-- Never use a client instance after it has been disposed
-- Never use (or return) a "server collection or resource" (e.g. [Redis.Lists](#simple-example-using-redis-lists), lock) after the client has been disposed
-- Never keep a Singleton or `static` instance to a redis client (just the `IRedisClientsManager` factory)
-- Never use the same redis client in multiple threads, i.e. have each thread resolve their own client from the factory
+<diagnosis-checklist>
+</diagnosis-checklist>

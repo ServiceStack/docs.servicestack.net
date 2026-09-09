@@ -111,6 +111,9 @@ More examples are available in the [RedisExamples Redis examples page] and in th
 [test suite](https://github.com/ServiceStack/ServiceStack.Redis/tree/master/tests/ServiceStack.Redis.Tests)
 
 
+<data-structure-tour>
+</data-structure-tour>
+
 ## Speed
 One of the best things about Redis is the speed - it is quick.
 
@@ -164,6 +167,9 @@ Took 132.0076ms to get the entire Northwind database (3202 records)
 
 Note: The total time taken includes an extra Redis operation for each record to store the id in a Redis set for each
 type as well as serializing and de-serializing each record using Service Stack's TypeSerializer.
+
+<advanced-apis>
+</advanced-apis>
 
 ## Lex Operations
 

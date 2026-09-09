@@ -11,6 +11,9 @@ settings in a single connection string (akin to DB Connection strings).
 Redis Connection Strings supports multiple URI-like formats, from a simple **hostname** or **IP Address and port** pair to a
 fully-qualified **URI** with multiple options specified on the QueryString.
 
+<connection-anatomy>
+</connection-anatomy>
+
 Some examples of supported formats:
 
 ```
@@ -97,6 +100,9 @@ we've added a new
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class.
+
+<manager-picker>
+</manager-picker>
 
 ### RedisManagerPool
 

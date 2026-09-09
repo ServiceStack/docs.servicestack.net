@@ -11,11 +11,17 @@ title: Getting Started with Redis in .NET
 
 Redis, standing for REmote DIctionary Server, is an open-source, in-memory data structure store. It's widely used as a database, cache, and message broker. With its unique set of features and unparalleled speed, it's a crucial tool for a modern developer's toolkit.
 
+<redis-quickstart>
+</redis-quickstart>
+
 ## Key Features of Redis
 
 Redis supports various kinds of data structures like [strings](https://redis.io/docs/data-types/strings), [hashes](https://redis.io/docs/data-types/hashes), [lists](https://redis.io/docs/data-types/lists), [sets](https://redis.io/docs/data-types/sets), [sorted sets with range queries](https://redis.io/docs/data-types/sorted-sets), [bitmaps](https://redis.io/docs/data-types/bitmaps), [hyperloglogs](https://redis.io/docs/data-types/hyperloglogs), and geospatial indexes with [radius queries](https://redis.io/docs/data-types/geospatial). This wide array of data types and its ability to perform [atomic operations](https://redis.io/docs/manual/transactions/) make Redis extremely versatile for solving a myriad of problems.
 
 ![](../img/pages/redis/getting-started/key-features.png)
+
+<redis-pillars>
+</redis-pillars>
 
 ## High Performance and Speed
 

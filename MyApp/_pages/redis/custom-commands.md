@@ -26,6 +26,9 @@ public interface IRedisNativeClient
 }
 ```
 
+<custom-command-apis>
+</custom-command-apis>
+
 ## Examples
 
 These Custom APIs take a flexible `object[]` arguments which accepts any serializable value e.g.

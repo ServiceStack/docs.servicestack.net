@@ -10,6 +10,9 @@ The [Redis Transactions](./transactions.md) interface implemented by [ServiceSta
 Redis transaction interface provides useful overloads that let you Queue-up any [IRedisTypedClient](./typed-client.md) operation within a single transaction.
 The API provides support for a callback so you also have access to any return values returned as part of the transaction as well.
 
+<typed-transaction-map>
+</typed-transaction-map>
+
 ## Usage
 
 Below is a simple example showing how to access, use and commit the transaction.

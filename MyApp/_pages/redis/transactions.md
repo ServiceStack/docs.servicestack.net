@@ -18,6 +18,9 @@ From there you 'Queue' up all operations you want to be a part of the transactio
 
 If you don't call the `Commit()` before the end of the using block, `Dispose()` method will automatically invokes `Rollback()` that will send the 'DISCARD' command disposing of the current transaction and resetting the Redis client connection back to its previous state.
 
+<transaction-flow>
+</transaction-flow>
+
 ## Redis Transaction Examples
 
 Below is a simple example showing how to queue up Redis operations with and without a callback.
