@@ -682,7 +682,7 @@ Run `npx get-dtos` with no arguments to list all 15 supported languages.
 
 <screenshot src="/img/pages/chat/chat-ui.webp" title="AI Chat v4 - a complete AI Assistant inside your ServiceStack App"></screenshot>
 
-They [sign in with the account they already have](/chat/auth). They can talk to OpenAI, Anthropic, Google, Groq, xAI, Mistral, a local Ollama model or any other [configured provider](/chat/providers) from one model selector. They can attach documents, [dictate with their voice](/chat/media), generate images and audio, ask questions [grounded in your organization's documents](/chat/gemini), [design a PDF](/chat/pdf-studio), and - most usefully - ask the assistant to **do things with [your application's own APIs](/chat/api-tools)**, with an editable approval form in front of anything consequential.
+They [sign in with the account they already have](/chat/auth). They can talk to OpenAI, Anthropic, Google, Groq, xAI, Mistral, a local Ollama model or any other [configured provider](/chat/providers) from one model selector. They can attach documents, [dictate with their voice](/chat/media), generate images and audio, ask questions [grounded in your organization's documents](/chat/gemini-rag), [design a PDF](/chat/pdf-studio), and - most usefully - ask the assistant to **do things with [your application's own APIs](/chat/api-tools)**, with an editable approval form in front of anything consequential.
 
 None of it leaves your application boundary. There is no second user directory, no separate AI product to buy and administer, no per-seat contract, and no vendor holding your conversation history.
 
@@ -704,7 +704,7 @@ Assembling the same capability from separate products usually means running - an
 | --- | --- | --- |
 | Chat UI for staff | Per-seat AI assistant subscription | [Built in at `/chat`](/chat/overview) |
 | Multi-provider routing | Model gateway / LLM proxy service | [Built-in provider config](/chat/providers) |
-| Document Q&A (RAG) | Managed vector DB + indexing pipeline | [Gemini File Search extension](/chat/gemini) |
+| Document Q&A (RAG) | Managed vector DB + indexing pipeline | [Gemini File Search extension](/chat/gemini-rag) |
 | Usage, token and cost reporting | Separate observability tooling | [Analytics extension](/chat/analytics) |
 | Document/PDF generation | Reporting or document service | [PDF Studio](/chat/pdf-studio) + [`PdfFeature`](/chat/pdf) |
 | Agent access to business systems | Custom function-calling backend | [API Tools](/chat/api-tools) over your existing APIs |
@@ -729,7 +729,7 @@ The entire UI is assembled from registered Vue components, so extensions can add
 | `core_tools` | [Utilities, math, and code execution tools](/chat/tools) |
 | `credentials` | [Username/password sign-in](/chat/auth) for the Chat UI |
 | `gallery` | [Browsable catalog](/chat/media) of generated images and audio |
-| `gemini` | [Gemini File Search stores](/chat/gemini) for RAG |
+| `gemini` | [Gemini File Search stores](/chat/gemini-rag) for RAG |
 | `identity` | [Sign-in using the host App's ASP.NET Identity users](/chat/auth) |
 | `katex` | Mathematical typesetting |
 | `mcp` | The built-in [MCP Server](/chat/mcp) at `/chat/mcp` |
@@ -782,7 +782,7 @@ This avoids locking an entire workforce into one model vendor, and makes it prac
 
 AI Chat is [installed *inside* your ServiceStack App](/chat/auth), so it doesn't need a separate user directory, a second login experience or a new identity silo. It supports ServiceStack Identity Auth cookies, AuthFeature credentials, [ServiceStack API keys](/auth/apikeys) for programmatic clients and MCP Assistants, and a `RequiredRole` that can limit the entire capability to an approved group.
 
-Authentication is also the boundary for AI Chat's state - conversation threads, [generated media](/chat/media), [Agent Profile](/chat/agents) customizations, [Projects](/chat/projects), personal [Skills](/chat/skills), [Gemini File Stores](/chat/gemini), [PDF Studio](/chat/pdf-studio) workspaces and model preferences are all [scoped to the current identity](/chat/data).
+Authentication is also the boundary for AI Chat's state - conversation threads, [generated media](/chat/media), [Agent Profile](/chat/agents) customizations, [Projects](/chat/projects), personal [Skills](/chat/skills), [Gemini File Stores](/chat/gemini-rag), [PDF Studio](/chat/pdf-studio) workspaces and model preferences are all [scoped to the current identity](/chat/data).
 
 <screenshot src="/img/pages/chat/user-profile.webp" title="Authenticated AI Chat user workspace"></screenshot>
 
@@ -804,7 +804,7 @@ Which providers see your prompts remains entirely your decision - including *"no
 
 ### Enterprise RAG with Gemini File Search
 
-The [Gemini extension](/chat/gemini) provides a complete UI for managing Google Gemini File Search Stores as managed **Retrieval Augmented Generation** knowledge bases. Teams can create separate stores for departments, customers, products or projects, then drag and drop PDFs, Markdown, text and supported business documents into categories. Uploads are content-addressed, deduplicated and processed asynchronously by a background worker so indexing never blocks the UI.
+The [Gemini extension](/chat/gemini-rag) provides a complete UI for managing Google Gemini File Search Stores as managed **Retrieval Augmented Generation** knowledge bases. Teams can create separate stores for departments, customers, products or projects, then drag and drop PDFs, Markdown, text and supported business documents into categories. Uploads are content-addressed, deduplicated and processed asynchronously by a background worker so indexing never blocks the UI.
 
 <screenshots-gallery :images="{
     'Gemini File Search stores': '/img/pages/chat/gemini/gemini-filestores.webp',
@@ -13184,6 +13184,9 @@ Source: https://docs.servicestack.net/chat/install
 
 AI Chat is delivered by the **ServiceStack.AI.Chat** NuGet package and requires a **.NET 8+** ServiceStack App.
 
+<install-journey>
+</install-journey>
+
 ## Add the plugin
 
 The fastest way to add AI Chat is with the `add-in` npx script, which adds the package, registers both plugins and writes a starting configuration:
@@ -13236,14 +13239,11 @@ services.AddPlugin(new ChatFeature());
 
 ## Requirements
 
-| Requirement | Needed for | Notes |
-| --- | --- | --- |
-| .NET 8+ | Everything | `net8.0` and `net10.0` builds |
-| `IDbConnectionFactory` | Threads, analytics, media, Gemini | Registered by every ServiceStack App template |
-| At least one provider API key | Talking to a model | See [Providers & Models](/chat/providers) |
-| `AuthFeature` or Identity Auth | `RequireAuth = true` | See [Integrated Auth](/chat/auth) |
-| `typst` CLI | PDF Studio + PDF rendering | Optional - self-disables when missing |
-| `ffmpeg` or Mistral | Voice transcription | Optional - self-disables when missing |
+<requirements>
+</requirements>
+
+See [Providers & Models](/chat/providers) for enabling a provider and [Integrated Auth](/chat/auth) for
+choosing an `AuthType`.
 
 :::info
 AI Chat resolves its OrmLite connection from the host's `IDbConnectionFactory` and creates its tables when `AutoInitSchema` is true (the default). Without a registered `IDbConnectionFactory`, threads aren't persisted and the `gemini` extension disables itself.
@@ -13334,6 +13334,9 @@ Source: https://docs.servicestack.net/chat/configuration
 
 Every AI Chat capability is configured from a single `ChatFeature` plugin registration. Extension-specific options are reached through the extension properties it exposes (`Tools`, `ApiTools`, `Mcp`, `Publish`, `Pdf`, …), so a complete configuration reads as one object graph.
 
+<config-explorer>
+</config-explorer>
+
 ```csharp
 services.AddPlugin(new ChatFeature {
     RequireAuth = true,
@@ -13373,6 +13376,7 @@ services.AddPlugin(new ChatFeature {
 | `AutoInitSchema` | `true` | Create the OrmLite tables on startup |
 | `NamedConnection` | `null` | Use a named OrmLite connection for chat data instead of the default |
 | `DisableAdminUi` | `false` | Removes the `/admin-ui/chat` Admin UI and its APIs |
+| `IncludeInGeneratedDtos` | `false` | Include `ServiceStack.AI` APIs and supporting types in generated client DTOs |
 | `SvgIcon` | AI Chat icon | Icon used for the Admin UI link |
 
 ### Mounting at the site root
@@ -13537,13 +13541,8 @@ Setup = ctx => {
 
 ## Tool sandboxing
 
-| Property | Default | Description |
-| --- | --- | --- |
-| `Tools.EnableApiTools` | `true` | Let Models discover and call the App's own ServiceStack APIs |
-| `Tools.EnableFilesystemTools` | `false` | Read/write/edit/search files within allowed directories |
-| `Tools.EnableCodeExecution` | `false` | `run_bash` and the `run_*` code execution tools |
-| `Tools.AllowedDirectories` | `[]` | Directories filesystem/code tools may access |
-| `Tools.ToolTimeout` | `60s` | Per tool-call timeout |
+<safe-defaults>
+</safe-defaults>
 
 ```csharp
 Tools = {
@@ -13557,6 +13556,21 @@ Higher-risk capabilities are opt-in. Filesystem and code execution tools stay un
 ## AI Chat and the OpenAI API
 
 `ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
+
+### Generated client DTOs
+
+AI Chat clients typically use its OpenAI-compatible API directly, so `ChatFeature` excludes its
+`ServiceStack.AI` APIs and supporting types from generated [ServiceStack client DTOs](/add-servicestack-reference)
+by default. The APIs remain registered and callable; this only keeps AI Chat's large contract from being
+added to Apps which don't consume it through a generated ServiceStack client.
+
+Opt in when your App needs strongly typed AI Chat DTOs:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    IncludeInGeneratedDtos = true,
+});
+```
 
 ## Full configuration reference
 
@@ -13572,6 +13586,7 @@ services.AddPlugin(new ChatFeature {
     AutoInitSchema = true,
     NamedConnection = null,
     DisableAdminUi = false,
+    IncludeInGeneratedDtos = false,
 
     // ── Extensions ──
     DisableExtensions = [],
@@ -13620,11 +13635,8 @@ Your existing C# DTO is the AI Contract - enable API + MCP tools for your APIs
 
 Sending every API schema to a Model on every request would be expensive, slow and confusing - a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:
 
-| Tool | Purpose |
-| --- | --- |
-| `api_search` | Find APIs relevant to the user's intent from a compact index |
-| `api_describe` | Return complete schemas and workflow metadata for selected APIs |
-| `api_call` | Invoke an API using its typed Request DTO, **as the current user** |
+<three-tools>
+</three-tools>
 
 <screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
 
@@ -13634,14 +13646,8 @@ Only the search index is loaded eagerly; a Model pays for an API's schema only w
 
 ### Progressive discovery, end to end
 
-For a request like *"two grande hot oat milk lattes with light vanilla syrup for Sam"* the Model:
-
-1. `api_search` for APIs related to ordering coffee
-2. `api_describe` the menu, preview and create-order APIs it found
-3. `api_call` the menu API to resolve the current product Id, supported sizes and available options
-4. `api_call` the preview API to apply defaults, validate customizations and calculate the current price
-5. Present the proposed `CreateCoffeeShopOrder` for approval
-6. Submit the approved request and report the persisted order number
+<discovery-journey>
+</discovery-journey>
 
 Nothing about the menu was memorized from a prompt. The Model isn't given a snapshot of your application, it's taught how to find and use its live capabilities - so the same conversation keeps working as products, prices, options and APIs change.
 
@@ -13878,16 +13884,10 @@ API Tools remove most of the integration work but not the value of thoughtful AP
 
 ## Where API Tools fit
 
-CoffeeShop is deliberately easy to follow, but any workflow expressible as well-designed APIs can be reached in natural language:
+<use-cases>
+</use-cases>
 
-- **Customer service** - look up a customer's recent orders, inspect delivery status, issue an approved refund or add an account note, still bounded by that staff member's permissions
-- **Bookings & scheduling** - search availability, resolve customers and resources, preview a booking, then approve before committing it
-- **Commerce & procurement** - find products from live inventory, price them, validate quantities and submit an approved purchase, with no catalog snapshot in the prompt
-- **Business intelligence** - focused read-only reporting and AutoQuery APIs answer questions in natural language, with `Fields` and `Take` keeping results within useful context limits
-- **Internal operations** - create tickets, update CRM records, run reports or start deployment workflows, with destructive actions explicitly classified and guarded
-- **Vertical assistants** - package the domain knowledge already in your APIs into specialised assistants; the App stays responsible for deterministic validation and authorization, the Model for language and orchestration
-
-Because the [Tool Registry](/chat/tools) is shared, API Tools run alongside AI Chat's other tools in the same conversation - so your business APIs can be combined with search, files, images, audio, [custom extensions](/chat/custom-extensions) and ServiceStack Commands. That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
+That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
 
 ## Example App
 
@@ -13976,7 +13976,8 @@ Protocol revision `2025-06-18` is offered, negotiating down to earlier supported
 
 ## Authentication
 
-MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `ChatFeature.OnRequestAsync` resolves it onto the request, so tools execute against your APIs with **that user's** access rather than as the App itself.
+<mcp-identity>
+</mcp-identity>
 
 ```json
 {
@@ -14025,18 +14026,16 @@ See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration example
 
 ## What the server publishes
 
-For each exposed tool the server publishes:
+<mcp-exposure>
+</mcp-exposure>
 
-- Its input JSON Schema (the same OpenAI function schema the Chat UI uses)
-- Its output schema, where one was registered
-- Structured results
-- Safety annotations derived from `ToolSafety`
-
-Images and audio are inlined as base64 when small enough - an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above `MaxInlineResourceBytes` is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.
+An external Agent has no session with your App, so a link to its cache may be unfetchable - which is why small
+images and audio are inlined rather than linked.
 
 ## Approval across the MCP boundary
 
-The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses a configurable `ApprovalMode`.
+<approval-modes>
+</approval-modes>
 
 ### Default: Two-Phase Confirmation Token
 
@@ -14059,8 +14058,8 @@ Read-only operations (`IGet`, `QueryBase`, etc.) execute immediately without req
 
 #### Production deployment
 
-- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated - tokens won't survive restarts and are rejected across load-balanced instances.
-- **Distributed cache**: Register a shared `ICacheClient` (Redis, `OrmLiteCacheClient`, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.
+<mcp-production>
+</mcp-production>
 
 ### Fail-closed: Reject
 
@@ -14123,6 +14122,9 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 Source: https://docs.servicestack.net/chat/connect-mcp
 
 MCP clients can register a ServiceStack MCP server via a single CLI command or by configuring their respective MCP settings.
+
+<client-matrix>
+</client-matrix>
 
 ## Claude Code
 
@@ -14338,14 +14340,13 @@ This page covers **authoring**. For publishing, production rendering and typed C
 Turn Any PDF into a Dynamic API with AI, Typst & ServiceStack
 :::
 
-<text-block text="AI Chat PDF Studio → Publish → Admin PDF → Generate C# → Render in your App"></text-block>
+<pdf-lifecycle>
+</pdf-lifecycle>
 
 PDF Studio is only the authoring half. Everything after Publish is a controlled software artifact, and **production rendering never calls an LLM**.
 
-| Capability | Plugin | Runtime dependencies |
-| --- | --- | --- |
-| AI-assisted authoring and live preview | `ChatFeature` PDF extension | Typst and an AI provider |
-| Published template management and rendering | `PdfFeature` | Typst |
+<pdf-plugins>
+</pdf-plugins>
 
 ## Requirements
 
@@ -90713,28 +90714,17 @@ Source: https://docs.servicestack.net/chat/overview
 
 ## What you get
 
-| Capability | Where it lives |
-| --- | --- |
-| Multi-provider Chat UI | `/chat` |
-| OpenAI-compatible Chat Completions API | `POST /v1/chat/completions` |
-| In-process client for your own C# code | `IChatClient` |
-| Discovery + invocation of your App's own APIs | [API Tools](/chat/api-tools) |
-| MCP Server for external AI Assistants | `/chat/mcp` |
-| Managed RAG over your documents | [Gemini File Search](/chat/gemini) |
-| PDF template designer | `/chat/rendering-pdfs` |
-| Production PDF rendering | `IPdfRenderer` + `PdfFeature` |
-| Cost, token and activity reporting | `/admin-ui/chat` |
+<chat-anatomy>
+</chat-anatomy>
 
 ## Two plugins
 
 AI Chat ships as two independent plugins in the **ServiceStack.AI.Chat** package:
 
-| Plugin | Provides | Requires |
-| --- | --- | --- |
-| `ChatFeature` | Chat UI, providers, tools, API Tools, MCP, RAG, PDF Studio | An AI provider API key |
-| `PdfFeature` | Published PDF template management + rendering | The `typst` CLI |
+<two-plugins>
+</two-plugins>
 
-`PdfFeature` has no dependency on `ChatFeature` - an App can deploy production PDF rendering without installing any AI capability at all. See [Rendering PDFs](/chat/rendering-pdfs).
+See [Rendering PDFs](/chat/rendering-pdfs) to deploy production rendering on its own.
 
 ## Architecture
 
@@ -90758,26 +90748,15 @@ A disabled extension registers no routes, no tools and no UI components. See [Ex
 
 ## Where state lives
 
-| State | Location |
-| --- | --- |
-| Threads, requests, media | Your App's database via OrmLite (`ChatThread`, `ChatRequest`, `ChatMedia`) |
-| Config | `App_Data/chat/llms.json`, `App_Data/chat/providers.json` |
-| Per-user files | `App_Data/chat/user/{user}/` |
-| Content-addressed cache | `App_Data/chat/cache/` |
-| Published PDF templates | `App_Data/pdf/` |
+<state-map>
+</state-map>
 
 Nothing is stored outside your application. See [Data & Storage](/chat/data).
 
 ## Security posture
 
-| Question | Answer |
-| --- | --- |
-| Who can reach `/chat`? | Whoever `RequireAuth` and `RequiredRole` allow, enforced by your existing auth |
-| Can one user see another's threads, media or projects? | No - state is scoped to the authenticated identity |
-| What can an Agent call? | Only APIs the **signed-in user** is authorized to call |
-| Can it write files or run code? | Only if you enable those tools, and only within configured directories |
-| What is exposed over MCP? | Nothing until you name tool groups |
-| Does it require an outbound AI provider? | Only the providers you configure |
+<security-posture>
+</security-posture>
 
 See [Integrated Auth](/chat/auth).
 
@@ -90807,6 +90786,9 @@ See [Integrated Auth](/chat/auth).
 Source: https://docs.servicestack.net/chat/install
 
 AI Chat is delivered by the **ServiceStack.AI.Chat** NuGet package and requires a **.NET 8+** ServiceStack App.
+
+<install-journey>
+</install-journey>
 
 ## Add the plugin
 
@@ -90860,14 +90842,11 @@ services.AddPlugin(new ChatFeature());
 
 ## Requirements
 
-| Requirement | Needed for | Notes |
-| --- | --- | --- |
-| .NET 8+ | Everything | `net8.0` and `net10.0` builds |
-| `IDbConnectionFactory` | Threads, analytics, media, Gemini | Registered by every ServiceStack App template |
-| At least one provider API key | Talking to a model | See [Providers & Models](/chat/providers) |
-| `AuthFeature` or Identity Auth | `RequireAuth = true` | See [Integrated Auth](/chat/auth) |
-| `typst` CLI | PDF Studio + PDF rendering | Optional - self-disables when missing |
-| `ffmpeg` or Mistral | Voice transcription | Optional - self-disables when missing |
+<requirements>
+</requirements>
+
+See [Providers & Models](/chat/providers) for enabling a provider and [Integrated Auth](/chat/auth) for
+choosing an `AuthType`.
 
 :::info
 AI Chat resolves its OrmLite connection from the host's `IDbConnectionFactory` and creates its tables when `AutoInitSchema` is true (the default). Without a registered `IDbConnectionFactory`, threads aren't persisted and the `gemini` extension disables itself.
@@ -90958,6 +90937,9 @@ Source: https://docs.servicestack.net/chat/configuration
 
 Every AI Chat capability is configured from a single `ChatFeature` plugin registration. Extension-specific options are reached through the extension properties it exposes (`Tools`, `ApiTools`, `Mcp`, `Publish`, `Pdf`, …), so a complete configuration reads as one object graph.
 
+<config-explorer>
+</config-explorer>
+
 ```csharp
 services.AddPlugin(new ChatFeature {
     RequireAuth = true,
@@ -90997,6 +90979,7 @@ services.AddPlugin(new ChatFeature {
 | `AutoInitSchema` | `true` | Create the OrmLite tables on startup |
 | `NamedConnection` | `null` | Use a named OrmLite connection for chat data instead of the default |
 | `DisableAdminUi` | `false` | Removes the `/admin-ui/chat` Admin UI and its APIs |
+| `IncludeInGeneratedDtos` | `false` | Include `ServiceStack.AI` APIs and supporting types in generated client DTOs |
 | `SvgIcon` | AI Chat icon | Icon used for the Admin UI link |
 
 ### Mounting at the site root
@@ -91161,13 +91144,8 @@ Setup = ctx => {
 
 ## Tool sandboxing
 
-| Property | Default | Description |
-| --- | --- | --- |
-| `Tools.EnableApiTools` | `true` | Let Models discover and call the App's own ServiceStack APIs |
-| `Tools.EnableFilesystemTools` | `false` | Read/write/edit/search files within allowed directories |
-| `Tools.EnableCodeExecution` | `false` | `run_bash` and the `run_*` code execution tools |
-| `Tools.AllowedDirectories` | `[]` | Directories filesystem/code tools may access |
-| `Tools.ToolTimeout` | `60s` | Per tool-call timeout |
+<safe-defaults>
+</safe-defaults>
 
 ```csharp
 Tools = {
@@ -91181,6 +91159,21 @@ Higher-risk capabilities are opt-in. Filesystem and code execution tools stay un
 ## AI Chat and the OpenAI API
 
 `ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
+
+### Generated client DTOs
+
+AI Chat clients typically use its OpenAI-compatible API directly, so `ChatFeature` excludes its
+`ServiceStack.AI` APIs and supporting types from generated [ServiceStack client DTOs](/add-servicestack-reference)
+by default. The APIs remain registered and callable; this only keeps AI Chat's large contract from being
+added to Apps which don't consume it through a generated ServiceStack client.
+
+Opt in when your App needs strongly typed AI Chat DTOs:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    IncludeInGeneratedDtos = true,
+});
+```
 
 ## Full configuration reference
 
@@ -91196,6 +91189,7 @@ services.AddPlugin(new ChatFeature {
     AutoInitSchema = true,
     NamedConnection = null,
     DisableAdminUi = false,
+    IncludeInGeneratedDtos = false,
 
     // ── Extensions ──
     DisableExtensions = [],
@@ -91243,32 +91237,8 @@ AI Chat normalizes commercial, open and locally-hosted providers behind one mode
 
 ## Built-in providers
 
-| Provider | `llms.json` key | API Key |
-| --- | --- | --- |
-| OpenAI | `openai` | `OPENAI_API_KEY` |
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` |
-| Google Gemini | `google` | `GEMINI_API_KEY` |
-| Groq | `groq` | `GROQ_API_KEY` |
-| xAI | `xai` | `XAI_API_KEY` |
-| Cerebras | `cerebras` | `CEREBRAS_API_KEY` |
-| Mistral | `mistral` | `MISTRAL_API_KEY` |
-| Codestral | `codestral` | `CODESTRAL_API_KEY` |
-| OpenRouter | `openrouter` | `OPENROUTER_API_KEY` |
-| Fireworks | `fireworks-ai` | `FIREWORKS_API_KEY` |
-| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` |
-| Moonshot | `moonshotai` | `MOONSHOT_API_KEY` |
-| Z.ai | `zai` / `zai-coding-plan` | `ZAI_API_KEY` / `ZHIPU_API_KEY` |
-| MiniMax | `minimax` | `MINIMAX_API_KEY` |
-| Nvidia | `nvidia` | `NVIDIA_API_KEY` |
-| Chutes | `chutes` | `CHUTES_API_KEY` |
-| Alibaba | `alibaba` | - |
-| Hugging Face | `huggingface` | - |
-| GitHub Copilot / Models | `github-copilot`, `github-models` | - |
-| Ollama | `ollama` | none (local) |
-| Ollama Cloud | `ollama-cloud` | `OLLAMA_API_KEY` |
-| LM Studio | `lmstudio` | none (local) |
-| OpenAI-compatible (local) | `openai-local` | - |
-| llms.py | `llmspy` | - |
+<provider-catalog>
+</provider-catalog>
 
 The `ChatApiKey` static class names every environment variable AI Chat looks for:
 
@@ -91280,19 +91250,8 @@ ChatApiKey.Gemini      // "GEMINI_API_KEY"
 
 ## How a provider becomes live
 
-A provider is created and registered when **all** of these hold:
-
-1. It has an entry in `llms.json`'s `providers` object.
-2. It is enabled - either `"enabled": true` in its definition, or named in `ChatFeature.EnableProviders`.
-3. Its `npm` sdk id resolves to a factory in `ChatFeature.ProviderTypes`.
-4. `provider.Test()` passes, which normally means an API key was resolved.
-
-API keys are resolved in this order:
-
-<text-block :rows="[
-  ['ChatFeature.Variables','Programmatic values, checked first'],
-  ['Environment variables','$OPENAI_API_KEY etc.'],
-  ['api_key in llms.json','A literal value, or a $VAR reference resolved as above']]"></text-block>
+<provider-lifecycle>
+</provider-lifecycle>
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -91303,11 +91262,10 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-:::tip
-Providers that can't resolve a key are simply skipped with an informational log entry - a missing key never fails startup.
-:::
-
 ## Restricting the providers users can reach
+
+<provider-lockdown>
+</provider-lockdown>
 
 `EnableProviders` overrides every `enabled` flag in `llms.json`, which makes it the simplest way to pin a deployment to an approved set:
 
@@ -91484,6 +91442,9 @@ Source: https://docs.servicestack.net/chat/auth
 
 AI Chat is installed **inside** your ServiceStack App, so it doesn't need a separate user directory, a second login experience or a new identity silo. Existing users sign in with the account they already have, and every user-facing capability is scoped to that identity.
 
+<identity-scope>
+</identity-scope>
+
 <screenshot src="/img/pages/chat/auth/signin.webp" title="Signing in to AI Chat with the host App's users"></screenshot>
 
 ## Choosing an AuthType
@@ -91495,11 +91456,8 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-| `ChatAuthType` | Sign-in experience | Requires |
-| --- | --- | --- |
-| `Credentials` *(default)* | Username/password form rendered **inside** the Chat UI | `AuthFeature` with `CredentialsAuth()`, or Identity Auth |
-| `OAuth` | Redirects to the host's Identity login page at `SignInUrl` | ASP.NET Identity Auth |
-| `ApiKey` | `GET /auth` with an `Authorization: Bearer` header | [`ApiKeysFeature`](/auth/apikeys) |
+<auth-types>
+</auth-types>
 
 ### Credentials
 
@@ -91655,18 +91613,8 @@ AI Chat ships eight themes users can switch between, and the theming system is o
 
 ## Bundled themes
 
-| Theme | `colorScheme` | Background image |
-| --- | --- | --- |
-| `light` | light | - |
-| `light_sky` | light | ✓ |
-| `light_slate` | light | ✓ |
-| `soft_pink` | light | ✓ |
-| `dark` | dark | - |
-| `nord` | dark | ✓ |
-| `matrix` | dark | ✓ |
-| `blue_smoke` | dark | ✓ |
-
-The theme picker splits them into **Light Themes** and **Dark Themes** columns based on each theme's `colorScheme`, with `light` and `dark` pinned first in their respective columns and the rest sorted by display name. Each entry renders a miniature chrome preview from the theme's own `preview` values.
+<theme-gallery>
+</theme-gallery>
 
 ## Anatomy of a theme
 
@@ -91746,13 +91694,8 @@ A theme only needs to define the slots it wants to change - everything else fall
 
 ## How a theme is resolved
 
-Themes are layered, so a custom theme can be as small as a handful of overrides:
-
-<text-block :rows="[
-  ['1. Built-in defaults','colorScheme + a transparent --background-image'],
-  ['2. shared.json','vars + styles every theme inherits'],
-  ['3. Base theme','The built-in light or dark, chosen by colorScheme'],
-  ['4. The theme itself','Its own vars + styles win']]"></text-block>
+<theme-layers>
+</theme-layers>
 
 `preview` is taken from the theme when it defines one; otherwise it's derived by looking up each of the base theme's preview keys in the resolved `styles`.
 
@@ -91927,54 +91870,24 @@ AI Chat solves this with a shared extension architecture spanning the server and
 
 ## Built-in extensions
 
-| Extension | What it adds |
-| --- | --- |
-| `app` | Threads, history, avatars and the core conversation UI |
-| `agents` | [Agent Profiles](/chat/agents) and the Profile Manager |
-| `analytics` | [Cost, token and activity reporting](/chat/analytics) for admins |
-| `api_tools` | [Discovery and invocation](/chat/api-tools) of the App's own ServiceStack APIs |
-| `computer` | Filesystem tools and `run_bash` - **off by default** |
-| `core_tools` | Utilities, math and code execution tools |
-| `credentials` | Username/password sign-in for the Chat UI |
-| `custom` | Your App's own UI + routes, served from `chat/custom/**` |
-| `gallery` | Browsable catalog of generated images and audio |
-| `gemini` | [Gemini File Search](/chat/gemini) stores for RAG |
-| `identity` | Sign-in using the host App's ASP.NET Identity users |
-| `katex` | Mathematical typesetting |
-| `mcp` | The built-in [MCP Server](/chat/mcp) at `/chat/mcp` |
-| `pdf` | [PDF Studio](/chat/pdf-studio) at `/chat/pdf-studio` |
-| `projects` | [Per-user workspaces](/chat/projects) and directory boundaries |
-| `publish` | Sharing threads, projects and media - **off by default** |
-| `skills` | [Skill](/chat/skills) management, search, install and authoring |
-| `system_prompts` | The system prompt library |
-| `tools` | The shared [Tool Registry](/chat/tools) and tools panel |
-| `voice` | [Voice input](/chat/media) and transcription |
+<extension-catalog>
+</extension-catalog>
 
 ## What an extension can contribute
 
-Each extension can register only what it needs:
-
-- ServiceStack routes and APIs, under `/{RoutePrefix}/ext/{name}/`
-- Model tools and tool groups
-- UI components and pages
-- Sidebar and toolbar actions
-- Chat request, tool, approval, status, response and error filters
-- Import maps and client dependencies
-- Per-user files and preferences
-- Database tables and background workers
-- Startup and shutdown lifecycle hooks
-
-The entire UI is assembled from registered Vue components, so an extension can add a new component or deliberately **replace** an existing building block by registering the same component name.
+<extension-surface>
+</extension-surface>
 
 ## Disabling extensions
+
+<disable-routes>
+</disable-routes>
 
 ```csharp
 services.AddPlugin(new ChatFeature {
     DisableExtensions = ["computer", "publish", "katex"],
 });
 ```
-
-`DisableExtensions` removes the capability from the server **and** the UI together - a disabled extension registers no routes, no tools and no components.
 
 The same list can be set in `App_Data/chat/llms.json`, which is merged with the programmatic list:
 
@@ -92070,6 +91983,9 @@ Nothing under `chat/custom/**` is ever overwritten by an upstream UI sync, which
 Source: https://docs.servicestack.net/chat/custom-extensions
 
 Adding your own capability to AI Chat means writing a `ChatExtension`. It's the same API the built-in extensions use - routes, tools, filters, providers, UI and background workers all register through the `ExtensionContext` passed to `Install`.
+
+<extension-api>
+</extension-api>
 
 ```csharp
 services.AddPlugin(new ChatFeature {
@@ -92414,6 +92330,9 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
+<tool-posture>
+</tool-posture>
+
 | Property | Default | Description |
 | --- | --- | --- |
 | `EnableApiTools` | `true` | Let Models discover and call the App's own ServiceStack APIs |
@@ -92508,12 +92427,8 @@ public class BookingToolsExtension() : ChatExtension("booking_tools")
 
 `ToolSafety` classifies how much damage a call can do, which determines whether an Agent may make it unattended:
 
-| Value | Meaning |
-| --- | --- |
-| `Auto` *(default)* | Inferred from the API's HTTP verb - GET/HEAD is read-only, DELETE is destructive, everything else is a write |
-| `ReadOnly` | Only reads data. Safe to call unattended and safe to retry |
-| `Write` | Creates or updates data. Recoverable, but retrying may duplicate the change |
-| `Destructive` | Deletes data or triggers a real-world side effect. Should require approval |
+<safety-ladder>
+</safety-ladder>
 
 ```csharp
 [Tool("the user has finished choosing an order and wants to place it",
@@ -92584,11 +92499,8 @@ Your existing C# DTO is the AI Contract - enable API + MCP tools for your APIs
 
 Sending every API schema to a Model on every request would be expensive, slow and confusing - a mature application's whole API surface is far too large to keep in context (270 APIs is roughly 156K tokens of schema). Instead, ServiceStack exposes three stable tools:
 
-| Tool | Purpose |
-| --- | --- |
-| `api_search` | Find APIs relevant to the user's intent from a compact index |
-| `api_describe` | Return complete schemas and workflow metadata for selected APIs |
-| `api_call` | Invoke an API using its typed Request DTO, **as the current user** |
+<three-tools>
+</three-tools>
 
 <screenshot src="/img/pages/chat/api-tools/api-tools.webp" title="API Tools"></screenshot>
 
@@ -92598,14 +92510,8 @@ Only the search index is loaded eagerly; a Model pays for an API's schema only w
 
 ### Progressive discovery, end to end
 
-For a request like *"two grande hot oat milk lattes with light vanilla syrup for Sam"* the Model:
-
-1. `api_search` for APIs related to ordering coffee
-2. `api_describe` the menu, preview and create-order APIs it found
-3. `api_call` the menu API to resolve the current product Id, supported sizes and available options
-4. `api_call` the preview API to apply defaults, validate customizations and calculate the current price
-5. Present the proposed `CreateCoffeeShopOrder` for approval
-6. Submit the approved request and report the persisted order number
+<discovery-journey>
+</discovery-journey>
 
 Nothing about the menu was memorized from a prompt. The Model isn't given a snapshot of your application, it's taught how to find and use its live capabilities - so the same conversation keeps working as products, prices, options and APIs change.
 
@@ -92842,16 +92748,10 @@ API Tools remove most of the integration work but not the value of thoughtful AP
 
 ## Where API Tools fit
 
-CoffeeShop is deliberately easy to follow, but any workflow expressible as well-designed APIs can be reached in natural language:
+<use-cases>
+</use-cases>
 
-- **Customer service** - look up a customer's recent orders, inspect delivery status, issue an approved refund or add an account note, still bounded by that staff member's permissions
-- **Bookings & scheduling** - search availability, resolve customers and resources, preview a booking, then approve before committing it
-- **Commerce & procurement** - find products from live inventory, price them, validate quantities and submit an approved purchase, with no catalog snapshot in the prompt
-- **Business intelligence** - focused read-only reporting and AutoQuery APIs answer questions in natural language, with `Fields` and `Take` keeping results within useful context limits
-- **Internal operations** - create tickets, update CRM records, run reports or start deployment workflows, with destructive actions explicitly classified and guarded
-- **Vertical assistants** - package the domain knowledge already in your APIs into specialised assistants; the App stays responsible for deterministic validation and authorization, the Model for language and orchestration
-
-Because the [Tool Registry](/chat/tools) is shared, API Tools run alongside AI Chat's other tools in the same conversation - so your business APIs can be combined with search, files, images, audio, [custom extensions](/chat/custom-extensions) and ServiceStack Commands. That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
+That's what makes `/chat` useful past a demo page: a natural language operations console for internal users, a guided assistant for customers, or the fastest way to test whether your APIs carry enough context for autonomous workflows.
 
 ## Example App
 
@@ -92940,7 +92840,8 @@ Protocol revision `2025-06-18` is offered, negotiating down to earlier supported
 
 ## Authentication
 
-MCP Clients authenticate with a **ServiceStack API key** in the Bearer token. `ChatFeature.OnRequestAsync` resolves it onto the request, so tools execute against your APIs with **that user's** access rather than as the App itself.
+<mcp-identity>
+</mcp-identity>
 
 ```json
 {
@@ -92989,18 +92890,16 @@ See the [Connect MCP Clients](/chat/connect-mcp) guide for configuration example
 
 ## What the server publishes
 
-For each exposed tool the server publishes:
+<mcp-exposure>
+</mcp-exposure>
 
-- Its input JSON Schema (the same OpenAI function schema the Chat UI uses)
-- Its output schema, where one was registered
-- Structured results
-- Safety annotations derived from `ToolSafety`
-
-Images and audio are inlined as base64 when small enough - an external Agent has no session with your App, so a link to its cache may be unfetchable. Anything above `MaxInlineResourceBytes` is returned as a resource link instead: an Agent can't stream a 40MB wav through its context.
+An external Agent has no session with your App, so a link to its cache may be unfetchable - which is why small
+images and audio are inlined rather than linked.
 
 ## Approval across the MCP boundary
 
-The built-in Chat UI can pause execution and render ServiceStack's editable approval form. A generic MCP client cannot render or resume that server UI, so MCP uses a configurable `ApprovalMode`.
+<approval-modes>
+</approval-modes>
 
 ### Default: Two-Phase Confirmation Token
 
@@ -93023,8 +92922,8 @@ Read-only operations (`IGet`, `QueryBase`, etc.) execute immediately without req
 
 #### Production deployment
 
-- **Signing secret**: Configure `SigningSecret` (or `HostConfig.AdminAuthSecret`) with a shared value of at least 32 bytes. Without it, an ephemeral per-process secret is generated - tokens won't survive restarts and are rejected across load-balanced instances.
-- **Distributed cache**: Register a shared `ICacheClient` (Redis, `OrmLiteCacheClient`, etc.) for single-use token replay protection. Otherwise an in-process set is used, which degrades silently in a farm.
+<mcp-production>
+</mcp-production>
 
 ### Fail-closed: Reject
 
@@ -93087,6 +92986,9 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 Source: https://docs.servicestack.net/chat/connect-mcp
 
 MCP clients can register a ServiceStack MCP server via a single CLI command or by configuring their respective MCP settings.
+
+<client-matrix>
+</client-matrix>
 
 ## Claude Code
 
@@ -93299,22 +93201,13 @@ One system prompt cannot be ideal for every task. **Agent Profiles** package a m
 
 ## Built-in profiles
 
-| Profile | Purpose |
-| --- | --- |
-| `chat` | General-purpose assistant |
-| `planner` | Decomposes a goal and writes `PLAN.md` |
-| `coder` | Implements an approved plan with the tools allowed in the selected Project |
-
-Bundled profiles are read-only until a user saves their own copy of the same name, at which point the user's version takes precedence.
+<profile-anatomy>
+</profile-anatomy>
 
 ## Where profiles live
 
-Profiles are resolved from three roots, lowest precedence first:
-
-<text-block :rows="[
-  ['(bundled)','chat/profiles/** shipped with the package'],
-  ['App_Data/chat/user/default/profiles/','Shared profiles for every user'],
-  ['App_Data/chat/user/{user}/profiles/','The signed-in user’s own profiles']]"></text-block>
+<profile-precedence>
+</profile-precedence>
 
 A profile is a folder:
 
@@ -93457,7 +93350,10 @@ Source: https://docs.servicestack.net/chat/skills
 
 ## Progressive disclosure
 
-A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it. This keeps prompts small and helps specialists remain specialists - a Model with fifty available skills pays for fifty one-line descriptions, not fifty procedure documents.
+A skill's *description* is always visible to the Model; its detailed instructions are only loaded when the Model calls the `skill` tool for it.
+
+<progressive-disclosure>
+</progressive-disclosure>
 
 ## Anatomy of a skill
 
@@ -93494,13 +93390,8 @@ asks how to run an incident.
 ...
 ```
 
-| Frontmatter key | Purpose |
-| --- | --- |
-| `name` | Skill identifier. Defaults to the folder name |
-| `description` | The one line the Model sees before deciding to load the skill |
-| `license` | Optional license attribution |
-| `allowed-tools` | Tools this skill expects to be available |
-| `metadata.*` | Arbitrary additional properties |
+<skill-manifest>
+</skill-manifest>
 
 The `description` is doing the selection work - write it as the situation the skill applies to, the same way you'd write `[Tool(WhenToUse)]`.
 
@@ -93579,7 +93470,8 @@ Source: https://docs.servicestack.net/chat/projects
 
 <screenshot src="/img/pages/chat/projects.webp" title="AI Chat project workspace selector"></screenshot>
 
-This is what allows capable coding and document Agents without granting them ambient access to the whole server.
+<project-boundary>
+</project-boundary>
 
 ## How the boundary works
 
@@ -93693,141 +93585,15 @@ With `projects` disabled, filesystem tools fall back to `Tools.AllowedDirectorie
 - Typst's root restriction and the project path check limit file access but are **not** operating-system sandboxes. Untrusted workloads belong in a container or dedicated worker.
 
 
-# Gemini File Search (RAG)
-Source: https://docs.servicestack.net/chat/gemini
-
-The `gemini` extension provides a complete UI for managing **Google Gemini File Search Stores** and using them as managed Retrieval Augmented Generation knowledge bases - without asking your team to design a chunking pipeline, vector database, background indexer, retrieval tool and administration UI from scratch.
-
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
-    'Gemini File Search stores': '/img/pages/chat/gemini/gemini-filestores.webp',
-    'Upload a document folder': '/img/pages/chat/gemini/gemini-filestores-upload-folder.webp',
-}"></screenshots-gallery>
-
-## Enabling it
-
-The extension self-enables when both of these are available:
-
-1. A Gemini API key - `GEMINI_API_KEY`, or whatever the `google` provider resolved.
-2. A registered `IDbConnectionFactory`, since the document catalog is an OrmLite table.
-
-```bash
-export GEMINI_API_KEY=...
-```
-
-Or programmatically:
-
-```csharp
-services.AddPlugin(new ChatFeature {
-    Variables = {
-        ["GEMINI_API_KEY"] = context.Configuration["Gemini:ApiKey"]!,
-    },
-});
-```
-
-Without either prerequisite the extension logs why and disables itself - no routes, no tools, no UI.
-
-To turn it off explicitly:
-
-```csharp
-services.AddPlugin(new ChatFeature {
-    DisableExtensions = ["gemini"],
-});
-```
-
-## Stores, categories and documents
-
-Teams create separate stores for departments, customers, products or projects, then drag and drop PDFs, Markdown, text and supported business documents into categories within them.
-
-Uploads are:
-
-- **Content-addressed** - written into `App_Data/chat/cache` under their SHA-256
-- **Deduplicated** - the same document uploaded twice is stored once
-- **Asynchronous** - a background worker performs the Gemini upload, so indexing never blocks the UI
-
-Queued uploads are resumed on startup if the App shut down mid-upload.
-
-## Grounded conversations at three scopes
-
-Once indexed, a user can start a grounded conversation at whichever scope fits the question:
-
-| Scope | Retrieval |
-| --- | --- |
-| **Ask File Store** | The complete knowledge base |
-| **Ask Category** | One department, subject or folder |
-| **Ask Document** | A single selected document |
-
-<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-3 gap-4" :images="{
-    'Ask the complete File Store': '/img/pages/chat/gemini/gemini-search-all.webp',
-    'Ask a document category': '/img/pages/chat/gemini/gemini-search-category.webp',
-    'Ask a single document': '/img/pages/chat/gemini/gemini-search-document.webp',
-}"></screenshots-gallery>
-
-Grounding is implemented by including an OpenAI-shaped `file_search` tool in the thread, which the Google provider forwards to Gemini. Grounding **sources are retained with responses**, so users can verify where an answer came from instead of treating fluent output as evidence.
-
-## Synchronization
-
-The local catalog and Gemini's view of a store can drift - an upload failed, a document was removed remotely, metadata changed. **Sync** reconciles them:
-
-- Matches by the SHA-256 hash Gemini keeps in each document's custom metadata, falling back to the document name
-- Refreshes stale local fields
-- Records what didn't line up as the document's state
-
-<screenshot src="/img/pages/chat/gemini/gemini-sync.webp" title="Gemini File Search synchronization report"></screenshot>
-
-## Storage economics
-
-Google currently charges for embeddings when documents are **indexed**, whilst **file storage and query-time embeddings are free**. Retrieved document tokens are billed as normal model context, and stores persist until deleted with project capacity scaling by usage tier.
-
-That removes the recurring vector-storage charge common in managed RAG architectures - an organization can maintain durable knowledge bases and pay primarily when content is indexed and when users actually query it.
-
-:::info
-Pricing and limits are Google's and can change. Check the current [Gemini File Search pricing and limits](https://ai.google.dev/gemini-api/docs/file-search) before deployment.
-:::
-
-## What AI Chat adds around Google's service
-
-- Local document catalog and per-document status
-- Store and category organization
-- Background upload queue with resume-on-startup
-- SHA-256 deduplication
-- Remote/local synchronization reports
-- Re-upload and delete controls
-- User-scoped management
-- One-click grounded chat creation
-
-## Per-user isolation
-
-File Stores and their document catalogs are scoped to the authenticated user, like every other piece of AI Chat state. A store one user creates is not visible to another.
-
-For a genuinely shared organizational knowledge base, create it under a shared account or expose it through an [API Tool](/chat/api-tools) that queries it on the user's behalf with your own authorization rules.
-
-## API
-
-<text-block :rows="[
-  ['GET    /chat/ext/gemini/filestores','List stores with document counts and sizes'],
-  ['POST   /chat/ext/gemini/filestores','Create a store'],
-  ['DELETE /chat/ext/gemini/filestores/{id}','Delete a store'],
-  ['GET    /chat/ext/gemini/filestores/{id}/categories','Categories within a store'],
-  ['GET    /chat/ext/gemini/filestores/{id}/documents','Live document state from Gemini'],
-  ['POST   /chat/ext/gemini/filestores/{id}/upload','Multipart upload into a store'],
-  ['POST   /chat/ext/gemini/filestores/{id}/sync','Reconcile local + remote'],
-  ['GET    /chat/ext/gemini/documents','Query the local document catalog'],
-  ['POST   /chat/ext/gemini/documents/{id}/upload','Retry a failed upload'],
-  ['DELETE /chat/ext/gemini/documents/{id}','Delete a document']]"></text-block>
-
-## Operational notes
-
-- The document catalog tables are created when `AutoInitSchema` is true.
-- The upload worker is stopped cleanly on AppHost disposal via a registered shutdown handler.
-- Cached document bytes live under `App_Data/chat/cache` and should be included in your backups - see [Data & Storage](/chat/data).
-
-
 # Voice &amp; Media
 Source: https://docs.servicestack.net/chat/media
 
 Text is only one AI modality. AI Chat supports voice-to-text input, image generation, audio generation and speech synthesis through configured providers, with everything generated recorded in the App's own media catalog.
 
 <screenshot src="/img/pages/chat/voice-and-media.webp" title="AI Chat voice and media controls"></screenshot>
+
+<media-pipeline>
+</media-pipeline>
 
 ## Voice input
 
@@ -93837,11 +93603,8 @@ It picks the first available option from the `LLMS_VOICE` environment variable, 
 
 <text-block text="voxtype,transcribe,voxtral-mini-latest"></text-block>
 
-| Option | Requires |
-| --- | --- |
-| `voxtype` | The `voxtype` CLI on `PATH`, plus `ffmpeg` |
-| `transcribe` | The `transcribe` CLI on `PATH`, plus `ffmpeg` |
-| `voxtral-*` | The `mistral` provider enabled with `MISTRAL_API_KEY` |
+<voice-options>
+</voice-options>
 
 ```bash
 # prefer Mistral's hosted transcription over local CLIs
@@ -93963,12 +93726,1645 @@ The look of all of this is controlled by the active theme - see [Themes](/chat/t
 
 The same modular provider system lets an organization enable only approved vendors and models. A creative team can expose image and speech models, whilst a regulated workflow restricts users to text models hosted inside its approved boundary:
 
+<media-controls>
+</media-controls>
+
 ```csharp
 services.AddPlugin(new ChatFeature {
     EnableProviders = ["ollama"],              // nothing leaves the network
     DisableExtensions = ["voice", "gallery"],  // no transcription, no media catalog
 });
 ```
+
+
+# Gemini RAG Overview &amp; Setup
+Source: https://docs.servicestack.net/chat/gemini-rag
+
+Gemini RAG turns your documents into a managed knowledge system built on Google Gemini's
+[File Search API](https://ai.google.dev/api/file-search). Import files, documentation repositories,
+or entire websites into isolated **File Stores**, organize them with categories and metadata, then
+ask questions over exactly the documents you choose.
+
+The same knowledge base can power private research chats and two independent public experiences:
+a fast, model-free **Website Search** and a citation-backed **Website Assistant**. Search runs
+against your App's RDBMS without calling Gemini, while Assistant responses stay grounded in the
+Gemini index and can include citations that lead readers back to the original source.
+
+Crucially, a knowledge base does not need to mirror a single site. Combine saved imports from
+multiple websites, repositories and file collections in one File Store, then give customers one
+place to search or ask questions across all of them. Each Assistant and Search deployment can still
+apply its own metadata scope, while Search ranking controls decide which titles, headings, document
+types and newer content should win across the combined corpus.
+
+<gemini-pipeline>
+</gemini-pipeline>
+
+<screenshot src="/img/pages/chat/gemini/gemini-02-filestore.webp" title="Gemini File Store management workspace"></screenshot>
+
+<screenshot src="/img/pages/chat/gemini/gemini-27-explore.webp" title="A combined knowledge base built from five imports across four websites"></screenshot>
+
+<gemini-doc-map>
+</gemini-doc-map>
+
+## What you can build
+
+| Capability | What it gives you |
+| --- | --- |
+| **Managed knowledge bases** | Separate File Stores for products, teams, customers, or security boundaries. |
+| **Repeatable ingestion** | Upload files, synchronize local folders, or crawl websites into clean Markdown. |
+| **Cross-site knowledge** | Combine multiple websites and repositories behind one Search widget and AI Assistant. |
+| **Precise retrieval** | Scope searches by category, document type, status, locale, product, version, and tags. |
+| **Verifiable answers** | Grounded responses with inline citations and inspectable source excerpts. |
+| **Website Search** | Publish a branded, keyboard-accessible Search widget backed by the local RDBMS index. |
+| **Website Assistants** | Publish a branded Shadow DOM chat widget using one script tag. |
+| **Search analytics** | Review popular queries, missing results, click-through rates, and frequently selected documents. |
+| **Website analytics** | Optionally capture and chart first-party page traffic from the Search widget. |
+| **Operational visibility** | Preview changes, watch indexing progress, audit coverage, and reconcile local and Gemini state. |
+
+## Enable and configure
+
+Gemini RAG is a built-in AI Chat extension. It installs automatically when AI Chat can resolve both:
+
+1. a Gemini API key; and
+2. the App's `IDbConnectionFactory`, used by OrmLite to persist File Stores, documents, imports,
+   Search indexes and analytics, Assistants, conversations, and citations.
+
+Create an API key in [Google AI Studio](https://aistudio.google.com/) and add either variable to the
+App's environment:
+
+```bash
+GOOGLE_API_KEY=your_api_key
+# or
+GEMINI_API_KEY=your_api_key
+```
+
+AI Chat resolves `GOOGLE_API_KEY`, then `GEMINI_API_KEY`, then the API key on its configured
+`google` provider. You can also provide the key programmatically:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    Variables = {
+        ["GEMINI_API_KEY"] = context.Configuration["Gemini:ApiKey"]!,
+    },
+});
+```
+
+The Gemini integration is a native AI Chat extension and talks directly to Gemini's HTTP APIs. No
+Google client SDK or additional Gemini package is required.
+
+Restart the App after changing its environment. You also need at least one Google Gemini chat
+model configured in AI Chat; the Gemini model selector only lists compatible Google chat models.
+Without an API key or database connection, the extension logs why and disables its routes and UI.
+
+To disable it explicitly:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    DisableExtensions = ["gemini"],
+});
+```
+
+:::info Local catalogue, remote retrieval
+AI Chat keeps the document catalogue, cached source files, imports, metadata, local Search index,
+published widgets, search analytics, Assistants, and conversation history locally. Gemini File
+Search Stores hold the indexed copies used for semantic retrieval. Upload and sync states describe
+the relationship between those two systems.
+:::
+
+### Upload tuning and MIME type overrides
+
+The upload worker normally lets Gemini infer a file's type. If Gemini rejects or misidentifies a
+particular extension, map it explicitly with `GEMINI_UPLOAD_MIME_TYPES`:
+
+```bash
+# Comma-separated extension:mime/type pairs; do not include the leading dot
+GEMINI_UPLOAD_MIME_TYPES="mdx:text/markdown,cshtml:text/html,ss:text/markdown"
+```
+
+The built-in mapping is `mdx:text/markdown,cshtml:text/html`. Setting the environment variable
+replaces that mapping, so retain any defaults you still need. Restart the App after changing it.
+Use an override only for extensions that need one; forcing the wrong type can reduce indexing and
+retrieval quality.
+
+Large imports use bounded concurrency and retry transient provider failures with exponential
+backoff. Their defaults can also be overridden from the App's environment:
+
+```bash
+GEMINI_UPLOAD_CONCURRENCY=4
+GEMINI_UPLOAD_MAX_RETRIES=4
+```
+
+Two model selections can also be overridden. `GEMINI_ASSISTANT_MODEL` is the default model for
+published Assistants that don't select their own, and `GEMINI_PROBE_MODEL` is used by the
+[metadata filter capability probe](/chat/gemini-operations#metadata-filter-capability-probe):
+
+```bash
+GEMINI_ASSISTANT_MODEL=gemini-flash-latest
+GEMINI_PROBE_MODEL=gemini-flash-latest
+```
+
+Write operations can be restricted to a role with `GEMINI_WRITE_ROLE`.
+
+## File Stores
+
+A **File Store** is an isolated searchable corpus. It is also the practical ownership and lifecycle
+boundary: documents that should be searched, administered, and deleted together belong in the same
+store.
+
+The Gemini home page lists each store with its document count and size. Create a store with a clear,
+stable name such as `docs.example.com`, or use the chat icon to immediately query an existing one.
+
+<screenshot src="/img/pages/chat/gemini/gemini-01-filestores.webp" title="Gemini File Stores overview with store creation and chat actions"></screenshot>
+
+Opening a store exposes four deep-linkable workspaces:
+
+- **Explore** - browse categories, search documents, apply metadata filters, edit metadata, inspect
+  coverage, monitor uploads, and start grounded chats.
+- **Import** - upload files, synchronize folders, or stage a website crawl.
+- **Assistants** - design, publish, and review website chat Assistants grounded in the store.
+- **Search** - tune and publish model-free website Search widgets backed by the local index.
+
+The selected workspace, Import subsection, Explorer category, saved crawl, Assistant, Search
+widget, and conversation are preserved in the URL, so a reload or shared link returns to the same
+view.
+
+## Quick start
+
+1. Open **Gemini** from the left toolbar and create a File Store.
+2. Open **Import → Upload files** and drop in one or more documents.
+3. Optionally choose a destination category and add metadata.
+4. Upload the files, then follow **View uploads** to watch Gemini indexing progress.
+5. In **Explore**, choose **New Chat** to query the whole store-or apply filters and choose
+   **Ask about this**.
+6. Expand **Sources** below an answer to inspect the evidence Gemini retrieved.
+7. Optionally open **Search**, test the local index, and publish a standalone Search widget.
+
+That is the smallest useful RAG workflow. The guides above show how to turn it into a repeatable,
+curated knowledge pipeline.
+
+## Storage economics
+
+Google currently charges for embeddings when documents are **indexed**, whilst **file storage and
+query-time embeddings are free**. Retrieved document tokens are billed as normal model context, and
+stores persist until deleted, with project capacity scaling by usage tier.
+
+<storage-economics>
+</storage-economics>
+
+That removes the recurring vector-storage charge common in managed RAG architectures - an
+organization can maintain durable knowledge bases and pay primarily when content is indexed and when
+users actually query it. Content-addressed deduplication reinforces this: the same document uploaded
+twice is stored and indexed once.
+
+:::info
+Pricing and limits are Google's and can change. Check the current
+[Gemini File Search pricing and limits](https://ai.google.dev/gemini-api/docs/file-search) before
+deployment.
+:::
+
+## Where to next
+
+Import your first real source with [Importing Documents](/chat/gemini-imports), or read
+[Metadata & Source URLs](/chat/gemini-metadata) first if you want retrieval scoping and durable
+citations in place before the initial import.
+
+
+# Gemini Importing Documents
+Source: https://docs.servicestack.net/chat/gemini-imports
+
+The Gemini extension imports the same managed document catalogue into two independent destinations:
+Gemini File Search for semantic RAG, and the App database for model-free
+[Website Search](/chat/gemini-search). One confirmed import updates both. See
+[Overview & Setup](/chat/gemini-rag) for enabling the extension and creating a File Store.
+
+<import-paths>
+</import-paths>
+
+<screenshot src="/img/pages/chat/gemini/gemini-import-methods.webp" title="Gemini import methods and configuration"></screenshot>
+
+Text, Markdown, HTML, and Razor files can feed the local Search index. HTML is converted to Markdown
+before indexing. Binary Office and PDF files can be sent to Gemini but need text conversion to
+participate in local Search.
+
+## Upload files and ZIP archives
+
+The upload drop zone accepts PDF, Markdown/MDX, plain text, HTML, reStructuredText, AsciiDoc, CSV,
+JSON, YAML, and ZIP archives containing supported files.
+
+HTML files are converted to Markdown before they are cached, indexed, and uploaded. Razor
+`.cshtml` files use the same conversion after removing server-only lines whose first non-whitespace
+character is `@`, and code blocks beginning with `{` through the matching `}` at the same or lower
+indentation. This keeps rendered page content searchable without leaking Razor directives into
+result snippets. When an HTML document has no explicit title, its generated display name uses the
+`.md` extension.
+
+<screenshot src="/img/pages/chat/gemini/gemini-22-import-upload-files.webp" title="Upload files and ZIP archives into a Gemini File Store"></screenshot>
+
+Choose an optional **Destination category** before uploading. A ZIP is expanded safely and each
+supported entry becomes a document; its internal directories are preserved beneath that category.
+For example, `guides/auth/login.md` uploaded to `products` becomes:
+
+```text
+products/guides/auth/login.md
+```
+
+Hidden system files, macOS metadata, dependencies, build output, and other common archive noise are
+excluded automatically.
+
+:::tip Import into the current category
+While browsing an Explorer category, choose **Import here**. The Import workspace opens with that
+category already set as the destination.
+:::
+
+## Import a local folder
+
+Folder import scans a directory on the machine hosting AI Chat. It is designed for sources you
+expect to preview and synchronize repeatedly.
+
+| Setting | Purpose |
+| --- | --- |
+| **Folder path** | Directory to scan. Non-admin users must remain inside a trusted import root. |
+| **Category root** | Limits the scan to a subfolder and removes that prefix from derived categories. |
+| **Max depth** | `0` imports direct files only; `1` also includes immediate child directories; blank is unlimited. |
+| **Include only** | Optional glob such as `**/*.md`. |
+| **Exclude** | Optional glob such as `**/drafts/**`. |
+| **Destination category** | Prefix applied to every category produced by the import. |
+| **Save as recurring import** | Retains the source definition after a confirmed import. |
+
+<screenshots-gallery-view :images="{
+    'Folder configuration': '/img/pages/chat/gemini/gemini-23-import-folder.webp',
+    'Metadata editor': '/img/pages/chat/gemini/gemini-23-import-folder-metadata-dialog.webp',
+    'Applied metadata': '/img/pages/chat/gemini/gemini-24-import-folder-metadata.webp',
+    'Preview changes': '/img/pages/chat/gemini/gemini-25-import-folder-preview.webp',
+    'Upload progress': '/img/pages/chat/gemini/gemini-26-import-folder-uploading.webp',
+}"></screenshots-gallery-view>
+
+Categories come from a document's directory, not its filename. Given
+`docs/guides/auth/login.md`, a Category root of `docs` produces `guides/auth`. Adding a destination
+of `products` produces `products/guides/auth`.
+
+:::info Import one directory level only
+Use **Max depth = 0** to import only files directly inside the selected folder. Use **1** for direct
+files plus files in immediate child directories. Depth is measured from Category root when one is
+set, otherwise from Folder path.
+:::
+
+### Preview before committing
+
+<preview-ledger>
+</preview-ledger>
+
+Only **Import N documents** applies the preview. Progress updates naturally-for example,
+`Uploading 16/21 documents to docs.example.com…`-and **View uploads** opens Explorer at the
+destination category sorted by active uploads. Pending uploads resume when the application starts
+again after an interruption. The same confirmed import queues each changed document for the local
+Search index, so one synchronization updates both Website Search and Gemini RAG.
+
+### Saved imports
+
+Enable **Save as a recurring import** and give the import a unique name before confirming it. A
+preview alone does not create a saved import; it appears only after the import is actually run.
+
+<screenshot src="/img/pages/chat/gemini/gemini-20-import-saved.webp" title="Saved recurring imports with preview results and trusted folder configuration"></screenshot>
+
+Saved imports are composable: run several of them into the same File Store to create a unified corpus
+from content that remains owned and deployed independently. For example, the Explorer below contains
+five saved imports spanning [docs.servicestack.net](https://docs.servicestack.net/),
+[servicestack.net](https://servicestack.net/), [react-templates.net](https://react-templates.net/) and
+[sharpscript.net](https://sharpscript.net/). Each source keeps its own synchronization definition,
+metadata rules and canonical Source URLs, while customers get one Search and Assistant experience
+across all four sites.
+
+<screenshot src="/img/pages/chat/gemini/gemini-27-explore.webp" title="Five saved imports combined into one cross-site File Store"></screenshot>
+
+Re-running a saved import compares normalized content and metadata independently. The saved source
+key identifies the same document on later runs, while content and metadata hashes determine whether
+it changed. Unchanged files are not embedded or locally indexed again. Content changes and
+metadata-only changes queue both indexes because Gemini cannot patch indexed metadata in place and
+Search ranking or filtering may depend on the changed metadata.
+
+When an upstream file disappears, the import removes its Gemini copy and retains a local
+`removed upstream` tombstone so the change remains visible. A deletion safety rail refuses an
+unexpectedly large removal, protecting against a mistyped path or incomplete source listing.
+
+### Trusted import folders
+
+Server-side folder access is privileged:
+
+- Administrators may import any accessible folder.
+- Other users are restricted to server-allowed directories and Gemini **Trusted import folders**.
+- Real paths are checked so a symlink cannot escape an allowed root.
+
+Trusted roots are saved in `App_Data/chat/user/default/config.json`. They can use any directory
+aliases registered in `ChatFeature.AliasedDirectories`, and can also be configured in that file:
+
+```json
+{
+  "gemini": {
+    "importRoots": ["$WORKSPACE/docs", "/srv/knowledge"]
+  }
+}
+```
+
+For example, an App can define the `$WORKSPACE` alias used above when registering AI Chat:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    AliasedDirectories = {
+        ["$WORKSPACE"] = "/srv/workspace",
+    },
+});
+```
+
+## Change detection and recovery
+
+Saved imports retain `SourceId`, `SourceKey`, source ETag/updated time, content hash, metadata hash,
+and extractor version per document. A later run classifies each source as unchanged, added, updated,
+metadata-only, missing, or failed. Content changes replace both the Gemini document and its local
+Search sections; metadata-only changes avoid unnecessary content work.
+
+Both the upload and Search workers use durable desired/completed state. Pending work survives an App
+restart and resumes automatically. Failed documents retain their error for inspection and retry. Use
+**Sync Store** to reconcile the local catalogue with remote Gemini state, and **Rebuild index** when
+extraction or database search configuration changes - see
+[Explore & Ask](/chat/gemini-explore#coverage-and-synchronization) and
+[Operations & Troubleshooting](/chat/gemini-operations).
+
+<screenshot src="/img/pages/chat/gemini/gemini-import-razor-preview.webp" title="Import preview and synchronization changes"></screenshot>
+
+## Versioned import configuration
+
+A folder or ZIP may include `import.json`. A root manifest supplies global defaults; a manifest in
+a nested directory inherits and overwrites settings for the files beneath it.
+
+<metadata-precedence>
+</metadata-precedence>
+
+```json
+{
+  "version": 1,
+  "metadata": {
+    "defaults": {
+      "product": "ServiceStack",
+      "status": "published",
+      "tags": ["docs"]
+    },
+    "rules": [
+      {
+        "match": "auth/**/*.md",
+        "set": { "tags": ["auth"] }
+      }
+    ]
+  },
+  "transforms": [
+    {
+      "match": "**/*.md",
+      "pattern": "\\nEdit this page.*$",
+      "replacement": "",
+      "flags": "gim"
+    }
+  ]
+}
+```
+
+When the UI contains no explicit metadata, Preview import automatically loads the root manifest.
+Saving a recurring folder import writes its effective metadata back atomically while preserving
+crawl and transform settings.
+
+Metadata defaults and rules in a manifest use the fields described in
+[Metadata & Source URLs](/chat/gemini-metadata). To import a public website, stage it first with
+[Crawling Websites](/chat/gemini-crawling), which hands its cleaned workspace to Folder import.
+
+
+# Gemini Crawling Websites
+Source: https://docs.servicestack.net/chat/gemini-crawling
+
+<crawl-stages>
+</crawl-stages>
+
+## Define crawl boundaries
+
+Enter a **Start URL** and the import folder is pre-populated from its host. A port uses a dash, so
+`http://localhost:5000` becomes `localhost-5000`. Crawls are stored beneath:
+
+:::copy
+`App_Data/chat/user/<user>/gemini/imports/<domain>/`
+:::
+
+<screenshots-gallery-view :images="{
+    'Crawl boundaries': '/img/pages/chat/gemini/gemini-03-import-web-crawl.webp',
+    'Additional crawl rules': '/img/pages/chat/gemini/gemini-04-import-web-crawl-config.webp',
+}"></screenshots-gallery-view>
+
+The common controls cover the safety rules most crawls need:
+
+- **Include / Exclude paths** use folder-style globs such as `/docs/**` and `/archives/**`.
+- **Max pages** and **Max depth** bound the crawl.
+- Query strings can be ignored, selectively allowed, or included with tracking/session parameters
+  excluded and variants capped per path.
+- Crawls stay on the same origin unless named supporting hosts are allowed.
+- `robots.txt`, `noindex`, `nofollow`, canonical URLs, HTML content types, and duplicate extracted
+  content are handled explicitly.
+- Ordered additional rules can **Exclude** a match or **Follow links only** without saving the page.
+
+<crawl-path-map>
+</crawl-path-map>
+
+## Transform and inspect extracted pages
+
+Regex transforms provide an ordered, repeatable cleanup pass over the crawled Markdown. Each rule
+defines a file glob, regex pattern, replacement, and flags:
+
+- `g` - global
+- `i` - ignore case
+- `m` - multiline
+- `s` - `.` matches line breaks
+
+Replacement capture groups are supported. 
+
+For example, pattern `\b0(\d)\b` with replacement
+`\1.` converts `01` to `1.`.
+
+<screenshots-gallery-view :images="{
+    'Define transforms': '/img/pages/chat/gemini/gemini-05-import-web-crawl-transforms.webp',
+    'Apply and save': '/img/pages/chat/gemini/gemini-06-import-web-crawl-transforms-applied.webp',
+    'Inspect crawled pages': '/img/pages/chat/gemini/gemini-07-import-web-crawl-view-pages.webp',
+}"></screenshots-gallery-view>
+
+**Apply transforms** updates the workspace and saves the rules to `import.json`. **View crawled
+pages** opens a large read-only browser with directories on the left and vertically scrollable file
+content on the right. When the content is ready, **Import this folder** opens Folder import with the
+workspace path and metadata pre-populated.
+
+Saved crawl imports are deep-linkable. Reopen one to load its configuration, make more
+transformations, inspect the result, and hand it back to Folder import whenever the website changes.
+
+Because the workspace is imported through the normal folder pipeline, everything in
+[Importing Documents](/chat/gemini-imports) applies to it - previews, recurring synchronization,
+trusted roots, and `import.json` manifests. Crawl frontmatter supplies per-page metadata described
+in [Metadata & Source URLs](/chat/gemini-metadata), where a crawled page's own source URL becomes
+the citation link.
+
+
+# Gemini Metadata &amp; Source URLs
+Source: https://docs.servicestack.net/chat/gemini-metadata
+
+Metadata does two jobs in a Gemini File Store. It narrows what a question searches, and it decides
+where a citation takes the reader. Both are worth getting right before a large import, because
+Gemini cannot patch indexed metadata in place - correcting it later re-uploads and re-embeds the
+affected documents.
+
+## Metadata fields
+
+<metadata-jobs>
+</metadata-jobs>
+
+Versions and tags are lists: entering `v2, v3` creates two searchable values rather than one string.
+Import metadata can define defaults for every document and ordered path rules that skip matches or
+override individual fields. Scalar fields are overwritten by the most specific matching value;
+list values such as versions and tags accumulate.
+
+## Source URL templates
+
+Source URL templates generate a canonical link for each imported document. The editor validates
+braces and variable names, and clicking a variable appends it with the appropriate `/` or `.`
+separator.
+
+<source-url-builder>
+</source-url-builder>
+
+For `docs/guides/auth.md` with Category root `docs`:
+
+| Variable | Example | Meaning |
+| --- | --- | --- |
+| `{fullPath}` | `docs/guides/auth.md` | Full source path. |
+| `{path}` | `guides/auth.md` | Path after removing Category root. |
+| `{pathNoExt}` | `guides/auth` | Root-relative path without extension. |
+| `{dir}` | `docs/guides` | Directory portion of the full path. |
+| `{filename}` | `auth.md` | Filename with extension. |
+| `{name}` | `auth` | Filename without extension. |
+| `{ext}` | `md` | Extension without a leading dot. |
+| `{category}` | `guides` | Final category, including any destination prefix. |
+| `{title}` | `Authentication` | Extracted document title, falling back to `{name}`. |
+| `{route}` | `/add-servicestack-reference` | Route extracted from a quoted Razor `.cshtml` `@page` directive. |
+
+:::copy
+`https://docs.example.com/{pathNoExt}`
+:::
+
+resolves to `https://docs.example.com/guides/auth`.
+
+For a Razor page beginning with `@page "/add-servicestack-reference"`, use the site's base URL with
+the extracted route:
+
+:::copy
+`https://servicestack.net{route}`
+:::
+
+A trailing slash on the base URL is safe, so `https://servicestack.net/{route}` produces the same
+URL instead of `https://servicestack.net//add-servicestack-reference`.
+
+Route extraction is limited to static routes. Dynamic templates containing `{` or `}`, such as
+`@page "/products/{id}"`, do not produce a `{route}` value because they cannot resolve to a single
+canonical Source URL.
+
+Documents without an extracted route omit their Source URL and log a warning when `{route}` is
+required; they do not stop the preview or import.
+
+Select **Require a Source URL** in the import form to exclude those documents instead. Preview
+reports them as skipped, and subsequent runs of a recurring import remove previously indexed
+documents that no longer resolve to a Source URL.
+
+Each placeholder can optionally apply a regular expression using
+`{variable:/pattern/}`. When the expression contains a capture group, the first group becomes the
+placeholder value; otherwise the whole match is used. For example, this removes a leading date and
+underscore from a filename such as `2026-09-04_servicestack-pdf.md`:
+
+:::copy
+`https://servicestack.net/posts/{name:/^[^_]+_(.+)$/}`
+:::
+
+The result is `https://servicestack.net/posts/servicestack-pdf`. A pattern is validated when the
+template is saved. If it does not match a particular document, that document's Source URL is
+omitted and a warning is logged; previewing or importing the remaining documents continues.
+
+:::tip Citations should lead somewhere useful
+Set Source URL metadata to the public documentation page whenever possible. Without it, a citation
+may fall back to Gemini's URI or the locally cached document download.
+:::
+
+## Razor page routes
+
+Razor `.cshtml` imports extract the route from a quoted `@page` directive. For example,
+`@page "/add-servicestack-reference"` supplies `{route}` as `/add-servicestack-reference`.
+
+**Require a Source URL** pairs well with `https://servicestack.net{route}`: Razor layouts, partials,
+and other `.cshtml` files without an `@page` route are excluded from the index entirely, while
+routed pages are imported normally.
+
+Variable names are case-insensitive, and the editor validates both names and brace balance when the
+template is saved.
+
+<screenshot src="/img/pages/chat/gemini/gemini-import-webcrawl-sharpscript-import-metadata.webp" title="Source URL regex configuration"></screenshot>
+
+Metadata is applied during import (see [Importing Documents](/chat/gemini-imports)), can be edited
+in bulk afterwards, and is what the facet filters and grounded-chat scopes in
+[Explore & Ask](/chat/gemini-explore) operate on. The same fields become server-enforced scopes for
+published [Search widgets](/chat/gemini-search) and [Assistants](/chat/gemini-assistants).
+
+
+# Gemini Explore &amp; Ask
+Source: https://docs.servicestack.net/chat/gemini-explore
+
+Explorer is where a File Store is inspected and maintained - and where grounded questions start.
+The filters you apply while browsing are the same filters passed to Gemini File Search, so the
+document set you can see is the document set an answer is drawn from.
+
+## Explore, filter, and maintain documents
+
+Explorer combines category navigation, full-store search, sorting, facet filters, metadata editing,
+upload state, and document actions.
+
+<screenshots-gallery-view :images="{
+    'Browse categories': '/img/pages/chat/gemini/gemini-27-explore.webp',
+    'Apply metadata filters': '/img/pages/chat/gemini/gemini-30-explore-filters.webp',
+}"></screenshots-gallery-view>
+
+Compact dropdowns for **doc type**, **status**, **locale**, **product**, **versions**, and **tags**
+sit beside **Categories** and **Coverage**. Selecting a value converts the dropdown into a visible,
+removable filter chip; clearing it restores the dropdown. Missing metadata is shown as `(no value)`.
+
+Category and facet filters are deep-linkable. Coverage links operate over the whole File Store, so
+they clear the current category before showing a store-wide result that would otherwise appear
+empty.
+
+Each document row can:
+
+- open its category or Source URL;
+- download the cached source;
+- edit metadata;
+- retry a failed or pending Gemini upload;
+- start a chat scoped to that document; or
+- delete the local and Gemini copies.
+
+Folder rows also provide a recursive delete action. It previews the exact number and a sample of
+documents that will be removed from that category and every nested category before asking for
+confirmation. A recurring folder import can restore those documents on its next run, so update the
+source's include or exclude rules as well when the deletion should be permanent.
+
+Work in progress remains visible: uploads show activity, failures show their provider message, and
+a document being deleted displays a red struck-through name with a spinner.
+
+### Edit metadata in bulk
+
+Select the current page-or every document matching the current filters-to apply a staged bulk edit.
+
+- Scalar fields support **Set where empty**, **Overwrite**, and **Clear**.
+- Versions and tags support **Add**, **Remove**, **Replace**, and **Clear**.
+
+The preview reports how many documents will change. Bulk edits update the local catalogue first,
+letting you make several corrections before paying for a single re-indexing pass.
+
+### Coverage and synchronization
+
+**Coverage & filters** answers two separate questions:
+
+1. How consistently is metadata populated?
+2. Does the local catalogue agree with Gemini?
+
+<screenshot src="/img/pages/chat/gemini/gemini-21-filestore-sync.webp" title="Gemini File Store synchronization report showing matching local and remote documents"></screenshot>
+
+The sync report detects documents missing locally or remotely, metadata differences, unmatched
+fields, and duplicate remote copies. Issue counts link back to an unscoped Explorer result with the
+active filter visibly displayed.
+
+Local metadata edits appear immediately in Explorer, but Gemini still searches its last indexed
+metadata until you choose **Push N to Gemini**. Because Gemini cannot patch metadata in place, those
+documents are uploaded and embedded again. Use **Prune duplicates** when sync detects redundant
+remote documents.
+
+<import-push-sync>
+</import-push-sync>
+
+---
+
+## Ask grounded questions
+
+<retrieval-scopes>
+</retrieval-scopes>
+
+<screenshots-gallery-view :images="{
+    'Filtered Explorer scope': '/img/pages/chat/gemini/gemini-30-explore-filters.webp',
+    'Preserved chat filters': '/img/pages/chat/gemini/gemini-31-chat-filters.webp',
+}"></screenshots-gallery-view>
+
+The chat header makes the retrieval scope visible. A category is displayed as a path, while other
+filters are summarized by count:
+
+```text
+docs.example.com/auth (2)
+```
+
+Hover over it to see each filter on a separate line. The same filter expression shown in Coverage
+is passed to Gemini File Search, so Explorer and the grounded query describe the same document set.
+
+### Answers, citations, and source evidence
+
+<screenshots-gallery-view :images="{
+    'Grounded answer': '/img/pages/chat/gemini/gemini-28-chat-ask.webp',
+    'Source evidence': '/img/pages/chat/gemini/gemini-29-chat-ask-sources.webp',
+    'Metadata-scoped RAG': '/img/pages/chat/gemini/gemini-31-chat-filters.webp',
+}"></screenshots-gallery-view>
+
+Grounded answers place citation markers beside supported claims. Each assistant response retains
+its own **Sources** section as the conversation continues. Expand a source to inspect the retrieved
+excerpt, or follow its title to the document's Source URL.
+
+Source links resolve in this order:
+
+1. the document's Source URL;
+2. the URI returned by Gemini;
+3. the cached document download.
+
+Grounding is implemented by including an OpenAI-shaped `file_search` tool in the thread, which the
+Google provider forwards to Gemini together with the active File Store and metadata filter. Sources
+are retained with each response, so users can verify where an answer came from instead of treating
+fluent output as evidence.
+
+Gemini File Search is a built-in retrieval tool. When a File Search request is active, the Gemini
+provider sends only `file_search` and temporarily omits other selected function tools, avoiding an
+unsupported built-in-tool/function-calling combination. Your normal tool selections are not
+changed.
+
+For the metadata fields these filters operate on, see
+[Metadata & Source URLs](/chat/gemini-metadata). To make the same grounded retrieval available to
+visitors on your website, publish an [AI Assistant](/chat/gemini-assistants).
+
+
+# Gemini Website Search
+Source: https://docs.servicestack.net/chat/gemini-search
+
+The **Search** workspace publishes a conventional documentation search experience from the same
+documents as Gemini RAG. It is a separate component from the Assistant: queries run entirely
+against the App's local RDBMS index and do not call a Gemini model.
+
+The local index is maintained for every File Store whether or not a Search widget has been created.
+This keeps ingestion simple and lets you add Search later without changing import definitions.
+Existing File Stores are detected and queued for indexing when the App starts; **Rebuild index** can
+also explicitly queue every current document.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-index-health.webp" title="Website Search index health"></screenshot>
+
+## Local indexing and RDBMS support
+
+<indexing-pipeline>
+</indexing-pipeline>
+
+The C# extension selects its search implementation from the configured OrmLite dialect provider's
+`DbKind`:
+
+<search-engine-matrix
+    eyebrow="Selected from your OrmLite dialect"
+    title="Native search per RDBMS"
+    description="Native full-text support is initialized automatically. If the database feature is unavailable, cannot be created with the current permissions, or a native query fails, Search transparently uses a bounded LIKE query over document titles, headings and content."
+    :columns="2"
+    footnote="<b class='text-slate-900 dark:text-white'>SQL Server's Full-Text Search is an optional server component</b> and must be installed in the SQL Server instance to use the native provider. A <code>*-like</code> status means initialization or querying fell back safely."
+    :databases="[
+      { name:'SQLite', color:'#0f80cc', engine:'FTS5 virtual table',
+        text:'Mirrors the section text fields into a ChatSearchSectionFts virtual table.',
+        status:'sqlite-fts5', fallback:'sqlite-like' },
+      { name:'PostgreSQL', color:'#336791', engine:`GIN index over to_tsvector('simple', …)`,
+        text:'Builds its full-text index directly over ChatSearchSection.',
+        status:'postgresql-fts', fallback:'postgresql-like' },
+      { name:'SQL Server', color:'#cc2927', engine:'Full-Text Catalog and CONTAINSTABLE',
+        text:'Requires the optional Full-Text Search component in the SQL Server instance.',
+        status:'sqlserver-fulltext', fallback:'sqlserver-like' },
+      { name:'MySQL / MariaDB', color:'#00758f', engine:'FULLTEXT index with Boolean mode',
+        text:'Both use the same Boolean-mode implementation and report their own provider name.',
+        status:['mysql-fulltext','mariadb-fulltext'], fallback:['mysql-like','mariadb-like'] },
+    ]"></search-engine-matrix>
+
+Native full-text support is initialized automatically. If the database feature is unavailable,
+cannot be created with the current permissions, or a native query fails, Search transparently uses
+a bounded `LIKE` query over document titles, headings, and content. SQL Server's Full-Text Search is
+an optional server component and must be installed in the SQL Server instance to use the native
+provider.
+
+PDF, Word, PowerPoint, and Excel documents can still be uploaded to Gemini, but are not locally
+searchable unless their text is first converted into a supported text or Markdown document. Their
+local Search status explains why no sections were created.
+
+:::info One import updates both retrieval systems
+The local Search worker uses durable desired and completed hashes. A change to content, title,
+Source URL, extractor version, or filterable metadata marks the document for re-indexing. Work is
+idempotent and pending documents resume after an application restart, independently of the Gemini
+upload worker.
+:::
+
+## Create and tune a Search widget
+
+Choose **New Search** and configure its visitor-facing title, input placeholder, optional launcher
+tooltip, and no-results message. **Document scope** uses the same category, doc type, status,
+locale, product, version, and tag dropdowns as Assistants. The server enforces this scope, so a host
+page cannot expand it.
+
+When a File Store combines several websites or repositories, visitors can search all of that
+knowledge from one box without first knowing where an answer lives. Per-deployment scope can expose
+the full corpus or only an approved slice, and ranking weights let you promote authoritative titles,
+heading matches, preferred document types and fresher content consistently across every source.
+
+Search first asks the active database provider for matching candidates, then applies one consistent
+ranking model across every RDBMS. You can tune each part while the **Test the local index** results
+refresh automatically:
+
+| Ranking control | Effect |
+| --- | --- |
+| **Title weight** | Promotes terms found in the document title. |
+| **Heading weight** | Promotes matching section headings. |
+| **Content weight** | Controls the contribution from body text. |
+| **Phrase boost** | Rewards the complete query appearing together. |
+| **Exact title boost** | Strongly promotes an exact document-title match. |
+| **Freshness weight** | Promotes `sourceUpdatedAt`, falling back to upload or creation time. |
+| **Freshness half-life** | Sets how many days it takes for the freshness boost to halve. |
+| **Database relevance weight** | Retains a controlled preference for the native provider's order. |
+| **Document type preference** | Promotes or demotes individual doc types with positive or negative values. |
+
+The same saved ranking configuration is used by the test panel, live preview, and published widget.
+Changing a weight issues a fresh query, providing immediate feedback without merely reordering an
+incomplete client-side result set. Each control's default value and accepted range is listed under
+[Ranking defaults](#ranking-defaults) below.
+
+## Search interaction and result behavior
+
+<search-interaction>
+</search-interaction>
+
+The Search dialog queries as the visitor types, debounces requests, cancels superseded work, and
+keeps the previous result list visible until the next response is ready. Matching text is bold and
+underlined in light themes and bold white in dark themes by default; its highlight color can be
+overridden.
+
+Results are grouped by document and use the Markdown frontmatter title when available. Visitors can:
+
+- open Search by clicking the launcher, pressing `Ctrl/⌘+K`, or pressing `/`;
+- move through results with Up and Down and open the selection with Enter;
+- load additional results automatically by scrolling;
+- press Escape or the **esc** button to close the active layer;
+- return from an open document with Escape or the left-arrow button; and
+- revisit recently opened documents, retained in that browser's `localStorage`.
+
+When a result has a Source URL, the published widget navigates to that canonical page and anchor.
+The administrative live preview opens it in a new browser window. When a Markdown document has no
+Source URL, the widget opens a second dialog containing a sanitized rendered copy; Escape closes
+that document first and returns focus to the Search results.
+
+If Search and Assistant widgets are embedded on the same page, Search keeps `Ctrl/⌘+K` and the
+Assistant automatically moves to `Ctrl/⌘+Shift+K`. The `/` shortcut can be enabled or disabled
+independently. Shortcuts do not fire from editable inputs.
+
+## Appearance and embedding
+
+Search uses Shadow DOM isolation and serves its saved configuration together with the widget as one
+self-contained classic script:
+
+```html
+<script
+  src="https://app.example.com/chat/ext/gemini/public/searches/widget.js?g=abc123"
+  async>
+</script>
+```
+
+Customize **Auto**, **Light**, **Dark**, **Nord**, **Matrix**, or **Soft Pink**, the font family,
+highlight color, launcher style, corner, and top/right/bottom/left offsets. Auto first follows the
+host page's `color-scheme` value in `localStorage` when it is `light` or `dark`, then falls back to
+the visitor's operating-system preference.
+
+As with Assistants, the launcher can float in any corner or render inside a host element using its
+saved **Mount element** selector or a `data-mount` override:
+
+```html
+<span id="search-slot"></span>
+<script
+  src="https://app.example.com/chat/ext/gemini/public/searches/widget.js?g=abc123"
+  data-mount="#search-slot"
+  async>
+</script>
+```
+
+Set exact or wildcard **Allowed origins** and a per-client request limit before publishing. Search
+uses the same familiar deployment lifecycle as Assistants: **Save draft**, **Publish**,
+**Unpublish**, **Regenerate ID**, **Archive**, **Restore**, and typed confirmation before permanent
+deletion. Regenerating the ID invalidates every old embed immediately.
+
+## Ranking defaults
+
+Results combine database relevance with configurable weights. Change any weight below the Live
+Preview to re-query immediately against the same term, so relevance is tuned against real results
+rather than a reordered client-side list. The same saved configuration is used by the test panel,
+the live preview, and the published widget.
+
+| Control | Config key | Default | Range | Effect |
+| --- | --- | --- | --- | --- |
+| **Title weight** | `titleWeight` | `8` | 0-50 | Matches in the document title. |
+| **Heading weight** | `headingWeight` | `5` | 0-50 | Matches in section headings. |
+| **Content weight** | `contentWeight` | `1` | 0-50 | Matches in body text. |
+| **Exact phrase boost** | `phraseBoost` | `4` | 0-50 | The complete query appearing together. |
+| **Exact title boost** | `exactTitleBoost` | `6` | 0-50 | The whole title equals the query. |
+| **Freshness weight** | `freshnessWeight` | `20` | 0-50 | Preference for recently updated sources. |
+| **Freshness half-life** | `freshnessHalfLifeDays` | `365` | 1-3650 | Days for the freshness boost to halve. |
+| **Database relevance weight** | `nativeWeight` | `2` | 0-20 | Retains a preference for the provider's native rank. |
+| **Document type preference** | `docTypeWeights` | none | -20-50 each | Promotes or demotes individual doc types. |
+
+<ranking-playground>
+</ranking-playground>
+
+Weights accept half-steps. Freshness uses `sourceUpdatedAt`, falling back to the upload and then the
+creation time. Document type preference lists every `docType` present in the store; `0` is neutral,
+positive values promote and negative values demote, and up to 50 types can be weighted.
+**Reset defaults** restores the whole table to the values above.
+
+A result opens its canonical Source URL; Markdown without one opens a rendered document preview.
+
+<screenshot src="/img/pages/chat/gemini/gemini-59-search-ranking.webp" title="Search ranking with live results"></screenshot>
+
+## Customization reference
+
+Every setting is stored per Search deployment and served with the widget. Values are validated and
+clamped on the server, so an out-of-range value is corrected rather than rejected.
+
+| Setting | Config key | Default | Notes |
+| --- | --- | --- | --- |
+| Title | `identity.title` | `Search documentation` | Shown when the dialog is empty. |
+| Input placeholder | `identity.placeholder` | `Search docs` | |
+| No results message | `identity.emptyText` | `No matching documents found.` | |
+| Button tooltip | `identity.tooltip` | none | Optional launcher tooltip. |
+| Results per page | `behavior.maxResults` | `30` | 5-100. |
+| Results per document | `behavior.groupLimit` | `8` | 1-30 sections shown per grouped document. |
+| Minimum characters | `behavior.minChars` | `2` | 1-10 before the first query runs. |
+| Ctrl/⌘+K shortcut | `behavior.commandKShortcut` | `true` | |
+| `/` shortcut | `behavior.slashShortcut` | `true` | |
+| Theme | `appearance.theme` | `auto` | `auto`, `light`, `dark`, `nord`, `matrix`, `soft-pink`. |
+| Highlight color | `appearance.highlightColor` | none | `#rrggbb`; defaults to blue underline in light themes and bold white in dark. |
+| Font family | `appearance.fontFamily` | none | CSS `font-family` stack. |
+| Button corner | `appearance.position` | `bottom-right` | Any of the four corners. |
+| Button style | `appearance.launcherStyle` | `flat` | `flat`, `raised`, or `inset`. |
+| Mount element | `appearance.mount` | none | CSS selector; renders the launcher inline instead of floating. |
+| Button offsets | `appearance.offset` | `20` each | 0-400px from each viewport edge. |
+| Dialog widths | `appearance.width` / `dialogWidth` | `420` / `760` | 240-900 and 420-1200px. |
+| Allowed origins | `hosting.allowedOrigins` | empty | Empty allows any site; up to 100 exact or wildcard origins. |
+| Request limit | `hosting.requestsPerMinute` | `120` | 1-5000 rolling per-client limit. |
+
+`data-mount` on the script tag overrides the saved **Mount element**, and `data-mount="none"` forces
+the floating launcher. An invalid or unmatched selector logs a console warning and falls back to
+floating.
+
+:::info Search and Assistant on the same page
+When both widgets are embedded together, Search keeps Ctrl/⌘+K and the Assistant automatically moves
+to Ctrl/⌘+Shift+K, so the two never compete for the same global shortcut.
+:::
+
+Use **Run diagnostics** before release to validate publication, File Store access, index contents,
+allowed origins, and the widget endpoint.
+
+<screenshot src="/img/pages/chat/gemini/gemini-61-search-widget.webp" title="Published Search widget"></screenshot>
+
+Use **Run diagnostics** before release to validate publication, File Store access, index contents,
+allowed origins, and the widget endpoint - see
+[Operations & Troubleshooting](/chat/gemini-operations#deployment-diagnostics).
+
+See [Search Analytics & Privacy](/chat/gemini-analytics) for search-quality metrics and optional
+page-view analytics, or [AI Assistants](/chat/gemini-assistants) to publish a grounded chat widget
+alongside Search.
+
+
+# Gemini Search Analytics &amp; Privacy
+Source: https://docs.servicestack.net/chat/gemini-analytics
+
+Analytics is an optional layer over a published [Website Search](/chat/gemini-search) deployment,
+and is isolated per deployment. **Customer searches** is always available and measures
+published-widget queries. **Website traffic** is off by default and must be explicitly enabled.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-searches.webp" title="Customer search analytics"></screenshot>
+
+## Analyze customer searches
+
+**View Searches** provides demand and quality signals without adding model usage. It shows:
+
+- total searches, result clicks, and search click-through rate;
+- related search intents grouped by normalized wording and conservative stemming;
+- frequency, average result count, clicks, CTR, and no-result count for each intent;
+- the latest searches with their originating page; and
+- popular documents with click count, unique searches, average clicked position, and last-clicked
+  time.
+
+Only interactions from a published widget are included. The administrative test and live-preview
+panels do not inflate customer metrics. Click reporting is fire-and-forget so analytics can never
+delay navigation or document preview.
+
+## Optional website traffic analytics
+
+Because the Search script is normally present on every page, it can also provide a lightweight
+first-party view of website traffic. This is disabled by default. Use **Capture Analytics** on a
+saved Search deployment to opt in, or **Disable Analytics** to stop collecting new page views.
+Configure retention (90 days by default), IP anonymization, Do Not Track handling, bot exclusion,
+optional consent, denied user-agent substrings, exact IP/CIDR ranges, and excluded page-path globs
+before publishing. IPv4 wildcards such as `114.119.*` are accepted and normalized to CIDR. These
+rules are enforced server-side before geo resolution or persistence and also omit matching customer
+searches and clicks. **Clear retained analytics** permanently removes that Search deployment's
+queries, clicks, and page views immediately.
+
+The **Website traffic** panel can switch between the last 24 hours, 7 days, 30 days, and 90 days.
+It charts page views and visitors, and reports sessions, pages per session, bounce rate, average
+load time, top pages and referrers, campaigns, languages, time zones, devices, platforms, and
+connection types. Visitor and 30-minute session identifiers are random values scoped to that
+Search deployment and retained in the visitor's `localStorage`.
+
+<data-collected>
+</data-collected>
+
+:::warning Treat search telemetry as customer data
+Search records query text and operational request context such as the origin, referring page, and
+user agent. Result selections are correlated to their search and document. Apply the same access,
+retention, and privacy review used for Assistant conversations.
+:::
+
+## Privacy settings reference
+
+Page-view capture is off by default. **Capture Analytics** enables it and **Disable Analytics** stops
+new events. The dashboard charts 24 hours, 7, 30, or 90 days and reports visitors, sessions, bounce
+rate, load time, pages, referrers, campaigns, language, time zone, device, platform, and available
+network hints.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-analytics-results.webp" title="Website traffic analytics"></screenshot>
+
+<privacy-pipeline>
+</privacy-pipeline>
+
+The editable denied user-agent list is trimmed, lowercased, and deduplicated. IP wildcards are
+normalized to CIDR (`114.119.*` becomes `114.119.0.0/16`), and **Exclude this IP** adds the current
+administrator request IP. These exclusion rules are evaluated by the server before geo resolution
+or persistence and are not included in the public widget configuration.
+
+When consent is required, define this before the widget script loads:
+
+```html
+<script>
+window.ServiceStackSearchAnalyticsConsent = async ({ searchId, origin, pageUrl }) => {
+  return window.myConsentManager?.allows('analytics') === true
+}
+</script>
+```
+
+The callback may return a Boolean or Promise. Failure, absence, or any value other than `true`
+suppresses capture. **Clear retained analytics** permanently deletes this Search's queries, clicks,
+and page views. Python does not persist request IP or geo data.
+
+<screenshot src="/img/pages/chat/gemini/gemini-62-search-analytics.webp" title="Analytics privacy configuration"></screenshot>
+
+## C# geo resolver
+
+Geo resolution is **opt-in and disabled by default**. Without an
+`IGeminiSearchGeoResolver` registration, analytics stores no country, region, city, coordinates,
+ASN, or organization data. ServiceStack includes two optional resolvers.
+
+### Free IP API
+
+[Free IP API](https://freeipapi.com) uses an HTTPS endpoint:
+
+```csharp
+services.AddSingleton<IGeminiSearchGeoResolver,
+    FreeIpApiGeminiSearchGeoResolver>();
+```
+
+It maps country, region, city, postal code, coordinates, continent, ASN, and organization into
+`GeminiSearchGeo`. A time zone is retained only when the API returns one unambiguous value; the
+provider commonly returns every time zone in a country, which should not be recorded as the
+visitor's time zone.
+
+### IP-API
+
+[IP-API](https://ip-api.com) can be enabled instead:
+
+```csharp
+services.AddSingleton<IGeminiSearchGeoResolver,
+    IpApiGeminiSearchGeoResolver>();
+```
+
+The free IP-API endpoint uses plain HTTP. Review the provider's current licence, rate limits, and
+HTTPS requirements before using it in production.
+
+Both built-in resolvers ignore loopback, private, link-local, multicast, and otherwise
+non-routable addresses. Successful lookups are cached for one day and time out after five seconds.
+These defaults can be customized:
+
+```csharp
+services.AddSingleton<IGeminiSearchGeoResolver>(sp =>
+    new FreeIpApiGeminiSearchGeoResolver(
+        sp.GetRequiredService<IHttpClientFactory>())
+    {
+        CacheDuration = TimeSpan.FromDays(7),
+        RequestTimeout = TimeSpan.FromSeconds(3),
+    });
+```
+
+:::warning Registering a resolver sends visitor IPs to a third party
+Only register one resolver. Either built-in provider transmits each uncached public visitor IP to an
+external service you do not control. Disclose this in your privacy policy and obtain any consent
+required in your jurisdiction before enabling it.
+:::
+
+### Custom resolver
+
+For a different provider or an internal database, implement `IGeminiSearchGeoResolver`:
+
+```csharp
+public sealed class MyGeoResolver : IGeminiSearchGeoResolver
+{
+    public async ValueTask<GeminiSearchGeo?> ResolveAsync(string ipAddress,
+        CancellationToken token = default) => await LookupAsync(ipAddress, token);
+}
+
+services.AddSingleton<IGeminiSearchGeoResolver, MyGeoResolver>();
+```
+
+`ResolveAsync` returns a `ValueTask<GeminiSearchGeo?>` so a cached or unresolved lookup completes
+without allocating. Return `null` for any address you don't want enriched.
+
+Registration in the IOC is resolved once during installation. A resolver that needs constructor
+arguments the container doesn't have can instead be assigned directly to the Gemini extension
+before the plugin is added:
+
+```csharp
+var chat = new ChatFeature();
+chat.Gemini.SearchGeoResolver = new MyGeoResolver();
+services.AddPlugin(chat);
+```
+
+An explicitly assigned resolver takes precedence; the IOC is only consulted when none was set.
+
+The resolver receives the normalized raw request IP transiently. Geo fields are resolved first,
+then the IP stored with the event is anonymized when enabled. Resolver failures are logged and do
+not prevent the page view from being recorded. Use a reliable resolver, honor its licence and rate
+limits, cache results by network, and configure trusted proxy forwarding correctly.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-analytics-recent-visitors.webp" title="Recent visitors with geo enrichment"></screenshot>
+
+Assistant conversations are retained separately and reviewed from the Assistants workspace - see
+[AI Assistants](/chat/gemini-assistants#review-customer-conversations).
+
+
+# Gemini AI Assistants
+Source: https://docs.servicestack.net/chat/gemini-assistants
+
+The **Assistants** workspace turns a File Store-or a filtered slice of it-into a branded,
+document-grounded support experience for any website.
+
+Because a File Store can contain multiple saved website and repository imports, one Assistant can
+answer across an entire product ecosystem instead of forcing customers to choose the right site
+first. Canonical Source URLs still take each citation back to the owning page, and server-enforced
+metadata scope can narrow a broadly shared corpus for a specific product, audience or version.
+
+<screenshot src="/img/pages/chat/gemini/gemini-40-assistants.webp" title="Saved Website Assistants for a Gemini File Store"></screenshot>
+
+Each named Assistant owns its:
+
+- visitor-facing identity and suggested questions;
+- server-enforced document scope;
+- behavior template, private system prompt, and optional Gemini model;
+- theme, typography, panel, and launcher appearance;
+- allowed website origins and request limit;
+- deployment ID and publish state; and
+- retained customer conversations.
+
+The widget is rendered in a **Shadow DOM**, isolating it from the host page's CSS. It also traps its
+keyboard events so global website shortcuts do not fire while a visitor is typing.
+
+## Configure an Assistant
+
+### 1. Identity, behavior, and document scope
+
+<screenshots-gallery-view :images="{
+    'Identity and welcome': '/img/pages/chat/gemini/gemini-41-assistant-identity.webp',
+    'Behavior and prompting': '/img/pages/chat/gemini/gemini-42-assistant-behavior.webp',
+    'Document scope': '/img/pages/chat/gemini/gemini-43-assistant-document.webp',
+}"></screenshots-gallery-view>
+
+Start with the visitor experience:
+
+- **Name** identifies the Assistant in the dashboard and must be unique within the store.
+- **Title** and **Description** appear in the widget header.
+- **Welcome message** appears when a new thread opens.
+- **Suggested questions** are editable single-line rows; press Enter or `+` to add another.
+
+Then define how it should answer:
+
+<behavior-templates>
+</behavior-templates>
+
+Choose **Concise**, **Balanced**, or **Detailed**, require grounded answers, enable citations, and
+customize the fallback and conversation-review notice. **Require retrieved evidence** adds a
+server-enforced citation threshold: when Gemini returns fewer than **Minimum citations**, the
+Assistant returns the configured fallback instead of exposing an unsupported answer. Strict
+grounding defaults to one citation and buffers streaming answers until evidence is checked. A
+custom Gemini model can be selected per Assistant; leaving it unset uses the server default.
+
+Assistants open only when initiated by default. They can instead open after page load or when the
+visitor reaches the bottom of the page. **Open with Ctrl/⌘+K** is enabled for new Assistants and
+opens and focuses the widget independently of the automatic trigger.
+
+Finally, restrict retrieval by category, doc type, status, locale, product, version, or tag. These
+filters and the private system prompt are applied by the server: they are not embedded in the
+public JavaScript and cannot be changed by the host website.
+
+:::tip Publish only approved content
+A common public support scope is `status = published`, optionally combined with a product,
+documentation category, locale, or version. Test the equivalent filters in Explorer before
+publishing the Assistant.
+:::
+
+### 2. Design the widget
+
+Choose **Auto**, **Light**, **Dark**, **Nord**, **Matrix**, or **Soft Pink**. Auto first follows a
+`light` or `dark` value in the host page's `color-scheme` localStorage key, then the visitor's
+`prefers-color-scheme`, and uses your independently saved Light or Dark customizations.
+
+<screenshots-gallery-view :images="{
+    'Light': '/img/pages/chat/gemini/gemini-44-assistant-appearance-light.webp',
+    'Dark': '/img/pages/chat/gemini/gemini-45-assistant-appearance-dark.webp',
+    'Nord': '/img/pages/chat/gemini/gemini-46-assistant-appearance-nord.webp',
+    'Matrix': '/img/pages/chat/gemini/gemini-12-assistant-appearance-matrix.webp',
+    'Soft Pink': '/img/pages/chat/gemini/gemini-47-assistant-appearance-softpink.webp',
+}"></screenshots-gallery-view>
+
+Every theme is a preset, not a locked skin. Override and reset individual values for:
+
+- assistant and user bubble backgrounds, borders, and text;
+- accent, panel, and conversation backgrounds;
+- panel and focus borders;
+- primary, muted, link, error, and warning text; and
+- a per-theme CSS `font-family` stack.
+
+Only explicit overrides are saved. **Reset theme appearance** restores the complete preset, while
+the reset action beside a value restores only that variable. The live preview uses the same SVG
+icons, layout, and CSS variables as the real widget.
+
+### 3. Customize the launcher and hosting rules
+
+<screenshots-gallery-view :images="{
+    'Launcher button': '/img/pages/chat/gemini/gemini-48-assistant-appearance-button.webp',
+    'Hosting and access': '/img/pages/chat/gemini/gemini-49-assistant-hosting.webp',
+    'Publish and embed': '/img/pages/chat/gemini/gemini-50-assistant-publish.webp',
+}"></screenshots-gallery-view>
+
+The launcher can appear bottom-left or bottom-right. Configure its size, icon size, corner radius,
+shadow, border width, border color, background, and icon color. Choose **Sparkles**, **Chat**, or
+**Help**, or provide a PNG, JPEG, GIF, WebP, or SVG Data URI for a custom icon.
+
+Leave **Allowed origins** empty to allow the Assistant on any website, or enter one exact HTTP(S)
+origin per line:
+
+```text
+https://docs.example.com
+https://*.example.com
+http://localhost:5173
+```
+
+An exact origin includes its scheme and port. A wildcard matches subdomains but not the apex, so
+add `https://example.com` separately when both are needed. The requests-per-minute setting applies
+a rolling per-client limit to public chat requests.
+
+:::info Why the script itself does not need CORS
+Browsers may load a public classic `<script>` across origins. The access check is applied to each
+chat request using its `Origin` header. Requests without an Origin are refused when an allowlist is
+configured.
+:::
+
+### 4. Save, publish, and embed
+
+Use **Save draft** while configuring. **Publish** makes the deployment available and produces a
+stable embed snippet:
+
+```html
+<script
+  src="https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123"
+  async>
+</script>
+```
+
+The deployment identifier is on the `g` query string. The public endpoint merges the saved
+configuration with the static widget and Markdown renderer, then returns a self-contained classic
+script. The `/chat` segment is AI Chat's default `RoutePrefix`; use your configured prefix when AI
+Chat is mounted somewhere else.
+
+The host page may override presentation choices without changing retrieval behavior:
+
+```html
+<script
+  src="https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123"
+  data-theme="dark"
+  data-position="bottom-left"
+  data-accent="#7c3aed"
+  data-icon="chat"
+  async>
+</script>
+```
+
+<embed-boundary>
+</embed-boundary>
+
+#### Mounting the launcher inside your own layout
+
+By default the launcher is a floating button anchored to a corner of the viewport. Set a
+**Mount element** CSS selector in the Assistant's Appearance settings, or `data-mount` on the script
+tag, to render the launcher inside an element you control instead - a nav bar, toolbar, or sidebar:
+
+```html
+<nav>
+  <a href="/docs">Docs</a>
+  <span id="assistant-slot"></span>
+</nav>
+
+<script
+  src="https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123"
+  data-mount="#assistant-slot"
+  async>
+</script>
+```
+
+The launcher becomes an inline element inside the target, so it participates in that container's
+layout like any other button, and the panel is anchored to it - opening below the launcher, or above
+it when the viewport has more room there. The panel itself is always rendered from `document.body`,
+so it overlays the page without affecting its layout, and it cannot be trapped inside a mount
+container that establishes a containing block (a `transform`, `filter`, or `backdrop-filter`
+ancestor, common in sticky headers).
+
+`data-mount` on the script tag wins over the saved **Mount element** setting; pass `data-mount="none"`
+to force the floating launcher on a page whose layout has no slot for it. If the selector is invalid
+or matches nothing the widget writes a console warning and falls back to the floating launcher.
+
+The Search widget accepts the same **Mount element** setting and `data-mount` attribute, so a
+documentation site can place a `⌘K` search button and an **Ask AI** button side by side in its
+header while both dialogs still overlay the page. Invalid or
+unavailable deployments return JavaScript that writes a useful error to the browser console rather
+than a JSON response that fails silently.
+
+The widget supports:
+
+- streaming Markdown responses with plain-text fallback;
+- citation links and source titles;
+- suggested questions and a configurable welcome message;
+- smooth fly-in/out animation from the launcher;
+- maximized full-screen reading;
+- a scrollable conversation thread;
+- clearing the current thread without confirmation; and
+- browser-local session continuity across page loads.
+
+When an Assistant and Search widget share a page, Search uses `Ctrl/⌘+K` and the Assistant
+automatically uses `Ctrl/⌘+Shift+K`, avoiding competing global shortcuts.
+
+## Review customer conversations
+
+Authoritative conversations and messages are retained server-side so support teams can understand
+what visitors ask, identify missing coverage, and improve documentation.
+
+Open **View Conversations** on a saved Assistant. The sidebar counts user messages, and each
+conversation shows its exact originating page. Expand the user-message navigator to jump directly
+to the corresponding Assistant response. Responses render as Markdown and retain their source
+citations.
+
+The conversation count appears in **View/Hide Conversations**, making new activity visible while
+you work. The review view and selected conversation are deep-linkable.
+
+:::warning Treat retained conversations as customer data
+Choose an appropriate conversation notice, access policy, retention practice, and privacy review
+for your deployment. The notice can be hidden, but doing so does not disable server-side retention.
+:::
+
+## Assistant lifecycle
+
+<screenshots-gallery-view :images="{
+    'Archive and restore': '/img/pages/chat/gemini/gemini-51-assistant-archive.webp',
+    'Delete Assistant': '/img/pages/chat/gemini/gemini-52-assistant-delete.webp',
+    'Delete File Store': '/img/pages/chat/gemini/gemini-53-filestore-delete.webp',
+}"></screenshots-gallery-view>
+
+<assistant-lifecycle>
+</assistant-lifecycle>
+
+**Run diagnostics** checks deployment state, public store access, active and failed Gemini
+documents, model selection, origins, and the widget URL.
+
+<screenshot src="/img/pages/chat/gemini/gemini-57-assistant-deployment.webp" title="Assistant publication and diagnostics"></screenshot>
+
+Deleting a File Store is broader: it removes the remote Gemini store, local and remote documents,
+local Search sections, Search widgets, query and click analytics, saved imports and runs,
+Assistants, conversations, and messages. Its dedicated impact summary and typed store-name
+confirmation are intentionally difficult to bypass.
+
+## Configuration reference
+
+Every setting below is stored per Assistant and served with the widget. The private prompt, model,
+document scope, origin policy, and rate limit stay on the server; the public embed contains only
+presentation and endpoint configuration.
+
+### Behavior templates
+
+The template seeds the specialist prompt only; the server always adds its shared RAG rules.
+
+| Template | `behavior.template` | Best fit |
+| --- | --- | --- |
+| Documentation guide | `documentation` | Manuals, reference material, general how-to questions. |
+| Technical troubleshooter | `troubleshooting` | Symptom-to-fix diagnosis with safe ordered checks. |
+| Customer support | `support` | Policy and process answers with practical next actions. |
+| Developer/API assistant | `developer` | Precise APIs, code, commands, and version-sensitive guidance. |
+| Product advisor | `product` | Capability fit, trade-offs, and documented limitations. |
+| Onboarding guide | `onboarding` | Ordered milestones to a first successful outcome. |
+| Policy and procedures | `policy` | Controlled interpretations of policies and escalation paths. |
+
+Changing the template replaces the prompt with that template's text, so save a customized prompt
+elsewhere before switching.
+
+### Grounding controls
+
+| Setting | Config key | Default | Notes |
+| --- | --- | --- | --- |
+| Require grounded answers | `behavior.grounded` | `true` | Adds the grounding boundary to the prompt. |
+| Show citations | `behavior.citations` | `true` | Hiding them does not disable server-side checking. |
+| Require retrieved evidence | `behavior.strictGrounding` | `true` | Enforces the citation threshold on the server. |
+| Minimum citations | `behavior.minCitations` | `1` | 1-5; only applies when both grounded and strict. |
+| Response style | `behavior.responseStyle` | `balanced` | `concise`, `balanced`, or `detailed`. |
+| Fallback message | `behavior.fallback` | `I couldn't find that in the available documents.` | Returned when evidence is insufficient. |
+| Conversation notice | `behavior.notice` | `Conversations may be reviewed to improve support.` | Shown to visitors; up to 500 characters. |
+| Open behavior | `behavior.openMode` | when initiated | Or `page-load`, or `page-bottom`. |
+| Ctrl/⌘+K shortcut | `behavior.keyboardShortcut` | `true` | Moves to Ctrl/⌘+Shift+K when a Search widget shares the page. |
+
+<screenshot src="/img/pages/chat/gemini/gemini-assistant-required-citations.webp" title="Assistant grounding controls"></screenshot>
+
+### Choosing the model
+
+Leave **Model** unset to use the server default, or select any compatible Google chat model to
+override it per Assistant. The server default is `gemini-flash-latest` and can be changed for every
+Assistant at once from the App's environment:
+
+```bash
+GEMINI_ASSISTANT_MODEL=gemini-flash-latest
+```
+
+A `models/` prefix is accepted and stripped. An unrecognized value is ignored in favor of the
+default rather than failing the deployment.
+
+### Appearance and hosting
+
+| Setting | Config key | Default | Notes |
+| --- | --- | --- | --- |
+| Theme | `appearance.theme` | `auto` | `auto`, `light`, `dark`, `nord`, `matrix`, `soft-pink`. |
+| Suggested questions | `identity.suggestions` | one entry | Up to 6, each 200 characters. |
+| Launcher corner | `appearance.position` | `bottom-right` | `bottom-left` or `bottom-right`. |
+| Mount element | `appearance.mount` | none | CSS selector; renders the launcher inline. |
+| Launcher icon | `appearance.icon` | `sparkles` | `sparkles`, `chat`, `help`, or a PNG/JPEG/GIF/WebP/SVG Data URI. |
+| Launcher size | `appearance.button.size` | `50` | 40-96px; icon 16-72px. |
+| Launcher radius | `appearance.button.borderRadius` | `50` | 0-50px; border width 0-8px. |
+| Launcher shadow | `appearance.button.shadow` | `medium` | `none`, `subtle`, `medium`, `strong`. |
+| Panel size | `appearance.panelSize` | `standard` | `standard` or `compact`. |
+| Allowed origins | `hosting.allowedOrigins` | empty | Empty allows any site; exact or wildcard subdomain origins. |
+| Request limit | `hosting.requestsPerMinute` | `30` | Rolling per-client limit on public chat requests. |
+
+The document scope uses the fields described in
+[Metadata & Source URLs](/chat/gemini-metadata) - test the equivalent filters in
+[Explore & Ask](/chat/gemini-explore) before publishing. To add a model-free search experience on
+the same page, see [Website Search](/chat/gemini-search).
+
+
+# Gemini Operations &amp; Troubleshooting
+Source: https://docs.servicestack.net/chat/gemini-operations
+
+The Gemini extension keeps durable local state for imports, uploads, Search indexing, deployments,
+conversations, and analytics. Back up the OrmLite database and AI Chat's `AppDataPath` together.
+
+## Worker recovery and index health
+
+<worker-model>
+</worker-model>
+
+Search health reports total, indexed, pending, stale, failed and section counts, the provider, last
+successful index time, oldest pending work, and recent errors.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-index-health.webp" title="Worker recovery and index health"></screenshot>
+
+Use **Rebuild index** after changing extractors or database FTS configuration. A native provider
+name means FTS is active; a `*-like` name means initialization or querying fell back safely. SQL
+Server requires the optional Full-Text Search component. PostgreSQL, SQL Server and MySQL/MariaDB
+support native C# providers; llms-py intentionally supports SQLite only.
+
+## Deployment diagnostics
+
+**Run diagnostics** is available on Search and Assistant deployments. Search checks publication,
+public File Store access, indexed/pending/failed content, allowed origins, and widget URL. Assistant
+also checks active Gemini documents and the resolved model. Warnings are deployable but deserve
+review; failures identify requirements that prevent the public widget from working.
+
+<screenshot src="/img/pages/chat/gemini/gemini-search-deployment-diagnostics.webp" title="Deployment diagnostics results"></screenshot>
+
+## Metadata filter capability probe
+
+Gemini's File Search metadata filters follow AIP-160, but the exact operators and key casing a model
+accepts can change. The extension assumes full support and exposes a probe that verifies it against
+the live API rather than guessing:
+
+```bash
+# Cached result, or the assumed defaults when never probed
+curl https://app.example.com/chat/ext/gemini/capabilities
+
+# Run the probe (requires write access)
+curl -X POST https://app.example.com/chat/ext/gemini/capabilities/probe
+```
+
+The probe creates a temporary File Store, uploads two fixture documents with known metadata, then
+issues one filtered retrieval per operator and checks which fixtures were actually cited:
+
+| Key | Expression tested | Enables |
+| --- | --- | --- |
+| `equality` | `status="published"` | Baseline equality with a lowercase key. |
+| `keyCamel` | `docType="guide"` | camelCase keys. |
+| `keyLower` | `doctype="guide"` | All-lowercase keys. |
+| `keySnake` | `doc_type="guide"` | snake_case keys used by this extension. |
+| `listHas` | `versions:"v8"` | Versions, tags, and category subtree filters. |
+| `numeric` | `sortkey > 1700000000` | Staleness filters. |
+| `numericCamel` | `sortKey > 1700000000` | Numeric comparison on camelCase keys. |
+| `and` | `status="published" AND versions:"v8"` | Combining facets. |
+| `or` | `status="published" OR status="deprecated"` | Multi-select facets. |
+| `not` | `NOT status="deprecated"` | Negative filters. |
+
+Each result records a verdict of `ok`, `filter ignored`, `rejected or no match`, or `error`. If the
+unfiltered baseline retrieval cannot cite both fixtures, the run reports `probed: false` with the
+reason and leaves every operator assumed working rather than disabling filters on a bad signal. The
+temporary store and fixtures are always deleted, and the result is cached until the next probe at:
+
+```text
+App_Data/chat/user/default/gemini/capabilities.json
+```
+
+The probe model defaults to `gemini-flash-latest` and can be changed from the environment:
+
+```bash
+GEMINI_PROBE_MODEL=gemini-flash-latest
+```
+
+:::info The probe consumes Gemini quota
+It uploads two documents and issues at least one grounded request per operator, retrying up to 34
+requests in total when results are inconclusive. Run it after a Gemini API change or when metadata
+filters behave unexpectedly - not on a schedule.
+:::
+
+## Operational guidance
+
+### Choose store boundaries deliberately
+
+Use separate File Stores when knowledge must have a different owner, access policy, lifecycle, or
+deletion boundary. Use categories and metadata inside a store when the same team should manage the
+content but queries need narrower scopes.
+
+### Prefer curated sources over larger sources
+
+Retrieval quality improves when navigation fragments, stale versions, duplicate pages, drafts, and
+boilerplate are excluded. Preview folder diffs, inspect crawl Markdown, set `status` and `version`
+metadata, and test filtered chats before exposing an Assistant publicly.
+
+### Make citations durable
+
+Use canonical Source URL templates instead of local cache links. Preserve stable page paths across
+re-imports, and push metadata changes after correcting URLs so Gemini retrieves the updated values.
+
+### Recover from interrupted uploads
+
+Pending documents remain queued in the local catalogue and resume after application startup. To
+inspect them, open Explorer at the destination category and sort by **Uploading**. Sort by
+**Failed** to review provider errors and retry individual documents.
+
+The local Search queue is independent and follows the same durable desired/completed-hash model.
+Open **Search** to see index health, document, indexed, pending, stale, failed and section counts,
+last successful indexing time, oldest pending work, and recent failures. Use **Rebuild index** to
+regenerate every local section after changing extraction or database configuration. Each Search
+and Assistant deployment also provides **Run diagnostics**, which checks publication, public store
+access, indexed knowledge, origin restrictions, model selection, and its public widget endpoint.
+
+## Troubleshooting
+
+<troubleshooting-index>
+</troubleshooting-index>
+
+### The Gemini icon is missing
+
+Confirm `GOOGLE_API_KEY` or `GEMINI_API_KEY` is available to the App, an
+`IDbConnectionFactory` is registered, and `gemini` is not listed in `DisableExtensions`. Restart the
+App after changing its environment. The extension logs which prerequisite is missing when it
+disables itself.
+
+### No Gemini model is available
+
+Configure a Google provider chat model. The Gemini picker excludes other providers and incompatible
+model types.
+
+### A folder cannot be imported
+
+Check the resolved folder shown by the picker. Non-admin users must remain beneath a trusted import
+root. The permission is checked again whenever a saved import runs.
+
+### Files were skipped
+
+Open **Skipped & failed** in the preview. Common causes include unsupported binary formats during a
+folder scan, very short prose, include/exclude globs, Category root, or an explicit skip rule.
+
+### An upload failed or appears stuck
+
+Sort Explorer by **Failed** or **Uploading**, hover the status for the provider message, and retry
+the document. Pending work resumes automatically after a server restart.
+
+### A metadata filter returns no results
+
+Clear other chips and verify exact values in Coverage. Versions and tags are lists, and every active
+facet is combined with the category when creating the Gemini metadata filter.
+
+### Citations open cached files
+
+Add or correct Source URL metadata, then push pending metadata changes to Gemini. Existing source
+cards can resolve locally, but future filtered retrieval uses the newly indexed metadata.
+
+### Explorer and Gemini disagree
+
+Run **Sync Store**. Use its issue links to open the relevant store-wide filter, push intentional
+metadata changes, retry missing uploads, and prune duplicates when reported.
+
+### Search is using a `*-like` provider
+
+The native full-text feature could not be initialized or a native query failed, so Search safely
+fell back to `LIKE`. Confirm the database supports its full-text feature and that the application
+user can create or use the required index. SQL Server additionally requires the optional
+Full-Text Search component. Restart the App or rebuild the index after correcting the database.
+
+### A document is missing from Search
+
+Open **Search** and inspect the pending and failed counts. Text, Markdown, HTML, and Razor content
+are locally indexed; PDF, Word, PowerPoint, and Excel require conversion to a text-based format for
+local Search. A Source URL affects where a result opens, not whether its content can match.
+
+## Storage and access
+
+When authentication is enabled, write operations require a signed-in user. A deployment can also
+require a role such as `Admin` with `GEMINI_WRITE_ROLE` or `gemini_write_role`.
+
+<storage-map>
+</storage-map>
+
+With `RequireAuth = false`, AI Chat uses the shared `default` user. See
+[Data & Storage](/chat/data) for AI Chat's complete storage layout. For provider-level API
+constraints, consult Google's [File Search documentation](https://ai.google.dev/gemini-api/docs/file-search).
+
+Search content is stored in `ChatSearchSection`; provider-specific full-text indexes reference its
+title, heading, and content. Permanent Search deletion removes that deployment's analytics, while
+permanent File Store deletion cascades through all owned imports, documents, Search and Assistant
+state. See [Overview & Setup](/chat/gemini-rag#storage-economics) for what Google charges for, and
+[Data & Storage](/chat/data) for AI Chat's complete storage layout.
 
 
 # PDF Studio
@@ -93986,14 +95382,13 @@ This page covers **authoring**. For publishing, production rendering and typed C
 Turn Any PDF into a Dynamic API with AI, Typst & ServiceStack
 :::
 
-<text-block text="AI Chat PDF Studio → Publish → Admin PDF → Generate C# → Render in your App"></text-block>
+<pdf-lifecycle>
+</pdf-lifecycle>
 
 PDF Studio is only the authoring half. Everything after Publish is a controlled software artifact, and **production rendering never calls an LLM**.
 
-| Capability | Plugin | Runtime dependencies |
-| --- | --- | --- |
-| AI-assisted authoring and live preview | `ChatFeature` PDF extension | Typst and an AI provider |
-| Published template management and rendering | `PdfFeature` | Typst |
+<pdf-plugins>
+</pdf-plugins>
 
 ## Requirements
 
@@ -94212,20 +95607,8 @@ services.AddPlugin(new PdfFeature());
 
 ## Publish is a controlled promotion boundary
 
-Design work stays private until an administrator chooses **Publish**, which does substantially more than copy files:
-
-- Follows JSON data, Typst includes, images, assets and versioned libraries
-- Flattens folder-based authoring into a self-contained runtime artifact set
-- Rewrites local references for the flattened result
-- Validates example data and named fixtures against `.ui.json`
-- Exercises C# model generation
-- Checks statically visible data paths
-- Compiles **every fixture** through the actual flattened Typst template
-- Generates the gallery preview
-- Records publisher and source metadata
-- Prevents silent takeover of a name published by another user
-- **Rolls back** the publish if validation or compilation fails
-- Saves every successful publish as an **immutable revision**
+<publish-gate>
+</publish-gate>
 
 <screenshot src="/img/pages/chat/pdf/publish-dialog.webp" title="PDF Studio publishing workflow"></screenshot>
 
@@ -94511,23 +95894,16 @@ Queue an **identifier, not rendered PDF bytes** - the worker loads current data 
 
 ## Deterministic by construction
 
-At runtime:
-
-1. The `[Pdf]` model selects the template.
-2. The model serializes to its JSON contract.
-3. `IPdfRenderer` invokes the published Typst template.
-4. **No LLM is called.**
-5. **No personal Studio workspace is read.**
-6. Only the live files in `App_Data/pdf` are used.
+<deterministic-runtime>
+</deterministic-runtime>
 
 ## Production controls
 
-PDF rendering starts external Typst processes, so `PdfFeature` includes practical operational limits: render and preview timeouts, maximum concurrent renders, maximum data payload size, a restricted Typst root directory, flat validated template names, Admin role requirements on every Admin PDF API, per-user path-checked Studio workspaces and publish-time validation on by default.
+<production-controls>
+</production-controls>
 
 :::info
-Pin the Typst version and deploy the same fonts used during validation. Put application fonts in `App_Data/pdf/fonts` and back up live artifacts, `.published.json` and `.versions` together.
-
-Typst's root restriction limits document file access but is **not** an operating-system sandbox. Organizations compiling untrusted templates should isolate compilation in an appropriate container or worker.
+Put application fonts in `App_Data/pdf/fonts` and back up live artifacts, `.published.json` and `.versions` together.
 :::
 
 ## Scope
@@ -94557,10 +95933,8 @@ Enterprise AI needs observability. AI Chat records every completion - provider, 
 
 ## Two places to look
 
-| Surface | Audience | Location |
-| --- | --- | --- |
-| Analytics extension | Admins, inside the Chat UI | `/chat` → Analytics |
-| Chat Admin UI | Admins, inside ServiceStack's Admin UI | `/admin-ui/chat` |
+<analytics-flow>
+</analytics-flow>
 
 Both read the same `ChatRequest` rows, so the numbers agree.
 
@@ -94621,12 +95995,8 @@ services.AddPlugin(new ChatFeature {
 
 It's backed by typed ServiceStack APIs you can also call directly:
 
-| API | Purpose |
-| --- | --- |
-| `AdminQueryChatRequests` | AutoQuery over `ChatRequest` - filter, sort, page by any field |
-| `AdminMonthlyChatAnalytics` | Monthly rollup |
-| `AdminDailyChatAnalytics` | Daily rollup |
-| `AdminGetChatThread` | A thread's messages and per-request stats for operational review |
+<admin-apis>
+</admin-apis>
 
 Because `AdminQueryChatRequests` is an AutoQuery API, the whole of [AutoQuery](/autoquery/rdbms)'s conventions apply:
 
@@ -94712,6 +96082,9 @@ Models you added yourself in `providers-extra.json` should carry their own prici
 Source: https://docs.servicestack.net/chat/api
 
 Registering `ChatFeature` gives your App an OpenAI-compatible Chat Completions endpoint and an in-process client, both running the **same pipeline**: provider selection, retry and failover, the tool-execution loop, usage and cost accounting, and every registered extension filter.
+
+<api-surfaces>
+</api-surfaces>
 
 ## POST /v1/chat/completions
 
@@ -94847,13 +96220,8 @@ The Chat UI can set a whitelisted set of per-thread request arguments, which are
 
 ## The pipeline in brief
 
-1. `OnRequestAsync` resolves any Bearer API key onto the request and runs first-request-per-user setup handlers.
-2. `ValidateRequest` may reject the request.
-3. Chat request filters run, letting extensions mutate the outgoing request.
-4. A provider is selected for the requested model, with retry and failover per `Limits.Retries`.
-5. Tool calls are executed in a loop, bounded by `Limits.MaxIterations`, pausing for approval where required.
-6. Streamed responses are checkpointed every `Limits.StreamCheckpointInterval` into `ChatThread.StreamingMessage`, kept out of the durable `Messages` so a failed stream can't damage the conversation.
-7. Chat response filters run, and usage and cost are recorded as a `ChatRequest` row.
+<request-pipeline>
+</request-pipeline>
 
 Cancellation is cooperative - `ShouldCancelThread` consults the thread's state, so cancelling in the UI stops the loop.
 
@@ -94868,6 +96236,9 @@ Cancellation is cooperative - `ShouldCancelThread` consults the thread's state, 
 Source: https://docs.servicestack.net/chat/data
 
 AI Chat stores everything inside your application: structured data in your App's database via OrmLite, and files under `App_Data`. There is no external service holding your conversation history.
+
+<storage-overview>
+</storage-overview>
 
 ## Database tables
 
@@ -94911,7 +96282,7 @@ The generated and uploaded media catalog - name, type, prompt, model, cost, seed
 
 ### Gemini tables
 
-The `gemini` extension owns its own document catalog tables, created the same way. See [Gemini File Search](/chat/gemini).
+The `gemini` extension owns its own document catalog tables, created the same way. See [Gemini RAG, Search & Analytics](/chat/gemini-rag).
 
 ### Querying
 
@@ -94958,7 +96329,8 @@ Path resolution is guarded: any relative path that would escape `App_Data/chat` 
 
 ### The content-addressed cache
 
-Attachments, generated images and audio, and Gemini document uploads are all hashed with SHA-256 and stored once under `cache/{first 2 chars}/{sha256}.{ext}`. The same file uploaded twice costs one copy.
+<content-addressed>
+</content-addressed>
 
 Cache writes fire the `cache_saved` filters, which is how the gallery records media and how an App can hook uploads:
 
@@ -95001,14 +96373,12 @@ A database backup on its own is not sufficient: media rows reference cache files
 
 **Deployment notes:**
 
-- `App_Data` must be on durable storage. On an ephemeral filesystem, mount a volume or set `AppDataPath` to one.
-- In a multi-instance deployment, `App_Data/chat` and `App_Data/pdf` need to be a **shared** volume - user workspaces, the cache and published templates are all filesystem state.
-- Pin the Typst version and deploy the same fonts used during template validation.
-- Consider a disk quota on `App_Data/chat/user` so a runaway Agent can't fill the disk.
+<deployment-checklist>
+</deployment-checklist>
 
 ## Retention
 
-AI Chat doesn't expire data on your behalf. Threads, requests and media persist until deleted, which suits audit requirements but means retention policy is yours to implement:
+AI Chat doesn't expire data on your behalf, so retention policy is yours to implement:
 
 ```csharp
 // example: delete threads untouched for a year

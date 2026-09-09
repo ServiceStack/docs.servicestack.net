@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-09-09T11:04:53.4501474Z'>
+    <meta name='date' content='2026-09-09T11:08:28.5497320Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Startup Tasks</title>
@@ -69,6 +69,9 @@
                         <a href="/chat/" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
                             AI
                         </a>
+                        <a href="/rag" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            RAG
+                        </a>
                         <a href="/pdf" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
                             PDF
                         </a>
@@ -125,6 +128,9 @@
                     </a>
                     <a href="/chat/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
                         AI
+                    </a>
+                    <a href="/rag" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                        RAG
                     </a>
                     <a href="/pdf" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
                         PDF
@@ -1481,7 +1487,7 @@ mount('#header', Header)
             <div class="mt-8 mx-auto prose lg:prose-lg">
                 
                     <section class="not-prose mb-16 md:mb-12">
-                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50">
                             Startup Tasks
                         </h1>
                     </section>
@@ -1501,6 +1507,7 @@ They're useful for keeping generated files synchronized with your server without
 <p>In ASP.NET Core Apps, ServiceStack enables <code>DebugMode</code> when the host environment is <code>Development</code>, so registered Startup Tasks are automatically disabled when the App runs in <code>Production</code>.</p>
 <h2 id="automatically-regenerate-client-dtos">Automatically regenerate client DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-regenerate-client-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>ServiceStack projects can register a Startup Task that finds existing <code>dtos.*</code> <a href="/add-servicestack-reference">ServiceStack References</a> and regenerates them from the current server's metadata:</p>
+<p>Add the registration in its own <code>Configure.StartupTasks.GeneratedDtos.cs</code> file:</p>
 <pre><code class="language-csharp">public class ConfigureGeneratedDtos : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) =&gt; builder
@@ -1759,6 +1766,40 @@ log.LogInformation(&quot;Updated {Count} DTO references&quot;, result.Updated.Co
 </tbody>
 </table>
 <p>Each file is processed independently. An invalid or inaccessible reference is reported without preventing other matching DTOs from being regenerated.</p>
+<h2 id="automatically-regenerate-pdf-models">Automatically regenerate PDF models<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-regenerate-pdf-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Apps using <code>PdfFeature</code> can keep the typed C# models generated from published PDF templates synchronized
+with their <code>.ui.json</code> schemas on every development restart:</p>
+<pre><code class="language-csharp">StartupTasks.Register(&quot;pdf&quot;, () =&gt;
+    appHost.GetPlugin&lt;PdfFeature&gt;().GeneratePdfs());
+</code></pre>
+<p>An unchanged run is inexpensive. It reads each template's small schema and example, generates its C#
+source in memory, and compares it with the existing file. It doesn't invoke Typst and doesn't rewrite
+unchanged files.</p>
+<p>Generated files carry an opening <code>&lt;auto-generated&gt;</code> comment which explicitly means the generator owns
+the file. Remove that opening marker when you want to take ownership of a hand-tuned model. Future runs
+then skip and report the unmarked file instead of overwriting it.</p>
+<p>Use <code>PdfAttribute.Namespace</code> as a per-template override when generated helper names like <code>Item</code>, <code>From</code> or
+<code>Details</code> would otherwise conflict with another template. It changes the C# namespace without changing
+the physical output location:</p>
+<pre><code class="language-csharp">[Pdf(&quot;invoice&quot;, Namespace = &quot;MyApp.ServiceModel.Pdf.Invoices&quot;)]
+public class Invoice { /* ... */ }
+</code></pre>
+<p>The generated <code>[Pdf]</code> attribute retains the namespace override on subsequent runs.</p>
+<p>See <a href="/chat/rendering-pdfs">Rendering PDFs</a> for <code>PdfFeature</code> and <code>PdfCodeGenConfig</code> configuration.</p>
+<h2 id="organizing-startup-tasks">Organizing Startup Tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#organizing-startup-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Keep each Startup Task registration in its own root-level configuration file using the
+<code>Configure.StartupTasks.*.cs</code> naming convention, e.g:</p>
+<pre><code class="language-text">Configure.StartupTasks.GeneratedDtos.cs
+Configure.StartupTasks.GeneratedPdfs.cs
+Configure.StartupTasks.SearchIndex.cs
+Configure.StartupTasks.SeedContent.cs
+</code></pre>
+<p>This follows the existing <code>Configure.*.cs</code> convention used by ServiceStack project templates while
+keeping related Startup Tasks grouped together in IDEs and directory listings. Independent files also
+let each task own its dependencies and configuration without growing a shared <code>StartupTasks.cs</code> into a
+catch-all file.</p>
+<p>The filename groups the registrations, while the <code>IHostingStartup</code> class should describe the feature it
+configures, such as <code>ConfigureGeneratedDtos</code> or <code>ConfigureSearchIndex</code>.</p>
 <h2 id="registering-other-startup-tasks">Registering other Startup Tasks<a class="header-anchor" href="javascript:;" onclick="location.hash='#registering-other-startup-tasks'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><code>StartupTasks</code> can run any parameterless development task which requires a fully started App:</p>
 <pre><code class="language-csharp">StartupTasks.Register(&quot;search-index&quot;, () =&gt;
@@ -1834,6 +1875,16 @@ log.LogInformation(&quot;Updated {Count} DTO references&quot;, result.Updated.Co
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#generation-results'" data-id="generation-results" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Generation results
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#automatically-regenerate-pdf-models'" data-id="automatically-regenerate-pdf-models" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Automatically regenerate PDF models
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#organizing-startup-tasks'" data-id="organizing-startup-tasks" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Organizing Startup Tasks
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">

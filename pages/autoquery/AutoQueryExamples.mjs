@@ -2,7 +2,7 @@ export default {
     template:`<div>
         <div class="mt-16 mx-auto max-w-7xl px-4 sm:mt-24 sm:px-6">
             <div class="text-center">
-                <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50">
                     <span class="block">
                         AutoQuery Examples
                     </span>

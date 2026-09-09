@@ -244,8 +244,53 @@ const ScreenshotToggle = {
     }
 }
 
+/** Which clients are covered, and how each one connects */
+const ClientMatrix = {
+    template: `
+    <section class="not-prose my-10">
+      <div class="mb-6">
+        <p class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Model-agnostic by design</p>
+        <h3 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">Clients covered on this page</h3>
+        <p class="mt-2 max-w-3xl leading-7 text-slate-600 dark:text-slate-300">
+          The same ServiceStack endpoint serves all of them - a client either takes a one-line CLI command or a small
+          JSON entry in its own settings. Jump to the one you use.
+        </p>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <a v-for="c in clients" :key="c.name" :href="c.href"
+           class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+          <div class="flex items-start justify-between gap-2">
+            <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{c.name}}</div>
+            <span :class="['shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider', c.tint]">{{c.how}}</span>
+          </div>
+          <p class="mt-2 flex-1 text-sm leading-6 text-slate-500 dark:text-slate-400">{{c.text}}</p>
+        </a>
+      </div>
+      <p class="mt-4 rounded-xl border border-indigo-200 bg-indigo-50/60 px-4 py-3 text-sm leading-6 text-slate-700 dark:border-indigo-900 dark:bg-indigo-950/30 dark:text-slate-200">
+        Every client authenticates the same way: a <b class="text-slate-900 dark:text-white">ServiceStack API key</b> in
+        an <code class="rounded bg-white px-1 py-0.5 text-xs dark:bg-slate-900">Authorization: Bearer</code> header, so
+        tools run with that key\u2019s own roles and permissions.
+      </p>
+    </section>`,
+    setup() {
+        const cli = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+        const json = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+        const clients = [
+            { name:'Claude Code', href:'#claude-code', how:'CLI', tint:cli, text:'claude mcp add --transport http, or an entry in .mcp.json.' },
+            { name:'Claude Desktop', href:'#claude-desktop', how:'JSON', tint:json, text:'A claude_desktop_config.json entry bridged through npx.' },
+            { name:'Codex', href:'#codex', how:'CLI', tint:cli, text:'codex mcp add with the endpoint and header.' },
+            { name:'Open Code', href:'#open-code', how:'JSON', tint:json, text:'Configured in its own MCP settings file.' },
+            { name:'Antigravity', href:'#antigravity', how:'JSON', tint:json, text:'Configured in its own MCP settings file.' },
+            { name:'ZCode', href:'#zcode', how:'JSON', tint:json, text:'Configured in its own MCP settings file.' },
+            { name:'Oh My Pi', href:'#oh-my-pi', how:'JSON', tint:json, text:'Configured in its own MCP settings file.' },
+        ]
+        return { clients }
+    }
+}
+
 export default {
     components: {
+        ClientMatrix,
         CopyBlock,
         ViewJson,
         ScreenshotToggle,
