@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-09-10T10:53:18.1056395Z'>
+    <meta name='date' content='2026-09-10T14:29:57.9852748Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Startup Tasks</title>
@@ -1505,6 +1505,52 @@ They're useful for keeping generated files synchronized with your server without
 </ul>
 <p>This makes them well suited to repeatable development conveniences like regenerating client DTOs on every restart.</p>
 <p>In ASP.NET Core Apps, ServiceStack enables <code>DebugMode</code> when the host environment is <code>Development</code>, so registered Startup Tasks are automatically disabled when the App runs in <code>Production</code>.</p>
+<h2 id="compared-with-source-generators">Compared with Source Generators<a class="header-anchor" href="javascript:;" onclick="location.hash='#compared-with-source-generators'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Startup Tasks serve a similar purpose to C# <a href="https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview">Source Generators</a>:
+code derived from a single source of truth is kept up to date automatically, so developers never need
+to remember to regenerate it.</p>
+<p>The difference is when they run and what they can see:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Source Generators</th>
+<th>Startup Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runs</td>
+<td>At compile time</td>
+<td>After the App has started in development</td>
+</tr>
+<tr>
+<td>Has access to</td>
+<td>Your project's source code</td>
+<td>The fully initialized <code>AppHost</code>, its Services, plugins, configuration and listening URLs</td>
+</tr>
+<tr>
+<td>Generates</td>
+<td>C# added to the assembly being compiled</td>
+<td>Any file in any language, anywhere in the project</td>
+</tr>
+<tr>
+<td>Can also</td>
+<td>Only generate code</td>
+<td>Run any development task, e.g. update a search index or seed content</td>
+</tr>
+</tbody>
+</table>
+<p>This makes Startup Tasks a good fit for code derived from the <strong>running</strong> App which a compiler can't
+see, such as client DTOs generated from your App's API metadata. Like source generators they remove an
+explicit build step from the development workflow, which:</p>
+<ul>
+<li>Keeps generated code synchronized with its source of truth without extra commands</li>
+<li>Avoids stale generated files being built against or committed to source control</li>
+<li>Reduces onboarding, as there are no project-specific generation commands to learn</li>
+<li>Lets AI Assistants focus on changing the source of truth, e.g. C# DTOs and Services, instead of
+having to discover and run generation commands or hand-write generated client contracts</li>
+</ul>
 <h2 id="automatically-regenerate-client-dtos">Automatically regenerate client DTOs<a class="header-anchor" href="javascript:;" onclick="location.hash='#automatically-regenerate-client-dtos'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>ServiceStack projects can register a Startup Task that finds existing <code>dtos.*</code> <a href="/add-servicestack-reference">ServiceStack References</a> and regenerates them from the current server's metadata.</p>
 <p>The easiest way to add it to existing projects is to run:</p>
@@ -1579,6 +1625,7 @@ They're useful for keeping generated files synchronized with your server without
 <li>Consistent DTO options and output across every developer's environment</li>
 <li>No dependency on Node.js or an HTTP request for regeneration</li>
 <li>Less context switching during server and client development</li>
+<li>AI Assistants only need to change server DTOs and Services, with client contracts updated on the next restart</li>
 </ul>
 <h2 id="how-dto-generation-works">How DTO generation works<a class="header-anchor" href="javascript:;" onclick="location.hash='#how-dto-generation-works'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><code>NativeTypesFeature.GenerateDtos()</code> provides the same regeneration behavior as <code>npx get-dtos</code>, but runs entirely inside the App:</p>
@@ -1853,6 +1900,11 @@ configures, such as <code>ConfigureGeneratedDtos</code> or <code>ConfigureSearch
                                 On This Page
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#compared-with-source-generators'" data-id="compared-with-source-generators" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Compared with Source Generators
+                                        </span>
+                                    </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#automatically-regenerate-client-dtos'" data-id="automatically-regenerate-client-dtos" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Automatically regenerate client DTOs
