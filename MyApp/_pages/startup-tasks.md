@@ -16,6 +16,31 @@ This makes them well suited to repeatable development conveniences like regenera
 
 In ASP.NET Core Apps, ServiceStack enables `DebugMode` when the host environment is `Development`, so registered Startup Tasks are automatically disabled when the App runs in `Production`.
 
+## Compared with Source Generators
+
+Startup Tasks serve a similar purpose to C# [Source Generators](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview):
+code derived from a single source of truth is kept up to date automatically, so developers never need
+to remember to regenerate it.
+
+The difference is when they run and what they can see:
+
+| | Source Generators | Startup Tasks |
+| --- | --- | --- |
+| Runs | At compile time | After the App has started in development |
+| Has access to | Your project's source code | The fully initialized `AppHost`, its Services, plugins, configuration and listening URLs |
+| Generates | C# added to the assembly being compiled | Any file in any language, anywhere in the project |
+| Can also | Only generate code | Run any development task, e.g. update a search index or seed content |
+
+This makes Startup Tasks a good fit for code derived from the **running** App which a compiler can't
+see, such as client DTOs generated from your App's API metadata. Like source generators they remove an
+explicit build step from the development workflow, which:
+
+- Keeps generated code synchronized with its source of truth without extra commands
+- Avoids stale generated files being built against or committed to source control
+- Reduces onboarding, as there are no project-specific generation commands to learn
+- Lets AI Assistants focus on changing the source of truth, e.g. C# DTOs and Services, instead of
+  having to discover and run generation commands or hand-write generated client contracts
+
 ## Automatically regenerate client DTOs
 
 ServiceStack projects can register a Startup Task that finds existing `dtos.*` [ServiceStack References](/add-servicestack-reference) and regenerates them from the current server's metadata.
@@ -60,6 +85,7 @@ Registering the `dtos` Startup Task removes this manual step. Restarting the App
 - Consistent DTO options and output across every developer's environment
 - No dependency on Node.js or an HTTP request for regeneration
 - Less context switching during server and client development
+- AI Assistants only need to change server DTOs and Services, with client contracts updated on the next restart
 
 ## How DTO generation works
 
