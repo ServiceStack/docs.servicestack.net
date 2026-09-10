@@ -1,8 +1,8 @@
 export const latestPages = [
-    { name:"Create your first WebService", href:"/create-your-first-webservice", text:"ServiceStack APIs start from a different place than most frameworks. Instead of writing a method that returns JSON, y\u2026", badge:null },
-    { name:"ServiceStack v10.2", href:"/releases/v10_02", text:"ServiceStack v10.2 is headlined by Gemini RAG - a complete, managed knowledge platform that turns", badge:"releases" },
-    { name:"Add ServiceStack Reference", href:"/add-servicestack-reference-overview", text:"Add ServiceStack Reference gives every consumer of your API an end-to-end typed client, generated from a single URL.", badge:null },
+    { name:"ServiceStack v10.2", href:"/releases/v10_02", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"Startup Tasks", href:"/startup-tasks", text:"Startup Tasks let you run development-time initialization after your ASP.NET Core App has fully started.", badge:null },
+    { name:"Create your first WebService", href:"/create-your-first-webservice", text:"ServiceStack APIs start from a different place than most frameworks. Instead of writing a method that returns JSON, y\u2026", badge:null },
+    { name:"Add ServiceStack Reference", href:"/add-servicestack-reference-overview", text:"Add ServiceStack Reference gives every consumer of your API an end-to-end typed client, generated from a single URL.", badge:null },
     { name:"Gemini Search Analytics \u0026 Privacy", href:"/chat/gemini-analytics", text:"Analytics is an optional layer over a published [Website Search](/chat/gemini-search) deployment,", badge:"chat" },
     { name:"Gemini Website Search", href:"/chat/gemini-search", text:"The Search workspace publishes a conventional documentation search experience from the same", badge:"chat" },
     { name:"Gemini AI Assistants", href:"/chat/gemini-assistants", text:"The Assistants workspace turns a File Store-or a filtered slice of it-into a branded,", badge:"chat" },
