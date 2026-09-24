@@ -286,9 +286,8 @@ as a great resource of how they're used in real-world Web Applications:
 Generate images for free using custom [Civit AI](https://civitai.com) and [FLUX-schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell)
 models:
 
-[![](/img/pages/sqlite/blazordiffusion.webp)](https://blazordiffusion.com)
+[![](/img/pages/sqlite/blazordiffusion.webp)](https://github.com/NetCoreApps/BlazorDiffusionVue)
 
-- Website: [blazordiffusion.com](https://blazordiffusion.com)
 - GitHub: [github.com/NetCoreApps/BlazorDiffusionVue](https://github.com/NetCoreApps/BlazorDiffusionVue/)
 
 ### pvq.app
@@ -308,7 +307,7 @@ to find the best performing LLM models (results are surprising!)
 The independent Microservice used to provide all AI Features used by the above applications. 
 It's already been used to execute millions of LLM and Comfy UI Requests to generate Open AI Chat Answers
 and Generated Images used to populate the
-[blazordiffusion.com](https://blazordiffusion.com) and [pvq.app](https://pvq.app) websites. 
+[Blazor Diffusion](https://github.com/NetCoreApps/BlazorDiffusionVue) and [pvq.app](https://pvq.app) websites. 
 
 It was the project used to develop and test [Background Jobs](/background-jobs) in action 
 where it serves as a private gateway to process all LLM, AI and image transformations requests 
