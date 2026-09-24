@@ -204,7 +204,7 @@ export default {
           </button>
           <img :src="src(shot)" :alt="shot.title" class="max-h-[calc(100vh-6rem)] max-w-full rounded-lg object-contain shadow-2xl">
           <p class="text-sm text-white/80">
-            {{ shot.title }} — {{ shot.desc }}
+            {{ shot.title }} - {{ shot.desc }}
             <span class="ml-3 text-white/50">{{ index + 1 }} / {{ allShots.length }}</span>
           </p>
         </div>

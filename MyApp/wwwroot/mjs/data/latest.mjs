@@ -1,4 +1,5 @@
 export const latestPages = [
+    { name:"ServiceStack v10.3", href:"/releases/v10_03", text:"ServiceStack v10.3 is a major upgrade to [Background Jobs](/background-jobs), turning it from a simple", badge:"releases" },
     { name:"JSON API Client Features", href:"/vue/use-client", text:"instance registered in Vue App\u0027s with:", badge:"vue" },
     { name:"What is Razor Press?", href:"/razor-press/what-is-razor-press", text:"Razor Press is a Razor Pages powered Markdown alternative to Ruby\u0027s Jekyll, Vue \u0026 VitePress that\u0027s ideal for", badge:"razor-press" },
     { name:"JSON Lines Data Format", href:"/jsonl-format", text:"like Unix shell pipelines, whose streamable properties is making it a popular data format for maintaining large datasets", badge:null },
@@ -19,5 +20,4 @@ export const latestPages = [
     { name:"Custom HTML Components", href:"/locode/custom-components-v1", text:"The Chinook Demo shows an example of overriding its existing", badge:"locode" },
     { name:"Locode - Code-First", href:"/locode/code-first", text:"Code-First is the natural development model of [AutoQuery Services](/autoquery/rdbms) which facilitates the majority \u2026", badge:"locode" },
     { name:"Advanced Locode Features", href:"/locode/advanced", text:"As we look for ways to improve productivity in Locode now pre-populates referential data from navigated references, e\u2026", badge:"locode" },
-    { name:"Jupyter Notebooks for Reporting", href:"/jupyter-notebooks-reporting", text:"Jupyter Notebooks provide a rich set of interactive computing tools that can be used for many different use cases.", badge:null },
 ]
