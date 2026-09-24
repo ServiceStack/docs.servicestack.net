@@ -35,7 +35,7 @@ const TransactionFlow = {
             { cmd:'EXEC', tint:'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
               name:'trans.Commit()', text:'Sends every queued command atomically and then invokes each registered callback with its result.' },
             { cmd:'DISCARD', tint:'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
-              name:'trans.Rollback() — automatic on Dispose()', text:'Throws the queue away without executing anything, leaving the connection ready for reuse.' },
+              name:'trans.Rollback() - automatic on Dispose()', text:'Throws the queue away without executing anything, leaving the connection ready for reuse.' },
         ]
         return { steps }
     }

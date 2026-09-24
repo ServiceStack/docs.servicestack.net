@@ -374,7 +374,7 @@ export default {
           </button>
           <img :src="src(screen)" :alt="screen.title" class="max-h-[calc(100vh-6rem)] max-w-full rounded-lg object-contain shadow-2xl">
           <p class="text-sm text-white/80">
-            {{ screen.title }} — {{ screen.desc }}
+            {{ screen.title }} - {{ screen.desc }}
             <span class="ml-3 text-white/50">{{ index + 1 }} / {{ allScreens.length }}</span>
           </p>
         </div>

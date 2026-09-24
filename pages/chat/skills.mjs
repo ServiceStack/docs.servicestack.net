@@ -46,10 +46,10 @@ const ProgressiveDisclosure = {
     </section>`,
     setup() {
         const visible = [
-            'incident-response — Triage and respond to a production incident…',
-            'customer-onboarding — Take a signed customer to first value…',
-            'code-review — Review a change for correctness and risk…',
-            'compliance-check — Verify a release against policy…',
+            'incident-response - Triage and respond to a production incident…',
+            'customer-onboarding - Take a signed customer to first value…',
+            'code-review - Review a change for correctness and risk…',
+            'compliance-check - Verify a release against policy…',
         ]
         const files = ['SKILL.md','runbooks/database-failover.md','runbooks/cache-eviction.md','templates/postmortem.md']
         return { visible, files }
