@@ -165,7 +165,7 @@ while (true)
         var indexedCreative = new IndexedCreative
         {
             Text = creative.Prompt,
-            Url = $"https://cdn.diffusion.works{artifact.FilePath}"
+            Url = $"https://cdn.example.org{artifact.FilePath}"
         };
         // Process and index the creative data
         await typesenseClient.CreateDocument("Creatives", indexedCreative);

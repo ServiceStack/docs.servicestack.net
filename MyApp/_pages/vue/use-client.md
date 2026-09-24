@@ -281,7 +281,7 @@ A popular performance enhancing technique you can use to improve perceived perfo
 which can deliver just as good UX as complex SPAs with stateless full page reloads of pre-rendered HTML pages if we use SWR to fetch all 
 the API data needed to render the page on first load:
 
-[![](/img/pages/release-notes/v6.9/diffusion-swr.gif)](https://diffusion.works)
+![](/img/pages/release-notes/v6.9/diffusion-swr.gif)
 
 This is easily achieved in reactive Vue.js UIs by invoking API requests with the new `swr()` client API where if 
 the same API request had been run before it will execute the callback immediately with its "stale" cached results

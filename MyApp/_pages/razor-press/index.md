@@ -185,11 +185,6 @@ Some examples built with Razor SSG include:
         <img class="p-2" src="https://docs.servicestack.net/img/pages/ssg/servicestack.net-home-1440.png">
         <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">servicestack.net</div>
     </a>
-    <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://diffusion.works">
-        <div style="max-height:350px;overflow:hidden">
-        <img class="p-2" src="https://servicestack.net/img/posts/vue-diffusion/vuediffusion-search.png"></div>
-        <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">diffusion.works</div>
-    </a>
     <a class="block group border dark:border-gray-800 hover:border-indigo-700 dark:hover:border-indigo-700" href="https://jamstacks.net">
         <img class="p-2" src="https://docs.servicestack.net/img/pages/release-notes/v6.9/jamstacks-screenshot.png">
         <div class="bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold group-hover:bg-indigo-700 group-hover:text-white text-center py-2">jamstacks.net</div>
