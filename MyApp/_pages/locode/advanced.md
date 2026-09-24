@@ -4,7 +4,7 @@ title: Advanced Locode Features
 
 ## Pre-populated Reference Data
 
-As we look for ways to improve productivity in Locode now pre-populates referential data from navigated references, e.g. when creating a new Job Application after navigating to a [Job's Applications in Talent Blazor](https://talent.locode.dev/locode/QueryJob) it uses this context to pre-populate the Job it's filtered by:
+As we look for ways to improve productivity in Locode now pre-populates referential data from navigated references, e.g. when creating a new Job Application after navigating to a [Job's Applications in Talent Blazor](https://github.com/NetCoreApps/TalentBlazor/blob/4c68e80560aa66a899cd4bc633816d59e2f36d50/TalentBlazor.ServiceModel/Talent.cs#L324) it uses this context to pre-populate the Job it's filtered by:
 
 ![](/img/pages/locode/prepopulated-related-data.png)
 

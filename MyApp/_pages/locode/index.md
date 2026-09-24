@@ -25,18 +25,6 @@ behaviour that can be further customized & extended and [customized using C# att
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="hkuO_DMFXmc" style="background-image: url('https://img.youtube.com/vi/hkuO_DMFXmc/maxresdefault.jpg')"></lite-youtube>
 </div>
 
-After creating your AutoQuery APIs they'll be immediately accessible them from the built-in Locode UI at:
+After creating your AutoQuery APIs they'll be immediately accessible them from the built-in Locode UI:
 
-<div class="not-prose">
-<h3 class="text-4xl text-center text-indigo-800 pb-3"><span class="text-gray-300">https://example.org</span>/locode/</h3>
-<h1 class="mt-16 text-center text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
-    API Reference
-</h1>
-<p class="text-center mt-6 text-xl text-gray-500">
-    <a href="/locode/custom">Custom Locode Apps</a>
-    can benefit from TypeScript definitions for all functionality in ServiceStack UI's at 
-    <b><a href="https://api.locode.dev">api.locode.dev</a></b>
-</p>
-</div>
-
-[![](/img/pages/locode/shared-api-reference.png)](https://api.locode.dev/modules/shared.html)
+![](/img/pages/locode/shared-api-reference.png)

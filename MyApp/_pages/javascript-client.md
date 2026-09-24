@@ -167,7 +167,7 @@ const client = new JsonServiceClient(baseUrl).useBasePath()
 
 ### API Reference
 
-<a href="https://api.locode.dev/classes/client.JsonServiceClient.html"><div class="my-8 mx-auto max-w-xl block flex justify-center shadow hover:shadow-lg rounded py-1"><img class="p-4" src="/img/pages/clients/JsonServiceClient-ui-reference.png"></div></a>
+<div class="my-8 mx-auto max-w-xl block flex justify-center shadow hover:shadow-lg rounded py-1"><img class="p-4" src="/img/pages/clients/JsonServiceClient-ui-reference.png"></div>
 
 ### API method
 

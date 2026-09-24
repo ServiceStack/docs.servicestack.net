@@ -4,7 +4,7 @@ title: Format Functions
 
 Format functions let you customize how fields are displayed in tabular result pages, e.g:
 
-[![](/img/pages/locode/talent/contact-formatters.png)](https://talent.locode.dev/locode/QueryContacts)
+![](/img/pages/locode/talent/contact-formatters.png)
 
 Where columns are customized using a built-in formatting function referenced by the `[Format]` attributes:
 
@@ -32,7 +32,7 @@ Whilst the `[Intl*]` attributes provide a typed API to utilize JavaScript's rich
 [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) object containing the
 namespace for the ECMAScript Internationalization API, which provides number formatting, and date & time formatting, e.g:
 
-[![](/img/pages/locode/chinook/tracks-formatters.png)](https://chinook.locode.dev/locode/QueryTracks)
+![](/img/pages/locode/chinook/tracks-formatters.png)
 
 Which was rendered using the `[Format]` ant `[Intl*]` attributes below:
 
@@ -95,8 +95,7 @@ method(field,options)
 
 For improved discoverability a typed list of all formatting functions are maintained in 
 [FormatMethods.cs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Interfaces/FormatMethods.cs)
-which map to the built-in JavaScript functions below which are also discoverable in the 
-[API Reference Function docs](https://api.locode.dev/modules/shared.html#apiForm-1).
+which map to the built-in JavaScript functions below.
 
 ### Number Formatters
 
@@ -158,7 +157,7 @@ appropriate icon for its file type.
 function attachment(url: string): string;
 ```
 
-[![](/img/pages/locode/talent/attachment-formatters.png)](https://talent.locode.dev/locode/QueryJobApplicationAttachment)
+![](/img/pages/locode/talent/attachment-formatters.png)
 
 Rendered with:
 

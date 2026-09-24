@@ -10,10 +10,10 @@ to your Host Project **/wwwroot** folder at `/modules/locode/components/*.mjs` u
 | `New{Table}`   | Custom Create Form UI |
 | `Edit{Table}`  | Custom Update Form UI |
 
-The [chinook.locode.dev](https://chinook.locode.dev) demo does this to create a custom Form UI for creating and
+The [Chinook](https://github.com/NetCoreApps/Chinook) demo does this to create a custom Form UI for creating and
 editing Albums by registering `NewAlbums` in [NewAlbums.mjs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/NewAlbums.mjs)
 and `EditAlbums` component in [EditAlbums.mjs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/EditAlbums.mjs)
-which are used to render Chinook's [custom Create Album form](https://chinook.locode.dev/locode/QueryAlbums?create)
+which are used to render Chinook's [custom Create Album form](https://github.com/NetCoreApps/Chinook/blob/main/Chinook.ServiceModel/Media.cs#L161)
 to update its `Albums` table.
 
 ## Built-in App functionality
@@ -57,7 +57,7 @@ const routes = inject('routes')            // usePageRoutes() Reactive store to 
 const breakpoints = inject('breakpoints')  // useBreakpoints() Reactive store to Tailwind responsive breakpoints
 ```
 
-Most of which creates instance of common library features in [core.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/NorthwindAuto/wwwroot/js/core.mjs) that are documented at [api.locode.dev/modules/locode.html](https://api.locode.dev/modules/locode.html).
+Most of which creates instance of common library features in [core.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/NorthwindAuto/wwwroot/js/core.mjs).
 
 You're also not limited with what's in Locode, with full access to [JavaScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
 you can import external 3rd Party packages the same way you import built-in packages.
@@ -134,13 +134,13 @@ refresh the AutoQueryGrid resultset to see the latest changes.
 
 Invoking APIs with `useClient()` APIs will propagate any error information from any [declarative validation attributes](/locode/declarative#type-validation-attributes) into validation-aware components which alleviates us from needing to perform any manual validation ourselves.
 
-When registered this custom component replaces Locode's Auto Form UI with a custom [Create Album Form](https://chinook.locode.dev/locode/QueryAlbums?create):
+When registered this custom component replaces Locode's Auto Form UI with a custom [Create Album Form](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/NewAlbums.mjs):
 
-[![](/img/pages/locode/chinook/custom-createform.png)](https://chinook.locode.dev/locode/QueryAlbums?create)
+![](/img/pages/locode/chinook/custom-createform.png)
 
 That when submitting an empty form will trigger the contextual validation errors to appear:
 
-[![](/img/pages/locode/chinook/custom-createform-errors.png)](https://chinook.locode.dev/locode/QueryAlbums?new=true)
+![](/img/pages/locode/chinook/custom-createform-errors.png)
 
 As enforced by the [Declarative Validation](/declarative-validation) rules on the `CreateAlbums` AutoQuery CRUD DTO its calling:
 
@@ -234,7 +234,7 @@ public class PatchAlbums
 
 Which is all that's need to implement our custom Edit Albums Form:
 
-[![](/img/pages/locode/chinook/custom-editform.png)](https://chinook.locode.dev/locode/QueryAlbums?edit=6)
+![](/img/pages/locode/chinook/custom-editform.png)
 
 To minimize code duplication both custom forms makes use of a shared
 [SubmitAlbumButton.mjs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/SubmitAlbumButton.mjs) component, defined as:

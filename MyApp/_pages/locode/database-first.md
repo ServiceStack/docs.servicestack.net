@@ -18,8 +18,7 @@ To get started quickly watch this video for a step-by-step walkthrough into crea
 
 ## Northwind example
 
-We have an example of this in the [Northwind demo](https://northwind.locode.dev) which provides a way to manage 
-all the data in the Northwind database with some customizations to improve usability, all in **~120 lines of C#**.
+We have an example of this in the [Northwind demo](https://github.com/NetCoreApps/NorthwindAuto) which provides a way to manage all the data in the Northwind database with some customizations to improve usability, all in **~120 lines of C#**.
 
 ## Create your project
 
@@ -234,9 +233,9 @@ it also annotates the code-generated types which are retained when moving from d
 ### Annotated Example of Northwind's Customizations
 
 To help illustrate some customizations available we've annotated the customizations made to the Northwind Sample SQLite Database
-that was used to create the custom [northwind.locode.dev](https://northwind.locode.dev) Locode App:
+that was used to create the custom [Northwind](https://github.com/NetCoreApps/NorthwindAuto) Locode App:
 
-[![](/img/pages/locode/northwind/screenshot.png)](https://northwind.locode.dev/locode/QueryEmployees)
+![](/img/pages/locode/northwind/screenshot.png)
 
 ### Modifying Dynamic Types at Runtime
 
@@ -372,7 +371,6 @@ if (type.Name is "Customer" or "Supplier" or "Shipper")
 To format the phone numbers in `tel:` HTML links enabling 1-click to call, directly from the search results page:
 
 <div class="not-prose">
-<a href="https://northwind.locode.dev/locode/QueryCustomers" class="hover:no-underline">
 <ul class="my-8 grid gap-4 sm:grid-cols-2">
     <li class="rounded-lg m-0 col-span-1 flex flex-col text-center items-center bg-white shadow divide-y divide-gray-200">
         <div class="flex-1 flex flex-col px-4 mt-4">
@@ -391,7 +389,6 @@ To format the phone numbers in `tel:` HTML links enabling 1-click to call, direc
         </div>
     </li>
 </ul>
-</a>
 </div>
 
 A complete list of built-in functions can be found in the [Format Functions docs](/locode/formatters), another example used in 
@@ -408,7 +405,6 @@ if (type.Name == "Employee" || type.IsCrudCreateOrUpdate("Employee"))
 To apply the `iconRounded` JavaScript function to render a preview of the Employee profile directly in the search results:
 
 <div class="not-prose">
-<a href="https://northwind.locode.dev/locode/QueryEmployees" class="hover:no-underline">
 <ul class="grid gap-4 sm:grid-cols-2">
     <li class="rounded-lg m-0 col-span-1 flex flex-col text-center items-center bg-white shadow divide-y divide-gray-200">
         <div class="flex-1 flex flex-col px-4 mt-4">
@@ -427,7 +423,6 @@ To apply the `iconRounded` JavaScript function to render a preview of the Employ
         </div>
     </li>
 </ul>
-</a>
 </div>
 
 `ReorderProperty` is used to change ordering of Table columns which changes the order they're displayed in APIs and UIs. 
@@ -459,7 +454,6 @@ if (type.Name == "OrderDetail")
 This can give a much more contextual view of the data in the returning from our services.
 
 <div class="not-prose">
-<a href="https://northwind.locode.dev/locode/QueryOrderDetails" class="hover:no-underline">
 <ul class="grid gap-4 sm:grid-cols-2">
     <li class="rounded-lg m-0 col-span-1 flex flex-col text-center items-center bg-white shadow divide-y divide-gray-200">
         <div class="flex-1 flex flex-col px-4 mt-4">
@@ -478,7 +472,6 @@ This can give a much more contextual view of the data in the returning from our 
         </div>
     </li>
 </ul>
-</a>
 </div>
 
 For more customization options, see the [Declarative Attributes docs](/locode/declarative). 

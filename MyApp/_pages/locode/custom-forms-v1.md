@@ -10,9 +10,9 @@ to your Host Project **/wwwroot** folder at `/modules/locode/custom.html` using 
 | `New{Table}`   | Custom Create Form UI |
 | `Edit{Table}`  | Custom Update Form UI |
 
-The [chinook.locode.dev](https://chinook.locode.dev) demo does this to create a custom Form UI for creating and
+The [Chinook](https://github.com/NetCoreApps/Chinook) demo does this to create a custom Form UI for creating and
 editing Albums by registering `NewAlbums` and `EditAlbums` components in 
-[/modules/locode/custom.html](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/custom.html) used to render Chinook's [custom Create Album form](https://chinook.locode.dev/locode/QueryAlbums?new=true)
+[/modules/locode/custom.html](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/custom.html) used to render Chinook's custom Create Album form
 to update its `Albums` table.
 
 It's able to benefit from static analysis and intelli-sense by [installing @servicestack/ui](/locode/custom-overview) and importing 
@@ -105,13 +105,13 @@ to select the Artist they want instead of having to enter Ids manually.
 </template>
 ```
 
-When registered this custom component replaces Locode's Auto Form UI with a custom [Create Album Form](https://chinook.locode.dev/locode/QueryAlbums?new=true):
+When registered this custom component replaces Locode's Auto Form UI with a custom [Create Album Form](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/NewAlbums.mjs):
 
-[![](/img/pages/locode/chinook/custom-new.png)](https://chinook.locode.dev/locode/QueryAlbums?new=true)
+![](/img/pages/locode/chinook/custom-new.png)
 
 That when submitting an empty form will trigger the contextual validation errors to appear:
 
-[![](/img/pages/locode/chinook/custom-new-errors.png)](https://chinook.locode.dev/locode/QueryAlbums?new=true)
+![](/img/pages/locode/chinook/custom-new-errors.png)
 
 As enforced by the [Declarative Validation](/declarative-validation) rules on the 
 `CreateAlbums` AutoQuery CRUD DTO its calling:
@@ -229,7 +229,7 @@ The Edit Form UI is a fairly straight-forward Tailwind Form that just uses the b
 
 In order to render our custom Edit Albums Form:
 
-[![](/img/pages/locode/chinook/custom-edit.png)](https://chinook.locode.dev/locode/QueryAlbums?edit=6)
+![](/img/pages/locode/chinook/custom-edit.png)
 
 To minimize code duplication both custom forms makes use of a `SubmitAlbumButton` Reusable Component, defined as:
 

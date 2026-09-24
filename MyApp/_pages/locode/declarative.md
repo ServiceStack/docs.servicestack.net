@@ -17,7 +17,7 @@ A great way to get a quick overview of what annotated DTOs looks like in practic
 Demos which uses declarative attributes extensively to achieve its customized behavior where you'll be able to 
 test the cause & effect of different attributes against their Live Demos or by downloading and running a locally modified copy. 
 
-### Talent Blazor - [talent.locode.dev](https://talent.locode.dev) - [download.zip](https://github.com/NetCoreApps/TalentBlazor/archive/refs/heads/main.zip)
+### Talent Blazor - [download.zip](https://github.com/NetCoreApps/TalentBlazor/archive/refs/heads/main.zip)
 
  - [Talent.cs](https://github.com/NetCoreApps/TalentBlazor/blob/main/TalentBlazor.ServiceModel/Talent.cs)
 
@@ -26,7 +26,7 @@ where every change is captured in an Executable Crud Audit Event Log and
 [AutoApply Behaviors](/autoquery/crud#apply-generic-crud-behaviors) to change the behavior of
 Delete APIs to implement "Soft Deletes".
 
-### Chinook - [chinook.locode.dev](https://chinook.locode.dev) - [download.zip](https://github.com/NetCoreApps/Chinook/archive/refs/heads/main.zip)
+### Chinook - [download.zip](https://github.com/NetCoreApps/Chinook/archive/refs/heads/main.zip)
 
  - [Types/Models.cs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook.ServiceModel/Types/Models.cs)
  - [Media.cs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook.ServiceModel/Media.cs)
@@ -34,7 +34,7 @@ Delete APIs to implement "Soft Deletes".
 
 Chinook is a good simple Code-First example that's primarily focused on creating a customized UI in Locode. 
 
-### Northwind Auto - [northwind.locode.dev](https://northwind.locode.dev) - [download.zip](https://github.com/NetCoreApps/NorthwindAuto/archive/refs/heads/master.zip)
+### Northwind Auto - [download.zip](https://github.com/NetCoreApps/NorthwindAuto/archive/refs/heads/master.zip)
 
  - [Configure.AppHost.cs](https://github.com/NetCoreApps/NorthwindAuto/blob/master/Configure.AppHost.cs)
 
@@ -309,7 +309,7 @@ public class CreateJob : ICreateDb<Job>, IReturn<Job>
 
 Which renders our preferred responsive form layout:
 
-[![](/img/pages/locode/talent/create-job.png)](https://talent.locode.dev/locode/QueryJob?new=true)
+![](/img/pages/locode/talent/create-job.png)
 
 ### Field
 

@@ -4,7 +4,7 @@ title: Custom HTML Components
 
 The Chinook Demo shows an example of overriding its existing
 [/modules/locode/components/Welcome.mjs](https://github.com/NetCoreApps/Chinook/blob/main/Chinook/wwwroot/modules/locode/components/Welcome.mjs)
-component in order to render its [custom Home page](https://chinook.locode.dev/locode).
+component in order to render its custom Home page.
 
 ## Example
 
@@ -48,9 +48,9 @@ export const Welcome = {
 }
 ```
 
-Which uses the [DataGrid](/vue/datagrid) component to render its [custom Home page](https://chinook.locode.dev/locode):
+Which uses the [DataGrid](/vue/datagrid) component to render its custom Home page:
 
-[![](/img/pages/locode/chinook/welcome.png)](https://chinook.locode.dev/locode)
+![](/img/pages/locode/chinook/welcome.png)
 
 That makes use of the [Declarative UI Attributes](/locode/declarative#ui-metadata-attributes) in its
 [Invoices](https://github.com/NetCoreApps/Chinook/blob/main/Chinook.ServiceModel/Types/Models.cs) data model to render a formatted currency

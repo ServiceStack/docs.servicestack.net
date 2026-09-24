@@ -113,9 +113,8 @@ Unlike the AutoGen `TypeFilter` to
 which is only executed for customizing code-gen Types, these metadata APIs can be used for customizing the metadata
 of both [Database-First](/locode/database-first) and [Code-First](/locode/code-first) Types.
 
-So if the [Northwind Database-First](https://northwind.locode.dev) and 
-[Chinook Code-First](https://chinook.locode.dev) were both configured in the same App, you could use a single lambda
-to configure the metadata in both, e.g:
+So if the [Northwind Database-First](https://github.com/NetCoreApps/NorthwindAuto) and 
+[Chinook Code-First](https://github.com/NetCoreApps/Chinook) were both configured in the same App, you could use a single lambda to configure the metadata in both, e.g:
 
 ```csharp
 var icons = new Dictionary<string, ImageInfo>
@@ -349,9 +348,7 @@ public class Employee
 
 Implicit UI References are also populated when using a [Database-first](/locode/database-first) approach with Foreign Key columns, table relationships 
 and relevant look up tables reflected in the Locode App, as can be seen in in Locode's Northwind example in its
-[Product](https://northwind.locode.dev/locode/QueryProducts?edit=1), 
-[Order](https://northwind.locode.dev/locode/QueryOrders?edit=10248) and 
-[OrderDetails](https://northwind.locode.dev/locode/QueryOrderDetails?edit=10248%2F11) tables.
+`Product`, `Order` and `OrderDetails` tables.
 
 When the reference can't be inferred we can dynamically add it using AutoQuery's `TypeFilter` by adding the `[Ref]` attribute to the Data Model property:
 

@@ -289,9 +289,9 @@ with the application having the `IPatch<Booking>` API defined.
 
 ## POCO References
 
-When it can be inferred Locode automatically detects and linkify [POCO references](/ormlite/reference-support) for easy navigation which is used a lot in https://talent.locode.dev like navigating to a Job's [Job Applications](https://talent.locode.dev/locode/QueryJobApplication):
+When it can be inferred Locode automatically detects and linkify [POCO references](/ormlite/reference-support) for easy navigation which is used a lot in navigating to a Job's [Job Applications](https://github.com/NetCoreApps/TalentBlazor/blob/4c68e80560aa66a899cd4bc633816d59e2f36d50/TalentBlazor.ServiceModel/Talent.cs#L373):
 
-[![](/img/pages/locode/talent/job-application-references.png)](https://talent.locode.dev/locode/QueryJobApplication)
+[![](/img/pages/locode/talent/job-application-references.png)](https://github.com/NetCoreApps/TalentBlazor/blob/4c68e80560aa66a899cd4bc633816d59e2f36d50/TalentBlazor.ServiceModel/Talent.cs#L373)
 
 defined by its [POCO References](https://github.com/NetCoreApps/TalentBlazor/blob/ff6fd961f49141e617fef37b85240af04295359a/TalentBlazor.ServiceModel/Talent.cs#L87):
 

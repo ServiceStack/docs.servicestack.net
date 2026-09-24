@@ -31,7 +31,7 @@ a table row without the uploaded files embedded in the database itself, taking u
 ## Basic File Upload Example
 
 To demonstrate how to use the Managed File Uploads feature we'll look at handling the basic example of uploading files
-to publicly accessible `/wwwroot` folder location. This is what the [talent.locode.dev](https://talent.locode.dev) Demo
+to publicly accessible `/wwwroot` folder location. This is what the Talent Demo
 uses to handle profile image uploads for Contacts and Users in different locations in its 
 [Configure.AppHost.cs](https://github.com/NetCoreApps/TalentBlazor/blob/main/TalentBlazor/Configure.AppHost.cs):
 
@@ -148,7 +148,7 @@ validated and stored along with the rest of the DTO properties in the `Contact` 
 In API Explorer & Locode Apps you'll want to pair this together with `[Input(Type="file")]` to instruct the Auto Form UI
 to use its File Upload control to handle updating this property, which looks like:
 
-[![](/img/pages/locode/talent/update-contact.png)](https://talent.locode.dev/locode/QueryContacts?edit=1)
+![](/img/pages/locode/talent/update-contact.png)
 
 ## Managed Multi File Upload example
 

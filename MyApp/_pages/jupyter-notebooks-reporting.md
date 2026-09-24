@@ -160,13 +160,13 @@ Now that we have our environment built and running, we want to create a report t
 
 To jump start the process of getting the data you need to create your report in a notebook, we can use the ServiceStack `x` tool to generate the plumbing code we need to fetch data from a specific ServiceStack host and service.
 
-For example, working with the [Chinook sample application](https://chinook.locode.dev) which has details of orders from all over the world, we can produce a report based on invoice data.
+For example, working with the [Chinook sample application](https://github.com/NetCoreApps/Chinook) which has details of orders from all over the world, we can produce a report based on invoice data.
 
-![Metadata page of the Chinook sample application hosted at chinook.locode.dev](/img/pages/jupyter/reports-and-testing/chinook-metadata.png)
+![Metadata page of the Chinook sample application](/img/pages/jupyter/reports-and-testing/chinook-metadata.png)
 
 Running the following command from a new `notebooks` directory in our local git repository, we can generate a working notebook that already integrates with the Chinook sample web services, specifically the `QueryInvoices` service.
 ```shell
-x jupyter-python https://chinook.locode.dev QueryInvoices
+x jupyter-python https://example.org QueryInvoices
 ```
 
 Once generated, we can navigate to this notebook in the jupyter environment using our browser.
@@ -260,7 +260,7 @@ Once this is done, we will need to run a command from a Terminal in the context 
 Navigating to the folder of your notebook report, you can use a utility called `nbconvert` to run a similar command to what is happening when using the `Download as` menu, but this time with additional arguments to further refine the output. Specifically, the `--TemplateExporter.exclude_input=True` option.
 
 ```shell
-jupyter nbconvert --to pdf chinook.locode.dev-QueryInvoices.ipynb --TemplateExporter.exclude_input=True
+jupyter nbconvert --to pdf example.org-QueryInvoices.ipynb --TemplateExporter.exclude_input=True
 ```
 
 The generated PDF will be visible in the Jupyter file explorer web UI so you can open and [download the result](https://raw.githubusercontent.com/ServiceStack/docs/master/docs/public/jupyter-samples/jupyter-reports-clean.pdf).
@@ -275,7 +275,7 @@ The same process can be done for outputing straight HTML for easy sharing on a s
 Using the terminal again to produce HTML, we can strip the code away to produce a clean report.
 
 ```shell
-jupyter nbconvert --to html chinook.locode.dev-QueryInvoices.ipynb --TemplateExporter.exclude_input=True
+jupyter nbconvert --to html example.org-QueryInvoices.ipynb --TemplateExporter.exclude_input=True
 ```
 
 ![](/img/pages/jupyter/reports-and-testing/html-clean.png)

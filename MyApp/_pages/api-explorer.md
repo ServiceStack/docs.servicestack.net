@@ -364,7 +364,7 @@ JavaScript framework that's optimal for progressive enhancement that your compon
 
 For auto registration of components the `*.mjs` should match the API doc component which needs to be named `{Type}Docs`.
 
-Here's a simple [CreateBookingDocs.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Blazor/tests/ServiceStack.Blazor.Bootstrap.Tests/Server/modules/ui/docs/CreateBookingDocs.mjs) component example used to generate API Docs for the `CreateBooking` API  which just references **server** [AppMetadata](https://api.locode.dev/classes/shared.AppMetadata.html) to access server API info from the `/metadata/app.json` endpoint:
+Here's a simple [CreateBookingDocs.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Blazor/tests/ServiceStack.Blazor.Bootstrap.Tests/Server/modules/ui/docs/CreateBookingDocs.mjs) component example used to generate API Docs for the `CreateBooking` API  which just references **server** AppMetadata to access server API info from the `/metadata/app.json` endpoint:
 
 ```js
 import { inject } from "vue"
@@ -503,7 +503,7 @@ const routes = inject('routes')            // usePageRoutes() Reactive store to 
 const breakpoints = inject('breakpoints')  // useBreakpoints() Reactive store to Tailwind responsive breakpoints
 ```
 
-Most of which creates instance of common library features in [core.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/NorthwindAuto/wwwroot/js/core.mjs) that are documented at [api.locode.dev/modules/explorer.html](https://api.locode.dev/modules/explorer.html).
+Most of which creates instance of common library features in [core.mjs](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/tests/NorthwindAuto/wwwroot/js/core.mjs).
 
 You're also not limited with what's in API Explorer, with full access to [JavaScript Modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
 you can import external 3rd Party packages the same way you import built-in packages.
