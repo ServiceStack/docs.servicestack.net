@@ -69,6 +69,9 @@ const allShots = groups.flatMap(g => g.shots)
 
 export default {
     components: { CopyBlock },
+    props: {
+        videoId: String,
+    },
     template: `
     <section class="not-prose relative w-full overflow-hidden border-b border-slate-200 bg-gradient-to-b from-sky-50 via-white to-white">
       <!-- Grid Pattern -->
@@ -96,6 +99,13 @@ export default {
               {{ h.label }}
             </li>
           </ul>
+        </div>
+
+        <!-- Video tour -->
+        <div v-if="videoId" class="mt-12 mx-auto max-w-5xl overflow-hidden rounded-xl border border-slate-200 shadow-2xl">
+          <lite-youtube class="block w-full aspect-video" :videoid="videoId"
+            :style="{ maxWidth: 'none', backgroundImage: 'url(https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg)' }">
+          </lite-youtube>
         </div>
 
         <!-- Group tabs -->
