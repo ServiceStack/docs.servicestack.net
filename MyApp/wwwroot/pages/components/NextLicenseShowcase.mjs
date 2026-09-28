@@ -94,6 +94,9 @@ const allScreens = groups.flatMap(g => g.screens)
 
 export default {
     components: { CopyBlock, Icon },
+    props: {
+        videoId: String,
+    },
     template: `
     <section class="not-prose relative w-full overflow-hidden border-b border-white/10 bg-[#07120c] text-white">
       <!-- Background -->
@@ -120,6 +123,13 @@ export default {
             Stripe Checkout, signed JWT license keys, GitHub-hosted downloads and an Operations Center,
             with no activation server to run.
           </p>
+        </div>
+
+        <!-- Video tour -->
+        <div v-if="videoId" class="mt-12 mx-auto max-w-5xl overflow-hidden rounded-xl border border-lime-300/20 shadow-2xl shadow-black/50">
+          <lite-youtube class="block w-full aspect-video" :videoid="videoId"
+            :style="{ maxWidth: 'none', backgroundImage: 'url(https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg)' }">
+          </lite-youtube>
         </div>
 
         <!-- Purchase → unlock flow -->
