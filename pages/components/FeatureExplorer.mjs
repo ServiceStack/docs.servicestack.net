@@ -59,7 +59,7 @@ export default {
               text: 'A complete modular multi-provider AI App inside your own App.' },
             { category: 'AI', name: 'API Tools', href: '/chat/api-tools', badge: 'New', keywords: 'agents tool calling',
               text: 'Let models discover and call your real APIs as the signed-in user.' },
-            { category: 'AI', name: 'MCP Server', href: '/chat/mcp', badge: 'New', keywords: 'model context protocol',
+            { category: 'AI', name: 'MCP Server', href: '/chat/mcp_server', badge: 'New', keywords: 'model context protocol',
               text: 'Expose approved APIs to external AI Assistants over MCP.' },
             { category: 'AI', name: 'Agents & Skills', href: '/chat/agents', badge: 'New', keywords: 'workflows prompts',
               text: 'Reusable agents, skills and system prompts backed by your own data.' },

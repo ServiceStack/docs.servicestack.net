@@ -3,12 +3,13 @@ import ScreenshotsGallery from "../components/ScreenshotsGallery.mjs"
 import ScreenshotsGalleryView from "../components/ScreenshotsGalleryView.mjs"
 
 /** One API, each RDBMS's fastest native import path */
-const BulkPaths = {
+export const BulkPaths = {
+    props: { method: { type: String, default: 'db.BulkInsert()' } },
     template: `
     <section class="not-prose my-10">
       <div class="mb-6">
         <p class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">One call, six implementations</p>
-        <h3 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">What <code class="rounded bg-slate-100 px-1.5 py-0.5 text-2xl dark:bg-slate-800">db.BulkInsert()</code> actually does</h3>
+        <h3 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">What <code class="rounded bg-slate-100 px-1.5 py-0.5 text-2xl dark:bg-slate-800">{{method}}</code> actually does</h3>
         <p class="mt-2 max-w-3xl leading-7 text-slate-600 dark:text-slate-300">
           It resolves to the fastest import each database offers, so you get the native path without writing against it
           - and switching database doesn’t change the calling code.

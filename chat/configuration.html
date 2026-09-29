@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-09-28T15:04:47.4833843Z'>
+    <meta name='date' content='2026-09-29T14:01:46.8663581Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ChatFeature Configuration</title>
@@ -255,8 +255,13 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/chat/mcp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/chat/mcp_server" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         MCP Server
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/mcp_client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MCP Clients
                                     </a>
                                 </li>
                                 <li class="relative">
@@ -591,6 +596,11 @@ mount('#header', Header)
 <td>The models.dev model catalog</td>
 </tr>
 <tr>
+<td><code>PreserveConfigs</code></td>
+<td><code>[]</code></td>
+<td>Bundled config files in <code>App_Data/chat</code> to keep instead of overwriting on startup</td>
+</tr>
+<tr>
 <td><code>EnableProviders</code></td>
 <td><code>[]</code></td>
 <td>Force-enable <strong>only</strong> these providers, overriding <code>llms.json</code></td>
@@ -617,10 +627,20 @@ mount('#header', Header)
 </tr>
 </tbody>
 </table>
+<h3 id="preserving-modified-configs">Preserving modified configs<a class="header-anchor" href="javascript:;" onclick="location.hash='#preserving-modified-configs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>On every startup AI Chat writes its bundled <code>llms.json</code>, <code>providers.json</code> and <code>providers-extra.json</code> to <code>App_Data/chat</code>, <strong>overwriting</strong> any existing copies. This keeps the provider catalog and defaults current with each ServiceStack release, but it also discards any edits you've made to those files, including provider changes persisted by the Admin UI.</p>
+<p>To keep your modified copy, add its file name to <code>PreserveConfigs</code>. A preserved file is only seeded when it doesn't exist yet and is otherwise left untouched:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    // keep your customized llms.json, still refresh providers.json each release
+    PreserveConfigs = [&quot;llms.json&quot;],
+});
+</code></pre>
+<p>Preserved files no longer pick up upstream changes, so when you preserve <code>providers.json</code> you're responsible for keeping it current, e.g. with <a href="#update-provider-models">Update Provider Models</a> below.</p>
 <h3 id="update-provider-models">Update Provider Models<a class="header-anchor" href="javascript:;" onclick="location.hash='#update-provider-models'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Each ServiceStack release includes the latest <code>providers.json</code>. To update the provider catalog between releases, override it with the latest version from the <a href="https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json">ServiceStack/llms</a> repo.</p>
 <p>Run the following command from your application's <code>App_Data/chat</code> directory to download and overwrite <code>providers.json</code>:</p>
 <p><shell-command>curl -fL <a href="https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json">https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json</a> -o providers.json</shell-command></p>
+<p>Add <code>&quot;providers.json&quot;</code> to <a href="#preserving-modified-configs">PreserveConfigs</a> so the downloaded catalog isn't replaced by the bundled copy on the next restart.</p>
 <p>See <a href="/chat/providers">Providers &amp; Models</a>.</p>
 <h2 id="limits">Limits<a class="header-anchor" href="javascript:;" onclick="location.hash='#limits'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p><code>Limits</code> mirrors the <code>limits</code> object in <code>llms.json</code>:</p>
@@ -759,6 +779,7 @@ added to Apps which don't consume it through a generated ServiceStack client.</p
     // ── Providers ──
     EnableProviders = [],
     Variables = {},
+    PreserveConfigs = [],           // e.g. [&quot;llms.json&quot;, &quot;providers.json&quot;]
     LoadingMessages = [&quot;Computing&quot;, &quot;Cooking&quot;, &quot;Crafting&quot;, &quot;Creating&quot;],
 
     // ── Limits ──
@@ -857,6 +878,12 @@ added to Apps which don't consume it through a generated ServiceStack client.</p
                                             Providers &amp; config
                                         </span>
                                             <ul class="ml-4">
+                                                    <li data-id="preserving-modified-configs" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#preserving-modified-configs'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Preserving modified configs
+                                                        </span>
+                                                    </li>
                                                     <li data-id="update-provider-models" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#update-provider-models'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>

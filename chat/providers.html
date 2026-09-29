@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-09-28T15:04:47.5230676Z'>
+    <meta name='date' content='2026-09-29T14:01:46.8920419Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Providers &amp; Models</title>
@@ -255,8 +255,13 @@ mount('#header', Header)
                                     </a>
                                 </li>
                                 <li class="relative">
-                                    <a href="/chat/mcp" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                    <a href="/chat/mcp_server" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         MCP Server
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/chat/mcp_client" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        MCP Clients
                                     </a>
                                 </li>
                                 <li class="relative">
@@ -423,7 +428,7 @@ ChatApiKey.Gemini      // &quot;GEMINI_API_KEY&quot;
 </code></pre>
 <p>For a fully self-hosted deployment, enable only <code>ollama</code> or <code>lmstudio</code> - nothing then leaves your network.</p>
 <h2 id="llms.json">llms.json<a class="header-anchor" href="javascript:;" onclick="location.hash='#llms.json'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p><code>App_Data/chat/llms.json</code> is seeded from an embedded default on first run and is yours to edit:</p>
+<p><code>App_Data/chat/llms.json</code> is written from an embedded default on startup:</p>
 <pre><code class="language-json">{
   &quot;version&quot;: 3,
   &quot;disable_extensions&quot;: [],
@@ -475,6 +480,13 @@ ChatApiKey.Gemini      // &quot;GEMINI_API_KEY&quot;
 </tr>
 </tbody>
 </table>
+<h3 id="preserving-your-changes">Preserving your changes<a class="header-anchor" href="javascript:;" onclick="location.hash='#preserving-your-changes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>By default the bundled <code>llms.json</code>, <code>providers.json</code> and <code>providers-extra.json</code> <strong>overwrite</strong> the copies in <code>App_Data/chat</code> on every startup, so each release ships with current defaults and an up-to-date model catalog. To keep a modified copy, list it in <code>PreserveConfigs</code>. It's then only seeded when missing:</p>
+<pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
+    PreserveConfigs = [&quot;llms.json&quot;, &quot;providers-extra.json&quot;],
+});
+</code></pre>
+<p>See <a href="/chat/configuration#preserving-modified-configs">Preserving modified configs</a>.</p>
 <h3 id="supplying-config-in-code">Supplying config in code<a class="header-anchor" href="javascript:;" onclick="location.hash='#supplying-config-in-code'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>Set <code>Config</code> (or <code>ConfigJson</code>) to bypass the <code>App_Data</code> file entirely - useful when configuration should come from your appsettings or a secret store:</p>
 <pre><code class="language-csharp">services.AddPlugin(new ChatFeature {
@@ -488,7 +500,7 @@ ChatApiKey.Gemini      // &quot;GEMINI_API_KEY&quot;
 <pre><code class="language-csharp">var count = await feature.UpdateProviderModelsAsync();
 </code></pre>
 <h3 id="providers-extra.json">providers-extra.json<a class="header-anchor" href="javascript:;" onclick="location.hash='#providers-extra.json'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
-<p>Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in <code>App_Data/chat/providers-extra.json</code> and survive every catalog refresh:</p>
+<p>Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in <code>App_Data/chat/providers-extra.json</code> and survive every catalog refresh. Add <code>&quot;providers-extra.json&quot;</code> to <code>PreserveConfigs</code> so your entries also survive restarts:</p>
 <pre><code class="language-json">{
   &quot;openai-local&quot;: {
     &quot;models&quot;: {
@@ -501,7 +513,7 @@ ChatApiKey.Gemini      // &quot;GEMINI_API_KEY&quot;
 }
 </code></pre>
 <h2 id="enabling-and-disabling-at-runtime">Enabling and disabling at runtime<a class="header-anchor" href="javascript:;" onclick="location.hash='#enabling-and-disabling-at-runtime'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>Providers can be toggled without a restart. Both persist the change to <code>llms.json</code> and rebuild the live provider set:</p>
+<p>Providers can be toggled without a restart. Both persist the change to <code>llms.json</code> and rebuild the live provider set. Add <code>&quot;llms.json&quot;</code> to <code>PreserveConfigs</code> so toggled providers stay that way after a restart:</p>
 <pre><code class="language-csharp">// returns null on success, or the reason it couldn't be enabled
 var error = await feature.EnableProviderAsync(&quot;anthropic&quot;);
 
@@ -617,6 +629,12 @@ await feature.DisableProviderAsync(&quot;openai&quot;);
                                             llms.json
                                         </span>
                                             <ul class="ml-4">
+                                                    <li data-id="preserving-your-changes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#preserving-your-changes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Preserving your changes
+                                                        </span>
+                                                    </li>
                                                     <li data-id="supplying-config-in-code" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#supplying-config-in-code'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>

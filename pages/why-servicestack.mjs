@@ -98,7 +98,7 @@ const CorePillars = {
                 links: [
                     { text: 'AI Chat', href: '/chat/overview' },
                     { text: 'API Tools', href: '/chat/api-tools' },
-                    { text: 'MCP Server', href: '/chat/mcp' },
+                    { text: 'MCP Server', href: '/chat/mcp_server' },
                 ],
             },
         ]

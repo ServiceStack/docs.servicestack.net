@@ -106,7 +106,7 @@ Because approval forms are generated from the same schema that powers API Explor
     <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">AI Chat</div>
     <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">A complete multi-provider AI App at <code>/chat</code> using your App's existing users, database and security boundary.</p>
   </a>
-  <a href="/chat/mcp" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+  <a href="/chat/mcp_server" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
     <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">MCP Server</div>
     <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Expose the same approved APIs to external AI Assistants over the Model Context Protocol.</p>
   </a>
@@ -402,729 +402,784 @@ control over which tables and operations each user can reach.
 </div>
 
 
-# ServiceStack v10.2
-Source: https://docs.servicestack.net/releases/v10_02
+# ServiceStack v10.3
+Source: https://docs.servicestack.net/releases/v10_03
 
 <div class="-mt-16 flex justify-center not-prose">
-    <audio-player id="v10-2-release" title="ServiceStack v10.2 Podcast Episode" src="https://media.servicestack.com/podcasts/v10-2-release.mp3" variant="compact" beacon-url="https://account.servicestack.net/stats/podcast/record?name=v10-2-release&source=v10_00&version=10.2"
+    <audio-player id="v10-3-release" title="ServiceStack v10.3 Podcast Episode" src="https://media.servicestack.com/podcasts/v10-3-release.mp3" variant="compact" beacon-url="https://account.servicestack.net/stats/podcast/record?name=v10-3-release&source=v10_00&version=10.3"
         class="w-[500px]"></audio-player>
 </div>
 
-![](/img/pages/release-notes/v10.2/bg.webp)
+![](/img/pages/release-notes/v10.3/bg.webp)
 
-# Put the content you already have to work
+# Background Jobs, ready for your important work
 
-**ServiceStack v10.2** is headlined by **Gemini RAG** - a complete, managed knowledge platform that turns
-the files, documentation and websites you already maintain into two public customer experiences: a
-citation-backed **AI Assistant** and an instant, model-free **Website Search**. Both are published to any
-site with a single script tag, from one import pipeline and one curated set of documents.
+**ServiceStack v10.3** is a major upgrade to [Background Jobs](/background-jobs), turning it from a simple
+way to run work off the request thread into a complete, durable job platform for the work your business
+depends on: charging payments, sending emails, importing data, generating reports, syncing tenants and
+calling third-party APIs.
 
-The rest of the release removes friction from everyday .NET development - portable typed **JSON queries**
-and native **Upsert** APIs in OrmLite, **Startup Tasks** that keep generated client DTOs and PDF models in
-sync on every restart, **ServiceStack Auth** support in AI Chat, and the results of a codebase-wide
-**security and reliability audit**.
+It's the same `IBackgroundJobs` API you already use, on the same database you already run. There's no
+broker to deploy, no new infrastructure to operate and nothing to learn before you benefit - existing Jobs
+get safer retries, bounded resource usage and graceful shutdown on upgrade, while the new features are there
+the moment you need them.
+
+See how v10.3 keeps your Jobs running through server crashes, deploys, failing dependencies and duplicate
+requests:
+
+:::youtube EYycrGqDyJk
+.NET Background Jobs That Survive Crashes, Deploys & Retries
+:::
+
+This release also adds two new React templates: [Next SaaS](#next-saas) for multi-tenant SaaS products and
+[Next License](#next-license) for selling licenses for desktop apps, as well as
+[MCP connections for AI Chat](#connect-ai-chat-to-your-tools-with-mcp),
+[project-organized AI Chat conversations](#ai-chat-organized-by-project),
+[API Rate Limiting](#api-rate-limiting) for ASP.NET Core endpoints and
+[OpenTelemetry tracing](#follow-a-request-with-opentelemetry) across APIs and the work they start:
 
 <release-highlights>
 </release-highlights>
 
+::: warning Upgrading requires a schema change
+Background Jobs updates its database schema automatically on startup, and clears Jobs that were still
+queued or running when you upgrade. Please read [Upgrading to v10.3](#upgrading-to-v10.3) before deploying.
+:::
+
 ---
 
-## Gemini RAG Knowledge Bases, Website Search and Assistants
+## Scale out across App Servers
 
-Gemini RAG combines Google Gemini's File Search retrieval with ServiceStack's local data ownership,
-content ingestion, metadata management and AI Chat UI. It provides the full workflow needed to build and
-operate reliable Retrieval-Augmented Generation without first assembling your own crawler, document
-catalogue, synchronization jobs, administration UI and embeddable chat client.
+The [RDBMS provider](/background-jobs-rdbms) now safely runs on any number of App Servers sharing the same
+PostgreSQL, SQL Server or MySQL database. Every Job is **claimed with a lease** that's renewed while
+it runs, and every write a server makes to a Job is fenced by that lease - so a Job is only ever owned by
+one server at a time, and a slow or partitioned server can't overwrite the result of the server that took
+over from it.
 
-Import a documentation repository, upload business documents or crawl a website into isolated **File
-Stores**, then query the entire knowledge base - or precisely the category, product, locale, version and
-document status relevant to the question. Answers can remain grounded in approved content with inline
-citations that let readers inspect the supporting source.
+When a server crashes, is killed or loses its network, its leases simply expire and another server
+**recovers its Jobs automatically**. A Job that repeatedly takes its server down with it is counted as a
+failed attempt each time, and is failed with the `LeaseExpired` error code once it exceeds its `RetryLimit`,
+instead of being retried forever.
 
-One import then feeds two independent public experiences from the same curated content: a citation-backed
-**Website Assistant** grounded in Gemini's semantic index, and a fast, model-free **Website Search**
-answered entirely by your own database.
+On PostgreSQL and MySQL 8+, servers claim Jobs with `SKIP LOCKED`, so adding more servers adds more
+throughput rather than more contention.
 
-<gemini-pipeline>
-</gemini-pipeline>
+<cluster-simulator>
+</cluster-simulator>
 
-<screenshot src="/img/pages/chat/gemini/gemini-02-filestore.webp" title="Manage, import, explore and publish Assistants from a Gemini File Store"></screenshot>
+### Deploy without losing work
 
-### Everything needed to operate a trusted knowledge system
+Background Jobs now **shuts down gracefully**. Running Jobs are given `ShutdownTimeoutSecs` (default 30s)
+to finish and have their progress saved, and on the RDBMS provider any Job that was claimed but never
+started is handed straight back so another server picks it up immediately - rather than waiting for its
+lease to expire on every deploy. This is registered for you by the plugin, so existing Apps get it without
+changing their own hosted service.
 
-| Capability | Customer benefit |
-| --- | --- |
-| **Managed File Stores** | Separate knowledge by product, team, customer, access boundary or lifecycle. |
-| **Multiple ingestion paths** | Upload files and ZIPs, synchronize maintained folders, or crawl complete documentation websites. |
-| **Previewable synchronization** | See new, changed, removed and unchanged documents before committing an import or embedding work. |
-| **Metadata-scoped retrieval** | Search only the category, document type, status, locale, product, version and tags relevant to each experience. |
-| **Grounded answers and citations** | Keep responses anchored to indexed content and let users open the evidence behind supported claims. |
-| **Embeddable Website Assistants** | Publish a branded, responsive AI support experience on any site with one script tag. |
-| **Model-free Website Search** | Publish instant `⌘K` documentation search from the same documents, answered by your own database at no cost per query. |
-| **Search and traffic analytics** | See what visitors search for, what returns nothing, and optionally chart first-party page traffic without a third-party tracker. |
-| **Conversation intelligence** | Review what customers ask, find documentation gaps and improve the source material that powers future answers. |
-| **Operational visibility** | Monitor uploads, audit metadata coverage and reconcile the local catalogue with Gemini's indexed state. |
+### Know which servers are doing what
 
-### Bring files, folders and websites into one knowledge pipeline
+Each App Server records a heartbeat, so `jobs.GetJobNodes()` and the `AdminGetJobNodes` API report which
+servers are alive, what version they're running, how many Jobs each is running, and which stopped
+reporting. You can also:
 
-<gemini-workflow>
-</gemini-workflow>
-
-Gemini RAG supports the ingestion workflow that best matches each source:
-
-- **Upload files** for PDFs, Markdown, HTML, CSV, JSON, YAML and other supported documents. ZIP directory
-  structures are retained as browsable categories.
-- **Synchronize folders** for documentation repositories and maintained server content. Imports can be
-  saved and rerun, with normalized content and metadata compared independently so unchanged documents
-  aren't embedded again.
-- **Crawl websites** into a private Markdown workspace where extracted pages can be inspected, cleaned and
-  transformed before anything is sent to Gemini.
-
-Folder and website imports can be previewed before they change the knowledge base. The preview identifies
-new, changed, metadata-only, unchanged and removed documents, making embedding work and destructive
-changes visible before they're applied. Pending uploads survive application restarts and continue from
-the local catalogue.
-
-This creates a repeatable content supply chain instead of a one-off upload: source material can evolve,
-imports can be rerun, and only the documents that actually changed need to be indexed again.
-
-:::tip One Assistant can know every site you maintain
-A File Store is not limited to one website or repository. The File Store shown below combines **five saved
-imports from four independently maintained sites** - [docs.servicestack.net](https://docs.servicestack.net/),
-[servicestack.net](https://servicestack.net/), [react-templates.net](https://react-templates.net/) and
-[sharpscript.net](https://sharpscript.net/) - into one searchable knowledge base.
-
-Customers can ask one AI Assistant or use one Search widget without needing to know which site owns the
-answer. Metadata scopes keep each published experience focused, while custom Search ranking can promote
-the most authoritative titles, headings, document types and fresher content across the combined corpus.
-:::
-
-<screenshot src="/img/pages/chat/gemini/gemini-27-explore.webp" title="One File Store combining five imports from four documentation sites"></screenshot>
-
-### Retrieve the right knowledge, not merely more knowledge
-
-Large corpora become useful when retrieval can exclude stale, irrelevant or unapproved content. Gemini
-RAG attaches structured metadata to each document, including category, document type, status, locale,
-product, versions, tags and a canonical Source URL.
-
-The Explorer UI turns that metadata into navigable categories, filters and coverage reports. Start a chat
-over the entire File Store, a single document, or the exact filtered view currently being explored. The
-same server-generated filter is passed to Gemini File Search, so a public product assistant can be limited
-to `status = published` and the visitor's product/version while an internal research chat can search a
-broader corpus.
-
-<screenshots-gallery-view :images="{
-    'Filtered knowledge': '/img/pages/chat/gemini/gemini-30-explore-filters.webp',
-    'Grounded answer': '/img/pages/chat/gemini/gemini-28-chat-ask.webp',
-    'Source evidence': '/img/pages/chat/gemini/gemini-29-chat-ask-sources.webp',
-}"></screenshots-gallery-view>
-
-Grounded responses retain their citations as the conversation continues. Readers can expand each source
-to inspect the retrieved excerpt or follow its canonical URL, making answers verifiable instead of asking
-customers to trust an opaque generated response.
-
-### Publish a Website Assistant with one script tag
-
-Any File Store - or a server-enforced filtered slice of it - can be published as a branded Website Assistant:
-
-```html
-<script
-  src="https://app.example.com/chat/ext/gemini/public/assistants/widget.js?g=abc123"
-  async>
-</script>
-```
-
-The self-contained widget streams Markdown responses, preserves visitor sessions, displays citations and
-supports suggested questions, welcome messages, maximized reading and keyboard launch. It renders inside
-a **Shadow DOM**, isolating its styles and keyboard handling from the host website.
-
-Each Assistant can have its own:
-
-- visitor-facing name, welcome message and suggested questions;
-- server-enforced category and metadata scope;
-- behavior template, private system prompt, response detail and Gemini model;
-- branded theme, typography, panel and launcher appearance;
-- automatic launch behavior and <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> shortcut;
-- exact or wildcard allowed website origins and per-client request limit; and
-- publish state, stable deployment ID and retained customer conversations.
-
-Retrieval rules, private prompts, model selection, origin restrictions and rate limits remain on the
-server - they aren't exposed in the embed code and can't be weakened by the host page. The host can still
-override safe presentation choices like theme, accent color, launcher icon and position.
-
-<screenshots-gallery-view :images="{
-    'Assistant identity': '/img/pages/chat/gemini/gemini-41-assistant-identity.webp',
-    'Document scope': '/img/pages/chat/gemini/gemini-43-assistant-document.webp',
-    'Appearance': '/img/pages/chat/gemini/gemini-44-assistant-appearance-light.webp',
-    'Publish and embed': '/img/pages/chat/gemini/gemini-50-assistant-publish.webp',
-}"></screenshots-gallery-view>
-
-Seven editable behavior templates provide useful starting points for documentation, troubleshooting,
-customer support, developer/API guidance, product advice, onboarding and policy assistants. Combined with
-custom prompts and document filters, the same knowledge base can power several purpose-built experiences
-without duplicating its source content.
-
-### Publish site search that costs nothing per query
-
-The same imported documents also build a **local search index** inside your own database, so one content
-pipeline powers two public experiences. **Website Search** is completely independent of Gemini: queries
-never reach a model, never incur usage costs and never leave your App.
-
-```html
-<script
-  src="https://app.example.com/chat/ext/gemini/public/searches/widget.js?g=abc123"
-  async>
-</script>
-```
-
-Documents are split into heading-aware sections and queried through whichever RDBMS the App already uses:
-
-<search-engine-matrix
-    :columns="2"
-    :databases="[
-      { name:'SQLite', color:'#0f80cc', engine:'FTS5 virtual table',
-        text:'Full-text search with zero setup - ideal for docs sites and single-server deployments.',
-        status:'sqlite-fts5', fallback:'sqlite-like' },
-      { name:'PostgreSQL', color:'#336791', engine:`GIN index over to_tsvector('simple', …)`,
-        text:'Language-aware indexing that scales with the rest of your Postgres workload.',
-        status:'postgresql-fts', fallback:'postgresql-like' },
-      { name:'SQL Server', color:'#cc2927', engine:'Full-Text Catalog and CONTAINSTABLE',
-        text:'Uses the engine your DBAs already operate, backed up and monitored like every other index.',
-        status:'sqlserver-fulltext', fallback:'sqlserver-like' },
-      { name:'MySQL / MariaDB', color:'#00758f', engine:'FULLTEXT index with Boolean mode',
-        text:'Boolean-mode matching that supports required terms and prefix queries out of the box.',
-        status:['mysql-fulltext','mariadb-fulltext'], fallback:['mysql-like','mariadb-like'] },
-    ]"></search-engine-matrix>
-
-<screenshots-gallery-view :images="{
-    'Published search widget': '/img/pages/chat/gemini/gemini-61-search-widget.webp',
-    'Tune ranking with live results': '/img/pages/chat/gemini/gemini-59-search-ranking.webp',
-}"></screenshots-gallery-view>
-
-Results are ranked by one consistent model across every database, with tunable weights for titles,
-headings, body text, exact phrases, exact titles, content freshness and preferred document types. Each
-adjustment re-queries immediately against the same term, so relevance is tuned against real results
-instead of guessed at.
-
-The Shadow DOM widget gives visitors the interaction they already expect from a documentation site:
-<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> and <kbd>/</kbd> shortcuts, keyboard result navigation,
-grouped results with match highlighting, infinite scrolling and recently-opened links. Results open the
-document's canonical Source URL, or a rendered in-place preview when it has none. Either launcher can be
-mounted inside your own nav bar instead of floating in a corner.
-
-<two-experiences>
-</two-experiences>
-
-### Understand what visitors are looking for
-
-Every published Search reports its own demand and quality signals, without adding any model usage.
-Related queries are grouped by normalized wording so near-identical phrasings count as one intent, and
-**no-result searches** point directly at the documentation you haven't written yet.
-
-<screenshots-gallery-view :images="{
-    'Customer searches': '/img/pages/chat/gemini/gemini-search-searches.webp',
-    'Website traffic': '/img/pages/chat/gemini/gemini-search-analytics-results.webp',
-    'Recent visitors': '/img/pages/chat/gemini/gemini-search-analytics-recent-visitors.webp',
-}"></screenshots-gallery-view>
-
-Because the Search script is already on every page, it can optionally double as a lightweight,
-**first-party website analytics** system - page views, visitors, sessions, bounce rate, load times,
-referrers, campaigns, devices and platforms - charted over 24 hours, 7, 30 or 90 days.
-
-This is off by default and privacy-respecting by design: it sets no cookies, requests no precise
-location, anonymizes IP addresses to an IPv4 `/24` or IPv6 `/48`, honors Do Not Track, excludes known
-bots, and enforces your own denied user-agent, IP-range and page-path rules on the server before
-anything is stored. Retention is configurable and expired data is removed automatically. An optional
-consent callback can gate collection entirely, and IP geography is only ever resolved when you
-explicitly register a resolver. The data stays in your database rather than a third party's.
-
-### Learn from every customer conversation
-
-Website Assistant conversations, messages and citations are retained server-side for authorized teams to
-review. Conversation lists surface user-message counts and originating pages, while message navigation
-makes it easy to move between a customer's question, the generated answer and its supporting sources.
-
-This closes the knowledge loop: teams can discover what visitors actually need, identify weak or missing
-coverage, improve the underlying documentation and let the next synchronized import improve every
-Assistant grounded in that content.
-
-Assistants support complete draft, publish, unpublish, archive, restore and permanent-deletion workflows.
-Regenerating a deployment ID invalidates old embeds immediately, while destructive operations summarize
-affected Assistants, imports and conversations and require typed-name confirmation.
-
-### Know what is indexed and keep it healthy
-
-AI Chat retains the authoritative document catalogue, source files, imports, metadata, Assistants and
-conversation history in your App and OrmLite database, while Gemini File Stores contain the indexed copies
-used for semantic retrieval.
-
-<data-ownership>
-</data-ownership>
-
-This operational visibility is what makes a knowledge base maintainable long after its first successful
-demo: administrators can find the documents nobody categorized, reconcile what Gemini actually holds, and
-correct both in bulk rather than one document at a time.
-
-### Enable Gemini RAG
-
-Gemini RAG is a built-in AI Chat extension and is enabled automatically when the App has a Gemini API key
-and an `IDbConnectionFactory` for its local catalogue:
-
-```bash
-GOOGLE_API_KEY=your_api_key
-# or GEMINI_API_KEY=your_api_key
-```
-
-Create a File Store, import a few documents and open **New Chat** to ask the first grounded question. When
-the corpus is ready for customers, publish a **Search** widget for instant navigation and an **Assistant**
-for grounded answers - both from the same script tag pipeline and the same imported content.
-
-See [Gemini RAG, Search & Analytics](/chat/gemini-rag) for the complete reference, or jump to
-[Imports & Synchronization](/chat/gemini-imports), [Website Search](/chat/gemini-search),
-[AI Assistants](/chat/gemini-assistants), [Analytics & Privacy](/chat/gemini-analytics) and
-[Operations & Diagnostics](/chat/gemini-operations).
-
-## Portable, Type-Safe JSON Queries
-
-Semi-structured JSON columns normally force a trade: either give up typed queries and hand-write
-provider-specific JSON SQL, or flatten the document into columns it doesn't naturally fit.
-
-OrmLite can now query JSON with the same typed `SqlExpression<T>` API used for relational columns across
-SQLite, PostgreSQL, SQL Server and MySQL - so the same C# query compiles once, refactors with your Data
-Models and runs unchanged on every supported database.
-
-### Query known JSON Data Models
-
-`Sql.Json<T>()` translates ordinary C# member access, collection membership and array indexes into each
-database's native JSON functions:
+- **Drain a server** before taking it out of service, so it finishes the Jobs it has without taking any more:
+  `jobs.SetJobNodeDraining(serverId, true)`
+- **Dedicate servers to queues**, e.g. only run GPU work on the servers that have one:
 
 ```csharp
-var q = db.From<OrderEvent>()
-    .Where(x =>
-        Sql.Json<OrderDocument>(x.Data).Customer.Address.State == "WA" &&
-        Sql.Json<OrderDocument>(x.Data).Tags.Contains("priority") &&
-        Sql.Json<OrderDocument>(x.Data).Lines[0].Quantity > 1);
-
-var priorityOrders = db.Select(q);
-```
-
-Applications can keep the flexibility of document-shaped data without giving up typed, refactor-safe
-queries or committing their data access layer to provider-specific JSON SQL. Nested scalar values,
-objects and collections can all be filtered or projected, with typed JSON fragments automatically
-deserialized back into C# Data Models.
-
-<json-portability>
-</json-portability>
-
-When the column is already a complex property serialized by OrmLite, its document type is inferred:
-
-```csharp
-var q = db.From<OrderEvent>()
-    .Where(x =>
-        Sql.Json(x.Document).Customer.Address.State == "WA" &&
-        Sql.Json(x.Document).Lines.Count > 0);
-```
-
-Typed members can also be projected as scalar values or complete C# objects:
-
-```csharp
-var q = db.From<OrderEvent>()
-    .Select(x => new {
-        x.Id,
-        State = Sql.Json<OrderDocument>(x.Data).Customer.Address.State,
-        Total = Sql.Json<OrderDocument>(x.Data).Total,
-        Address = Sql.Json<OrderDocument>(x.Data).Customer.Address,
-    });
-
-var summaries = db.Select<OrderSummary>(q);
-```
-
-### Complete JSON API
-
-Typed expressions are preferred when a C# Data Model is available, while explicit JSON paths support
-dynamic documents and paths selected at runtime:
-
-| Capability | Typed expression | Explicit JSON function |
-| --- | --- | --- |
-| Read a scalar | `Sql.Json<T>(json).Member` | `Sql.JsonValue<TValue>(json, path)` |
-| Read an object or array | `Sql.Json<T>(json).Member` | `Sql.JsonQuery<TValue>(json, path)` |
-| Read the root object or array | - | `Sql.JsonQuery<TValue>(json)` |
-| Array indexing | `Sql.Json<T>(json).Items[index]` | Include `[index]` in the path |
-| Array length | `Sql.Json<T>(json).Items.Count` | `Sql.JsonArrayLength(json, path)` |
-| Scalar array membership | `Sql.Json<T>(json).Items.Contains(value)` | `Sql.JsonArrayContains(json, path, value)` |
-| Validate JSON | - | `Sql.IsJson(json)` |
-| Test whether a path exists | - | `Sql.JsonExists(json, path)` |
-| Read a JSON value's type | - | `Sql.JsonType(json, path)` |
-| Test document containment | - | `Sql.JsonContains(json, candidate, path)` |
-
-`Sql.JsonValue<T>()` extracts a scalar and can be used anywhere a normal value can be used, including
-filters, projections and ordering:
-
-```csharp
-var totalPath = "$.Total";
-
-var q = db.From<OrderEvent>()
-    .Where(x =>
-        Sql.JsonValue<string>(x.Data,
-            "$.Customer.Address.shipping_state") == "WA" &&
-        Sql.JsonValue<decimal?>(x.Data, totalPath) >= 100m)
-    .OrderByDescending(x =>
-        Sql.JsonValue<decimal?>(x.Data, totalPath));
-```
-
-`Sql.JsonQuery<T>()` extracts an object, array or complete root document and deserializes it into the
-requested C# type:
-
-```csharp
-var address = db.Scalar<Address>(db.From<OrderEvent>()
-    .Where(x => x.Id == id)
-    .Select(x => Sql.JsonQuery<Address>(x.Data,
-        "$.Customer.Address")));
-
-var document = db.Scalar<OrderDocument>(db.From<OrderEvent>()
-    .Where(x => x.Id == id)
-    .Select(x => Sql.JsonQuery<OrderDocument>(x.Data)));
-```
-
-`Sql.IsJson()`, `Sql.JsonExists()` and `Sql.JsonType()` provide validation and document introspection:
-
-```csharp
-var validRows = db.Count<OrderEvent>(x =>
-    Sql.IsJson(x.Data) == true);
-
-var rowsWithTags = db.Select(db.From<OrderEvent>()
-    .Where(x => Sql.JsonExists(x.Data, "$.Tags")));
-
-var addressType = db.Scalar<JsonValueType?>(db.From<OrderEvent>()
-    .Where(x => x.Id == id)
-    .Select(x => Sql.JsonType(x.Data,
-        "$.Customer.Address")));
-// JsonValueType.Object
-```
-
-`Sql.JsonArrayLength()` and `Sql.JsonArrayContains()` query arrays without requiring a typed document:
-
-```csharp
-var priorityOrders = db.Select(db.From<OrderEvent>()
-    .Where(x =>
-        Sql.JsonArrayLength(x.Data, "$.Lines") > 0 &&
-        Sql.JsonArrayContains(x.Data, "$.Tags", "priority") &&
-        Sql.JsonArrayContains(x.Data, "$.Numbers", 1)));
-
-var withNull = db.Select(db.From<OrderEvent>()
-    .Where(x => Sql.JsonArrayContains<string>(
-        x.Data, "$.NullableTags", null)));
-```
-
-PostgreSQL and MySQL can additionally use `Sql.JsonContains()` to test whether a JSON document or nested
-array contains another document:
-
-```csharp
-var candidate = new {
-    Customer = new {
-        Address = new { shipping_state = "WA" }
-    }
-};
-
-var matchingOrders = db.Select(db.From<OrderEvent>()
-    .Where(x => Sql.JsonContains(x.Data, candidate)));
-
-var requiredTags = new[] { "priority" };
-var taggedOrders = db.Select(db.From<OrderEvent>()
-    .Where(x => Sql.JsonContains(
-        x.Data, requiredTags, "$.Tags")));
-```
-
-All of these remain ordinary `SqlExpression<T>` queries and work with OrmLite's async query APIs:
-
-```csharp
-var priorityOrders = await db.SelectAsync(q);
-```
-
-See [OrmLite JSON Support](/ormlite/json) for supported operations, typed projections, dynamic paths and
-database-specific capabilities.
-
-## Native Upsert APIs
-
-OrmLite's new `Upsert` APIs express one of the most common data workflows directly: insert a row when its
-Primary Key is new, otherwise bring the existing row up to date.
-
-```csharp
-var customer = new Customer {
-    Id = 1,
-    Name = "Initial Name",
-    Email = "initial@example.org",
-};
-
-db.Upsert(customer); // Insert Id=1
-
-customer.Name = "Updated Name";
-db.Upsert(customer); // Update Id=1
-```
-
-On SQLite, PostgreSQL, SQL Server and MySQL/MariaDB this uses each database's native single-statement
-conflict handling. It avoids the extra existence query used by `Save()` and closes the race window between
-checking for a row and subsequently inserting or updating it.
-
-This makes `Upsert` a natural fit for imports, synchronization, event consumers and retryable jobs that
-should converge on the same persisted state whether a row is new or already exists.
-
-<upsert-compare>
-</upsert-compare>
-
-### Update selected fields
-
-A typed `updateOnly` expression restricts which fields change when the row already exists, while still
-inserting every insertable field for a new row:
-
-```csharp
-db.Upsert(customer,
-    updateOnly: x => new { x.Name, x.Email });
-```
-
-This makes it safe to preserve fields owned by another part of the application. Primary Key and RowVersion
-fields can't be updated, and `[IgnoreOnUpdate]` properties remain excluded.
-
-When the field set is selected at runtime, use the equivalent string field-name overload:
-
-```csharp
-var fields = includeEmail
-    ? new[] { nameof(Customer.Name), nameof(Customer.Email) }
-    : new[] { nameof(Customer.Name) };
-
-db.Upsert(customer, updateOnly: fields);
-```
-
-### Upsert multiple rows
-
-`UpsertAll` inserts new rows and updates existing rows together in a transaction:
-
-```csharp
-var customers = new[] {
-    new Customer {
-        Id = 1,
-        Name = "Updated",
-        Email = "one@example.org",
-    },
-    new Customer {
-        Id = 2,
-        Name = "Inserted",
-        Email = "two@example.org",
-    },
-};
-
-db.UpsertAll(customers);
-
-db.UpsertAll(customers,
-    updateOnly: x => new { x.Name, x.Email });
-
-db.UpsertAll(customers, updateOnly: fields);
-```
-
-As with `Upsert`, `updateOnly` restricts updates to existing rows without restricting the fields inserted
-for new rows.
-
-### Async Upsert APIs
-
-Every single-row, batch, typed-field and runtime-field API has an async equivalent with optional
-`CancellationToken` support:
-
-```csharp
-await db.UpsertAsync(customer,
-    token: cancellationToken);
-
-await db.UpsertAsync(customer,
-    updateOnly: x => new { x.Name, x.Email },
-    token: cancellationToken);
-
-await db.UpsertAsync(customer,
-    updateOnly: fields,
-    token: cancellationToken);
-
-await db.UpsertAllAsync(customers,
-    token: cancellationToken);
-
-await db.UpsertAllAsync(customers,
-    updateOnly: x => new { x.Name, x.Email },
-    token: cancellationToken);
-
-await db.UpsertAllAsync(customers,
-    updateOnly: fields,
-    token: cancellationToken);
-```
-
-Auto-increment models are also supported. A default `[AutoIncrement]` Primary Key inserts a new row and
-populates its generated ID; subsequent calls use that ID as the Upsert conflict key.
-
-See [OrmLite Upsert](/ormlite/upsert) for batch and async APIs, auto-increment keys, selective updates and
-guidance on choosing between `Upsert`, `Save`, `Insert` and `Update`.
-
-## Development Startup Tasks
-
-![](/img/pages/release-notes/v10.2/startup-tasks.webp)
-
-ServiceStack v10.2 introduces [Startup Tasks](/startup-tasks), a new way to automate development-time
-work as soon as your App is ready. They run after ASP.NET Core and ServiceStack have fully started, giving
-them access to the configured `AppHost`, plugins and server addresses:
-
-```csharp
-StartupTasks.Register("search-index", () =>
-    appHost.Resolve<SearchIndexer>().Update());
-```
-
-Startup Tasks turn recurring setup commands into part of the normal development loop. Restart the App and
-the work happens automatically - without another CLI command to remember, a separate toolchain to install,
-or stale generated artifacts making their way into source control.
-
-They're development-only and don't run in Production, whilst failures are isolated and logged so a
-convenience task can't prevent the App from starting.
-
-## Client DTOs That Stay in Sync
-
-The first built-in use of Startup Tasks removes one of the most common interruptions in full-stack
-ServiceStack development: manually running `npx get-dtos` after changing a server API.
-
-```csharp
-StartupTasks.Register("dtos", () =>
-    appHost.GetPlugin<NativeTypesFeature>().GenerateDtos());
-```
-
-The easiest way to add it to existing projects is to run:
-
-:::sh
-npx add-in startup-dtos
-:::
-
-<dev-loop>
-</dev-loop>
-
-On every development restart, ServiceStack finds the existing `dtos.*` references belonging to the App
-and regenerates them directly from its Native Types metadata. There's no longer a separate manual DTO
-update step after changing or updating server APIs - restarting the App keeps its clients synchronized.
-
-<dtos-guarantees>
-</dtos-guarantees>
-
-This also improves agent-driven development workflows: an agent can add or change server APIs, restart the
-App, and immediately use the regenerated contracts from the client App without needing to discover and run
-a separate DTO generation command.
-
-## Safe Automatic PDF Model Generation
-
-Apps using `PdfFeature` can use the same workflow to regenerate typed C# models from published PDF
-template schemas whenever the App restarts:
-
-```csharp
-StartupTasks.Register("pdf", () =>
-    appHost.GetPlugin<PdfFeature>().GeneratePdfs());
-```
-
-Unchanged runs are inexpensive: models are generated in memory and compared with existing source without
-invoking Typst or rewriting files.
-
-Generated PDF models now use a simple ownership marker:
-
-```csharp
-// <auto-generated>
-//     Remove this <auto-generated> line to preserve this file on future runs.
-// </auto-generated>
-```
-
-While the opening marker remains, ServiceStack keeps the model synchronized with its `.ui.json` schema.
-Remove it when you want to take ownership of a generated model and future runs will preserve it. This makes
-automatic regeneration safe and predictable without content hashes or heuristics trying to determine
-whether a file was edited.
-
-See the [Startup Tasks reference](/startup-tasks) for complete DTO discovery, URL matching and generation
-options, or [Rendering PDFs](/chat/rendering-pdfs) for PDF model generation and customization.
-
-## AI Chat now supports ServiceStack Auth
-
-AI Chat is installed **inside** your ServiceStack App, so it never needs a separate user directory, a second
-login experience or a new identity silo - existing users sign in with the account they already have. Until
-now that integration assumed ASP.NET Core **Identity Auth**.
-
-In v10.2 AI Chat also supports ServiceStack's own built-in **Auth** - `AuthFeature` with `CredentialsAuth()`
-and your existing `IAuthRepository` - so both identity models are now first-class:
-
-```csharp
-services.AddPlugin(new ChatFeature {
-    RequireAuth = true,
-    AuthType = ChatAuthType.Credentials,
+services.AddPlugin(new DatabaseJobFeature {
+    Queues = ["gpu"], // this server only processes Jobs on the gpu queue
 });
 ```
 
-The `credentials` sign-in component authenticates through ServiceStack's `Authenticate` API and shares the
-App's auth cookie, which is what lets it work against either provider - the Chat UI asks the App who the
-user is instead of maintaining its own answer.
+<screenshot src="/img/pages/jobs/05-nodes.png" title="App Servers processing Jobs, with their heartbeat, running Jobs and Drain control"></screenshot>
 
-Everything AI Chat scopes to an identity behaves identically on both: conversation threads, history and
-generated media; Projects, personal Skills, Agent Profiles and provider preferences; Gemini File Stores,
-document catalogues and PDF Studio workspaces; `RequireAuth` and `RequiredRole` gating; and API Tools calls,
-which execute as the signed-in user through your App's normal authorization.
+---
 
-The practical consequence is that adopting AI Chat no longer implies an Identity Auth migration. Apps still
-running ServiceStack Auth can add AI Chat and have their existing users, roles and permissions apply
-immediately, whilst account lifecycle - password policy, lockouts, roles, deactivation - remains owned by
-the App in either case.
+## Control your workloads
 
-API Keys remain a valid way in whichever `AuthType` is configured, and `RequireAuth = false` still runs
-everything as the shared `default` user for single-user or trusted-network deployments.
+Different work has different needs: a password reset can't wait behind a bulk import, and a third-party
+API can't be called faster than its quota allows. Queues let you run each class of work in its own lane,
+and control each lane while your App is running:
 
-See [Integrated Auth](/chat/auth) for sign-in types, per-user isolation and request validation.
+<queue-lanes>
+</queue-lanes>
+
+### Queues and priorities
+
+Jobs can now be routed to **named queues**, each with its own concurrency, so different classes of work
+don't compete for the same capacity. Within a queue, Jobs with a higher `Priority` run first:
+
+```csharp
+jobs.EnqueueCommand<SendPasswordResetCommand>(request, new() {
+    Queue = "emails",
+    Priority = 10, // ahead of the newsletter
+});
+```
+
+```csharp
+services.AddPlugin(new BackgroundsJobFeature {
+    MaxConcurrentJobs = 8,                   // default for every queue
+    QueueConcurrency = { ["imports"] = 2 },  // bulk imports can't take over the server
+});
+```
+
+### Pause, resume and throttle at runtime
+
+When a downstream system is down, **pause its queue** - its Jobs stay safely queued and resume where they
+left off, instead of burning through their retries. Queue concurrency can also be raised to clear a backlog
+or lowered to protect a struggling dependency. Both take effect on every server, from the API or the Admin UI:
+
+```csharp
+jobs.PauseJobQueue("payments");
+jobs.ResumeJobQueue("payments");
+jobs.SetJobQueueConcurrency("imports", 4);
+```
+
+### Rate limit third-party APIs
+
+Concurrency limits how many Jobs run at once, but a quota like "10 calls per second" limits how often they
+*start*. **Queue rate limits** handle exactly that, and on the RDBMS provider the limit is counted across
+every server, so adding servers doesn't multiply your API bill:
+
+```csharp
+jobs.SetJobQueueRateLimit("stripe-api", rateLimit: 10, window: TimeSpan.FromSeconds(1));
+```
+
+<screenshot src="/img/pages/jobs/04-queues.png" title="Pause, resume, concurrency and rate limit controls for each queue"></screenshot>
+
+### Fair distribution across servers
+
+Each server only claims its queue's concurrency plus `MaxPrefetchJobs` (default 100) Jobs ahead of its
+Workers, so one server can't hoard a backlog that the others could be running.
+
+---
+
+## Never do the same work twice
+
+Networks time out, users double-click and messages get replayed - the same request arriving twice is
+normal, but charging a customer twice isn't. Background Jobs gives you three ways to make sure work
+happens once:
+
+- **Idempotent enqueue** - give a Job a meaningful `RefId` and submitting it again returns the Job that's
+  already queued, instead of queueing a duplicate.
+- **Singleton Jobs** - a `SingletonKey` allows only one Job with that key to be queued or running at a time,
+  enforced by a unique database index so it holds even when several servers submit at once.
+- **Transactional outbox** - with the RDBMS provider, queue Jobs on your own connection so they're saved in
+  the same transaction as your data: if the transaction rolls back, so do its Jobs.
+
+<dedup-playground>
+</dedup-playground>
+
+---
+
+## Resilient failure handling
+
+- **Smarter retries.** Retries back off with `Fixed`, `Linear`, `Exponential` or the new default
+  `ExponentialJitter`, which spreads retries out after an outage so your servers don't all hammer a
+  recovering dependency at once. Configure the delays per Job with `RetryDelay` and `MaxRetryDelay`.
+- **Every failure is kept.** Each failed attempt is recorded with its error, server and duration, so an
+  intermittent failure shows its full history rather than only the last error - see
+  `jobs.GetJobAttempts(jobId)` or the `AdminGetJobAttempts` API.
+- **Jobs that shouldn't run late won't.** Give a Job an `ExpiresIn` or `ExpiresAt` and if it can't start in
+  time it's cancelled with the `JobExpired` error code - no more reminders for meetings that already
+  happened.
+- **Timeouts are enforced.** A Job that exceeds its `TimeoutSecs` is cancelled, and even a Job that ignores
+  its cancellation token releases its Worker so the Jobs queued behind it keep moving.
+- **Cancellation reaches the running Job**, on whichever server is executing it.
+- **Typed errors you can branch on**, like `DuplicateRefIdException`, `JobErrorCodes.JobExpired` and
+  `JobErrorCodes.LeaseExpired`.
+
+```csharp
+jobs.EnqueueCommand<SyncCrmContactCommand>(contact, new() {
+    RetryLimit = 5,
+    RetryBackoff = RetryBackoff.ExponentialJitter,
+    RetryDelay = TimeSpan.FromSeconds(5),
+    MaxRetryDelay = TimeSpan.FromMinutes(5),
+    ExpiresIn = TimeSpan.FromHours(1),
+    TimeoutSecs = 120,
+});
+```
+
+<screenshot src="/img/pages/jobs/08-job-failed.png" title="Every failed attempt is recorded with its error, server and duration"></screenshot>
+
+<retry-planner>
+</retry-planner>
+
+---
+
+## Workflows and batches
+
+### Multi-step workflows
+
+Steps can depend on each other, with each step reading the result of the step before it. If a step fails,
+the steps after it are cancelled - while steps queued with `DependsOnPolicy.OnFinished` still run however the
+previous step ended, perfect for notifications and clean-up:
+
+```csharp
+var charge  = jobs.EnqueueCommand<ChargePaymentCommand>(order);
+var reserve = jobs.EnqueueCommand<ReserveInventoryCommand>(order, new() { DependsOn = charge.Id });
+var ship    = jobs.EnqueueCommand<ShipOrderCommand>(order, new() {
+    DependsOn = reserve.Id,
+    Callback = nameof(OrderShippedCommand),
+});
+// Tell the customer what happened, whether shipping succeeded or not
+jobs.EnqueueCommand<NotifyCustomerCommand>(order, new() {
+    DependsOn = ship.Id,
+    DependsOnPolicy = JobDependencyPolicy.OnFinished,
+});
+```
+
+<workflow-simulator>
+</workflow-simulator>
+
+### Batches with live progress
+
+Fan out thousands of Jobs as a **Batch** and watch its progress in the Admin UI. When every Job has
+finished, the batch's `callback` runs, and `onSuccess` runs only if every Job succeeded - so "email the
+report when the import completes" no longer needs a polling loop. A Job with `DependsOnBatch` fans back in,
+only running once the whole batch is done:
+
+```csharp
+jobs.CreateJobBatch(batchId, total: images.Count,
+    callback: nameof(ImportFinishedCommand),   // runs once every Job has finished
+    onSuccess: nameof(PublishGalleryCommand)); // only when every Job succeeded
+
+foreach (var image in images)
+    jobs.EnqueueCommand<ResizeImageCommand>(image, new() { BatchId = batchId });
+
+jobs.EnqueueCommand<CreateZipArchiveCommand>(new() { DependsOnBatch = batchId });
+```
+
+<batch-simulator>
+</batch-simulator>
+
+A whole batch can be cancelled or requeued in one call, and cancelling a batch prevents any more Jobs being
+added to it.
+
+<screenshot src="/img/pages/jobs/09-job-batch.png" title="Batch progress, callbacks and requeueing its failed Jobs"></screenshot>
+
+### Keep each customer's Jobs in order
+
+Jobs that share a `ConcurrencyKey` run one at a time, while Jobs with different keys still run in parallel.
+Each tenant's syncs, each account's ledger updates or each document's edits are applied in order - without
+serialising everyone else behind them:
+
+```csharp
+jobs.EnqueueCommand<SyncTenantDataCommand>(sync, new() {
+    ConcurrencyKey = $"tenant:{sync.TenantId}",
+    TenantId = sync.TenantId, // also filter and report by tenant
+});
+```
+
+<tenant-ordering>
+</tenant-ordering>
+
+---
+
+## Get results back
+
+Background work doesn't have to mean fire-and-forget. **Await a Job's result** in the same request to keep a
+synchronous API while the heavy lifting runs on whichever server has capacity, or give it a `ReplyTo` and
+have its result **delivered** the moment it completes - POSTed to a webhook URL, or published to an MQ.
+
+<results-delivery>
+</results-delivery>
+
+When a `ReplyTo` can come from your users, restrict where results can be sent so your servers can't be used
+to reach internal addresses:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    ValidateReplyTo = JobReplyTo.AllowUrlPrefixes(["https://hooks.example.org/"]),
+});
+```
+
+---
+
+## Production-grade schedules
+
+Recurring tasks are now durable and safe to run on every server - each occurrence is only ever queued
+once, however many servers evaluate the schedule:
+
+<schedule-pillars>
+</schedule-pillars>
+
+```csharp
+var schedule = Schedule.Cron("0 9 * * MON-FRI");
+schedule.TimeZoneId = "America/New_York";
+schedule.OverlapPolicy = ScheduleOverlapPolicy.Skip;
+schedule.EndDate = new DateTime(2026, 12, 31);
+
+jobs.RecurringCommand<SendDailyDigestCommand>("Daily Digest", schedule);
+```
+
+<screenshot src="/img/pages/jobs/11-scheduled-tasks.png" title="Scheduled Tasks with their next run, last result and run-now controls"></screenshot>
+
+---
+
+## See what your Jobs are doing
+
+<observability-pillars>
+</observability-pillars>
+
+Job executions also appear in the Admin UI's **Profiling** page alongside APIs, OrmLite and Redis, and
+continue the trace of the request that queued them with [OpenTelemetry](#follow-a-request-with-opentelemetry).
+
+The **Background Jobs Admin UI** has been updated with pause, resume, concurrency and rate limit controls
+for each queue, a Nodes view to see and drain App Servers, per-queue statistics and wait times on the
+dashboard, each Job's failed attempts, batch progress, pause and run-now controls for Scheduled Tasks,
+replaying a completed Job, and bulk actions to cancel or requeue Jobs by queue, tag or batch. Running Jobs
+stream their progress and logs live:
+
+<screenshot src="/img/pages/jobs/03-job-running.png" title="A running Job streaming its progress and logs live"></screenshot>
+
+---
+
+## Protecting your database
+
+Your jobs database is a work queue, so v10.3 keeps it lean:
+
+- Requests larger than `MaxRequestBodyChars` (1M chars) are rejected when they're queued - pass a reference
+  to large payloads instead.
+- Responses larger than `MaxResponseBodyChars` (1M chars) aren't stored, and the Job records why.
+- Job logs are bounded by `MaxJobLogChars` (100K chars), with truncation shown in the Admin UI.
+- Opt in to `JobSummaryRetention` and `ArchiveRetention` to delete old history automatically.
+
+---
+
+## Upgrading to v10.3
+
+v10.3 changes the Background Jobs schema and clears in-flight Jobs, so a few minutes of preparation makes
+for a smooth upgrade. Tick these off as you go - the details for each are below:
+
+<upgrade-checklist>
+</upgrade-checklist>
+
+### The schema is upgraded on startup
+
+When your App starts, Background Jobs upgrades its database schema automatically (unless you've disabled
+`AutoInitSchema`):
+
+- **New columns** are added to the `BackgroundJob`, `JobSummary` and `ScheduledTask` tables, and to the
+  `CompletedJob` and `FailedJob` archives.
+- **New tables** are created: `JobBatch`, `JobQueue`, `JobConcurrencyLock`, `JobNode` and `JobAttempt`.
+- **New indexes** are created.
+
+#### New columns
+
+`BackgroundJob`, along with its `CompletedJob` and `FailedJob` archives, and `JobSummary` gain:
+
+| Columns | Used for |
+| --- | --- |
+| `Queue`, `Priority` | Routing Jobs to [named queues](#queues-and-priorities), and running higher priority Jobs first |
+| `RetryBackoff`, `RetryDelayMs`, `MaxRetryDelayMs` | Each Job's [retry policy](#resilient-failure-handling) |
+| `ExpiresAt` | Cancelling a Job with `JobExpired` if it can't start in time |
+| `CancelRequestedDate` | Telling a cancelled queued Job apart from a running Job that's asked to stop |
+| `LeaseOwner` | The server that ran the Job - on `BackgroundJob`, the server that owns it |
+| `DependsOnBatch`, `DependsOnPolicy` | Fan-in after a [batch](#batches-with-live-progress), and running a dependent Job however its parent ended |
+| `ConcurrencyKey` | Running Jobs that share a key [one at a time](#keep-each-customers-jobs-in-order) |
+| `TenantId` | Filtering and reporting by tenant |
+| `TraceId` | Continuing the trace of the request that queued the Job |
+| `LogsTruncated` | Showing when a Job's logs reached `MaxJobLogChars` |
+
+`BackgroundJob` also gains `SingletonKey`, which is backed by a unique index that allows only one queued or running Job
+per key, and `LeaseToken` and `LeaseExpiresAt`, the lease that lets only one server own a Job and lets another server
+[recover it](#scale-out-across-app-servers) when it expires.
+
+`JobSummary` also gains `RunAfter` and `SingletonKey` to show and filter them in the Admin UI, and `Meta`, the
+metadata recorded against the Job.
+
+`ScheduledTask` gains the columns behind [production-grade schedules](#production-grade-schedules):
+
+| Columns | Used for |
+| --- | --- |
+| `Enabled`, `NextRun` | Pausing and resuming a schedule, and the persisted next occurrence every server agrees on |
+| `TimeZoneId` | Running at the intended local time |
+| `MisfirePolicy`, `OverlapPolicy` | Whether a missed occurrence runs after a restart, and whether an occurrence can overlap the previous one |
+| `StartDate`, `EndDate`, `MaxRuns`, `RunCount` | Limiting when and how many times a schedule runs |
+| `LastRunState`, `LastRunDurationMs`, `LastErrorCode`, `LastErrorMessage` | The outcome of the last run, and any error scheduling it |
+| `CreatedDate`, `ModifiedDate`, `Meta` | Auditing when a schedule was created and last changed |
+
+#### New tables
+
+| Table | Used for |
+| --- | --- |
+| `JobBatch` | [Batches](#batches-with-live-progress): progress counters, the `callback` and `onSuccess` commands, and cancellation |
+| `JobQueue` | [Queue controls](#pause-resume-and-throttle-at-runtime): pausing a queue, runtime concurrency overrides and [rate limits](#rate-limit-third-party-apis), shared by every server |
+| `JobConcurrencyLock` | [Concurrency keys](#keep-each-customers-jobs-in-order): holding each key so only one Job with that key runs at a time |
+| `JobNode` | [Server heartbeats](#know-which-servers-are-doing-what): which servers are alive, what they're running, and draining them |
+| `JobAttempt` | [Failed attempt history](#resilient-failure-handling): each failed attempt's error, server and duration |
+
+These changes are additive, so your history and Scheduled Tasks are preserved. The database user your App
+connects with needs permission to alter tables and create indexes. If you manage schema changes separately,
+apply them before deploying.
+
+### Jobs still queued when you upgrade are cleared
+
+To start the new release from a consistent state, any Job that's still **queued, scheduled to run later,
+retrying or running** when the upgrade is applied is removed from the queue. It's kept in your history as
+**Cancelled** with the `QueueClearedOnUpgrade` error code, so you can see exactly what was cleared.
+
+Before upgrading:
+
+1. **Let your queue drain**, or pause new work and wait for running Jobs to finish.
+2. **Check for delayed Jobs** - Jobs queued with `RunAfter` or `ScheduleCommand` for a future date will be
+   cleared too, and need to be queued again after the upgrade.
+
+Recurring Scheduled Tasks aren't affected; they'll continue queueing their next occurrences as normal.
+
+### Upgrade every server at once
+
+If you run the RDBMS provider on multiple servers, **stop all of them before starting the new version**,
+rather than doing a rolling deploy. Servers running v10.2 and v10.3 must not process the same database at
+the same time.
+
+### Behaviour changes to review
+
+| Change | What to check |
+| --- | --- |
+| **Bounded concurrency** | Jobs without a named `Worker` previously each started immediately with unlimited parallelism. They now run on their queue's Workers, at most `MaxConcurrentJobs` at a time (default: the number of CPU cores). Raise `MaxConcurrentJobs` or set `QueueConcurrency` if you relied on running more at once. |
+| **ReplyTo is delivered** | `ReplyTo` was previously only stored against the Job. It's now used to deliver the result: URLs receive a POST, and anything else is published to an MQ. If you used `ReplyTo` to store your own data, move it to `Args` or `Meta`. |
+| **Retry defaults** | Retries now use `ExponentialJitter` backoff from a 5s base delay, capped at 5 minutes. Use `DefaultRetryBackoff`, `DefaultRetryDelayMs` and `DefaultMaxRetryDelayMs` to change them. |
+| **Cancellation isn't retried** | Jobs that throw any `OperationCanceledException` (not just `TaskCanceledException`) are no longer retried. |
+| **Payload limits** | Queueing a Job whose serialized request exceeds `MaxRequestBodyChars` (1M chars) now throws an `ArgumentException`. |
+| **Duplicate RefIds** | Queueing a Job with a `RefId` already used by a different Job throws a `DuplicateRefIdException` instead of a database error. |
+| **`Schedule.Yearly`** | Now runs once a year on 1 January. It previously ran on the first of every month. |
+| **Scheduled times** | Schedule times are stored to the whole second. |
+| **Profiling** | Job executions are now included in `ProfileSource.All`. |
+
+### For custom implementations
+
+- `IBackgroundJobs` has a new `StopAsync()` method, which custom implementations need to implement.
+- `DbJobsWorker.Queue` has been removed. Use `QueuedCount` or `GetQueuedJobs()` instead.
 
 ---
 
 ## Get Started
 
-Everything in v10.2 works on **.NET 8+** ServiceStack Apps, and the OrmLite, Startup Tasks and hardening
-improvements arrive with the upgrade - there's nothing new to install or configure:
+Background Jobs is available in every ServiceStack App on **.NET 8+**. Existing Apps get the reliability
+improvements with the upgrade, and new features are opt-in per Job or per queue:
 
 | To use | Do this |
 | --- | --- |
-| [JSON Queries](/ormlite/json) and [Upsert](/ormlite/upsert) | Upgrade `ServiceStack.OrmLite.*` - both are available on SQLite, PostgreSQL, SQL Server and MySQL/MariaDB. |
-| [Startup Tasks](/startup-tasks) | Register a task in development, or start from a project template where the `dtos` task is already included. |
-| [Gemini RAG](/chat/gemini-rag) | Add AI Chat with `npx add-in chat`, set `GOOGLE_API_KEY` and open **Gemini RAG** in `/chat`. |
-| [AI Chat with ServiceStack Auth](/chat/auth) | Keep your existing `AuthFeature` - set `AuthType = ChatAuthType.Credentials` and your users, roles and permissions apply to `/chat` immediately. |
+| [Background Jobs](/background-jobs) | Upgrade to v10.3 - your existing Jobs and schedules keep working. |
+| [Scale out across servers](/background-jobs-rdbms) | Use `DatabaseJobFeature` on PostgreSQL, SQL Server or MySQL. |
+| Queues, priorities, retries, expiry | Set them in `BackgroundJobOptions` when queueing a Job. |
+| Batches, rate limits and queue controls | Use the new `IBackgroundJobs` extension methods. Queues can also be paused, resumed and re-throttled from the Admin UI. |
+| Transactional outbox | Pass your `IDbConnection` to `EnqueueCommand` with the RDBMS provider. |
 
-The quickest way to see the headline feature is to point a **folder import** at the documentation folder
-of a repo you already have, import it, and ask the first grounded question in **New Chat**. From there the
-same documents publish a [Search](/chat/gemini-search) widget and an [Assistant](/chat/gemini-assistants)
-with two script tags.
+Open **Background Jobs** in the [Admin UI](/admin-ui) to see your queues, batches and schedules.
 
-## Hardened ServiceStack
+---
 
-![](/img/pages/release-notes/v10.2/hardened-servicestack.webp)
+## New Next.js SaaS and Licensing Templates
 
-This release also includes the results of a codebase-wide AI-assisted security and reliability audit. The
-review identified and resolved issues across ServiceStack's core runtime, authentication, data access,
-messaging, cloud integrations, UI, serialization, image processing and client libraries.
+This release also adds two new production-ready templates to the [React Templates](/react/). Both are built
+with .NET 10, ServiceStack and Next.js 16. They take care of the parts every commercial product needs, like
+taking payments, managing customers and running the business, so you can spend your time on your product.
 
-The value for existing Apps is that this work happens beneath your code: the same trust boundaries,
-parsers and background workers your App already relies on now handle malformed input, hostile input and
-concurrent load more defensively - and every change is published for review in the per-package audit
-reports below, so security teams can see exactly what was fixed rather than take an upgrade on faith.
+### Next SaaS
 
-<hardening-pillars>
-</hardening-pillars>
+[Next SaaS](https://react-templates.net/docs/next-saas) is a starting point for **multi-tenant B2C and B2B
+SaaS products**. It includes the public site, the customer app and the back office from day one:
 
-### Reliability and correctness
+- **Public Site** - a product landing page, pricing rendered from published plan versions, ASP.NET Core
+  Identity sign up and hosted Stripe Checkout with trials, coupons and promotion codes
+- **Customer App** - organization dashboards, organization-scoped file storage, real-time usage meters and
+  quotas, plan and billing management through the Stripe Customer Portal, team roles, API keys, audit logs
+  and data export, ownership transfer and delayed deletion
+- **Operations Center** - platform-wide commercial health, a Customer 360 view, an immutable plan editor,
+  Stripe-synced coupons, platform usage analytics and recovery of failed webhooks, jobs and integrations
 
-The audit also fixed race conditions in distributed locks, caches, serializers, background workers and
-type registries; made disposal and shutdown deterministic; removed sync-over-async and retry defects; and
-added defensive null, range and format validation throughout public APIs. Further corrections address
-master/replica routing, cache key and update semantics, OpenAPI schema generation, route parameters,
-multipart requests, configuration parsing, image resizing, database metadata and query generation,
-message acknowledgement and recovery, and cross-platform behavior.
+See it in action in this tour of Next SaaS:
 
-Together these changes make failures explicit instead of silently losing data, prevent malformed external
-input from escalating into process-wide failures, and improve predictable behavior under concurrency,
-cancellation and partial infrastructure outages.
+:::youtube A0CaPJG4_Fs
+Build Your SaaS Product, Not Its Plumbing - Next SaaS for .NET
+:::
 
-### Audit reports
+<next-saas-template></next-saas-template>
 
-<audit-reports>
-</audit-reports>
+Create a new Next SaaS project with:
+
+:::sh
+npx create-net next-saas ProjectName
+:::
+
+### Next License
+
+[Next License](https://react-templates.net/docs/next-license) lets you sell **perpetual, offline-verified
+licenses** for your .NET and Electron desktop apps, with no activation server to run:
+
+1. **Purchase** - customers choose an offer and pay with Stripe Checkout
+2. **Fulfill** - a Stripe webhook confirms the payment and signs an ES256 JWT license key
+3. **Deliver** - customers copy their key from **My licenses**
+4. **Unlock** - your app verifies the key offline against its embedded public key and enables Pro features
+
+Licenses cover every build released up to their update cutoff, and keep working with those builds forever.
+Lifetime licenses cover every future build. Your app checks the key against its own release date, not
+today's date, so there's no expiry to enforce and no network call to make. The storefront also includes
+downloads from your published GitHub releases, account license transfers and an Operations Center where you
+can manage products and pricing, licenses, orders, refunds and license terms.
+
+See it in action in this tour of Next License:
+
+:::youtube LtrTxmkP5XE
+Sell Your Desktop App Without Running a License Server
+:::
+
+<next-license-template></next-license-template>
+
+Create a new Next License project with:
+
+:::sh
+npx create-net next-license ProjectName
+:::
+
+---
+
+## Connect AI Chat to your tools with MCP
+
+Your AI assistant can now work with tools hosted by other services. Add a remote **Model Context Protocol
+(MCP) server** from AI Chat's **Tools → MCP Connections** page, choose the tools you want in a conversation,
+and review each new tool call before it runs. Connections to GitHub, internal knowledge services and other
+Streamable HTTP MCP servers sit alongside your existing [API Tools](/chat/api-tools).
+
+The connection form starts with a **name and server URL**. When a service needs credentials, choose a Bearer
+token or OAuth. For GitHub's hosted MCP server, paste a personal access token without the `Bearer` prefix;
+AI Chat stores it encrypted and sends it as an Authorization header when connecting.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-02-add-connection-bearer-token.webp" title="Connect GitHub MCP with a personal access token from AI Chat"></screenshot>
+
+Prefer sign-in? Register an OAuth App with your provider, enter its client details and the callback URL shown
+in the form, then authorize in the provider's browser window. The Tools page loads the connection's catalog
+after sign-in, so you can start selecting tools for a conversation.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-09-add-connection-oauth.webp" title="Configure a GitHub OAuth connection with the registered client and callback URL"></screenshot>
+
+Search the discovered tools, select all matching results in one click, or pick individual tools. You can
+disable a connection without deleting its credentials and later use **Connect all** to reconnect every
+enabled service. Tool calls show the server, input schema and proposed arguments; approvals can be granted
+for one call or remembered for an individual tool. If a remote result is uncertain after a connection
+failure, AI Chat asks you to verify it before continuing, without replaying the call.
+
+<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'Choose tools from a connected server': '/img/pages/chat/mcp_client/mcp_client-05-connected-select-tools.webp',
+    'Review an MCP tool call before it runs': '/img/pages/chat/mcp_client/mcp_client-07-approve-new-request.webp',
+}"></screenshots-gallery>
+
+Hosts enable the outbound `McpClientExtension` separately from the existing [MCP Server](/chat/mcp_server), which
+publishes your App's tools to external assistants. Connections can be managed by users in the UI or supplied
+as shared, host-controlled configuration. See [MCP Clients](/chat/mcp_client) for setup, authentication and
+configuration details.
+
+---
+
+## AI Chat, organized by project
+
+AI Chat's chat thread UI and prompt have been completely redesigned, so anyone who has used ChatGPT will feel
+at home straight away.
+
+Its sidebar now groups conversations into **project folders**, so the chats for each piece of work stay
+together and the ones you need are a click away. Each folder shows its five most recent chats, **Show more**
+loads more on demand, and chats that don't belong to a project are kept under **Recents**. Hover a folder to
+start a new chat in it, or use its menu to edit the project or hide the folder from the sidebar.
+
+<screenshots-gallery-view grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'Chats grouped into project folders': '/img/pages/chat/prompt/sidebar.webp',
+    'Thread details moved to a hover popover': '/img/pages/chat/prompt/chat-thread-popover.webp',
+    'Choose, change or create a project from the prompt': '/img/pages/chat/prompt/chat-projects.webp',
+    'Choose, change or manage profiles from the prompt': '/img/pages/chat/prompt/chat-profiles.webp',
+    'Choose or change model to use from the prompt': '/img/pages/chat/prompt/chat-model.webp',
+    'Drop images and documents anywhere on the chat': '/img/pages/chat/prompt/chat-drag-image.webp',
+    'Attachments preview in the prompt and each draft is kept': '/img/pages/chat/prompt/chat-drop-image.webp',
+}"></screenshots-gallery-view>
+
+### Every chat runs in its own project
+
+The prompt shows which project a conversation belongs to. Click it to search your projects, move the chat to
+another one, create a **New project**, or choose **Don't work in a project**. A chat's project decides which
+folder its file and code tools work in, and each running chat keeps the workspace it started with, so you can
+run chats in several projects at once without their work getting mixed up.
+
+### Titles that describe the conversation
+
+New chats get a short, descriptive title generated alongside the first answer, instead of the first line of
+your prompt. It never slows down or interrupts the response, and a chat you've renamed yourself keeps your
+title. The model is configurable with `defaults.summarize` in `llms.json`, including a local model, or set it
+to `null` to turn automatic titles off.
+
+### A prompt that keeps your work
+
+Each conversation now has its own **draft**. Switch between chats and your unsent text, attachments and edits
+are exactly where you left them, even after reloading the page. Unsent drafts show in the sidebar with a
+**Draft** badge, so nothing you started gets lost.
+
+The redesigned prompt floats above the conversation and grows as you type. **Drop** images, audio or documents
+anywhere on the chat to attach them, see image **thumbnails** before you send, and remove any attachment with
+one click.
+
+AI Chat adds its new columns to your existing tables on startup, and your existing conversations keep their
+titles and appear under **Recents** until you move them into a project.
+
+---
+
+## API Rate Limiting
+
+![](/img/pages/release-notes/v10.3/rate-limiting.webp)
+
+Protect your ServiceStack APIs from traffic spikes with **opt-in ASP.NET Core rate limiting**. Attach a
+named policy to a request DTO with ServiceStack's `[RateLimiting]` attribute or Microsoft's
+`[EnableRateLimiting]`, or bind one policy to a `[Tag]` shared by several operations. Tagged operations
+consume the **same policy budget**, so you can limit an entire workflow, such as orders, without giving
+each endpoint a separate allowance.
+
+Define the policy with `AddRateLimiter` and choose the limiter that fits your workload: fixed or sliding
+windows, token buckets, concurrency limits, or your own policy. ASP.NET Core handles permits, queueing,
+rejections and metrics. ServiceStack applies the policy consistently to explicit routes, `/api` URLs,
+format URLs and autobatch endpoints, allowing an over-limit request to receive **HTTP 429 before the
+service runs**. Shared DTO libraries can use `[RateLimiting]` without referencing ASP.NET Core.
+
+For example, give every API tagged `orders` one fixed-window budget:
+
+```csharp
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("orders", limiter =>
+    {
+        limiter.PermitLimit = 60;
+        limiter.Window = TimeSpan.FromMinutes(1);
+        limiter.QueueLimit = 0;
+    });
+});
+
+var app = builder.Build();
+app.UseRouting();
+app.UseRateLimiter();
+app.UseServiceStack(new AppHost(), options =>
+{
+    options.MapEndpoints();
+    options.RateLimitTag("orders", "orders");
+});
+```
+
+```csharp
+[Tag("orders")]
+public class ListOrders : IGet, IReturn<ListOrdersResponse> { }
+
+[RateLimiting("orders")]
+public class PlaceOrder : IPost, IReturn<PlaceOrderResponse> { }
+```
+
+Both operations now draw from the `orders` policy. For per-user budgets, partition a named policy by an
+**authenticated ASP.NET Core principal** and put `UseAuthentication()` before `UseRateLimiter()`. Keep
+`MapEndpoints()` at its default `force: true` so legacy routes cannot bypass a limit. Built-in ASP.NET Core
+limiter counters are local to each App Server; use a distributed policy or gateway for a quota shared across
+servers. This API feature is separate from the [Background Jobs queue rate limits](#rate-limit-third-party-apis)
+introduced in this release.
+
+---
+
+## Follow a request with OpenTelemetry
+
+![](/img/pages/release-notes/v10.3/opentelemetry.webp)
+
+A single API call can charge a card, publish a message and queue a Job that runs on a different server. When
+something goes wrong, the evidence is spread across servers and log files. ServiceStack now emits standard
+**OpenTelemetry traces and metrics** that connect all of that work into one distributed trace, so you can
+follow a request from its HTTP call through its ServiceStack operation, outbound HTTP calls, MQ messages and
+Background Jobs in the tracing backend you already use, like Jaeger, Grafana Tempo, Honeycomb, Datadog or the
+.NET Aspire Dashboard.
+
+Add it to an existing .NET 8+ App with:
+
+::: sh
+npx add-in opentelemetry
+:::
+
+This adds the OpenTelemetry packages and a `Configure.Profiling.cs` that registers ASP.NET Core and
+HttpClient instrumentation alongside ServiceStack's own sources, exporting over OTLP to the collector in
+`OTEL_EXPORTER_OTLP_ENDPOINT`:
+
+```csharp
+services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddSource(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+        .AddOtlpExporter())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddMeter(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+        .AddOtlpExporter());
+```
+
+ServiceStack doesn't depend on the OpenTelemetry SDK or include an exporter, so your App keeps control of
+sampling, retention and where its data goes.
+
+### One trace, from the API to the work it starts
+
+- **API operations** get a `ServiceStack {Operation}` span inside ASP.NET Core's HTTP span, tagged with the
+  Request DTO, route template, status code and outcome. No duplicate HTTP spans.
+- **Messages** published to Background MQ, Redis MQ or RabbitMQ carry the W3C trace context in their `Meta`,
+  so the consumer continues the trace, even on another server.
+- **Background Jobs** store the trace of the request that queued them, and continue it when they run,
+  including after a retry or when another server recovers them.
+- **Outbound HTTP calls** are traced by .NET's own HttpClient instrumentation, which passes the trace on to
+  the services you call.
+
+### Metrics you can alert on
+
+| Metric | Description |
+| --- | --- |
+| `servicestack.operation.duration` | How long each API operation took, in seconds |
+| `servicestack.operation.active` | API operations currently executing |
+| `servicestack.operation.errors` | API operations that failed with a server error |
+
+Only 5xx responses and unhandled exceptions count as errors. Validation and authorization failures are
+recorded as `client_error`, so they don't set off your error alerts. Metrics are tagged by operation, HTTP
+method, route template and outcome, never by raw URLs, users or request bodies. They're joined by the existing
+[Background Jobs metrics](/background-jobs-monitoring#opentelemetry) for queue wait times, retries and failures.
+
+### Traces in the Profiling UI
+
+You don't need to leave the Admin UI to follow a trace. With OpenTelemetry registered, the
+[Profiling UI](/admin-ui-profiling#traces-in-the-profiling-ui) records each event with its W3C **Trace Id** and
+**Span Id**, so API, OrmLite, Redis, HttpClient, MQ and Job events from the same request come up together.
+Click a Trace Id to see them in order, switch to **Trace view** to see each event under its parent span, or
+use **Open in trace backend** to jump to the full trace in your tracing backend:
+
+```csharp
+services.AddPlugin(new ProfilingFeature {
+    ExternalTraceUrlTemplate = "https://traces.example.org/trace/{traceId}",
+});
+```
+
+Profiling durations and times are now also measured correctly on Linux and macOS, where they were previously
+overstated. Profiling continues to work without OpenTelemetry, so you can adopt tracing when you're ready.
+
+See [OpenTelemetry Tracing](/admin-ui-profiling#opentelemetry-tracing) for the full list of spans, attributes
+and configuration.
+
+---
+
+## Async Bulk Inserts
+
+OrmLite now has `BulkInsertAsync` for inserting large sets of rows without blocking an async workflow:
+
+```csharp
+await db.BulkInsertAsync(rows, token: cancellationToken);
+```
+
+<bulk-paths method="db.BulkInsertAsync()"></bulk-paths>
+
+It accepts the same `BulkInsertConfig` options as `BulkInsert`, including `Mode`, `BatchSize` and
+`InsertFields`. The async implementation uses the provider's bulk insert path for PostgreSQL, SQL Server,
+MySQL and Firebird; `BulkInsertMode.Sql` sends batched multi-row `INSERT` statements asynchronously.
+
+Thanks to ServiceStack community contributor [@DeonHeyns](https://github.com/DeonHeyns) for
+[contributing this feature](https://github.com/ServiceStack/ServiceStack/pull/1383). See
+[Bulk Inserts](/ormlite/bulk-inserts#async-bulk-inserts) for usage and configuration.
 
 
 # Release Notes History
@@ -1132,6 +1187,8 @@ Source: https://docs.servicestack.net/release-notes-history
 
 ## 2026
 
+- [v10.3](/releases/v10_03)     
+- [v10.2](/releases/v10_02)
 - [v10.1](/releases/v10_01)
 
 ## 2025
@@ -11493,15 +11550,26 @@ Source: https://docs.servicestack.net/admin-ui-profiling
 
 The Request Logging & Profiling UIs bring an invaluable new level of observability into your App, from being able to quickly inspect and browse incoming requests, to tracing their behavior from their generated events in the [Diagnostic Source](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.diagnosticsource?view=net-6.0) capabilities added all throughout ServiceStack, which both power the new UIs and enables new introspectability from code where you can now to tap in to inspect & debug when each diagnostic event occurs.
 
+To follow requests across servers, message queues and Background Jobs in your own tracing backend, enable
+OpenTelemetry and Profiling in a .NET 8+ App with:
+
+::: sh
+npx add-in opentelemetry
+:::
+
+This exports traces and metrics over OTLP to your collector, and adds a **Trace view** to the Profiling UI.
+See [OpenTelemetry Tracing](#opentelemetry-tracing) to learn what it traces and how to configure it.
+
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="LgQHTSHSk1g" style="background-image: url('https://img.youtube.com/vi/LgQHTSHSk1g/maxresdefault.jpg')"></lite-youtube>
 
-The quickest way to enable access to these new features to your App is with:
+To enable local Profiling without OpenTelemetry, use:
 
 ::: sh 
 npx add-in profiling
 :::
 
-Which will add the [Modular Startup](/modular-startup) configuration to your Host project that registers both Request Logging & Profiling features when running your App in [DebugMode](/debugging#debugmode) (i.e. Development):
+This adds [Modular Startup](/modular-startup) configuration to your Host project that registers Profiling
+when running your App in [DebugMode](/debugging#debugmode) (i.e. Development):
 
 ```csharp
 public class ConfigureProfiling : IHostingStartup
@@ -11965,7 +12033,8 @@ enum ProfileSource
     Client       = 1 << 1,
     Redis        = 1 << 2,
     OrmLite      = 1 << 3,
-    All          = ServiceStack | Client | OrmLite | Redis,
+    Jobs         = 1 << 4,
+    All          = ServiceStack | Client | OrmLite | Redis | Jobs,
 }
 
 class ProfilingFeature
@@ -12012,6 +12081,9 @@ class ProfilingFeature
     
     // Default take, if none is specified
     int DefaultLimit = 50;
+
+    // Optional trace backend URL containing {traceId}. HTTPS, or HTTP for localhost
+    string? ExternalTraceUrlTemplate;
     
     // Customize DiagnosticEntry that gets captured
     Action<DiagnosticEntry, DiagnosticEvent>? DiagnosticEntryFilter;
@@ -12020,6 +12092,273 @@ class ProfilingFeature
     int MaxBodyLength = 10 * 10 * 1024;
 }
 ```
+
+## OpenTelemetry Tracing
+
+Profiling shows what happened inside one App. When a request queues a Job that runs on another server,
+publishes a message or calls another service, [OpenTelemetry](https://opentelemetry.io/docs/languages/dotnet/)
+connects that work into a single distributed trace that you can follow in any OTLP-compatible backend, such
+as Jaeger, Grafana Tempo, Honeycomb, Datadog or the .NET Aspire Dashboard.
+
+On **.NET 8+**, ServiceStack emits standard .NET `ActivitySource` traces and `Meter` metrics for API
+operations, messaging and Background Jobs. ServiceStack doesn't depend on the OpenTelemetry SDK: your App
+chooses the exporter, sampling and collector, and nothing is recorded until a listener is registered.
+
+### Add OpenTelemetry to your App
+
+Add OpenTelemetry to an existing App with:
+
+::: sh
+npx add-in opentelemetry
+:::
+
+This installs the `OpenTelemetry.Extensions.Hosting`, `OpenTelemetry.Instrumentation.AspNetCore`,
+`OpenTelemetry.Instrumentation.Http` and `OpenTelemetry.Exporter.OpenTelemetryProtocol` packages and adds
+this [Modular Startup](/modular-startup) configuration:
+
+```csharp
+public class ConfigureProfiling : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource
+                    .AddService(context.Configuration["OTEL_SERVICE_NAME"] 
+                            ?? context.HostingEnvironment.ApplicationName,
+                        serviceVersion: typeof(ConfigureProfiling).Assembly.GetName().Version?.ToString())
+                    .AddAttributes(new Dictionary<string, object> {
+                        ["deployment.environment.name"] = context.HostingEnvironment.EnvironmentName,
+                    }))
+                .WithTracing(tracing => tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSource(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+                    .AddOtlpExporter())
+                .WithMetrics(metrics => metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddMeter(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+                    .AddOtlpExporter());
+
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddPlugin(new ProfilingFeature {
+                    IncludeStackTrace = true,
+                    ExternalTraceUrlTemplate = context.Configuration["OTEL_TRACE_URL_TEMPLATE"],
+                });
+            }
+        });
+}
+```
+
+ASP.NET Core and `HttpClient` instrumentation cover incoming HTTP requests and outbound HTTP calls, while
+the three ServiceStack sources cover API operations, messaging and Background Jobs. OpenTelemetry is enabled
+in every environment, while the local Profiling UI is only registered in Development.
+
+::: info
+The `opentelemetry` add-in includes everything the `profiling` add-in does. Both create a
+`Configure.Profiling.cs`, so use one or the other.
+:::
+
+### Configure the exporter
+
+The exporter is configured with the standard OpenTelemetry environment variables, so the same build can send
+traces to a different collector in each environment:
+
+| Variable | Used for |
+| --- | --- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Your collector's OTLP endpoint. Defaults to `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc` (default) or `http/protobuf` |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Credentials your hosted backend needs, e.g. an API key header |
+| `OTEL_SERVICE_NAME` | The service name shown in your backend. Defaults to your App's name |
+| `OTEL_TRACE_URL_TEMPLATE` | Optional link from the Profiling UI to your backend, [see below](#open-a-trace-in-your-backend) |
+
+To try it locally without an account, run the [.NET Aspire Dashboard](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/standalone)
+in Docker. It receives OTLP on the default port, so no configuration is needed:
+
+::: sh
+docker run --rm -it -p 18888:18888 -p 4317:18889 mcr.microsoft.com/dotnet/aspire-dashboard:latest
+:::
+
+Then open the login link printed in its output to see your App's traces and metrics.
+
+Sampling is configured in the tracing builder. For example, to export 10% of new traces while always
+following the sampling decision of an upstream service:
+
+```csharp
+.WithTracing(tracing => tracing
+    .SetSampler(new ParentBasedSampler(new TraceIdRatioBasedSampler(0.1)))
+    //...
+```
+
+Sampling only affects what's exported. The Profiling UI keeps its own bounded history, controlled by
+`ProfilingFeature.Capacity`.
+
+### What ServiceStack emits
+
+#### Traces
+
+| Source | Spans |
+| --- | --- |
+| `ServiceStack` | A `ServiceStack {Operation}` span for each API request, nested under ASP.NET Core's HTTP server span |
+| `ServiceStack.Messaging` | A `send {queue}` producer span when a message is published, and a `process {queue}` consumer span when it's processed, for Background MQ, Redis MQ and RabbitMQ |
+| `ServiceStack.Jobs` | A consumer span for each Job execution that continues the trace of the request that queued it |
+
+ServiceStack adds one span inside ASP.NET Core's HTTP span instead of creating a second HTTP span. Operation
+spans are tagged with:
+
+| Attribute | Value |
+| --- | --- |
+| `servicestack.operation` | The Request DTO name, e.g. `GetOrders` |
+| `http.request.method` | The HTTP method |
+| `http.route` | The matched route template, e.g. `/orders/{Id}`, never the raw URL |
+| `http.response.status_code` | The response status code |
+| `servicestack.outcome` | `success`, `client_error`, `error`, `cancelled` or `unknown` |
+| `exception.type` | The exception type, for failed requests |
+
+Only server failures are marked as errors, so validation and authorization responses don't trigger your
+error alerts:
+
+| Response | Outcome | Span status |
+| --- | --- | --- |
+| 1xx - 3xx | `success` | Ok |
+| 4xx, e.g. validation or authorization errors | `client_error` | Ok |
+| 5xx, or an unhandled exception | `error` | Error |
+| Request cancelled | `cancelled` | Unset |
+
+Request and response bodies, user ids and exception messages aren't added to spans. Only requests for known
+API operations get an operation span and metrics, so requests for unknown `/api/{Request}` names, static files
+and redirects don't add new metric series.
+
+Messaging spans follow the OpenTelemetry messaging conventions. The destination is the queue name, e.g.
+`send mq:CreateOrder.inq` and `process mq:CreateOrder.inq`, and both spans are tagged with:
+
+| Attribute | Value |
+| --- | --- |
+| `messaging.system` | `servicestack.background`, `redis` or `rabbitmq` |
+| `messaging.operation.type` | `send` or `process` |
+| `messaging.destination.name` | The queue name, e.g. `mq:CreateOrder.inq` |
+| `messaging.message.id` | The message's `IMessage.Id` |
+| `error.type` | The exception type, when sending or processing failed |
+
+#### Metrics
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `servicestack.operation.duration` | Histogram (s) | How long API operations took |
+| `servicestack.operation.active` | UpDownCounter | API operations currently executing |
+| `servicestack.operation.errors` | Counter | API operations with an `error` outcome |
+
+Operation metrics are tagged with `servicestack.operation`, `http.request.method`, `http.route` and
+`servicestack.outcome`, all of which have a limited set of values so they're safe to use as metric
+dimensions. They're recorded whether or not a trace is sampled.
+
+The `ServiceStack.Messaging` meter records:
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `messaging.client.sent.messages` | Counter | Messages a producer sent |
+| `messaging.client.consumed.messages` | Counter | Messages delivered to a consumer |
+| `messaging.process.duration` | Histogram (s) | How long processing a message took |
+
+Messaging metrics are tagged with `messaging.system`, `messaging.destination.name` and, when sending or
+processing failed, `error.type`.
+
+For Background Jobs metrics, see [Background Jobs OpenTelemetry](/background-jobs-monitoring#opentelemetry).
+
+#### Detailed spans
+
+To see where time is spent inside an API, enable spans for the request filters, the service invocation and
+AutoQuery execution:
+
+```csharp
+OperationDiagnostics.EnableDetailedSpans = true;
+```
+
+These are disabled by default to keep the number of spans per request low.
+
+### Messages and Jobs
+
+Trace context is carried with the work, so a message or Job continues the trace of the request that started
+it, even when it's processed on a different server:
+
+- **Messages** carry the W3C `traceparent` and `tracestate` in their `Meta` dictionary, which RabbitMQ sends
+  as message headers. Your own `Meta` entries are preserved, and the existing `IMessage.TraceId` is
+  unchanged.
+- **Background Jobs** store the trace context in the `BackgroundJob.TraceId` column when they're queued, and
+  continue it when they run, including Jobs that are retried or recovered by another server.
+
+Messages and Jobs without trace context, including those queued before upgrading, start a new trace instead
+of failing.
+
+Custom `IMessageQueueClient` implementations can join the same trace with `MessagingDiagnostics`:
+
+```csharp
+public void Publish(string queueName, IMessage message)
+{
+    using var scope = MessagingDiagnostics.StartPublish("my-mq", queueName, message);
+    MessagingDiagnostics.Inject(message); // adds traceparent and tracestate to message.Meta
+    try
+    {
+        // send the message...
+    }
+    catch (Exception ex)
+    {
+        scope.RecordError(ex);
+        throw;
+    }
+}
+```
+
+The first argument is the `messaging.system` of your queue. Disposing the scope ends the span and records
+the `messaging.client.sent.messages` metric. Messages are processed by ServiceStack's shared message handler,
+which reads the trace context with `MessagingDiagnostics.StartProcess(message, system, destination)`.
+
+### Traces in the Profiling UI
+
+With OpenTelemetry registered, Profiling events are recorded with the W3C **Trace Id** and **Span Id** of the
+work they belong to. OrmLite, Redis and HttpClient events are correlated with the API request, message or Job
+that ran them, so one Trace Id brings together everything a request caused on this server.
+
+Click a Trace Id, or paste one into the **Trace Id** filter, to see all of its events in the order they
+happened. Two views are available:
+
+- **Details** - the familiar Profiling grid, with each event's full details
+- **Trace view** - one row per step, indented under its parent span, with its source, duration and any errors.
+  A step that hasn't completed yet is shown as **pending**
+
+Click a Span Id to narrow the results to a single span. The selected view is kept in the URL, so you can
+share a link to a trace.
+
+The Profiling UI only shows events retained by this App's bounded Profiling history, and still requires the
+Admin role. Spans from other services, or events that are no longer retained, are only in your trace backend.
+
+#### Open a trace in your backend
+
+To link to the complete trace in your tracing backend, set `ExternalTraceUrlTemplate` to an HTTPS URL
+containing `{traceId}`, or set the `OTEL_TRACE_URL_TEMPLATE` environment variable when using the add-in:
+
+```csharp
+services.AddPlugin(new ProfilingFeature {
+    ExternalTraceUrlTemplate = "https://traces.example.org/trace/{traceId}",
+});
+```
+
+HTTP is also allowed for `localhost`, so you can link to a local Jaeger or Aspire Dashboard during
+development:
+
+| Backend | `ExternalTraceUrlTemplate` |
+| --- | --- |
+| Jaeger | `http://localhost:16686/trace/{traceId}` |
+| Aspire Dashboard | `http://localhost:18888/traces/detail/{traceId}` |
+
+An invalid template is ignored, with a warning logged when the App starts.
+
+When a W3C Trace Id is selected, the Trace view shows an **Open in trace backend** link.
+
+#### Without OpenTelemetry
+
+Profiling works the same without OpenTelemetry, where events use their existing request identifiers as their
+Trace Id, so you can continue filtering all the events of a request, message or Job.
 
 
 # Admin UI Features
@@ -12326,7 +12665,7 @@ AI Chat resolves `typst` from `$TYPST_PATH` first, then `PATH`. See [PDF Studio]
 
 ## First-run files
 
-On first request AI Chat seeds its configuration into `App_Data/chat`:
+On startup AI Chat writes its configuration into `App_Data/chat`:
 
 <text-block :rows="[
   ['App_Data/chat/llms.json','Providers, defaults, limits, disabled extensions'],
@@ -12335,7 +12674,15 @@ On first request AI Chat seeds its configuration into `App_Data/chat`:
   ['App_Data/chat/cache/','Content-addressed asset cache'],
   ['App_Data/chat/user/{user}/','Per-user prefs, projects, profiles, skills, pdf']]"></text-block>
 
-These files are yours to edit and check in. See [Data & Storage](/chat/data).
+The bundled `llms.json`, `providers.json` and `providers-extra.json` are overwritten on every startup. To keep a modified copy, add it to `PreserveConfigs`:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+See [Data & Storage](/chat/data).
 
 ## What's next
 
@@ -12483,11 +12830,27 @@ See [Custom Extensions](/chat/custom-extensions) for the full `ExtensionContext`
 | `Config` | seeded `llms.json` | The parsed `llms.json` document |
 | `ConfigJson` | - | Write-only setter that parses a JSON string into `Config` |
 | `ProviderModels` | seeded `providers.json` | The models.dev model catalog |
+| `PreserveConfigs` | `[]` | Bundled config files in `App_Data/chat` to keep instead of overwriting on startup |
 | `EnableProviders` | `[]` | Force-enable **only** these providers, overriding `llms.json` |
 | `Variables` | `[]` | `$VAR` substitutions checked **before** environment variables |
 | `ProviderTypes` | built-ins | npm sdk id → provider factory |
 | `Providers` | - | The live (enabled + configured) providers |
 | `LoadingMessages` | `["Computing", …]` | Words shown while a response streams |
+
+### Preserving modified configs
+
+On every startup AI Chat writes its bundled `llms.json`, `providers.json` and `providers-extra.json` to `App_Data/chat`, **overwriting** any existing copies. This keeps the provider catalog and defaults current with each ServiceStack release, but it also discards any edits you've made to those files, including provider changes persisted by the Admin UI.
+
+To keep your modified copy, add its file name to `PreserveConfigs`. A preserved file is only seeded when it doesn't exist yet and is otherwise left untouched:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    // keep your customized llms.json, still refresh providers.json each release
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+Preserved files no longer pick up upstream changes, so when you preserve `providers.json` you're responsible for keeping it current, e.g. with [Update Provider Models](#update-provider-models) below.
 
 ### Update Provider Models
 
@@ -12496,6 +12859,8 @@ Each ServiceStack release includes the latest `providers.json`. To update the pr
 Run the following command from your application's `App_Data/chat` directory to download and overwrite `providers.json`:
 
 <shell-command>curl -fL https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json -o providers.json</shell-command>
+
+Add `"providers.json"` to [PreserveConfigs](#preserving-modified-configs) so the downloaded catalog isn't replaced by the bundled copy on the next restart.
 
 See [Providers & Models](/chat/providers).
 
@@ -12611,6 +12976,7 @@ services.AddPlugin(new ChatFeature {
     // ── Providers ──
     EnableProviders = [],
     Variables = {},
+    PreserveConfigs = [],           // e.g. ["llms.json", "providers.json"]
     LoadingMessages = ["Computing", "Cooking", "Crafting", "Creating"],
 
     // ── Limits ──
@@ -12827,7 +13193,7 @@ public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderRespons
 
 When set, MCP responses - `api_search`, `api_describe` and confirmation summaries - prefer it over `[Description]`, whilst every non-MCP consumer continues to see the original.
 
-Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp#approval-across-the-mcp-boundary) without asking a human.
+Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp_server#approval-across-the-mcp-boundary) without asking a human.
 
 ## Your metadata becomes AI context
 
@@ -12931,15 +13297,17 @@ Mcp = {
 }
 ```
 
-See [MCP Server](/chat/mcp) and [Connect MCP Clients](/chat/connect-mcp).
+See [MCP Server](/chat/mcp_server) and [Connect MCP Clients](/chat/connect-mcp).
 
 <screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot>
 
 
 # MCP Server
-Source: https://docs.servicestack.net/chat/mcp
+Source: https://docs.servicestack.net/chat/mcp_server
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
+
+To use tools hosted by another MCP server *inside* AI Chat, see [MCP Clients](/chat/mcp_client).
 
 <text-block text="https://example.org/chat/mcp"></text-block>
 
@@ -44299,11 +44667,130 @@ START Chat.exe /port=3337 /redis=localhost /background=/port-3337.jpg
 This script was used to create the animated gif above to launch **3 self-hosting instances of Chat.exe** running on **different ports**, all connected to each other via Redis. This enables some interesting peer-to-peer scenarios where users are able to run a network of (CPU/resource isolated) decentralized stand-alone HTTP Servers on their local machines, but can still communicate with each other via redis.
 
 
+# Background Jobs
+Source: https://docs.servicestack.net/background-jobs
+
+Background Jobs is ServiceStack's built-in solution for running work in the background and on a schedule,
+durably, in the database you already use. Queue any of your existing APIs or [Commands](/commands) to run in
+the background, retry them when they fail, run them on a schedule, and monitor and manage them all from the
+built-in Admin UI - without deploying a message broker or any other infrastructure.
+
+:::youtube 2Cza_a_rrjA
+Durable Background Jobs and Scheduled Tasks for .NET 10 Apps
+:::
+
+It's designed for the work your App depends on: sending emails, charging payments, importing data,
+generating reports, syncing tenants and calling third-party APIs.
+
+```csharp
+class MyServices(IBackgroundJobs jobs) : Service
+{
+    public object Any(PlaceOrder request)
+    {
+        // Send the confirmation email in the background, retrying if it fails
+        var jobRef = jobs.EnqueueCommand<SendOrderConfirmationCommand>(new SendOrderConfirmation {
+            OrderId = request.Id,
+        }, new() {
+            Queue = "emails",
+            RetryLimit = 3,
+        });
+        //...
+    }
+}
+```
+
+<screenshot src="/img/pages/jobs/03-job-running.png" title="Monitor Jobs, their progress and logs in real-time from the Admin UI"></screenshot>
+
+## Choose a provider
+
+Background Jobs is available with two storage providers that share the same `IBackgroundJobs` APIs, data
+models and Admin UI, so you can start with one and move to the other without changing how you queue Jobs.
+
+| | [RDBMS Background Jobs](/background-jobs-rdbms) | [SQLite Background Jobs](/background-jobs-sqlite) |
+| --- | --- | --- |
+| Plugin | `DatabaseJobFeature` | `BackgroundsJobFeature` |
+| Storage | Your App's PostgreSQL, SQL Server or MySQL database | Local SQLite database files |
+| App Servers | Any number sharing the same database | A single App Server |
+| Failover | Jobs of a failed server are recovered by another | - |
+| Queue Jobs in your own transaction | ✓ | - |
+| Job history | Monthly partitioned tables | Monthly database files |
+| Install | `npx add-in db-jobs` | `npx add-in jobs` |
+
+Use **RDBMS Background Jobs** when your App runs on more than one server, or you want your Jobs stored and
+backed up with the rest of your data. Use **SQLite Background Jobs** for a single server App that wants Jobs
+kept out of its main database with no setup at all.
+
+## Documentation
+
+### Getting started
+
+ - **[RDBMS Background Jobs](/background-jobs-rdbms)** - Install and configure `DatabaseJobFeature`, scale out
+   across App Servers, queue Jobs in your own transaction, and manage its partitioned history tables
+ - **[SQLite Background Jobs](/background-jobs-sqlite)** - Install and configure `BackgroundsJobFeature`
+   with its monthly SQLite databases
+
+Both pages also cover the fundamentals shared by every App: queueing APIs and Commands, Job options, named
+Workers, running Jobs as an authenticated user, logging and progress updates, and implementing Commands.
+
+### Guides
+
+<jobs-guides></jobs-guides>
+
+### Related
+
+ - **[Commands](/commands)** - Encapsulate units of logic into reusable, inspectable Commands, the
+   recommended way to implement Background Jobs
+ - **[Background MQ](/background-mq)** - A lightweight in-memory MQ for work that doesn't need to be durable
+ - **[What's new in v10.3](/releases/v10_03)** - The major upgrade that added queues, batches, leases,
+   rate limits and more, including how to upgrade existing Apps
+
+## How a Job runs
+
+Every Job moves through the same states, whichever provider you use. Queued Jobs are started by the
+Workers of their queue, and retried, failed or cancelled depending on how they end:
+
+<job-lifecycle></job-lifecycle>
+
+## Feature overview
+
+ - **No infrastructure** - runs in your existing RDBMS, or in local SQLite databases
+ - **Execute existing APIs or Commands** - Commands are auto registered in the IOC
+ - **Scale out** across App Servers with automatic failover (RDBMS)
+ - **Queues** with their own concurrency, priorities and rate limits, controllable at runtime
+ - **Workflows** of dependent Jobs, and **Batches** with live progress and completion callbacks
+ - **Retries** with exponential backoff and jitter, and a history of every failed attempt
+ - **Exactly-once patterns** with idempotent and singleton Jobs, concurrency keys and the
+   transactional outbox (RDBMS)
+ - **Results** that can be awaited, or delivered to a webhook or MQ when a Job completes
+ - **Durable Recurring Tasks** with time zones, misfire and overlap policies
+ - **Real-time Admin UI** to monitor, cancel, requeue and replay Jobs, and manage queues and schedules
+ - **Observability** with health checks, OpenTelemetry traces and metrics, and Profiling
+
+
 # RDBMS Background Jobs
-Source: https://docs.servicestack.net/rdbms-background-jobs
+Source: https://docs.servicestack.net/background-jobs-rdbms
 
 The **DatabaseJobFeature** is a new implementation purpose built for **PostgreSQL**, **SQL Server** and **MySQL** 
-backends that's a drop-in replacement for [SQLite's BackgroundsJobFeature](/background-jobs) which can be applied to an existing .NET 10+ project by [mixing in](/mix-tool) the **db-identity** or **db-jobs** gist files to your host project.
+backends that's a drop-in replacement for [SQLite's BackgroundsJobFeature](/background-jobs-sqlite) which can be applied to an existing .NET 10+ project by [mixing in](/mix-tool) the **db-identity** or **db-jobs** gist files to your host project.
+
+It runs your Jobs in the database you already operate, with no broker or other infrastructure to deploy,
+and safely scales out across any number of App Servers sharing the same database:
+
+ - **[Scale out across App Servers](#scale-out-across-app-servers)** - every Job is owned by one server at a
+   time, and recovered automatically when a server fails
+ - **[Queue Jobs in your own transaction](#queue-jobs-in-your-own-transaction)** - Jobs are only queued if
+   the work that queued them commits
+ - **[Queues, priorities & rate limits](/background-jobs-queues)** - run each class of work in its own lane,
+   and control it at runtime from any server
+ - **[Workflows, batches & results](/background-jobs-workflows)** - multi-step workflows, batches with live
+   progress, and results awaited or delivered to a webhook
+ - **[Retries & reliability](/background-jobs-reliability)** - backoff with jitter, failed attempt history,
+   expiry, and preventing duplicate work
+ - **[Monitoring & operations](/background-jobs-monitoring)** - Admin UI, health checks and OpenTelemetry
+
+:::youtube EYycrGqDyJk
+.NET Background Jobs That Survive Crashes, Deploys & Retries
+:::
 
 ### Install
 
@@ -44367,6 +44854,86 @@ By implementing the same API Service Contracts (i.e. Request/Response DTOs) it's
 :::youtube 2Cza_a_rrjA
 Durable C# Background Jobs and Scheduled Tasks for .NET
 :::
+
+## Scale out across App Servers
+
+Any number of App Servers can process Jobs from the same PostgreSQL, SQL Server or MySQL database.
+Each server claims Jobs in batches, and every claimed Job is **leased** to the server that claimed it:
+
+ - **One owner at a time.** A Job can only be claimed by one server, and every write a server makes to a
+   Job - its progress, completion, retry or failure - is fenced by its lease. A slow or partitioned server
+   can't overwrite the result of the server that took over from it.
+ - **Heartbeats keep long Jobs alive.** A server renews the leases of the Jobs it's running, so a
+   long-running Job isn't mistaken for an abandoned one.
+ - **Automatic recovery.** When a server crashes, is killed or loses its network, its leases expire and
+   another server recovers its Jobs. A server that loses a lease - to a cancellation or to another server
+   recovering the Job - cancels its local execution.
+ - **Poison Jobs are failed, not retried forever.** A Job abandoned mid-execution counts as a failed attempt,
+   and fails with the `LeaseExpired` error code once it exceeds its `RetryLimit`.
+ - **Claiming scales with your servers.** On PostgreSQL and MySQL 8+, Jobs are claimed with `SKIP LOCKED`,
+   so competing servers claim different Jobs instead of contending for the same rows.
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    LeaseDurationSecs = 60,     // how long a claim lasts before another server can recover it
+    ClaimBatchSize = 100,       // Jobs claimed per query
+    MaxPrefetchJobs = 100,      // Jobs claimed ahead of a queue's Workers
+});
+```
+
+<cluster-simulator></cluster-simulator>
+
+### Deploy without losing work
+
+When a server shuts down, its running Jobs are given `ShutdownTimeoutSecs` (default 30s) to finish. Jobs it
+had claimed but not started, and Jobs still running when the timeout runs out, are released immediately so
+another server picks them up, instead of waiting for their leases to expire on every deploy.
+
+### Know which servers are doing what
+
+Each server records a heartbeat, so you can see which servers are alive, what they're running and which
+stopped reporting, and **drain** a server before taking it out of service. See
+[App Servers](/background-jobs-monitoring#app-servers).
+
+<screenshot src="/img/pages/jobs/05-nodes.png" title="App Servers processing Jobs, with their heartbeat, running Jobs and Drain control"></screenshot>
+
+### Dedicate servers to queues
+
+Use `Queues` to restrict a server to specific [queues](/background-jobs-queues), e.g. only running GPU work
+on the servers that have one:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    Queues = ["gpu"],
+});
+```
+
+## Queue Jobs in your own transaction
+
+Pass your own `IDbConnection` to `EnqueueCommand` or `EnqueueApi` to queue a Job in the same database
+transaction as your data. The Job is only queued if your transaction commits, so an order and the email
+confirming it can't disagree - also known as the **transactional outbox** pattern:
+
+```csharp
+public object Post(PlaceOrder request)
+{
+    using var db = Db;
+    using var trans = db.OpenTransaction();
+
+    var orderId = db.Insert(request.ConvertTo<Order>(), selectIdentity: true);
+
+    jobs.EnqueueCommand<SendOrderConfirmationCommand>(db, new SendOrderConfirmation {
+        OrderId = orderId,
+    });
+
+    trans.Commit(); // Rolling back also removes the Job
+    return new PlaceOrderResponse { Id = orderId };
+}
+```
+
+The Jobs tables need to be in the same database as your data, so this isn't available when Jobs use a
+[separate database](#separate-jobs-database). Jobs queued this way are picked up on the next tick rather than
+immediately, since they can't run before your transaction has committed.
 
 ## RDBMS Optimizations
 
@@ -44437,28 +45004,11 @@ services.AddPlugin(new DatabaseJobFeature {
 
 ### Real Time Admin UI
 
-The Jobs Admin UI provides a real time view into the status of all background jobs including their progress, completion times, 
-Executed, Failed, and Cancelled Jobs, etc. which is useful for monitoring and debugging purposes.
+The Jobs Admin UI provides a real time view into the status of all background jobs including their progress,
+logs, retries, batches, queues and servers, with controls to cancel, requeue and replay Jobs, pause queues and
+drain servers. See [Monitoring & Operations](/background-jobs-monitoring#admin-ui) for a tour.
 
-[![](/img/pages/jobs/jobs-dashboard.webp)](/img/pages/jobs/jobs-dashboard.webp)
-
-View Real-time progress of queued Jobs
-
-[![](/img/pages/jobs/jobs-queue.webp)](/img/pages/jobs/jobs-queue.webp)
-
-View real-time progress logs of executing Jobs
-
-[![](/img/pages/jobs/jobs-logs.webp)](/img/pages/jobs/jobs-logs.webp)
-
-View Job Summary and Monthly Databases of Completed and Failed Jobs
-
-[![](/img/pages/jobs/jobs-completed.webp)](/img/pages/jobs/jobs-completed.webp)
-
-View full state and execution history of each Job
-
-[![](/img/pages/jobs/jobs-failed.webp)](/img/pages/jobs/jobs-failed.webp)
-
-Cancel Running jobs and Requeue failed jobs
+<screenshot src="/img/pages/jobs/04-queues.png" title="Pause, resume, concurrency and rate limit controls for each queue"></screenshot>
 
 ## Usage
 
@@ -44522,33 +45072,72 @@ they'll also be visible in the [Commands Admin UI](/commands#command-admin-ui).
 
 ### Feature Overview
 
-It packs most features needed in a Background Jobs solution including:
-
 - Use your App's existing RDBMS (no other infrastructure dependencies)
 - Execute existing APIs or versatile Commands
     - Commands auto registered in IOC
-- Scheduled Reoccurring Tasks
-    - Track Last Job Run
-- Serially execute jobs with the same named Worker
-- Queue Jobs dependent on successful completion of parent Job
+- [Scale out across App Servers](#scale-out-across-app-servers) with leased Jobs and automatic failover
+- [Queue Jobs in your own database transaction](#queue-jobs-in-your-own-transaction)
+- [Named queues](/background-jobs-queues) with their own concurrency, priorities and rate limits
+    - Pause, resume and re-throttle queues at runtime from any server
+- [Concurrency keys](/background-jobs-queues#concurrency-keys) to run each customer's Jobs in order
+- [Multi-step workflows](/background-jobs-workflows) with Jobs dependent on their parent Job
+- [Job Batches](/background-jobs-workflows#job-batches) with live progress and completion callbacks
+- [Await a Job's result](/background-jobs-workflows#await-a-jobs-result) or have it
+  [delivered to a webhook or MQ](/background-jobs-workflows#deliver-results-to-replyto)
+- [Retries with exponential backoff and jitter](/background-jobs-reliability#retries-and-backoff), with every
+  failed attempt recorded
+- [Idempotent](/background-jobs-reliability#idempotent-enqueue) and
+  [singleton](/background-jobs-reliability#singleton-jobs) Jobs to prevent duplicate work
+- [Job expiry](/background-jobs-reliability#job-expiry), timeouts and cancellation
+- [Durable, time zone aware Recurring Tasks](/recurring-tasks)
 - Queue Jobs to be executed after a specified Date
 - Execute Jobs within the context of an Authenticated User
-- Auto retry failed jobs on a default or per-job limit
-- Timeout Jobs on a default or per-job limit
-- Cancellable Jobs
-- Requeue Failed Jobs
-- Execute custom callbacks on successful execution of Job
 - Maintain Status, Logs, and Progress of Executing Jobs
-- Execute transitive (i.e. non-durable) jobs using named workers
-- Attach optional `Tag`, `BatchId`, `CreatedBy`, `ReplyTo` and `Args` with Jobs
+- [Health checks, OpenTelemetry and Profiling](/background-jobs-monitoring)
+- Attach optional `Tag`, `TenantId`, `CreatedBy` and `Args` metadata to Jobs
+
+### Configuration
+
+The main `DatabaseJobFeature` options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `NamedConnection` | | Use a [separate database](#separate-jobs-database) for Jobs |
+| `MaxConcurrentJobs` | CPU cores | Jobs each queue runs at once |
+| `QueueConcurrency` | | Per-queue concurrency overrides |
+| `Queues` | all | Queues this server processes |
+| `DefaultRetryLimit` | `2` | Retries after a failed attempt |
+| `DefaultRetryBackoff` | `ExponentialJitter` | How retry delays grow |
+| `DefaultRetryDelayMs` | `5000` | Delay before the first retry |
+| `DefaultMaxRetryDelayMs` | `300000` | Longest delay between retries |
+| `DefaultTimeoutSecs` | `600` | How long a Job can run before it's cancelled |
+| `LeaseDurationSecs` | `60` | How long a claim lasts before another server can recover the Job |
+| `ClaimBatchSize` | `100` | Jobs claimed per query |
+| `MaxPrefetchJobs` | `100` | Jobs claimed ahead of a queue's Workers |
+| `ShutdownTimeoutSecs` | `30` | How long running Jobs have to finish on shutdown |
+| `NodeHeartbeatSecs` | `15` | How often a server records its heartbeat |
+| `MaxRequestBodyChars` | `1000000` | Largest Request a Job can be queued with |
+| `MaxResponseBodyChars` | `1000000` | Largest Response that's stored |
+| `MaxJobLogChars` | `100000` | Largest log kept for a Job |
+| `JobSummaryRetention` | off | Delete the history of finished Jobs older than this |
+| `ArchiveRetention` | off | Drop monthly `CompletedJob` and `FailedJob` archives older than this |
+| `ValidateReplyTo` | | [Restrict where results are sent](/background-jobs-workflows#restrict-where-results-are-sent) |
+| `OnJobReplyTo` | | [Customize how results are delivered](/background-jobs-workflows#customize-delivery) |
+
+### Upgrading from v10.2
+
+v10.3 upgrades the Background Jobs schema on startup, and clears Jobs that are still queued or running when
+the upgrade is applied. If you run multiple App Servers, stop all of them before starting the new version,
+rather than doing a rolling deploy. See [Upgrading to v10.3](/releases/v10_03#upgrading-to-v103) for what
+changes and how to prepare.
 
 ::include jobs-shared.md::
 
 ::include command-types.md::
 
 
-# Background Jobs
-Source: https://docs.servicestack.net/background-jobs
+# SQLite Background Jobs
+Source: https://docs.servicestack.net/background-jobs-sqlite
 
 ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It's a easy to use library that seamlessly integrates into existing ServiceStack Apps with a built-in Management UI to provide real-time monitoring, inspection and management of background jobs.
 
@@ -44575,6 +45164,10 @@ and archivable monthly databases on-the-fly without any maintenance overhead or 
 dependencies making it easy to add to any .NET App without impacting or adding increased load to 
 their existing configured databases.
 
+SQLite Background Jobs runs on a single App Server. To process Jobs on multiple App Servers sharing the
+same database, use [RDBMS Background Jobs](/background-jobs-rdbms) with PostgreSQL, SQL Server or MySQL,
+which uses the same `IBackgroundJobs` APIs, Admin UI and data models.
+
 ### Queue APIs or Commands
 
 For even greater reuse you're able to queue your existing ServiceStack APIs
@@ -44585,51 +45178,37 @@ into internal invokable, inspectable and auto-retryable building blocks.
 ### Real Time Admin UI
 
 The Background Jobs Admin UI provides a real time view into the status of all background jobs including 
-their progress, completion times, Executed, Failed and Cancelled Jobs, etc. which is useful for monitoring 
-and debugging purposes. 
+their progress, logs, retries, batches and queues, with controls to cancel, requeue and replay Jobs and
+pause queues. See [Monitoring & Operations](/background-jobs-monitoring#admin-ui) for a tour.
 
-![](/img/pages/jobs/jobs-dashboard.webp)
-
-View Real-time progress of queued Jobs
-
-![](/img/pages/jobs/jobs-queue.webp)
-
-View real-time progress logs of executing Jobs
-
-![](/img/pages/jobs/jobs-logs.webp)
-
-View Job Summary and Monthly Databases of Completed and Failed Jobs
-
-![](/img/pages/jobs/jobs-completed.webp)
-
-View full state and execution history of each Job
-
-![](/img/pages/jobs/jobs-failed.webp)
-
-Cancel Running jobs and Requeue failed jobs
+<screenshot src="/img/pages/jobs/03-job-running.png" title="A running Job streaming its progress and logs live"></screenshot>
 
 ### Feature Overview
-
-Despite being a v1 release it packs all the features we wanted to use in a Background Jobs solution including:
 
  - No infrastructure dependencies
    - Monthly archivable rolling Databases with full Job Execution History
  - Execute existing APIs or versatile Commands
    - Commands auto registered in IOC
- - Scheduled Reoccurring Tasks
-   - Track Last Job Run
- - Serially execute jobs with the same named Worker
- - Queue Jobs dependent on successful completion of parent Job
+ - [Named queues](/background-jobs-queues) with their own concurrency, priorities and rate limits
+   - Pause, resume and re-throttle queues at runtime
+ - Serially execute jobs with the same named Worker, or per
+   [concurrency key](/background-jobs-queues#concurrency-keys)
+ - [Multi-step workflows](/background-jobs-workflows) with Jobs dependent on their parent Job
+ - [Job Batches](/background-jobs-workflows#job-batches) with live progress and completion callbacks
+ - [Await a Job's result](/background-jobs-workflows#await-a-jobs-result) or have it
+   [delivered to a webhook or MQ](/background-jobs-workflows#deliver-results-to-replyto)
+ - [Retries with exponential backoff and jitter](/background-jobs-reliability#retries-and-backoff), with every
+   failed attempt recorded
+ - [Idempotent](/background-jobs-reliability#idempotent-enqueue) and
+   [singleton](/background-jobs-reliability#singleton-jobs) Jobs to prevent duplicate work
+ - [Job expiry](/background-jobs-reliability#job-expiry), timeouts and cancellation
+ - [Durable, time zone aware Recurring Tasks](/recurring-tasks)
  - Queue Jobs to be executed after a specified Date
  - Execute Jobs within the context of an Authenticated User
- - Auto retry failed jobs on a default or per-job limit
- - Timeout Jobs on a default or per-job limit
- - Cancellable Jobs
- - Requeue Failed Jobs
- - Execute custom callbacks on successful execution of Job
  - Maintain Status, Logs and Progress of Executing Jobs
  - Execute transitive (i.e. non-durable) jobs using named workers
- - Attach optional `Tag`, `BatchId`, `CreatedBy`, `ReplyTo` and `Args` with Jobs
+ - [Health checks, OpenTelemetry and Profiling](/background-jobs-monitoring)
+ - Attach optional `Tag`, `TenantId`, `CreatedBy` and `Args` metadata to Jobs
 
 Please [let us know](https://servicestack.net/ideas) if there are any other missing features
 you would love to see implemented.
@@ -44708,9 +45287,816 @@ APIs are executed via the [MQ Request Pipeline](/order-of-operations)
 and commands executed using the [Commands Feature](/commands) where
 it will be also visible in the [Commands Admin UI](/commands#command-admin-ui).
 
+### Configuration
+
+The main `BackgroundsJobFeature` options:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `DbDir` | `App_Data/jobs` | Directory for the Jobs databases |
+| `DbFile` | `jobs.db` | Database for queued Jobs, their history and Scheduled Tasks |
+| `DbMonthFile` | `jobs_{yyyy}-{MM}.db` | Monthly database for the Completed and Failed Jobs archive |
+| `MaxConcurrentJobs` | CPU cores | Jobs each queue runs at once |
+| `QueueConcurrency` | | Per-queue concurrency overrides |
+| `DefaultRetryLimit` | `2` | Retries after a failed attempt |
+| `DefaultRetryBackoff` | `ExponentialJitter` | How retry delays grow |
+| `DefaultRetryDelayMs` | `5000` | Delay before the first retry |
+| `DefaultMaxRetryDelayMs` | `300000` | Longest delay between retries |
+| `DefaultTimeoutSecs` | `600` | How long a Job can run before it's cancelled |
+| `ShutdownTimeoutSecs` | `30` | How long running Jobs have to finish on shutdown |
+| `MaxRequestBodyChars` | `1000000` | Largest Request a Job can be queued with |
+| `MaxResponseBodyChars` | `1000000` | Largest Response that's stored |
+| `MaxJobLogChars` | `100000` | Largest log kept for a Job |
+| `JobSummaryRetention` | off | Delete the history of finished Jobs older than this |
+| `ArchiveRetention` | off | Delete monthly archive databases older than this |
+| `ValidateReplyTo` | | [Restrict where results are sent](/background-jobs-workflows#restrict-where-results-are-sent) |
+| `OnJobReplyTo` | | [Customize how results are delivered](/background-jobs-workflows#customize-delivery) |
+
+### Upgrading from v10.2
+
+v10.3 upgrades the Background Jobs schema on startup, and clears Jobs that are still queued or running when
+the upgrade is applied. See [Upgrading to v10.3](/releases/v10_03#upgrading-to-v103) for what changes and
+how to prepare.
+
 ::include jobs-shared.md::
 
 ::include command-types.md::
+
+
+# Queues, Priorities &amp; Rate Limits
+Source: https://docs.servicestack.net/background-jobs-queues
+
+Different work has different needs: a password reset can't wait behind a bulk import, and a third-party
+API can't be called faster than its quota allows. Background Jobs lets you run each class of work in its
+own **queue**, control how much of it runs at once, and change those limits while your App is running.
+
+Everything on this page works the same with [RDBMS](/background-jobs-rdbms) and
+[SQLite](/background-jobs-sqlite) Background Jobs.
+
+## Queues
+
+Every Job runs on a queue, which is `default` unless you specify one:
+
+```csharp
+jobs.EnqueueCommand<SendPasswordResetCommand>(request, new() {
+    Queue = "emails",
+});
+
+jobs.EnqueueCommand<ImportProductsCommand>(import, new() {
+    Queue = "imports",
+});
+```
+
+Each queue has its own Workers, so a backlog on one queue never delays the Jobs on another.
+
+### Queue concurrency
+
+`MaxConcurrentJobs` sets how many Jobs each queue runs at once, defaulting to the number of CPU cores.
+Use `QueueConcurrency` to give individual queues a different limit:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {     // or BackgroundsJobFeature
+    MaxConcurrentJobs = 8,                      // every queue not listed below
+    QueueConcurrency = {
+        ["imports"] = 2,                        // bulk imports can't take over the server
+        ["emails"] = 4,
+    },
+});
+```
+
+Queues that aren't listed in `QueueConcurrency` use `MaxConcurrentJobs`, so adding a new queue never
+quietly limits it to one Job at a time.
+
+<queue-lanes></queue-lanes>
+
+### Priorities
+
+Within a queue, Jobs with a higher `Priority` are started first. Jobs have a priority of `0` unless you
+specify one:
+
+```csharp
+jobs.EnqueueCommand<SendEmailCommand>(passwordReset, new() {
+    Queue = "emails",
+    Priority = 10,  // ahead of the newsletter
+});
+```
+
+### Named Workers
+
+A named `Worker` runs its Jobs **one at a time**, in the order they were queued, which is useful when work
+must never overlap, e.g. sending emails through an SMTP connection:
+
+```csharp
+jobs.EnqueueCommand<SendEmailCommand>(email, new() { Worker = "smtp" });
+```
+
+Use queues when you want to limit how much of a type of work runs at once, and named Workers when a
+fixed set of work must run strictly one at a time. To keep Jobs in order for each customer or tenant,
+use a [Concurrency Key](#concurrency-keys) instead.
+
+## Control queues at runtime
+
+Queue settings can be changed while your App is running, from code or the
+[Admin UI](/background-jobs-monitoring#queues). Changes are stored in the `JobQueue` table so they take
+effect on every server, and survive restarts.
+
+<screenshot src="/img/pages/jobs/04-queues.png" title="Pause, resume, concurrency and rate limit controls for each queue"></screenshot>
+
+### Pause and resume
+
+When a downstream system is unavailable, pause its queue. Its Jobs stay queued and resume where they left
+off, instead of burning through their retries:
+
+```csharp
+jobs.PauseJobQueue("payments");
+
+// Once the payment provider has recovered
+jobs.ResumeJobQueue("payments");
+```
+
+### Change concurrency
+
+Raise a queue's concurrency to clear a backlog, or lower it to take pressure off a struggling dependency,
+without a redeploy:
+
+```csharp
+jobs.SetJobQueueConcurrency("imports", 4);
+```
+
+### Queue status
+
+`GetJobQueues()` returns the runtime settings of every queue, and `GetJobsStatus()` a point-in-time view of
+the backlog:
+
+```csharp
+foreach (var queue in jobs.GetJobQueues())
+{
+    // queue.Concurrency is only set when overridden at runtime
+    Console.WriteLine($"{queue.Name} paused:{queue.Paused} concurrency:{jobs.GetQueueConcurrency(queue.Name)}");
+}
+
+var status = jobs.AssertQueues().GetJobsStatus();
+Console.WriteLine($"{status.Queued} queued, {status.Running} running, oldest waiting {status.OldestQueued}");
+```
+
+The [Admin UI](/background-jobs-monitoring#queues) also shows each queue's backlog, running Jobs and how long
+its oldest Job has been waiting.
+
+## Rate limits
+
+Concurrency limits how many Jobs run at once, but a quota like "10 calls per second" limits how often Jobs
+**start** - a fast Job running one at a time can still exceed it. Rate limits cap how many Jobs a queue may
+start within a time window:
+
+```csharp
+// At most 10 Jobs start per second
+jobs.SetJobQueueRateLimit("stripe-api", rateLimit: 10, window: TimeSpan.FromSeconds(1));
+
+// Remove the limit
+jobs.SetJobQueueRateLimit("stripe-api", rateLimit: 0);
+```
+
+Jobs over the limit wait in the queue until the next window. With RDBMS Background Jobs the count is kept
+in the database, so the limit applies across **every** server rather than to each one - adding servers
+doesn't multiply your API bill.
+
+## Concurrency keys
+
+Jobs that share a `ConcurrencyKey` run **one at a time**, while Jobs with different keys still run in
+parallel. This keeps each tenant's syncs, each account's ledger updates or each document's edits in order,
+without making everyone else wait behind them:
+
+```csharp
+jobs.EnqueueCommand<SyncTenantDataCommand>(sync, new() {
+    ConcurrencyKey = $"tenant:{sync.TenantId}",
+    TenantId = sync.TenantId,
+});
+```
+
+Unlike a named Worker, which only covers a fixed set of names, a concurrency key can be anything - one per
+customer, order or document.
+
+<tenant-ordering></tenant-ordering>
+
+Keys are held in the `JobConcurrencyLock` table, whose primary key is the concurrency key, so two servers
+can't both run a Job with the same key. Each lock expires, so a server that stops can't hold a key forever.
+
+:::info
+A `ConcurrencyKey` queues Jobs to run one after another. To stop a second Job being queued at all while
+one is active, use a [Singleton Job](/background-jobs-reliability#singleton-jobs) instead.
+:::
+
+## Dedicate servers to queues
+
+With RDBMS Background Jobs, each App Server processes every queue by default. Use `Queues` to restrict a
+server to specific queues, e.g. to only run GPU work on the servers that have one:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    Queues = ["gpu"], // this server only processes Jobs on the gpu queue
+});
+```
+
+Each server also only claims its queue's concurrency plus `MaxPrefetchJobs` (default 100) Jobs ahead of its
+Workers, so one server can't hoard a backlog that others could be running.
+
+
+# Workflows, Batches &amp; Results
+Source: https://docs.servicestack.net/background-jobs-workflows
+
+Background Jobs can do more than run a single task in the background. Jobs can depend on each other to
+form multi-step workflows, fan out as a **Batch** whose progress you can track, and have their results
+awaited or delivered as soon as they complete.
+
+Everything on this page works the same with [RDBMS](/background-jobs-rdbms) and
+[SQLite](/background-jobs-sqlite) Background Jobs.
+
+## Multi-step workflows
+
+A Job queued with `DependsOn` only runs after its parent Job has completed successfully. If the parent
+fails or is cancelled, every Job that depends on it is cancelled too - including Jobs queued after the
+parent had already failed:
+
+```csharp
+var charge  = jobs.EnqueueCommand<ChargePaymentCommand>(order);
+var reserve = jobs.EnqueueCommand<ReserveInventoryCommand>(order, new() { DependsOn = charge.Id });
+var ship    = jobs.EnqueueCommand<ShipOrderCommand>(order, new() {
+    DependsOn = reserve.Id,
+    Callback = nameof(OrderShippedCommand),
+});
+```
+
+Each step can read the Job it depends on, including its Request and Response, from inside the Command:
+
+```csharp
+public class ShipOrderCommand : AsyncCommand<Order>
+{
+    protected override async Task RunAsync(Order order, CancellationToken token)
+    {
+        var job = Request.GetBackgroundJob();
+        var reserved = job.ParentJob; // the completed ReserveInventory Job
+        //...
+    }
+}
+```
+
+### Run however the parent finished
+
+Some steps need to run whether or not the previous step succeeded, like notifying a customer or cleaning
+up temporary files. Queue them with `DependsOnPolicy.OnFinished` to run once the parent has finished in
+any state:
+
+```csharp
+jobs.EnqueueCommand<NotifyCustomerCommand>(order, new() {
+    DependsOn = ship.Id,
+    DependsOnPolicy = JobDependencyPolicy.OnFinished,
+});
+```
+
+The default, `JobDependencyPolicy.OnSuccess`, only runs the Job if its parent completed successfully.
+
+<workflow-simulator></workflow-simulator>
+
+### Callbacks
+
+A `Callback` runs another Command with the result of a successful Job, which lets the same Command's
+results be handled differently for different callers:
+
+```csharp
+jobs.EnqueueCommand<CheckUrlsCommand>(new CheckUrls { Urls = urls }, new() {
+    Callback = nameof(EmailUrlResultsCommand),
+});
+```
+
+## Job Batches
+
+Bulk work like importing a file, resizing a gallery or reprocessing a day of records is queued as many
+Jobs sharing a `BatchId`. A **Job Batch** makes that group trackable: how far through it is, what failed,
+and what to run once it's done.
+
+```csharp
+var batchId = $"gallery-{galleryId}";
+jobs.CreateJobBatch(batchId, total: images.Count,
+    description: "Resize gallery images",
+    callback: nameof(GalleryResizedCommand),    // runs once every Job has finished
+    onSuccess: nameof(PublishGalleryCommand));   // only runs if every Job succeeded
+
+foreach (var image in images)
+{
+    jobs.EnqueueCommand<ResizeImageCommand>(image, new() { BatchId = batchId });
+}
+```
+
+ - `total` is the number of Jobs you'll add. It lets the batch report its progress, and makes sure its
+   callbacks don't run early when Jobs are queued over time.
+ - `callback` runs once every Job has finished, however they finished.
+ - `onSuccess` only runs if every Job in the batch completed successfully.
+
+Both callbacks are Commands that receive the completed `JobBatch`, and are only ever queued once, however
+many servers are processing the batch:
+
+```csharp
+public class GalleryResizedCommand(IEmailer emailer) : AsyncCommand<JobBatch>
+{
+    protected override async Task RunAsync(JobBatch batch, CancellationToken token)
+    {
+        await emailer.SendAsync($"{batch.Completed} of {batch.Total} images resized, {batch.Failed} failed");
+    }
+}
+```
+
+You don't need to create a batch up-front - queueing a Job with a new `BatchId` creates it - but without a
+`total` or callbacks it only groups the Jobs together.
+
+<batch-simulator></batch-simulator>
+
+### Batch progress
+
+A batch's counters are updated in the database as each Job finishes, so its progress can be read from any
+server:
+
+```csharp
+var batch = jobs.GetJobBatch(batchId);
+Console.WriteLine($"{batch.Finished}/{batch.Total} ({batch.Progress:P0}), {batch.Failed} failed");
+```
+
+The [Admin UI](/background-jobs-monitoring#batches) shows the progress of a batch on each of its Jobs, along
+with actions to requeue its failed Jobs or cancel it.
+
+<screenshot src="/img/pages/jobs/09-job-batch.png" title="Batch progress, callbacks and requeueing its failed Jobs"></screenshot>
+
+### Cancel a batch
+
+Cancelling a batch cancels every Job in it that hasn't finished, and prevents any more Jobs being added
+to it:
+
+```csharp
+List<long> cancelledJobIds = jobs.CancelJobBatch(batchId);
+```
+
+Related batches can be grouped with `parentBatchId`, e.g. one batch per file in a multi-file import.
+
+### Fan in after a batch
+
+A Job queued with `DependsOnBatch` waits until every Job in the batch has finished before it runs:
+
+```csharp
+jobs.EnqueueCommand<CreateZipArchiveCommand>(new CreateZip { GalleryId = galleryId }, new() {
+    DependsOnBatch = batchId,
+});
+```
+
+This is an alternative to a batch `callback` when the follow-up work needs its own Request, queue or
+options.
+
+<results-delivery></results-delivery>
+
+## Await a Job's result
+
+`WaitForJobAsync` waits for a durable Job to finish and returns its result, so an API can queue work to be
+run by whichever server has capacity, and still return its result in the same request:
+
+```csharp
+public async Task<object> Any(GenerateReport request)
+{
+    var jobRef = jobs.EnqueueCommand<GenerateReportCommand>(request);
+    var result = await jobs.WaitForJobAsync(jobRef, TimeSpan.FromSeconds(30));
+    return jobs.CreateResponse(result);
+}
+```
+
+It polls for the result, backing off from 100ms to 1s, and throws a `TimeoutException` if the Job hasn't
+finished within the timeout. For work that doesn't need to be durable, `RunCommandAsync` runs a Command
+in-memory and returns its result directly.
+
+## Deliver results to ReplyTo
+
+Give a Job a `ReplyTo` and its result is delivered as soon as it completes:
+
+```csharp
+// POSTed as JSON to a URL
+jobs.EnqueueCommand<BuildReportCommand>(request, new() {
+    ReplyTo = "https://example.org/hooks/report-ready",
+});
+
+// Published to an MQ queue
+jobs.EnqueueCommand<BuildReportCommand>(request, new() {
+    ReplyTo = "report.ready",
+});
+```
+
+ - An `http://` or `https://` URL receives the Response DTO as a JSON POST, with `X-Job-Id`, `X-Job-RefId`,
+   `X-Job-BatchId`, `X-Job-Tag` and `X-Job-State` HTTP Headers so the receiver can correlate the result
+   without parsing the body.
+ - Anything else is treated as a queue name, and the Response is published to it with the registered
+   [MQ Server](/messaging).
+
+A failed delivery is logged, but doesn't fail the Job, which has already run successfully.
+
+### Restrict where results are sent
+
+If a `ReplyTo` can come from your users, restrict where results can be sent so your servers can't be used
+to POST to internal addresses:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    ValidateReplyTo = JobReplyTo.AllowUrlPrefixes(["https://hooks.example.org/"]),
+});
+```
+
+`AllowUrlPrefixes` compares the parsed scheme, host and port rather than the raw string, so a look-alike
+host like `https://hooks.example.org.evil.com` can't pass. A Job with a `ReplyTo` that isn't allowed is
+rejected when it's queued, and it's checked again before the result is sent. MQ queue names are still
+allowed unless you pass `allowMqQueues:false`.
+
+### Customize delivery
+
+Replace `OnJobReplyTo` to sign requests, add authentication, or send results somewhere else entirely:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    OnJobReplyTo = async ctx => {
+        // ctx.Job, ctx.ReplyTo, ctx.Response, ctx.Token
+        if (ctx.ReplyTo.StartsWith("slack:"))
+            await slack.PostAsync(ctx.ReplyTo["slack:".Length..], ctx.Response);
+        else
+            await JobReplyTo.SendAsync(ctx); // default delivery
+    },
+});
+```
+
+
+# Retries &amp; Reliability
+Source: https://docs.servicestack.net/background-jobs-reliability
+
+Background Jobs is built for work that has to happen, and happen once: charging payments, sending emails
+and syncing data with other systems. This page covers how failed Jobs are retried, how to stop work running
+twice or running late, and the limits that keep your Jobs database healthy.
+
+Everything on this page works with both [RDBMS](/background-jobs-rdbms) and [SQLite](/background-jobs-sqlite)
+Background Jobs, except where noted.
+
+## Retries and backoff
+
+A Job that throws is retried up to its `RetryLimit` (default `2`) before it's recorded as **Failed**.
+Retries are spaced out so a failing dependency has time to recover:
+
+```csharp
+jobs.EnqueueCommand<SyncCrmContactCommand>(contact, new() {
+    RetryLimit = 5,
+    RetryBackoff = RetryBackoff.ExponentialJitter,
+    RetryDelay = TimeSpan.FromSeconds(5),       // before the first retry
+    MaxRetryDelay = TimeSpan.FromMinutes(5),    // longest wait between retries
+});
+```
+
+| `RetryBackoff` | Delay before retry *n* |
+| --- | --- |
+| `Fixed` | `RetryDelay` |
+| `Linear` | `RetryDelay` × *n* |
+| `Exponential` | `RetryDelay` × 2<sup>*n*-1</sup> |
+| `ExponentialJitter` (default) | A random delay between half and all of the `Exponential` delay |
+
+Every delay is capped at `MaxRetryDelay`. `ExponentialJitter` spreads retries out after an outage, so all
+the Jobs that failed at the same time don't retry at the same time.
+
+<retry-planner></retry-planner>
+
+Defaults for every Job are configured on the plugin:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {     // or BackgroundsJobFeature
+    DefaultRetryLimit = 2,
+    DefaultRetryBackoff = RetryBackoff.ExponentialJitter,
+    DefaultRetryDelayMs = 5_000,
+    DefaultMaxRetryDelayMs = 300_000,
+});
+```
+
+### Which failures are retried
+
+Jobs that throw an `OperationCanceledException`, e.g. because they were cancelled or timed out, aren't
+retried. Use `ShouldRetry` to decide for yourself, e.g. to not retry validation errors that will never
+succeed:
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    ShouldRetry = (job, ex) => ex is not (OperationCanceledException or ArgumentException),
+});
+```
+
+### Failed attempt history
+
+Every failed attempt is recorded with its error, the server it ran on and how long it took, so an
+intermittent failure shows its full history rather than only the last error:
+
+```csharp
+foreach (var attempt in jobs.GetJobAttempts(jobId))
+{
+    Console.WriteLine($"Attempt {attempt.Attempt} on {attempt.ServerId}: {attempt.Error?.Message}");
+}
+```
+
+The attempts are also listed on each Job in the [Admin UI](/background-jobs-monitoring#job-details):
+
+<screenshot src="/img/pages/jobs/08-job-failed.png" title="Every failed attempt is recorded with its error, server and duration"></screenshot>
+
+### Requeue failed Jobs
+
+A failed Job can be requeued to run again, which clears its previous run state:
+
+```csharp
+jobs.RequeueFailedJob(jobId);
+```
+
+Failed Jobs can also be requeued from the Admin UI, individually or in bulk by Tag or Batch.
+
+## Timeouts
+
+A Job that runs longer than its `TimeoutSecs` (default 10 minutes) is cancelled:
+
+```csharp
+jobs.EnqueueCommand<GenerateReportCommand>(request, new() {
+    Timeout = TimeSpan.FromMinutes(30),
+});
+```
+
+Commands should pass on or check their `CancellationToken` so they stop promptly. A Job that ignores its
+token still releases its Worker once it exceeds its timeout, so the Jobs queued behind it keep moving.
+
+## Cancellation
+
+Queued and running Jobs can be cancelled from code or the Admin UI:
+
+```csharp
+jobs.CancelJob(jobId);
+
+// Cancel every Job in a state or on a named Worker
+jobs.CancelJobs(state: BackgroundJobState.Queued, worker: "smtp");
+```
+
+A queued Job is cancelled immediately. A running Job is asked to stop through its `CancellationToken` -
+with RDBMS Background Jobs this reaches whichever server is executing it - and its completion can't
+overwrite the cancellation afterwards. If a Job fails or is cancelled, the Jobs that
+[depend on it](/background-jobs-workflows#multi-step-workflows) are cancelled too.
+
+## Job expiry
+
+Some work is pointless once it's late, like a reminder for a meeting that's already happened. Give a Job
+an expiry, and if it can't start in time it's cancelled with the `JobExpired` error code instead of running:
+
+```csharp
+jobs.EnqueueCommand<SendMeetingReminderCommand>(reminder, new() {
+    ExpiresIn = TimeSpan.FromMinutes(15),       // or ExpiresAt = meeting.StartTime
+});
+```
+
+## Idempotent enqueue
+
+Networks time out and clients retry, so the same request can arrive twice. Give a Job a meaningful `RefId`
+and use `DuplicateRefIdBehavior.ReturnExisting` so queueing it again returns the Job that already exists,
+instead of creating a duplicate:
+
+```csharp
+var jobRef = jobs.EnqueueCommand<ChargeOrderCommand>(order, new() {
+    RefId = $"charge-order-{order.Id}",
+    DuplicateRefIdBehavior = DuplicateRefIdBehavior.ReturnExisting,
+});
+```
+
+With the default `DuplicateRefIdBehavior.Throw`, queueing a `RefId` that belongs to a different Job throws a
+`DuplicateRefIdException`.
+
+## Singleton Jobs
+
+A `SingletonKey` allows only one Job with that key to be queued or running at a time. Queueing another while
+one is active returns the existing Job instead, e.g. to refresh a cache without piling up refreshes:
+
+```csharp
+jobs.EnqueueCommand<RefreshProductsCacheCommand>(new() {
+    SingletonKey = "refresh-products-cache",
+});
+```
+
+It's enforced by a unique database index, so it holds even when several servers queue the same Job at the
+same moment. Once the Job finishes, the key can be used again.
+
+<dedup-playground></dedup-playground>
+
+| To make sure... | Use |
+| --- | --- |
+| The same request is only ever processed once | `RefId` + `DuplicateRefIdBehavior.ReturnExisting` |
+| Only one Job does this work at a time, and extras are dropped | `SingletonKey` |
+| Jobs for the same entity run in order, one at a time | [`ConcurrencyKey`](/background-jobs-queues#concurrency-keys) |
+| A Job is only queued if your database transaction commits | [Transactional outbox](/background-jobs-rdbms#queue-jobs-in-your-own-transaction) (RDBMS) |
+
+## Graceful shutdown
+
+When your App shuts down, running Jobs are given `ShutdownTimeoutSecs` (default 30s) to finish, and their
+progress and logs are saved. This is registered by the plugin, so it works without changes to your own
+hosted service.
+
+With RDBMS Background Jobs, Jobs that were claimed but never started, and Jobs still running when the
+shutdown timeout runs out, are released straight away so another server picks them up immediately, instead
+of waiting for their lease to expire.
+
+## Protecting your database
+
+Your Jobs database is a work queue, not a blob store. These limits keep it lean:
+
+| Option | Default | Behavior |
+| --- | --- | --- |
+| `MaxRequestBodyChars` | 1M chars | Queueing a Job with a larger serialized Request throws an `ArgumentException`, since a truncated Request couldn't be deserialized. Pass a reference to large payloads instead. |
+| `MaxResponseBodyChars` | 1M chars | Larger Responses aren't stored, and the Job's `Meta` records why its result is missing. |
+| `MaxJobLogChars` | 100K chars | Logs beyond the limit are dropped, and the Job is marked `LogsTruncated`. |
+| `JobSummaryRetention` | off | Deletes the history of finished Jobs older than this. A Job's `RefId` can be reused once its history is deleted. |
+| `ArchiveRetention` | off | Drops monthly `CompletedJob` and `FailedJob` archives older than this. |
+
+```csharp
+services.AddPlugin(new DatabaseJobFeature {
+    JobSummaryRetention = TimeSpan.FromDays(90),
+    ArchiveRetention = TimeSpan.FromDays(365),
+});
+```
+
+## Error codes
+
+Jobs that the Background Jobs runtime fails or cancels itself are recorded with these `JobErrorCodes`:
+
+| Error code | Meaning |
+| --- | --- |
+| `JobExpired` | The Job couldn't start before its `ExpiresAt` deadline |
+| `LeaseExpired` | The Job was abandoned mid-execution, e.g. its server crashed, more times than its `RetryLimit` allows (RDBMS) |
+| `QueueClearedOnUpgrade` | The Job was still queued when its database was upgraded to the v10.3 schema |
+
+
+# Monitoring &amp; Operations
+Source: https://docs.servicestack.net/background-jobs-monitoring
+
+Background Jobs gives you several ways to see what your Jobs are doing: a built-in Admin UI for day-to-day
+operations, ASP.NET health checks for your load balancer and alerting, and OpenTelemetry traces and metrics
+for your existing observability stack.
+
+Everything on this page works with both [RDBMS](/background-jobs-rdbms) and [SQLite](/background-jobs-sqlite)
+Background Jobs.
+
+<observability-pillars></observability-pillars>
+
+## Admin UI
+
+Open **Background Jobs** in the [Admin UI](/admin-ui) to monitor and manage your Jobs in real-time.
+
+### Dashboard
+
+The Dashboard summarizes the Jobs that ran over a period, broken down by Command, API, Worker and Queue,
+along with how long Jobs waited to start. A backlog building up shows in the wait times before Jobs start
+timing out.
+
+<screenshot src="/img/pages/jobs/01-dashboard.png" title="Job activity and statistics over a selected period"></screenshot>
+
+### Queue
+
+The **Queue** tab lists the Jobs that are queued or running, with the progress of running Jobs. Use its
+toolbar to cancel Jobs in bulk by state, worker, queue, tag or batch.
+
+<screenshot src="/img/pages/jobs/02-queue.png" title="Queued and running Jobs"></screenshot>
+
+### Job details
+
+Selecting a Job shows its options, Request and Response, and for running Jobs their live status and logs.
+Depending on its state a Job can be cancelled, requeued or **replayed** - queueing a completed Job again with
+the same arguments, e.g. when a downstream system lost its result.
+
+<screenshot src="/img/pages/jobs/03-job-running.png" title="A running Job streaming its progress and logs live"></screenshot>
+
+Jobs that were retried list each [failed attempt](/background-jobs-reliability#failed-attempt-history) with
+its error, the server it ran on and how long it took:
+
+<screenshot src="/img/pages/jobs/07-job-attempts.png" title="A Job that succeeded after two failed attempts"></screenshot>
+
+### Batches
+
+Jobs in a [Batch](/background-jobs-workflows#job-batches) show the progress of the whole batch, with actions
+to requeue its failed Jobs or cancel the Jobs that haven't finished:
+
+<screenshot src="/img/pages/jobs/09-job-batch.png" title="Batch progress, callbacks and requeueing its failed Jobs"></screenshot>
+
+### Queues
+
+The **Queues** tab shows each queue's backlog, running Jobs and how long its oldest Job has been waiting,
+with controls to pause and resume it and change its [concurrency and rate limit](/background-jobs-queues)
+while your App is running. Changes take effect on every server.
+
+<screenshot src="/img/pages/jobs/04-queues.png" title="Pause, resume, concurrency and rate limit controls for each queue"></screenshot>
+
+### Nodes
+
+The **Nodes** tab lists the App Servers processing Jobs - see [App Servers](#app-servers) below.
+
+<screenshot src="/img/pages/jobs/05-nodes.png" title="App Servers processing Jobs, with their heartbeat, running Jobs and Drain control"></screenshot>
+
+### History
+
+The **History** tab lists every Job that has run with its outcome, and the full details of Completed and
+Failed Jobs in their monthly archives. Failed Jobs can be requeued in bulk by Tag or Batch.
+
+<screenshot src="/img/pages/jobs/06-history.png" title="The history of every Job"></screenshot>
+
+### Scheduled Tasks
+
+The **Scheduled Tasks** tab lists your [Recurring Tasks](/recurring-tasks) with their next run and the
+outcome of their last run, where they can be paused, resumed or run immediately.
+
+<screenshot src="/img/pages/jobs/11-scheduled-tasks.png" title="Scheduled Tasks with their next run, last result and run-now controls"></screenshot>
+
+## App Servers
+
+Each App Server records a heartbeat in the `JobNode` table every `NodeHeartbeatSecs` (default 15s), with its
+machine name, process, version, concurrency and how many Jobs it's running. A clean shutdown is recorded
+too, so a deploy doesn't look like a crash:
+
+```csharp
+foreach (var node in jobs.AssertQueues().GetJobNodes())
+{
+    var alive = node.IsAlive(TimeSpan.FromMinutes(1));
+    Console.WriteLine($"{node.ServerId} running {node.RunningJobs}/{node.Concurrency} alive:{alive}");
+}
+```
+
+### Drain a server
+
+Before taking a server out of service, drain it so it finishes the Jobs it has without taking any more:
+
+```csharp
+jobs.SetJobNodeDraining(serverId, draining: true);
+```
+
+Servers can also be drained from the Nodes tab of the Admin UI.
+
+## Health checks
+
+`JobsHealthCheck` reports Background Jobs to [ASP.NET Core health checks](https://learn.microsoft.com/aspnet/core/host-and-deploy/health-checks),
+so a growing backlog or a queue that's stopped being processed shows up where your team already looks:
+
+```csharp
+services.AddHealthChecks()
+    .AddCheck<JobsHealthCheck>("background-jobs");
+```
+
+It reports **Degraded** or **Unhealthy** based on the size of the backlog, how long the oldest Job has been
+waiting, and whether any App Server is still reporting in. Register `JobsHealthCheckOptions` to change the
+thresholds:
+
+```csharp
+services.AddSingleton(new JobsHealthCheckOptions {
+    DegradedQueuedJobs = 1000,
+    UnhealthyQueuedJobs = 10_000,
+    DegradedWaitTime = TimeSpan.FromMinutes(5),
+    UnhealthyWaitTime = TimeSpan.FromMinutes(30),
+    CheckNodes = true,
+});
+```
+
+## OpenTelemetry
+
+Background Jobs publishes traces and metrics under the `ServiceStack.Jobs` name, which you can export with
+[OpenTelemetry](https://opentelemetry.io/docs/languages/dotnet/):
+
+```csharp
+services.AddOpenTelemetry()
+    .WithTracing(x => x.AddSource(JobsDiagnostics.Name))
+    .WithMetrics(x => x.AddMeter(JobsDiagnostics.Name));
+```
+
+Each Job execution starts an `Activity` tagged with its id, queue, type, attempt, batch and worker. A Job
+records the trace of the request that queued it and continues it when it runs, so an API request and the
+work it queued appear in the same trace.
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `servicestack.jobs.queued` | Counter | Jobs added to a queue |
+| `servicestack.jobs.started` | Counter | Jobs that began executing |
+| `servicestack.jobs.completed` | Counter | Jobs that completed successfully |
+| `servicestack.jobs.failed` | Counter | Jobs that failed permanently |
+| `servicestack.jobs.retried` | Counter | Job attempts that were retried |
+| `servicestack.jobs.cancelled` | Counter | Jobs that were cancelled or expired |
+| `servicestack.jobs.duration` | Histogram (ms) | How long Jobs took to execute |
+| `servicestack.jobs.wait_time` | Histogram (ms) | How long Jobs waited between being queued and starting |
+
+Metrics are tagged with `job.queue`, `job.type`, `job.name` and `job.worker`. Nothing is recorded when no
+listener is configured.
+
+## Profiling
+
+Job executions also appear in the Admin UI's [Profiling](/admin-ui-profiling) page, alongside APIs, the
+Gateway, OrmLite and Redis, showing each Job's Command, queue, batch, worker, attempt and duration.
+`ProfileSource.Jobs` is included in `ProfileSource.All`, or can be enabled on its own:
+
+```csharp
+services.AddPlugin(new ProfilingFeature {
+    Profile = ProfileSource.ServiceStack | ProfileSource.Jobs,
+});
+```
 
 
 # Schedule Recurring Tasks
@@ -44837,11 +46223,73 @@ public class ConfigureBackgroundJobs : IHostingStartup
 }
 ```
 
+<schedule-pillars></schedule-pillars>
+
+## Schedule options
+
+Schedules can be configured to run at the intended local time, within a date range, a limited number of
+times, and to control what happens when an occurrence is missed or the previous one is still running:
+
+```csharp
+var schedule = Schedule.Cron("0 9 * * MON-FRI");
+schedule.TimeZoneId = "America/New_York";                 // 9am New York time, including daylight saving
+schedule.MisfirePolicy = ScheduleMisfirePolicy.Skip;      // don't catch up on missed occurrences
+schedule.OverlapPolicy = ScheduleOverlapPolicy.Skip;      // don't start while the last run is active
+schedule.StartDate = new DateTime(2026, 10, 1);
+schedule.EndDate = new DateTime(2026, 12, 31);
+
+jobs.RecurringCommand<SendDailyDigestCommand>("Daily Digest", schedule);
+```
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `TimeZoneId` | UTC | Time zone the Cron expression is evaluated in, e.g. `Australia/Perth` |
+| `MisfirePolicy` | `RunOnce` | When occurrences were missed, e.g. while the App was down, `RunOnce` runs a single catch-up occurrence and `Skip` waits for the next one |
+| `OverlapPolicy` | `Allow` | `Skip` doesn't start an occurrence while the previous one is still queued or running |
+| `StartDate` | | Don't run before this date |
+| `EndDate` | | Stop running after this date |
+| `MaxRuns` | | Stop running after this many occurrences |
+
+A task that reaches its `EndDate` or `MaxRuns` is disabled. Its `RunCount` is kept when the task is
+registered again on the next startup, so it doesn't start over.
+
+:::info
+`Schedule.Yearly` runs once a year on 1 January. Prior to v10.3 it ran on the first day of every month.
+:::
+
+## Pause, resume and run now
+
+Recurring Tasks can be paused and resumed without deleting their registration, or run immediately without
+changing their ongoing schedule, e.g. to check a change or re-run after a failure:
+
+```csharp
+jobs.SetRecurringTaskEnabled("Daily Digest", enabled: false);
+jobs.SetRecurringTaskEnabled("Daily Digest", enabled: true);
+
+jobs.RunRecurringTaskNow("Daily Digest");
+```
+
+These are also available from the Scheduled Tasks tab of the Admin UI.
+
+## Running on multiple servers
+
+Schedules are stored in the database with their next run, so they're recovered across restarts and every
+server agrees on when a task is next due. Each occurrence is only ever queued **once**, however many servers
+evaluate the schedule, so it's safe to register the same Recurring Tasks on every App Server.
+
+Servers reload the Scheduled Tasks from the database every `ReloadScheduledTasksSecs` (default 60s), so
+pausing, resuming or running a task on one server takes effect on the others, and tasks deleted elsewhere are
+dropped.
+
+An invalid Cron expression or time zone is recorded against its task with the error, without stopping the
+other tasks from running.
+
 ## Background Jobs Admin UI
 
-The last job the Recurring Task ran is also viewable in the Jobs Admin UI: 
+The Scheduled Tasks tab lists each task with its schedule, when it next runs, and the outcome and duration of
+its last run, with controls to pause, resume or run it now:
 
-![](/img/pages/jobs/jobs-scheduled-tasks-last-job.webp)
+<screenshot src="/img/pages/jobs/11-scheduled-tasks.png" title="Scheduled Tasks with their next run, last result and run-now controls"></screenshot>
 
 
 # Commands Feature
@@ -63005,7 +64453,7 @@ Up until this release all of ServiceStack's database features like [AutoQuery](h
 have been database agnostic courtesy of OrmLite's [support for popular RDBMS's](/ormlite/installation)
 so that they integrate into an App's existing configured database.
 
-[Background Jobs](/background-jobs) is our first foray into a SQLite-only backend, as it's the only 
+[Background Jobs](/background-jobs-sqlite) is our first foray into a SQLite-only backend, as it's the only 
 RDBMS that enables us to provide encapsulated black-box functionality without requiring any infrastructure 
 dependencies. It's low latency, high-performance and ability to create lightweight databases on the fly make 
 it ideal for self-managing isolated appliance backends like Background Jobs and Request Logging which don't 
@@ -93693,7 +95141,7 @@ AI Chat resolves `typst` from `$TYPST_PATH` first, then `PATH`. See [PDF Studio]
 
 ## First-run files
 
-On first request AI Chat seeds its configuration into `App_Data/chat`:
+On startup AI Chat writes its configuration into `App_Data/chat`:
 
 <text-block :rows="[
   ['App_Data/chat/llms.json','Providers, defaults, limits, disabled extensions'],
@@ -93702,7 +95150,15 @@ On first request AI Chat seeds its configuration into `App_Data/chat`:
   ['App_Data/chat/cache/','Content-addressed asset cache'],
   ['App_Data/chat/user/{user}/','Per-user prefs, projects, profiles, skills, pdf']]"></text-block>
 
-These files are yours to edit and check in. See [Data & Storage](/chat/data).
+The bundled `llms.json`, `providers.json` and `providers-extra.json` are overwritten on every startup. To keep a modified copy, add it to `PreserveConfigs`:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+See [Data & Storage](/chat/data).
 
 ## What's next
 
@@ -93850,11 +95306,27 @@ See [Custom Extensions](/chat/custom-extensions) for the full `ExtensionContext`
 | `Config` | seeded `llms.json` | The parsed `llms.json` document |
 | `ConfigJson` | - | Write-only setter that parses a JSON string into `Config` |
 | `ProviderModels` | seeded `providers.json` | The models.dev model catalog |
+| `PreserveConfigs` | `[]` | Bundled config files in `App_Data/chat` to keep instead of overwriting on startup |
 | `EnableProviders` | `[]` | Force-enable **only** these providers, overriding `llms.json` |
 | `Variables` | `[]` | `$VAR` substitutions checked **before** environment variables |
 | `ProviderTypes` | built-ins | npm sdk id → provider factory |
 | `Providers` | - | The live (enabled + configured) providers |
 | `LoadingMessages` | `["Computing", …]` | Words shown while a response streams |
+
+### Preserving modified configs
+
+On every startup AI Chat writes its bundled `llms.json`, `providers.json` and `providers-extra.json` to `App_Data/chat`, **overwriting** any existing copies. This keeps the provider catalog and defaults current with each ServiceStack release, but it also discards any edits you've made to those files, including provider changes persisted by the Admin UI.
+
+To keep your modified copy, add its file name to `PreserveConfigs`. A preserved file is only seeded when it doesn't exist yet and is otherwise left untouched:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    // keep your customized llms.json, still refresh providers.json each release
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+Preserved files no longer pick up upstream changes, so when you preserve `providers.json` you're responsible for keeping it current, e.g. with [Update Provider Models](#update-provider-models) below.
 
 ### Update Provider Models
 
@@ -93863,6 +95335,8 @@ Each ServiceStack release includes the latest `providers.json`. To update the pr
 Run the following command from your application's `App_Data/chat` directory to download and overwrite `providers.json`:
 
 <shell-command>curl -fL https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json -o providers.json</shell-command>
+
+Add `"providers.json"` to [PreserveConfigs](#preserving-modified-configs) so the downloaded catalog isn't replaced by the bundled copy on the next restart.
 
 See [Providers & Models](/chat/providers).
 
@@ -93978,6 +95452,7 @@ services.AddPlugin(new ChatFeature {
     // ── Providers ──
     EnableProviders = [],
     Variables = {},
+    PreserveConfigs = [],           // e.g. ["llms.json", "providers.json"]
     LoadingMessages = ["Computing", "Cooking", "Crafting", "Creating"],
 
     // ── Limits ──
@@ -94060,7 +95535,7 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing
 
 ## llms.json
 
-`App_Data/chat/llms.json` is seeded from an embedded default on first run and is yours to edit:
+`App_Data/chat/llms.json` is written from an embedded default on startup:
 
 ```json
 {
@@ -94093,6 +95568,18 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing
 | `disable_extensions` | Merged with `ChatFeature.DisableExtensions` |
 | `providers` | Which providers are enabled, plus any per-provider overrides |
 
+### Preserving your changes
+
+By default the bundled `llms.json`, `providers.json` and `providers-extra.json` **overwrite** the copies in `App_Data/chat` on every startup, so each release ships with current defaults and an up-to-date model catalog. To keep a modified copy, list it in `PreserveConfigs`. It's then only seeded when missing:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json", "providers-extra.json"],
+});
+```
+
+See [Preserving modified configs](/chat/configuration#preserving-modified-configs).
+
 ### Supplying config in code
 
 Set `Config` (or `ConfigJson`) to bypass the `App_Data` file entirely - useful when configuration should come from your appsettings or a secret store:
@@ -94117,7 +95604,7 @@ var count = await feature.UpdateProviderModelsAsync();
 
 ### providers-extra.json
 
-Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in `App_Data/chat/providers-extra.json` and survive every catalog refresh:
+Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in `App_Data/chat/providers-extra.json` and survive every catalog refresh. Add `"providers-extra.json"` to `PreserveConfigs` so your entries also survive restarts:
 
 ```json
 {
@@ -94134,7 +95621,7 @@ Models that aren't in models.dev - a private deployment, a preview model, a self
 
 ## Enabling and disabling at runtime
 
-Providers can be toggled without a restart. Both persist the change to `llms.json` and rebuild the live provider set:
+Providers can be toggled without a restart. Both persist the change to `llms.json` and rebuild the live provider set. Add `"llms.json"` to `PreserveConfigs` so toggled providers stay that way after a restart:
 
 ```csharp
 // returns null on success, or the reason it couldn't be enabled
@@ -95086,13 +96573,13 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-See [MCP Server](/chat/mcp).
+See [MCP Server](/chat/mcp_server).
 
 
 # Tools
 Source: https://docs.servicestack.net/chat/tools
 
-AI Chat has a single **Tool Registry** shared by chat models, custom extensions, ServiceStack Commands, [API Tools](/chat/api-tools) and the [MCP Server](/chat/mcp). Tools are described with JSON Schema, grouped for selection, and rendered as compact expandable calls in conversation history.
+AI Chat has a single **Tool Registry** shared by chat models, custom extensions, ServiceStack Commands, [API Tools](/chat/api-tools), [MCP Clients](/chat/mcp_client) and the [MCP Server](/chat/mcp_server). Tools are described with JSON Schema, grouped for selection, and rendered as compact expandable calls in conversation history.
 
 <screenshot src="/img/pages/chat/tools/llm-tool-call.webp" title="A tool call rendered in conversation history"></screenshot>
 
@@ -95455,7 +96942,7 @@ public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderRespons
 
 When set, MCP responses - `api_search`, `api_describe` and confirmation summaries - prefer it over `[Description]`, whilst every non-MCP consumer continues to see the original.
 
-Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp#approval-across-the-mcp-boundary) without asking a human.
+Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp_server#approval-across-the-mcp-boundary) without asking a human.
 
 ## Your metadata becomes AI context
 
@@ -95559,15 +97046,17 @@ Mcp = {
 }
 ```
 
-See [MCP Server](/chat/mcp) and [Connect MCP Clients](/chat/connect-mcp).
+See [MCP Server](/chat/mcp_server) and [Connect MCP Clients](/chat/connect-mcp).
 
 <screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot>
 
 
 # MCP Server
-Source: https://docs.servicestack.net/chat/mcp
+Source: https://docs.servicestack.net/chat/mcp_server
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
+
+To use tools hosted by another MCP server *inside* AI Chat, see [MCP Clients](/chat/mcp_client).
 
 <text-block text="https://example.org/chat/mcp"></text-block>
 
@@ -95760,6 +97249,257 @@ See [Custom Extensions](/chat/custom-extensions) for registering tools.
 - Register a distributed `ICacheClient` for single-use token replay protection across instances.
 - Keep `[Tool(Safety)]` accurate - it drives both confirmation token requirements and MCP safety annotations.
 - Remember the key's user is the identity every call runs as: scope its roles accordingly.
+
+
+# MCP Clients
+Source: https://docs.servicestack.net/chat/mcp_client
+
+AI Chat can connect to **remote Model Context Protocol (MCP) servers** and use their tools in a
+conversation. A user can add a personal connection in the Tools page; a host can provide shared
+connections. Discovered tools appear alongside [API Tools](/chat/api-tools) and other
+[Chat tools](/chat/tools), with per-call review before execution.
+
+This is the **outbound** MCP client. The separate [MCP Server](/chat/mcp_server) publishes your App's tools to
+external assistants. Enabling either feature does not enable the other, and remote tools are not
+automatically republished through your App's MCP endpoint.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-01-tools.webp" title="MCP Connections alongside the built-in MCP Server and conversation tools"></screenshot>
+
+## Enable MCP connections
+
+The C# `McpClientExtension` is opt-in. Enable it on `ChatFeature` before registering the plugin:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    McpClient = {
+        Enabled = true,
+    },
+});
+```
+
+An enabled client with no connections does not contact a remote server. Connections are made when a
+user connects one or a conversation needs its tools. Personal connections require an authenticated
+Chat host. Bearer tokens and OAuth credentials require ASP.NET Core Data Protection with **persistent
+keys**; instances serving the same users must share those keys and the Chat database. OAuth also
+requires a host-configured callback URL, described [below](#connect-with-oauth).
+
+## Add a connection in the UI
+
+Open **Tools → MCP Connections → Add connection**. Give the server a name and its Streamable HTTP URL,
+choose **Authentication**, then select **Connect**. For a server with no credentials, leave
+Authentication at **None**. The connection's status and discovered tools appear on the same page.
+
+Personal connections belong to the signed-in user. Host-provided connections are marked **Shared**;
+users can connect and select their tools, while the host controls their settings. Personal connections
+can be edited or removed with **Settings** and **Connection options**.
+
+### Connect with a Bearer token
+
+For GitHub's hosted MCP server:
+
+1. Set **Name** to `GitHub` and **Server URL** to `https://api.githubcopilot.com/mcp/`.
+2. Select **Bearer token / personal access token** under Authentication.
+3. Paste your GitHub PAT into **Bearer token**, without the `Bearer ` prefix, and select **Connect**.
+4. Open **Tools** on the connected server and choose the tools for your conversation.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-02-add-connection-bearer-token.webp" title="Add the GitHub MCP server with a personal access token"></screenshot>
+
+AI Chat sends the token as `Authorization: Bearer <token>`. The token is encrypted in the host's
+credential store, scoped to this account and connection, and is **not** written into `config.json` or
+returned to the browser. When editing a connection, leave the token field blank to retain the saved
+token; enter a new one to rotate it. A settings change may require you to enter it again. **Clear saved
+credentials** deletes the stored token; **Disable** retains it. Tokens that expire or are revoked must
+be replaced in Settings.
+
+### Connect with OAuth
+
+OAuth requires a client registered with the provider. Configure the callback URL on the host, using
+the public HTTPS URL that the browser will return to:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    McpClient = {
+        Enabled = true,
+        OAuthRedirectUri = new Uri("https://chat.example.com/chat/ext/mcp_client/oauth/callback"),
+    },
+});
+```
+
+The Chat host must require sign-in and use persistent Data Protection keys. Register an OAuth App
+with the remote provider using the **exact callback URL** shown in the connection form. Then add an
+MCP connection with Authentication set to **OAuth**, supplying the registered **Client ID**.
+The connection requests scopes advertised by the MCP server automatically. Advanced OAuth settings
+can supply fallback scopes if the server advertises none. The sign-in provider is discovered from the MCP
+server URL. If the server advertises more than one, choose the provider where you registered your App.
+Only servers without discovery metadata need an **Issuer URL** in Advanced OAuth settings. Supply a
+**Client secret** when the provider requires one; it is stored encrypted, not in the connection JSON.
+
+For GitHub's hosted MCP server, use `https://api.githubcopilot.com/mcp/` as the Server URL. The
+connection discovers GitHub's authorization server automatically. A GitHub OAuth App needs a client ID and secret.
+Register the callback URL displayed by your Chat host with that App. GitHub's hosted MCP server
+does not dynamically register the OAuth client for you.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-09-add-connection-oauth.webp" title="Configure GitHub OAuth with a registered client, secret and callback URL"></screenshot>
+
+Select **Connect**, open the provider's sign-in page, and authorize the App. On success, the sign-in
+page attempts to close and the Tools page loads the connection's tools. If the browser keeps the tab
+open, select **Close this tab**; use **Load tools** on the Tools page if it has not refreshed yet.
+If an existing connection reports `access_denied`, choose **Reauthorize** under its Connection
+options and grant the requested access at the provider.
+
+<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'Authorize the OAuth App': '/img/pages/chat/mcp_client/mcp_client-10-oauth-signin.webp',
+    'Connected OAuth tools': '/img/pages/chat/mcp_client/mcp_client-11-oauth-connected-show-tools.webp',
+}"></screenshots-gallery>
+
+Clearing credentials removes the saved OAuth tokens but keeps the encrypted client secret so the
+account can sign in again. Removing or reconfiguring the connection clears that secret; an edited
+connection may need it to be entered again. Revoking the provider's authorization is a separate
+action in the provider's account settings. A host restart during an in-progress sign-in requires a
+new sign-in attempt.
+
+## Choose tools for a conversation
+
+Select **Tools** on a connected server to inspect its discovered tools and input schemas. Search by
+name or description, select individual tools, or use **Select all results** to select everything in
+the current filtered search. The chosen tools become available to the model in that conversation.
+
+<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'Search the connected server catalog': '/img/pages/chat/mcp_client/mcp_client-04-connected-filter-tools.webp',
+    'Select all matching tools': '/img/pages/chat/mcp_client/mcp_client-05-connected-select-tools.webp',
+}"></screenshots-gallery>
+
+Each server has a tool group such as `mcp_github`; tool aliases are generated by AI Chat, so use the
+names shown in the Tools page instead of constructing them yourself. Selecting **All** in a
+conversation includes local tools by default. A host can explicitly opt a remote connection into
+that selection with `includeInAll`; otherwise select its group or tools directly.
+
+The **refresh icon** reloads the displayed connection status. **Connect all** contacts every enabled
+connection and refreshes its tools with saved credentials. Use **Connection options → Disable** to
+exclude one from Connect all and tool discovery without deleting its credentials; **Enable & connect**
+restores it. **Refresh tools** reloads one server's catalog. OAuth connections that need a browser
+sign-in must be connected individually.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-08-connection-options.webp" title="Refresh, disable or clear a connection without changing other servers"></screenshot>
+
+## Review and approve remote calls
+
+A new personal MCP tool call pauses the conversation for approval. The request shows the connection,
+tool description, input schema and proposed JSON arguments. You can edit the arguments before
+choosing **Approve and run**, or reject the call.
+
+<screenshot src="/img/pages/chat/mcp_client/mcp_client-07-approve-new-request.webp" title="Review and edit the arguments before a remote MCP call runs"></screenshot>
+
+**Always approve this tool** remembers approval for that particular tool on this connection, for
+future calls with any arguments. Use it only when that is the access you intend to grant. The Tools
+list shows an approval label beside the tool; remove it with its **×** to require approval again.
+Host-defined shared connections can set approval policy separately. Server-provided read-only hints
+do not, by themselves, bypass approval.
+
+The call and response remain in the conversation. Text and structured JSON are displayed directly;
+supported images and audio remain attached to the user's conversation rather than being published
+to a shared media cache.
+
+<screenshots-gallery grid-class="grid grid-cols-1 md:grid-cols-2 gap-4" :images="{
+    'MCP request in a conversation': '/img/pages/chat/mcp_client/mcp_client-06-github-request.webp',
+    'Inspect the returned result': '/img/pages/chat/mcp_client/mcp_client-08-view-response.webp',
+}"></screenshots-gallery>
+
+If a call was dispatched but its response was lost, AI Chat marks its outcome **uncertain**. It does
+not replay the operation. Check the remote service for its actual result, then use **I checked —
+continue without replay** to let the conversation proceed. That acknowledgment does not re-run the
+tool or guarantee that the remote operation did or did not occur.
+
+## Host-managed connections
+
+The host can offer connections to everyone or to an authorized audience. Configuration is scoped to
+the `App_Data/chat` user folders:
+
+| File | Purpose |
+| --- | --- |
+| `user/default/mcp_client/config.json` | Shared, host-managed connections |
+| `user/<username>/mcp_client/config.json` | Personal connections managed through that user's UI |
+
+For example, a shared connection to a service without remote authentication can be configured as:
+
+```json
+{
+  "servers": [
+    {
+      "id": "knowledge",
+      "displayName": "Company Knowledge",
+      "endpoint": "https://knowledge.example.com/mcp",
+      "auth": { "mode": "anonymous" },
+      "allowedTools": ["search", "read_document"],
+      "deniedTools": [],
+      "includeInAll": false
+    }
+  ]
+}
+```
+
+The host can also define a connection in code when it needs a secret manager or custom authorization:
+
+```csharp
+var chat = new ChatFeature();
+chat.McpClient.Enabled = true;
+chat.McpClient.CredentialStore = mySecretStore; // IMcpClientCredentialStore
+chat.McpClient.Servers.Add(new McpClientServer {
+    Id = "knowledge",
+    DisplayName = "Company Knowledge",
+    Endpoint = new Uri("https://knowledge.example.com/mcp"),
+    Auth = McpClientAuth.HostSecret("knowledge-token"),
+    AllowedTools = ["search", "read_document"],
+    RequiredRoles = ["Employee"],
+    Authorize = (context, operation) => Task.FromResult(context.User != null),
+});
+services.AddPlugin(chat);
+```
+
+`IMcpClientCredentialStore` resolves the secret reference to an access token and a revision; update
+the revision when rotating the secret. A shared host-secret connection must name an audience with
+`AllowedUsers` or an `Authorize` callback. Shared files can also set `requiredRoles`, `approval`,
+`toolsWithoutApproval` and `revision`. Personal connections cannot override a shared ID or weaken
+host limits, audiences and network policy.
+
+`allowedTools` is a host exposure policy: an empty list exposes nothing, `"*"` permits every
+discovered tool, and `deniedTools` always takes precedence. A user's conversation selection is
+separate from this host allow-list. New personal connections allow discovered tools by default,
+while every new tool call still asks for approval. Configuration files are re-read without a host
+restart; host-level changes such as callback URL or network policy require one.
+
+The config files contain connection metadata, **not Bearer or OAuth tokens**. Personal saves are
+atomic and use a revision check to reject stale browser tabs. For multiple App Servers, share the
+configuration directory as well as the Chat database and Data Protection keys.
+
+### Durable agent runs
+
+A paused agent can continue after approval or a process restart only if it is still authorized to
+use the connection. For background continuation, set `McpClient.ReauthorizeBackgroundRequest` to
+return a **current host-authorized request** for the saved username. Return `null` when the account,
+tenant or roles no longer allow access. A stored username or tool catalog is not an authorization
+grant, and a remote invocation with an uncertain outcome is never replayed on recovery.
+
+## Limits and troubleshooting
+
+Outbound connections use HTTPS on port 443 with normal certificate checks by default. The host
+must explicitly allow other ports or private destinations through `McpClient.NetworkPolicy`.
+Automatic redirects, ambient cookies and proxy credentials are not inherited. Discovery has a
+15-second deadline; a tool call has a 60-second deadline, also bounded by the Chat tool timeout.
+Catalogs and responses have size limits, and schemas are validated before arguments are sent.
+
+| Symptom | What to check |
+| --- | --- |
+| **MCP Connections** does not appear | The host has enabled `chat.McpClient.Enabled` and loaded the `mcp_client` extension. |
+| **Invalid MCP configuration** | The server URL and host network policy; for Bearer or OAuth, authenticated Chat and persistent Data Protection; for OAuth, `OAuthRedirectUri`, client ID and a discoverable sign-in provider or Advanced issuer override. |
+| **Could not connect** | Server availability, HTTPS certificate, saved credentials and the host logs. Reconnect after rotating a token. |
+| **Connected but no tools** | Open **Tools**, refresh the catalog, check the host's `allowedTools` policy, and select tools for the conversation. |
+| **Authorization finished but tools are not loaded** | Return to the original Tools tab and select **Load tools**. A host restart during sign-in requires a new sign-in. |
+| **Remote result is uncertain** | Inspect the remote service, then continue without replay. The operation is not automatically repeated. |
+
+Only Streamable HTTP tool discovery and calls are supported here. Local stdio MCP processes,
+legacy HTTP+SSE transport, MCP prompts and resources browsing, and server-initiated
+sampling/elicitation are outside this client feature.
 
 
 # Connect MCP Clients
@@ -99124,7 +100864,15 @@ Cached files are served at `{RoutePrefix}/~cache/{path}` to authenticated users.
 
 ### Seeded config files
 
-`llms.json`, `providers.json` and `providers-extra.json` are seeded from embedded defaults on first run and then belong to you - edit them, check them into source control, or bypass them entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
+`llms.json`, `providers.json` and `providers-extra.json` are written from embedded defaults on startup, **overwriting** existing copies so they stay current with each release. To edit one and keep your changes, add its file name to `ChatFeature.PreserveConfigs`. It's then only seeded when missing:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+Alternatively, bypass `llms.json` entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
 
 ## PDF storage
 
@@ -109612,7 +111360,7 @@ It's already been used to execute millions of LLM and Comfy UI Requests to gener
 and Generated Images used to populate the
 [Blazor Diffusion](https://github.com/NetCoreApps/BlazorDiffusionVue) and [pvq.app](https://pvq.app) websites. 
 
-It was the project used to develop and test [Background Jobs](/background-jobs) in action 
+It was the project used to develop and test [Background Jobs](/background-jobs-sqlite) in action 
 where it serves as a private gateway to process all LLM, AI and image transformations requests 
 that any of our Apps need where it dynamically delegates requests across multiple Ollama, 
 Open AI Chat, LLM Gateway, Comfy UI, Whisper and ffmpeg providers. 
@@ -111113,6 +112861,24 @@ ways for inserting large amounts of data from code, which is encapsulated behind
 ```csharp
 db.BulkInsert(rows);
 ```
+
+## Async Bulk Inserts
+
+Use `BulkInsertAsync` when inserting rows from an async workflow. It has the same `BulkInsertConfig`
+options as `BulkInsert` and accepts a `CancellationToken`:
+
+```csharp
+await db.BulkInsertAsync(rows, token: cancellationToken);
+
+await db.BulkInsertAsync(rows, new BulkInsertConfig {
+    Mode = BulkInsertMode.Sql,
+    BatchSize = 1000,
+}, cancellationToken);
+```
+
+The async API uses each provider's bulk insert implementation, including PostgreSQL binary import,
+SQL Server bulk copy and the MySQL bulk loaders. `BulkInsertMode.Sql` instead sends batched multi-row
+`INSERT` statements asynchronously. 
 
 ## Bulk Insert Implementations
 
@@ -122528,7 +124294,7 @@ To switch from SQLite to PostgreSQL/SQL Server/MySQL:
 npx add-in ef-postgres
 :::
 
-2. Install `db-identity` to also switch to use this RDBMS for [Background Jobs](/rdbms-background-jobs) and [Request Logs Analytics](/admin-ui-rdbms-analytics):
+2. Install `db-identity` to also switch to use this RDBMS for [Background Jobs](/background-jobs-rdbms) and [Request Logs Analytics](/admin-ui-rdbms-analytics):
 
 :::sh {.mb-8}
 npx add-in db-identity
