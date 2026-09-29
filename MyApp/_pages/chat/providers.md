@@ -54,7 +54,7 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing
 
 ## llms.json
 
-`App_Data/chat/llms.json` is seeded from an embedded default on first run and is yours to edit:
+`App_Data/chat/llms.json` is written from an embedded default on startup:
 
 ```json
 {
@@ -87,6 +87,18 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing
 | `disable_extensions` | Merged with `ChatFeature.DisableExtensions` |
 | `providers` | Which providers are enabled, plus any per-provider overrides |
 
+### Preserving your changes
+
+By default the bundled `llms.json`, `providers.json` and `providers-extra.json` **overwrite** the copies in `App_Data/chat` on every startup, so each release ships with current defaults and an up-to-date model catalog. To keep a modified copy, list it in `PreserveConfigs`. It's then only seeded when missing:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json", "providers-extra.json"],
+});
+```
+
+See [Preserving modified configs](/chat/configuration#preserving-modified-configs).
+
 ### Supplying config in code
 
 Set `Config` (or `ConfigJson`) to bypass the `App_Data` file entirely - useful when configuration should come from your appsettings or a secret store:
@@ -111,7 +123,7 @@ var count = await feature.UpdateProviderModelsAsync();
 
 ### providers-extra.json
 
-Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in `App_Data/chat/providers-extra.json` and survive every catalog refresh:
+Models that aren't in models.dev - a private deployment, a preview model, a self-hosted checkpoint - go in `App_Data/chat/providers-extra.json` and survive every catalog refresh. Add `"providers-extra.json"` to `PreserveConfigs` so your entries also survive restarts:
 
 ```json
 {
@@ -128,7 +140,7 @@ Models that aren't in models.dev - a private deployment, a preview model, a self
 
 ## Enabling and disabling at runtime
 
-Providers can be toggled without a restart. Both persist the change to `llms.json` and rebuild the live provider set:
+Providers can be toggled without a restart. Both persist the change to `llms.json` and rebuild the live provider set. Add `"llms.json"` to `PreserveConfigs` so toggled providers stay that way after a restart:
 
 ```csharp
 // returns null on success, or the reason it couldn't be enabled

@@ -19,7 +19,7 @@ const ExtensionCatalog = {
             { name:'tools', category:'Tools', href:'/chat/tools', text:'The shared Tool Registry and the tools panel.', keywords:'registry groups' },
             { name:'core_tools', category:'Tools', href:'/chat/tools', text:'Utilities, math and code execution tools.', keywords:'calc time run' },
             { name:'api_tools', category:'Tools', href:'/chat/api-tools', text:'Discovery and invocation of the App’s own ServiceStack APIs.', keywords:'api_search api_describe api_call' },
-            { name:'mcp', category:'Tools', href:'/chat/mcp', text:'The built-in MCP Server at /chat/mcp.', keywords:'model context protocol external assistants' },
+            { name:'mcp', category:'Tools', href:'/chat/mcp_server', text:'The built-in MCP Server at /chat/mcp.', keywords:'model context protocol external assistants' },
             { name:'computer', category:'Off by default', href:'/chat/tools', badge:'opt-in', text:'Filesystem tools and run_bash.', keywords:'shell bash files dangerous' },
             { name:'publish', category:'Off by default', href:'/chat/overview', badge:'opt-in', text:'Sharing threads, projects and media.', keywords:'share public' },
             { name:'gemini', category:'Knowledge', href:'/chat/gemini-rag', text:'Gemini File Stores for RAG, Website Search and Assistants.', keywords:'rag search assistant filestore' },

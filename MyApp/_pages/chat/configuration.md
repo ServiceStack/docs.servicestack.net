@@ -137,11 +137,27 @@ See [Custom Extensions](/chat/custom-extensions) for the full `ExtensionContext`
 | `Config` | seeded `llms.json` | The parsed `llms.json` document |
 | `ConfigJson` | - | Write-only setter that parses a JSON string into `Config` |
 | `ProviderModels` | seeded `providers.json` | The models.dev model catalog |
+| `PreserveConfigs` | `[]` | Bundled config files in `App_Data/chat` to keep instead of overwriting on startup |
 | `EnableProviders` | `[]` | Force-enable **only** these providers, overriding `llms.json` |
 | `Variables` | `[]` | `$VAR` substitutions checked **before** environment variables |
 | `ProviderTypes` | built-ins | npm sdk id → provider factory |
 | `Providers` | - | The live (enabled + configured) providers |
 | `LoadingMessages` | `["Computing", …]` | Words shown while a response streams |
+
+### Preserving modified configs
+
+On every startup AI Chat writes its bundled `llms.json`, `providers.json` and `providers-extra.json` to `App_Data/chat`, **overwriting** any existing copies. This keeps the provider catalog and defaults current with each ServiceStack release, but it also discards any edits you've made to those files, including provider changes persisted by the Admin UI.
+
+To keep your modified copy, add its file name to `PreserveConfigs`. A preserved file is only seeded when it doesn't exist yet and is otherwise left untouched:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    // keep your customized llms.json, still refresh providers.json each release
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+Preserved files no longer pick up upstream changes, so when you preserve `providers.json` you're responsible for keeping it current, e.g. with [Update Provider Models](#update-provider-models) below.
 
 ### Update Provider Models
 
@@ -150,6 +166,8 @@ Each ServiceStack release includes the latest `providers.json`. To update the pr
 Run the following command from your application's `App_Data/chat` directory to download and overwrite `providers.json`:
 
 <shell-command>curl -fL https://raw.githubusercontent.com/ServiceStack/llms/refs/heads/main/llms/providers.json -o providers.json</shell-command>
+
+Add `"providers.json"` to [PreserveConfigs](#preserving-modified-configs) so the downloaded catalog isn't replaced by the bundled copy on the next restart.
 
 See [Providers & Models](/chat/providers).
 
@@ -265,6 +283,7 @@ services.AddPlugin(new ChatFeature {
     // ── Providers ──
     EnableProviders = [],
     Variables = {},
+    PreserveConfigs = [],           // e.g. ["llms.json", "providers.json"]
     LoadingMessages = ["Computing", "Cooking", "Crafting", "Creating"],
 
     // ── Limits ──

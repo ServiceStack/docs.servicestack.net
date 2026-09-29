@@ -13,6 +13,24 @@ ways for inserting large amounts of data from code, which is encapsulated behind
 db.BulkInsert(rows);
 ```
 
+## Async Bulk Inserts
+
+Use `BulkInsertAsync` when inserting rows from an async workflow. It has the same `BulkInsertConfig`
+options as `BulkInsert` and accepts a `CancellationToken`:
+
+```csharp
+await db.BulkInsertAsync(rows, token: cancellationToken);
+
+await db.BulkInsertAsync(rows, new BulkInsertConfig {
+    Mode = BulkInsertMode.Sql,
+    BatchSize = 1000,
+}, cancellationToken);
+```
+
+The async API uses each provider's bulk insert implementation, including PostgreSQL binary import,
+SQL Server bulk copy and the MySQL bulk loaders. `BulkInsertMode.Sql` instead sends batched multi-row
+`INSERT` statements asynchronously. 
+
 ## Bulk Insert Implementations
 
 <bulk-paths>

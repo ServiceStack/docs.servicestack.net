@@ -43,7 +43,7 @@ const ChatAnatomy = {
               text:'Call models from your own C# without an HTTP hop or a second SDK.' },
             { icon:'⚡', name:'API Tools', where:'/chat/api-tools',
               text:'Models discover and call your existing APIs as the signed-in user.' },
-            { icon:'🔗', name:'MCP Server', where:'/chat/mcp',
+            { icon:'🔗', name:'MCP Server', where:'/chat/mcp_server',
               text:'Expose a named subset of tools to external AI assistants.' },
             { icon:'📚', name:'Gemini RAG', where:'/chat/gemini-rag',
               text:'Managed knowledge bases, Website Search and published Assistants.' },

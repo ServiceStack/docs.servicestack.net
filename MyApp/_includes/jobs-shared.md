@@ -3,19 +3,42 @@
 The behavior for each `Enqueue*` method for executing background jobs can be customized with 
 the following options: 
 
+**When and where it runs**
+
+ - `Queue` - Run the job on a [named queue](/background-jobs-queues) with its own concurrency, e.g. `emails`
+ - `Priority` - Higher priority jobs are started first within their queue
  - `Worker` - Serially process job using a named worker thread 
- - `Callback` - Invoke another command with the result of a successful job 
- - `DependsOn` - Execute jobs after successful completion of a dependent job
-   - If parent job fails all dependent jobs are cancelled
- - `UserId` - Execute within an Authenticated User Context
+ - `ConcurrencyKey` - Jobs sharing a key [run one at a time](/background-jobs-queues#concurrency-keys), while different keys run in parallel
  - `RunAfter` - Queue jobs that are only run after a specified date
+ - `ExpiresAt` / `ExpiresIn` - [Cancel the job](/background-jobs-reliability#job-expiry) instead of running it late
+ - `UserId` - Execute within an Authenticated User Context
+
+**Workflows**
+
+ - `DependsOn` - Execute jobs after completion of a parent job
+   - `DependsOnPolicy` - Run only if the parent succeeded (default), or [however it finished](/background-jobs-workflows#run-however-the-parent-finished)
+ - `DependsOnBatch` - Execute after [every job in a batch](/background-jobs-workflows#fan-in-after-a-batch) has finished
+ - `BatchId` - Add the job to a [Job Batch](/background-jobs-workflows#job-batches) to track its progress
+ - `Callback` - Invoke another command with the result of a successful job 
+ - `ReplyTo` - [Deliver the result](/background-jobs-workflows#deliver-results-to-replyto) to a URL or MQ queue when the job completes
+
+**Failure handling**
+
  - `RetryLimit` - Override default retry limit for how many attempts should be made to execute a job
- - `TimeoutSecs` - Override default timeout for how long a job should run before being cancelled
+ - `RetryBackoff`, `RetryDelay`, `MaxRetryDelay` - How long to [wait between retries](/background-jobs-reliability#retries-and-backoff)
+ - `TimeoutSecs` / `Timeout` - Override default timeout for how long a job should run before being cancelled
+
+**Preventing duplicates**
+
  - `RefId` - Allow clients to specify a unique Id (e.g Guid) to track job
+   - `DuplicateRefIdBehavior` - [Return the existing job](/background-jobs-reliability#idempotent-enqueue) when the same `RefId` is queued again
+ - `SingletonKey` - Only allow [one queued or running job](/background-jobs-reliability#singleton-jobs) with this key
+
+**Metadata**
+
  - `Tag` - Group related jobs under a user specified tag
+ - `TenantId` - The tenant the job belongs to, for filtering and reporting
  - `CreatedBy` - Optional field for capturing the owner of a job
- - `BatchId` - Group multiple jobs with the same Id
- - `ReplyTo` - Optional field for capturing where to send notification for completion of a Job
  - `Args` - Optional String Dictionary of Arguments that can be attached to a Job
 
 
@@ -50,7 +73,8 @@ var result = await jobs.RunCommandAsync<SendEmailCommand>(new SendEmail {...},
 
 ### Serially Execute Jobs with named Workers
 
-By default jobs are executed immediately in a new Task, we can also change the behavior to
+By default jobs are executed by the Workers of their [queue](/background-jobs-queues), which run up to
+`MaxConcurrentJobs` (default: the number of CPU cores) jobs at a time. We can also change the behavior to
 instead execute jobs one-by-one in a serial queue by specifying them to use the same named 
 worker as seen in the example above.
 
@@ -69,7 +93,7 @@ public class SendEmailCommand(IBackgroundJobs jobs) : SyncCommand<SendEmail>
 
 Callbacks can be used to extend the lifetime of a job to include processing a callback to process its results.
 This is useful where you would like to reuse the the same command but handle the results differently,
-e.g. the same command can email results or invoke a webhook by using a callback:
+e.g. the same command can email results or post them to Slack by using a callback:
 
 ```csharp
 jobs.EnqueueCommand<CheckUrlsCommand>(new CheckUrls { Urls = allUrls },
@@ -79,8 +103,7 @@ jobs.EnqueueCommand<CheckUrlsCommand>(new CheckUrls { Urls = allUrls },
 
 jobs.EnqueueCommand<CheckUrlsCommand>(new CheckUrls { Urls = criticalUrls },
     new() {
-        Callback = nameof(WebhookUrlResultsCommand),
-        ReplyTo = callbackUrl
+        Callback = nameof(SlackUrlResultsCommand),
     });
 ```
 
@@ -162,6 +185,11 @@ public class CheckUrlsCommand(IHttpClientFactory factory, IBackgroundJobs jobs)
 Where any dependent jobs are only executed if the job was successfully completed. 
 If instead an exception was thrown during execution, the job will be failed and
 all its dependent jobs cancelled and removed from the queue.
+
+:::tip
+See [Workflows & Batches](/background-jobs-workflows) for running a job however its parent finished,
+tracking the progress of a batch of jobs and running a job once a whole batch has finished.
+:::
 
 ### Executing jobs with an Authorized User Context
 
@@ -251,8 +279,8 @@ var jobRef = jobs.EnqueueCommand<CreateOpenAiChatCommand>(openAiRequest,
       // Link jobs together that are sent together in a batch
       BatchId = batchId,
       
-      // Capture where to notify the completion of the job to
-      ReplyTo = "https:example.org/callback",
+      // Tenant the job belongs to
+      TenantId = tenantId,
       
       // Additional properties about the job that aren't in the Request  
       Args = new() {
@@ -293,13 +321,17 @@ class JobResult
 
 ### Job Execution Limits
 
-Default Retry and Timeout Limits can be configured on the Backgrounds Job plugin:
+Default Retry and Timeout Limits can be configured on the Backgrounds Job plugin
+(or `DatabaseJobFeature` for RDBMS Background Jobs):
 
 ```csharp
 services.AddPlugin(new BackgroundsJobFeature
 {
-   DefaultRetryLimit = 2,
-   DefaultTimeout = TimeSpan.FromMinutes(10),
+   DefaultRetryLimit = 2,                // retries after the first attempt
+   DefaultTimeoutSecs = 10 * 60,         // 10 mins
+   DefaultRetryBackoff = RetryBackoff.ExponentialJitter,
+   DefaultRetryDelayMs = 5_000,          // delay before the first retry
+   DefaultMaxRetryDelayMs = 300_000,     // longest delay between retries
 });
 ```
 
@@ -315,6 +347,9 @@ var jobRef = jobs.EnqueueCommand<AggregateMonthlyDataCommand>(new Aggregate {
    });
 ```
 
+See [Retries & Reliability](/background-jobs-reliability) for how retries are spaced out, the history
+kept for each failed attempt, and expiring jobs that shouldn't run late.
+
 ### Logging, Cancellation an Status Updates
 
 We'll use the command for checking multiple URLs to demonstrate some recommended patterns
@@ -324,9 +359,9 @@ and how to enlist different job processing features.
 public class CheckUrlsCommand(
     ILogger<CheckUrlsCommand> logger,
     IBackgroundJobs jobs,
-    IHttpClientFactory clientFactory) : AsyncCommand<CheckUrls>
+    IHttpClientFactory clientFactory) : AsyncCommandWithResult<CheckUrls,CheckUrlsResult>
 {
-    protected override async Task RunAsync(CheckUrls req, CancellationToken ct)
+    protected override async Task<CheckUrlsResult> RunAsync(CheckUrls req, CancellationToken ct)
     {
         // 1. Create Logger that Logs and maintains logging in Jobs DB
         var log = Request.CreateJobLogger(jobs,logger);
@@ -363,15 +398,8 @@ public class CheckUrlsCommand(
             }
         }
 
-        // 5. Send Results to WebHook Callback if specified
-        if (job.ReplyTo != null)
-        {
-            jobs.EnqueueCommand<NotifyCheckUrlsCommand>(result,
-                new() {
-                    ParentId = job.Id,
-                    ReplyTo = job.ReplyTo,
-                });
-        }
+        // 5. Return the result, which is delivered to the job's ReplyTo if it has one
+        return result;
     }
 }
 ```
@@ -431,53 +459,43 @@ of a job.
 #### 5. Notify completion of Job
 
 Calling a Web Hook is a good way to notify externally initiated job requests of the completion
-of a job. You could invoke the callback within the command itself but there are a few benefits
-to initiating another job to handle the callback:
-
- - Frees up the named worker immediately to process the next task
- - Callbacks are durable, auto-retried and their success recorded like any job
- - If a callback fails the entire command doesn't need to be re-run again
-
-We can queue a callback with the result by passing through the `ReplyTo` and link it to the
-existing job with:
+of a job. Instead of calling it from within your command, return the result and queue the job with a
+`ReplyTo` - once the job completes its result is delivered automatically:
 
 ```csharp
-if (job.ReplyTo != null)
-{
-   jobs.EnqueueCommand<NotifyCheckUrlsCommand>(result,
-       new() {
-           ParentId = job.Id,
-           ReplyTo = job.ReplyTo,
-       });
-}
+jobs.EnqueueCommand<CheckUrlsCommand>(new CheckUrls { Urls = urls },
+    new() {
+        ReplyTo = $"https://api.example.com/callback?refId={refId}",
+    });
 ```
 
-Which we can implement by calling the `SendJsonCallbackAsync` extension method with the
-Callback URL and the Result DTO it should be called with:
+This has a few benefits over sending the callback yourself:
 
-```csharp
-public class NotifyCheckUrlsCommand(IHttpClientFactory clientFactory) 
-    : AsyncCommand<CheckUrlsResult>
-{
-    protected override async Task RunAsync(
-        CheckUrlsResult request, CancellationToken token)
-    {
-        await clientFactory.SendJsonCallbackAsync(
-            Request.GetBackgroundJob().ReplyTo, request, token);
-    }
-}
-```
+ - Frees up the worker as soon as the command has finished
+ - A failed delivery is logged without failing a job that has already succeeded
+ - `X-Job-Id`, `X-Job-RefId`, `X-Job-BatchId`, `X-Job-Tag` and `X-Job-State` HTTP Headers let the
+   receiver correlate the result without parsing the body
+
+A `ReplyTo` that's an `http://` or `https://` URL receives the result as a JSON POST, anything else is
+treated as an [MQ](/messaging) queue name the result is published to. See
+[Deliver results to ReplyTo](/background-jobs-workflows#deliver-results-to-replyto) to customize how
+results are delivered, or restrict where they can be sent.
 
 #### Callback URLs
 
-`ReplyTo` can be any URL which by default will have the result POST'ed back to the URL with a JSON
-Content-Type. Typically URLs will contain a reference Id so external clients can correlate a callback
+Typically URLs will contain a reference Id so external clients can correlate a callback
 with the internal process that initiated the job. If the callback API is publicly available you'll
 want to use an internal Id that can't be guessed (like a Guid) so the callback can't be spoofed, e.g:
 
 `$"https://api.example.com/callback?refId={RefId}"`
 
-If needed the callback URL can be customized on how the HTTP Request callback is sent.
+If you need more control over how a callback is sent, the `SendJsonCallbackAsync` extension method
+supports a number of formats for customizing the HTTP Request, which you can use from your own command
+or from a custom [OnJobReplyTo](/background-jobs-workflows#deliver-results-to-replyto) handler:
+
+```csharp
+await clientFactory.SendJsonCallbackAsync(callbackUrl, result, token);
+```
 
 If the URL contains a space, the text before the space is treated as the HTTP method:
 

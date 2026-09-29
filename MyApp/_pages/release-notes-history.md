@@ -5,6 +5,8 @@ slug: release-notes-history
 
 ## 2026
 
+- [v10.3](/releases/v10_03)     
+- [v10.2](/releases/v10_02)
 - [v10.1](/releases/v10_01)
 
 ## 2025

@@ -130,7 +130,7 @@ AI Chat resolves `typst` from `$TYPST_PATH` first, then `PATH`. See [PDF Studio]
 
 ## First-run files
 
-On first request AI Chat seeds its configuration into `App_Data/chat`:
+On startup AI Chat writes its configuration into `App_Data/chat`:
 
 <text-block :rows="[
   ['App_Data/chat/llms.json','Providers, defaults, limits, disabled extensions'],
@@ -139,7 +139,15 @@ On first request AI Chat seeds its configuration into `App_Data/chat`:
   ['App_Data/chat/cache/','Content-addressed asset cache'],
   ['App_Data/chat/user/{user}/','Per-user prefs, projects, profiles, skills, pdf']]"></text-block>
 
-These files are yours to edit and check in. See [Data & Storage](/chat/data).
+The bundled `llms.json`, `providers.json` and `providers-extra.json` are overwritten on every startup. To keep a modified copy, add it to `PreserveConfigs`:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+See [Data & Storage](/chat/data).
 
 ## What's next
 

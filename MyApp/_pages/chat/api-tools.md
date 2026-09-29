@@ -188,7 +188,7 @@ public class CreateCoffeeShopOrder : IPost, IReturn<CreateCoffeeShopOrderRespons
 
 When set, MCP responses - `api_search`, `api_describe` and confirmation summaries - prefer it over `[Description]`, whilst every non-MCP consumer continues to see the original.
 
-Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp#approval-across-the-mcp-boundary) without asking a human.
+Most Assistants infer the need for confirmation from MCP's safety annotations, but some need telling explicitly so they don't route around the [two-phase confirmation](/chat/mcp_server#approval-across-the-mcp-boundary) without asking a human.
 
 ## Your metadata becomes AI context
 
@@ -292,6 +292,6 @@ Mcp = {
 }
 ```
 
-See [MCP Server](/chat/mcp) and [Connect MCP Clients](/chat/connect-mcp).
+See [MCP Server](/chat/mcp_server) and [Connect MCP Clients](/chat/connect-mcp).
 
 <screenshot src="/img/pages/chat/api-tools/api-tools-architecture.webp" title="ServiceStack API Tools architecture"></screenshot>

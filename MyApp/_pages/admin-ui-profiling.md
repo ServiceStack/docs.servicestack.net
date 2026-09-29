@@ -4,15 +4,26 @@ title: Logging & Profiling UI
 
 The Request Logging & Profiling UIs bring an invaluable new level of observability into your App, from being able to quickly inspect and browse incoming requests, to tracing their behavior from their generated events in the [Diagnostic Source](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.diagnosticsource?view=net-6.0) capabilities added all throughout ServiceStack, which both power the new UIs and enables new introspectability from code where you can now to tap in to inspect & debug when each diagnostic event occurs.
 
+To follow requests across servers, message queues and Background Jobs in your own tracing backend, enable
+OpenTelemetry and Profiling in a .NET 8+ App with:
+
+::: sh
+npx add-in opentelemetry
+:::
+
+This exports traces and metrics over OTLP to your collector, and adds a **Trace view** to the Profiling UI.
+See [OpenTelemetry Tracing](#opentelemetry-tracing) to learn what it traces and how to configure it.
+
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="LgQHTSHSk1g" style="background-image: url('https://img.youtube.com/vi/LgQHTSHSk1g/maxresdefault.jpg')"></lite-youtube>
 
-The quickest way to enable access to these new features to your App is with:
+To enable local Profiling without OpenTelemetry, use:
 
 ::: sh 
 npx add-in profiling
 :::
 
-Which will add the [Modular Startup](/modular-startup) configuration to your Host project that registers both Request Logging & Profiling features when running your App in [DebugMode](/debugging#debugmode) (i.e. Development):
+This adds [Modular Startup](/modular-startup) configuration to your Host project that registers Profiling
+when running your App in [DebugMode](/debugging#debugmode) (i.e. Development):
 
 ```csharp
 public class ConfigureProfiling : IHostingStartup
@@ -476,7 +487,8 @@ enum ProfileSource
     Client       = 1 << 1,
     Redis        = 1 << 2,
     OrmLite      = 1 << 3,
-    All          = ServiceStack | Client | OrmLite | Redis,
+    Jobs         = 1 << 4,
+    All          = ServiceStack | Client | OrmLite | Redis | Jobs,
 }
 
 class ProfilingFeature
@@ -523,6 +535,9 @@ class ProfilingFeature
     
     // Default take, if none is specified
     int DefaultLimit = 50;
+
+    // Optional trace backend URL containing {traceId}. HTTPS, or HTTP for localhost
+    string? ExternalTraceUrlTemplate;
     
     // Customize DiagnosticEntry that gets captured
     Action<DiagnosticEntry, DiagnosticEvent>? DiagnosticEntryFilter;
@@ -531,3 +546,270 @@ class ProfilingFeature
     int MaxBodyLength = 10 * 10 * 1024;
 }
 ```
+
+## OpenTelemetry Tracing
+
+Profiling shows what happened inside one App. When a request queues a Job that runs on another server,
+publishes a message or calls another service, [OpenTelemetry](https://opentelemetry.io/docs/languages/dotnet/)
+connects that work into a single distributed trace that you can follow in any OTLP-compatible backend, such
+as Jaeger, Grafana Tempo, Honeycomb, Datadog or the .NET Aspire Dashboard.
+
+On **.NET 8+**, ServiceStack emits standard .NET `ActivitySource` traces and `Meter` metrics for API
+operations, messaging and Background Jobs. ServiceStack doesn't depend on the OpenTelemetry SDK: your App
+chooses the exporter, sampling and collector, and nothing is recorded until a listener is registered.
+
+### Add OpenTelemetry to your App
+
+Add OpenTelemetry to an existing App with:
+
+::: sh
+npx add-in opentelemetry
+:::
+
+This installs the `OpenTelemetry.Extensions.Hosting`, `OpenTelemetry.Instrumentation.AspNetCore`,
+`OpenTelemetry.Instrumentation.Http` and `OpenTelemetry.Exporter.OpenTelemetryProtocol` packages and adds
+this [Modular Startup](/modular-startup) configuration:
+
+```csharp
+public class ConfigureProfiling : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource
+                    .AddService(context.Configuration["OTEL_SERVICE_NAME"] 
+                            ?? context.HostingEnvironment.ApplicationName,
+                        serviceVersion: typeof(ConfigureProfiling).Assembly.GetName().Version?.ToString())
+                    .AddAttributes(new Dictionary<string, object> {
+                        ["deployment.environment.name"] = context.HostingEnvironment.EnvironmentName,
+                    }))
+                .WithTracing(tracing => tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSource(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+                    .AddOtlpExporter())
+                .WithMetrics(metrics => metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddMeter(OperationDiagnostics.Name, MessagingDiagnostics.Name, JobsDiagnostics.Name)
+                    .AddOtlpExporter());
+
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddPlugin(new ProfilingFeature {
+                    IncludeStackTrace = true,
+                    ExternalTraceUrlTemplate = context.Configuration["OTEL_TRACE_URL_TEMPLATE"],
+                });
+            }
+        });
+}
+```
+
+ASP.NET Core and `HttpClient` instrumentation cover incoming HTTP requests and outbound HTTP calls, while
+the three ServiceStack sources cover API operations, messaging and Background Jobs. OpenTelemetry is enabled
+in every environment, while the local Profiling UI is only registered in Development.
+
+::: info
+The `opentelemetry` add-in includes everything the `profiling` add-in does. Both create a
+`Configure.Profiling.cs`, so use one or the other.
+:::
+
+### Configure the exporter
+
+The exporter is configured with the standard OpenTelemetry environment variables, so the same build can send
+traces to a different collector in each environment:
+
+| Variable | Used for |
+| --- | --- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Your collector's OTLP endpoint. Defaults to `http://localhost:4317` |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `grpc` (default) or `http/protobuf` |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Credentials your hosted backend needs, e.g. an API key header |
+| `OTEL_SERVICE_NAME` | The service name shown in your backend. Defaults to your App's name |
+| `OTEL_TRACE_URL_TEMPLATE` | Optional link from the Profiling UI to your backend, [see below](#open-a-trace-in-your-backend) |
+
+To try it locally without an account, run the [.NET Aspire Dashboard](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/standalone)
+in Docker. It receives OTLP on the default port, so no configuration is needed:
+
+::: sh
+docker run --rm -it -p 18888:18888 -p 4317:18889 mcr.microsoft.com/dotnet/aspire-dashboard:latest
+:::
+
+Then open the login link printed in its output to see your App's traces and metrics.
+
+Sampling is configured in the tracing builder. For example, to export 10% of new traces while always
+following the sampling decision of an upstream service:
+
+```csharp
+.WithTracing(tracing => tracing
+    .SetSampler(new ParentBasedSampler(new TraceIdRatioBasedSampler(0.1)))
+    //...
+```
+
+Sampling only affects what's exported. The Profiling UI keeps its own bounded history, controlled by
+`ProfilingFeature.Capacity`.
+
+### What ServiceStack emits
+
+#### Traces
+
+| Source | Spans |
+| --- | --- |
+| `ServiceStack` | A `ServiceStack {Operation}` span for each API request, nested under ASP.NET Core's HTTP server span |
+| `ServiceStack.Messaging` | A `send {queue}` producer span when a message is published, and a `process {queue}` consumer span when it's processed, for Background MQ, Redis MQ and RabbitMQ |
+| `ServiceStack.Jobs` | A consumer span for each Job execution that continues the trace of the request that queued it |
+
+ServiceStack adds one span inside ASP.NET Core's HTTP span instead of creating a second HTTP span. Operation
+spans are tagged with:
+
+| Attribute | Value |
+| --- | --- |
+| `servicestack.operation` | The Request DTO name, e.g. `GetOrders` |
+| `http.request.method` | The HTTP method |
+| `http.route` | The matched route template, e.g. `/orders/{Id}`, never the raw URL |
+| `http.response.status_code` | The response status code |
+| `servicestack.outcome` | `success`, `client_error`, `error`, `cancelled` or `unknown` |
+| `exception.type` | The exception type, for failed requests |
+
+Only server failures are marked as errors, so validation and authorization responses don't trigger your
+error alerts:
+
+| Response | Outcome | Span status |
+| --- | --- | --- |
+| 1xx - 3xx | `success` | Ok |
+| 4xx, e.g. validation or authorization errors | `client_error` | Ok |
+| 5xx, or an unhandled exception | `error` | Error |
+| Request cancelled | `cancelled` | Unset |
+
+Request and response bodies, user ids and exception messages aren't added to spans. Only requests for known
+API operations get an operation span and metrics, so requests for unknown `/api/{Request}` names, static files
+and redirects don't add new metric series.
+
+Messaging spans follow the OpenTelemetry messaging conventions. The destination is the queue name, e.g.
+`send mq:CreateOrder.inq` and `process mq:CreateOrder.inq`, and both spans are tagged with:
+
+| Attribute | Value |
+| --- | --- |
+| `messaging.system` | `servicestack.background`, `redis` or `rabbitmq` |
+| `messaging.operation.type` | `send` or `process` |
+| `messaging.destination.name` | The queue name, e.g. `mq:CreateOrder.inq` |
+| `messaging.message.id` | The message's `IMessage.Id` |
+| `error.type` | The exception type, when sending or processing failed |
+
+#### Metrics
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `servicestack.operation.duration` | Histogram (s) | How long API operations took |
+| `servicestack.operation.active` | UpDownCounter | API operations currently executing |
+| `servicestack.operation.errors` | Counter | API operations with an `error` outcome |
+
+Operation metrics are tagged with `servicestack.operation`, `http.request.method`, `http.route` and
+`servicestack.outcome`, all of which have a limited set of values so they're safe to use as metric
+dimensions. They're recorded whether or not a trace is sampled.
+
+The `ServiceStack.Messaging` meter records:
+
+| Metric | Type | Description |
+| --- | --- | --- |
+| `messaging.client.sent.messages` | Counter | Messages a producer sent |
+| `messaging.client.consumed.messages` | Counter | Messages delivered to a consumer |
+| `messaging.process.duration` | Histogram (s) | How long processing a message took |
+
+Messaging metrics are tagged with `messaging.system`, `messaging.destination.name` and, when sending or
+processing failed, `error.type`.
+
+For Background Jobs metrics, see [Background Jobs OpenTelemetry](/background-jobs-monitoring#opentelemetry).
+
+#### Detailed spans
+
+To see where time is spent inside an API, enable spans for the request filters, the service invocation and
+AutoQuery execution:
+
+```csharp
+OperationDiagnostics.EnableDetailedSpans = true;
+```
+
+These are disabled by default to keep the number of spans per request low.
+
+### Messages and Jobs
+
+Trace context is carried with the work, so a message or Job continues the trace of the request that started
+it, even when it's processed on a different server:
+
+- **Messages** carry the W3C `traceparent` and `tracestate` in their `Meta` dictionary, which RabbitMQ sends
+  as message headers. Your own `Meta` entries are preserved, and the existing `IMessage.TraceId` is
+  unchanged.
+- **Background Jobs** store the trace context in the `BackgroundJob.TraceId` column when they're queued, and
+  continue it when they run, including Jobs that are retried or recovered by another server.
+
+Messages and Jobs without trace context, including those queued before upgrading, start a new trace instead
+of failing.
+
+Custom `IMessageQueueClient` implementations can join the same trace with `MessagingDiagnostics`:
+
+```csharp
+public void Publish(string queueName, IMessage message)
+{
+    using var scope = MessagingDiagnostics.StartPublish("my-mq", queueName, message);
+    MessagingDiagnostics.Inject(message); // adds traceparent and tracestate to message.Meta
+    try
+    {
+        // send the message...
+    }
+    catch (Exception ex)
+    {
+        scope.RecordError(ex);
+        throw;
+    }
+}
+```
+
+The first argument is the `messaging.system` of your queue. Disposing the scope ends the span and records
+the `messaging.client.sent.messages` metric. Messages are processed by ServiceStack's shared message handler,
+which reads the trace context with `MessagingDiagnostics.StartProcess(message, system, destination)`.
+
+### Traces in the Profiling UI
+
+With OpenTelemetry registered, Profiling events are recorded with the W3C **Trace Id** and **Span Id** of the
+work they belong to. OrmLite, Redis and HttpClient events are correlated with the API request, message or Job
+that ran them, so one Trace Id brings together everything a request caused on this server.
+
+Click a Trace Id, or paste one into the **Trace Id** filter, to see all of its events in the order they
+happened. Two views are available:
+
+- **Details** - the familiar Profiling grid, with each event's full details
+- **Trace view** - one row per step, indented under its parent span, with its source, duration and any errors.
+  A step that hasn't completed yet is shown as **pending**
+
+Click a Span Id to narrow the results to a single span. The selected view is kept in the URL, so you can
+share a link to a trace.
+
+The Profiling UI only shows events retained by this App's bounded Profiling history, and still requires the
+Admin role. Spans from other services, or events that are no longer retained, are only in your trace backend.
+
+#### Open a trace in your backend
+
+To link to the complete trace in your tracing backend, set `ExternalTraceUrlTemplate` to an HTTPS URL
+containing `{traceId}`, or set the `OTEL_TRACE_URL_TEMPLATE` environment variable when using the add-in:
+
+```csharp
+services.AddPlugin(new ProfilingFeature {
+    ExternalTraceUrlTemplate = "https://traces.example.org/trace/{traceId}",
+});
+```
+
+HTTP is also allowed for `localhost`, so you can link to a local Jaeger or Aspire Dashboard during
+development:
+
+| Backend | `ExternalTraceUrlTemplate` |
+| --- | --- |
+| Jaeger | `http://localhost:16686/trace/{traceId}` |
+| Aspire Dashboard | `http://localhost:18888/traces/detail/{traceId}` |
+
+An invalid template is ignored, with a warning logged when the App starts.
+
+When a W3C Trace Id is selected, the Trace view shows an **Open in trace backend** link.
+
+#### Without OpenTelemetry
+
+Profiling works the same without OpenTelemetry, where events use their existing request identifiers as their
+Trace Id, so you can continue filtering all the events of a request, message or Job.

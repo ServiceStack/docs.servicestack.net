@@ -38,7 +38,7 @@ To switch from SQLite to PostgreSQL/SQL Server/MySQL:
 npx add-in ef-postgres
 :::
 
-2. Install `db-identity` to also switch to use this RDBMS for [Background Jobs](/rdbms-background-jobs) and [Request Logs Analytics](/admin-ui-rdbms-analytics):
+2. Install `db-identity` to also switch to use this RDBMS for [Background Jobs](/background-jobs-rdbms) and [Request Logs Analytics](/admin-ui-rdbms-analytics):
 
 :::sh {.mb-8}
 npx add-in db-identity

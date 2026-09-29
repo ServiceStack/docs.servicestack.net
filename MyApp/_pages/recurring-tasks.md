@@ -123,8 +123,70 @@ public class ConfigureBackgroundJobs : IHostingStartup
 }
 ```
 
+<schedule-pillars></schedule-pillars>
+
+## Schedule options
+
+Schedules can be configured to run at the intended local time, within a date range, a limited number of
+times, and to control what happens when an occurrence is missed or the previous one is still running:
+
+```csharp
+var schedule = Schedule.Cron("0 9 * * MON-FRI");
+schedule.TimeZoneId = "America/New_York";                 // 9am New York time, including daylight saving
+schedule.MisfirePolicy = ScheduleMisfirePolicy.Skip;      // don't catch up on missed occurrences
+schedule.OverlapPolicy = ScheduleOverlapPolicy.Skip;      // don't start while the last run is active
+schedule.StartDate = new DateTime(2026, 10, 1);
+schedule.EndDate = new DateTime(2026, 12, 31);
+
+jobs.RecurringCommand<SendDailyDigestCommand>("Daily Digest", schedule);
+```
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `TimeZoneId` | UTC | Time zone the Cron expression is evaluated in, e.g. `Australia/Perth` |
+| `MisfirePolicy` | `RunOnce` | When occurrences were missed, e.g. while the App was down, `RunOnce` runs a single catch-up occurrence and `Skip` waits for the next one |
+| `OverlapPolicy` | `Allow` | `Skip` doesn't start an occurrence while the previous one is still queued or running |
+| `StartDate` | | Don't run before this date |
+| `EndDate` | | Stop running after this date |
+| `MaxRuns` | | Stop running after this many occurrences |
+
+A task that reaches its `EndDate` or `MaxRuns` is disabled. Its `RunCount` is kept when the task is
+registered again on the next startup, so it doesn't start over.
+
+:::info
+`Schedule.Yearly` runs once a year on 1 January. Prior to v10.3 it ran on the first day of every month.
+:::
+
+## Pause, resume and run now
+
+Recurring Tasks can be paused and resumed without deleting their registration, or run immediately without
+changing their ongoing schedule, e.g. to check a change or re-run after a failure:
+
+```csharp
+jobs.SetRecurringTaskEnabled("Daily Digest", enabled: false);
+jobs.SetRecurringTaskEnabled("Daily Digest", enabled: true);
+
+jobs.RunRecurringTaskNow("Daily Digest");
+```
+
+These are also available from the Scheduled Tasks tab of the Admin UI.
+
+## Running on multiple servers
+
+Schedules are stored in the database with their next run, so they're recovered across restarts and every
+server agrees on when a task is next due. Each occurrence is only ever queued **once**, however many servers
+evaluate the schedule, so it's safe to register the same Recurring Tasks on every App Server.
+
+Servers reload the Scheduled Tasks from the database every `ReloadScheduledTasksSecs` (default 60s), so
+pausing, resuming or running a task on one server takes effect on the others, and tasks deleted elsewhere are
+dropped.
+
+An invalid Cron expression or time zone is recorded against its task with the error, without stopping the
+other tasks from running.
+
 ## Background Jobs Admin UI
 
-The last job the Recurring Task ran is also viewable in the Jobs Admin UI: 
+The Scheduled Tasks tab lists each task with its schedule, when it next runs, and the outcome and duration of
+its last run, with controls to pause, resume or run it now:
 
-![](/img/pages/jobs/jobs-scheduled-tasks-last-job.webp)
+<screenshot src="/img/pages/jobs/11-scheduled-tasks.png" title="Scheduled Tasks with their next run, last result and run-now controls"></screenshot>

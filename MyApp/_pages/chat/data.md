@@ -111,7 +111,15 @@ Cached files are served at `{RoutePrefix}/~cache/{path}` to authenticated users.
 
 ### Seeded config files
 
-`llms.json`, `providers.json` and `providers-extra.json` are seeded from embedded defaults on first run and then belong to you - edit them, check them into source control, or bypass them entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
+`llms.json`, `providers.json` and `providers-extra.json` are written from embedded defaults on startup, **overwriting** existing copies so they stay current with each release. To edit one and keep your changes, add its file name to `ChatFeature.PreserveConfigs`. It's then only seeded when missing:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    PreserveConfigs = ["llms.json"],
+});
+```
+
+Alternatively, bypass `llms.json` entirely by setting `ChatFeature.Config` in code. See [Providers & Models](/chat/providers).
 
 ## PDF storage
 

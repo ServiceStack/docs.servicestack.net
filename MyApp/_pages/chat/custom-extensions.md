@@ -326,4 +326,4 @@ services.AddPlugin(new ChatFeature {
 });
 ```
 
-See [MCP Server](/chat/mcp).
+See [MCP Server](/chat/mcp_server).

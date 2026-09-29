@@ -4,6 +4,8 @@ title: MCP Server
 
 AI Chat includes a built-in **Model Context Protocol** server that exposes selected Chat tools to external AI Assistants - Claude Code, Cursor, VS Code, OpenCode and any other MCP-compatible client.
 
+To use tools hosted by another MCP server *inside* AI Chat, see [MCP Clients](/chat/mcp_client).
+
 <text-block text="https://example.org/chat/mcp"></text-block>
 
 ## Enabling it

@@ -2,7 +2,7 @@
 title: Tools
 ---
 
-AI Chat has a single **Tool Registry** shared by chat models, custom extensions, ServiceStack Commands, [API Tools](/chat/api-tools) and the [MCP Server](/chat/mcp). Tools are described with JSON Schema, grouped for selection, and rendered as compact expandable calls in conversation history.
+AI Chat has a single **Tool Registry** shared by chat models, custom extensions, ServiceStack Commands, [API Tools](/chat/api-tools), [MCP Clients](/chat/mcp_client) and the [MCP Server](/chat/mcp_server). Tools are described with JSON Schema, grouped for selection, and rendered as compact expandable calls in conversation history.
 
 <screenshot src="/img/pages/chat/tools/llm-tool-call.webp" title="A tool call rendered in conversation history"></screenshot>
 

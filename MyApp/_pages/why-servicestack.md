@@ -108,7 +108,7 @@ Because approval forms are generated from the same schema that powers API Explor
     <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">AI Chat</div>
     <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">A complete multi-provider AI App at <code>/chat</code> using your App's existing users, database and security boundary.</p>
   </a>
-  <a href="/chat/mcp" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
+  <a href="/chat/mcp_server" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-900 dark:hover:border-indigo-600">
     <div class="font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">MCP Server</div>
     <p class="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">Expose the same approved APIs to external AI Assistants over the Model Context Protocol.</p>
   </a>
