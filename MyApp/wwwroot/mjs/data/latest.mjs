@@ -1,5 +1,7 @@
 export const latestPages = [
-    { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"Raw SQL is where SQL injection usually creeps in, typically by concatenating a value into a query string.", badge:"releases" },
+    { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
+    { name:"Fast, Simple, Typed ORM for .NET", href:"/ormlite/", text:"OrmLite\u0027s goal is to provide a convenient, DRY, config-free, RDBMS-agnostic typed wrapper that retains", badge:"ormlite" },
+    { name:"Release Notes History", href:"/release-notes-history", text:"- [v10.4](/releases/v1004)", badge:null },
     { name:"Publishing", href:"/chat/publishing", text:"AI.Chat offers two independent sharing extensions:", badge:"chat" },
     { name:"Extensions", href:"/chat/extensions", text:"Modern AI applications evolve too quickly for a fixed collection of hard-coded screens. New model providers, tools, m\u2026", badge:"chat" },
     { name:"ChatFeature Configuration", href:"/chat/configuration", text:"Every AI Chat capability is configured from a single ChatFeature plugin registration. Extension-specific options are \u2026", badge:"chat" },
@@ -18,6 +20,4 @@ export const latestPages = [
     { name:"Install AI Chat", href:"/chat/install", text:"AI Chat is delivered by the ServiceStack.AI.Chat NuGet package and requires a .NET 8\u002B ServiceStack App.", badge:"chat" },
     { name:"Skills", href:"/chat/skills", text:"Skills package specialized instructions, references and supporting files that Models load only when relevant. Instead\u2026", badge:"chat" },
     { name:"Agent Profiles", href:"/chat/agents", text:"One system prompt cannot be ideal for every task. Agent Profiles package a model, system prompt, theme, avatar, allow\u2026", badge:"chat" },
-    { name:"Gemini Crawling Websites", href:"/chat/gemini-crawling", text:"Enter a Start URL and the import folder is pre-populated from its host. A port uses a dash, so", badge:"chat" },
-    { name:"Gemini Operations \u0026 Troubleshooting", href:"/chat/gemini-operations", text:"The Gemini extension keeps durable local state for imports, uploads, Search indexing, deployments,", badge:"chat" },
 ]
