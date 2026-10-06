@@ -36,15 +36,3 @@ Get Started with OrmLite by installing your preferred RDBMS provider and configu
         Get OrmLite
     </a>
 </div>
-
-## Other notable Micro ORMs for .NET
-Many performance problems can be mitigated and a lot of use-cases can be simplified without the use of a heavyweight ORM, and their config, mappings and infrastructure. We can recommend the following list, each with their own unique special blend of features.
-
-* **[Dapper](https://github.com/DapperLib/Dapper)** - by [@samsaffron](http://twitter.com/samsaffron) and [@marcgravell](http://twitter.com/marcgravell)
-    - Current performance king, supports both POCO and dynamic access, fits in a single class. Used to solve [StackOverflow's Perf issues](http://samsaffron.com/archive/2011/03/30/How+I+learned+to+stop+worrying+and+write+my+own+ORM)
-* **[PetaPoco](http://www.toptensoftware.com/petapoco/)** - by [@toptensoftware](http://twitter.com/toptensoftware)
-    - Fast, supports dynamics, expandos and typed POCOs, fits in a single class. Includes optional T4 templates for POCO table generation
-* **[Massive](https://github.com/robconery/massive)** - by [@robconery](http://twitter.com/robconery)
-    - Fast, supports dynamics and expandos, smart use of optional params for a wrist-friendly api, fits in a single class. Multi RDBMS
-* **[Simple.Data](https://github.com/markrendle/Simple.Data)** - by [@markrendle](http://twitter.com/markrendle)
-    - A little slower than above ORMS, most wrist-friendly courtesy of a dynamic API, multiple RDBMS support inc. Mongo DB

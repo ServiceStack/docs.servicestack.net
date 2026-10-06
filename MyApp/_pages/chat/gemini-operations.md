@@ -190,3 +190,16 @@ title, heading, and content. Permanent Search deletion removes that deployment's
 permanent File Store deletion cascades through all owned imports, documents, Search and Assistant
 state. See [Overview & Setup](/chat/gemini-rag#storage-economics) for what Google charges for, and
 [Data & Storage](/chat/data) for AI Chat's complete storage layout.
+
+## Resume queued uploads
+
+Explorer's **Resume uploads** action resumes the current category and its descendants, or the whole
+store at its root. A queued row's upload icon resumes only that document. The status beside **Sort**
+shows imports, uploads, syncs, deletions, queued work, and failures; **Paused** resumes the store queue.
+Queue entries retain document identities across repeated runs. A locally unchanged file may still
+need its pending remote upload; successful completed uploads are not repeated unnecessarily.
+
+**Sync Store** reloads enabled [saved imports](/chat/gemini-imports#saved-imports), refreshes crawls,
+imports changes, and reconciles remote state. Large source deletions require confirmation through the
+individual source run. Remote-removal errors retain the old identity for retry and remain visible.
+See [Explorer recovery](/chat/gemini-explore#recover-from-interrupted-uploads).

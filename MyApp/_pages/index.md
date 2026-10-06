@@ -3,7 +3,7 @@ title: ServiceStack Documentation
 ---
 
 <div class="not-prose">
-<feature-explorer></feature-explorer>
+<feature-explorer flush></feature-explorer>
 <other-products></other-products>
 </div>
 

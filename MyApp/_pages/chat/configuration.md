@@ -2,7 +2,7 @@
 title: ChatFeature Configuration
 ---
 
-Every AI Chat capability is configured from a single `ChatFeature` plugin registration. Extension-specific options are reached through the extension properties it exposes (`Tools`, `ApiTools`, `Mcp`, `Publish`, `Pdf`, …), so a complete configuration reads as one object graph.
+Every AI Chat capability is configured from a single `ChatFeature` plugin registration. Extension-specific options are reached through the extension properties it exposes (`Tools`, `ApiTools`, `Mcp`, `ShareStatic`, `ShareLlmspy`, `Pdf`, …), so a complete configuration reads as one object graph.
 
 <config-explorer>
 </config-explorer>
@@ -13,7 +13,7 @@ services.AddPlugin(new ChatFeature {
     RequiredRole = "Employee",
     AuthType = ChatAuthType.Credentials,
 
-    DisableExtensions = ["computer", "publish"],
+    DisableExtensions = ["computer", "share_llmspy"],
 
     Tools = {
         EnableApiTools = true,
@@ -146,14 +146,13 @@ See [Custom Extensions](/chat/custom-extensions) for the full `ExtensionContext`
 
 ### Preserving modified configs
 
-On every startup AI Chat writes its bundled `llms.json`, `providers.json` and `providers-extra.json` to `App_Data/chat`, **overwriting** any existing copies. This keeps the provider catalog and defaults current with each ServiceStack release, but it also discards any edits you've made to those files, including provider changes persisted by the Admin UI.
-
-To keep your modified copy, add its file name to `PreserveConfigs`. A preserved file is only seeded when it doesn't exist yet and is otherwise left untouched:
+`llms.json` is seeded only when missing and preserves user settings across restarts. Provider
+catalogs (`providers.json` and `providers-extra.json`) refresh from bundled defaults on startup unless
+their filenames are listed in `PreserveConfigs`. Preserved catalog files are seeded when missing.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
-    // keep your customized llms.json, still refresh providers.json each release
-    PreserveConfigs = ["llms.json"],
+    PreserveConfigs = ["providers-extra.json"],
 });
 ```
 
@@ -243,7 +242,7 @@ Higher-risk capabilities are opt-in. Filesystem and code execution tools stay un
 
 ## AI Chat and the OpenAI API
 
-`ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api).
+`ChatFeature` also registers the typed `ChatCompletion` service at `POST /v1/chat/completions` and an in-process `IChatClient`. Both run the same pipeline - provider selection, retry/failover, the tool loop, usage and cost accounting. See [Chat API](/chat/api). `IChatClient.CreateDecisionAsync` and `POST /v1/decisions` also ask typed questions of decision models like Jev via OpenRouter. See [Decisions API](/chat/api#decisions-api).
 
 ### Generated client DTOs
 
@@ -259,6 +258,37 @@ services.AddPlugin(new ChatFeature {
     IncludeInGeneratedDtos = true,
 });
 ```
+
+## Sharing destinations
+
+`ShareStatic` is enabled by default and publishes project builds to `<WebContentDirectory>/p`, typically
+`wwwroot/p`. `ShareLlmspy` is disabled by default; set `ShareLlmspy.Enabled = true` to opt into public
+hosting on ai.llmspy.org. Each extension can be disabled independently.
+
+Use a typed code override for the static export settings:
+
+```csharp
+services.AddPlugin(new ChatFeature {
+    ShareStatic = {
+        StaticPublish = new StaticPublishConfig {
+            // Omit Directory to use the host's web content directory/p.
+            BasePath = "/p/",
+            BaseUrl = "", // Project links use the current browser origin.
+        },
+    },
+});
+```
+
+Without the code override, settings load from `App_Data/chat/user/default/share_static/config.json`.
+The file is optional; omit `directory` for the web-root default. Explicit relative directories resolve
+from the working directory where the host starts. These are global settings, independent of named-user
+and publisher account configuration. A code override replaces the file configuration, with defaults
+for omitted properties.
+
+An empty or null `BaseUrl` produces a link on the Chat UI's current domain using `BasePath`, independent
+of `RoutePrefix`. A configured HTTP(S) URL includes its static mount path and overrides `BasePath`.
+See [Publishing](/chat/publishing#configure-the-export) for JSON settings, static-file middleware order,
+and serving a custom destination.
 
 ## Full configuration reference
 
@@ -299,7 +329,8 @@ services.AddPlugin(new ChatFeature {
     Tools     = { EnableApiTools = true, EnableFilesystemTools = false, EnableCodeExecution = false },
     ApiTools  = { IncludeTags = [], IncludeTypes = [], ExcludeTypes = [], DefaultTake = 25, MaxTake = 100 },
     Mcp       = { ToolGroups = [], Tools = [], RejectToolsRequiringApproval = true },
-    Publish   = { Enabled = false },
+    ShareStatic = { Enabled = true },
+    ShareLlmspy = { Enabled = false },
 
     // ── Hooks ──
     ValidateRequest = null,

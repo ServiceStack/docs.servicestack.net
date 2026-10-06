@@ -143,6 +143,88 @@ services.AddOrmLite(options => {
     .AddFirebird("firebird", FirebirdDb.Connection);
 ```
 
+### Read Replicas
+
+Queries that can read from a read replica, e.g. a PostgreSQL standby, open their connection with
+`OpenReadOnlyDbConnection()`. It opens the replica when one is registered, otherwise the primary, so the same code works
+with and without a replica:
+
+```csharp
+services.AddOrmLite(options => options.UsePostgres(connectionString))
+    .AddReadReplica(replicaConnectionString)
+    .AddPostgres("reporting", reportingConnectionString)
+    .AddReadReplica("reporting", reportingReplicaConnectionString);
+
+using var db = dbFactory.OpenReadOnlyDbConnection();             // the main connection's replica
+using var reports = dbFactory.OpenReadOnlyDbConnection("reporting"); // the reporting connection's replica
+```
+
+A replica uses the dialect of its primary, so it has the same naming strategy, converters and retry policy. Replicas
+can be behind their primary, so read what was just written from the primary with `OpenDbConnection()`. Connection
+filters are used by a replica's connections the same way, e.g. `db.UseFilters(TenantFilters.For(tenant))`.
+
+Read-only connections can't write, including when they're opened on the primary without a replica, e.g. in
+development, so a write fails the same way it would on a replica. PostgreSQL, MySQL and SQLite make the connection's
+session read-only, which is made read-write again before it's returned to the pool, and OrmLite rejects statements
+that write on SQL Server. Connections say what they are with `IsReadOnly` and `IsReadReplica`, and whether they've
+written with `HasWrites`. Statements run with OrmLite's Dapper APIs bypass OrmLite, so on SQL Server their writes
+aren't rejected, and they aren't counted in `HasWrites`. Shared SQLite `:memory:` connections aren't made read-only, as
+they're the same connection for every open.
+
+To keep reading while a replica is unavailable, open the primary when the replica can't be opened, which is logged as
+a warning:
+
+```csharp
+.AddReadReplica(replicaConnectionString, fallbackToPrimary: true)
+```
+
+To spread reads over several replicas, use a connection string that does it, e.g. Npgsql's multiple hosts with
+`Target Session Attributes=prefer-standby;Load Balance Hosts=true`. The Admin UI's profiling shows which queries ran
+on a replica.
+
+#### In ServiceStack Services
+
+`ReadDb` is the read replica of the connection `Db` uses, configured by the AppHost's `DbConnectionRequestFilters`
+like `Db`, e.g. with the request's tenant. It's the same database as `Db` without a replica:
+
+```csharp
+public class ReportServices : Service
+{
+    public object Get(SalesReport request) =>
+        ReadDb.Select<Order>(x => x.CreatedDate >= request.Since);
+}
+```
+
+Outside a Service, `Request.OpenReadOnlyDb()` and `Request.OpenDb()` open them with the request's filters, which the
+caller disposes. Once a request writes, its `ReadDb` and `Request.OpenReadOnlyDb()` read from the primary, so it sees
+what it wrote.
+
+A user's next requests read from the primary for 5 seconds after one of their requests writes, so e.g. the page they're
+sent to after saving a form shows what they saved while the replica catches up. Users are identified by their
+authenticated user id, or their session when they're not signed in. Change how long with the AppHost's
+`ReadYourWritesFor`, or turn it off with `TimeSpan.Zero`:
+
+```csharp
+public override void Configure()
+{
+    ReadYourWritesFor = TimeSpan.FromSeconds(10);
+}
+```
+
+Writes are remembered in the App's memory cache, so with several servers a user's next request can go to a server
+that doesn't know they wrote. Use sticky sessions, or override the AppHost's `RecordDbWrites()` and
+`HasRecentDbWrites()` to keep them in a distributed cache.
+
+AutoQuery APIs can run their queries on the replica too, while AutoQuery CRUD APIs write to the primary. `[ReadReplica]`
+opts in an AutoQuery API or table, or out with `[ReadReplica(false)]`, e.g. for an API that reads what was just written:
+
+```csharp
+services.AddPlugin(new AutoQueryFeature { UseReadReplica = true });
+
+[ReadReplica(false)]
+public class QueryRecentOrders : QueryDb<Order> {}
+```
+
 ### Complex Type JSON Serialization
 
 The new configuration model uses a configurable `JsonComplexTypeSerializer` where you can change the default 

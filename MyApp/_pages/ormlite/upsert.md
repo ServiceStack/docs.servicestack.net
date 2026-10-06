@@ -116,6 +116,10 @@ db.UpsertAll(customers,
 
 String field-name overloads are also available for `UpsertAll`.
 
+`UpsertAll` has a statement for each row, which are [sent together](/ormlite/batched-writes) when the driver supports
+it. Use [BulkUpsert](/ormlite/bulk-upsert) for thousands of rows, which loads them with each RDBMS's bulk loader and
+upserts them in a single statement.
+
 ## Async APIs
 
 Every Upsert API has an asynchronous equivalent and accepts an optional `CancellationToken`:
@@ -165,6 +169,56 @@ db.Upsert(customer);
 
 An explicitly populated auto-increment Primary Key is preserved and can be used to insert or update that specific ID.
 
+## Database generated values
+
+Like `Save()`, `Upsert` keeps the Data Model in sync with the row in the database. After both inserts and updates it
+populates:
+
+- the generated `Id` of `[AutoIncrement]` Primary Keys
+- `[RowVersion]` fields
+- `[ReturnOnInsert]` fields, e.g. values set by database defaults
+
+```csharp
+public class WikiPage
+{
+    // Primary Key, populated after Upsert when [AutoIncrement]
+    public int Id { get; set; }
+
+    // Set by the application, not modified by Upsert
+    public string Title { get; set; }
+
+    // Populated after Upsert: set by the database default on insert,
+    // never updated after that ([IgnoreOnUpdate])
+    [Default(OrmLiteVariables.SystemUtc), IgnoreOnUpdate, ReturnOnInsert]
+    public DateTime CreatedAt { get; set; }
+
+    // Populated after Upsert: changes on every insert and update
+    [RowVersion]
+    public ulong RowVersion { get; set; }
+}
+
+var page = new WikiPage { Id = 1, Title = "Draft" };
+db.Upsert(page);
+
+page.CreatedAt;  // set by the database
+page.RowVersion; // the current row version
+```
+
+As the row version is kept current, the upserted Data Model can be used in later optimistic concurrency updates:
+
+```csharp
+page.Title = "Published";
+db.Update(page); // Throws OptimisticConcurrencyException if the row was changed since the Upsert
+```
+
+On PostgreSQL, SQLite and SQL Server these values are returned by the Upsert statement itself, using `RETURNING` or
+`OUTPUT`, so no additional query is needed. Other databases read them with a query after the Upsert.
+
+::: warning
+SQL Server doesn't allow an `OUTPUT` clause on tables with enabled triggers, so `Upsert` fails on those tables if their
+Data Model has `[RowVersion]` or `[ReturnOnInsert]` fields.
+:::
+
 ## Native database support
 
 OrmLite generates the native Upsert syntax for its primary supported databases:
@@ -179,6 +233,9 @@ OrmLite generates the native Upsert syntax for its primary supported databases:
 Providers without native Upsert support fall back to `Save()`-style behavior: OrmLite checks whether the Primary Key
 exists, then issues an `INSERT` or `UPDATE`. The fallback has the same `updateOnly` behavior, but requires a separate
 existence query and cannot provide the same atomic single-statement behavior as a native Upsert.
+
+Tables with [Connection Filters or Write Rules](/ormlite/connection-filters#upserts) also use this fallback, so the
+row that's updated is filtered and rules can set different columns on insert and update.
 
 ::: info
 MySQL and MariaDB's `ON DUPLICATE KEY UPDATE` can also be activated by a secondary `UNIQUE` constraint, not just the

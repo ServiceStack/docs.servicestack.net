@@ -225,6 +225,8 @@ var cities = new[] { "London", "Madrid", "Berlin" };
 db.Select<Author>(x => Sql.In(x.City, cities));
 ```
 
+Lists of any size are supported, see [Querying Large Lists of Values](/ormlite/large-in-lists).
+
 ## SqlExpression with JOIN examples
 
 Just like SQL, SqlExpression supports multiple JOIN's that can leverage OrmLite's Reference Conventions for Simple, Terse and Intuitive Table JOIN's:
@@ -289,6 +291,8 @@ db.Insert(new Track {
 lazyLinq.Each(x => x.Print());
 ```
 
+Use `SelectLazyAsync()` to stream results asynchronously, see [Streaming Results](/ormlite/streaming).
+
 ## Column, ColumnDistinct, Dictionary and Lookup Examples
 
 In addition there are convenience API's to return results in your preferred .NET Collection:
@@ -311,10 +315,27 @@ Dictionary<int, List<string>> tracksByYear = db.Lookup<int, string>(
 	db.From<Track>().Select(x => new { x.Year, x.Name }));
 ```
 
+They also accept raw SQL, where [Sql.Fmt()](/ormlite/sql-fmt) sends each interpolated value as a db param:
+
+```csharp
+HashSet<int> years = db.ColumnDistinct<int>(Sql.Fmt($"SELECT Year FROM Track WHERE ArtistId = {artistId}"));
+
+Dictionary<string, int> trackAndYears = db.Dictionary<string, int>(
+    Sql.Fmt($"SELECT Name, Year FROM Track WHERE Year > {year}"));
+
+Dictionary<int, List<string>> tracksByYear = db.Lookup<int, string>(
+    Sql.Fmt($"SELECT Year, Name FROM Track WHERE ArtistId IN ({artistIds})"));
+
+List<KeyValuePair<string, int>> pairs = db.KeyValuePairs<string, int>(
+    Sql.Fmt($"SELECT Name, Year FROM Track WHERE Year > {year}"));
+
+long count = db.RowCount(Sql.Fmt($"SELECT Id FROM Track WHERE Year > {year}"));
+```
+
 ## Custom SQL Examples
 
 If you need more flexibility or RDBMS-specific functionality that's not possible using Typed APIs you can drop down to raw SQL using our 
-[Custom SQL APIs](/ormlite/custom-sql).
+[Custom SQL APIs](/ormlite/custom-sql). Use [Sql.Fmt()](/ormlite/sql-fmt) to safely interpolate values into raw SQL.
 
 ## Dynamic Result Set Examples
 

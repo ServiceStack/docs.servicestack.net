@@ -260,6 +260,96 @@ API Key in the `apikey` Claim to the request - resulting in the same behavior ha
 public class QueryOrders : QueryDb<Order> { }
 ```
 
+### Allow Authenticated User APIs to API Keys
+
+From [ServiceStack v10.4](/releases/v10_04) you can also do the reverse: let a User API Key call the APIs
+protected with `[ValidateIsAuthenticated]`, by authenticating requests sent with it as the user it belongs to.
+
+Without it, a request sent with an API Key to an API that requires authentication is rejected by ASP.NET Core
+before it reaches ServiceStack, where a cookie scheme redirects it to the Sign In page.
+
+Enable it by adding API Keys as an ASP.NET Core Authentication scheme:
+
+```csharp
+// Program.cs
+services.AddAuthentication(options => {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
+services.AddAuthentication().AddApiKeyAuth();
+```
+
+Your APIs can then be called with either the user's session or one of their API Keys:
+
+```csharp
+[ValidateIsAuthenticated]
+public class QueryOrders : QueryDb<Order> { }
+
+public class OrderServices : Service
+{
+    public object Get(GetOrders request)
+    {
+        var userId = Request.GetUserId(); // the signed in user, or the user of the API Key
+    }
+}
+```
+
+What a User API Key is authenticated with:
+
+| | |
+|-|-|
+| **User** | The `UserId` and `UserName` of the API Key |
+| **Roles** | None of the user's roles, so it can't call APIs protected by a role. An API Key with the `Admin` scope has the `Admin` role |
+| **Scopes** | The API Key's scopes, available in `session.Scopes` and as `scope` claims |
+| **Auth Provider** | `apikey` in `session.AuthProvider` |
+| **Restrict to APIs** | An API Key that's [restricted to APIs](#restrict-to-apis) can only call those APIs |
+
+As an API Key is able to call every API its user can call that doesn't require a role, limit what it can do by
+checking its scopes. `IsApiKeyUser()` returns whether a request was authenticated with an API Key:
+
+```csharp
+public class MyServices : Service
+{
+    public object Any(DeleteAccount request)
+    {
+        var user = Request.GetClaimsPrincipal();
+        if (user.IsApiKeyUser() && !user.HasClaim(JwtClaimTypes.Scope, "account:write"))
+            throw HttpError.Forbidden("This API Key can't delete accounts");
+        //...
+    }
+}
+```
+
+For Apps where API Keys should only be able to call a few APIs, do this once in a Global Request Filter that
+rejects API Key requests for APIs that don't allow them. The API Key that authenticated the request is available
+from `req.GetApiKey()`:
+
+```csharp
+GlobalRequestFilters.Add((req, res, dto) => {
+    var apiKey = req.GetApiKey(); // null for requests that weren't sent with an API Key
+    if (apiKey != null && !dto.GetType().HasAttribute<ValidateHasScopeAttribute>())
+        throw HttpError.Forbidden("This API can't be called with an API Key");
+});
+```
+
+Other behavior to be aware of:
+
+- Requests with an invalid, cancelled or expired API Key return `401 Unauthorized` instead of being redirected
+- Requests without an API Key are handled by your other schemes as before
+- API Keys that don't belong to a user aren't authenticated, they continue to only be able to call
+  `[ValidateApiKey]` APIs
+- Use `ClaimsFilter` to customize the claims of the authenticated user:
+
+```csharp
+services.AddAuthentication().AddApiKeyAuth(options => {
+    options.ClaimsFilter = (apiKey, claims) => {
+        if (apiKey.RefIdStr != null)
+            claims.Add(new Claim("tenant", apiKey.RefIdStr));
+    };
+});
+```
+
 ## Integrated UIs
 
 Like many of ServiceStack's other premium features, API Keys are fully integrated into [ServiceStack's built-in UIs](https://servicestack.net/auto-ui)

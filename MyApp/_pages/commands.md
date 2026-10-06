@@ -227,6 +227,8 @@ public class AddTodoCommand(IDbConnection db, IBackgroundJobs jobs) : SyncComman
 }
 ```
 
+See [Commands in Background Jobs](/jobs/commands) for more on executing Commands with Background Jobs.
+
 ### Background MQ
 
 ```csharp
@@ -268,7 +270,7 @@ easily add logging, monitoring, and resilience around your logic.
 
 ### Background Jobs or MQ
 
-It should be noted adopting a messaging pattern doesn't require additional infrastructure complexity of an external MQ Server as you can use [Background Jobs](/background-jobs) or [Background MQ](/background-mq) to execute messages in managed background threads.
+It should be noted adopting a messaging pattern doesn't require additional infrastructure complexity of an external MQ Server as you can use [Background Jobs](/jobs/) or [Background MQ](/background-mq) to execute messages in managed background threads.
 
 ### Executing Commands
 
@@ -394,51 +396,12 @@ public class AddTodoCommand() : IAsyncCommand<CreateTodo> {}
 
 ## Execute Commands in Durable Background Jobs
 
-In addition to being able to execute **Commands** with the `ICommandExecutor` or from the UI, they can also be executed as part of a [Durable Background Job](/background-jobs) where you'll be able to track and monitor 
+In addition to being able to execute **Commands** with the `ICommandExecutor` or from the UI, they can also be
+executed as part of a [Durable Background Job](/jobs/) where you'll be able to track and monitor
 their progress in real-time.
 
-Background Jobs is already configured in all new [Identity Auth Templates](https://servicestack.net/start)
-in order to send all Identity Auth Emails. Whilst existing Projects can enable it in their .NET 10 Apps with:
-
-:::sh
-npx add-in jobs
-:::
-
-Which adds a reference to the [ServiceStack.Jobs](https://www.nuget.org/packages/ServiceStack.Jobs) NuGet package
-and includes the [Modular Startup](/modular-startup) configuration below:
-
-```csharp
-public class ConfigureBackgroundJobs : IHostingStartup
-{
-    public void Configure(IWebHostBuilder builder) => builder
-        .ConfigureServices(services => {
-            services.AddPlugin(new CommandsFeature());
-            services.AddPlugin(new BackgroundsJobFeature());
-            services.AddHostedService<JobsHostedService>();
-         }).ConfigureAppHost(afterAppHostInit: appHost => {
-            var services = appHost.GetApplicationServices();
-            var jobs = services.GetRequiredService<IBackgroundJobs>();
-            // Example of registering a Recurring Job to run Every Hour
-            //jobs.RecurringCommand<MyCommand>(Schedule.Hourly);
-        });
-}
-
-public class JobsHostedService(ILogger<JobsHostedService> log, IBackgroundJobs jobs) 
-    : BackgroundService
-{
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        await jobs.StartAsync(stoppingToken);
-        
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
-        while (!stoppingToken.IsCancellationRequested && 
-            await timer.WaitForNextTickAsync(stoppingToken))
-        {
-            await jobs.TickAsync();
-        }
-    }
-}
-```
+See [Commands in Background Jobs](/jobs/commands) for how to enable Background Jobs, queue durable and
+non-durable Commands, implement them with the ergonomic base classes and serialize DB Writes with named Workers.
 
 ## Background MQ Integration
 
@@ -472,114 +435,13 @@ You'd typically want to use queues to improve scalability by reducing locking an
 
 As we've started to [use server-side SQLite databases](/ormlite/scalable-sqlite) for our new Apps given its [many benefits](/ormlite/litestream) we needed a solution to workaround its limitation of not being able to handle multiple writes concurrently.
 
-One of the benefits of using SQLite is creating and managing [multiple databases](/ormlite/scalable-sqlite#multiple-sqlite-databases) is relatively cheap, so we can mitigate this limitation somewhat by maintaining different subsystems in separate databases, e.g:
+Since each database can only be written to by a single thread at a time, we can serialize DB Writes by
+executing them in Commands with either:
 
-[![](/img/pages/commands/pvq-databases.png)](/img/pages/commands/pvq-databases.png)
-
-But each database can only be written to by a single thread at a time, which we can now easily facilitate with 
-**Background Jobs** or **MQ Command DTOs**.
+ - **Background Jobs** - using [named Workers](/jobs/commands#serialize-db-writes-with-named-workers) for each database
+ - **Background MQ** - using MQ Command DTOs below
 
 In all cases we recommend using [Sync DB APIs for SQLite](/ormlite/scalable-sqlite#always-use-synchronous-apis-for-sqlite) since their underlying implementation always blocks.
-
-### Queuing DB Writes with SyncCommand Background Jobs
-
-One way to remove contention is to serially execute DB Writes which we can do by executing DB Writes within `SyncCommand*` and using a named `[Worker(Workers.AppDb)]` attribute for Writes to the primary database, e.g: 
-
-```csharp
-[Worker(Workers.AppDb)]
-public class DeleteCreativeCommand(IDbConnection db) 
-    : SyncCommand<DeleteCreative>
-{
-    protected override void Run(DeleteCreative request)
-    {
-        var artifactIds = request.ArtifactIds;
-        db.Delete<AlbumArtifact>(x => artifactIds.Contains(x.ArtifactId));
-        db.Delete<ArtifactReport>(x => artifactIds.Contains(x.ArtifactId));
-        db.Delete<ArtifactLike>(x => artifactIds.Contains(x.ArtifactId));
-        db.Delete<Artifact>(x => x.CreativeId == request.Id);
-        db.Delete<CreativeArtist>(x => x.CreativeId == request.Id);
-        db.Delete<CreativeModifier>(x => x.CreativeId == request.Id);
-        db.Delete<Creative>(x => x.Id == request.Id);
-    }
-}
-```
-
-Other databases should use its named connection for its named worker, e.g: 
-
-```csharp
-[Worker(Databases.Search)]
-public class DeleteSearchCommand(IDbConnectionFactory dbFactory) 
-    : SyncCommand<DeleteSearch>
-{
-    protected override void Run(DeleteSearch request)
-    {
-        using var db = dbFactory.Open(Databases.Search);
-        db.DeleteById<ArtifactFts>(request.Id);
-        //...
-    }
-}
-```
-
-Example of a DB Write command with result:
-
-```csharp
-[Worker(Databases.Albums)]
-public class CreateAlbumCommand(IDbConnectionFactory dbFactory) 
-    : SyncCommandWithResult<CreateAlbum,Album>
-{
-    protected override Album Run(CreateAlbum request)
-    {
-        using var db = dbFactory.Open(Databases.Albums);
-        var album = request.ConvertTo<Album>();
-        album.Id = db.Insert(album, selectIdentity:true);
-        foreach (var artifact in request.Artifacts)
-        {
-            artifact.AlbumId = album.Id;
-            db.Insert(artifact);
-        }
-        return album;
-    }
-}
-```
-
-Where it will be executed within its Database Lock. 
-
-### Running Commands
-
-You'll typically want to run DB Write Commands with `RunCommand*` APIs which are a faster and lighter weight 
-alternative then durable jobs which are persisted in the **jobs.db** before execution.
-
-Everytime commands are executed they'll be added to a ConcurrentQueue of the specified worker. Commands delegated to different named workers execute concurrently, whilst commands with the same worker are executed serially.
-
-When using any `SyncCommand*` base class, its execution still uses database locks
-but any contention is alleviated as they're executed serially by a single worker thread.
-
-```csharp
-public class MyServices(IBackgroundJobs jobs) : Service
-{
-    // Returns immediately with a reference to the Background Job
-    public object Any(DeleteCreative request)
-    {
-        // Queues a durable job to execute the command with the AppDb Worker
-        var jobRef = jobs.EnqueueCommand<DeleteCreativeCommand>(request);
-
-        // Executes Command with Databases.Search worker
-        jobs.EnqueueCommand<DeleteSearchCommand>(new DeleteSearch {
-            Id = request.ArtifactId
-        });
-
-        return jobRef;
-    }
-
-    // Returns after the command is executed with its result (if any)
-    public async Task Any(CreateAlbum request)
-    {
-        // Executes a transient (i.e. non-durable) job with the named worker
-        var album = await jobs.RunCommandAsync<CreateAlbumCommand>(request);
-        return album;
-    }
-}
-```
 
 ### MQ Command DTOs
 

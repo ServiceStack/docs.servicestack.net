@@ -71,6 +71,13 @@ Skills can be installed from a GitHub repository via a shallow clone:
 
 The Chat UI provides browse, search, install, create and edit experiences over the same APIs.
 
+## Browsing skill files
+
+Open a skill to browse nested references, scripts, and assets. Expand folders without losing parent
+context, and use clickable breadcrumbs to return to a directory. The URL retains the selected file
+and directory through reload and Back/Forward. Switching files, folders, or skills asks before
+discarding unsaved edits. These controls browse only the skill's validated folder.
+
 ## API
 
 <text-block :rows="[

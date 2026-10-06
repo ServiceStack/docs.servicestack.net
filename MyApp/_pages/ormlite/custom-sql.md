@@ -31,6 +31,17 @@ int result = db.SqlScalar<int>(q);
 int result = db.SqlScalar<int>("SELECT COUNT(*) FROM Person WHERE Age < 50");
 ```
 
+Every Custom SQL API also accepts [Sql.Fmt()](/ormlite/sql-fmt), which sends each interpolated value as a db param
+so values from your users are never concatenated into SQL:
+
+```csharp
+List<Person> results = db.SqlList<Person>(Sql.Fmt($"SELECT * FROM Person WHERE Age < {age}"));
+List<string> results = db.SqlColumn<string>(Sql.Fmt($"SELECT LastName FROM Person WHERE Age < {age}"));
+HashSet<int> results = db.ColumnDistinct<int>(Sql.Fmt($"SELECT Age FROM Person WHERE LastName IN ({names})"));
+int result = db.SqlScalar<int>(Sql.Fmt($"SELECT COUNT(*) FROM Person WHERE Age < {age}"));
+db.ExecuteSql(Sql.Fmt($"UPDATE Person SET LastName = {name} WHERE Id = {id}"));
+```
+
 ## Custom SQL with Typed SqlExpression
 
 Using a typed SQL Expression with a mix of typed an custom SQL Expressions:
@@ -46,7 +57,7 @@ List<Person> results = db.Select(sql, q.Params);
 ```
 
 :::tip
-If your custom SQL Expression fails because it contains raw SQL with comments or write commands you can use `Unsafe*` APIs to by-pass SQL Validation, e.g. `q.UnsafeWhere(rawSql)`
+If your custom SQL Expression fails because it contains raw SQL with comments or write commands you can use `Unsafe*` APIs to by-pass SQL Validation, e.g. `q.UnsafeWhere(rawSql)`. See [SQL Injection Protection](/ormlite/sql-injection) for what's validated.
 :::
 
 ## Custom Selects

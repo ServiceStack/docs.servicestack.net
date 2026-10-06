@@ -45,6 +45,16 @@ As well as un-typed, string-based expressions:
 db.Delete<Person>(where: "Age = @age", new { age = 27 });
 ```
 
+Or with [Sql.Fmt()](/ormlite/sql-fmt), where each interpolated value is sent as a db param and collections are
+expanded into an `IN` list:
+
+```csharp
+db.Delete<Person>(Sql.Fmt($"Age = {age}"));
+db.Delete<Person>(Sql.Fmt($"Id IN ({ids})"));
+
+db.Delete(typeof(Person), Sql.Fmt($"Age = {age}")); // when you only have the table's Type
+```
+
 ## Delete from Table JOIN
 
 Using a SqlExpression to delete rows by querying from a joined table:
@@ -58,6 +68,17 @@ db.Delete(q);
 ```
 
 > Not supported in MySql
+
+## Return the deleted rows
+
+`DeleteReturning()` deletes rows and returns them in the same statement, using `RETURNING` on PostgreSQL and SQLite
+and `OUTPUT` on SQL Server, e.g. to take the items of a queue table that only one caller receives:
+
+```csharp
+List<EmailJob> jobs = db.DeleteReturning<EmailJob>(x => x.Queue == "emails");
+```
+
+See [Returning Updated & Deleted Rows](/ormlite/returning) for its overloads, joins and `returning` columns.
 
 ## Delete by Dictionary
 

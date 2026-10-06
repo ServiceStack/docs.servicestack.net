@@ -126,3 +126,36 @@ changed.
 For the metadata fields these filters operate on, see
 [Metadata & Source URLs](/chat/gemini-metadata). To make the same grounded retrieval available to
 visitors on your website, publish an [AI Assistant](/chat/gemini-assistants).
+
+## Synchronize saved sources
+
+**Sync Store** reloads every enabled saved import's manifest, discovers folder changes, refreshes web
+crawls with their saved rules/transforms, and reconciles the local catalogue with Gemini. Uploads and
+replacements run in the background; source errors and queued work appear in the results. Unchanged
+sources do not require new uploads. Older saved folder imports gain a manifest link on a successful sync.
+
+Push pending metadata when you intentionally edit catalogue attributes. Syncing can restore manually
+deleted documents while their files remain in an enabled saved import.
+
+
+## Recover from interrupted uploads
+
+**Queued** means a local document awaits upload; **Uploading** means work has started. **Resume uploads**
+above the document list resumes queued files in the current folder and its descendants, or the entire
+store at its root. A queued row's upload icon resumes that one document without creating duplicate work.
+
+The status beside **Sort** shows running imports, uploads, syncs, deletions, queued work, and failures.
+Hover for upload counts, click for details, or click **Paused** to resume the store's queue. Import
+progress is scoped to the source and reports when work is queued behind earlier uploads.
+
+A healthy green check's **Local + Gemini** tooltip means the cache exists and Gemini reported an active
+document at the last upload/sync. **Cache missing** identifies absent local content. These reflect the
+last remote check; Sync Store refreshes them. Sort by **Failed** to inspect and retry provider errors.
+
+
+## Delete folders and documents
+
+Deleting a category affects only that folder and descendants; deleting the folder currently open returns
+Explorer to the store view. The root, a selection containing every document, and the last document cannot
+be removed with these actions. To remove all content, delete the File Store with its required confirmation.
+Files that remain in enabled saved imports can be imported again by Sync Store.

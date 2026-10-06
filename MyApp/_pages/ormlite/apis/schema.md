@@ -573,6 +573,13 @@ var id = db.Insert(new CustomTable { CSharpName = "Name", IndexColumn = "bar", R
 var customTableRow = db.SingleById<CustomTable>(id);
 ```
 
+See [Indexes, Generated Columns & Constraints](/ormlite/ddl-attributes) for the attributes that create filtered and
+covering indexes, generated columns, enum check constraints and comments, [Vector Search](/ormlite/vectors) for
+`[Vector]` columns and [System-Versioned Tables](/ormlite/system-versioned-tables) for `[SystemVersioned]` tables that
+keep the previous versions of their rows.
+
+After a model changes, [Schema Diff](/ormlite/schema-diff) finds the differences between it and its table.
+
 ## Create Tables with Foreign Keys
 
 A popular use-case where you'd want to use Attributes is to define Foreign Keys:

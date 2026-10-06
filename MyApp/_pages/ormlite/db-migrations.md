@@ -18,6 +18,11 @@ OrmLite DB Migrations advances OrmLite's light-weight code-first development app
 
 ## Getting Started
 
+:::tip
+[Schema Diff](/ormlite/schema-diff) finds the differences between your models and their tables, and can write the
+migration that makes them the same for you to review.
+:::
+
 We'll start by looking at the minimum amount of code required for a Migration:
 
 ```csharp
@@ -153,6 +158,35 @@ class Migration1001 : MigrationBase
 ```
 
 But our preference is to adopt the declarative approach when possible since it's a better match for code-first development where new or modified columns can be copied over from your App's Data Models to maintain and perform the schema changes. But ultimately you could use anything to implement your migration, from [Custom SQL](/ormlite/apis/schema.html#custom-sql) or as `Db` is just an ADO .NET Connection you could also use other Micro ORM's like [Dapper](https://github.com/DapperLib/Dapper) that's also [built-into OrmLite](https://github.com/ServiceStack/ServiceStack/tree/main/ServiceStack.OrmLite/src/ServiceStack.OrmLite/Dapper).
+
+### Alter SQLite tables
+
+SQLite can't alter a column, its default, foreign keys or constraints, which it changes by creating the table again.
+`Db.RebuildTable<T>()` creates the table again from the migration's model and copies the rows of the columns that are
+in both:
+
+```csharp
+class Migration1002 : MigrationBase
+{
+    class MyTable
+    {
+        [AutoIncrement]
+        public int Id { get; set; }
+
+        [StringLength(200)] // was StringLength(50) and Required
+        public string Name { get; set; }
+
+        [Default(1), CheckConstraint("Qty > 0")]
+        public int Qty { get; set; }
+    }
+
+    public override void Up() => Db.RebuildTable<MyTable>();
+}
+```
+
+The model's indexes and the table's triggers are created again, and columns that aren't in the model aren't kept.
+A table that's referenced by the foreign keys of other tables can only be rebuilt in a migration when foreign keys
+aren't enforced, see [Rebuild SQLite tables](/ormlite/schema-diff#rebuild-sqlite-tables).
 
 ### Code-First approach
 

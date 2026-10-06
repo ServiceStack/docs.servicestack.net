@@ -8,6 +8,7 @@ import { computed, ref } from "vue"
  *        text:'…', keywords:'rdbms crud' }]" />
  *
  * Categories are derived from the features themselves, in first-seen order.
+ * Use `flush` to drop the surrounding card so the grid fills the full width of its container.
  */
 export default {
     props: {
@@ -19,10 +20,12 @@ export default {
         placeholder: { type: String, default: 'Search features…' },
         baseUrl: { type: String, default: '' },
         /** Category rendered before All in a distinct amber colour */
-        specialCategory: { type: String, default: '' }
+        specialCategory: { type: String, default: '' },
+        /** Render without the outer border, background and padding to fill its container */
+        flush: Boolean
     },
     template: `
-    <section class="not-prose my-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8">
+    <section :class="['not-prose my-10', flush ? '' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-8']">
       <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p v-if="eyebrow" class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">{{eyebrow}}</p>
@@ -61,7 +64,7 @@ export default {
 
       <div v-if="results.length" class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <a v-for="feature in results" :key="feature.name" :href="baseUrl + feature.href"
-           class="group flex flex-col rounded-xl border border-slate-200 bg-slate-50/70 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-indigo-600 dark:hover:bg-slate-800">
+           class="group flex flex-col rounded-lg border border-slate-300 bg-slate-50/70 p-4 transition-colors hover:border-indigo-500 hover:bg-white dark:border-slate-600 dark:bg-slate-800/50 dark:hover:border-indigo-400 dark:hover:bg-slate-800">
           <div class="flex items-start justify-between gap-2">
             <span :title="feature.name" class="min-w-0 truncate font-bold text-slate-900 group-hover:text-indigo-700 dark:text-white dark:group-hover:text-indigo-300">{{feature.name}}</span>
             <span v-if="feature.badge" class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{feature.badge}}</span>

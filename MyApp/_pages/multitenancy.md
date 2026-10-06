@@ -3,6 +3,11 @@ slug: multitenancy
 title: Multitenancy
 ---
 
+::: info
+This page covers giving each tenant its own database. To keep every tenant in one database, with each row saying
+which tenant owns it, see [OrmLite Multitenancy](/ormlite/multitenancy/overview).
+:::
+
 ServiceStack provides a number of ways of changing the database connection used at runtime based on an incoming Request. 
 You can use a [Request Filter](/request-and-response-filters#global-request-filters), use the `[ConnectionInfo]` 
 [Request Filter Attribute](/filter-attributes#request-filter-attributes), use the `[NamedConnection]` attribute on 

@@ -155,3 +155,14 @@ Because AI Chat has no user store of its own, account lifecycle - password polic
 | Does any of it require an outbound AI provider? | Only the providers you configure |
 
 Which providers see your prompts is entirely your decision - including *"none outside this network"* if you point AI Chat at a local Ollama or LM Studio endpoint.
+
+## Personal ChatGPT and publisher connections
+
+[ChatGPT Sign-In](/chat/chatgpt) authorizes eligible subscription inference for the already signed-in
+application user. [Remote publishing](/chat/publishing) through `share_llmspy` connects that user's separate publisher account and
+explicitly authorizes the requesting host. Neither connection signs someone into your application,
+changes their roles, or grants workspace access. Credentials remain server-side and per user.
+
+
+`share_static` exports project builds without a publisher account. It remains subject to the host's
+normal Chat authentication and project permissions; it does not require an ai.llmspy.org connection.

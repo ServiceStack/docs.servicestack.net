@@ -155,6 +155,74 @@ Clicking on an entry will show more useful contextual information captured for e
 
 The profiling detail view also contains **blue** links to filter matching diagnostic events and showing useful information like the **Thread**, **User** this command was executed by as well as the **duration** and **timestamp** when it occurred.
 
+### Slowest Queries
+
+The **Slowest Queries** view lists the slowest database queries since your App started, showing when each query ran,
+how long it took, the [named connection](/ormlite/getting-started#multiple-database-connections) it ran on and the
+start of its SQL. By default the 50 slowest OrmLite commands are retained after they're no longer in the latest
+profiled events, so slow queries aren't lost in busy Apps.
+
+Selecting a query shows everything that was captured for it, including its full SQL, params, the connection and
+operation that ran it, and the trace and user it was run for. Use the maximize button next to the close button to
+view the panel in full-screen.
+
+Configure how many queries are retained with `SlowQueriesLimit`, or disable it with `0`:
+
+```csharp
+services.AddPlugin(new ProfilingFeature {
+    SlowQueriesLimit = 100,
+});
+```
+
+### Explain, Analyze and Run Queries
+
+When the [Database Admin](/admin-ui-database) plugin is also registered, any `SELECT` query captured by the
+Profiling UI can be explained and re-run from its detail panel:
+
+```csharp
+services.AddPlugin(new ProfilingFeature());
+services.AddPlugin(new AdminDatabaseFeature());
+```
+
+**Explain** shows the [query plan](/ormlite/explain) your RDBMS uses for the query without running it, making it
+easy to see why a query is slow, e.g. if it's scanning a table instead of using an index:
+
+<div class="block flex justify-center items-center">
+    <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling/profiling-explain.webp">
+</div>
+
+**Analyze** runs the query to include what actually happened, like the actual rows and time of each step. It's most
+useful when the plan looks right but the query is still slow, as it shows where your RDBMS's estimates were wrong.
+As it needs to run the query it takes as long as the query does, so it's best to try **Explain** first:
+
+<div class="block flex justify-center items-center">
+    <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling/profiling-analyze.webp">
+</div>
+
+**Analyze** is only shown for databases that support it, which are PostgreSQL, SQL Server, MySQL and MariaDB.
+
+**Run Query** runs the query again with its original params and shows its first rows and how long it took:
+
+<div class="block flex justify-center items-center">
+    <img class="max-w-screen-md" src="/img/pages/admin-ui/profiling/profiling-run-query.webp">
+</div>
+
+These features are designed to be safe to use on a live database:
+
+- Only `SELECT` queries your App has already run can be explained or re-run, selected from the profiled queries.
+  SQL can't be entered or edited.
+- Queries are run in a transaction that's rolled back.
+- They require the `Admin` role, and run on the same named connection as the original query.
+- **Run Query** returns the first 20 rows, configurable with `RunQueryLimit`:
+
+```csharp
+services.AddPlugin(new AdminDatabaseFeature {
+    RunQueryLimit = 50,
+});
+```
+
+Queries run by these features aren't profiled, so they don't appear in the slowest queries.
+
 ### Redis Profiling
 
 Redis simpler commands are captured in a list of arguments:
@@ -502,6 +570,12 @@ class ProfilingFeature
     // Size of circular buffer of profiled events
     int Capacity = 10000;
 
+    // The number of slowest OrmLite queries to retain, 0 to disable
+    int SlowQueriesLimit = 50;
+
+    // Don't profile OrmLite events of connections with these tags
+    HashSet<string> ExcludeTags = new();
+
     // Don't log requests of these types. By default Profiling/Metadata requests are excluded
     List<Type> ExcludeRequestDtoTypes = new();
 
@@ -717,7 +791,7 @@ The `ServiceStack.Messaging` meter records:
 Messaging metrics are tagged with `messaging.system`, `messaging.destination.name` and, when sending or
 processing failed, `error.type`.
 
-For Background Jobs metrics, see [Background Jobs OpenTelemetry](/background-jobs-monitoring#opentelemetry).
+For Background Jobs metrics, see [Background Jobs OpenTelemetry](/jobs/monitoring#opentelemetry).
 
 #### Detailed spans
 

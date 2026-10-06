@@ -30,6 +30,12 @@ OrmLiteConfig.UpdateFilter = (dbCmd, row) => {
 
 Which will ensure that the `CreatedDate` and `ModifiedDate` fields are populated on every insert and update.
 
+::: info
+These filters are global, so they can't easily use values from the current request, like its user or tenant. Use
+[Connection Write Rules](/ormlite/connection-filters#write-rules) to set columns from a scope each connection
+provides, e.g. `f.OnWrite<IAudit>(x => x.ModifiedBy, s => s.UserId)` in a `FilterSet`.
+:::
+
 ## Validation Example
 
 The filters can also be used for validation where throwing an exception will prevent the operation and bubble the exception, e.g:

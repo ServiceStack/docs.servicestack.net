@@ -1,18 +1,6 @@
 @{
-    var menuItems = new (string Href, string Text)[]
-    {
-        ("/templates/", "Project Templates"),
-        ("/vue/", "Vue"),
-        ("/react/", "React"),
-        ("/add-servicestack-reference", "DTOs"),
-        ("/chat/", "AI"),
-        ("/rag", "RAG"),
-        ("/pdf", "PDF"),
-        ("/autoquery/", "AutoQuery"),
-        ("/auth/", "Auth"),
-        ("/ormlite/", "OrmLite"),
-        ("/redis/", "Redis"),
-    };
+    var sections = SiteSections.All;
+    var topBarCount = SiteSections.TopBarCount;
 }
 <header id="header" class="top-0 fixed z-50 h-14 bg-white/90 dark:bg-black/90 w-full shadow">
   <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
@@ -26,21 +14,44 @@
             </a>
           </div>
             <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
-                <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
-                @{
-                    void RenderNavLink(string href, string childContent, string? cls = null)
-                    {
-                        <a href="@href" class="@Html.ClassNames("inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium", Html.MatchesPath(href) ? "border-indigo-500 text-gray-900" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200", cls)">
-                            @Html.Raw(childContent)
-                        </a>
-                    }
-
-                    foreach (var menuItem in menuItems)
-                    {
-                        RenderNavLink(menuItem.Href,
-                            menuItem.Text == "Project Templates" ? "<span class=\"hidden xl:inline mr-1\">Project</span> Templates" : menuItem.Text);
-                    }
+                <!-- All sections are rendered, #nav-sections script shows the most recently visited -->
+                @for (var i = 0; i < sections.Length; i++)
+                {
+                    var item = sections[i];
+                    <a href="@item.Href" data-section="@item.Id" class="@Html.ClassNames("items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap", i < topBarCount ? "inline-flex" : "hidden", Html.MatchesPath(item.Href) ? "border-indigo-500 text-gray-900 dark:text-gray-100" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200")">
+                        @if (item.Id == "templates")
+                        {
+                            <span class="hidden xl:inline mr-1">Project</span><span>Templates</span>
+                        }
+                        else
+                        {
+                            @item.Text
+                        }
+                    </a>
                 }
+                <div class="relative inline-flex items-center">
+                    <button type="button" v-on:click.stop="more=!more" :aria-expanded="more" aria-haspopup="true"
+                            class="inline-flex items-center gap-x-1 px-1 pt-1 h-full border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                        More
+                        <svg :class="['size-4 transition-transform', more ? 'rotate-180' : '']" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div data-more v-cloak v-show="more" v-on:click.stop class="absolute left-1/2 top-full z-10 mt-1 w-screen max-w-sm -translate-x-1/2 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg ring-1 ring-gray-900/5 dark:ring-white/10">
+                        <div class="max-h-[calc(100vh-6rem)] overflow-y-auto p-2">
+                            @for (var i = 0; i < sections.Length; i++)
+                            {
+                                var item = sections[i];
+                                <a href="@item.Href" data-section="@item.Id" class="@Html.ClassNames("group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800", i < topBarCount ? "hidden" : "flex")">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5">@Html.Raw(item.Icon)</span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">@item.Text</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">@item.Description</span>
+                                    </span>
+                                </a>
+                            }
+                        </div>
+                        <a href="/#sections" class="block bg-gray-50 dark:bg-gray-800 px-4 py-2 text-center text-xs font-medium text-indigo-600 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700">Browse all sections</a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:items-center">
@@ -68,32 +79,69 @@
     <div v-cloak v-if="open" class="sm:hidden">
         <div class="space-y-1 pb-3 pt-2">
             <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
-            @{
-                void RenderMobileLink(string href, string childContent, string? cls = null)
-                {
-                    <a href="@href" class="@Html.ClassNames("block border-l-4 py-2 pl-3 pr-4 text-base font-medium", 
-                                           Html.MatchesPath(href) ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200" : "border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100", cls)">
-                        @Html.Raw(childContent)
-                    </a>
-                }
-                foreach (var menuItem in menuItems)
-                {
-                    RenderMobileLink(menuItem.Href, menuItem.Text);
-                }
+            @foreach (var item in sections)
+            {
+                <a href="@item.Href" class="@Html.ClassNames("block border-l-4 py-2 pl-3 pr-4 text-base font-medium",
+                                       Html.MatchesPath(item.Href) ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200" : "border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100")">
+                    @item.Text
+                </a>
             }
         </div>
     </div>
   </nav>
 </header>
 
+<script id="nav-sections">
+// Runs before paint: record the section being visited and show the most recently visited sections in the top bar
+(function () {
+    var sections = @Html.Raw(sections.Select(x => new { id = x.Id, href = x.Href }).ToJson())
+    var count = @topBarCount, key = 'nav-sections', path = location.pathname
+    var ids = sections.map(function (x) { return x.id })
+    var recent = []
+    try { recent = JSON.parse(localStorage.getItem(key) || '[]').filter(function (id) { return ids.indexOf(id) >= 0 }) } catch (e) {}
+    var current = sections.find(function (x) {
+        var href = x.href.replace(/\/$/, '')
+        return path === href || path === href + '/' || (x.href.endsWith('/') && path.startsWith(x.href))
+    })
+    if (current) {
+        recent = [current.id].concat(recent.filter(function (id) { return id !== current.id })).slice(0, count)
+        try { localStorage.setItem(key, JSON.stringify(recent)) } catch (e) {}
+    }
+    // Most recently visited first, with any remaining slots filled by the default sections
+    var visible = recent.concat(ids.filter(function (id) { return recent.indexOf(id) < 0 })).slice(0, count)
+    document.querySelectorAll('#header [data-section]').forEach(function (el) {
+        var inTopBar = !el.closest("[data-more]")
+        var show = (visible.indexOf(el.dataset.section) >= 0) === inTopBar
+        el.classList.toggle('hidden', !show)
+        el.classList.toggle(inTopBar ? 'inline-flex' : 'flex', show)
+    })
+    // Move the visible top bar links to the front in most recently visited order
+    visible.slice().reverse().forEach(function (id) {
+        var el = document.querySelector('#header [data-section="' + id + '"]:not([data-more] *)')
+        if (el) el.parentNode.insertBefore(el, el.parentNode.firstChild)
+    })
+})()
+</script>
+
 <script type="module">
-import { ref } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 import { mount } from "app.mjs"
 
 const Header = {
     setup() {
         const open = ref(false)
-        return { open }
+        const more = ref(false)
+        const close = () => more.value = false
+        const onKey = e => { if (e.key === 'Escape') close() }
+        onMounted(() => {
+            document.addEventListener('click', close)
+            document.addEventListener('keydown', onKey)
+        })
+        onUnmounted(() => {
+            document.removeEventListener('click', close)
+            document.removeEventListener('keydown', onKey)
+        })
+        return { open, more }
     }
 }
 mount('#header', Header)

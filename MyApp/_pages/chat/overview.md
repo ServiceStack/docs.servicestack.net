@@ -11,6 +11,20 @@ title: AI Chat Overview
 <chat-anatomy>
 </chat-anatomy>
 
+## A connected AI workspace
+
+AI.Chat shares its native Vue ES-module interface with [llms.py](https://llmspy.org), backed by
+ServiceStack Identity, OrmLite, and App_Data. Continue from conversations into:
+
+- [Decision Studio](/chat/decision-studio): reusable typed decisions, probabilities, examples, and community recipes.
+- [Workspace Explorer](/chat/workspace-explorer) and [Git](/chat/git): file previews, diffs, commits, stashes, and controlled remote access.
+- [Projects](/chat/projects): initialize or clone repositories, organize chat workspaces, reorder, and archive.
+- [ChatGPT Sign-In](/chat/chatgpt): eligible personal subscription chat with explicit consent.
+- [Saved Gemini imports](/chat/gemini-imports#saved-imports): editable manifests, synchronized sources, and resumable uploads.
+- [Publishing](/chat/publishing): account-free static project exports, plus optional public conversations, projects, media, and worked decision recipes through `share_llmspy`.
+
+The host controls permissions and transport policy; shared screens do not imply shared credentials.
+
 ## Two plugins
 
 AI Chat ships as two independent plugins in the **ServiceStack.AI.Chat** package:

@@ -13,6 +13,20 @@ AI Chat solves this with a shared extension architecture spanning the server and
 <extension-catalog>
 </extension-catalog>
 
+The shared UI also includes these built-ins:
+
+| Extension | Capability | Setup |
+| --- | --- | --- |
+| `projects` | [Workspace Explorer](/chat/workspace-explorer), stable project IDs, reorder/archive, managed creation | Per-user App_Data workspaces |
+| `git` | [Diffs, commits, stashes, remote actions](/chat/git) | Git on PATH; hosted transport policy by default |
+| `jev` | [Decision Studio](/chat/decision-studio) | OpenRouter key for execution |
+| `openai_auth` | [ChatGPT subscription sign-in](/chat/chatgpt) | Eligible personal account and plan-usage consent |
+| `share_static` | [Static project exports](/chat/publishing#publish-to-a-static-folder) | Enabled by default; no publisher account |
+| `share_llmspy` | [Public links and worked recipes](/chat/publishing) | `ShareLlmspy.Enabled = true` and per-user connection |
+
+The Git extension disables itself when Git or Projects is unavailable. Workspace file browsing remains
+available without Git. All UI modules use the same native Vue ES modules as llms.py.
+
 ## What an extension can contribute
 
 <extension-surface>
@@ -25,7 +39,7 @@ AI Chat solves this with a shared extension architecture spanning the server and
 
 ```csharp
 services.AddPlugin(new ChatFeature {
-    DisableExtensions = ["computer", "publish", "katex"],
+    DisableExtensions = ["computer", "share_llmspy", "katex"],
 });
 ```
 
@@ -52,7 +66,7 @@ services.AddPlugin(new ChatFeature {
     Tools    = { EnableCodeExecution = true, EnableFilesystemTools = true },
     ApiTools = { IncludeTags = ["CoffeeShop"] },
     Mcp      = { ToolGroups = ["api_tools"] },
-    Publish  = { Enabled = true },
+    ShareLlmspy = { Enabled = true },
 });
 ```
 
@@ -62,13 +76,17 @@ services.AddPlugin(new ChatFeature {
 | `App` | `app` |
 | `Agents` | `agents` |
 | `Projects` | `projects` |
+| `Git` | `git` |
+| `Jev` | `jev` |
+| `OpenAiAuth` | `openai_auth` |
 | `Tools` | `tools` |
 | `CoreTools` | `core_tools` |
 | `Computer` | `computer` |
 | `Gallery` | `gallery` |
 | `Skills` | `skills` |
 | `Voice` | `voice` |
-| `Publish` | `publish` |
+| `ShareStatic` | `share_static` |
+| `ShareLlmspy` | `share_llmspy` |
 | `Gemini` | `gemini` |
 | `Katex` | `katex` |
 | `Pdf` | `pdf` |
@@ -84,6 +102,17 @@ services.AddPlugin(new ChatFeature {
 ```csharp
 var bookings = feature.AssertExtension<BookingToolsExtension>();
 ```
+
+### Independent sharing destinations
+
+`ShareStatic` exports project builds beneath the host's web content directory, normally `wwwroot/p`.
+`ShareLlmspy` publishes to ai.llmspy.org and is an explicit opt-in. Use either, both, or neither;
+disabling remote publishing does not disable Folder exports. With no available sharing tabs, core
+hides the Share icon. See [Publishing](/chat/publishing) for the typed `StaticPublishConfig` override
+and global configuration file.
+
+Custom extensions register ordered sharing tabs with
+[`ctx.setShareOptions`](/chat/custom-extensions#sharing-options); core owns the toolbar icon and panel.
 
 ## Install order
 

@@ -89,11 +89,13 @@ For a fully self-hosted deployment, enable only `ollama` or `lmstudio` - nothing
 
 ### Preserving your changes
 
-By default the bundled `llms.json`, `providers.json` and `providers-extra.json` **overwrite** the copies in `App_Data/chat` on every startup, so each release ships with current defaults and an up-to-date model catalog. To keep a modified copy, list it in `PreserveConfigs`. It's then only seeded when missing:
+`llms.json` is seeded only when missing and preserves user settings across restarts. Provider
+catalogs (`providers.json` and `providers-extra.json`) refresh from bundled defaults on startup unless
+their filenames are listed in `PreserveConfigs`. Preserved catalog files are seeded when missing.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
-    PreserveConfigs = ["llms.json", "providers-extra.json"],
+    PreserveConfigs = ["providers-extra.json"],
 });
 ```
 
@@ -221,3 +223,11 @@ Then reference it from `llms.json`:
 ```
 
 Most services only need `OpenAiCompatibleProvider` with a different `base_url`.
+
+## Catalog updates and subscription models
+
+The bundled catalog adds new model definitions and refreshes prices, context limits, and capabilities.
+Use [Update Provider Models](/chat/configuration#update-provider-models) for updates between releases,
+or call `UpdateProviderModelsAsync()` as described above. Preserve custom catalog files explicitly.
+[ChatGPT Sign-In](/chat/chatgpt) uses the connected account's available-model catalog; a bundled model
+entry does not itself grant subscription access.

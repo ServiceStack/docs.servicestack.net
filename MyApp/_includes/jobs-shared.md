@@ -5,34 +5,34 @@ the following options:
 
 **When and where it runs**
 
- - `Queue` - Run the job on a [named queue](/background-jobs-queues) with its own concurrency, e.g. `emails`
+ - `Queue` - Run the job on a [named queue](/jobs/queues) with its own concurrency, e.g. `emails`
  - `Priority` - Higher priority jobs are started first within their queue
  - `Worker` - Serially process job using a named worker thread 
- - `ConcurrencyKey` - Jobs sharing a key [run one at a time](/background-jobs-queues#concurrency-keys), while different keys run in parallel
+ - `ConcurrencyKey` - Jobs sharing a key [run one at a time](/jobs/queues#concurrency-keys), while different keys run in parallel
  - `RunAfter` - Queue jobs that are only run after a specified date
- - `ExpiresAt` / `ExpiresIn` - [Cancel the job](/background-jobs-reliability#job-expiry) instead of running it late
+ - `ExpiresAt` / `ExpiresIn` - [Cancel the job](/jobs/reliability#job-expiry) instead of running it late
  - `UserId` - Execute within an Authenticated User Context
 
 **Workflows**
 
  - `DependsOn` - Execute jobs after completion of a parent job
-   - `DependsOnPolicy` - Run only if the parent succeeded (default), or [however it finished](/background-jobs-workflows#run-however-the-parent-finished)
- - `DependsOnBatch` - Execute after [every job in a batch](/background-jobs-workflows#fan-in-after-a-batch) has finished
- - `BatchId` - Add the job to a [Job Batch](/background-jobs-workflows#job-batches) to track its progress
+   - `DependsOnPolicy` - Run only if the parent succeeded (default), or [however it finished](/jobs/workflows#run-however-the-parent-finished)
+ - `DependsOnBatch` - Execute after [every job in a batch](/jobs/workflows#fan-in-after-a-batch) has finished
+ - `BatchId` - Add the job to a [Job Batch](/jobs/workflows#job-batches) to track its progress
  - `Callback` - Invoke another command with the result of a successful job 
- - `ReplyTo` - [Deliver the result](/background-jobs-workflows#deliver-results-to-replyto) to a URL or MQ queue when the job completes
+ - `ReplyTo` - [Deliver the result](/jobs/workflows#deliver-results-to-replyto) to a URL or MQ queue when the job completes
 
 **Failure handling**
 
  - `RetryLimit` - Override default retry limit for how many attempts should be made to execute a job
- - `RetryBackoff`, `RetryDelay`, `MaxRetryDelay` - How long to [wait between retries](/background-jobs-reliability#retries-and-backoff)
+ - `RetryBackoff`, `RetryDelay`, `MaxRetryDelay` - How long to [wait between retries](/jobs/reliability#retries-and-backoff)
  - `TimeoutSecs` / `Timeout` - Override default timeout for how long a job should run before being cancelled
 
 **Preventing duplicates**
 
  - `RefId` - Allow clients to specify a unique Id (e.g Guid) to track job
-   - `DuplicateRefIdBehavior` - [Return the existing job](/background-jobs-reliability#idempotent-enqueue) when the same `RefId` is queued again
- - `SingletonKey` - Only allow [one queued or running job](/background-jobs-reliability#singleton-jobs) with this key
+   - `DuplicateRefIdBehavior` - [Return the existing job](/jobs/reliability#idempotent-enqueue) when the same `RefId` is queued again
+ - `SingletonKey` - Only allow [one queued or running job](/jobs/reliability#singleton-jobs) with this key
 
 **Metadata**
 
@@ -73,7 +73,7 @@ var result = await jobs.RunCommandAsync<SendEmailCommand>(new SendEmail {...},
 
 ### Serially Execute Jobs with named Workers
 
-By default jobs are executed by the Workers of their [queue](/background-jobs-queues), which run up to
+By default jobs are executed by the Workers of their [queue](/jobs/queues), which run up to
 `MaxConcurrentJobs` (default: the number of CPU cores) jobs at a time. We can also change the behavior to
 instead execute jobs one-by-one in a serial queue by specifying them to use the same named 
 worker as seen in the example above.
@@ -187,7 +187,7 @@ If instead an exception was thrown during execution, the job will be failed and
 all its dependent jobs cancelled and removed from the queue.
 
 :::tip
-See [Workflows & Batches](/background-jobs-workflows) for running a job however its parent finished,
+See [Workflows & Batches](/jobs/workflows) for running a job however its parent finished,
 tracking the progress of a batch of jobs and running a job once a whole batch has finished.
 :::
 
@@ -347,7 +347,7 @@ var jobRef = jobs.EnqueueCommand<AggregateMonthlyDataCommand>(new Aggregate {
    });
 ```
 
-See [Retries & Reliability](/background-jobs-reliability) for how retries are spaced out, the history
+See [Retries & Reliability](/jobs/reliability) for how retries are spaced out, the history
 kept for each failed attempt, and expiring jobs that shouldn't run late.
 
 ### Logging, Cancellation an Status Updates
@@ -478,7 +478,7 @@ This has a few benefits over sending the callback yourself:
 
 A `ReplyTo` that's an `http://` or `https://` URL receives the result as a JSON POST, anything else is
 treated as an [MQ](/messaging) queue name the result is published to. See
-[Deliver results to ReplyTo](/background-jobs-workflows#deliver-results-to-replyto) to customize how
+[Deliver results to ReplyTo](/jobs/workflows#deliver-results-to-replyto) to customize how
 results are delivered, or restrict where they can be sent.
 
 #### Callback URLs
@@ -491,7 +491,7 @@ want to use an internal Id that can't be guessed (like a Guid) so the callback c
 
 If you need more control over how a callback is sent, the `SendJsonCallbackAsync` extension method
 supports a number of formats for customizing the HTTP Request, which you can use from your own command
-or from a custom [OnJobReplyTo](/background-jobs-workflows#deliver-results-to-replyto) handler:
+or from a custom [OnJobReplyTo](/jobs/workflows#deliver-results-to-replyto) handler:
 
 ```csharp
 await clientFactory.SendJsonCallbackAsync(callbackUrl, result, token);
@@ -521,17 +521,6 @@ When needed headers, passwords and tokens can be URL encoded if they contain any
 
 ## Implementing Commands
 
-At a minimum a command need only implement the simple [IAsyncCommand interface](/commands#commands-feature): 
-
-```csharp
-public interface IAsyncCommand<in T>
-{
-    Task ExecuteAsync(T request);
-}
-```
-
-Which is the singular interface that can execute any command.
-
-However commands executed via Background Jobs have additional context your commands may need to 
-access during execution, including the `BackgroundJob` itself, the `CancellationToken` and
-an Authenticated User Context.
+Commands are the recommended way to implement Background Jobs. See [Commands in Background Jobs](/jobs/commands)
+for how to implement them with the ergonomic `SyncCommand*` and `AsyncCommand*` base classes, access the
+executing `BackgroundJob`, and use named Workers to serialize writes to your databases.

@@ -60,7 +60,7 @@ expect to preview and synchronize repeatedly.
 | **Include only** | Optional glob such as `**/*.md`. |
 | **Exclude** | Optional glob such as `**/drafts/**`. |
 | **Destination category** | Prefix applied to every category produced by the import. |
-| **Save as recurring import** | Retains the source definition after a confirmed import. |
+| **Ignore files and folders** | Comma/newline-separated paths or globs such as `private/, **/generated/**`. |
 
 <screenshots-gallery-view :images="{
     'Folder configuration': '/img/pages/chat/gemini/gemini-23-import-folder.webp',
@@ -82,6 +82,9 @@ set, otherwise from Folder path.
 
 ### Preview before committing
 
+**Preview import** saves the current source settings and scans without changing documents, uploading
+content, or spending on embeddings. A dismissed preview leaves the folder in Saved imports.
+
 <preview-ledger>
 </preview-ledger>
 
@@ -93,10 +96,42 @@ Search index, so one synchronization updates both Website Search and Gemini RAG.
 
 ### Saved imports
 
-Enable **Save as a recurring import** and give the import a unique name before confirming it. A
-preview alone does not create a saved import; it appears only after the import is actually run.
+Folder imports are saved when previewed; web crawls are saved after crawling. Both appear in the same
+**Saved imports** list. Give each source a unique name within its File Store. A dismissed preview leaves
+its source available to run later.
 
-<screenshot src="/img/pages/chat/gemini/gemini-20-import-saved.webp" title="Saved recurring imports with preview results and trusted folder configuration"></screenshot>
+<screenshot src="/img/pages/chat/gemini/gemini-imports.webp" title="Editing a saved Gemini folder import with file filters, ignore paths, metadata, preview, run, and save actions"></screenshot>
+
+| Action | Result |
+| --- | --- |
+| **Load import.json** | Browse a server folder or enter a manifest path; save the source and open its editor without uploading |
+| **Edit** | Open the existing Folder or Web crawl editor with current manifest settings |
+| **Save changes** | Update the source manifest without running an import or spending on embeddings |
+| **Preview** | Rescan and compare documents without indexing |
+| **Run** | Import the source's current files and resume pending work |
+| **Remove** | Stop syncing this source; keep its manifest, source files, and previously imported documents |
+| **Close editor** | Clear the current form to start another source; keep the saved import |
+
+Loaded folder manifests open in **Folder**; crawl manifests open in **Web crawl**. **Import folder**
+continues from a crawl into Folder to configure attributes before **Run import**. **Edit crawl settings**
+and **Edit folder settings** move between those forms without losing their shared configuration.
+Preview and Run save current settings first. Selecting another store category does not overwrite the
+loaded import's destination.
+
+Removing and reloading the same manifest in the same store reconnects its existing documents. Loading
+a crawl workspace outside your private Gemini imports directory copies its manifest, generated Markdown,
+and nested metadata into a private named workspace; the original stays untouched. Reloading it refreshes
+that same private copy without creating suffixed duplicates.
+
+Re-running compares normalized content, metadata, and titles, reusing document identities. Unchanged,
+successfully uploaded files need no new embeddings. Changed documents replace their old remote copy
+after the new copy succeeds; removal failures retain the old identity and report an error for retry.
+Pending and failed uploads reuse existing document rows. A locally unchanged file can still be
+**Awaiting Gemini upload**: use **Resume** or Run to finish its existing queue entry.
+
+Missing upstream files follow the saved deletion policy; the default removes the Gemini copy and
+retains a local tombstone. Large deletions still require confirmation through the individual source run.
+
 
 Saved imports are composable: run several of them into the same File Store to create a unified corpus
 from content that remains owned and deployed independently. For example, the Explorer below contains
@@ -110,7 +145,7 @@ across all four sites.
 
 Re-running a saved import compares normalized content and metadata independently. The saved source
 key identifies the same document on later runs, while content and metadata hashes determine whether
-it changed. Unchanged files are not embedded or locally indexed again. Content changes and
+it changed. Unchanged, successfully indexed files need no new work; locally unchanged files may still await a Gemini upload. Content changes and
 metadata-only changes queue both indexes because Gemini cannot patch indexed metadata in place and
 Search ranking or filtering may depend on the changed metadata.
 
@@ -156,7 +191,7 @@ Search sections; metadata-only changes avoid unnecessary content work.
 
 Both the upload and Search workers use durable desired/completed state. Pending work survives an App
 restart and resumes automatically. Failed documents retain their error for inspection and retry. Use
-**Sync Store** to reconcile the local catalogue with remote Gemini state, and **Rebuild index** when
+**Sync Store** to reload enabled saved imports, refresh crawls, import changed sources, and reconcile remote state, and **Rebuild index** when
 extraction or database search configuration changes - see
 [Explore & Ask](/chat/gemini-explore#coverage-and-synchronization) and
 [Operations & Troubleshooting](/chat/gemini-operations).
@@ -199,9 +234,38 @@ a nested directory inherits and overwrites settings for the files beneath it.
 ```
 
 When the UI contains no explicit metadata, Preview import automatically loads the root manifest.
-Saving a recurring folder import writes its effective metadata back atomically while preserving
-crawl and transform settings.
+Saving a folder import writes its effective settings back atomically while preserving
+crawl and transform settings. Saving does not run the import.
 
 Metadata defaults and rules in a manifest use the fields described in
 [Metadata & Source URLs](/chat/gemini-metadata). To import a public website, stage it first with
 [Crawling Websites](/chat/gemini-crawling), which hands its cleaned workspace to Folder import.
+
+### Portable source settings
+
+A root `import.json` can store the complete source alongside metadata:
+
+```json
+{
+  "version": 1,
+  "source": {
+    "name": "Product docs",
+    "type": "folder",
+    "config": {
+      "path": ".",
+      "include": ["**/*.md", "**/*.html"],
+      "ignore": ["drafts/", "private.md", "**/generated/**"],
+      "requireSourceUrl": false
+    },
+    "category": { "root": "docs", "maxDepth": 4, "prefix": "product" },
+    "extract": { "minWords": 25 },
+    "onDelete": "tombstone"
+  },
+  "metadata": { "defaults": { "product": "My product" }, "rules": [] }
+}
+```
+
+Paths are relative to the manifest directory; `.` selects that directory. Absolute paths also work.
+`include`, `exclude`, and `ignore` accept arrays of paths or globs. A folder pattern such as `drafts/`
+ignores its whole subtree. Nested manifests add exclusions relative to their own folder and can override
+metadata. Existing metadata-only manifests remain supported; crawl rules and transforms share this file.

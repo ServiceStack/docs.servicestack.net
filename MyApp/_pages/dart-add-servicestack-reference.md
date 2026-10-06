@@ -854,7 +854,7 @@ var apiKeys = await client.get(GetApiKeys());
 var navItems = await client.get(GetNavItems());
 ```
 
-[Background Jobs](/background-jobs) DTOs like `BackgroundJob`, `JobSummary`, `ScheduledTask`, `CompletedJob` and `FailedJob` are also included.
+[Background Jobs](/jobs/) DTOs like `BackgroundJob`, `JobSummary`, `ScheduledTask`, `CompletedJob` and `FailedJob` are also included.
 
 ### Inspecting API Responses
 

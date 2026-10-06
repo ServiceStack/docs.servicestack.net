@@ -6,7 +6,7 @@ Up until this release all of ServiceStack's database features like [AutoQuery](h
 have been database agnostic courtesy of OrmLite's [support for popular RDBMS's](/ormlite/installation)
 so that they integrate into an App's existing configured database.
 
-[Background Jobs](/background-jobs-sqlite) is our first foray into a SQLite-only backend, as it's the only 
+[Background Jobs](/jobs/sqlite) is our first foray into a SQLite-only backend, as it's the only 
 RDBMS that enables us to provide encapsulated black-box functionality without requiring any infrastructure 
 dependencies. It's low latency, high-performance and ability to create lightweight databases on the fly make 
 it ideal for self-managing isolated appliance backends like Background Jobs and Request Logging which don't 

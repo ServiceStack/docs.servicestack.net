@@ -13,6 +13,9 @@ ways for inserting large amounts of data from code, which is encapsulated behind
 db.BulkInsert(rows);
 ```
 
+Use [BulkUpsert](/ormlite/bulk-upsert) to also update the rows that already exist. For fewer rows, or rows that need
+the filters and rules of your connection, `InsertAll` [sends its rows together](/ormlite/batched-writes).
+
 ## Async Bulk Inserts
 
 Use `BulkInsertAsync` when inserting rows from an async workflow. It has the same `BulkInsertConfig`

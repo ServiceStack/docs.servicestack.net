@@ -25,6 +25,21 @@ using (IDbTransaction dbTrans = db.OpenTransaction())
 }
 ```
 
+## Retry transactions that deadlock
+
+`RunInTransaction` runs your code in a transaction and commits it. With a
+[RetryPolicy](/ormlite/retries), a transaction that fails with a temporary error, e.g. a deadlock or serialization
+failure, is rolled back and run again:
+
+```csharp
+db.RunInTransaction(() => {
+    db.UpdateAdd(() => new Account { Balance = -amount }, x => x.Id == fromId);
+    db.UpdateAdd(() => new Account { Balance = amount }, x => x.Id == toId);
+});
+```
+
+See [Retrying Temporary Errors](/ormlite/retries#retry-a-whole-transaction).
+
 ## Custom Isolation Level
 
 Which also supports custom Isolation Levels:

@@ -57,7 +57,7 @@ For example, pattern `\b0(\d)\b` with replacement
 
 **Apply transforms** updates the workspace and saves the rules to `import.json`. **View crawled
 pages** opens a large read-only browser with directories on the left and vertically scrollable file
-content on the right. When the content is ready, **Import this folder** opens Folder import with the
+content on the right. When the content is ready, **Import folder** opens Folder import with the
 workspace path and metadata pre-populated.
 
 Saved crawl imports are deep-linkable. Reopen one to load its configuration, make more
@@ -68,3 +68,15 @@ Because the workspace is imported through the normal folder pipeline, everything
 trusted roots, and `import.json` manifests. Crawl frontmatter supplies per-page metadata described
 in [Metadata & Source URLs](/chat/gemini-metadata), where a crawled page's own source URL becomes
 the citation link.
+
+## Saved crawl settings
+
+Crawls and folder imports share [Saved imports](/chat/gemini-imports#saved-imports) and their portable
+`import.json`. **Edit crawl settings** and **Edit folder settings** move between forms without losing
+the shared configuration. **Save changes** updates settings without indexing; Preview and Run save
+the current settings first. **Sync Store** refreshes enabled crawls using saved rules and transforms.
+
+Loading a crawl workspace outside the user's private Gemini imports directory copies its manifest,
+Markdown, and nested metadata to a private named workspace. The source remains untouched; reloading
+refreshes the same private copy instead of creating suffixed duplicates. Repeated imports reuse
+document identities and resume pending uploads.

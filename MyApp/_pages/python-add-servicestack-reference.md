@@ -845,7 +845,7 @@ Together with the built-in Response Types, interface markers and base types that
 | `UploadFile`                                                     | A file uploaded in a `multipart/form-data` Request                 |
 | `WebServiceException`                                            | Structured error details of a failed Request                       |
 
-As well as the DTOs for querying and managing [Background Jobs](/background-jobs), e.g. `BackgroundJob`,
+As well as the DTOs for querying and managing [Background Jobs](/jobs/), e.g. `BackgroundJob`,
 `JobSummary`, `BackgroundJobOptions`, `ScheduledTask`, `CompletedJob`, `FailedJob`, `BackgroundJobState`,
 `JobStatSummary`, `HourSummary` and `WorkerStats`.
 

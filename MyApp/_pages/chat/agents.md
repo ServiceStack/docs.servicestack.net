@@ -51,6 +51,14 @@ profiles/support-assistant/
     'Restrict the profile’s tools': '/img/pages/chat/profiles/profile-tools.webp',
 }"></screenshots-gallery>
 
+## Choose a profile model
+
+Click **Selected Model** in the profile editor to open the shared model-card picker. Search by name,
+ID, or provider; filter providers; sort by release date, price, context limit, or name. The initial
+view shows the newest 20 models and loads another 20 as you scroll, with pricing, context, and
+capabilities. **Use default model** clears the profile override. Decision Studio uses the same picker
+for recipe writing; the main chat keeps its existing selector.
+
 ## Composing a system prompt
 
 The simplest profile has a `SYSTEM.md` used verbatim. For anything organizational, a `SYSTEM.template` composes the prompt from sibling Markdown files with `{VAR}` substitutions:

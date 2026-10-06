@@ -139,13 +139,16 @@ On startup AI Chat writes its configuration into `App_Data/chat`:
   ['App_Data/chat/cache/','Content-addressed asset cache'],
   ['App_Data/chat/user/{user}/','Per-user prefs, projects, profiles, skills, pdf']]"></text-block>
 
-The bundled `llms.json`, `providers.json` and `providers-extra.json` are overwritten on every startup. To keep a modified copy, add it to `PreserveConfigs`:
+`llms.json` is seeded only when missing and preserves user settings across restarts. Provider
+catalogs (`providers.json` and `providers-extra.json`) refresh from bundled defaults on startup unless
+their filenames are listed in `PreserveConfigs`. Preserved catalog files are seeded when missing.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
-    PreserveConfigs = ["llms.json"],
+    PreserveConfigs = ["providers-extra.json"],
 });
 ```
+
 
 See [Data & Storage](/chat/data).
 

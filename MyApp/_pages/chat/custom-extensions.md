@@ -285,6 +285,55 @@ ctx.AddIndexFooter("<!-- analytics -->");
 
 Because the UI is assembled from registered Vue components, registering a component under an existing name replaces that building block - which is how an App rebrands or specializes the experience without forking.
 
+### Sharing options
+
+An extension's `index.mjs` can register a tab in the core Share panel with `ctx.setShareOptions`.
+Core owns the toolbar icon, panel, and tab selection; each extension owns its component and errors.
+A separate top-bar icon registration is unnecessary.
+
+```js
+const ExportPanel = {
+    template: `<p>Export the current conversation from this panel.</p>`,
+}
+
+export default {
+    install(ctx) {
+        ctx.setShareOptions({
+            my_export: {
+                name: 'Export',
+                component: ExportPanel,
+                order: 50,
+                isVisible: ctx => !!ctx.threads.currentThread?.value,
+            },
+        })
+    },
+}
+```
+
+| Option | Purpose |
+| --- | --- |
+| Map key | Unique option ID, normally the extension name. Re-registering replaces the option. |
+| `name` | Tab label; defaults to the humanized ID. |
+| `component` | Required Vue component, mounted while its tab is selected. |
+| `order` | Finite numeric sort order, ascending; defaults to `100`. |
+| `props` | Optional object passed to the selected component. |
+| `isVisible(ctx)` | Optional reactive visibility predicate receiving the app context. |
+
+The first available tab by order is selected initially. If the selected tab disappears, the panel
+falls back to the first available tab. Core hides the icon when all tabs are hidden and removes it
+when no options are registered; an open panel closes when its last tab disappears.
+
+The built-in **Folder** option from `share_static` has order `10` and only appears for a selected
+project or project chat. **ai.llmspy.org** from `share_llmspy` has order `100`; the example's order `50`
+places Export between them. Unregister with:
+
+```js
+ctx.setShareOptions({ my_export: null })
+```
+
+`ExtensionScope.setShareOptions` delegates to the same API. See [Publishing](/chat/publishing) for
+independently enabling the built-in destinations.
+
 ## Disabling from inside Install
 
 Set `ctx.Disabled` when a prerequisite is missing. The extension is skipped and nothing it registered is kept:
@@ -327,3 +376,36 @@ services.AddPlugin(new ChatFeature {
 ```
 
 See [MCP Server](/chat/mcp_server).
+
+## Workspace Panels
+
+Register a tab in the right workspace sidebar with `ctx.setRightIcons()`:
+
+```javascript
+ctx.setRightIcons({
+  notes: {
+    name: 'Notes',
+    title: 'Workspace notes',
+    component: NotesIcon,
+    panel: NotesPanel,
+    // preview: NotesPreview,
+    isVisible: ({ workspace, projectId }) => !!workspace,
+  },
+})
+```
+
+`panel` receives `workspace` (validated roots and selected directory), `projectId`, and `refreshKey`.
+It owns loading/error/empty states, ignores or cancels stale requests, and emits `busy` while loading.
+Emit `file` with `{ path }` for the shared file preview, or `{ path, preview: 'notes', directoryPath }`
+when registering a custom `preview` component. Optional `aliases` support older tab IDs. Visibility
+predicates may receive a null workspace while it loads.
+
+The host manages URL selection and clears stale previews on page/project changes. Server routes must
+independently validate the authenticated workspace rather than trusting browser paths. See
+[Workspace Explorer](/chat/workspace-explorer) for user-facing navigation.
+
+## Settings Cards
+
+Use `ctx.setSettings({ MySettingsCard })`, or the same method on an extension scope, to contribute a
+component to Settings. Keep account-owned state and requests with their originating user; never expose
+credentials through a UI card or browser storage.

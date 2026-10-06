@@ -40,7 +40,7 @@ previous ServiceStack v8.3 release we [worked around this limitation](/commands#
 by using [MQ Command DTOs](/commands#mq-command-dtos) to route all DB
 Writes to be executed by a single Background MQ Thread.
 
-This works great for [messaging-based architectures](/commands#messaging)
+This works great for [messaging-based architectures](/commands#messaging-workflow)
 where you can queue commands to be processed serially, but the overhead of using commands for all 
 DB writes can be cumbersome when needing to perform sporadic writes within complex logic.
 
@@ -309,7 +309,7 @@ It's already been used to execute millions of LLM and Comfy UI Requests to gener
 and Generated Images used to populate the
 [Blazor Diffusion](https://github.com/NetCoreApps/BlazorDiffusionVue) and [pvq.app](https://pvq.app) websites. 
 
-It was the project used to develop and test [Background Jobs](/background-jobs-sqlite) in action 
+It was the project used to develop and test [Background Jobs](/jobs/sqlite) in action 
 where it serves as a private gateway to process all LLM, AI and image transformations requests 
 that any of our Apps need where it dynamically delegates requests across multiple Ollama, 
 Open AI Chat, LLM Gateway, Comfy UI, Whisper and ffmpeg providers. 

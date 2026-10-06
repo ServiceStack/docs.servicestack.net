@@ -88,11 +88,23 @@ Rooted at `App_Data/chat` by default, overridable with `AppDataPath`:
   ['user/{user}/skills/','Personal skills'],
   ['user/{user}/themes/','Custom themes'],
   ['user/{user}/pdf/','PDF Studio workspace'],
-  ['user/{user}/publish/config.json','Publish connection config']]"></text-block>
+  ['user/{user}/share_llmspy/config.json','Remote publisher connection config']]"></text-block>
 
 With `RequireAuth = false` everything runs as the `default` user, so all of the above lives under `user/default/`.
 
 Path resolution is guarded: any relative path that would escape `App_Data/chat` throws `UnauthorizedAccessException`.
+
+### Static project exports
+
+The global `user/default/share_static/config.json` configures static folder sharing. By default,
+exports live outside App_Data at `<WebContentDirectory>/p/<user>/<project-folder>/`, typically
+`wwwroot/p/...`. A custom `Directory` can select another export root. The UI abbreviates this root to
+`~/`; it does not display the full destination path.
+
+Project `staticPublication` metadata remains in the user's project configuration, separately from the
+remote publication link. Folder exports can be served by a static server without AI.Chat running.
+Include the export directory in deployment or backup if you need to retain the served copies.
+See [Publishing](/chat/publishing#publish-to-a-static-folder).
 
 ### The content-addressed cache
 
@@ -111,11 +123,13 @@ Cached files are served at `{RoutePrefix}/~cache/{path}` to authenticated users.
 
 ### Seeded config files
 
-`llms.json`, `providers.json` and `providers-extra.json` are written from embedded defaults on startup, **overwriting** existing copies so they stay current with each release. To edit one and keep your changes, add its file name to `ChatFeature.PreserveConfigs`. It's then only seeded when missing:
+`llms.json` is seeded only when missing and preserves user settings across restarts. Provider
+catalogs (`providers.json` and `providers-extra.json`) refresh from bundled defaults on startup unless
+their filenames are listed in `PreserveConfigs`. Preserved catalog files are seeded when missing.
 
 ```csharp
 services.AddPlugin(new ChatFeature {
-    PreserveConfigs = ["llms.json"],
+    PreserveConfigs = ["providers-extra.json"],
 });
 ```
 
@@ -167,3 +181,17 @@ db.Delete<ChatThread>(x => Sql.In(x.Id, ids));
 ```
 
 Deleting a user's folder under `App_Data/chat/user/{user}` removes their projects, profiles, skills, PDF workspace and preferences.
+
+## Decision, subscription, and creation state
+
+| Location | State |
+| --- | --- |
+| `App_Data/chat/user/{user}/jev/` | Portable recipes, immutable history, index, initialization receipt, and publication journals |
+| `App_Data/chat/user/{user}/credentials/openai_subscription.json` | Private per-user ChatGPT grant |
+| `App_Data/chat/openai-agent-host.json` | Public-sign-in host registration identity |
+| App database | Durable project-creation reservations, chat/run identities, and Gemini desired/completed work |
+
+Use a single owning host process per App_Data root for Decision Studio and rotating subscription
+credentials. Stop hosts before moving profiles and preserve hidden files and pending receipts.
+Back up the database and App_Data together. A downgrade requires restoring the matching pre-upgrade
+backup rather than handing migrated state to an older binary.

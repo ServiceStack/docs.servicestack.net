@@ -9,8 +9,26 @@ properties can be filtered, selected and ordered without embedding provider-spec
 <json-api-choice>
 </json-api-choice>
 
-When the shape of a JSON document is known, the preferred API is `Sql.Json<T>()`. It translates normal C# member access
-into the native JSON functions of the configured database:
+Properties with a complex type, e.g. a class or a `List`, are stored as JSON in a single column, and are queried like
+any other property:
+
+```csharp
+public class Customer
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Address Address { get; set; }       // stored as JSON
+    public List<string> Tags { get; set; }     // stored as JSON
+}
+
+var londonVips = db.Select<Customer>(x => x.Address.City == "London" && x.Tags.Contains("vip"));
+```
+
+See [Querying complex type properties](#querying-complex-type-properties) for what's supported.
+
+For JSON stored in a `string` column, the preferred API is `Sql.Json<T>()` when the shape of the JSON document is
+known. It translates normal C# member access into the native JSON functions of the configured database:
 
 ```csharp
 var q = db.From<OrderEvent>()
@@ -151,6 +169,123 @@ db.Insert(new OrderEvent {
     Data = document.ToJson(),
     Document = document,
 });
+```
+
+## Querying complex type properties
+
+When complex types are [stored as JSON](#storing-complex-properties-as-json), typed queries can read into them
+without any other API:
+
+```csharp
+public class Customer
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Address Address { get; set; }
+    public List<string> Tags { get; set; }
+    public List<OrderLine> Lines { get; set; }
+}
+
+public class Address
+{
+    public string City { get; set; }
+    public Country Country { get; set; }
+}
+```
+
+| Expression | Queries |
+|-|-|
+| `x.Address.City == "London"` | A property, at any depth: `x.Address.Country.Code` |
+| `x.Tags.Contains("vip")` | Whether a list or array has a value |
+| `x.Lines.Count > 1` | How many items a list has, or `Length` of an array |
+| `x.Lines[0].Quantity >= 2` | An item of a list by its position |
+| `x.Lines.Any(l => l.Sku == "A-1" && l.Quantity > 1)` | Whether a list has an item matching a condition |
+| `x.Lines.All(l => l.Shipped)` | Whether every item matches a condition |
+| `x.Lines.Count(l => l.Quantity > 10) >= 2` | How many items match a condition |
+
+They're used wherever a typed expression is, e.g. to filter, sort and select:
+
+```csharp
+var q = db.From<Customer>()
+    .Where(x => x.Address.Country.Code == "UK" && x.Tags.Contains("vip"))
+    .OrderBy(x => x.Address.City)
+    .Select(x => new { x.Name, City = x.Address.City });
+
+db.Count<Customer>(x => x.Address.City == "London");
+db.UpdateOnly(() => new Customer { Name = "Londoner" }, where: x => x.Address.City == "London");
+db.Delete<Customer>(x => x.Lines.Count == 0);
+```
+
+And on joined tables:
+
+```csharp
+var q = db.From<Customer>()
+    .Join<Order>((c, o) => c.Id == o.CustomerId)
+    .Where<Customer, Order>((c, o) => o.Source.Channel == "web" && c.Tags.Contains("vip"));
+```
+
+Values are sent as db params, and the same native JSON functions are used as `Sql.Json<T>()` below, which is for JSON
+in `string` columns.
+
+### Complex types need to be stored as JSON
+
+Querying a complex type property throws a `NotSupportedException` unless the dialect stores complex types as JSON,
+as their values can't be read by the JSON functions of an RDBMS otherwise:
+
+```csharp
+// The default of dialects configured with AddOrmLite()
+services.AddOrmLite(options => options.UsePostgres(connectionString));
+
+// Or set on a dialect provider
+PostgreSqlDialect.Provider.UseJson = true;
+```
+
+::: warning
+`UseJson` changes how complex types are saved, existing rows saved as JSV need to be converted to JSON before they
+can be queried.
+:::
+
+### What isn't a JSON property
+
+- **Properties of a joined table's type** refer to the columns of that table, e.g. `x.Customer.Name` in a query that
+  joins `Customer` is its `Name` column
+- **Types with their own converter**, e.g. PostgreSQL's `string[]` and `int[]` arrays and `hstore`, aren't stored as
+  JSON. PostgreSQL's arrays are queried the same way as lists, see [PostgreSQL arrays](#postgresql-arrays)
+- **Custom JSON serializers** aren't recognized, use `Sql.Json(x.Address).City` to query them
+
+See [When to use Sql.Json](#when-to-use-sqljson) for the cases that need it.
+
+### Conditions on the items of a list
+
+`Any()`, `All()` and `Count()` check each item of a list against a condition, which can use every property of the item
+and the text functions of its properties, including lists of values:
+
+```csharp
+// The same item has the Sku and the Quantity, unlike x.Lines[0]
+db.Select<Customer>(x => x.Lines.Any(l => l.Sku == sku && l.Quantity > 1));
+
+db.Select<Customer>(x => x.Lines.Any(l => !l.Shipped && l.Quantity >= x.MinQuantity)); // the row's columns
+db.Select<Customer>(x => x.Tags.Any(t => t.StartsWith("vip")));                      // lists of values
+db.Select<Customer>(x => x.Lines.Count(l => l.Quantity > 10) >= 2);
+```
+
+They're a subquery of the list's items, `EXISTS (SELECT 1 FROM ... WHERE ...)`, using `json_each()` in SQLite,
+`jsonb_path_query()` in PostgreSQL, `OPENJSON()` in SQL Server and `JSON_TABLE()` in MySQL 8.0.4+ and MariaDB 10.6+.
+Values are sent as db params, so they can be used in compiled queries and connection filters too.
+
+Rows without the list, or with an empty one, have no items, so they're matched by `All()` and not by `Any()`.
+
+### PostgreSQL arrays
+
+PostgreSQL stores arrays of strings and numbers, e.g. `string[]`, `int[]` and `long[]`, in its own array types instead
+of JSON, e.g. `text[]`. They're queried the same way as lists, with PostgreSQL's array functions:
+
+```csharp
+db.Select<Article>(x => x.Tags.Contains("vip"));              // :0 = ANY("tags")
+db.Select<Article>(x => x.Tags.Length > 2);                   // cardinality("tags") > :0
+db.Select<Article>(x => x.Tags.Any(t => t.StartsWith("v")));  // EXISTS (SELECT 1 FROM unnest("tags") ...)
+db.Select<Article>(x => x.Scores.Count(s => s >= 90) >= 2);
 ```
 
 ## Type-safe JSON queries
@@ -593,12 +728,112 @@ var sql = q.ToSelectStatement();
 var parameters = q.Params;
 ```
 
-This is useful when deciding whether a frequently queried JSON property should be exposed through a generated column,
-expression index or provider-specific JSON index. Indexing facilities remain outside the portable API because their
-definitions and query-planner behavior differ substantially between databases.
-
 JSON expressions can also be reused with OrmLite's async APIs:
 
 ```csharp
 var results = await db.SelectAsync(q);
 ```
+
+### Index a JSON property
+
+Queries of JSON properties read the JSON of every row. When a property is queried often on a large table, e.g. to
+find customers by `x.Address.City`, store it in a column of its own, which is indexed with `[Index]` and works
+the same way in every database:
+
+```csharp
+public class Customer
+{
+    [Index]
+    public string City { get; set; }
+    public Address Address { get; set; }
+}
+```
+
+SQLite and PostgreSQL can also index the expression a query reads the property with, which you can create in a
+[migration](/ormlite/db-migrations). The index's expression needs to be the same as the query's, so copy it from the
+SQL of the query, e.g. the left side of `= @0`:
+
+```csharp
+var q = db.From<Customer>().Where(x => x.Address.City == "London");
+var sql = q.ToSelectStatement();
+// ... WHERE (CASE WHEN json_type("Address", '$.City') NOT IN ('object','array','null')
+//           THEN json_extract("Address", '$.City') END = @0)
+
+Db.ExecuteSql("""
+    CREATE INDEX ix_customer_city ON "Customer" ((CASE WHEN json_type("Address", '$.City')
+        NOT IN ('object','array','null') THEN json_extract("Address", '$.City') END))
+    """);
+```
+
+Check the index is used with `EXPLAIN QUERY PLAN` on SQLite or `EXPLAIN` on PostgreSQL. It's only used while the
+query's SQL stays the same, so check it again after upgrading OrmLite. SQL Server and MySQL can only index an
+expression through a computed or generated column of the same type, so a column of its own is the better choice for
+them.
+
+## When to use Sql.Json
+
+Complex type properties are [queried directly](#querying-complex-type-properties), so `Sql.Json()` isn't needed for
+them. It's for JSON that OrmLite can't tell is JSON, or can't tell the shape of:
+
+| JSON is in | Use |
+|-|-|
+| A complex type property, on a dialect with `UseJson` | The property: `x.Address.City` |
+| A `string` column | `Sql.Json<T>(x.Data)` with the type of its document |
+| A complex type property, on a dialect without `UseJson` | `Sql.Json(x.Address)` |
+| A property with the type of a table the query joins | `Sql.Json(x.Customer)` |
+
+### JSON in a string column
+
+A `string` has no properties to query, so `Sql.Json<T>()` says what the JSON document in it looks like:
+
+```csharp
+public class OrderEvent
+{
+    public long Id { get; set; }
+    public string Data { get; set; } // JSON of an OrderDocument
+}
+
+var q = db.From<OrderEvent>()
+    .Where(x => Sql.Json<OrderDocument>(x.Data).Customer.Address.State == "WA");
+```
+
+### JSON the dialect doesn't store
+
+Querying a complex type property directly throws on a dialect that doesn't have `UseJson`, as its complex types
+aren't saved as JSON. `Sql.Json()` isn't checked, so use it for a column you know has JSON, e.g. one that's saved with
+a custom JSON serializer, or with a `[PgSqlJsonB]` attribute:
+
+```csharp
+var q = db.From<Customer>()
+    .Where(x => Sql.Json(x.Address).City == "London");
+```
+
+### A property with the type of a joined table
+
+In a query that joins a table, a property with that table's type refers to its columns, which is how OrmLite has
+always resolved them. When the property is also stored as JSON, e.g. a copy of a row as it was at the time, use
+`Sql.Json()` to query the copy:
+
+```csharp
+public class Invoice
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
+
+    // A copy of the customer as they were when the invoice was created
+    public Customer Customer { get; set; }
+}
+
+var q = db.From<Invoice>()
+    .Join<Customer>((i, c) => i.CustomerId == c.Id)
+    .Where(x => x.Customer.Name == "Alice Smith"            // the Name column of the joined Customer table
+        && Sql.Json(x.Customer).Name == "Alice");           // the Name in the invoice's copy
+```
+
+Without the join, `x.Customer.Name` is the JSON property like any other complex type.
+
+### Paths chosen at runtime
+
+Neither can query a path that's only known at runtime, or test whether a path exists or what type its value has. Use
+the [explicit JSON path APIs](#explicit-json-path-queries) for those, e.g. `Sql.JsonValue<string>(x.Data, path)`.

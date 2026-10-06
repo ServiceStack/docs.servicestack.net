@@ -45,3 +45,16 @@ var rows = db.Select(q);
 
 These APIs are useful for mandatory filters like "Soft Deletes" and Multitenant records.
 
+## Mandatory filters for every query
+
+To apply a mandatory filter to every query of a table or interface on a connection, including APIs like
+`SingleById()`, updates and deletes, declare it once in a [FilterSet](/ormlite/connection-filters) and use it for
+the connection:
+
+```csharp
+public static readonly FilterSet<int> TenantFilters = FilterSet.Create<int>(f =>
+    f.Ensure<IHasTenantId>(x => x.TenantId, tenantId => tenantId));
+
+db.UseFilters(TenantFilters.For(tenantId));
+```
+

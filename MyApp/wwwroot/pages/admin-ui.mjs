@@ -108,7 +108,7 @@ const AnalyticsUi = {
             'backgroundjobs': {
                 title: 'Background Jobs',
                 summary: 'Effortless management of Background Jobs and Scheduled Tasks',
-                href: 'https://docs.servicestack.net/background-jobs',
+                href: 'https://docs.servicestack.net/jobs/',
             },
             'validation': {
                 title: 'DB Validation Rules',
