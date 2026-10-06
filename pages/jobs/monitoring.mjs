@@ -1,4 +1,4 @@
-import { ObservabilityPillars } from "./components/BackgroundJobs.mjs"
+import { ObservabilityPillars } from "../components/BackgroundJobs.mjs"
 
 export default {
     components: {

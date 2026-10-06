@@ -86,11 +86,11 @@ const PreviewLedger = {
     template: `
     <section class="not-prose my-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div class="border-b border-slate-200 px-6 py-5 dark:border-slate-700 sm:px-8">
-        <p class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Read-only, before anything is written</p>
+        <p class="text-xs font-bold uppercase tracking-[.18em] text-indigo-600 dark:text-indigo-400">Save settings, then preview document changes</p>
         <h3 class="mt-1 text-xl font-bold text-slate-900 dark:text-white">What a preview tells you</h3>
         <p class="mt-2 max-w-3xl leading-7 text-slate-600 dark:text-slate-300">
-          Preview scans and compares the source without writing documents, uploading content or incurring
-          embedding work. Every discovered file lands in exactly one of these buckets.
+          Preview saves source settings and compares files without changing documents, uploading content or incurring
+          embedding work. The scan distinguishes local changes from pending upload work.
         </p>
       </div>
 
@@ -114,8 +114,8 @@ const PreviewLedger = {
         <div class="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 dark:border-emerald-900 dark:bg-emerald-950/30">
           <span class="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-black uppercase tracking-wider text-white">Embeds</span>
           <span class="text-sm leading-6 text-slate-700 dark:text-slate-200">
-            The documents Gemini will upload and index after you confirm - the only line that costs anything.
-            Nothing is applied until you choose <b class="text-slate-900 dark:text-white">Import N documents</b>.
+            The documents Gemini will upload and index after confirmation, including pending remote work. Saving settings does not spend on embeddings.
+            Document changes are applied when you choose <b class="text-slate-900 dark:text-white">Import N documents</b>.
           </span>
         </div>
       </div>
@@ -131,9 +131,9 @@ const PreviewLedger = {
             { name:'Metadata only', cost:'Re-indexes', costTint:'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
               accent:'border-indigo-200 bg-indigo-50/40 dark:border-indigo-900 dark:bg-indigo-950/20',
               text:'Content is unchanged but indexed metadata changed. Gemini cannot patch metadata in place.' },
-            { name:'Unchanged', cost:'Free', costTint:'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+            { name:'Unchanged locally', cost:'Check queue', costTint:'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
               accent:'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40',
-              text:'Documents requiring no work. Never embedded or locally indexed again.' },
+              text:'Matching cached content. Completed uploads need no new work; a queued or failed Gemini upload may still need Resume.' },
             { name:'Removed', cost:'Deletes', costTint:'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300',
               accent:'border-rose-200 bg-rose-50/40 dark:border-rose-900 dark:bg-rose-950/20',
               text:'Previously imported from this source but no longer present. A deletion safety rail refuses an unexpectedly large removal.' },

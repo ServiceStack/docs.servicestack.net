@@ -31,7 +31,7 @@ const JsonApiChoice = {
             { name:'Sql.JsonValue / JsonQuery', badge:'dynamic',
               tint:'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300',
               accent:'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900',
-              code:'Sql.JsonValue<string>(x.Data,\n  "$.Customer.Address.state") == "WA"',
+              code:'Sql.JsonValue<string>(x.Data,\n  "$.Customer.Address.shipping_state") == "WA"',
               text:'An explicit SQL/JSON path, evaluated at runtime.',
               when:'There is no Data Model, the path is chosen at runtime, or you need path existence and type inspection.' },
         ]

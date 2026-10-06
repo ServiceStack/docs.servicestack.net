@@ -1,4 +1,4 @@
-import { QueueLanes, TenantOrdering } from "./components/BackgroundJobs.mjs"
+import { QueueLanes, TenantOrdering } from "../components/BackgroundJobs.mjs"
 
 export default {
     components: {

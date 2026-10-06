@@ -1,4 +1,4 @@
-import { WorkflowSimulator, BatchSimulator, ResultsDelivery } from "./components/BackgroundJobs.mjs"
+import { WorkflowSimulator, BatchSimulator, ResultsDelivery } from "../components/BackgroundJobs.mjs"
 
 export default {
     components: {

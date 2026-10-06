@@ -81,7 +81,7 @@ const CorePillars = {
                 ],
                 links: [
                     { text: 'Identity Auth', href: '/auth/identity-auth' },
-                    { text: 'Background Jobs', href: '/background-jobs' },
+                    { text: 'Background Jobs', href: '/jobs/' },
                     { text: 'Commands', href: '/commands' },
                     { text: 'Server Events', href: '/server-events' },
                 ],
@@ -264,7 +264,7 @@ const BuiltInUis = {
               summary: 'In-depth, interactive analytics per API, user, API Key and IP - with no external service to wire up.' },
             { name: 'AI Chat', title: 'AI Chat', href: '/chat/overview', img: img('ai-chat'),
               summary: 'A complete multi-provider AI App using your existing users, database and security boundary.' },
-            { name: 'Background Jobs', title: 'Background Jobs', href: '/background-jobs', img: img('backgroundjobs'),
+            { name: 'Background Jobs', title: 'Background Jobs', href: '/jobs/', img: img('backgroundjobs'),
               summary: 'Monitor, retry and audit durable background jobs and scheduled tasks with full execution history.' },
             { name: 'Commands', title: 'Commands', href: '/commands', img: img('commands'),
               summary: 'Observable building blocks with timings, retries and failure history for every command your App runs.' },

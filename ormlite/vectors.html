@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2026-10-06T14:31:41.9136979Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>Vector Search</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <style>html { scroll-padding-top: 5rem }</style>
+    <link rel="stylesheet" href="/css/app.css">
+    
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs",
+        "marked": "/lib/mjs/marked.min.mjs",
+        "highlight.js": "/lib/mjs/highlight.min.mjs"
+    }
+}
+</script>
+
+    <script src="https://account.servicestack.net/chat/ext/gemini/public/searches/widget.js?g=YHirLFCKNoXZ2Orjt4hxZ6" data-mount="#search-slot" async></script>
+    <script src="https://account.servicestack.net/chat/ext/gemini/public/assistants/widget.js?g=yVsDQdz9VHO5vtVq9rBh61Vs" async></script>
+
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white/90 dark:bg-black/90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- All sections are rendered, #nav-sections script shows the most recently visited -->
+                    <a href="/templates/" data-section="templates" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span><span>Templates</span>
+                    </a>
+                    <a href="/vue/" data-section="vue" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Vue                    </a>
+                    <a href="/react/" data-section="react" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+React                    </a>
+                    <a href="/add-servicestack-reference" data-section="dtos" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+DTOs                    </a>
+                    <a href="/autoquery/" data-section="autoquery" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AutoQuery                    </a>
+                    <a href="/jobs/" data-section="jobs" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Background Jobs                    </a>
+                    <a href="/chat/" data-section="ai" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AI                    </a>
+                    <a href="/rag" data-section="rag" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+RAG                    </a>
+                    <a href="/pdf" data-section="pdf" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+PDF                    </a>
+                    <a href="/auth/" data-section="auth" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Auth                    </a>
+                    <a href="/ormlite/" data-section="ormlite" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-indigo-500 text-gray-900 dark:text-gray-100">
+OrmLite                    </a>
+                    <a href="/redis/" data-section="redis" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Redis                    </a>
+                    <a href="/locode/" data-section="locode" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Locode                    </a>
+                    <a href="/grpc/" data-section="grpc" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+gRPC                    </a>
+                    <a href="/ai-server/" data-section="ai-server" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AI Server                    </a>
+                <div class="relative inline-flex items-center">
+                    <button type="button" v-on:click.stop="more=!more" :aria-expanded="more" aria-haspopup="true"
+                            class="inline-flex items-center gap-x-1 px-1 pt-1 h-full border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                        More
+                        <svg :class="['size-4 transition-transform', more ? 'rotate-180' : '']" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div data-more v-cloak v-show="more" v-on:click.stop class="absolute left-1/2 top-full z-10 mt-1 w-screen max-w-sm -translate-x-1/2 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg ring-1 ring-gray-900/5 dark:ring-white/10">
+                        <div class="max-h-[calc(100vh-6rem)] overflow-y-auto p-2">
+                                <a href="/templates/" data-section="templates" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Project Templates</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Start new .NET Apps from ready-to-run Vue, React, Blazor &amp; Razor</span>
+                                    </span>
+                                </a>
+                                <a href="/vue/" data-section="vue" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2 3h3.5L12 15l6.5-12H22L12 21L2 3m4.5 0h3L12 7.58L14.5 3h3L12 13.08L6.5 3Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Vue</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Tailwind Vue Component Library for building ServiceStack Apps</span>
+                                    </span>
+                                </a>
+                                <a href="/react/" data-section="react" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 10.11c1.03 0 1.87.84 1.87 1.89c0 1-.84 1.85-1.87 1.85c-1.03 0-1.87-.85-1.87-1.85c0-1.05.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7c-.52-.59-1.03-1.23-1.51-1.9a22.7 22.7 0 0 1-2.4-.36c-.51 2.14-.32 3.61.31 3.96m.71-5.74l-.29-.51c-.11.29-.22.58-.29.86c.27.06.57.11.88.16l-.3-.51m6.54-.76l.81-1.5l-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9c-.6 0-1.17 0-1.71.03c-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47c.54.03 1.11.03 1.71.03c.6 0 1.17 0 1.71-.03c.29-.47.61-.94.91-1.47M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.62-.38-2 .2-3.59 1.7c.52.59 1.03 1.23 1.51 1.9c.82.08 1.63.2 2.4.36c.51-2.14.32-3.61-.32-3.96m-.7 5.74l.29.51c.11-.29.22-.58.29-.86c-.27-.06-.57-.11-.88-.16l.3.51m1.45-7.05c1.47.84 1.63 3.05 1.01 5.63c2.54.75 4.37 1.99 4.37 3.68c0 1.69-1.83 2.93-4.37 3.68c.62 2.58.46 4.79-1.01 5.63c-1.46.84-3.45-.12-5.37-1.95c-1.92 1.83-3.91 2.79-5.38 1.95c-1.46-.84-1.62-3.05-1-5.63c-2.54-.75-4.37-1.99-4.37-3.68c0-1.69 1.83-2.93 4.37-3.68c-.62-2.58-.46-4.79 1-5.63c1.47-.84 3.46.12 5.38 1.95c1.92-1.83 3.91-2.79 5.37-1.95M17.08 12c.34.75.64 1.5.89 2.26c2.1-.63 3.28-1.53 3.28-2.26c0-.73-1.18-1.63-3.28-2.26c-.25.76-.55 1.51-.89 2.26M6.92 12c-.34-.75-.64-1.5-.89-2.26c-2.1.63-3.28 1.53-3.28 2.26c0 .73 1.18 1.63 3.28 2.26c.25-.76.55-1.51.89-2.26m9 2.26l-.3.51c.31-.05.61-.1.88-.16c-.07-.28-.18-.57-.29-.86l-.29.51m-2.89 4.04c1.59 1.5 2.97 2.08 3.59 1.7c.64-.35.83-1.82.32-3.96c-.77.16-1.58.28-2.4.36c-.48.67-.99 1.31-1.51 1.9M8.08 9.74l.3-.51c-.31.05-.61.1-.88.16c.07.28.18.57.29.86l.29-.51m2.89-4.04C9.38 4.2 8 3.62 7.37 4c-.63.35-.82 1.82-.31 3.96a22.7 22.7 0 0 1 2.4-.36c.48-.67.99-1.31 1.51-1.9Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">React</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Tailwind React Components and templates for Vibe Coded UIs</span>
+                                    </span>
+                                </a>
+                                <a href="/add-servicestack-reference" data-section="dtos" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="currentColor" d="M11.586 3H1v2h10.586l-1.5 1.5L11.5 7.914L15.414 4L11.5.086L10.086 1.5zM4.414 13H15v-2H4.414l1.5-1.5L4.5 8.086L.586 12L4.5 15.914L5.914 14.5z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">DTOs</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">End-to-end typed API Clients for 15 programming languages</span>
+                                    </span>
+                                </a>
+                                <a href="/autoquery/" data-section="autoquery" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AutoQuery</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Instant queryable &amp; CRUD APIs from declarative Request DTOs</span>
+                                    </span>
+                                </a>
+                                <a href="/jobs/" data-section="jobs" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Background Jobs</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Durable Jobs, queues, workflows and recurring tasks in your existing DB</span>
+                                    </span>
+                                </a>
+                                <a href="/chat/" data-section="ai" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AI</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Modular AI Chat, Agents, MCP and API Tools for ServiceStack Apps</span>
+                                    </span>
+                                </a>
+                                <a href="/rag" data-section="rag" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">RAG</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Build Gemini RAG knowledge bases from your docs and websites</span>
+                                    </span>
+                                </a>
+                                <a href="/pdf" data-section="pdf" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">PDF</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">PDF Studio for generating branded documents and reports</span>
+                                    </span>
+                                </a>
+                                <a href="/auth/" data-section="auth" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Auth</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Identity Auth, API Keys, JWT and securing your APIs</span>
+                                    </span>
+                                </a>
+                                <a href="/ormlite/" data-section="ormlite" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M448 73.143v45.714C448 159.143 347.667 192 224 192S0 159.143 0 118.857V73.143C0 32.857 100.333 0 224 0s224 32.857 224 73.143zM448 176v102.857C448 319.143 347.667 352 224 352S0 319.143 0 278.857V176c48.125 33.143 136.208 48.572 224 48.572S399.874 209.143 448 176zm0 160v102.857C448 479.143 347.667 512 224 512S0 479.143 0 438.857V336c48.125 33.143 136.208 48.572 224 48.572S399.874 369.143 448 336z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">OrmLite</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Code-first, fast, lightweight ORM for major RDBMS</span>
+                                    </span>
+                                </a>
+                                <a href="/redis/" data-section="redis" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M31.99 19.12c-.01.307-.417.646-1.245 1.078c-1.708.891-10.552 4.531-12.438 5.51c-1.885.984-2.927.974-4.417.26c-1.49-.708-10.901-4.516-12.599-5.323c-.844-.406-1.276-.745-1.292-1.068v3.234c0 .323.448.661 1.292 1.068c1.698.813 11.115 4.615 12.599 5.323c1.49.714 2.531.724 4.417-.26c1.885-.979 10.729-4.62 12.438-5.51c.87-.448 1.255-.802 1.255-1.12v-3.188c0-.005-.005-.005-.01-.005zm0-5.271c-.016.302-.417.641-1.245 1.078c-1.708.885-10.552 4.526-12.438 5.505c-1.885.984-2.927.974-4.417.266c-1.49-.714-10.901-4.516-12.599-5.328c-.844-.401-1.276-.745-1.292-1.068v3.234c0 .323.448.667 1.292 1.068c1.698.813 11.109 4.615 12.599 5.328c1.49.708 2.531.719 4.417-.26c1.885-.984 10.729-4.62 12.438-5.51c.87-.453 1.255-.807 1.255-1.125v-3.188h-.01zm0-5.474c.016-.323-.406-.609-1.266-.922c-1.661-.609-10.458-4.109-12.141-4.729c-1.682-.615-2.37-.589-4.349.12c-1.979.714-11.339 4.385-13.005 5.036c-.833.328-1.24.63-1.224.953v3.234c0 .323.443.661 1.292 1.068c1.693.813 11.109 4.615 12.599 5.328c1.484.708 2.531.719 4.417-.266c1.88-.979 10.729-4.62 12.438-5.505c.865-.453 1.25-.807 1.25-1.125V8.374zm-20.532 3.063l7.417-1.135l-2.24 3.281zm16.401-2.959L23 10.401l-4.385-1.734l4.854-1.917zM14.984 5.302l-.719-1.323l2.24.875l2.109-.688l-.573 1.365l2.151.807l-2.771.286l-.625 1.495l-1-1.667l-3.203-.286zm-5.526 1.87c2.193 0 3.964.688 3.964 1.531c0 .849-1.776 1.536-3.964 1.536s-3.964-.688-3.964-1.536c0-.844 1.776-1.531 3.964-1.531z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Redis</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">.NET&#x27;s leading C# Redis Client</span>
+                                    </span>
+                                </a>
+                                <a href="/locode/" data-section="locode" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5v13.5H3.75zM3.75 9.75h16.5M3.75 14.25h16.5M9 9.75v9"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Locode</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Instant data management UIs for your AutoQuery APIs</span>
+                                    </span>
+                                </a>
+                                <a href="/grpc/" data-section="grpc" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">gRPC</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Code-first, high-performance HTTP/2 typed services</span>
+                                    </span>
+                                </a>
+                                <a href="/ai-server/" data-section="ai-server" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AI Server</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Self-hosted gateway for LLMs, ComfyUI and FFmpeg APIs</span>
+                                    </span>
+                                </a>
+                        </div>
+                        <a href="/#sections" class="block bg-gray-50 dark:bg-gray-800 px-4 py-2 text-center text-xs font-medium text-indigo-600 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700">Browse all sections</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <div id="search-slot"></div>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Project Templates
+                </a>
+                <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Vue
+                </a>
+                <a href="/react/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    React
+                </a>
+                <a href="/add-servicestack-reference" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    DTOs
+                </a>
+                <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AutoQuery
+                </a>
+                <a href="/jobs/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Background Jobs
+                </a>
+                <a href="/chat/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AI
+                </a>
+                <a href="/rag" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    RAG
+                </a>
+                <a href="/pdf" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    PDF
+                </a>
+                <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Auth
+                </a>
+                <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                    OrmLite
+                </a>
+                <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Redis
+                </a>
+                <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Locode
+                </a>
+                <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    gRPC
+                </a>
+                <a href="/ai-server/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AI Server
+                </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script id="nav-sections">
+// Runs before paint: record the section being visited and show the most recently visited sections in the top bar
+(function () {
+    var sections = [{"__type":"<>f__AnonymousType1`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], MyApp","id":"templates","href":"/templates/"},{"id":"vue","href":"/vue/"},{"id":"react","href":"/react/"},{"id":"dtos","href":"/add-servicestack-reference"},{"id":"autoquery","href":"/autoquery/"},{"id":"jobs","href":"/jobs/"},{"id":"ai","href":"/chat/"},{"id":"rag","href":"/rag"},{"id":"pdf","href":"/pdf"},{"id":"auth","href":"/auth/"},{"id":"ormlite","href":"/ormlite/"},{"id":"redis","href":"/redis/"},{"id":"locode","href":"/locode/"},{"id":"grpc","href":"/grpc/"},{"id":"ai-server","href":"/ai-server/"}]
+    var count = 5, key = 'nav-sections', path = location.pathname
+    var ids = sections.map(function (x) { return x.id })
+    var recent = []
+    try { recent = JSON.parse(localStorage.getItem(key) || '[]').filter(function (id) { return ids.indexOf(id) >= 0 }) } catch (e) {}
+    var current = sections.find(function (x) {
+        var href = x.href.replace(/\/$/, '')
+        return path === href || path === href + '/' || (x.href.endsWith('/') && path.startsWith(x.href))
+    })
+    if (current) {
+        recent = [current.id].concat(recent.filter(function (id) { return id !== current.id })).slice(0, count)
+        try { localStorage.setItem(key, JSON.stringify(recent)) } catch (e) {}
+    }
+    // Most recently visited first, with any remaining slots filled by the default sections
+    var visible = recent.concat(ids.filter(function (id) { return recent.indexOf(id) < 0 })).slice(0, count)
+    document.querySelectorAll('#header [data-section]').forEach(function (el) {
+        var inTopBar = !el.closest("[data-more]")
+        var show = (visible.indexOf(el.dataset.section) >= 0) === inTopBar
+        el.classList.toggle('hidden', !show)
+        el.classList.toggle(inTopBar ? 'inline-flex' : 'flex', show)
+    })
+    // Move the visible top bar links to the front in most recently visited order
+    visible.slice().reverse().forEach(function (id) {
+        var el = document.querySelector('#header [data-section="' + id + '"]:not([data-more] *)')
+        if (el) el.parentNode.insertBefore(el, el.parentNode.firstChild)
+    })
+})()
+</script>
+
+<script type="module">
+import { ref, onMounted, onUnmounted } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        const more = ref(false)
+        const close = () => more.value = false
+        const onKey = e => { if (e.key === 'Escape') close() }
+        onMounted(() => {
+            document.addEventListener('click', close)
+            document.addEventListener('keydown', onKey)
+        })
+        onUnmounted(() => {
+            document.removeEventListener('click', close)
+            document.removeEventListener('keydown', onKey)
+        })
+        return { open, more }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="w-full pt-16 pb-3">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/ormlite/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+OrmLite                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/installation" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Installation
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/getting-started" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Getting Started
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        API Overview
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/async-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Async APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/db-migrations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        DB Migrations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/schema-diff" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schema Diff
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/litestream" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Litestream
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/install-postgres-mysql-sqlserver" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Install Postgres, MySql &amp; MSSQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multi-database-app" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multiple App Databases
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/scalable-sqlite" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Scalable SQLite
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    OrmLite APIs
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/apis/select" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Select APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/insert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/update" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Update APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/delete" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Delete APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/apis/schema" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schema APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ddl-attributes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Indexes &amp; Constraints
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/system-versioned-tables" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        System-Versioned Tables
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Query Features
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/sql-fmt" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Interpolated SQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/order-by-safe" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dynamic Sorting
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/keyset-pagination" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Keyset Pagination
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/set-operations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Union, Intersect &amp; Except
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/common-table-expressions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Named Sub Queries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/recursive-queries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Recursive Queries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/window-functions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Window Functions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/returning" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Returning Updated Rows
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/locking" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Locking Rows
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/update-from" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Update from Joined Tables
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/streaming" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Streaming Results
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/large-in-lists" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Large Lists of Values
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/vectors" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        Vector Search
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/full-text-search" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Full-Text Search
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/compiled-queries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Compiled Queries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/explain" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Query Plans
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/sql-injection" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Injection Protection
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Multitenancy
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/multitenancy/overview" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multitenancy
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multitenancy/guide" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multitenancy Guide
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/connection-filters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Connection Filters &amp; Rules
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Advanced Topics
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/batched-writes" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Batched Writes
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/bulk-inserts" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Bulk Inserts
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/json" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Type-Safe JSON Queries
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/upsert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Upsert
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/bulk-upsert" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Bulk Upsert
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/async-tasks-builder" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Async Tasks Builder
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/reference-support" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Reference Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/typed-joins" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Typed Join Expressions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dynamic-result-sets" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dynamic Result Sets
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/transactions" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Database Transactions
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/retries" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Retrying Temporary Errors
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/type-converters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Type Converters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ormlite-utils" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        OrmLite Utils
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/ensure-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Ensure APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/introspection" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Logging &amp; Introspection
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/complex-type-serializers" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Complex Type Serializers
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/filters" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Insert &amp; Update Filters
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/custom-sql" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Custom SQL
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customized-sql-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Customizations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/dictionary-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Dictionary APIs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    RDBMS specific features
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/sql-server-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        SQL Server Features
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/postgres-features" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        PostgreSQL Features
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Background Info
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/ormlite/optimistic-concurrency" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Optimistic Concurrency
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/untyped-apis" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Untyped APIs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/autogen-t4" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AutoGen &amp; T4 templates
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/stored-procedures" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Stored Procedures
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/multi-database-connections" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Multi database connections
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/shippers-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        OrmLite Shippers example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/customer-orders-example" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Customer Orders example
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/aws-rds-databases" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        AWS &amp; RDS Support
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/ormlite/limitations" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Limitations
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50">
+                            Vector Search
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p><code>[Vector]</code> columns store the embeddings of an AI model, so the rows most similar to a piece of text can be found in
+the same query as your typed filters and joins:</p>
+<pre><code class="language-csharp">public class Passage
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public int BookId { get; set; }
+    public string Text { get; set; }
+
+    [Vector(1536)]
+    public float[] Embedding { get; set; }
+}
+
+float[] questionVector = await embeddings.CreateAsync(question); // from your AI model
+
+// The 5 passages most similar to the question
+var nearest = db.Select(db.From&lt;Passage&gt;()
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, questionVector))
+    .Take(5));
+</code></pre>
+<p>The dimensions of a <code>[Vector]</code> are the size of the embeddings of the model that creates them, e.g. <code>1536</code> for OpenAI's
+<code>text-embedding-3-small</code>.</p>
+<p>Vectors can also be a <code>ReadOnlyMemory&lt;float&gt;</code>, the type of <code>Embedding&lt;float&gt;.Vector</code> in Microsoft.Extensions.AI, so
+embeddings are saved and compared without copying them to an array:</p>
+<pre><code class="language-csharp">[Vector(1536)]
+public ReadOnlyMemory&lt;float&gt; Embedding { get; set; }
+
+var embedding = await generator.GenerateAsync(question);
+var nearest = db.Select(db.From&lt;Passage&gt;()
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, embedding.Vector))
+    .Take(5));
+</code></pre>
+<h2 id="supported-databases">Supported databases<a class="header-anchor" href="javascript:;" onclick="location.hash='#supported-databases'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Vectors need an RDBMS with vector support enabled:</p>
+<table>
+<thead>
+<tr>
+<th>RDBMS</th>
+<th>Requires</th>
+<th>Column</th>
+<th>Vector index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td>The <a href="https://github.com/pgvector/pgvector">pgvector</a> extension</td>
+<td><code>vector(n)</code></td>
+<td>HNSW</td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td>SQL Server 2025 or Azure SQL</td>
+<td><code>VECTOR(n)</code></td>
+<td>None created</td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td>MariaDB 11.7+</td>
+<td><code>VECTOR(n)</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td>MySQL 9+, distances need HeatWave or Enterprise</td>
+<td><code>VECTOR(n)</code></td>
+<td>None</td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td>The <a href="https://github.com/asg017/sqlite-vec">sqlite-vec</a> extension</td>
+<td><code>BLOB</code></td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>Other RDBMS throw a <code>NotSupportedException</code>.</p>
+<h3 id="postgresql">PostgreSQL<a class="header-anchor" href="javascript:;" onclick="location.hash='#postgresql'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Enable pgvector in each database that uses it, which needs a superuser unless your provider allows it:</p>
+<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;
+</code></pre>
+<h3 id="sqlite">SQLite<a class="header-anchor" href="javascript:;" onclick="location.hash='#sqlite'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Add the <a href="https://www.nuget.org/packages/sqlite-vec">sqlite-vec</a> NuGet package, which has the extension for each
+platform, and load it into each connection when it opens:</p>
+<pre><code class="language-csharp">// With Microsoft.Data.Sqlite
+SqliteDialect.Provider.OnOpenConnection = db =&gt;
+    ((SqliteConnection)db.ToDbConnection()).LoadExtension(&quot;vec0&quot;);
+</code></pre>
+<p>With <code>System.Data.SQLite</code> call <code>EnableExtensions(true)</code> on the connection first, then <code>LoadExtension()</code> with the path
+of the extension's file for your platform.</p>
+<h2 id="finding-similar-rows">Finding similar rows<a class="header-anchor" href="javascript:;" onclick="location.hash='#finding-similar-rows'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Order by a distance to the vector you're searching for, where smaller is more similar:</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Distance</th>
+<th>Supported by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Sql.CosineDistance()</code></td>
+<td>The angle between 2 vectors, ignoring their length. The usual choice for text embeddings</td>
+<td>All</td>
+</tr>
+<tr>
+<td><code>Sql.L2Distance()</code></td>
+<td>The straight-line (Euclidean) distance</td>
+<td>All</td>
+</tr>
+<tr>
+<td><code>Sql.NegativeInnerProduct()</code></td>
+<td>The inner (dot) product negated, for normalized vectors</td>
+<td>PostgreSQL, SQL Server, MySQL</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-csharp">var nearest = db.Select(db.From&lt;Passage&gt;()
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, questionVector))
+    .Take(5));
+</code></pre>
+<p>The vector is sent as a db param. This is what's ordered by in each RDBMS:</p>
+<table>
+<thead>
+<tr>
+<th>RDBMS</th>
+<th>SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td><code>ORDER BY (&quot;embedding&quot; &lt;=&gt; :0::vector)</code></td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td><code>ORDER BY VECTOR_DISTANCE('cosine', &quot;Embedding&quot;, CAST(@0 AS VECTOR(1536)))</code></td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td><code>ORDER BY VEC_DISTANCE_COSINE(`Embedding`, @0)</code></td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td><code>ORDER BY DISTANCE(`Embedding`, @0, 'COSINE')</code></td>
+</tr>
+<tr>
+<td>SQLite</td>
+<td><code>ORDER BY vec_distance_cosine(&quot;Embedding&quot;, @0)</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="combine-with-filters-and-joins">Combine with filters and joins<a class="header-anchor" href="javascript:;" onclick="location.hash='#combine-with-filters-and-joins'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Vector search is part of a typed query, so it can be limited to the rows a user can see, e.g. the passages of books
+that are in stock:</p>
+<pre><code class="language-csharp">var q = db.From&lt;Passage&gt;()
+    .Join&lt;Book&gt;((p, b) =&gt; p.BookId == b.Id)
+    .Where&lt;Book&gt;(b =&gt; b.Available &amp;&amp; b.Genre != Genre.Fiction)
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, questionVector))
+    .Take(5);
+
+var passages = db.Select(q);
+</code></pre>
+<p>On a connection with <a href="/ormlite/connection-filters">connection filters</a> it's also confined to the connection's tenant,
+so one tenant's search never returns another's rows.</p>
+<h2 id="returning-the-distance">Returning the distance<a class="header-anchor" href="javascript:;" onclick="location.hash='#returning-the-distance'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Select the distance to show a score, and filter by it to leave out weak matches:</p>
+<pre><code class="language-csharp">public class PassageMatch
+{
+    public int Id { get; set; }
+    public string Text { get; set; }
+    public double Distance { get; set; }
+}
+
+var matches = db.Select&lt;PassageMatch&gt;(db.From&lt;Passage&gt;()
+    .Where(x =&gt; Sql.CosineDistance(x.Embedding, questionVector) &lt; 0.35)
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, questionVector))
+    .Take(10)
+    .Select(x =&gt; new {
+        x.Id,
+        x.Text,
+        Distance = Sql.CosineDistance(x.Embedding, questionVector),
+    }));
+</code></pre>
+<p>Vectors can be selected too. A class that vectors are read into needs <code>[Vector]</code> on its property, like the table's:</p>
+<pre><code class="language-csharp">public class PassageVector
+{
+    public int Id { get; set; }
+    [Vector(1536)]
+    public float[] Embedding { get; set; }
+}
+
+var vectors = db.Select&lt;PassageVector&gt;(db.From&lt;Passage&gt;().Select(x =&gt; new { x.Id, x.Embedding }));
+</code></pre>
+<p>The same methods calculate the distance of 2 vectors in memory:</p>
+<pre><code class="language-csharp">double distance = Sql.CosineDistance(vectorA, vectorB);
+</code></pre>
+<h2 id="saving-vectors">Saving vectors<a class="header-anchor" href="javascript:;" onclick="location.hash='#saving-vectors'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Vectors are saved and read back like any other property, with every API:</p>
+<pre><code class="language-csharp">db.Insert(new Passage { BookId = book.Id, Text = text, Embedding = vector });
+
+db.UpdateOnly(() =&gt; new Passage { Embedding = newVector }, where: x =&gt; x.Id == id);
+
+float[] saved = db.SingleById&lt;Passage&gt;(id).Embedding;
+</code></pre>
+<p>A vector with different dimensions than its column is rejected by the RDBMS, except in SQLite where the column is a
+<code>BLOB</code>.</p>
+<p>Rows without a vector can't be compared, so leave them out:</p>
+<pre><code class="language-csharp">var q = db.From&lt;Passage&gt;()
+    .Where(x =&gt; x.Embedding != null)
+    .OrderBy(x =&gt; Sql.CosineDistance(x.Embedding, questionVector));
+</code></pre>
+<h2 id="vector-indexes">Vector indexes<a class="header-anchor" href="javascript:;" onclick="location.hash='#vector-indexes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Without an index every row is compared, which is fine for thousands of rows. Add <code>[Index]</code> to create a vector index
+where the RDBMS has one, for the distance your queries order by:</p>
+<pre><code class="language-csharp">public class Passage
+{
+    [AutoIncrement]
+    public int Id { get; set; }
+    public string Text { get; set; }
+
+    [Vector(1536, Distance = VectorDistance.Cosine), Index, Required]
+    public float[] Embedding { get; set; }
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>RDBMS</th>
+<th>Index created</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td><code>CREATE INDEX ... USING hnsw (&quot;embedding&quot; vector_cosine_ops)</code></td>
+</tr>
+<tr>
+<td>MariaDB</td>
+<td><code>CREATE VECTOR INDEX ... DISTANCE=cosine</code>, which needs a <code>[Required]</code> column</td>
+</tr>
+<tr>
+<td>SQL Server, MySQL, SQLite</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>The index can be tuned with the options of <code>[Vector]</code>, where the RDBMS has them:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>PostgreSQL</th>
+<th>MariaDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>M</code>: the connections of each vector of an HNSW index</td>
+<td><code>m</code></td>
+<td><code>M</code></td>
+</tr>
+<tr>
+<td><code>EfConstruction</code>: the candidates compared when it's built</td>
+<td><code>ef_construction</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>IndexType = VectorIndexType.IvfFlat</code> with <code>Lists</code></td>
+<td><code>USING ivfflat ... WITH (lists = 100)</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-csharp">[Vector(1536, M = 16, EfConstruction = 64), Index, Required]
+public float[] Embedding { get; set; }
+</code></pre>
+<p>Options an RDBMS doesn't have throw a <code>NotSupportedException</code> instead of being ignored, before the table is created.</p>
+<h3 id="searching-vector-indexes">Searching vector indexes<a class="header-anchor" href="javascript:;" onclick="location.hash='#searching-vector-indexes'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>SetVectorSearch()</code> sets how a connection searches vector indexes, for the rest of its session:</p>
+<pre><code class="language-csharp">db.SetVectorSearch(new() { EfSearch = 100, IterativeScan = true });
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>PostgreSQL</th>
+<th>MariaDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EfSearch</code>: the candidates an HNSW search compares, at least as many as a query takes</td>
+<td><code>hnsw.ef_search</code></td>
+<td><code>mhnsw_ef_search</code></td>
+</tr>
+<tr>
+<td><code>Probes</code>: the lists an IVFFlat search reads</td>
+<td><code>ivfflat.probes</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>IterativeScan</code>: continue until enough rows match the query's other conditions (pgvector 0.8+)</td>
+<td><code>hnsw.iterative_scan</code> and <code>ivfflat.iterative_scan</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>SQL Server 2025's <code>DiskANN</code> vector index is a preview feature that has to be enabled for a database, create it with a
+<a href="/ormlite/apis/schema#pre-post-custom-sql-hooks-when-creating-and-dropping-tables">PostCreateTable</a> attribute if
+you've enabled it.</p>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>A vector index finds approximate matches. When it's combined with a filter, some RDBMS apply the filter to the
+candidates the index returns, so a filter that only matches a few rows can return fewer rows than were asked for, e.g.
+a tenant's rows in a multi-tenant App. On PostgreSQL, <code>IterativeScan</code> keeps searching until enough rows match.</p>
+</div>
+<h3 id="half-precision-vectors">Half-precision vectors<a class="header-anchor" href="javascript:;" onclick="location.hash='#half-precision-vectors'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>Precision = VectorPrecision.Half</code> stores each value in 16 bits instead of 32, halving the size of a table's vectors
+and their index, for a small loss of precision. The property is still a <code>float[]</code>:</p>
+<pre><code class="language-csharp">[Vector(1536, Precision = VectorPrecision.Half), Index, Required]
+public float[] Embedding { get; set; }
+</code></pre>
+<p>They use PostgreSQL's <code>halfvec</code> type and SQL Server 2025's <code>VECTOR(n, float16)</code>, which is a preview feature that has to
+be enabled with <code>PREVIEW_FEATURES</code>. Other RDBMS throw a <code>NotSupportedException</code>.</p>
+<h2 id="limitations">Limitations<a class="header-anchor" href="javascript:;" onclick="location.hash='#limitations'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<ul>
+<li><strong>Raw SQL</strong>: send a vector as the value your RDBMS expects, e.g. its text <code>[1,2,3]</code> cast to its vector type in
+PostgreSQL and SQL Server, or <code>VectorConverter.ToBytes(vector)</code> in MySQL, MariaDB and SQLite</li>
+<li>Vectors are <code>float[]</code> or <code>ReadOnlyMemory&lt;float&gt;</code> properties</li>
+</ul>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/ormlite/vectors.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/ormlite/large-in-lists" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                Large Lists of Values
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/ormlite/full-text-search" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Full-Text Search
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#supported-databases'" data-id="supported-databases" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Supported databases
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="postgresql" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#postgresql'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            PostgreSQL
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="sqlite" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#sqlite'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            SQLite
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#finding-similar-rows'" data-id="finding-similar-rows" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Finding similar rows
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#combine-with-filters-and-joins'" data-id="combine-with-filters-and-joins" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Combine with filters and joins
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#returning-the-distance'" data-id="returning-the-distance" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Returning the distance
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#saving-vectors'" data-id="saving-vectors" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Saving vectors
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#vector-indexes'" data-id="vector-indexes" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Vector indexes
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="searching-vector-indexes" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#searching-vector-indexes'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Searching vector indexes
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="half-precision-vectors" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#half-precision-vectors'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Half-precision vectors
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#limitations'" data-id="limitations" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Limitations
+                                        </span>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-7722718-13"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
+    
+    <meta charset="utf-8"/>
+    <meta name='date' content='2026-10-06T14:31:43.8868874Z'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg" href="/img/logo.svg">
+    <title>SQLite Background Jobs</title>
+    <script>
+    if (location.search === "?dark") localStorage.setItem('color-scheme','dark') 
+    if (location.search === "?light") localStorage.removeItem('color-scheme') 
+    const cls = document.querySelector('html').classList
+    if (localStorage.getItem('color-scheme') === 'dark')
+        cls.add('dark')
+    else
+        cls.remove('dark')
+    </script>
+    <style>html { scroll-padding-top: 5rem }</style>
+    <link rel="stylesheet" href="/css/app.css">
+    
+    <script type="importmap">
+{
+    "imports": {
+        "app.mjs": "/mjs/app.mjs",
+        "vue": "/lib/mjs/vue.min.mjs",
+        "@servicestack/client": "/lib/mjs/servicestack-client.min.mjs",
+        "@servicestack/vue": "/lib/mjs/servicestack-vue.min.mjs",
+        "marked": "/lib/mjs/marked.min.mjs",
+        "highlight.js": "/lib/mjs/highlight.min.mjs"
+    }
+}
+</script>
+
+    <script src="https://account.servicestack.net/chat/ext/gemini/public/searches/widget.js?g=YHirLFCKNoXZ2Orjt4hxZ6" data-mount="#search-slot" async></script>
+    <script src="https://account.servicestack.net/chat/ext/gemini/public/assistants/widget.js?g=yVsDQdz9VHO5vtVq9rBh61Vs" async></script>
+
+</head>
+<body class="bg-white dark:bg-black dark:text-white">
+
+<header id="header" class="top-0 fixed z-50 h-14 bg-white/90 dark:bg-black/90 w-full shadow">
+  <nav class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-black">
+    <div class="mx-auto max-w-[100rem] pr-4 sm:pr-6 lg:pr-8">
+      <div class="flex h-16 justify-between">
+        <div class="flex">
+          <div class="flex flex-shrink-0 items-center">
+            <a class="mr-2 lg:mr-8 flex items-center" href="/">
+                <svg class="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="currentColor" d="M10 6c1.544 1.76 2.276 4.15 2.217 6.61c3.968 1.67 9.924 6.12 11.181 12.39H28C26.051 14.31 14.918 6.77 10 6zm-2 7c4.67 4.913.81 11.582-4 12h18.97C21.5 18.289 11.95 13.533 8 13z"/></svg>
+                <span class="hidden sm:block text-2xl font-semibold">Documentation</span>
+            </a>
+          </div>
+            <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-4 lg:space-x-8">
+                <!-- All sections are rendered, #nav-sections script shows the most recently visited -->
+                    <a href="/templates/" data-section="templates" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                            <span class="hidden xl:inline mr-1">Project</span><span>Templates</span>
+                    </a>
+                    <a href="/vue/" data-section="vue" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Vue                    </a>
+                    <a href="/react/" data-section="react" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+React                    </a>
+                    <a href="/add-servicestack-reference" data-section="dtos" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+DTOs                    </a>
+                    <a href="/autoquery/" data-section="autoquery" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap inline-flex border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AutoQuery                    </a>
+                    <a href="/jobs/" data-section="jobs" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-indigo-500 text-gray-900 dark:text-gray-100">
+Background Jobs                    </a>
+                    <a href="/chat/" data-section="ai" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AI                    </a>
+                    <a href="/rag" data-section="rag" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+RAG                    </a>
+                    <a href="/pdf" data-section="pdf" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+PDF                    </a>
+                    <a href="/auth/" data-section="auth" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Auth                    </a>
+                    <a href="/ormlite/" data-section="ormlite" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+OrmLite                    </a>
+                    <a href="/redis/" data-section="redis" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Redis                    </a>
+                    <a href="/locode/" data-section="locode" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+Locode                    </a>
+                    <a href="/grpc/" data-section="grpc" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+gRPC                    </a>
+                    <a href="/ai-server/" data-section="ai-server" class="items-center border-b-2 px-1 pt-1 text-sm font-medium whitespace-nowrap hidden border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+AI Server                    </a>
+                <div class="relative inline-flex items-center">
+                    <button type="button" v-on:click.stop="more=!more" :aria-expanded="more" aria-haspopup="true"
+                            class="inline-flex items-center gap-x-1 px-1 pt-1 h-full border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-200">
+                        More
+                        <svg :class="['size-4 transition-transform', more ? 'rotate-180' : '']" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div data-more v-cloak v-show="more" v-on:click.stop class="absolute left-1/2 top-full z-10 mt-1 w-screen max-w-sm -translate-x-1/2 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg ring-1 ring-gray-900/5 dark:ring-white/10">
+                        <div class="max-h-[calc(100vh-6rem)] overflow-y-auto p-2">
+                                <a href="/templates/" data-section="templates" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Project Templates</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Start new .NET Apps from ready-to-run Vue, React, Blazor &amp; Razor</span>
+                                    </span>
+                                </a>
+                                <a href="/vue/" data-section="vue" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2 3h3.5L12 15l6.5-12H22L12 21L2 3m4.5 0h3L12 7.58L14.5 3h3L12 13.08L6.5 3Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Vue</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Tailwind Vue Component Library for building ServiceStack Apps</span>
+                                    </span>
+                                </a>
+                                <a href="/react/" data-section="react" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 10.11c1.03 0 1.87.84 1.87 1.89c0 1-.84 1.85-1.87 1.85c-1.03 0-1.87-.85-1.87-1.85c0-1.05.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7c-.52-.59-1.03-1.23-1.51-1.9a22.7 22.7 0 0 1-2.4-.36c-.51 2.14-.32 3.61.31 3.96m.71-5.74l-.29-.51c-.11.29-.22.58-.29.86c.27.06.57.11.88.16l-.3-.51m6.54-.76l.81-1.5l-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9c-.6 0-1.17 0-1.71.03c-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47c.54.03 1.11.03 1.71.03c.6 0 1.17 0 1.71-.03c.29-.47.61-.94.91-1.47M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.62-.38-2 .2-3.59 1.7c.52.59 1.03 1.23 1.51 1.9c.82.08 1.63.2 2.4.36c.51-2.14.32-3.61-.32-3.96m-.7 5.74l.29.51c.11-.29.22-.58.29-.86c-.27-.06-.57-.11-.88-.16l.3.51m1.45-7.05c1.47.84 1.63 3.05 1.01 5.63c2.54.75 4.37 1.99 4.37 3.68c0 1.69-1.83 2.93-4.37 3.68c.62 2.58.46 4.79-1.01 5.63c-1.46.84-3.45-.12-5.37-1.95c-1.92 1.83-3.91 2.79-5.38 1.95c-1.46-.84-1.62-3.05-1-5.63c-2.54-.75-4.37-1.99-4.37-3.68c0-1.69 1.83-2.93 4.37-3.68c-.62-2.58-.46-4.79 1-5.63c1.47-.84 3.46.12 5.38 1.95c1.92-1.83 3.91-2.79 5.37-1.95M17.08 12c.34.75.64 1.5.89 2.26c2.1-.63 3.28-1.53 3.28-2.26c0-.73-1.18-1.63-3.28-2.26c-.25.76-.55 1.51-.89 2.26M6.92 12c-.34-.75-.64-1.5-.89-2.26c-2.1.63-3.28 1.53-3.28 2.26c0 .73 1.18 1.63 3.28 2.26c.25-.76.55-1.51.89-2.26m9 2.26l-.3.51c.31-.05.61-.1.88-.16c-.07-.28-.18-.57-.29-.86l-.29.51m-2.89 4.04c1.59 1.5 2.97 2.08 3.59 1.7c.64-.35.83-1.82.32-3.96c-.77.16-1.58.28-2.4.36c-.48.67-.99 1.31-1.51 1.9M8.08 9.74l.3-.51c-.31.05-.61.1-.88.16c.07.28.18.57.29.86l.29-.51m2.89-4.04C9.38 4.2 8 3.62 7.37 4c-.63.35-.82 1.82-.31 3.96a22.7 22.7 0 0 1 2.4-.36c.48-.67.99-1.31 1.51-1.9Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">React</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Tailwind React Components and templates for Vibe Coded UIs</span>
+                                    </span>
+                                </a>
+                                <a href="/add-servicestack-reference" data-section="dtos" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="currentColor" d="M11.586 3H1v2h10.586l-1.5 1.5L11.5 7.914L15.414 4L11.5.086L10.086 1.5zM4.414 13H15v-2H4.414l1.5-1.5L4.5 8.086L.586 12L4.5 15.914L5.914 14.5z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">DTOs</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">End-to-end typed API Clients for 15 programming languages</span>
+                                    </span>
+                                </a>
+                                <a href="/autoquery/" data-section="autoquery" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 hidden">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AutoQuery</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Instant queryable &amp; CRUD APIs from declarative Request DTOs</span>
+                                    </span>
+                                </a>
+                                <a href="/jobs/" data-section="jobs" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Background Jobs</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Durable Jobs, queues, workflows and recurring tasks in your existing DB</span>
+                                    </span>
+                                </a>
+                                <a href="/chat/" data-section="ai" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AI</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Modular AI Chat, Agents, MCP and API Tools for ServiceStack Apps</span>
+                                    </span>
+                                </a>
+                                <a href="/rag" data-section="rag" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">RAG</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Build Gemini RAG knowledge bases from your docs and websites</span>
+                                    </span>
+                                </a>
+                                <a href="/pdf" data-section="pdf" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">PDF</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">PDF Studio for generating branded documents and reports</span>
+                                    </span>
+                                </a>
+                                <a href="/auth/" data-section="auth" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Auth</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Identity Auth, API Keys, JWT and securing your APIs</span>
+                                    </span>
+                                </a>
+                                <a href="/ormlite/" data-section="ormlite" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M448 73.143v45.714C448 159.143 347.667 192 224 192S0 159.143 0 118.857V73.143C0 32.857 100.333 0 224 0s224 32.857 224 73.143zM448 176v102.857C448 319.143 347.667 352 224 352S0 319.143 0 278.857V176c48.125 33.143 136.208 48.572 224 48.572S399.874 209.143 448 176zm0 160v102.857C448 479.143 347.667 512 224 512S0 479.143 0 438.857V336c48.125 33.143 136.208 48.572 224 48.572S399.874 369.143 448 336z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">OrmLite</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Code-first, fast, lightweight ORM for major RDBMS</span>
+                                    </span>
+                                </a>
+                                <a href="/redis/" data-section="redis" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="currentColor" d="M31.99 19.12c-.01.307-.417.646-1.245 1.078c-1.708.891-10.552 4.531-12.438 5.51c-1.885.984-2.927.974-4.417.26c-1.49-.708-10.901-4.516-12.599-5.323c-.844-.406-1.276-.745-1.292-1.068v3.234c0 .323.448.661 1.292 1.068c1.698.813 11.115 4.615 12.599 5.323c1.49.714 2.531.724 4.417-.26c1.885-.979 10.729-4.62 12.438-5.51c.87-.448 1.255-.802 1.255-1.12v-3.188c0-.005-.005-.005-.01-.005zm0-5.271c-.016.302-.417.641-1.245 1.078c-1.708.885-10.552 4.526-12.438 5.505c-1.885.984-2.927.974-4.417.266c-1.49-.714-10.901-4.516-12.599-5.328c-.844-.401-1.276-.745-1.292-1.068v3.234c0 .323.448.667 1.292 1.068c1.698.813 11.109 4.615 12.599 5.328c1.49.708 2.531.719 4.417-.26c1.885-.984 10.729-4.62 12.438-5.51c.87-.453 1.255-.807 1.255-1.125v-3.188h-.01zm0-5.474c.016-.323-.406-.609-1.266-.922c-1.661-.609-10.458-4.109-12.141-4.729c-1.682-.615-2.37-.589-4.349.12c-1.979.714-11.339 4.385-13.005 5.036c-.833.328-1.24.63-1.224.953v3.234c0 .323.443.661 1.292 1.068c1.693.813 11.109 4.615 12.599 5.328c1.484.708 2.531.719 4.417-.266c1.88-.979 10.729-4.62 12.438-5.505c.865-.453 1.25-.807 1.25-1.125V8.374zm-20.532 3.063l7.417-1.135l-2.24 3.281zm16.401-2.959L23 10.401l-4.385-1.734l4.854-1.917zM14.984 5.302l-.719-1.323l2.24.875l2.109-.688l-.573 1.365l2.151.807l-2.771.286l-.625 1.495l-1-1.667l-3.203-.286zm-5.526 1.87c2.193 0 3.964.688 3.964 1.531c0 .849-1.776 1.536-3.964 1.536s-3.964-.688-3.964-1.536c0-.844 1.776-1.531 3.964-1.531z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Redis</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">.NET&#x27;s leading C# Redis Client</span>
+                                    </span>
+                                </a>
+                                <a href="/locode/" data-section="locode" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5v13.5H3.75zM3.75 9.75h16.5M3.75 14.25h16.5M9 9.75v9"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">Locode</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Instant data management UIs for your AutoQuery APIs</span>
+                                    </span>
+                                </a>
+                                <a href="/grpc/" data-section="grpc" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">gRPC</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Code-first, high-performance HTTP/2 typed services</span>
+                                    </span>
+                                </a>
+                                <a href="/ai-server/" data-section="ai-server" class="group gap-x-3 rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800 flex">
+                                    <span class="flex size-9 flex-none items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900 [&>svg]:size-5"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z"/></svg></span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">AI Server</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">Self-hosted gateway for LLMs, ComfyUI and FFmpeg APIs</span>
+                                    </span>
+                                </a>
+                        </div>
+                        <a href="/#sections" class="block bg-gray-50 dark:bg-gray-800 px-4 py-2 text-center text-xs font-medium text-indigo-600 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700">Browse all sections</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+            <div id="search-slot"></div>
+            <dark-mode-toggle class="ml-2 w-10"></dark-mode-toggle>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" v-on:click="open=!open" class="inline-flex items-center justify-center rounded-md bg-white dark:bg-black p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:ring-offset-black" aria-controls="mobile-menu" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <!-- Menu open: "hidden", Menu closed: "block" -->
+            <svg :class="['h-6 w-6', open ? 'hidden' : 'block']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!-- Menu open: "block", Menu closed: "hidden" -->
+            <svg :class="['h-6 w-6', open ? 'block' : 'hidden']" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div v-cloak v-if="open" class="sm:hidden">
+        <div class="space-y-1 pb-3 pt-2">
+            <!-- Current: "border-indigo-500 bg-indigo-50 text-indigo-700", Default: "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800" -->
+                <a href="/templates/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Project Templates
+                </a>
+                <a href="/vue/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Vue
+                </a>
+                <a href="/react/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    React
+                </a>
+                <a href="/add-servicestack-reference" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    DTOs
+                </a>
+                <a href="/autoquery/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AutoQuery
+                </a>
+                <a href="/jobs/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200">
+                    Background Jobs
+                </a>
+                <a href="/chat/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AI
+                </a>
+                <a href="/rag" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    RAG
+                </a>
+                <a href="/pdf" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    PDF
+                </a>
+                <a href="/auth/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Auth
+                </a>
+                <a href="/ormlite/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    OrmLite
+                </a>
+                <a href="/redis/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Redis
+                </a>
+                <a href="/locode/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    Locode
+                </a>
+                <a href="/grpc/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    gRPC
+                </a>
+                <a href="/ai-server/" class="block border-l-4 py-2 pl-3 pr-4 text-base font-medium border-transparent text-gray-600 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-gray-800 dark:hover:text-gray-100">
+                    AI Server
+                </a>
+        </div>
+    </div>
+  </nav>
+</header>
+
+<script id="nav-sections">
+// Runs before paint: record the section being visited and show the most recently visited sections in the top bar
+(function () {
+    var sections = [{"__type":"<>f__AnonymousType1`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], MyApp","id":"templates","href":"/templates/"},{"id":"vue","href":"/vue/"},{"id":"react","href":"/react/"},{"id":"dtos","href":"/add-servicestack-reference"},{"id":"autoquery","href":"/autoquery/"},{"id":"jobs","href":"/jobs/"},{"id":"ai","href":"/chat/"},{"id":"rag","href":"/rag"},{"id":"pdf","href":"/pdf"},{"id":"auth","href":"/auth/"},{"id":"ormlite","href":"/ormlite/"},{"id":"redis","href":"/redis/"},{"id":"locode","href":"/locode/"},{"id":"grpc","href":"/grpc/"},{"id":"ai-server","href":"/ai-server/"}]
+    var count = 5, key = 'nav-sections', path = location.pathname
+    var ids = sections.map(function (x) { return x.id })
+    var recent = []
+    try { recent = JSON.parse(localStorage.getItem(key) || '[]').filter(function (id) { return ids.indexOf(id) >= 0 }) } catch (e) {}
+    var current = sections.find(function (x) {
+        var href = x.href.replace(/\/$/, '')
+        return path === href || path === href + '/' || (x.href.endsWith('/') && path.startsWith(x.href))
+    })
+    if (current) {
+        recent = [current.id].concat(recent.filter(function (id) { return id !== current.id })).slice(0, count)
+        try { localStorage.setItem(key, JSON.stringify(recent)) } catch (e) {}
+    }
+    // Most recently visited first, with any remaining slots filled by the default sections
+    var visible = recent.concat(ids.filter(function (id) { return recent.indexOf(id) < 0 })).slice(0, count)
+    document.querySelectorAll('#header [data-section]').forEach(function (el) {
+        var inTopBar = !el.closest("[data-more]")
+        var show = (visible.indexOf(el.dataset.section) >= 0) === inTopBar
+        el.classList.toggle('hidden', !show)
+        el.classList.toggle(inTopBar ? 'inline-flex' : 'flex', show)
+    })
+    // Move the visible top bar links to the front in most recently visited order
+    visible.slice().reverse().forEach(function (id) {
+        var el = document.querySelector('#header [data-section="' + id + '"]:not([data-more] *)')
+        if (el) el.parentNode.insertBefore(el, el.parentNode.firstChild)
+    })
+})()
+</script>
+
+<script type="module">
+import { ref, onMounted, onUnmounted } from "vue"
+import { mount } from "app.mjs"
+
+const Header = {
+    setup() {
+        const open = ref(false)
+        const more = ref(false)
+        const close = () => more.value = false
+        const onKey = e => { if (e.key === 'Escape') close() }
+        onMounted(() => {
+            document.addEventListener('click', close)
+            document.addEventListener('keydown', onKey)
+        })
+        onUnmounted(() => {
+            document.removeEventListener('click', close)
+            document.removeEventListener('keydown', onKey)
+        })
+        return { open, more }
+    }
+}
+mount('#header', Header)
+</script>
+
+
+<div class="min-h-screen">
+    <main role="main" class="w-full pt-16 pb-3">
+        
+
+
+
+<style>
+.active {
+    color: #0ea5e9 !important;
+}
+</style>
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/typography.css">
+<link rel="stylesheet" href="/css/lite-yt-embed.css">
+
+<div class="w-full max-w-[100rem] mx-auto">
+    <div class="flex flex-wrap">
+        <div id="sidebar" class="z-40 inset-0 flex-none bg-white dark:bg-black lg:w-64 xl:w-80">
+            <button v-cloak v-on:click="open=true" :class="['text-gray-400 hover:text-gray-500 pt-4 pl-2 absolute transform transition-all duration-200', open ? 'opacity-0 translate-x-56' : 'opacity-100']" title="Open Sidebar">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H10m10 0l-4 4m4-4l-4-4M4 4v16"/></svg>
+            </button>
+            <div :class="['fixed bg-white dark:bg-black h-screen overflow-y-auto scrolling-touch overflow-hidden shadow lg:shadow-none transform transition-transform duration-200', open ? '' : 'translate-x-[-100%]']">
+                <nav class="sidebar lg:w-64 xl:w-80 px-1 pt-6 pb-16 overflow-y-auto font-medium text-sm lg:text-base sm:px-3 xl:px-5" aria-label="Sidebar">
+                    <close-button title="Close Sidebar" class="lg:hidden -mr-2" v-on:close="open=false"></close-button>
+                                <a href="/jobs/" class="block flex items-center whitespace-nowrap">
+<svg class='h-6 w-6 shrink-0 text-sky-500' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' aria-hidden='true'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'></path></svg>                                    <span class="p-2 pl-3 font-display font-medium text-slate-900 dark:text-white">
+Background Jobs                                    </span>
+                                </a>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/jobs/rdbms" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        RDBMS Background Jobs
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/sqlite" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full active font-semibold text-sky-500 before:bg-sky-500">
+                                        SQLite Background Jobs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Guides
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/jobs/queues" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Queues &amp; Rate Limits
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/workflows" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Workflows &amp; Batches
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/reliability" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Retries &amp; Reliability
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/monitoring" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Monitoring &amp; Operations
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/recurring-tasks" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Schedule Recurring Tasks
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/jobs/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Commands in Jobs
+                                    </a>
+                                </li>
+                        </ul>
+                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    Related
+                                </h2>
+                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
+                                <li class="relative">
+                                    <a href="/commands" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Commands Feature
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/background-mq" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Background MQ
+                                    </a>
+                                </li>
+                        </ul>
+                </nav>
+            </div>
+        </div>
+        <div id="doc" class="mx-auto flex">
+            <div class="mt-8 mx-auto prose lg:prose-lg">
+                
+                    <section class="not-prose mb-16 md:mb-12">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl tracking-tight font-extrabold text-gray-900 dark:text-gray-50">
+                            SQLite Background Jobs
+                        </h1>
+                    </section>
+
+                <div class="not-prose"></div>
+
+                <div class="content"><p>ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It's a easy to use library that seamlessly integrates into existing ServiceStack Apps with a built-in Management UI to provide real-time monitoring, inspection and management of background jobs.</p>
+<lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="2Cza_a_rrjA" playlabel="Durable Background Jobs and Scheduled Tasks for .NET 10 Apps" style="background-image:url('https://img.youtube.com/vi/2Cza_a_rrjA/maxresdefault.jpg')"></lite-youtube>
+<h3 id="durable-and-infrastructure-free">Durable and Infrastructure-Free<a class="header-anchor" href="javascript:;" onclick="location.hash='#durable-and-infrastructure-free'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Prior to Background Jobs we've been using <a href="/background-mq">Background MQ</a> for executing
+our background tasks which lets you queue any Request DTO to execute its API in a background worker.
+It's been our preferred choice as it didn't require any infrastructure dependencies since its concurrent
+queues are maintained in memory, this also meant they were non-durable that didn't survive across App restarts.
+Whilst <a href="/messaging">ServiceStack MQ</a> enables an additional endpoint for your APIs our main use-case for using
+it was for executing background tasks which would be better suited by purpose-specific software
+designed for the task.</p>
+<h4 id="sqlite-persistence">SQLite Persistence<a class="header-anchor" href="javascript:;" onclick="location.hash='#sqlite-persistence'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>It uses SQLite as the backing store for its durability since it's low latency,
+<a href="https://www.sqlite.org/fasterthanfs.html">fast disk persistence</a> and embeddable file-based
+database makes it ideally suited for the task which allows creation of naturally partition-able
+and archivable monthly databases on-the-fly without any maintenance overhead or infrastructure
+dependencies making it easy to add to any .NET App without impacting or adding increased load to
+their existing configured databases.</p>
+<p>SQLite Background Jobs runs on a single App Server. To process Jobs on multiple App Servers sharing the
+same database, use <a href="/jobs/rdbms">RDBMS Background Jobs</a> with PostgreSQL, SQL Server or MySQL,
+which uses the same <code>IBackgroundJobs</code> APIs, Admin UI and data models.</p>
+<h3 id="queue-apis-or-commands">Queue APIs or Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#queue-apis-or-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>For even greater reuse you're able to queue your existing ServiceStack APIs
+as a Background Job in addition to <a href="/commands">Commands</a> added in the
+<a href="/releases/v8_03">last v8.3 release</a> for encapsulating units of logic
+into internal invokable, inspectable and auto-retryable building blocks.</p>
+<h3 id="real-time-admin-ui">Real Time Admin UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#real-time-admin-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The Background Jobs Admin UI provides a real time view into the status of all background jobs including
+their progress, logs, retries, batches and queues, with controls to cancel, requeue and replay Jobs and
+pause queues. See <a href="/jobs/monitoring#admin-ui">Monitoring &amp; Operations</a> for a tour.</p>
+<p><screenshot src="/img/pages/jobs/03-job-running.png" title="A running Job streaming its progress and logs live"></screenshot></p>
+<h3 id="feature-overview">Feature Overview<a class="header-anchor" href="javascript:;" onclick="location.hash='#feature-overview'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<ul>
+<li>No infrastructure dependencies
+<ul>
+<li>Monthly archivable rolling Databases with full Job Execution History</li>
+</ul>
+</li>
+<li>Execute existing APIs or versatile Commands
+<ul>
+<li>Commands auto registered in IOC</li>
+</ul>
+</li>
+<li><a href="/jobs/queues">Named queues</a> with their own concurrency, priorities and rate limits
+<ul>
+<li>Pause, resume and re-throttle queues at runtime</li>
+</ul>
+</li>
+<li>Serially execute jobs with the same named Worker, or per
+<a href="/jobs/queues#concurrency-keys">concurrency key</a></li>
+<li><a href="/jobs/workflows">Multi-step workflows</a> with Jobs dependent on their parent Job</li>
+<li><a href="/jobs/workflows#job-batches">Job Batches</a> with live progress and completion callbacks</li>
+<li><a href="/jobs/workflows#await-a-jobs-result">Await a Job's result</a> or have it
+<a href="/jobs/workflows#deliver-results-to-replyto">delivered to a webhook or MQ</a></li>
+<li><a href="/jobs/reliability#retries-and-backoff">Retries with exponential backoff and jitter</a>, with every
+failed attempt recorded</li>
+<li><a href="/jobs/reliability#idempotent-enqueue">Idempotent</a> and
+<a href="/jobs/reliability#singleton-jobs">singleton</a> Jobs to prevent duplicate work</li>
+<li><a href="/jobs/reliability#job-expiry">Job expiry</a>, timeouts and cancellation</li>
+<li><a href="/jobs/recurring-tasks">Durable, time zone aware Recurring Tasks</a></li>
+<li>Queue Jobs to be executed after a specified Date</li>
+<li>Execute Jobs within the context of an Authenticated User</li>
+<li>Maintain Status, Logs and Progress of Executing Jobs</li>
+<li>Execute transitive (i.e. non-durable) jobs using named workers</li>
+<li><a href="/jobs/monitoring">Health checks, OpenTelemetry and Profiling</a></li>
+<li>Attach optional <code>Tag</code>, <code>TenantId</code>, <code>CreatedBy</code> and <code>Args</code> metadata to Jobs</li>
+</ul>
+<p>Please <a href="https://servicestack.net/ideas">let us know</a> if there are any other missing features
+you would love to see implemented.</p>
+<h2 id="install">Install<a class="header-anchor" href="javascript:;" onclick="location.hash='#install'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>As it's more versatile and better suited, we've replaced the usage of Background MQ with
+ServiceStack.Jobs in all <strong>.NET 10 Identity Auth Templates</strong> for sending Identity Auth Confirmation
+Emails when SMTP is enabled. So the easiest way to get started with ServiceStack.Jobs is to
+<a href="https://servicestack.net/start">create a new Identity Auth Project</a>, e.g:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npx create-net blazor-vue MyApp</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<h3 id="exiting.net-10-templates">Exiting .NET 10 Templates<a class="header-anchor" href="javascript:;" onclick="location.hash='#exiting.net-10-templates'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Existing .NET 10 Projects can configure their app to use <strong>ServiceStack.Jobs</strong> by mixing in:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npx add-in jobs</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Which adds the <code>Configure.BackgroundJobs.cs</code> <a href="https://docs.servicestack.net/modular-startup">Modular Startup</a>
+configuration and a <strong>ServiceStack.Jobs</strong> NuGet package reference to your project.</p>
+<h2 id="usage">Usage<a class="header-anchor" href="javascript:;" onclick="location.hash='#usage'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Any API, Controller or Minimal API can execute jobs with the <code>IBackgroundJobs</code> dependency, e.g.
+here's how you can run a background job to send a new email when an API is called in
+any new Identity Auth template:</p>
+<pre><code class="language-csharp">class MyService(IBackgroundJobs jobs) : Service 
+{
+    public object Any(MyOrder request)
+    {
+        var jobRef = jobs.EnqueueCommand&lt;SendEmailCommand&gt;(new SendEmail {
+            To = &quot;my@email.com&quot;,
+            Subject = $&quot;Received New Order {request.Id}&quot;,
+            BodyText = $&quot;&quot;&quot;
+                       Order Details:
+                       {request.OrderDetails.DumptTable()}
+                       &quot;&quot;&quot;,
+        });
+        //...
+    }
+}
+</code></pre>
+<p>Which records and immediately executes a worker to execute the <code>SendEmailCommand</code> with the specified
+<code>SendEmail</code> Request argument. It also returns a reference to a Job which can be used later to query
+and track execution of a job.</p>
+<p>Alternatively a <code>SendEmail</code> API could be executed with just the Request DTO:</p>
+<pre><code class="language-csharp">var jobRef = jobs.EnqueueApi(new SendEmail {
+    To = &quot;my@email.com&quot;,
+    Subject = $&quot;Received New Order {request.Id}&quot;,
+    BodyText = $&quot;&quot;&quot;
+               Order Details:
+               {request.OrderDetails.DumptTable()}
+               &quot;&quot;&quot;,
+});
+</code></pre>
+<p>Although Sending Emails is typically not an API you want to make externally available and would
+want to either <a href="/auth/restricting-services">Restrict access</a> or <a href="/auth/identity-auth#declarative-validation-attributes">limit usage to specified users</a>.</p>
+<p>In both cases the <code>SendEmail</code> Request is persisted into the Jobs SQLite database for durability
+that gets updated as it progresses through the queue.</p>
+<p>For execution the API or command is resolved from the IOC before being invoked with the Request.
+APIs are executed via the <a href="/order-of-operations">MQ Request Pipeline</a>
+and commands executed using the <a href="/commands">Commands Feature</a> where
+it will be also visible in the <a href="/commands#command-admin-ui">Commands Admin UI</a>.</p>
+<h3 id="configuration">Configuration<a class="header-anchor" href="javascript:;" onclick="location.hash='#configuration'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The main <code>BackgroundsJobFeature</code> options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DbDir</code></td>
+<td><code>App_Data/jobs</code></td>
+<td>Directory for the Jobs databases</td>
+</tr>
+<tr>
+<td><code>DbFile</code></td>
+<td><code>jobs.db</code></td>
+<td>Database for queued Jobs, their history and Scheduled Tasks</td>
+</tr>
+<tr>
+<td><code>DbMonthFile</code></td>
+<td><code>jobs_{yyyy}-{MM}.db</code></td>
+<td>Monthly database for the Completed and Failed Jobs archive</td>
+</tr>
+<tr>
+<td><code>MaxConcurrentJobs</code></td>
+<td>CPU cores</td>
+<td>Jobs each queue runs at once</td>
+</tr>
+<tr>
+<td><code>QueueConcurrency</code></td>
+<td></td>
+<td>Per-queue concurrency overrides</td>
+</tr>
+<tr>
+<td><code>DefaultRetryLimit</code></td>
+<td><code>2</code></td>
+<td>Retries after a failed attempt</td>
+</tr>
+<tr>
+<td><code>DefaultRetryBackoff</code></td>
+<td><code>ExponentialJitter</code></td>
+<td>How retry delays grow</td>
+</tr>
+<tr>
+<td><code>DefaultRetryDelayMs</code></td>
+<td><code>5000</code></td>
+<td>Delay before the first retry</td>
+</tr>
+<tr>
+<td><code>DefaultMaxRetryDelayMs</code></td>
+<td><code>300000</code></td>
+<td>Longest delay between retries</td>
+</tr>
+<tr>
+<td><code>DefaultTimeoutSecs</code></td>
+<td><code>600</code></td>
+<td>How long a Job can run before it's cancelled</td>
+</tr>
+<tr>
+<td><code>ShutdownTimeoutSecs</code></td>
+<td><code>30</code></td>
+<td>How long running Jobs have to finish on shutdown</td>
+</tr>
+<tr>
+<td><code>MaxRequestBodyChars</code></td>
+<td><code>1000000</code></td>
+<td>Largest Request a Job can be queued with</td>
+</tr>
+<tr>
+<td><code>MaxResponseBodyChars</code></td>
+<td><code>1000000</code></td>
+<td>Largest Response that's stored</td>
+</tr>
+<tr>
+<td><code>MaxJobLogChars</code></td>
+<td><code>100000</code></td>
+<td>Largest log kept for a Job</td>
+</tr>
+<tr>
+<td><code>JobSummaryRetention</code></td>
+<td>off</td>
+<td>Delete the history of finished Jobs older than this</td>
+</tr>
+<tr>
+<td><code>ArchiveRetention</code></td>
+<td>off</td>
+<td>Delete monthly archive databases older than this</td>
+</tr>
+<tr>
+<td><code>ValidateReplyTo</code></td>
+<td></td>
+<td><a href="/jobs/workflows#restrict-where-results-are-sent">Restrict where results are sent</a></td>
+</tr>
+<tr>
+<td><code>OnJobReplyTo</code></td>
+<td></td>
+<td><a href="/jobs/workflows#customize-delivery">Customize how results are delivered</a></td>
+</tr>
+</tbody>
+</table>
+<h3 id="upgrading-from-v10.2">Upgrading from v10.2<a class="header-anchor" href="javascript:;" onclick="location.hash='#upgrading-from-v10.2'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>v10.3 upgrades the Background Jobs schema on startup, and clears Jobs that are still queued or running when
+the upgrade is applied. See <a href="/releases/v10_03#upgrading-to-v103">Upgrading to v10.3</a> for what changes and
+how to prepare.</p>
+<p><div><h3 id="background-job-options">Background Job Options<a class="header-anchor" href="javascript:;" onclick="location.hash='#background-job-options'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>The behavior for each <code>Enqueue*</code> method for executing background jobs can be customized with
+the following options:</p>
+<p><strong>When and where it runs</strong></p>
+<ul>
+<li><code>Queue</code> - Run the job on a <a href="/jobs/queues">named queue</a> with its own concurrency, e.g. <code>emails</code></li>
+<li><code>Priority</code> - Higher priority jobs are started first within their queue</li>
+<li><code>Worker</code> - Serially process job using a named worker thread</li>
+<li><code>ConcurrencyKey</code> - Jobs sharing a key <a href="/jobs/queues#concurrency-keys">run one at a time</a>, while different keys run in parallel</li>
+<li><code>RunAfter</code> - Queue jobs that are only run after a specified date</li>
+<li><code>ExpiresAt</code> / <code>ExpiresIn</code> - <a href="/jobs/reliability#job-expiry">Cancel the job</a> instead of running it late</li>
+<li><code>UserId</code> - Execute within an Authenticated User Context</li>
+</ul>
+<p><strong>Workflows</strong></p>
+<ul>
+<li><code>DependsOn</code> - Execute jobs after completion of a parent job
+<ul>
+<li><code>DependsOnPolicy</code> - Run only if the parent succeeded (default), or <a href="/jobs/workflows#run-however-the-parent-finished">however it finished</a></li>
+</ul>
+</li>
+<li><code>DependsOnBatch</code> - Execute after <a href="/jobs/workflows#fan-in-after-a-batch">every job in a batch</a> has finished</li>
+<li><code>BatchId</code> - Add the job to a <a href="/jobs/workflows#job-batches">Job Batch</a> to track its progress</li>
+<li><code>Callback</code> - Invoke another command with the result of a successful job</li>
+<li><code>ReplyTo</code> - <a href="/jobs/workflows#deliver-results-to-replyto">Deliver the result</a> to a URL or MQ queue when the job completes</li>
+</ul>
+<p><strong>Failure handling</strong></p>
+<ul>
+<li><code>RetryLimit</code> - Override default retry limit for how many attempts should be made to execute a job</li>
+<li><code>RetryBackoff</code>, <code>RetryDelay</code>, <code>MaxRetryDelay</code> - How long to <a href="/jobs/reliability#retries-and-backoff">wait between retries</a></li>
+<li><code>TimeoutSecs</code> / <code>Timeout</code> - Override default timeout for how long a job should run before being cancelled</li>
+</ul>
+<p><strong>Preventing duplicates</strong></p>
+<ul>
+<li><code>RefId</code> - Allow clients to specify a unique Id (e.g Guid) to track job
+<ul>
+<li><code>DuplicateRefIdBehavior</code> - <a href="/jobs/reliability#idempotent-enqueue">Return the existing job</a> when the same <code>RefId</code> is queued again</li>
+</ul>
+</li>
+<li><code>SingletonKey</code> - Only allow <a href="/jobs/reliability#singleton-jobs">one queued or running job</a> with this key</li>
+</ul>
+<p><strong>Metadata</strong></p>
+<ul>
+<li><code>Tag</code> - Group related jobs under a user specified tag</li>
+<li><code>TenantId</code> - The tenant the job belongs to, for filtering and reporting</li>
+<li><code>CreatedBy</code> - Optional field for capturing the owner of a job</li>
+<li><code>Args</code> - Optional String Dictionary of Arguments that can be attached to a Job</li>
+</ul>
+<h3 id="executing-non-durable-jobs">Executing non-durable jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-non-durable-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p><code>IBackgroundJobs</code> also supports <code>RunCommand</code> methods to be able to execute jobs transiently
+(i.e. non-durable), which is useful for commands that want to be serially executed by a named worker
+but don't need to be persisted.</p>
+<p>You could use this to queue system emails to be sent by the same <strong>smtp</strong> worker and are happy to
+avoid tracking its state and execution history in the Jobs database.</p>
+<pre><code class="language-csharp">var job = jobs.RunCommand&lt;SendEmailCommand&gt;(new SendEmail { ... }, 
+    new() {
+        Worker = &quot;smtp&quot;
+    });
+</code></pre>
+<p>In this case <code>RunCommand</code> returns the actual <code>BackgroundJob</code> instance that will be updated by
+the worker.</p>
+<p>You can also use <code>RunCommandAsync</code> if you prefer to wait until the job has been executed. Instead
+of a Job it returns the <strong>Result</strong> of the command if it returned one.</p>
+<pre><code class="language-csharp">var result = await jobs.RunCommandAsync&lt;SendEmailCommand&gt;(new SendEmail {...}, 
+    new() {
+        Worker = &quot;smtp&quot;
+    });
+</code></pre>
+<h3 id="serially-execute-jobs-with-named-workers">Serially Execute Jobs with named Workers<a class="header-anchor" href="javascript:;" onclick="location.hash='#serially-execute-jobs-with-named-workers'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>By default jobs are executed by the Workers of their <a href="/jobs/queues">queue</a>, which run up to
+<code>MaxConcurrentJobs</code> (default: the number of CPU cores) jobs at a time. We can also change the behavior to
+instead execute jobs one-by-one in a serial queue by specifying them to use the same named
+worker as seen in the example above.</p>
+<p>Alternatively you can annotate the command with the <code>[Worker]</code> attribute if you <strong>always</strong> want
+all jobs executing the command to use the same worker:</p>
+<pre><code class="language-csharp">[Worker(&quot;smtp&quot;)]
+public class SendEmailCommand(IBackgroundJobs jobs) : SyncCommand&lt;SendEmail&gt;
+{
+    //...
+}
+</code></pre>
+<h3 id="use-callbacks-to-process-the-results-of-commands">Use Callbacks to process the results of Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#use-callbacks-to-process-the-results-of-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Callbacks can be used to extend the lifetime of a job to include processing a callback to process its results.
+This is useful where you would like to reuse the the same command but handle the results differently,
+e.g. the same command can email results or post them to Slack by using a callback:</p>
+<pre><code class="language-csharp">jobs.EnqueueCommand&lt;CheckUrlsCommand&gt;(new CheckUrls { Urls = allUrls },
+    new() {
+        Callback = nameof(EmailUrlResultsCommand),
+    });
+
+jobs.EnqueueCommand&lt;CheckUrlsCommand&gt;(new CheckUrls { Urls = criticalUrls },
+    new() {
+        Callback = nameof(SlackUrlResultsCommand),
+    });
+</code></pre>
+<p>Callbacks that fail are auto-retried the same number of times as their jobs, which if they all fail then
+the entire job is also marked as failed.</p>
+<h3 id="run-job-dependent-on-successful-completion-of-parent">Run Job dependent on successful completion of parent<a class="header-anchor" href="javascript:;" onclick="location.hash='#run-job-dependent-on-successful-completion-of-parent'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Jobs can be queued to only run after the successful completion of another job, this is useful
+for when you need to kick off multiple jobs after a long running task has finished like
+generating monthly reports after monthly data has been aggregated, e.g:</p>
+<pre><code class="language-csharp">var jobRef = jobs.EnqueueCommand&lt;AggregateMonthlyDataCommand&gt;(new Aggregate {
+    Month = DateTime.UtcNow
+});
+
+jobs.EnqueueCommand&lt;GenerateSalesReportCommand&gt;(new () {
+   DependsOn = jobRef.Id,
+});
+
+jobs.EnqueueCommand&lt;GenerateExpenseReportCommand&gt;(new () {
+   DependsOn = jobRef.Id,
+});
+</code></pre>
+<p>Inside your command you can get a reference to your current job with <code>Request.GetBackgroundJob()</code>
+which will have its <code>ParentId</code> populated with the parent job Id and <code>job.ParentJob</code> containing
+a reference to the completed Parent Job where you can access its Request, Results and other job
+information:</p>
+<pre><code class="language-csharp">public class GenerateSalesReportCommand(ILogger&lt;MyCommandNoArgs&gt; log) 
+    : SyncCommand
+{
+    protected override void Run()
+    {
+        var job = Request.GetBackgroundJob();
+        var parentJob = job.ParentJob;
+    }
+}
+</code></pre>
+<h3 id="atomic-batching-behavior">Atomic Batching Behavior<a class="header-anchor" href="javascript:;" onclick="location.hash='#atomic-batching-behavior'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>We can also use <code>DependsOn</code> to implement atomic batching behavior where from inside our
+executing command we can queue new jobs that are dependent on the successful execution
+of the current job, e.g:</p>
+<pre><code class="language-csharp">public class CheckUrlsCommand(IHttpClientFactory factory, IBackgroundJobs jobs)
+    : AsyncCommand&lt;CheckUrls&gt;
+{
+    protected override async Task RunAsync(CheckUrls req, CancellationToken ct)
+    {
+        var job = Request.GetBackgroundJob();
+
+        var batchId = Guid.NewGuid().ToString(&quot;N&quot;);
+        using var client = factory.CreateClient();
+        foreach (var url in req.Urls)
+        {
+            var msg = new HttpRequestMessage(HttpMethod.Get, url);
+            var response = await client.SendAsync(msg, ct);
+            response.EnsureSuccessStatusCode();
+      
+            jobs.EnqueueCommand&lt;SendEmailCommand&gt;(new SendEmail {
+                To = &quot;my@email.com&quot;,
+                Subject = $&quot;{new Uri(url).Host} status&quot;,
+                BodyText = $&quot;{url} is up&quot;,
+            }, new() {
+                DependsOn = job.Id,
+                BatchId = batchId,
+            });
+        }
+    }
+}
+</code></pre>
+<p>Where any dependent jobs are only executed if the job was successfully completed.
+If instead an exception was thrown during execution, the job will be failed and
+all its dependent jobs cancelled and removed from the queue.</p>
+<div class="tip custom-block">
+            <p class="custom-block-title">TIP</p><p>See <a href="/jobs/workflows">Workflows &amp; Batches</a> for running a job however its parent finished,
+tracking the progress of a batch of jobs and running a job once a whole batch has finished.</p>
+</div>
+<h3 id="executing-jobs-with-an-authorized-user-context">Executing jobs with an Authorized User Context<a class="header-anchor" href="javascript:;" onclick="location.hash='#executing-jobs-with-an-authorized-user-context'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>If you have logic dependent on an Authenticated <code>ClaimsPrincipal</code> or ServiceStack
+<code>IAuthSession</code> you can have your APIs and Commands also be executed with that user context
+by specifying the <code>UserId</code> the job should be executed as:</p>
+<pre><code class="language-csharp">var openAiRequest = new CreateOpenAiChat {
+   Request = new() {
+       Model = &quot;gpt-4&quot;,
+       Messages = [
+           new() {
+               Content = request.Question
+           }
+       ]
+   },
+}; 
+
+// Example executing API Job with User Context
+jobs.EnqueueApi(openAiRequest, 
+    new() {
+      UserId = Request.GetClaimsPrincipal().GetUserId(),
+      CreatedBy = Request.GetClaimsPrincipal().GetUserName(),
+   });
+
+// Example executing Command Job with User Context
+jobs.EnqueueCommand&lt;CreateOpenAiChatCommand&gt;(openAiRequest, 
+    new() {
+      UserId = Request.GetClaimsPrincipal().GetUserId(),
+      CreatedBy = Request.GetClaimsPrincipal().GetUserName(),
+   });
+</code></pre>
+<p>Inside your API or Command you access the populated User <code>ClaimsPrincipal</code> or
+ServiceStack <code>IAuthSession</code> using the same APIs that you'd use inside your ServiceStack APIs, e.g:</p>
+<pre><code class="language-csharp">public class CreateOpenAiChatCommand(IBackgroundJobs jobs) 
+    : AsyncCommand&lt;CreateOpenAiChat&gt;
+{
+    protected override async Task RunAsync(
+        CreateOpenAiChat request, CancellationToken token)
+    {
+        var user = Request.GetClaimsPrincipal();
+        var session = Request.GetSession();
+        //...
+    }
+}
+</code></pre>
+<h3 id="queue-job-to-run-after-a-specified-date">Queue Job to run after a specified date<a class="header-anchor" href="javascript:;" onclick="location.hash='#queue-job-to-run-after-a-specified-date'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Using <code>RunAfter</code> lets you queue jobs that are only executed after a specified <code>DateTime</code>,
+useful for executing resource intensive tasks at low traffic times, e.g:</p>
+<pre><code class="language-csharp">var jobRef = jobs.EnqueueCommand&lt;AggregateMonthlyDataCommand&gt;(new Aggregate {
+       Month = DateTime.UtcNow
+   }, 
+   new() {
+       RunAfter = DateTime.UtcNow.Date.AddDays(1)
+   });
+</code></pre>
+<h3 id="attach-metadata-to-jobs">Attach Metadata to Jobs<a class="header-anchor" href="javascript:;" onclick="location.hash='#attach-metadata-to-jobs'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>All above Background Job Options have an effect on when and how Jobs are executed.
+There are also a number of properties that can be attached to a Job that can be useful
+in background job processing despite not having any effect on how jobs are executed.</p>
+<p>These properties can be accessed by commands or APIs executing the Job and are visible
+and can be filtered in the Jobs Admin UI to help find and analyze executed jobs.</p>
+<pre><code class="language-csharp">var jobRef = jobs.EnqueueCommand&lt;CreateOpenAiChatCommand&gt;(openAiRequest, 
+   new() {
+      // Group related jobs under a common tag
+      Tag = &quot;ai&quot;,
+
+      // A User-specified or system generated unique Id to track the job
+      RefId = request.RefId,
+      
+      // Capture who created the job
+      CreatedBy = Request.GetClaimsPrincipal().GetUserName(),
+      
+      // Link jobs together that are sent together in a batch
+      BatchId = batchId,
+      
+      // Tenant the job belongs to
+      TenantId = tenantId,
+      
+      // Additional properties about the job that aren't in the Request  
+      Args = new() {
+          [&quot;Additional&quot;] = &quot;Metadata&quot;
+      }
+   });
+</code></pre>
+<h3 id="querying-a-job">Querying a Job<a class="header-anchor" href="javascript:;" onclick="location.hash='#querying-a-job'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>A job can be queried by either it's auto-incrementing <code>Id</code> Primary Key or by a unique <code>RefId</code>
+that can be user-specified.</p>
+<pre><code class="language-csharp">var jobResult = jobs.GetJob(jobRef.Id);
+
+var jobResult = jobs.GetJobByRefId(jobRef.RefId);
+</code></pre>
+<p>At a minimum a <code>JobResult</code> will contain the Summary Information about a Job as well as the
+full information about a job depending on where it's located:</p>
+<pre><code class="language-csharp">class JobResult
+{
+    // Summary Metadata about a Job in the JobSummary Table 
+    JobSummary Summary
+    // Job that's still in the BackgroundJob Queue
+    BackgroundJob? Queued
+    // Full Job information in Monthly DB CompletedJob Table
+    CompletedJob? Completed
+    // Full Job information in Monthly DB FailedJob Table
+    FailedJob? Failed
+    // Helper to access full Job Information
+    BackgroundJobBase? Job =&gt; Queued ?? Completed ?? Failed 
+}
+</code></pre>
+<h3 id="job-execution-limits">Job Execution Limits<a class="header-anchor" href="javascript:;" onclick="location.hash='#job-execution-limits'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>Default Retry and Timeout Limits can be configured on the Backgrounds Job plugin
+(or <code>DatabaseJobFeature</code> for RDBMS Background Jobs):</p>
+<pre><code class="language-csharp">services.AddPlugin(new BackgroundsJobFeature
+{
+   DefaultRetryLimit = 2,                // retries after the first attempt
+   DefaultTimeoutSecs = 10 * 60,         // 10 mins
+   DefaultRetryBackoff = RetryBackoff.ExponentialJitter,
+   DefaultRetryDelayMs = 5_000,          // delay before the first retry
+   DefaultMaxRetryDelayMs = 300_000,     // longest delay between retries
+});
+</code></pre>
+<p>These limits are also overridable on a per-job basis, e.g:</p>
+<pre><code class="language-csharp">var jobRef = jobs.EnqueueCommand&lt;AggregateMonthlyDataCommand&gt;(new Aggregate {
+       Month = DateTime.UtcNow
+   }, 
+   new() {
+      RetryLimit = 3,
+      Timeout = TimeSpan.FromMinutes(30),
+   });
+</code></pre>
+<p>See <a href="/jobs/reliability">Retries &amp; Reliability</a> for how retries are spaced out, the history
+kept for each failed attempt, and expiring jobs that shouldn't run late.</p>
+<h3 id="logging-cancellation-an-status-updates">Logging, Cancellation an Status Updates<a class="header-anchor" href="javascript:;" onclick="location.hash='#logging-cancellation-an-status-updates'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>We'll use the command for checking multiple URLs to demonstrate some recommended patterns
+and how to enlist different job processing features.</p>
+<pre><code class="language-csharp">public class CheckUrlsCommand(
+    ILogger&lt;CheckUrlsCommand&gt; logger,
+    IBackgroundJobs jobs,
+    IHttpClientFactory clientFactory) : AsyncCommandWithResult&lt;CheckUrls,CheckUrlsResult&gt;
+{
+    protected override async Task&lt;CheckUrlsResult&gt; RunAsync(CheckUrls req, CancellationToken ct)
+    {
+        // 1. Create Logger that Logs and maintains logging in Jobs DB
+        var log = Request.CreateJobLogger(jobs,logger);
+
+        // 2. Get Current Executing Job
+        var job = Request.GetBackgroundJob();
+
+        var result = new CheckUrlsResult {
+            Statuses = new()
+        };
+        using var client = clientFactory.CreateClient();
+        for (var i = 0; i &lt; req.Urls.Count; i++)
+        {
+            // 3. Stop processing Job if it's been cancelled 
+            ct.ThrowIfCancellationRequested();
+
+            var url = req.Urls[i];
+            try
+            {
+                var msg = new HttpRequestMessage(HttpMethod.Get,url);
+                var response = await client.SendAsync(msg, ct);
+
+                result.Statuses[url] = response.IsSuccessStatusCode;
+                log.LogInformation(&quot;{Url} is {Status}&quot;,
+                    url, response.IsSuccessStatusCode ? &quot;up&quot; : &quot;down&quot;);
+
+                // 4. Optional: Maintain explicit progress and status updates
+                log.UpdateStatus(i/(double)req.Urls.Count,$&quot;Checked {i} URLs&quot;);
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, &quot;Error checking {Url}&quot;, url);
+                result.Statuses[url] = false;
+            }
+        }
+
+        // 5. Return the result, which is delivered to the job's ReplyTo if it has one
+        return result;
+    }
+}
+</code></pre>
+<p>We'll cover some of the notable parts useful when executing Jobs:</p>
+<h4 id="job-logger">1. Job Logger<a class="header-anchor" href="javascript:;" onclick="location.hash='#job-logger'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>We can use a Job logger to enable database logging that can be monitored in real-time in the
+Admin Jobs UI. Creating it with both <code>BackgroundJobs</code> and <code>ILogger</code> will return a combined
+logger that both Logs to standard output and to the Jobs database:</p>
+<pre><code class="language-csharp">var log = Request.CreateJobLogger(jobs,logger);
+</code></pre>
+<p>Or just use <code>Request.CreateJobLogger(jobs)</code> to only save logs to the database.</p>
+<h4 id="resolve-executing-job">2. Resolve Executing Job<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolve-executing-job'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>If needed the currently executing job can be accessed with:</p>
+<pre><code class="language-csharp">var job = Request.GetBackgroundJob();
+</code></pre>
+<p>Where you'll be able to access all the metadata the jobs were created with including <code>ReplyTo</code>
+and <code>Args</code>.</p>
+<h4 id="check-if-job-has-been-cancelled">3. Check if Job has been cancelled<a class="header-anchor" href="javascript:;" onclick="location.hash='#check-if-job-has-been-cancelled'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>To be able to cancel a long running job you'll need to periodically check if a Cancellation
+has been requested and throw a <code>TaskCanceledException</code> if it has to short-circuit the command
+which can be done with:</p>
+<pre><code class="language-csharp">ct.ThrowIfCancellationRequested();
+</code></pre>
+<p>You'll typically want to call this at the start of any loops to prevent it from doing any more work.</p>
+<h4 id="optionally-record-progress-and-status-updates">4. Optionally record progress and status updates<a class="header-anchor" href="javascript:;" onclick="location.hash='#optionally-record-progress-and-status-updates'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>By default Background Jobs looks at the last API or Command run and worker used to estimate
+the duration and progress for how long a running job will take.</p>
+<p>If preferred your command can explicitly set a more precise progress and optional status update
+that should be used instead, e.g:</p>
+<pre><code class="language-csharp">log.UpdateStatus(progress:i/(double)req.Urls.Count, $&quot;Checked {i} URLs&quot;);
+</code></pre>
+<p>Although generally the estimated duration and live logs provide a good indication for the progress
+of a job.</p>
+<h4 id="notify-completion-of-job">5. Notify completion of Job<a class="header-anchor" href="javascript:;" onclick="location.hash='#notify-completion-of-job'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Calling a Web Hook is a good way to notify externally initiated job requests of the completion
+of a job. Instead of calling it from within your command, return the result and queue the job with a
+<code>ReplyTo</code> - once the job completes its result is delivered automatically:</p>
+<pre><code class="language-csharp">jobs.EnqueueCommand&lt;CheckUrlsCommand&gt;(new CheckUrls { Urls = urls },
+    new() {
+        ReplyTo = $&quot;https://api.example.com/callback?refId={refId}&quot;,
+    });
+</code></pre>
+<p>This has a few benefits over sending the callback yourself:</p>
+<ul>
+<li>Frees up the worker as soon as the command has finished</li>
+<li>A failed delivery is logged without failing a job that has already succeeded</li>
+<li><code>X-Job-Id</code>, <code>X-Job-RefId</code>, <code>X-Job-BatchId</code>, <code>X-Job-Tag</code> and <code>X-Job-State</code> HTTP Headers let the
+receiver correlate the result without parsing the body</li>
+</ul>
+<p>A <code>ReplyTo</code> that's an <code>http://</code> or <code>https://</code> URL receives the result as a JSON POST, anything else is
+treated as an <a href="/messaging">MQ</a> queue name the result is published to. See
+<a href="/jobs/workflows#deliver-results-to-replyto">Deliver results to ReplyTo</a> to customize how
+results are delivered, or restrict where they can be sent.</p>
+<h4 id="callback-urls">Callback URLs<a class="header-anchor" href="javascript:;" onclick="location.hash='#callback-urls'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Typically URLs will contain a reference Id so external clients can correlate a callback
+with the internal process that initiated the job. If the callback API is publicly available you'll
+want to use an internal Id that can't be guessed (like a Guid) so the callback can't be spoofed, e.g:</p>
+<p><code>$&quot;https://api.example.com/callback?refId={RefId}&quot;</code></p>
+<p>If you need more control over how a callback is sent, the <code>SendJsonCallbackAsync</code> extension method
+supports a number of formats for customizing the HTTP Request, which you can use from your own command
+or from a custom <a href="/jobs/workflows#deliver-results-to-replyto">OnJobReplyTo</a> handler:</p>
+<pre><code class="language-csharp">await clientFactory.SendJsonCallbackAsync(callbackUrl, result, token);
+</code></pre>
+<p>If the URL contains a space, the text before the space is treated as the HTTP method:</p>
+<p><code>&quot;PUT https://api.example.com/callback&quot;</code></p>
+<p>If the auth part contains a colon <code>:</code> it's treated as Basic Auth:</p>
+<p><code>&quot;username:password@https://api.example.com/callback&quot;</code></p>
+<p>If name starts with <code>http.</code> sends a HTTP Header</p>
+<p><code>&quot;http.X-API-Key:myApiKey@https://api.example.com/callback&quot;</code></p>
+<p>Otherwise it's sent as a Bearer Token:</p>
+<p><code>&quot;myToken123@https://api.example.com/callback&quot;</code></p>
+<p>Bearer Token or HTTP Headers starting with <code>$</code> is substituted with Environment Variable if exists:</p>
+<p><code>&quot;$API_TOKEN@https://api.example.com/callback&quot;</code></p>
+<p>When needed headers, passwords and tokens can be URL encoded if they contain any delimiter characters.</p>
+<h2 id="implementing-commands">Implementing Commands<a class="header-anchor" href="javascript:;" onclick="location.hash='#implementing-commands'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>Commands are the recommended way to implement Background Jobs. See <a href="/jobs/commands">Commands in Background Jobs</a>
+for how to implement them with the ergonomic <code>SyncCommand*</code> and <code>AsyncCommand*</code> base classes, access the
+executing <code>BackgroundJob</code>, and use named Workers to serialize writes to your databases.</p>
+
+</div></p>
+</div>
+
+                <div class="not-prose"></div>
+                
+                    <div class="not-prose py-8">
+                        <a class="text-slate-500 font-semibold hover:text-indigo-600 flex items-center" href="https://github.com/ServiceStack/docs.servicestack.net/blob/main/MyApp/_pages/jobs/sqlite.md" target="_blank" rel="noopener noreferrer">
+                            Edit this page on GitHub<svg class="ml-1 inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" data-v-1ed99556=""><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg>
+                        </a>
+                    </div>
+
+                    <div class="not-prose my-20">
+                                <nav class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 sm:px-0">
+                                    <div class="-mt-px flex w-0 flex-1">
+                                            <a href="/jobs/rdbms" class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                <!-- Heroicon name: mini/arrow-long-left -->
+                                                <svg class="mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M18 10a.75.75 0 01-.75.75H4.66l2.1 1.95a.75.75 0 11-1.02 1.1l-3.5-3.25a.75.75 0 010-1.1l3.5-3.25a.75.75 0 111.02 1.1l-2.1 1.95h12.59A.75.75 0 0118 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                RDBMS Background Jobs
+                                            </a>
+                                    </div>
+                                    <div class="hidden md:-mt-px md:flex"></div>
+                                    <div class="-mt-px flex w-0 flex-1 justify-end">
+                                            <a href="/jobs/queues" class="inline-flex items-center border-t-2 border-transparent pt-4 pl-1 text-sm font-medium text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-700 dark:hover:text-gray-200">
+                                                Queues &amp; Rate Limits
+                                                <!-- Heroicon name: mini/arrow-long-right -->
+                                                <svg class="ml-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                    </div>
+                                </nav>
+                    </div>
+            </div>
+                
+                <div class="docmap hidden 2xl:block flex-none w-64 pl-8 mr-8">
+                    <div class="fixed bg-white dark:bg-black flex flex-col overflow-y-auto pt-10 px-8 pb-6" style="height:calc(100vh - 50px);">
+                        <div>
+                            <h5 class="text-slate-900 font-semibold mb-4 text-sm leading-6 dark:text-slate-100">
+                                On This Page
+                            </h5>
+                            <ul class="text-slate-700 text-sm leading-6">
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#install'" data-id="install" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Install
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="exiting.net-10-templates" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#exiting.net-10-templates'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Exiting .NET 10 Templates
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#usage'" data-id="usage" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Usage
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="configuration" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#configuration'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Configuration
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="upgrading-from-v10.2" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#upgrading-from-v10.2'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            Upgrading from v10.2
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+        </div>
+    </div>    
+</div>
+
+<script>
+//doc instructions
+if (document.querySelector('.hide-title')) {
+    const el = document.querySelector('#doc section h1') 
+    if (el) el.style.display='none'
+}
+</script>
+
+
+<script type="module">
+import { ref } from "vue"
+import { mount } from "app.mjs"
+
+
+    const App = {
+        setup() {
+            function nav(url) {
+                window.open(url)
+            }
+            return { nav }
+        }
+    }
+    
+const Sidebar = {
+    setup() {
+        const open = ref(true)
+        return { open }
+    }
+}
+
+mount('#doc', App)
+mount('#sidebar', Sidebar)
+</script>
+
+<script src="/lib/js/highlight.js"></script>
+<script>hljs.highlightAll()</script>
+<script src="/lib/js/lite-yt-embed.js"></script>
+<script src="/mjs/docs.mjs" type="module"></script>
+
+
+    </main>
+</div>
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+
+
+
+
+</body>
+</html>

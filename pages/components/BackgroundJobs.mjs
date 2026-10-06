@@ -924,18 +924,18 @@ export const JobsGuides = {
     template: `<DocCards :items="items" />`,
     setup() {
         const items = [
-            { icon:'⇆', eyebrow:'Guide', title:'Queues & Rate Limits', href:'/background-jobs-queues',
+            { icon:'⇆', eyebrow:'Guide', title:'Queues & Rate Limits', href:'/jobs/queues',
               text:'Run each class of work in its own queue with its own concurrency and priorities, re-throttle it at runtime, and keep each customer\'s Jobs in order.' },
-            { icon:'⤳', eyebrow:'Guide', title:'Workflows & Batches', href:'/background-jobs-workflows',
+            { icon:'⤳', eyebrow:'Guide', title:'Workflows & Batches', href:'/jobs/workflows',
               text:'Chain dependent Jobs, track the progress of Job Batches, and await a Job\'s result or have it delivered to a webhook or MQ.' },
-            { icon:'↻', eyebrow:'Guide', title:'Retries & Reliability', href:'/background-jobs-reliability',
+            { icon:'↻', eyebrow:'Guide', title:'Retries & Reliability', href:'/jobs/reliability',
               text:'Retry with backoff and jitter, review every failed attempt, expire Jobs that shouldn\'t run late, and never do the same work twice.' },
-            { icon:'⏱', eyebrow:'Guide', title:'Recurring Tasks', href:'/recurring-tasks',
+            { icon:'⏱', eyebrow:'Guide', title:'Recurring Tasks', href:'/jobs/recurring-tasks',
               text:'Run APIs and Commands on a Cron or interval schedule, in any time zone, safely on every server.' },
-            { icon:'◉', eyebrow:'Guide', title:'Monitoring & Operations', href:'/background-jobs-monitoring',
+            { icon:'◉', eyebrow:'Guide', title:'Monitoring & Operations', href:'/jobs/monitoring',
               text:'Tour the Admin UI, see and drain App Servers, and integrate with health checks and OpenTelemetry.' },
-            { icon:'⌘', eyebrow:'Related', title:'Commands', href:'/commands',
-              text:'Encapsulate units of logic into reusable, inspectable Commands - the recommended way to implement Jobs.' },
+            { icon:'⌘', eyebrow:'Guide', title:'Commands in Jobs', href:'/jobs/commands',
+              text:'Implement Jobs as reusable, inspectable Commands, and serialize DB writes with named Workers.' },
         ]
         return { items }
     }

@@ -85,7 +85,7 @@ export default {
               text: 'Route requests to per-tenant databases and configuration.' },
 
             // Operations
-            { category: 'Operations', name: 'Background Jobs', href: '/background-jobs', keywords: 'queues scheduled tasks cron',
+            { category: 'Operations', name: 'Background Jobs', href: '/jobs/', keywords: 'queues scheduled tasks cron',
               text: 'Durable background jobs and scheduled tasks with full execution history.' },
             { category: 'Operations', name: 'Commands', href: '/commands', keywords: 'cqrs observable retries',
               text: 'Observable, retryable building blocks with timings and failure history.' },

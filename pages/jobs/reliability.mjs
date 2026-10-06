@@ -1,4 +1,4 @@
-import { RetryPlanner, DedupPlayground } from "./components/BackgroundJobs.mjs"
+import { RetryPlanner, DedupPlayground } from "../components/BackgroundJobs.mjs"
 
 export default {
     components: {

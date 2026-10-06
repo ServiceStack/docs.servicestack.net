@@ -1,4 +1,4 @@
-import { JobsGuides, JobLifecycle } from "./components/BackgroundJobs.mjs"
+import { JobsGuides, JobLifecycle } from "../components/BackgroundJobs.mjs"
 
 export default {
     components: {
