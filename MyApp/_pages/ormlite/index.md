@@ -8,6 +8,10 @@ a high affinity with SQL, exposing intuitive APIs that generate predictable SQL 
 it obvious what SQL is getting executed at what time, whilst mitigating unexpected behavior,
 implicit N+1 queries and leaky data access prevalent in Heavy Object Relational Mappers (ORMs).
 
+:::youtube H6Ba6NJ5VOU
+OrmLite Overview
+:::
+
 <div class="py-8 max-w-7xl mx-auto">
     <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="vUbpwjfEYzg" style="background-image: url('https://img.youtube.com/vi/vUbpwjfEYzg/maxresdefault.jpg')"></lite-youtube>
 </div>
