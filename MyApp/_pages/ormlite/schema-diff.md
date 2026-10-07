@@ -31,6 +31,12 @@ The differences can be logged, [written as a migration](#write-a-migration) for 
 The [Database Admin UI](/admin-ui-database#schema-diff) has a **Schema Diff** for each database, which shows the
 differences between your App's models and their tables with a migration to copy into your App.
 
+<screenshot src="/img/pages/admin-ui/database-schema-diff.webp" title="Schema Diff in the Database Admin UI"></screenshot>
+
+The generated migration class is available to copy into your App and review before running it:
+
+<screenshot src="/img/pages/admin-ui/database-migration-class.webp" title="Migration class generated from Schema Diff"></screenshot>
+
 It compares these models of your App:
 
 - The data models of your AutoQuery APIs
@@ -195,11 +201,18 @@ services.AddPlugin(new AdminDatabaseFeature {
 It compares the same models as the [Admin UI](#in-the-admin-ui), in the background after your App starts, and logs a
 warning with the differences of each database whose tables aren't the same as their models:
 
-```
+For example, after changing the `SaasPlanFeature` model without updating its table, developers see this
+Schema Diff warning when starting their App with `LogSchemaDiff` enabled:
+
+```text
 Schema Diff: the tables of the main database aren't the same as their models
-Invoice
-  + PaidDate  DATETIME NULL
-Ignored: AspNetUsers, AspNetRoles
+SaasPlanFeature
+  ~ Name  TEXT NULL -> CHARACTER VARYING(120) NOT NULL
+  + Summary  TEXT NULL (renamed from Description?)
+  ~ DisplayOrder  default no default -> DEFAULT 10
+  - Description  TEXT NULL (not in SaasPlanFeature) (renamed to Summary?)
+  + index idx_saasplanfeature_enabled
+Ignored: AspNetUsers
 ```
 
 Or an information message when they are. It isn't compared when running [App Tasks](/app-tasks), e.g. migrations.
