@@ -3,8 +3,10 @@ title: Multitenancy Guide
 ---
 
 This guide walks through how a complete SaaS App keeps each customer's data separate, using the code of the
-[next-saas](https://github.com/NetCoreTemplates/next-saas) template. It's written as rules to follow, each with the
+[Next SaaS template](/react/#next-saas). It's written as rules to follow, each with the
 code that enforces it and the test that protects it, so they can be applied to your own App.
+
+[![](https://react-templates.net/img/next-saas/landing-hero.png)](/react/#next-saas)
 
 See [Multitenancy](/ormlite/multitenancy/overview) for the reference of what's used here, and
 [Connection Filters & Write Rules](/ormlite/connection-filters) for the OrmLite APIs behind it.
