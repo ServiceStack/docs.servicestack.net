@@ -2,9 +2,13 @@
 title: Multitenancy
 ---
 
-A multi-tenant App serves many customers from one deployment, and has to keep each customer's data separate. This
-page covers the model where every tenant shares one database and each row says which tenant owns it, which OrmLite
-enforces on the database connection so it doesn't depend on every query remembering its tenant.
+A multi-tenant App serves many customers from one deployment, and has to keep each customer's data separate. 
+
+:::youtube 86ff8gs4h3w
+Multi-Tenant .NET Apps: Enforce Tenant Isolation on the Connection, Not Every Query
+:::
+
+This page covers the model where every tenant shares one database and each row says which tenant owns it, which OrmLite enforces on the database connection so it doesn't depend on every query remembering its tenant.
 
 | Model | How tenants are separated | See |
 |-|-|-|
