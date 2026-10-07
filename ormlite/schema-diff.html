@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-10-06T16:03:12.5532556Z'>
+    <meta name='date' content='2026-10-07T03:01:27.5804109Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Schema Diff</title>
@@ -771,6 +771,9 @@ Customer
 <h2 id="in-the-admin-ui">In the Admin UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#in-the-admin-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The <a href="/admin-ui-database#schema-diff">Database Admin UI</a> has a <strong>Schema Diff</strong> for each database, which shows the
 differences between your App's models and their tables with a migration to copy into your App.</p>
+<p><screenshot src="/img/pages/admin-ui/database-schema-diff.webp" title="Schema Diff in the Database Admin UI"></screenshot></p>
+<p>The generated migration class is available to copy into your App and review before running it:</p>
+<p><screenshot src="/img/pages/admin-ui/database-migration-class.webp" title="Migration class generated from Schema Diff"></screenshot></p>
 <p>It compares these models of your App:</p>
 <ul>
 <li>The data models of your AutoQuery APIs</li>
@@ -975,10 +978,16 @@ in its startup logs, e.g. in <code>Configure.Db.cs</code>:</p>
 </code></pre>
 <p>It compares the same models as the <a href="#in-the-admin-ui">Admin UI</a>, in the background after your App starts, and logs a
 warning with the differences of each database whose tables aren't the same as their models:</p>
-<pre><code>Schema Diff: the tables of the main database aren't the same as their models
-Invoice
-  + PaidDate  DATETIME NULL
-Ignored: AspNetUsers, AspNetRoles
+<p>For example, after changing the <code>SaasPlanFeature</code> model without updating its table, developers see this
+Schema Diff warning when starting their App with <code>LogSchemaDiff</code> enabled:</p>
+<pre><code class="language-text">Schema Diff: the tables of the main database aren't the same as their models
+SaasPlanFeature
+  ~ Name  TEXT NULL -&gt; CHARACTER VARYING(120) NOT NULL
+  + Summary  TEXT NULL (renamed from Description?)
+  ~ DisplayOrder  default no default -&gt; DEFAULT 10
+  - Description  TEXT NULL (not in SaasPlanFeature) (renamed to Summary?)
+  + index idx_saasplanfeature_enabled
+Ignored: AspNetUsers
 </code></pre>
 <p>Or an information message when they are. It isn't compared when running <a href="/app-tasks">App Tasks</a>, e.g. migrations.
 Comparing creates temporary tables, so it's best enabled in development.</p>

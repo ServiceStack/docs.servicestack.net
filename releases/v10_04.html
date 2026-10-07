@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-10-06T16:03:12.9933212Z'>
+    <meta name='date' content='2026-10-07T03:01:28.2013522Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>ServiceStack v10.4</title>
@@ -2240,6 +2240,9 @@ models of your AutoQuery APIs, the models of the tables your <a href="/ormlite/d
 other models you add to the <code>ModelTypes</code> of the <code>AdminDatabaseFeature</code>, with their tables. It shows each difference
 with the SQL that fixes it, next to a migration that you can copy into your App. Comparing doesn't change your
 database.</p>
+<p><screenshot src="/img/pages/admin-ui/database-schema-diff.webp" title="Schema Diff in the Database Admin UI"></screenshot></p>
+<p>The generated migration class is available to copy into your App and review before running it:</p>
+<p><screenshot src="/img/pages/admin-ui/database-migration-class.webp" title="Migration class generated from Schema Diff"></screenshot></p>
 <p>Tables that aren't managed by OrmLite aren't compared, e.g. the <code>AspNet*</code> tables of ASP.NET Core Identity are ignored
 by default. Ignore other tables by name or model in <code>OrmLiteConfig.SchemaDiff</code>:</p>
 <pre><code class="language-csharp">OrmLiteConfig.SchemaDiff.IgnoreTables.Add(&quot;Legacy*&quot;);
@@ -2278,6 +2281,17 @@ Admin UI in the background when your App starts:</p>
 <pre><code class="language-csharp">services.AddPlugin(new AdminDatabaseFeature {
     LogSchemaDiff = context.HostingEnvironment.IsDevelopment(),
 });
+</code></pre>
+<p>For example, after changing the <code>SaasPlanFeature</code> model without updating its table, developers see this
+Schema Diff warning when starting their App with <code>LogSchemaDiff</code> enabled:</p>
+<pre><code class="language-text">Schema Diff: the tables of the main database aren't the same as their models
+SaasPlanFeature
+  ~ Name  TEXT NULL -&gt; CHARACTER VARYING(120) NOT NULL
+  + Summary  TEXT NULL (renamed from Description?)
+  ~ DisplayOrder  default no default -&gt; DEFAULT 10
+  - Description  TEXT NULL (not in SaasPlanFeature) (renamed to Summary?)
+  + index idx_saasplanfeature_enabled
+Ignored: AspNetUsers
 </code></pre>
 <p>It's supported for SQLite, PostgreSQL, SQL Server, MySQL and MariaDB. See <a href="/ormlite/schema-diff">Schema Diff</a>.</p>
 <h2 id="retry-deadlocks-throttling-and-lost-connections">Retry deadlocks, throttling and lost connections<a class="header-anchor" href="javascript:;" onclick="location.hash='#retry-deadlocks-throttling-and-lost-connections'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
