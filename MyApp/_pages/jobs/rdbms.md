@@ -12,6 +12,8 @@ and safely scales out across any number of App Servers sharing the same database
    time, and recovered automatically when a server fails
  - **[Queue Jobs in your own transaction](#queue-jobs-in-your-own-transaction)** - Jobs are only queued if
    the work that queued them commits
+ - **[Using Background Jobs](/jobs/usage)** - queue APIs and Commands, Job options, logging,
+   progress and cancellation
  - **[Queues, priorities & rate limits](/jobs/queues)** - run each class of work in its own lane,
    and control it at runtime from any server
  - **[Workflows, batches & results](/jobs/workflows)** - multi-step workflows, batches with live
@@ -24,7 +26,7 @@ and safely scales out across any number of App Servers sharing the same database
 .NET Background Jobs That Survive Crashes, Deploys & Retries
 :::
 
-### Install
+## Install
 
 For [ServiceStack ASP.NET Identity Auth](https://servicestack.net/start) Projects:
 
@@ -167,7 +169,7 @@ The Jobs tables need to be in the same database as your data, so this isn't avai
 [separate database](#separate-jobs-database). Jobs queued this way are picked up on the next tick rather than
 immediately, since they can't run before your transaction has committed.
 
-## RDBMS Optimizations
+## Job History Storage
 
 A key benefit of using SQLite for Background Jobs was the ability to easily maintain completed and failed job history in 
 separate **monthly databases**. This approach prevented the main application database from growing unbounded by archiving 
@@ -216,9 +218,9 @@ nature means there's no complex update logic to manage across partitions.
 This approach maintains the same benefits as SQLite's monthly databases - easy archival, manageable table sizes,
 and efficient queries - while leveraging the scalability and features of enterprise RDBMS systems.
 
-### Separate Jobs Database
+## Separate Jobs Database
 
-Or if preferred, you can maintain background jobs in a **separate database** from your main application database. 
+If preferred, you can maintain background jobs in a **separate database** from your main application database. 
 This separation keeps the write-heavy job processing load off your primary database, allowing you to optimize 
 each database independently for its specific workload patterns like maintaining different backup strategies
 for your critical application data vs. job history. 
@@ -234,101 +236,7 @@ services.AddPlugin(new DatabaseJobFeature {
 });
 ```
 
-### Real Time Admin UI
-
-The Jobs Admin UI provides a real time view into the status of all background jobs including their progress,
-logs, retries, batches, queues and servers, with controls to cancel, requeue and replay Jobs, pause queues and
-drain servers. See [Monitoring & Operations](/jobs/monitoring#admin-ui) for a tour.
-
-<screenshot src="/img/pages/jobs/04-queues.png" title="Pause, resume, concurrency and rate limit controls for each queue"></screenshot>
-
-## Usage
-
-For even greater reuse of your APIs you're able to queue your existing ServiceStack Request DTOs
-as a Background Job in addition to [Commands](/commands) 
-for encapsulating units of logic into internal invokable, inspectable and auto-retryable building blocks.
-
-### Queue Commands
-
-Any API, Controller or Minimal API can execute jobs with the `IBackgroundJobs` dependency, e.g.
-here's how you can run a background job to send a new email when an API is called in
-any new Identity Auth template:
-
-```csharp
-class MyService(IBackgroundJobs jobs) : Service 
-{
-    public object Any(MyOrder request)
-    {
-        var jobRef = jobs.EnqueueCommand<SendEmailCommand>(new SendEmail {
-            To = "my@email.com",
-            Subject = $"Received New Order {request.Id}",
-            BodyText = $"""
-                       Order Details:
-                       {request.OrderDetails.DumptTable()}
-                       """,
-        });
-        //...
-    }
-}
-```
-
-Which records and immediately executes a worker to execute the `SendEmailCommand` with the specified
-`SendEmail` Request argument. It also returns a reference to a Job which can be used later to query
-and track the execution of a job.
-
-### Queue APIs
-
-Alternatively a `SendEmail` API could be executed with just the Request DTO:
-
-```csharp
-var jobRef = jobs.EnqueueApi(new SendEmail {
-    To = "my@email.com",
-    Subject = $"Received New Order {request.Id}",
-    BodyText = $"""
-               Order Details:
-               {request.OrderDetails.DumptTable()}
-               """,
-});
-```
-
-Although Sending Emails is typically not an API you want to make externally available and would
-want to [Restrict access](/auth/restricting-services) or [limit usage to specified users](/auth/identity-auth#declarative-validation-attributes).
-
-In both cases the `SendEmail` Request is persisted into the Jobs SQLite database for durability
-that gets updated as it progresses through the queue.
-
-For execution the API or command is resolved from the IOC before being invoked with the Request.
-APIs are executed via the [MQ Request Pipeline](/order-of-operations)
-and commands executed using the [Commands Feature](/commands) where
-they'll also be visible in the [Commands Admin UI](/commands#command-admin-ui).
-
-### Feature Overview
-
-- Use your App's existing RDBMS (no other infrastructure dependencies)
-- Execute existing APIs or versatile Commands
-    - Commands auto registered in IOC
-- [Scale out across App Servers](#scale-out-across-app-servers) with leased Jobs and automatic failover
-- [Queue Jobs in your own database transaction](#queue-jobs-in-your-own-transaction)
-- [Named queues](/jobs/queues) with their own concurrency, priorities and rate limits
-    - Pause, resume and re-throttle queues at runtime from any server
-- [Concurrency keys](/jobs/queues#concurrency-keys) to run each customer's Jobs in order
-- [Multi-step workflows](/jobs/workflows) with Jobs dependent on their parent Job
-- [Job Batches](/jobs/workflows#job-batches) with live progress and completion callbacks
-- [Await a Job's result](/jobs/workflows#await-a-jobs-result) or have it
-  [delivered to a webhook or MQ](/jobs/workflows#deliver-results-to-replyto)
-- [Retries with exponential backoff and jitter](/jobs/reliability#retries-and-backoff), with every
-  failed attempt recorded
-- [Idempotent](/jobs/reliability#idempotent-enqueue) and
-  [singleton](/jobs/reliability#singleton-jobs) Jobs to prevent duplicate work
-- [Job expiry](/jobs/reliability#job-expiry), timeouts and cancellation
-- [Durable, time zone aware Recurring Tasks](/jobs/recurring-tasks)
-- Queue Jobs to be executed after a specified Date
-- Execute Jobs within the context of an Authenticated User
-- Maintain Status, Logs, and Progress of Executing Jobs
-- [Health checks, OpenTelemetry and Profiling](/jobs/monitoring)
-- Attach optional `Tag`, `TenantId`, `CreatedBy` and `Args` metadata to Jobs
-
-### Configuration
+## Configuration
 
 The main `DatabaseJobFeature` options:
 
@@ -356,11 +264,14 @@ The main `DatabaseJobFeature` options:
 | `ValidateReplyTo` | | [Restrict where results are sent](/jobs/workflows#restrict-where-results-are-sent) |
 | `OnJobReplyTo` | | [Customize how results are delivered](/jobs/workflows#customize-delivery) |
 
-### Upgrading from v10.2
+## Upgrading from v10.2
 
 v10.3 upgrades the Background Jobs schema on startup, and clears Jobs that are still queued or running when
 the upgrade is applied. If you run multiple App Servers, stop all of them before starting the new version,
 rather than doing a rolling deploy. See [Upgrading to v10.3](/releases/v10_03#upgrading-to-v103) for what
 changes and how to prepare.
 
-::include jobs-shared.md::
+## Next steps
+
+See [Using Background Jobs](/jobs/usage) for queueing your APIs and Commands, all the options
+available when queueing Jobs, and logging, progress and cancellation from inside a running Job.

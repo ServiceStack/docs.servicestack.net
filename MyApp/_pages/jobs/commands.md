@@ -77,9 +77,9 @@ public class AddTodoCommand(IDbConnection db, IBackgroundJobs jobs) : SyncComman
 ```
 
 Commands executed by Background Jobs are run using the [Commands Feature](/commands) where they'll also
-be visible in the [Commands Admin UI](/commands#command-admin-ui). See the
-[RDBMS](/jobs/rdbms#usage) or [SQLite](/jobs/sqlite#usage) docs for all the options available when queueing
-Jobs, and [Recurring Tasks](/jobs/recurring-tasks) for running Commands on a schedule.
+be visible in the [Commands Admin UI](/commands#command-admin-ui). See
+[Using Background Jobs](/jobs/usage) for all the options available when queueing Jobs, and
+[Recurring Tasks](/jobs/recurring-tasks) for running Commands on a schedule.
 
 ## Implementing Commands
 
@@ -103,7 +103,7 @@ an Authenticated User Context.
 ### Access the executing Job
 
 Commands can resolve the `BackgroundJob` they're executing in to log, check for cancellation and record
-progress and status updates, see [Logging, Cancellation and Status Updates](/jobs/rdbms#logging-cancellation-an-status-updates)
+progress and status updates, see [Logging, Cancellation and Status Updates](/jobs/usage#logging-cancellation-and-status-updates)
 for examples.
 
 ## Serialize DB Writes with named Workers

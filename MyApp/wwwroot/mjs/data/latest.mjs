@@ -1,5 +1,11 @@
 export const latestPages = [
+    { name:"Commands in Background Jobs", href:"/jobs/commands", text:"into reusable classes that are auto registered in the IOC, can be executed with any of the IBackgroundJobs", badge:"jobs" },
+    { name:"Background Jobs", href:"/jobs/", text:"Background Jobs is ServiceStack\u0027s built-in solution for running work in the background and on a schedule,", badge:"jobs" },
+    { name:"SQLite Background Jobs", href:"/jobs/sqlite", text:"ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It\u0027s\u2026", badge:"jobs" },
+    { name:"RDBMS Background Jobs", href:"/jobs/rdbms", text:"The DatabaseJobFeature is a new implementation purpose built for PostgreSQL, SQL Server and MySQL", badge:"jobs" },
+    { name:"Using Background Jobs", href:"/jobs/usage", text:"Background Jobs are queued with the IBackgroundJobs dependency, which is the same for both", badge:"jobs" },
     { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
+    { name:"Schema Diff", href:"/ormlite/schema-diff", text:"GetSchemaDiff() compares your models with their tables in the database and returns what\u0027s in one and not the", badge:"ormlite" },
     { name:"Fast, Simple, Typed ORM for .NET", href:"/ormlite/", text:"OrmLite\u0027s goal is to provide a convenient, DRY, config-free, RDBMS-agnostic typed wrapper that retains", badge:"ormlite" },
     { name:"Release Notes History", href:"/release-notes-history", text:"- [v10.4](/releases/v1004)", badge:null },
     { name:"Publishing", href:"/chat/publishing", text:"AI.Chat offers two independent sharing extensions:", badge:"chat" },
@@ -14,10 +20,4 @@ export const latestPages = [
     { name:"ServiceStack v10.3", href:"/releases/v10_03", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"Workflows, Batches \u0026 Results", href:"/jobs/workflows", text:"Background Jobs can do more than run a single task in the background. Jobs can depend on each other to", badge:"jobs" },
     { name:"Queues, Priorities \u0026 Rate Limits", href:"/jobs/queues", text:"Different work has different needs: a password reset can\u0027t wait behind a bulk import, and a third-party", badge:"jobs" },
-    { name:"Gemini Importing Documents", href:"/chat/gemini-imports", text:"The Gemini extension imports the same managed document catalogue into two independent destinations:", badge:"chat" },
-    { name:"Gemini Explore \u0026 Ask", href:"/chat/gemini-explore", text:"Explorer is where a File Store is inspected and maintained - and where grounded questions start.", badge:"chat" },
-    { name:"Providers \u0026 Models", href:"/chat/providers", text:"AI Chat normalizes commercial, open and locally-hosted providers behind one model selector. Users move between fast i\u2026", badge:"chat" },
-    { name:"Install AI Chat", href:"/chat/install", text:"AI Chat is delivered by the ServiceStack.AI.Chat NuGet package and requires a .NET 8\u002B ServiceStack App.", badge:"chat" },
-    { name:"Skills", href:"/chat/skills", text:"Skills package specialized instructions, references and supporting files that Models load only when relevant. Instead\u2026", badge:"chat" },
-    { name:"Agent Profiles", href:"/chat/agents", text:"One system prompt cannot be ideal for every task. Agent Profiles package a model, system prompt, theme, avatar, allow\u2026", badge:"chat" },
 ]

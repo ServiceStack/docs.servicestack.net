@@ -61,9 +61,9 @@ kept out of its main database with no setup at all.
  - **[SQLite Background Jobs](/jobs/sqlite)** - Install and configure `BackgroundsJobFeature`
    with its monthly SQLite databases
 
-Both pages also cover the fundamentals shared by every App: queueing APIs and Commands, Job options, named
-Workers, running Jobs as an authenticated user, and logging and progress updates. See
-[Commands in Background Jobs](/jobs/commands) for implementing your Jobs as Commands.
+ - **[Using Background Jobs](/jobs/usage)** - The fundamentals shared by both providers: queueing APIs and
+   Commands, Job options, named Workers, running Jobs as an authenticated user, and logging, progress and
+   cancellation
 
 ### Guides
 

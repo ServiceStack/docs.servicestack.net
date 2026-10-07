@@ -87,7 +87,7 @@ Emails when SMTP is enabled. So the easiest way to get started with ServiceStack
 npx create-net blazor-vue MyApp
 :::
 
-### Exiting .NET 10 Templates
+### Existing .NET 10 Templates
 
 Existing .NET 10 Projects can configure their app to use **ServiceStack.Jobs** by mixing in:
 
@@ -100,9 +100,8 @@ configuration and a **ServiceStack.Jobs** NuGet package reference to your projec
 
 ## Usage
 
-Any API, Controller or Minimal API can execute jobs with the `IBackgroundJobs` dependency, e.g.
-here's how you can run a background job to send a new email when an API is called in 
-any new Identity Auth template:
+SQLite Background Jobs uses the same `IBackgroundJobs` APIs as RDBMS Background Jobs, where any API,
+Controller or Minimal API can queue your APIs and Commands, e.g:
 
 ```csharp
 class MyService(IBackgroundJobs jobs) : Service 
@@ -112,45 +111,16 @@ class MyService(IBackgroundJobs jobs) : Service
         var jobRef = jobs.EnqueueCommand<SendEmailCommand>(new SendEmail {
             To = "my@email.com",
             Subject = $"Received New Order {request.Id}",
-            BodyText = $"""
-                       Order Details:
-                       {request.OrderDetails.DumptTable()}
-                       """,
         });
         //...
     }
 }
 ```
 
-Which records and immediately executes a worker to execute the `SendEmailCommand` with the specified
-`SendEmail` Request argument. It also returns a reference to a Job which can be used later to query
-and track execution of a job.
+See [Using Background Jobs](/jobs/usage) for queueing APIs and Commands, all the options available when
+queueing Jobs, and logging, progress and cancellation from inside a running Job.
 
-Alternatively a `SendEmail` API could be executed with just the Request DTO: 
-
-```csharp
-var jobRef = jobs.EnqueueApi(new SendEmail {
-    To = "my@email.com",
-    Subject = $"Received New Order {request.Id}",
-    BodyText = $"""
-               Order Details:
-               {request.OrderDetails.DumptTable()}
-               """,
-});
-```
-
-Although Sending Emails is typically not an API you want to make externally available and would 
-want to either [Restrict access](/auth/restricting-services) or [limit usage to specified users](/auth/identity-auth#declarative-validation-attributes).
-
-In both cases the `SendEmail` Request is persisted into the Jobs SQLite database for durability 
-that gets updated as it progresses through the queue.
-
-For execution the API or command is resolved from the IOC before being invoked with the Request.
-APIs are executed via the [MQ Request Pipeline](/order-of-operations)
-and commands executed using the [Commands Feature](/commands) where
-it will be also visible in the [Commands Admin UI](/commands#command-admin-ui).
-
-### Configuration
+## Configuration
 
 The main `BackgroundsJobFeature` options:
 
@@ -175,10 +145,8 @@ The main `BackgroundsJobFeature` options:
 | `ValidateReplyTo` | | [Restrict where results are sent](/jobs/workflows#restrict-where-results-are-sent) |
 | `OnJobReplyTo` | | [Customize how results are delivered](/jobs/workflows#customize-delivery) |
 
-### Upgrading from v10.2
+## Upgrading from v10.2
 
 v10.3 upgrades the Background Jobs schema on startup, and clears Jobs that are still queued or running when
 the upgrade is applied. See [Upgrading to v10.3](/releases/v10_03#upgrading-to-v103) for what changes and
 how to prepare.
-
-::include jobs-shared.md::
