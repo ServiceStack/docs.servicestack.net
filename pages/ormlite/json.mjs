@@ -6,18 +6,21 @@ import ScreenshotsGalleryView from "../components/ScreenshotsGalleryView.mjs"
 /** Complex type properties vs Sql.Json<T> vs explicit path - when to use which */
 const JsonApiChoice = {
     template: `
-    <section class="not-prose my-10 grid gap-4 lg:grid-cols-3">
-      <div v-for="a in apis" :key="a.name"
-           :class="['flex min-w-0 flex-col rounded-2xl border-2 p-5 shadow-sm', a.accent]">
-        <div class="flex items-start justify-between gap-3">
-          <code class="min-w-0 break-words text-base font-bold text-slate-900 dark:text-white">{{a.name}}</code>
-          <span :class="['shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider', a.tint]">{{a.badge}}</span>
+    <section class="not-prose my-10 flex flex-col gap-3">
+      <div v-for="(a, i) in apis" :key="a.name"
+           :class="['grid min-w-0 gap-4 rounded-2xl border-2 p-5 shadow-sm md:grid-cols-2 md:items-center', a.accent]">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white dark:bg-white dark:text-slate-900">{{i + 1}}</span>
+            <code class="text-base font-bold text-slate-900 dark:text-white">{{a.name}}</code>
+            <span :class="['rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider', a.tint]">{{a.badge}}</span>
+          </div>
+          <p class="mt-2.5 text-sm leading-6 text-slate-600 dark:text-slate-300">{{a.text}}</p>
+          <p class="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+            <b class="text-slate-700 dark:text-slate-200">Use when:</b> {{a.when}}
+          </p>
         </div>
-        <pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-slate-900 p-3 text-[11px] leading-5 text-slate-200 dark:bg-black/50"><code class="nohighlight">{{a.code}}</code></pre>
-        <p class="mt-2.5 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{{a.text}}</p>
-        <p class="mt-3 border-t border-black/5 pt-2.5 text-xs leading-5 text-slate-500 dark:border-white/10 dark:text-slate-400">
-          <b class="text-slate-700 dark:text-slate-200">Use when:</b> {{a.when}}
-        </p>
+        <pre class="m-0 min-w-0 overflow-x-auto rounded-lg bg-slate-900 p-4 text-xs leading-5 text-slate-200 dark:bg-black/50"><code class="nohighlight">{{a.code}}</code></pre>
       </div>
     </section>`,
     setup() {
@@ -31,13 +34,13 @@ const JsonApiChoice = {
             { name:'Sql.Json<T>()', badge:'string columns',
               tint:'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300',
               accent:'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900',
-              code:'Sql.Json<OrderDocument>(x.Data)\n   .Customer.Address.State == "WA"',
+              code:'Sql.Json<OrderDocument>(x.Data)\n  .Customer.Address.State == "WA"',
               text:'Declares the shape of JSON in a string column for the same typed member access, collection membership and array indexes.',
               when:'The JSON is in a string column and its document has a C# Data Model - so a rename refactors the query with it.' },
             { name:'Sql.JsonValue / JsonQuery', badge:'dynamic',
               tint:'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300',
               accent:'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900',
-              code:'Sql.JsonValue<string>(x.Data,\n  "$.Customer.Address.shipping_state") == "WA"',
+              code:'Sql.JsonValue<string>(x.Data,\n    "$.Customer.Address.shipping_state")\n  == "WA"',
               text:'An explicit SQL/JSON path, evaluated at runtime.',
               when:'There is no Data Model, the path is chosen at runtime, or you need path existence and type inspection.' },
         ]
