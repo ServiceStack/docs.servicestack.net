@@ -1,4 +1,7 @@
 export const latestPages = [
+    { name:"JSON Support", href:"/ormlite/json", text:"OrmLite provides a portable, typed API for querying JSON stored in SQLite, PostgreSQL, SQL Server and MySQL.", badge:"ormlite" },
+    { name:"Multitenancy Guide", href:"/ormlite/multitenancy/guide", text:"This guide walks through how a complete SaaS App keeps each customer\u0027s data separate, using the code of the", badge:"ormlite/multitenancy" },
+    { name:"Multitenancy", href:"/ormlite/multitenancy/overview", text:"A multi-tenant App serves many customers from one deployment, and has to keep each customer\u0027s data separate.", badge:"ormlite/multitenancy" },
     { name:"Commands in Background Jobs", href:"/jobs/commands", text:"into reusable classes that are auto registered in the IOC, can be executed with any of the IBackgroundJobs", badge:"jobs" },
     { name:"Background Jobs", href:"/jobs/", text:"Background Jobs is ServiceStack\u0027s built-in solution for running work in the background and on a schedule,", badge:"jobs" },
     { name:"SQLite Background Jobs", href:"/jobs/sqlite", text:"ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It\u0027s\u2026", badge:"jobs" },
@@ -17,7 +20,4 @@ export const latestPages = [
     { name:"Integrated Auth", href:"/chat/auth", text:"AI Chat is installed inside your ServiceStack App, so it doesn\u0027t need a separate user directory, a second login exper\u2026", badge:"chat" },
     { name:"Decision Studio", href:"/chat/decision-studio", text:"Decision Studio turns a recurring judgment into a reusable recipe: define an input form, ask focused", badge:"chat" },
     { name:"Custom Extensions", href:"/chat/custom-extensions", text:"Adding your own capability to AI Chat means writing a ChatExtension. It\u0027s the same API the built-in extensions use - \u2026", badge:"chat" },
-    { name:"ServiceStack v10.3", href:"/releases/v10_03", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
-    { name:"Workflows, Batches \u0026 Results", href:"/jobs/workflows", text:"Background Jobs can do more than run a single task in the background. Jobs can depend on each other to", badge:"jobs" },
-    { name:"Queues, Priorities \u0026 Rate Limits", href:"/jobs/queues", text:"Different work has different needs: a password reset can\u0027t wait behind a bulk import, and a third-party", badge:"jobs" },
 ]
