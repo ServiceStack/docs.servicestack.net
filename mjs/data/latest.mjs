@@ -1,4 +1,6 @@
 export const latestPages = [
+    { name:"Publishing", href:"/chat/publishing", text:"AI.Chat offers two independent sharing extensions:", badge:"chat" },
+    { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"JSON Support", href:"/ormlite/json", text:"OrmLite provides a portable, typed API for querying JSON stored in SQLite, PostgreSQL, SQL Server and MySQL.", badge:"ormlite" },
     { name:"Multitenancy Guide", href:"/ormlite/multitenancy/guide", text:"This guide walks through how a complete SaaS App keeps each customer\u0027s data separate, using the code of the", badge:"ormlite/multitenancy" },
     { name:"Multitenancy", href:"/ormlite/multitenancy/overview", text:"A multi-tenant App serves many customers from one deployment, and has to keep each customer\u0027s data separate.", badge:"ormlite/multitenancy" },
@@ -7,11 +9,9 @@ export const latestPages = [
     { name:"SQLite Background Jobs", href:"/jobs/sqlite", text:"ServiceStack.Jobs is our solution for queueing and managing background jobs and scheduled tasks in .NET 10 Apps. It\u0027s\u2026", badge:"jobs" },
     { name:"RDBMS Background Jobs", href:"/jobs/rdbms", text:"The DatabaseJobFeature is a new implementation purpose built for PostgreSQL, SQL Server and MySQL", badge:"jobs" },
     { name:"Using Background Jobs", href:"/jobs/usage", text:"Background Jobs are queued with the IBackgroundJobs dependency, which is the same for both", badge:"jobs" },
-    { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"Schema Diff", href:"/ormlite/schema-diff", text:"GetSchemaDiff() compares your models with their tables in the database and returns what\u0027s in one and not the", badge:"ormlite" },
     { name:"Fast, Simple, Typed ORM for .NET", href:"/ormlite/", text:"OrmLite\u0027s goal is to provide a convenient, DRY, config-free, RDBMS-agnostic typed wrapper that retains", badge:"ormlite" },
     { name:"Release Notes History", href:"/release-notes-history", text:"- [v10.4](/releases/v1004)", badge:null },
-    { name:"Publishing", href:"/chat/publishing", text:"AI.Chat offers two independent sharing extensions:", badge:"chat" },
     { name:"Extensions", href:"/chat/extensions", text:"Modern AI applications evolve too quickly for a fixed collection of hard-coded screens. New model providers, tools, m\u2026", badge:"chat" },
     { name:"ChatFeature Configuration", href:"/chat/configuration", text:"Every AI Chat capability is configured from a single ChatFeature plugin registration. Extension-specific options are \u2026", badge:"chat" },
     { name:"Data \u0026 Storage", href:"/chat/data", text:"AI Chat stores everything inside your application: structured data in your App\u0027s database via OrmLite, and files unde\u2026", badge:"chat" },
