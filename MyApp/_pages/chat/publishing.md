@@ -14,6 +14,10 @@ AI.Chat offers two independent sharing extensions:
 Publishing is an explicit action; subsequent local edits do not update either destination automatically.
 Folder and remote publication status are stored separately.
 
+:::youtube -BfooJPT3-I
+Prompt It, Publish It: Create AI Works directly from your .NET APIs
+:::
+
 ## Enable or disable sharing
 
 The application host opts into remote publishing before plugin registration:
