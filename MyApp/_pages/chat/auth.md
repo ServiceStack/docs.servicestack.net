@@ -86,8 +86,6 @@ Authentication is the boundary for AI Chat's state. Everything below is scoped t
 - PDF Studio workspaces
 - Provider and model preferences
 
-<screenshot src="/img/pages/chat/user-profile.webp" title="An authenticated user's AI Chat workspace"></screenshot>
-
 One user's working context never becomes another user's prompt history or project filesystem. Shared and administrator-managed capabilities are explicit rather than emerging from a common global workspace.
 
 Database rows carry the username in a `user` column (`ChatThread`, `ChatRequest`, `ChatMedia`), and file storage is partitioned at `App_Data/chat/user/{username}/`.

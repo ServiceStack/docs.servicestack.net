@@ -4,8 +4,6 @@ title: Voice & Media
 
 Text is only one AI modality. AI Chat supports voice-to-text input, image generation, audio generation and speech synthesis through configured providers, with everything generated recorded in the App's own media catalog.
 
-<screenshot src="/img/pages/chat/voice-and-media.webp" title="AI Chat voice and media controls"></screenshot>
-
 <media-pipeline>
 </media-pipeline>
 
