@@ -1,4 +1,8 @@
 export const latestPages = [
+    { name:"ServiceStack v10.1", href:"/releases/v10_01", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
+    { name:"Voice \u0026 Media", href:"/chat/media", text:"Text is only one AI modality. AI Chat supports voice-to-text input, image generation, audio generation and speech syn\u2026", badge:"chat" },
+    { name:"Integrated Auth", href:"/chat/auth", text:"AI Chat is installed inside your ServiceStack App, so it doesn\u0027t need a separate user directory, a second login exper\u2026", badge:"chat" },
+    { name:"ChatGPT Sign-In", href:"/chat/chatgpt", text:"The built-in OpenAI Subscription card connects your personal ChatGPT account for eligible text", badge:"chat" },
     { name:"Publishing", href:"/chat/publishing", text:"AI.Chat offers two independent sharing extensions:", badge:"chat" },
     { name:"ServiceStack v10.4", href:"/releases/v10_04", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"JSON Support", href:"/ormlite/json", text:"OrmLite provides a portable, typed API for querying JSON stored in SQLite, PostgreSQL, SQL Server and MySQL.", badge:"ormlite" },
@@ -16,8 +20,4 @@ export const latestPages = [
     { name:"ChatFeature Configuration", href:"/chat/configuration", text:"Every AI Chat capability is configured from a single ChatFeature plugin registration. Extension-specific options are \u2026", badge:"chat" },
     { name:"Data \u0026 Storage", href:"/chat/data", text:"AI Chat stores everything inside your application: structured data in your App\u0027s database via OrmLite, and files unde\u2026", badge:"chat" },
     { name:"Projects", href:"/chat/projects", text:"Projects organize your chats and give AI agents a safe place to work. Each project is a dedicated", badge:"chat" },
-    { name:"AI Chat Overview", href:"/chat/overview", text:"AI Chat is a complete, modular AI application delivered as a single ServiceStack plugin. Registering ChatFeature moun\u2026", badge:"chat" },
-    { name:"Integrated Auth", href:"/chat/auth", text:"AI Chat is installed inside your ServiceStack App, so it doesn\u0027t need a separate user directory, a second login exper\u2026", badge:"chat" },
-    { name:"Decision Studio", href:"/chat/decision-studio", text:"Decision Studio turns a recurring judgment into a reusable recipe: define an input form, ask focused", badge:"chat" },
-    { name:"Custom Extensions", href:"/chat/custom-extensions", text:"Adding your own capability to AI Chat means writing a ChatExtension. It\u0027s the same API the built-in extensions use - \u2026", badge:"chat" },
 ]
