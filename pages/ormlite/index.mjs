@@ -1,6 +1,7 @@
 import Screenshot from "../components/Screenshot.mjs"
 import ScreenshotsGallery from "../components/ScreenshotsGallery.mjs"
 import ScreenshotsGalleryView from "../components/ScreenshotsGalleryView.mjs"
+import VideoGallery from "../components/VideoGallery.mjs"
 
 /** The design principle everything else follows from */
 const OneClassOneTable = {
@@ -175,6 +176,33 @@ const OrmliteDocMap = {
     }
 }
 
+/** The OrmLite video series, added as each video is released */
+const OrmliteVideos = {
+    components: { VideoGallery },
+    template: `<VideoGallery
+        eyebrow="Video series"
+        title="OrmLite: Typed C#, Predictable SQL"
+        description="Each video follows the C# you write and the SQL it generates. Start with the overview, then dive into each feature."
+        :videos="videos" />`,
+    setup() {
+        const videos = [
+            { id:'H6Ba6NJ5VOU', tags:['Overview'],
+              title:'OrmLite: Typed C#, Predictable SQL',
+              caption:'.NET Micro ORM Overview',
+              summary:'A tour of how OrmLite combines plain C# classes, compiler-checked queries and readable, parameterized SQL - from multitenancy and migrations to window functions, JSON and vector search.' },
+            { id:'86ff8gs4h3w', tags:['Multitenancy', 'Connection Filters'],
+              title:'Multi-Tenant .NET Apps',
+              caption:'Enforce tenant isolation on the connection, not every query',
+              summary:'Connection filters move the tenant rule out of each query and onto the connection: declare it once, and every typed query, lookup, update, delete and join it runs gets the tenant condition.' },
+            { id:'GGXmyUx5qqY', tags:['Sql.Fmt', 'OrderBySafe', 'Security'],
+              title:'Dynamic SQL Without SQL Injection',
+              caption:'Safe interpolation & sorting',
+              summary:'Sql.Fmt keeps your interpolated strings but sends every value as a db param, table and column names come from your models, and OrderBySafe only sorts by the fields you allow.' },
+        ]
+        return { videos }
+    }
+}
+
 export default {
-    components: { Screenshot, ScreenshotsGallery, ScreenshotsGalleryView, OneClassOneTable, DesignGoals, OrmliteDocMap }
+    components: { Screenshot, ScreenshotsGallery, ScreenshotsGalleryView, OneClassOneTable, DesignGoals, OrmliteDocMap, OrmliteVideos }
 }

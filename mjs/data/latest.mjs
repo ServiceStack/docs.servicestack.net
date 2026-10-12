@@ -1,4 +1,8 @@
 export const latestPages = [
+    { name:"Fast, Simple, Typed ORM for .NET", href:"/ormlite/", text:"OrmLite\u0027s goal is to provide a convenient, DRY, config-free, RDBMS-agnostic typed wrapper that retains", badge:"ormlite" },
+    { name:"SQL Injection Protection", href:"/ormlite/sql-injection", text:"Dynamic SQL Without SQL Injection in .NET: Safe Interpolation \u0026 Sorting", badge:"ormlite" },
+    { name:"Interpolated SQL with Sql.Fmt", href:"/ormlite/sql-fmt", text:"Dynamic SQL Without SQL Injection in .NET: Safe Interpolation \u0026 Sorting", badge:"ormlite" },
+    { name:"Git", href:"/chat/git", text:"The built-in Git panel brings repository review into your AI workspace. Inspect what an agent changed,", badge:"chat" },
     { name:"ServiceStack v10.1", href:"/releases/v10_01", text:"class=\u0022w-[500px]\u0022\u003E\u003C/audio-player\u003E", badge:"releases" },
     { name:"Voice \u0026 Media", href:"/chat/media", text:"Text is only one AI modality. AI Chat supports voice-to-text input, image generation, audio generation and speech syn\u2026", badge:"chat" },
     { name:"Integrated Auth", href:"/chat/auth", text:"AI Chat is installed inside your ServiceStack App, so it doesn\u0027t need a separate user directory, a second login exper\u2026", badge:"chat" },
@@ -14,10 +18,6 @@ export const latestPages = [
     { name:"RDBMS Background Jobs", href:"/jobs/rdbms", text:"The DatabaseJobFeature is a new implementation purpose built for PostgreSQL, SQL Server and MySQL", badge:"jobs" },
     { name:"Using Background Jobs", href:"/jobs/usage", text:"Background Jobs are queued with the IBackgroundJobs dependency, which is the same for both", badge:"jobs" },
     { name:"Schema Diff", href:"/ormlite/schema-diff", text:"GetSchemaDiff() compares your models with their tables in the database and returns what\u0027s in one and not the", badge:"ormlite" },
-    { name:"Fast, Simple, Typed ORM for .NET", href:"/ormlite/", text:"OrmLite\u0027s goal is to provide a convenient, DRY, config-free, RDBMS-agnostic typed wrapper that retains", badge:"ormlite" },
     { name:"Release Notes History", href:"/release-notes-history", text:"- [v10.4](/releases/v1004)", badge:null },
     { name:"Extensions", href:"/chat/extensions", text:"Modern AI applications evolve too quickly for a fixed collection of hard-coded screens. New model providers, tools, m\u2026", badge:"chat" },
-    { name:"ChatFeature Configuration", href:"/chat/configuration", text:"Every AI Chat capability is configured from a single ChatFeature plugin registration. Extension-specific options are \u2026", badge:"chat" },
-    { name:"Data \u0026 Storage", href:"/chat/data", text:"AI Chat stores everything inside your application: structured data in your App\u0027s database via OrmLite, and files unde\u2026", badge:"chat" },
-    { name:"Projects", href:"/chat/projects", text:"Projects organize your chats and give AI agents a safe place to work. Each project is a dedicated", badge:"chat" },
 ]
