@@ -11,9 +11,7 @@ Install Git on the server and leave the `git` extension enabled. Open the top-ri
 then select its Git tab. The panel uses the selected chat's project; without a project, it can browse
 repositories inside your initial allowed directories.
 
-<screenshot src="/img/pages/chat/git/git-review.webp" title="Git workspace with a staged Python diff, commit message editor, working changes, and recent history"></screenshot>
-
-*Example repository data showing the staged comparison and commit controls.*
+<screenshot src="/img/pages/chat/screenshots/chat-04-project-git.webp" title="Project Git panel with commit controls, working changes, and recent commits alongside the chat"></screenshot>
 
 ## Bring a repository into your workspace
 
@@ -37,9 +35,13 @@ line numbers and hunk headers show where each change belongs. Deleted files rema
 untracked files compare against an empty file. Binary files, conflicts, and oversized changes show an
 explanation instead of an incomplete diff.
 
+<screenshot src="/img/pages/chat/screenshots/chat-05-project-git-working-diff.webp" title="Working changes diff showing additions and removals in a project file"></screenshot>
+
 Expand a recent commit to load its changed files. Hover or focus a commit for its author, date, full
 hash, and message. Right-click it, or press **Shift+F10**, for **Open on GitHub**, **Copy Commit Hash**,
 and **Copy Commit Message**. The GitHub link follows the selected remote; other hosts disable that action.
+
+<screenshot src="/img/pages/chat/screenshots/chat-06-project-git-commit-diff.webp" title="Historical commit diff with the selected file expanded in recent commits"></screenshot>
 
 Refresh keeps expanded folders and commits. While the Git panel is open, finishing the selected chat's
 agent run refreshes its repository status. URLs retain the selected file, comparison, and historical
