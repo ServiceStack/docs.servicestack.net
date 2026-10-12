@@ -2,6 +2,10 @@
 title: Interpolated SQL with Sql.Fmt
 ---
 
+:::youtube GGXmyUx5qqY
+Dynamic SQL Without SQL Injection in .NET: Safe Interpolation & Sorting
+:::
+
 `Sql.Fmt()` lets you write raw SQL with C# string interpolation while every interpolated value is sent as a db
 parameter, so it's never concatenated into the SQL. OrmLite generates the SQL and params for your RDBMS:
 

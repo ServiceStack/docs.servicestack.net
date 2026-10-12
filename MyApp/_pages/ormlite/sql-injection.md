@@ -2,6 +2,10 @@
 title: SQL Injection Protection
 ---
 
+:::youtube GGXmyUx5qqY
+Dynamic SQL Without SQL Injection in .NET: Safe Interpolation & Sorting
+:::
+
 OrmLite's typed APIs send every value as a db parameter, so the safest way to query is to stay typed wherever
 possible. This page covers how OrmLite protects the places where SQL is written by hand, and the safe alternatives
 to reach for first.
