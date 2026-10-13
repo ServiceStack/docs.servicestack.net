@@ -2,6 +2,10 @@
 title: Schema Diff
 ---
 
+:::youtube chmFo1TE-Wc
+Keep Your Database in Sync With Your C# Models: Schema Diff for .NET
+:::
+
 `GetSchemaDiff()` compares your models with their tables in the database and returns what's in one and not the
 other, so you find out that a model has changed without its table when your App starts, not when a query fails:
 

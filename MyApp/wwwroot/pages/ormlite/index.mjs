@@ -198,6 +198,10 @@ const OrmliteVideos = {
               title:'Dynamic SQL Without SQL Injection',
               caption:'Safe interpolation & sorting',
               summary:'Sql.Fmt keeps your interpolated strings but sends every value as a db param, table and column names come from your models, and OrderBySafe only sorts by the fields you allow.' },
+            { id:'chmFo1TE-Wc', tags:['Schema Diff', 'Migrations'],
+              title:'Keep Your Database in Sync With Your C# Models',
+              caption:'Schema Diff for .NET',
+              summary:'Schema Diff compares your models with their tables and finds every difference - columns, types, defaults, indexes, foreign keys and constraints - then writes the migration that fixes them, for you to review.' },
         ]
         return { videos }
     }
