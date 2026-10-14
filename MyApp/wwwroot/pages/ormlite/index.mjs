@@ -202,6 +202,10 @@ const OrmliteVideos = {
               title:'Keep Your Database in Sync With Your C# Models',
               caption:'Schema Diff for .NET',
               summary:'Schema Diff compares your models with their tables and finds every difference - columns, types, defaults, indexes, foreign keys and constraints - then writes the migration that fixes them, for you to review.' },
+            { id:'FYPdNBALe_U', tags:['Row Locks', 'RETURNING', 'Upsert'],
+              title:'Concurrent RDBMS Writes in C#: ForUpdate, SKIP LOCKED Queues and Upsert',
+              caption:'Row locks, work queues and database-side writes',
+              summary:'Prevent lost updates with ForUpdate, claim queue jobs with SKIP LOCKED, return updated and deleted rows in one statement, keep objects in sync with Upsert, and apply joined values with UpdateFrom.' },
         ]
         return { videos }
     }

@@ -2,6 +2,10 @@
 title: Locking Rows
 ---
 
+:::youtube FYPdNBALe_U
+Concurrent RDBMS Writes in C#: ForUpdate, SKIP LOCKED Queues and Upsert
+:::
+
 `ForUpdate()` locks the rows a query selects until the end of the current transaction, so no other transaction can
 update, delete or lock them in between reading and updating them:
 

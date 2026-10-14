@@ -2,6 +2,10 @@
 title: Returning Updated & Deleted Rows
 ---
 
+:::youtube FYPdNBALe_U
+Concurrent RDBMS Writes in C#: ForUpdate, SKIP LOCKED Queues and Upsert
+:::
+
 `UpdateOnlyReturning()` and `DeleteReturning()` return the rows affected by an UPDATE or DELETE in the same statement:
 
 ```csharp
