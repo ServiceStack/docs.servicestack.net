@@ -7,9 +7,7 @@ durably, in the database you already use. Queue any of your existing APIs or [Co
 the background, retry them when they fail, run them on a schedule, and monitor and manage them all from the
 built-in Admin UI - without deploying a message broker or any other infrastructure.
 
-:::youtube 2Cza_a_rrjA
-Durable Background Jobs and Scheduled Tasks for .NET 10 Apps
-:::
+<jobs-videos></jobs-videos>
 
 It's designed for the work your App depends on: sending emails, charging payments, importing data,
 generating reports, syncing tenants and calling third-party APIs.
