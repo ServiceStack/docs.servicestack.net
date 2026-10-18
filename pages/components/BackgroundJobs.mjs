@@ -1,6 +1,7 @@
 import { computed, ref, reactive, onMounted, onUnmounted } from "vue"
 import FeaturePillars from "./FeaturePillars.mjs"
 import CodeCompare from "./CodeCompare.mjs"
+import VideoGallery from "./VideoGallery.mjs"
 
 /*
  * Interactive Background Jobs components shared by the Background Jobs docs and Release Notes.
@@ -938,5 +939,32 @@ export const JobsGuides = {
               text:'Implement Jobs as reusable, inspectable Commands, and serialize DB writes with named Workers.' },
         ]
         return { items }
+    }
+}
+
+/** Background Jobs video series */
+export const JobsVideos = {
+    components: { VideoGallery },
+    template: `<VideoGallery
+        eyebrow="Video series"
+        title="Durable Background Jobs for .NET"
+        description="Start with the overview, then see how Jobs survive failures and how to control your workloads."
+        :videos="videos" />`,
+    setup() {
+        const videos = [
+            { id:'2Cza_a_rrjA', tags:['Overview'],
+              title:'Durable Background Jobs and Scheduled Tasks for .NET 10 Apps',
+              caption:'Background Jobs Overview',
+              summary:'Queue any of your existing APIs or Commands to run in the background, retry them when they fail, run them on a schedule, and monitor them from the Admin UI - in the database you already use.' },
+            { id:'EYycrGqDyJk', tags:['Reliability', 'Scale Out', 'Retries'],
+              title:'.NET Background Jobs That Survive Crashes, Deploys & Retries',
+              caption:'Keep Jobs running through failures',
+              summary:'See how Jobs keep running through server crashes, deploys, failing dependencies and duplicate requests, with every Job owned by one server at a time and recovered automatically when a server fails.' },
+            { id:'PYsdzX_A-ic', tags:['Queues', 'Rate Limits', 'Workflows', 'Batches'],
+              title:'.NET Background Jobs: Per-Tenant Ordering, Queues, Rate Limits, Workflows & Batches',
+              caption:'Control your workloads',
+              summary:'Run each class of work in its own queue, throttle it at runtime, keep each tenant\'s Jobs in order, and chain dependent Jobs into workflows and batches with live progress.' },
+        ]
+        return { videos }
     }
 }
