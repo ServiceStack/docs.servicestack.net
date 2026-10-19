@@ -206,6 +206,10 @@ const OrmliteVideos = {
               title:'Concurrent RDBMS Writes in C#: ForUpdate, SKIP LOCKED Queues and Upsert',
               caption:'Row locks, work queues and database-side writes',
               summary:'Prevent lost updates with ForUpdate, claim queue jobs with SKIP LOCKED, return updated and deleted rows in one statement, keep objects in sync with Upsert, and apply joined values with UpdateFrom.' },
+            { id:'2LJ33hCQzMs', tags:['Batched Writes', 'Compiled Queries', 'SeekAfter'],
+              title:'Make .NET RDBMS Access Fly: Batched Writes, Compiled Queries, Paging',
+              caption:'Fewer round trips, faster queries and stable paging',
+              summary:'Send InsertAll, UpdateAll, UpsertAll and SaveAll rows to the database together, generate a query\'s SQL once with compiled queries, and page through large results with keyset pagination using SeekAfter.' },
         ]
         return { videos }
     }

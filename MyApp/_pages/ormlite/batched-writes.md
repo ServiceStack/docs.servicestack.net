@@ -2,6 +2,10 @@
 title: Batched Writes
 ---
 
+:::youtube 2LJ33hCQzMs
+Make .NET RDBMS Access Fly: Batched Writes, Compiled Queries, Paging
+:::
+
 `InsertAll`, `UpdateAll`, `UpsertAll` and `SaveAll` send their rows to the database together, instead of making a
 round trip for each row. There's nothing to change in your code:
 

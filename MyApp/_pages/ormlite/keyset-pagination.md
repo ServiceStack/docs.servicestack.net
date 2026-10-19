@@ -2,6 +2,10 @@
 title: Keyset Pagination with SeekAfter
 ---
 
+:::youtube 2LJ33hCQzMs
+Make .NET RDBMS Access Fly: Batched Writes, Compiled Queries, Paging
+:::
+
 `SeekAfter()` pages through results by continuing after the last row of the previous page, known as keyset or seek
 pagination:
 

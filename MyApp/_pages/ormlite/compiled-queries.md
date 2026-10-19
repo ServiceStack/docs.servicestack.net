@@ -2,6 +2,10 @@
 title: Compiled Queries
 ---
 
+:::youtube 2LJ33hCQzMs
+Make .NET RDBMS Access Fly: Batched Writes, Compiled Queries, Paging
+:::
+
 A typed query generates its SQL each time it's run. `OrmLiteQuery.Compile()` generates the SQL of a query once, then
 only creates db params from its arguments each time it's run:
 
