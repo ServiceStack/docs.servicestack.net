@@ -2,6 +2,10 @@
 title: Window Functions
 ---
 
+:::youtube 1e5TXrOapqg
+Advanced SQL with a Typed C# ORM: Window Functions, CTEs & Temporal Tables
+:::
+
 Window functions calculate a value for each row from other rows related to it, like its rank within a group, a running
 total or the value of the previous row. Unlike `GroupBy()`, every row is still returned:
 

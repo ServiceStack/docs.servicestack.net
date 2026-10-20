@@ -2,6 +2,10 @@
 title: System-Versioned Tables
 ---
 
+:::youtube 1e5TXrOapqg
+Advanced SQL with a Typed C# ORM: Window Functions, CTEs & Temporal Tables
+:::
+
 A `[SystemVersioned]` table keeps every previous version of its rows, so it can be queried as it was at any time:
 
 ```csharp

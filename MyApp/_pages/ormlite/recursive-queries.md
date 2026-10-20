@@ -2,6 +2,10 @@
 title: Recursive Queries
 ---
 
+:::youtube 1e5TXrOapqg
+Advanced SQL with a Typed C# ORM: Window Functions, CTEs & Temporal Tables
+:::
+
 `WithRecursive()` queries hierarchical data, like categories, org charts, threaded comments or bills of materials,
 using a recursive common table expression (CTE). It starts with the rows of a seed query, then repeatedly adds the
 rows that match a relationship until no more rows are found:

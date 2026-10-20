@@ -210,6 +210,10 @@ const OrmliteVideos = {
               title:'Make .NET RDBMS Access Fly: Batched Writes, Compiled Queries, Paging',
               caption:'Fewer round trips, faster queries and stable paging',
               summary:'Send InsertAll, UpdateAll, UpsertAll and SaveAll rows to the database together, generate a query\'s SQL once with compiled queries, and page through large results with keyset pagination using SeekAfter.' },
+            { id:'1e5TXrOapqg', tags:['Window Functions', 'CTEs', 'Temporal Tables'],
+              title:'Advanced SQL with a Typed C# ORM: Window Functions, CTEs & Temporal Tables',
+              caption:'Rankings, running totals, hierarchies and history',
+              summary:'Rank rows and calculate running totals with window functions, query hierarchical data with recursive CTEs using WithRecursive, and query tables as they were at any point in time with system-versioned temporal tables.' },
         ]
         return { videos }
     }
