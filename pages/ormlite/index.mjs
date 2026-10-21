@@ -214,6 +214,10 @@ const OrmliteVideos = {
               title:'Advanced SQL with a Typed C# ORM: Window Functions, CTEs & Temporal Tables',
               caption:'Rankings, running totals, hierarchies and history',
               summary:'Rank rows and calculate running totals with window functions, query hierarchical data with recursive CTEs using WithRecursive, and query tables as they were at any point in time with system-versioned temporal tables.' },
+            { id:'e_zQubovAj8', tags:['JSON', 'Typed Queries'],
+              title:'Query JSON data with a Typed C# ORM: No Extra Tables, No Raw SQL',
+              caption:'Store, filter and project JSON with typed LINQ',
+              summary:'Store complex types as JSON in a single column and filter, select and order by their properties with typed LINQ expressions that work across SQLite, PostgreSQL, SQL Server and MySQL.' },
         ]
         return { videos }
     }
