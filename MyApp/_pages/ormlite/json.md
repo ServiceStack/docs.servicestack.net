@@ -2,6 +2,10 @@
 title: JSON Support
 ---
 
+:::youtube e_zQubovAj8
+Query JSON data with a Typed C# ORM: No Extra Tables, No Raw SQL
+:::
+
 OrmLite provides a portable, typed API for querying JSON stored in SQLite, PostgreSQL, SQL Server and MySQL.
 JSON queries are written as normal typed LINQ expressions that compose with `SqlExpression<T>` queries, so JSON
 properties can be filtered, selected and ordered without embedding provider-specific SQL.
