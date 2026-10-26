@@ -218,6 +218,10 @@ const OrmliteVideos = {
               title:'Query JSON data with a Typed C# ORM: No Extra Tables, No Raw SQL',
               caption:'Store, filter and project JSON with typed LINQ',
               summary:'Store complex types as JSON in a single column and filter, select and order by their properties with typed LINQ expressions that work across SQLite, PostgreSQL, SQL Server and MySQL.' },
+            { id:'IqqUeNUN3do', tags:['Full-Text Search', 'Vector Search'],
+              title:'Full-Text and Vector Search in Your .NET App using your existing RDBMS',
+              caption:'Search by keywords and meaning without a separate search engine',
+              summary:'Index text columns with [FullTextIndex] to search and rank by relevance with Sql.Matches() and Sql.MatchRank(), and store AI embeddings in [Vector] columns to find the most similar rows, in the same typed queries as your filters and joins.' },
         ]
         return { videos }
     }

@@ -2,6 +2,10 @@
 title: Full-Text Search
 ---
 
+:::youtube IqqUeNUN3do
+Full-Text and Vector Search in Your .NET App using your existing RDBMS
+:::
+
 `[FullTextIndex]` creates a full-text index of a table's text columns, which `Sql.Matches()` searches for words and
 phrases and `Sql.MatchRank()` orders by relevance, in the same typed query as your filters and joins:
 

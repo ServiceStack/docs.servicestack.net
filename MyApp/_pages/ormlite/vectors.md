@@ -2,6 +2,10 @@
 title: Vector Search
 ---
 
+:::youtube IqqUeNUN3do
+Full-Text and Vector Search in Your .NET App using your existing RDBMS
+:::
+
 `[Vector]` columns store the embeddings of an AI model, so the rows most similar to a piece of text can be found in
 the same query as your typed filters and joins:
 
