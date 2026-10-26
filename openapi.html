@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-10-21T14:56:30.2225732Z'>
+    <meta name='date' content='2026-10-26T10:45:54.3936961Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Open API v3</title>
@@ -1789,13 +1789,52 @@ your ServiceStack APIs to integrate with your wider ASP.NET Core application, op
 <p>This opens up the ability to use common third party tooling to implement application-wide features like OpenAPI v3 specification
 generation support for your endpoints offered by the <code>Swashbuckle.AspNetCore</code> package.</p>
 <p><lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="zAq9hp7ojn4" style="background-image: url('https://img.youtube.com/vi/zAq9hp7ojn4/maxresdefault.jpg')"></lite-youtube></p>
-<p>To make this integration as easy as possible we're maintaining the <code>ServiceStack.AspNetCore.OpenApi</code> package to incorporate additional
-information from your ServiceStack APIs into Swagger metadata.</p>
+<p>To make this integration as easy as possible we maintain ServiceStack OpenAPI packages to incorporate additional
+information from your ServiceStack APIs into the generated OpenAPI metadata.</p>
 <p><img src="/img/pages/openapi/v3/openapi-v3-swagger-ui.png" alt="" /></p>
 <p>In this guide we will look at how you can take advantage of the new OpenAPI v3 Swagger support using mapped Endpoints,
 customizing the generated specification, as well as touch on other related changes when using <a href="/endpoint-routing">Endpoint Routing</a>.</p>
+<h3 id="which-package-should-i-use">Which package should I use?<a class="header-anchor" href="javascript:;" onclick="location.hash='#which-package-should-i-use'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Target Framework</th>
+<th>NuGet Package</th>
+<th>OpenAPI Generator</th>
+<th>UI</th>
+<th>add-in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.NET 10+</td>
+<td><code>ServiceStack.OpenApi.Swashbuckle</code></td>
+<td><code>Swashbuckle.AspNetCore</code> v10</td>
+<td>Swagger UI</td>
+<td><code>openapi-swashbuckle</code></td>
+</tr>
+<tr>
+<td>.NET 10+</td>
+<td><code>ServiceStack.OpenApi.Microsoft</code></td>
+<td><code>Microsoft.AspNetCore.OpenApi</code></td>
+<td>Scalar UI</td>
+<td><code>openapi-scalar</code></td>
+</tr>
+<tr>
+<td>.NET 8</td>
+<td><code>ServiceStack.AspNetCore.OpenApi</code></td>
+<td><code>Swashbuckle.AspNetCore</code> v8</td>
+<td>Swagger UI</td>
+<td><code>openapi3</code></td>
+</tr>
+</tbody>
+</table>
+<div class="info custom-block">
+            <p class="custom-block-title">INFO</p><p>.NET 10 Apps should use one of the new <strong>.NET 10</strong> packages which depend on <strong>Microsoft.OpenApi v2</strong>.
+The existing <code>ServiceStack.AspNetCore.OpenApi</code> package remains for <strong>.NET 8</strong> Apps which depend on <strong>Microsoft.OpenApi v1</strong>.</p>
+</div>
 <h2 id="apphost-initialization">AppHost Initialization<a class="header-anchor" href="javascript:;" onclick="location.hash='#apphost-initialization'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>To use Swashbuckle your ServiceStack App needs to be configured to use <a href="/endpoint-routing">Endpoint Routing</a> and
+<p>To use OpenAPI your ServiceStack App needs to be configured to use <a href="/endpoint-routing">Endpoint Routing</a> and
 <a href="/net-ioc">ASP.NET Core IOC</a> where registration of your ServiceStack Services and App's Dependencies &amp; Plugins need to be setup
 before your <code>WebApplication</code> is built, e.g:</p>
 <h4 id="program.cs">Program.cs<a class="header-anchor" href="javascript:;" onclick="location.hash='#program.cs'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
@@ -1812,8 +1851,184 @@ app.UseServiceStack(new AppHost(), options =&gt; {
 
 app.Run();
 </code></pre>
-<p>Once configured to use Endpoint Routing we can then use the <a href="https://docs.servicestack.net/mix-tool">mix</a> tool to apply the
-<a href="https://gist.github.com/gistlyn/dac47b68e77796902cde0f0b7b9c6ac2">openapi3</a> Startup Configuration with:</p>
+<p>Once configured to use Endpoint Routing you can use the <a href="/mix-tool">mix</a> tool to apply the OpenAPI configuration
+for your App's target framework.</p>
+<h2 id="net-10-openapi-support">.NET 10 OpenAPI Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-10-openapi-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>.NET 10 has added support for generating OpenAPI schemas and API Explorer UIs with there now being multiple ways to
+generate OpenAPI schemas and multiple ways to view them. ServiceStack supports both popular options with 2 new NuGet packages:</p>
+<h3 id="servicestack.openapi.swashbuckle">ServiceStack.OpenApi.Swashbuckle<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.openapi.swashbuckle'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<div class="not-prose">
+  <img class="mx-auto my-4 max-w-3xl border" src="/img/pages/openapi/v3/swagger.webp">
+</div>
+<p>Depends on:</p>
+<ul>
+<li>Microsoft.OpenApi v2.x</li>
+<li>Swashbuckle.AspNetCore v10.x</li>
+</ul>
+<p>Which can be added to .NET 10 Projects with:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npx add-in openapi-swashbuckle</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Which uses <code>Swashbuckle.AspNetCore</code> for generating OpenAPI schemas and displaying the Swagger UI.</p>
+<h4 id="manually-configure-swashbuckle-and-swagger-ui">Manually Configure Swashbuckle and Swagger UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#manually-configure-swashbuckle-and-swagger-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Alternatively add the NuGet package:</p>
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;ServiceStack.OpenApi.Swashbuckle&quot; Version=&quot;10.*&quot; /&gt;
+</code></pre>
+<p>Then add the <code>Configure.OpenApi.cs</code> <a href="/modular-startup">Modular Startup</a> class to your project:</p>
+<pre><code class="language-csharp">[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
+
+namespace MyApp;
+
+public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen(); // Swashbuckle
+                services.AddServiceStackSwagger();
+                // services.AddBasicAuth&lt;Data.ApplicationUser&gt;();
+                // services.AddApiKeys();
+                // services.AddJwtAuth();
+
+                services.AddTransient&lt;IStartupFilter,StartupFilter&gt;();
+            }
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action&lt;IApplicationBuilder&gt; Configure(Action&lt;IApplicationBuilder&gt; next) =&gt; app =&gt;
+        {
+            // Provided by Swashbuckle library
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            next(app);
+        };
+    }
+}
+</code></pre>
+<h3 id="servicestack.openapi.microsoft">ServiceStack.OpenApi.Microsoft<a class="header-anchor" href="javascript:;" onclick="location.hash='#servicestack.openapi.microsoft'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<div class="not-prose">
+  <img class="mx-auto my-4 max-w-3xl border" src="/img/pages/openapi/v3/scalar.webp">
+</div>
+<p>Depends on:</p>
+<ul>
+<li>Microsoft.OpenApi v2.x</li>
+<li>Microsoft.AspNetCore.OpenApi v10.x</li>
+</ul>
+<p>Which can be added to .NET 10 Projects with:</p>
+<div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+                <div class="relative flex items-center justify-between px-4 py-3">
+                    <!-- Left side - Terminal icon and command -->
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>
+                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <code class="text-sm font-mono text-slate-900 dark:text-slate-100 truncate"><p>npx add-in openapi-scalar</p>
+</code>
+                            </div>
+                        </div>
+
+                        <!-- Right side - Copy button -->
+                        <div class="flex items-center gap-2 ml-4">
+                            <button class="shell-copy-btn flex items-center justify-center p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-400 dark:hover:border-slate-500" aria-label="Copy command">
+                                <svg class="copied w-4 h-4" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                <svg class="nocopy w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+</div>
+<p>Which uses <code>Microsoft.AspNetCore.OpenApi</code> to generate OpenAPI schemas and is configured to use <code>Scalar.AspNetCore</code>
+to display the Scalar UI from <a href="https://scalar.com">scalar.com</a>.</p>
+<h4 id="manually-configure-microsoft.aspnetcore.openapi-and-scalar-ui">Manually Configure Microsoft.AspNetCore.OpenApi and Scalar UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#manually-configure-microsoft.aspnetcore.openapi-and-scalar-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Alternatively add the NuGet packages:</p>
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;Scalar.AspNetCore&quot; Version=&quot;2.*&quot; /&gt;
+&lt;PackageReference Include=&quot;ServiceStack.OpenApi.Microsoft&quot; Version=&quot;10.*&quot; /&gt;
+</code></pre>
+<p>Then add the <code>Configure.OpenApi.cs</code> <a href="/modular-startup">Modular Startup</a> class to your project:</p>
+<pre><code class="language-csharp">using Scalar.AspNetCore;
+
+[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
+
+namespace MyApp;
+
+public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) =&gt; builder
+        .ConfigureServices((context, services) =&gt; {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddOpenApi();
+                services.AddServiceStackOpenApi();
+                // services.AddBasicAuth&lt;Data.ApplicationUser&gt;();
+                // services.AddApiKeys();
+                // services.AddJwtAuth();
+
+                services.AddTransient&lt;IStartupFilter,StartupFilter&gt;();
+            }
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action&lt;IApplicationBuilder&gt; Configure(Action&lt;IApplicationBuilder&gt; next) =&gt; app =&gt;
+        {
+            app.UseRouting();
+            app.UseEndpoints(endpoints =&gt;
+            {
+                endpoints.MapOpenApi();
+                endpoints.MapScalarApiReference();
+            });
+            next(app);
+        };
+    }
+}
+</code></pre>
+<h4 id="resolving-microsoft.aspnetcore.openapi-build-errors">Resolving Microsoft.AspNetCore.OpenApi build errors<a class="header-anchor" href="javascript:;" onclick="location.hash='#resolving-microsoft.aspnetcore.openapi-build-errors'" aria-label="Permalink">&ZeroWidthSpace;</a></h4>
+<p>Using <code>Microsoft.AspNetCore.OpenApi</code> as-is results in build errors which require adding <code>&lt;InterceptorsNamespaces&gt;</code>
+to your <strong>MyApp.csproj</strong>:</p>
+<pre><code class="language-xml">&lt;PropertyGroup&gt;
+  &lt;InterceptorsNamespaces&gt;$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated&lt;/InterceptorsNamespaces&gt;
+&lt;/PropertyGroup&gt;
+</code></pre>
+<p>Alternatively you can resolve build errors by disabling its XML Comment source generator:</p>
+<pre><code class="language-xml">&lt;!-- Disable the XML comment source generator to avoid compatibility issues with Microsoft.OpenApi --&gt;
+&lt;Target Name=&quot;DisableCompileTimeOpenApiXmlGenerator&quot; BeforeTargets=&quot;CoreCompile&quot;&gt;
+  &lt;ItemGroup&gt;
+    &lt;Analyzer Remove=&quot;$(PkgMicrosoft_AspNetCore_OpenApi)\analyzers\dotnet\cs\Microsoft.AspNetCore.OpenApi.SourceGenerators.dll&quot;/&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Target&gt;
+</code></pre>
+<p>Which requires <code>$(PkgMicrosoft_AspNetCore_OpenApi)</code> to be defined, by adding a direct package reference with <code>GeneratePathProperty</code>:</p>
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;Microsoft.AspNetCore.OpenApi&quot; Version=&quot;10.*&quot; GeneratePathProperty=&quot;true&quot; /&gt;
+</code></pre>
+<h2 id="net-8-openapi-support">.NET 8 OpenAPI Support<a class="header-anchor" href="javascript:;" onclick="location.hash='#net-8-openapi-support'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>.NET 8 Apps should continue to use the <code>ServiceStack.AspNetCore.OpenApi</code> package which can be added with the
+<a href="https://gist.github.com/gistlyn/494a1def5aa9cfa47bfb2fb9d46ca353">openapi3</a> Startup Configuration:</p>
 <div class="sh mb-4"><div class="not-prose group relative overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="shellCopy(this)">
                 <!-- Background pattern -->
                 <div class="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800 opacity-50" style="background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 16px 16px;"></div>
@@ -1840,8 +2055,8 @@ app.Run();
 </div>
 <h3 id="manually-configure-openapi-v3-and-swagger-ui">Manually Configure OpenAPI v3 and Swagger UI<a class="header-anchor" href="javascript:;" onclick="location.hash='#manually-configure-openapi-v3-and-swagger-ui'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
 <p>This will install the required ASP.NET Core Microsoft, Swashbuckle and ServiceStack Open API NuGet packages:</p>
-<pre><code class="language-xml">&lt;PackageReference Include=&quot;Microsoft.AspNetCore.OpenApi&quot; Version=&quot;10.*&quot; /&gt;
-&lt;PackageReference Include=&quot;Swashbuckle.AspNetCore&quot; Version=&quot;7.*&quot; /&gt;
+<pre><code class="language-xml">&lt;PackageReference Include=&quot;Microsoft.AspNetCore.OpenApi&quot; Version=&quot;8.*&quot; /&gt;
+&lt;PackageReference Include=&quot;Swashbuckle.AspNetCore&quot; Version=&quot;8.*&quot; /&gt;
 &lt;PackageReference Include=&quot;ServiceStack.AspNetCore.OpenApi&quot; Version=&quot;10.*&quot; /&gt;
 </code></pre>
 <p>Then add the <code>Configure.OpenApi.cs</code> <a href="https://docs.servicestack.net/modular-startup">Modular Startup</a> class to your project:</p>
@@ -1879,7 +2094,10 @@ public class ConfigureOpenApi : IHostingStartup
     }
 }
 </code></pre>
-<p>All this setup is done for you in our updated <a href="https://servicestack.net/start">Identity Auth .NET 10 Templates</a>.</p>
+<h3 id="api-explorer">API Explorer<a class="header-anchor" href="javascript:;" onclick="location.hash='#api-explorer'" aria-label="Permalink">&ZeroWidthSpace;</a></h3>
+<p>ServiceStack's built-in <a href="/api-explorer">API Explorer</a> is an alternative that doesn't require any additional packages
+whose richer metadata enables more optimal form inputs with <strong>validation bound forms</strong> and code-generation for
+<a href="/add-servicestack-reference">11 programming languages</a>.</p>
 <h2 id="open-api-attributes">Open API Attributes<a class="header-anchor" href="javascript:;" onclick="location.hash='#open-api-attributes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>Each route could have a separate summary and description. You can set it with <code>Route</code> attribute:</p>
 <pre><code class="language-csharp">[Route(&quot;/hello&quot;, Summary = @&quot;Default hello service.&quot;, 
@@ -2099,11 +2317,41 @@ ServiceStack APIs into the larger ASP.NET Core ecosystem.</p>
                                         <span v-hash="'#apphost-initialization'" data-id="apphost-initialization" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             AppHost Initialization
                                         </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#net-10-openapi-support'" data-id="net-10-openapi-support" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            .NET 10 OpenAPI Support
+                                        </span>
+                                            <ul class="ml-4">
+                                                    <li data-id="servicestack.openapi.swashbuckle" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#servicestack.openapi.swashbuckle'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ServiceStack.OpenApi.Swashbuckle
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="servicestack.openapi.microsoft" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#servicestack.openapi.microsoft'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            ServiceStack.OpenApi.Microsoft
+                                                        </span>
+                                                    </li>
+                                            </ul>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#net-8-openapi-support'" data-id="net-8-openapi-support" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            .NET 8 OpenAPI Support
+                                        </span>
                                             <ul class="ml-4">
                                                     <li data-id="manually-configure-openapi-v3-and-swagger-ui" class="text-gray-500 hover:text-gray-900">
                                                         <span v-hash="'#manually-configure-openapi-v3-and-swagger-ui'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
                                                             <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
                                                             Manually Configure OpenAPI v3 and Swagger UI
+                                                        </span>
+                                                    </li>
+                                                    <li data-id="api-explorer" class="text-gray-500 hover:text-gray-900">
+                                                        <span v-hash="'#api-explorer'" class="cursor-pointer flex text-sm transform transition-colors duration-200 py-2">
+                                                            <svg width="3" height="24" viewBox="0 -9 3 24" class="mr-2 overflow-visible"><path d="M0 0L3 3L0 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                                            API Explorer
                                                         </span>
                                                     </li>
                                             </ul>

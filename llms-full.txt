@@ -65392,17 +65392,30 @@ generation support for your endpoints offered by the `Swashbuckle.AspNetCore` pa
 
 <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="zAq9hp7ojn4" style="background-image: url('https://img.youtube.com/vi/zAq9hp7ojn4/maxresdefault.jpg')"></lite-youtube>
 
-To make this integration as easy as possible we're maintaining the `ServiceStack.AspNetCore.OpenApi` package to incorporate additional 
-information from your ServiceStack APIs into Swagger metadata.
+To make this integration as easy as possible we maintain ServiceStack OpenAPI packages to incorporate additional 
+information from your ServiceStack APIs into the generated OpenAPI metadata.
 
 ![](/img/pages/openapi/v3/openapi-v3-swagger-ui.png)
 
 In this guide we will look at how you can take advantage of the new OpenAPI v3 Swagger support using mapped Endpoints, 
 customizing the generated specification, as well as touch on other related changes when using [Endpoint Routing](/endpoint-routing).
 
+### Which package should I use?
+
+| Target Framework | NuGet Package                       | OpenAPI Generator              | UI          | add-in                |
+|------------------|-------------------------------------|--------------------------------|-------------|-----------------------|
+| .NET 10+         | `ServiceStack.OpenApi.Swashbuckle`  | `Swashbuckle.AspNetCore` v10   | Swagger UI  | `openapi-swashbuckle` |
+| .NET 10+         | `ServiceStack.OpenApi.Microsoft`    | `Microsoft.AspNetCore.OpenApi` | Scalar UI   | `openapi-scalar`      |
+| .NET 8           | `ServiceStack.AspNetCore.OpenApi`   | `Swashbuckle.AspNetCore` v8    | Swagger UI  | `openapi3`            |
+
+:::info
+.NET 10 Apps should use one of the new **.NET 10** packages which depend on **Microsoft.OpenApi v2**.
+The existing `ServiceStack.AspNetCore.OpenApi` package remains for **.NET 8** Apps which depend on **Microsoft.OpenApi v1**.
+:::
+
 ## AppHost Initialization
 
-To use Swashbuckle your ServiceStack App needs to be configured to use [Endpoint Routing](/endpoint-routing) and
+To use OpenAPI your ServiceStack App needs to be configured to use [Endpoint Routing](/endpoint-routing) and
 [ASP.NET Core IOC](/net-ioc) where registration of your ServiceStack Services and App's Dependencies & Plugins need to be setup
 before your `WebApplication` is built, e.g:
 
@@ -65422,8 +65435,178 @@ app.UseServiceStack(new AppHost(), options => {
 app.Run();
 ```
 
-Once configured to use Endpoint Routing we can then use the [mix](https://docs.servicestack.net/mix-tool) tool to apply the 
-[openapi3](https://gist.github.com/gistlyn/dac47b68e77796902cde0f0b7b9c6ac2) Startup Configuration with:
+Once configured to use Endpoint Routing you can use the [mix](/mix-tool) tool to apply the OpenAPI configuration
+for your App's target framework.
+
+## .NET 10 OpenAPI Support
+
+.NET 10 has added support for generating OpenAPI schemas and API Explorer UIs with there now being multiple ways to 
+generate OpenAPI schemas and multiple ways to view them. ServiceStack supports both popular options with 2 new NuGet packages:
+
+### ServiceStack.OpenApi.Swashbuckle
+
+<div class="not-prose">
+  <img class="mx-auto my-4 max-w-3xl border" src="/img/pages/openapi/v3/swagger.webp">
+</div>
+
+Depends on:
+  - Microsoft.OpenApi v2.x
+  - Swashbuckle.AspNetCore v10.x
+
+Which can be added to .NET 10 Projects with:
+
+:::sh
+npx add-in openapi-swashbuckle
+:::
+
+Which uses `Swashbuckle.AspNetCore` for generating OpenAPI schemas and displaying the Swagger UI.
+
+#### Manually Configure Swashbuckle and Swagger UI
+
+Alternatively add the NuGet package:
+
+```xml
+<PackageReference Include="ServiceStack.OpenApi.Swashbuckle" Version="10.*" />
+```
+
+Then add the `Configure.OpenApi.cs` [Modular Startup](/modular-startup) class to your project:
+
+```csharp
+[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
+
+namespace MyApp;
+
+public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddEndpointsApiExplorer();
+                services.AddSwaggerGen(); // Swashbuckle
+                services.AddServiceStackSwagger();
+                // services.AddBasicAuth<Data.ApplicationUser>();
+                // services.AddApiKeys();
+                // services.AddJwtAuth();
+
+                services.AddTransient<IStartupFilter,StartupFilter>();
+            }
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            // Provided by Swashbuckle library
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            next(app);
+        };
+    }
+}
+```
+
+### ServiceStack.OpenApi.Microsoft
+
+<div class="not-prose">
+  <img class="mx-auto my-4 max-w-3xl border" src="/img/pages/openapi/v3/scalar.webp">
+</div>
+
+Depends on:
+  - Microsoft.OpenApi v2.x
+  - Microsoft.AspNetCore.OpenApi v10.x
+
+Which can be added to .NET 10 Projects with:
+
+:::sh
+npx add-in openapi-scalar
+:::
+
+Which uses `Microsoft.AspNetCore.OpenApi` to generate OpenAPI schemas and is configured to use `Scalar.AspNetCore`
+to display the Scalar UI from [scalar.com](https://scalar.com).
+
+#### Manually Configure Microsoft.AspNetCore.OpenApi and Scalar UI
+
+Alternatively add the NuGet packages:
+
+```xml
+<PackageReference Include="Scalar.AspNetCore" Version="2.*" />
+<PackageReference Include="ServiceStack.OpenApi.Microsoft" Version="10.*" />
+```
+
+Then add the `Configure.OpenApi.cs` [Modular Startup](/modular-startup) class to your project:
+
+```csharp
+using Scalar.AspNetCore;
+
+[assembly: HostingStartup(typeof(MyApp.ConfigureOpenApi))]
+
+namespace MyApp;
+
+public class ConfigureOpenApi : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices((context, services) => {
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                services.AddOpenApi();
+                services.AddServiceStackOpenApi();
+                // services.AddBasicAuth<Data.ApplicationUser>();
+                // services.AddApiKeys();
+                // services.AddJwtAuth();
+
+                services.AddTransient<IStartupFilter,StartupFilter>();
+            }
+        });
+
+    public class StartupFilter : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapOpenApi();
+                endpoints.MapScalarApiReference();
+            });
+            next(app);
+        };
+    }
+}
+```
+
+#### Resolving Microsoft.AspNetCore.OpenApi build errors
+
+Using `Microsoft.AspNetCore.OpenApi` as-is results in build errors which require adding `<InterceptorsNamespaces>` 
+to your **MyApp.csproj**:
+
+```xml
+<PropertyGroup>
+  <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+</PropertyGroup>
+```
+
+Alternatively you can resolve build errors by disabling its XML Comment source generator:
+
+```xml
+<!-- Disable the XML comment source generator to avoid compatibility issues with Microsoft.OpenApi -->
+<Target Name="DisableCompileTimeOpenApiXmlGenerator" BeforeTargets="CoreCompile">
+  <ItemGroup>
+    <Analyzer Remove="$(PkgMicrosoft_AspNetCore_OpenApi)\analyzers\dotnet\cs\Microsoft.AspNetCore.OpenApi.SourceGenerators.dll"/>
+  </ItemGroup>
+</Target>
+```
+
+Which requires `$(PkgMicrosoft_AspNetCore_OpenApi)` to be defined, by adding a direct package reference with `GeneratePathProperty`:
+
+```xml
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" GeneratePathProperty="true" />
+```
+
+## .NET 8 OpenAPI Support
+
+.NET 8 Apps should continue to use the `ServiceStack.AspNetCore.OpenApi` package which can be added with the 
+[openapi3](https://gist.github.com/gistlyn/494a1def5aa9cfa47bfb2fb9d46ca353) Startup Configuration:
 
 :::sh
 npx add-in openapi3
@@ -65434,8 +65617,8 @@ npx add-in openapi3
 This will install the required ASP.NET Core Microsoft, Swashbuckle and ServiceStack Open API NuGet packages:
 
 ```xml
-<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.*" />
-<PackageReference Include="Swashbuckle.AspNetCore" Version="7.*" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.*" />
+<PackageReference Include="Swashbuckle.AspNetCore" Version="8.*" />
 <PackageReference Include="ServiceStack.AspNetCore.OpenApi" Version="10.*" />
 ```
 
@@ -65477,7 +65660,11 @@ public class ConfigureOpenApi : IHostingStartup
 }
 ```
 
-All this setup is done for you in our updated [Identity Auth .NET 10 Templates](https://servicestack.net/start).
+### API Explorer
+
+ServiceStack's built-in [API Explorer](/api-explorer) is an alternative that doesn't require any additional packages
+whose richer metadata enables more optimal form inputs with **validation bound forms** and code-generation for 
+[11 programming languages](/add-servicestack-reference).
 
 ## Open API Attributes
 
