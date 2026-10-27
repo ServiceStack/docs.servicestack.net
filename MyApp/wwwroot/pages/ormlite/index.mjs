@@ -230,3 +230,4 @@ const OrmliteVideos = {
 export default {
     components: { Screenshot, ScreenshotsGallery, ScreenshotsGalleryView, OneClassOneTable, DesignGoals, OrmliteDocMap, OrmliteVideos }
 }
+
