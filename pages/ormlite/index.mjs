@@ -222,6 +222,10 @@ const OrmliteVideos = {
               title:'Full-Text and Vector Search in Your .NET App using your existing RDBMS',
               caption:'Search by keywords and meaning without a separate search engine',
               summary:'Index text columns with [FullTextIndex] to search and rank by relevance with Sql.Matches() and Sql.MatchRank(), and store AI embeddings in [Vector] columns to find the most similar rows, in the same typed queries as your filters and joins.' },
+            { id:'O7RAp_XvHMc', tags:['Retries', 'Read Replicas'],
+              title:'Survive Deadlocks without writing Retry Loops: Safe Database Retries and Read Replicas in .NET',
+              caption:'Retry temporary errors safely and scale reads with replicas',
+              summary:'Set a RetryPolicy to automatically re-run statements that fail from deadlocks, serialization failures, throttling or failovers, only when it\'s safe to, and send read-only queries to a read replica with OpenReadOnlyDbConnection(), using the same code with or without one.' },
         ]
         return { videos }
     }
