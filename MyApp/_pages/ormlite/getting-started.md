@@ -145,6 +145,10 @@ services.AddOrmLite(options => {
 
 ### Read Replicas
 
+:::youtube O7RAp_XvHMc
+Survive Deadlocks without writing Retry Loops: Safe Database Retries and Read Replicas in .NET
+:::
+
 Queries that can read from a read replica, e.g. a PostgreSQL standby, open their connection with
 `OpenReadOnlyDbConnection()`. It opens the replica when one is registered, otherwise the primary, so the same code works
 with and without a replica:

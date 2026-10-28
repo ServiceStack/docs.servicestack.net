@@ -2,6 +2,10 @@
 title: Retrying Temporary Errors
 ---
 
+:::youtube O7RAp_XvHMc
+Survive Deadlocks without writing Retry Loops: Safe Database Retries and Read Replicas in .NET
+:::
+
 Some database errors don't mean anything is wrong with your query, only that the database couldn't run it at that
 moment: a deadlock, a serialization failure, throttling by a cloud database, a failover or a dropped connection.
 They would usually work if they were run again a moment later.
