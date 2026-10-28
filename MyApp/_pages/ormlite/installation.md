@@ -99,9 +99,3 @@ npx add-in oracle
 ::: sh
 npx add-in firebird
 :::
-
-If you don't have the dotnet `x` tool installed, it can be installed with: 
-
-::: sh
-dotnet tool install -g x
-:::
