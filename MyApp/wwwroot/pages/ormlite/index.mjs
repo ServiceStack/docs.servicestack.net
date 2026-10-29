@@ -226,6 +226,10 @@ const OrmliteVideos = {
               title:'Survive Deadlocks without writing Retry Loops: Safe Database Retries and Read Replicas in .NET',
               caption:'Retry temporary errors safely and scale reads with replicas',
               summary:'Set a RetryPolicy to automatically re-run statements that fail from deadlocks, serialization failures, throttling or failovers, only when it\'s safe to, and send read-only queries to a read replica with OpenReadOnlyDbConnection(), using the same code with or without one.' },
+            { id:'VgkOmcmWBPE', tags:['Slow Queries', 'Query Plans', 'Profiling'],
+              title:'Why Is My .NET App Slow? Find and Fix Slow SQL From Your Browser',
+              caption:'Find slow queries and see why they\'re slow',
+              summary:'Use the Profiling UI\'s Slowest Queries view to find the slowest SQL your App has run, then Explain, Analyze or re-run any captured SELECT query from your browser to see its query plan, or get it in code with db.Explain().' },
         ]
         return { videos }
     }

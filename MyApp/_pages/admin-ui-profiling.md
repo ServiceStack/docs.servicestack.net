@@ -157,6 +157,10 @@ The profiling detail view also contains **blue** links to filter matching diagno
 
 ### Slowest Queries
 
+:::youtube VgkOmcmWBPE
+Why Is My .NET App Slow? Find and Fix Slow SQL From Your Browser
+:::
+
 The **Slowest Queries** view lists the slowest database queries since your App started, showing when each query ran,
 how long it took, the [named connection](/ormlite/getting-started#multiple-database-connections) it ran on and the
 start of its SQL. By default the 50 slowest OrmLite commands are retained after they're no longer in the latest

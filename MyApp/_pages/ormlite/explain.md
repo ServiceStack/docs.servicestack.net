@@ -2,6 +2,10 @@
 title: Query Plans
 ---
 
+:::youtube VgkOmcmWBPE
+Why Is My .NET App Slow? Find and Fix Slow SQL From Your Browser
+:::
+
 `db.Explain()` returns the query plan your RDBMS will use to run a query, e.g. to check that it uses an index instead
 of scanning a table:
 
