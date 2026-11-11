@@ -76,3 +76,86 @@ var redisPubSub = new RedisPubSubServer(clientsManager, "channel-1", "channel-2"
 
 Calling `Start()` after it's initialized will get it to start listening and processing any messages
 published to the subscribed channels.
+## Publishing messages
+
+Any client can publish to a channel; `PublishMessage` returns the number of subscribers that received it:
+
+```csharp
+using var redis = redisManager.GetClient();
+long receivers = redis.PublishMessage("notifications", "Deploy started");
+
+// Publish typed messages as JSON
+redis.PublishMessage("orders:created", new OrderCreated { OrderId = 42 }.ToJson());
+```
+
+Deserialize them in the handler with `msg.FromJson<OrderCreated>()`.
+
+## Subscribe to channel patterns
+
+`ChannelsMatching` subscribes to every channel matching a glob-style pattern, using `PSUBSCRIBE`. The handler
+receives the concrete channel name, so one subscriber can route several related channels:
+
+```csharp
+var pubSub = new RedisPubSubServer(redisManager) {
+    ChannelsMatching = new[] { "orders:*" },
+    OnMessage = (channel, msg) => {
+        switch (channel)
+        {
+            case "orders:created": OnCreated(msg.FromJson<OrderCreated>()); break;
+            case "orders:shipped": OnShipped(msg.FromJson<OrderShipped>()); break;
+        }
+    },
+}.Start();
+```
+
+## Run it for the lifetime of your App
+
+Start the subscriber when your App starts and dispose it on shutdown by wrapping it in a hosted service:
+
+```csharp
+public class NotificationsSubscriber(IRedisClientsManager redisManager, ILogger<NotificationsSubscriber> log)
+    : IHostedService, IDisposable
+{
+    RedisPubSubServer? pubSub;
+
+    public Task StartAsync(CancellationToken token)
+    {
+        pubSub = new RedisPubSubServer(redisManager, "notifications") {
+            OnMessage = (channel, msg) => log.LogInformation("{Channel}: {Message}", channel, msg),
+            OnError = ex => log.LogError(ex, "Redis Pub/Sub error"),
+        };
+        pubSub.Start();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken token)
+    {
+        pubSub?.Stop();
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => pubSub?.Dispose();
+}
+
+services.AddHostedService<NotificationsSubscriber>();
+```
+
+`OnMessage` runs on the subscriber's background thread, one message at a time. Keep handlers fast, and hand
+slow work to a queue or [Background Jobs](/jobs/) so later messages aren't delayed.
+
+## Use-cases
+
+- **Cache invalidation across servers.** Evict each server's in-memory copy of a changed value; see the
+  [two-tier cache recipe](/redis/caching-patterns#two-tier-cache-with-pubsub-invalidation).
+- **Configuration reloads.** Publish to a `config:reload` channel after changing settings, so every server
+  reloads them without a restart.
+- **Live updates to browsers.** [Redis Server Events](/redis-server-events) uses Pub/Sub to deliver
+  Server-Sent Events to browsers connected to any app server.
+- **Coordinating workers.** Tell background workers to pause, resume or shut down.
+
+## Delivery guarantees
+
+Pub/Sub delivers each message to the subscribers connected at the moment it's published, and stores nothing.
+A subscriber that's disconnected, restarting or failing over misses those messages, and `RedisPubSubServer`
+reconnects without replaying them. Design handlers so a missed message only means a short delay, e.g. a local
+cache entry that also expires, or use [Redis Streams](/redis/streams) when every message must be processed.

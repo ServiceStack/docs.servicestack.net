@@ -63,6 +63,8 @@ and ServiceStack MVC Controllers or anywhere else via the `HostContext.AppHost.G
 
 ### Redis
 
+For Microsoft `IDistributedCache` consumers on **.NET 10**, the built-in [ServiceStack.Redis adapter](/redis/distributed-cache) provides binary storage, atomic absolute/sliding expiration, DI registration and HybridCache L2 support using ServiceStack.Redis managers. The adapter APIs and Microsoft dependencies are limited to the net10.0 target.
+
 ```csharp
 services.AddSingleton<IRedisClientsManager>(c => 
     new RedisManagerPool("localhost:6379"));

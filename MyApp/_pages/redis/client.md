@@ -15,6 +15,81 @@ Use this API if you just need to access values as strings or you want to have co
 <client-api-map>
 </client-api-map>
 
+## Atomic Key Commands
+
+New in v10.5, the following extensions are available on clients returned by ServiceStack.Redis managers:
+
+| Command | String API | Native byte API | Server requirement |
+| --- | --- | --- | --- |
+| GETEX | `GetAndExpireValue` | `GetEx` | Redis 6.2+ |
+| GETDEL | `GetAndDeleteValue` | `GetDel` | Redis 6.2+ |
+| UNLINK | `Unlink` | `Unlink` | Redis 4.0+ |
+
+All three commands require a **writer connection**, including GETEX without an expiration option. Borrow a
+client with `GetClient()` rather than `GetReadOnlyClient()`:
+
+```csharp
+using var manager = new RedisManagerPool("localhost:6379");
+using var redis = manager.GetClient();
+
+redis.SetValue("status", "ready");
+string value = redis.GetAndExpireValue("status", new RedisGetExOptions {
+    ExpirySeconds = 60
+}); // Returns "ready" and sets its TTL in one atomic command
+
+string removed = redis.GetAndDeleteValue("status"); // Returns "ready" and deletes the key atomically
+long count = redis.Unlink("large:key", "another:key"); // Number of existing keys removed
+```
+
+`RedisGetExOptions` accepts at most one of:
+
+- `ExpirySeconds` or `ExpiryMilliseconds` — a positive relative expiration
+- `ExpiryAtSeconds` or `ExpiryAtMilliseconds` — a positive absolute Unix timestamp
+- `Persist = true` — remove the expiration
+
+Omit the options to preserve the existing TTL. A past absolute timestamp returns the current value and expires
+the key. Missing keys return `null`; stored empty values remain empty. GETEX and GETDEL report a server error
+for non-string values. UNLINK accepts any value type, removes keys immediately and reclaims their memory in
+the background. It does not scan for matching keys or change the behavior of existing `Remove` methods.
+
+The native `GetEx` and `GetDel` methods return raw `byte[]` values. The string APIs decode UTF-8 and do not
+apply POCO deserialization. Existing serialized payloads are unchanged. Async counterparts accept cancellation
+tokens; see [async key commands](/redis/async#atomic-key-commands).
+
+These APIs use additive `IRedisNativeKeyCommands` / `IRedisNativeKeyCommandsAsync` capabilities implemented by
+`RedisNativeClient` and `RedisClient`. Existing client interfaces gain no required members. A third-party
+provider must implement the optional capability to use the extensions; otherwise they throw
+`NotSupportedException`. Server support is separate: unsupported commands and ACL errors are propagated without
+a Lua or multi-command fallback. Pipelines and transactions use the existing command queuing APIs.
+
+## Hash Field Expiration
+
+Expire individual hash fields with `HExpire`/`HPExpire` or absolute Unix timestamps, inspect field TTL/deadlines,
+and remove expiration with `HPersist`. Sync/async APIs preserve per-field results and support NX/XX/GT/LT
+conditions. Requires Redis 7.4+ or compatible native support (Valkey 9+); standalone calls only.
+See [hash-field expiration](/redis/hash-field-expiration) for binary overloads, status codes and examples.
+
+## SCAN + UNLINK Pattern Cleanup
+
+New `UnlinkByPattern` and `UnlinkByPatternAsync` APIs scan matching keys and remove them in bounded UNLINK
+batches, with memory reclaimed in the background:
+
+```csharp
+long removed = await redis.UnlinkByPatternAsync("cache:reports:*",
+    batchSize: 512, scanCount: 1000, token: token);
+```
+
+Use an exclusively leased writer. `batchSize` is a hard key-count limit per UNLINK; `scanCount` is a SCAN hint,
+not a response-size guarantee. The result sums Redis-confirmed removals. Binary key names are preserved.
+Existing `RemoveByPattern` behavior is unchanged. Requires Redis 4.0+ and SCAN/UNLINK permission; errors propagate
+without a DEL fallback. Cancellation is checked between scans and batches and may leave partial cleanup.
+The scan is not an atomic snapshot; concurrent writes and duplicate observations can affect results. These
+multi-command helpers cannot run inside a pipeline or transaction.
+
+## Streams
+
+Sync/async Streams commands, typed JSON entries and explicit consumer-group recovery are available in v10.5. See the [Streams guide](/redis/streams) for usage, server requirements and blocking-connection semantics.
+
 ## API
 
 ```csharp

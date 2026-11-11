@@ -1,3 +1,5 @@
+import VideoGallery from "../components/VideoGallery.mjs"
+
 /** The three client layers, and what each one does to your value on the way to redis-server */
 const ClientLayers = {
     template: `
@@ -117,12 +119,26 @@ const RedisDocMap = {
                 { title:'Client Usage', href:'/redis/client-usage', text:'A tour of the APIs over Redis Lists, Sets, Sorted Sets and Hashes.' },
                 { title:'Async APIs', href:'/redis/async', text:'The async client, and how to resolve it inside a ServiceStack Service.' },
               ] },
+            { name:'Use-cases', caption:'Tested recipes for common problems',
+              tint:'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300',
+              docs:[
+                { title:'Solving Problems with Redis', href:'/redis/use-cases', text:'Map an application problem to the structure and APIs that solve it.' },
+                { title:'Caching Patterns', href:'/redis/caching-patterns', text:'Cache-aside, stampede protection, tags, generations and two-tier caches.' },
+                { title:'Rate Limiting', href:'/redis/rate-limiting', text:'Fixed window, sliding window and token bucket limits shared by every server.' },
+                { title:'Leaderboards', href:'/redis/leaderboards', text:'Top-N, ranks, neighbours and period boards with Sorted Sets.' },
+                { title:'Queues', href:'/redis/queues', text:'Reliable, delayed and priority queues, and when to use Streams or Redis MQ.' },
+                { title:'Counters & Analytics', href:'/redis/analytics', text:'Atomic counters, time buckets, HyperLogLog and bitmaps.' },
+                { title:'Geospatial', href:'/redis/geo', text:'Nearby search, live tracking and geofencing.' },
+              ] },
             { name:'The APIs', caption:'The interfaces you bind to',
               tint:'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
               docs:[
                 { title:'Redis Client', href:'/redis/client', text:'The full IRedisClient string API surface.' },
                 { title:'Typed Client', href:'/redis/typed-client', text:'redis.As<T>() - every value operation, typed to your POCO.' },
                 { title:'Custom Commands', href:'/redis/custom-commands', text:'Call any Redis command, including ones the client has no API for yet.' },
+                { title:'Streams', href:'/redis/streams', text:'Append-only logs with consumer groups, acknowledgment and recovery.' },
+                { title:'Hash Field Expiration', href:'/redis/hash-field-expiration', text:'A separate lifetime for every field in a hash.' },
+                { title:'IDistributedCache', href:'/redis/distributed-cache', text:'Back HybridCache and other ASP.NET Core caches with Redis.' },
               ] },
             { name:'Atomicity', caption:'Make several operations act as one',
               tint:'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
@@ -154,6 +170,33 @@ const RedisDocMap = {
     }
 }
 
+/** The ServiceStack.Redis video series */
+const RedisVideos = {
+    components: { VideoGallery },
+    template: `<VideoGallery
+        eyebrow="Video series"
+        title="ServiceStack.Redis in Action"
+        description="Walkthroughs of the C# Redis client, from your first connection to production caching and crash-safe work queues."
+        :videos="videos" />`,
+    setup() {
+        const videos = [
+            { id:'bb5ThR6ZV9w', tags:['IDistributedCache', 'HybridCache', 'Caching'],
+              title:'Redis Caching in .NET',
+              caption:'IDistributedCache, HybridCache and Atomic TTLs',
+              summary:'Back ASP.NET Core\'s IDistributedCache and HybridCache with ServiceStack.Redis, and see how sliding and absolute expirations are refreshed atomically on the server.' },
+            { id:'RhNCEMj1gQA', tags:['Streams', 'Consumer Groups', 'Queues'],
+              title:'A Redis Streams Work Queue in C#',
+              caption:'That survives worker crashes',
+              summary:'Build a work queue on Redis Streams consumer groups that acknowledges processed messages and reclaims the pending work of crashed workers.' },
+            { id:'jBdOvTvjyqY', tags:['Getting Started'],
+              title:'Getting Started with Redis in .NET',
+              caption:'Install, connect and store your first values',
+              summary:'Run Redis locally, register a client manager and use the cache, string and typed POCO clients with Redis Lists, Sets and Sorted Sets.' },
+        ]
+        return { videos }
+    }
+}
+
 export default {
-    components: { ClientLayers, InterfacePicker, RedisDocMap }
+    components: { ClientLayers, InterfacePicker, RedisDocMap, RedisVideos }
 }

@@ -4,9 +4,8 @@ title: C#/.NET Client for Redis
 
 [ServiceStack's C# Redis Client](https://github.com/ServiceStack/ServiceStack.Redis) is a simple, high-performance and feature-rich C# Client for Redis with native support and [high-level abstractions](./design-nosql.md) for serializing POCOs and Complex Types supporting both native Sync and Async APIs.
 
-<div class="py-8 max-w-7xl mx-auto">
-    <lite-youtube class="w-full mx-4 my-4" width="560" height="315" videoid="jBdOvTvjyqY" style="background-image: url('https://img.youtube.com/vi/jBdOvTvjyqY/maxresdefault.jpg')"></lite-youtube>
-</div>
+<redis-videos>
+</redis-videos>
 
 There are a number of different APIs available with the `RedisClient` implementing the following interfaces:
 
@@ -47,6 +46,12 @@ With each client providing different layers of abstraction:
 <div class="my-8 flex justify-center">
   <a class="max-w-4xl" href="/img/pages/redis/redis-annotated.png"><img src="/img/pages/redis/redis-annotated.png"></a>
 </div>
+
+## Solve problems with Redis
+
+New to using Redis beyond caching? [Solving Problems with Redis](/redis/use-cases) maps common application
+problems, like rate limiting, leaderboards, background queues, unique-visitor counts and nearby search, to the
+data structures and APIs that solve them, with a tested recipe for each.
 
 <redis-doc-map>
 </redis-doc-map>

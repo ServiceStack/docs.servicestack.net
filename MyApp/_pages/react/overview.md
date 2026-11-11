@@ -86,6 +86,13 @@ We're introducing production-ready React templates, each optimized for different
   name="nextjs" 
   description="A Next.js template with TypeScript and Tailwind CSS, offering server-side rendering and optimized performance with complete ServiceStack integration."></react-template>
 
+All React templates use the [Vite+](https://viteplus.dev) toolchain, with a single `vp` CLI for developing, building,
+linting, formatting, type checking and testing, configured from a single `vite.config.ts`:
+
+:::youtube POVYVwCZRYU
+React, Next.js and Vue on .NET: Unified toolchain with Vite+
+:::
+
 
 ## Comprehensive React Component Library
 

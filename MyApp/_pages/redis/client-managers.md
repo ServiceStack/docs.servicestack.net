@@ -60,7 +60,7 @@ Any additional configuration can be specified as QueryString parameters. The ful
     <tr>
         <td><b>ConnectTimeout</b></td>
         <td>int</td>
-        <td>Timeout in ms for making a TCP Socket connection</td>
+        <td>Timeout in ms for TCP connection; async setup shares this budget across DNS, TCP, TLS and initialization</td>
     </tr>
     <tr>
         <td><b>SendTimeout</b></td>
@@ -97,12 +97,43 @@ As connecting to [Azure Redis Cache](http://azure.microsoft.com/en-us/services/c
 we've added a new
 [Getting connected to Azure Redis via SSL](/ssl-redis-azure) to help you get started.
 
+## IPv6 and Opt-in Redis URI Endpoints
+
+Redis connections now support IPv6 literals and dual-stack DNS hosts. Bracket IPv6 addresses in connection
+strings, e.g. `[::1]:6379`; endpoint formatting and pool failover preserve that form. Hostnames that resolve to
+both IPv4 and IPv6 addresses try IPv4 first, so hosts reachable over IPv4 connect exactly as in earlier versions,
+even when IPv6 is broken on the network.
+
+`rediss://` opts into TLS URI semantics, with escaped ACL credentials and an optional database path:
+
+```csharp
+using var tls = new RedisClient("rediss://user:p%40ss@redis.example:6380/2");
+var endpoint = RedisEndpoint.ParseUri("redis://user:p%40ss@[::1]:6379/2");
+using var redis = new RedisClient(endpoint);
+```
+
+`RedisEndpoint.ParseUri` explicitly selects modern URI semantics for either scheme. Existing `redis://`
+connection strings retain their client-name/password userinfo convention. Default ports are 6379 for `redis`
+and 6380 for `rediss`; explicit ports take precedence. Supported query options include client name, namespace,
+connection/send/receive/retry/idle timeouts and TLS protocols. Unknown or duplicate options and conflicting
+SSL/auth/database query overrides are rejected. URI validation errors do not include credentials.
+
+TLS certificate and hostname validation remain enabled, and clones preserve TLS and ACL configuration.
+See [fully async connection setup](/redis/async#fully-async-connection-setup) for async DNS, connect and TLS behavior.
+
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class.
 
 <manager-picker>
 </manager-picker>
+
+Long-running work, like a blocking Streams consumer, should hold its own client from the pool for its lifetime
+rather than borrowing one per command. This video builds a crash-safe work queue that does exactly that:
+
+:::youtube RhNCEMj1gQA
+Build a Redis Streams Work Queue in C# That Survives Worker Crashes
+:::
 
 ### RedisManagerPool
 
@@ -117,7 +148,59 @@ container.Register<IRedisClientsManager>(c =>
 
 **Pooling Behavior**
 
-Any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
+By default, any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
+
+### Optional Bounded Admission
+
+New in v10.5, `RedisManagerPool` can limit admitted clients independently of the number retained for reuse:
+
+```csharp
+using var pool = new RedisManagerPool("localhost:6379", new RedisPoolConfig {
+    MaxPoolSize = 20,          // Retain up to 20 clients for reuse
+    MaxLiveConnections = 40,  // Admit at most 40 clients, including creation/closing reservations
+    MaxWaitingClients = 100,  // Queue at most 100 acquisitions when saturated
+    PoolTimeout = 2000       // One pool-wait timeout in milliseconds
+});
+
+await using var redis = await ((IRedisClientsManagerAsync)pool).GetClientAsync(token);
+await redis.PingAsync(token);
+```
+
+| Setting | Default | Behavior |
+| --- | --- | --- |
+| `MaxPoolSize` | Existing configured pool size | Maximum retained clients; this alone does not cap overflow |
+| `MaxLiveConnections` | `null` | Unbounded overflow by default; a positive value enables bounded admission |
+| `MaxWaitingClients` | `0` | Fail immediately at the live-client limit; a positive value allows bounded waiting |
+| `PoolTimeout` | `30000` | Total admission wait deadline across notifications; `null` or `-1` allows an indefinite wait |
+
+The waiting settings apply when `MaxLiveConnections` is configured. Settings are copied when constructing the
+manager. Both sync and async acquisitions, including read-only aliases, share the same capacity. Sync callers
+block on their own wait handle while queued, so waking them never needs a free thread-pool thread; async waiters
+accept cancellation tokens. Queued callers are served in arrival order: each returned client or freed slot wakes
+one waiter. A new caller arriving at the moment a client is returned can still take it first.
+
+When the limit is reached with no waiting capacity, acquisition throws `InvalidOperationException` before
+creating another client. A queued caller receives `TimeoutException` when its deadline expires,
+`OperationCanceledException` when its token is cancelled, or `ObjectDisposedException` if the manager is disposed.
+Repeated notifications do not restart the deadline. Default async acquisition also supports cancellable
+connection setup and role verification, whether bounded admission is enabled or disabled.
+
+Overflow clients above the retained pool size are closed on return. Creation reservations and clients still
+closing count toward the cap. During failover, old active leases continue to count until returned and closed;
+new callers cannot bypass the limit by creating replacements for those leases. Connections created against a
+superseded topology are discarded before hand-off. Disposing the manager wakes waiters and closes its clients;
+in-flight async creation observes caller cancellation and checks disposal before hand-off. Custom synchronous
+creation is cleaned up when it returns.
+
+The cap covers clients admitted by this manager, including idle retained clients. It is not a server-wide
+connection limit: resolver discovery probes, custom factory internals and independently created clients are
+outside that accounting. `PoolTimeout` bounds waiting for capacity; a positive `ConnectTimeout` separately
+bounds async setup. Legacy blocking acquisition, Sentinel/custom synchronous resolvers and synchronous hooks
+retain their execution behavior; see [async setup](/redis/async#fully-async-connection-setup).
+
+In bounded mode, `GetStats()` adds `clientsLive`, `clientsCreating`, `clientsWaiting`, `clientsMaxLive` and
+`clientsMaxWaiting`. `clientsLive` counts occupied capacity, including creation/closing reservations, rather
+than only established sockets. Existing retained-pool statistics keep their existing meaning.
 
 ### PooledRedisClientManager
 
@@ -317,3 +400,7 @@ To demonstrate this functionality we've created a new
 [Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in
 the U.S. to find the list of nearest cities within a given radius, Live Demo at: https://redis.netcore.io
 
+
+## Microsoft Distributed Cache
+
+On .NET 10, ServiceStack.Redis includes a built-in [IDistributedCache adapter](/redis/distributed-cache) that exposes a ServiceStack.Redis manager through Microsoft `IDistributedCache`, including absolute/sliding expiration and HybridCache L2 support.

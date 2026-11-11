@@ -38,6 +38,12 @@ using (var trans = redis.CreateTransaction())
 
 ```
 
+::: info
+From v10.5, queued reads of empty strings and byte arrays return the empty value in transactions and pipelines,
+matching non-queued calls. Earlier versions returned `null`. Missing keys still return `null`. Set
+`RedisConfig.PipelineEmptyValuesAsNull = true` to restore the previous behavior.
+:::
+
 ## Other common examples
 The full-source code and other common examples can be found on the
 [common transaction tests page](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/RedisTransactionCommonTests.cs).
