@@ -64011,6 +64011,8 @@ and ServiceStack MVC Controllers or anywhere else via the `HostContext.AppHost.G
 
 ### Redis
 
+For Microsoft `IDistributedCache` consumers on **.NET 10**, the built-in [ServiceStack.Redis adapter](/redis/distributed-cache) provides binary storage, atomic absolute/sliding expiration, DI registration and HybridCache L2 support using ServiceStack.Redis managers. The adapter APIs and Microsoft dependencies are limited to the net10.0 target.
+
 ```csharp
 services.AddSingleton<IRedisClientsManager>(c => 
     new RedisManagerPool("localhost:6379"));
@@ -133506,7 +133508,7 @@ Any additional configuration can be specified as QueryString parameters. The ful
     <tr>
         <td><b>ConnectTimeout</b></td>
         <td>int</td>
-        <td>Timeout in ms for making a TCP Socket connection</td>
+        <td>Timeout in ms for TCP connection; async setup shares this budget across DNS, TCP, TLS and initialization</td>
     </tr>
     <tr>
         <td><b>SendTimeout</b></td>
@@ -133543,12 +133545,43 @@ As connecting to [Azure Redis Cache](http://azure.microsoft.com/en-us/services/c
 we've added a new
 [Getting connected to Azure Redis via SSL](/ssl-redis-azure) to help you get started.
 
+## IPv6 and Opt-in Redis URI Endpoints
+
+Redis connections now support IPv6 literals and dual-stack DNS hosts. Bracket IPv6 addresses in connection
+strings, e.g. `[::1]:6379`; endpoint formatting and pool failover preserve that form. Hostnames that resolve to
+both IPv4 and IPv6 addresses try IPv4 first, so hosts reachable over IPv4 connect exactly as in earlier versions,
+even when IPv6 is broken on the network.
+
+`rediss://` opts into TLS URI semantics, with escaped ACL credentials and an optional database path:
+
+```csharp
+using var tls = new RedisClient("rediss://user:p%40ss@redis.example:6380/2");
+var endpoint = RedisEndpoint.ParseUri("redis://user:p%40ss@[::1]:6379/2");
+using var redis = new RedisClient(endpoint);
+```
+
+`RedisEndpoint.ParseUri` explicitly selects modern URI semantics for either scheme. Existing `redis://`
+connection strings retain their client-name/password userinfo convention. Default ports are 6379 for `redis`
+and 6380 for `rediss`; explicit ports take precedence. Supported query options include client name, namespace,
+connection/send/receive/retry/idle timeouts and TLS protocols. Unknown or duplicate options and conflicting
+SSL/auth/database query overrides are rejected. URI validation errors do not include credentials.
+
+TLS certificate and hostname validation remain enabled, and clones preserve TLS and ACL configuration.
+See [fully async connection setup](/redis/async#fully-async-connection-setup) for async DNS, connect and TLS behavior.
+
 ## Redis Client Managers
 
 The recommended way to access `RedisClient` instances is to use one of the available Thread-Safe Client Managers below. Client Managers are connection factories which should be registered as a Singleton either in your IOC or static class.
 
 <manager-picker>
 </manager-picker>
+
+Long-running work, like a blocking Streams consumer, should hold its own client from the pool for its lifetime
+rather than borrowing one per command. This video builds a crash-safe work queue that does exactly that:
+
+:::youtube RhNCEMj1gQA
+Build a Redis Streams Work Queue in C# That Survives Worker Crashes
+:::
 
 ### RedisManagerPool
 
@@ -133563,7 +133596,59 @@ container.Register<IRedisClientsManager>(c =>
 
 **Pooling Behavior**
 
-Any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
+By default, any connections required after the maximum Pool size has been reached will be created and disposed outside of the Pool. By not being restricted to a maximum pool size, the pooling behavior in `RedisManagerPool` can maintain a smaller connection pool size at the cost of potentially having a higher opened/closed connection count.
+
+### Optional Bounded Admission
+
+New in v10.5, `RedisManagerPool` can limit admitted clients independently of the number retained for reuse:
+
+```csharp
+using var pool = new RedisManagerPool("localhost:6379", new RedisPoolConfig {
+    MaxPoolSize = 20,          // Retain up to 20 clients for reuse
+    MaxLiveConnections = 40,  // Admit at most 40 clients, including creation/closing reservations
+    MaxWaitingClients = 100,  // Queue at most 100 acquisitions when saturated
+    PoolTimeout = 2000       // One pool-wait timeout in milliseconds
+});
+
+await using var redis = await ((IRedisClientsManagerAsync)pool).GetClientAsync(token);
+await redis.PingAsync(token);
+```
+
+| Setting | Default | Behavior |
+| --- | --- | --- |
+| `MaxPoolSize` | Existing configured pool size | Maximum retained clients; this alone does not cap overflow |
+| `MaxLiveConnections` | `null` | Unbounded overflow by default; a positive value enables bounded admission |
+| `MaxWaitingClients` | `0` | Fail immediately at the live-client limit; a positive value allows bounded waiting |
+| `PoolTimeout` | `30000` | Total admission wait deadline across notifications; `null` or `-1` allows an indefinite wait |
+
+The waiting settings apply when `MaxLiveConnections` is configured. Settings are copied when constructing the
+manager. Both sync and async acquisitions, including read-only aliases, share the same capacity. Sync callers
+block on their own wait handle while queued, so waking them never needs a free thread-pool thread; async waiters
+accept cancellation tokens. Queued callers are served in arrival order: each returned client or freed slot wakes
+one waiter. A new caller arriving at the moment a client is returned can still take it first.
+
+When the limit is reached with no waiting capacity, acquisition throws `InvalidOperationException` before
+creating another client. A queued caller receives `TimeoutException` when its deadline expires,
+`OperationCanceledException` when its token is cancelled, or `ObjectDisposedException` if the manager is disposed.
+Repeated notifications do not restart the deadline. Default async acquisition also supports cancellable
+connection setup and role verification, whether bounded admission is enabled or disabled.
+
+Overflow clients above the retained pool size are closed on return. Creation reservations and clients still
+closing count toward the cap. During failover, old active leases continue to count until returned and closed;
+new callers cannot bypass the limit by creating replacements for those leases. Connections created against a
+superseded topology are discarded before hand-off. Disposing the manager wakes waiters and closes its clients;
+in-flight async creation observes caller cancellation and checks disposal before hand-off. Custom synchronous
+creation is cleaned up when it returns.
+
+The cap covers clients admitted by this manager, including idle retained clients. It is not a server-wide
+connection limit: resolver discovery probes, custom factory internals and independently created clients are
+outside that accounting. `PoolTimeout` bounds waiting for capacity; a positive `ConnectTimeout` separately
+bounds async setup. Legacy blocking acquisition, Sentinel/custom synchronous resolvers and synchronous hooks
+retain their execution behavior; see [async setup](/redis/async#fully-async-connection-setup).
+
+In bounded mode, `GetStats()` adds `clientsLive`, `clientsCreating`, `clientsWaiting`, `clientsMaxLive` and
+`clientsMaxWaiting`. `clientsLive` counts occupied capacity, including creation/closing reservations, rather
+than only established sockets. Existing retained-pool statistics keep their existing meaning.
 
 ### PooledRedisClientManager
 
@@ -133762,6 +133847,11 @@ which will let you store Lat/Long coordinates in Redis and query locations withi
 To demonstrate this functionality we've created a new
 [Redis GEO Live Demo](https://github.com/ServiceStackApps/redis-geo) which lets you click on anywhere in
 the U.S. to find the list of nearest cities within a given radius, Live Demo at: https://redis.netcore.io
+
+
+## Microsoft Distributed Cache
+
+On .NET 10, ServiceStack.Redis includes a built-in [IDistributedCache adapter](/redis/distributed-cache) that exposes a ServiceStack.Redis manager through Microsoft `IDistributedCache`, including absolute/sliding expiration and HybridCache L2 support.
 
 
 # Getting Started with Redis Client APIs
@@ -134084,8 +134174,98 @@ public class MyDep(IRedisClientsManagerAsync manager)
 }
 ```
 
+## Fully Async Connection Setup
+
+From v10.5, async commands open cold connections using asynchronous DNS, TCP connect, TLS authentication,
+AUTH (including ACL usernames), SELECT, CLIENT SETNAME and initial INFO discovery. The default RedisResolver
+also verifies master roles asynchronously during manager acquisition. Async database resets on reused
+PooledRedisClientManager leases run outside the pool lock.
+
+```csharp
+using var pool = new RedisManagerPool("localhost:6379?ConnectTimeout=2000");
+await using var redis = await ((IRedisClientsManagerAsync)pool).GetClientAsync(token);
+await redis.PingAsync(token);
+
+// Optional eager setup on a concrete, exclusively used client:
+using var direct = new RedisClient("rediss://redis.example:6380?ConnectTimeout=2000");
+await direct.ConnectAsync(token);
+```
+
+A positive ConnectTimeout supplies one deadline across DNS addresses, TCP, TLS and connection initialization,
+including the compatibility reconnect if INFO is unsupported. Default master resolution includes ROLE verification
+in that budget. When a host resolves to several addresses, sync and async connections try IPv4 addresses
+before IPv6, and give each attempt except the last an equal share of the remaining budget, so an unreachable
+address can't consume all of it. Zero or
+negative values add no connection deadline. Caller cancellation or a shorter command
+SendTimeout can end setup earlier. Timeout throws TimeoutException; caller cancellation throws
+OperationCanceledException and preserves the caller's token. An interrupted connection is closed before reuse.
+PoolTimeout continues to bound capacity waiting separately; command send/receive timeouts retain their roles.
+
+When master verification fails with a role or connection error, async resolution retries with backoff within
+the endpoint's `RetryTimeout`, like the sync path. A `ConnectTimeout` expiry is not retried, since retrying
+would restart the connection deadline. This means async acquisition can fail sooner than sync acquisition
+while a failed master is unreachable.
+Async EOF handling closes the interrupted connection and never opens a synchronous replacement from a response reader.
+
+For asynchronous initialization, RedisClient and all three managers expose ConnectionFilterAsync:
+
+```csharp
+pool.ConnectionFilterAsync = async (client, cancellationToken) => {
+    await client.PingAsync(cancellationToken);
+};
+```
+
+Configure the hook before borrowing clients. It runs once on each connection opened asynchronously, after
+OnConnected and the existing ConnectionFilter, and receives the connection deadline/cancellation token.
+Use that token in asynchronous work. Synchronous connection APIs do not invoke this hook. Existing synchronous
+hooks and client factories retain their execution behavior; user code that blocks cannot be interrupted.
+
+RedisResolver and BasicRedisResolver implement the optional IRedisResolverAsync contract. Custom resolvers
+can implement it to provide nonblocking creation/verification; existing custom resolvers and Sentinel discovery
+keep their synchronous resolution policy. Subclasses overriding RedisResolver.CreateRedisClient also retain
+that synchronous override during async acquisition, including its credential/TLS/routing configuration.
+An explicit CreateRedisClientAsync override supplies the subclass's async implementation instead.
+PooledRedisClientManager.UseGetClientBlocking=true retains legacy
+blocking acquisition. On older target frameworks, cancellation stops awaiting DNS and observes late failures;
+the underlying platform lookup may finish in the background without creating a client socket. TLS certificate
+and hostname validation defaults are unchanged.
+
+## Atomic Key Commands
+
+The v10.5 key-command extensions also support `IRedisClientAsync`, including cancellation tokens:
+
+```csharp
+using var manager = new RedisManagerPool("localhost:6379");
+await using var redis = await ((IRedisClientsManagerAsync)manager).GetClientAsync(token);
+
+string value = await redis.GetAndExpireValueAsync("status", new RedisGetExOptions {
+    ExpiryMilliseconds = 60_000
+}, token);
+string removed = await redis.GetAndDeleteValueAsync("status", token);
+long count = await redis.UnlinkAsync(new[] { "large:key", "another:key" }, token);
+```
+
+Use a writer lease for all three operations. GETEX/GETDEL require Redis 6.2+; UNLINK requires Redis 4.0+.
+The native `IRedisNativeClientAsync` extensions `GetExAsync` and `GetDelAsync` return raw bytes, while the rich
+methods above return UTF-8 strings. Missing keys return `null`. Options, optional capability contracts and
+unsupported-server behavior are described in [atomic key commands](/redis/client#atomic-key-commands).
+
+Cancellation uses the existing async transport behavior. Once a command may have reached the server, cancellation
+does not prove that its mutation was undone. Keep a borrowed client exclusive to one operation flow.
+
 <async-pairs>
 </async-pairs>
+
+## Hash Field Expiration
+
+The [hash-field expiration APIs](/redis/hash-field-expiration) include cancellation-aware async relative/absolute
+expiry, TTL/deadline inspection and persistence methods. Results remain per field; malformed or interrupted
+replies close/reset the connection before reuse. These commands require standalone calls and native server
+support (Redis 7.4+ or compatible Valkey 9+).
+
+## Streams
+
+Sync/async Streams commands, typed JSON entries and explicit consumer-group recovery are available in v10.5. See the [Streams guide](/redis/streams) for usage, server requirements and blocking-connection semantics.
 
 ## Usage in ServiceStack
 
@@ -134110,6 +134290,1326 @@ public class HomeController : ServiceStackController
     }
 }
 ```
+
+
+# Solving Problems with Redis
+Source: https://docs.servicestack.net/redis/use-cases
+
+Redis is more than a cache. Each of its data structures has operations that are atomic, run in memory and are
+shared by every app server, so problems that need coordination, ordering or counting across servers often have a
+short solution in Redis. This page maps common application problems to the structure and ServiceStack.Redis APIs
+that solve them, with a link to a complete recipe for each.
+
+<use-case-map>
+</use-case-map>
+
+## The data structures
+
+Every solution builds on a handful of structures. Choosing one is mostly a matter of how the data is read:
+
+<data-structure-guide>
+</data-structure-guide>
+
+## A taste of each
+
+The snippets below are the core of each recipe; follow the links for complete, tested implementations and their
+trade-offs. They all use a client from a registered `IRedisClientsManager`:
+
+```csharp
+using var redis = redisManager.GetClient();
+```
+
+### Cache a query
+
+```csharp
+var product = cache.GetOrCreate($"product:{id}", TimeSpan.FromMinutes(10),
+    () => db.SingleById<Product>(id));
+```
+
+[Caching Patterns](/redis/caching-patterns) adds stampede protection, tags, generations and a two-tier cache.
+
+### Limit requests across servers
+
+```csharp
+var count = redis.ExecLuaAsInt("""
+    local count = redis.call('INCR', KEYS[1])
+    if count == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end
+    return count
+    """, new[] { $"ratelimit:{userId}" }, new[] { "60000" });
+
+if (count > 100) throw new HttpError(429, "TooManyRequests", "Rate limit exceeded");
+```
+
+[Rate Limiting](/redis/rate-limiting) covers sliding windows, token buckets and a global request filter.
+
+### Rank players
+
+```csharp
+redis.IncrementItemInSortedSet("leaderboard", playerId, points);
+var top10 = redis.GetRangeWithScoresFromSortedSetDesc("leaderboard", 0, 9);
+long myRank = redis.GetItemIndexInSortedSetDesc("leaderboard", playerId);
+```
+
+[Leaderboards](/redis/leaderboards) adds neighbours, percentiles and daily or weekly boards.
+
+### Process work in the background
+
+```csharp
+redis.EnqueueItemOnList("queue:emails", email.ToJson());                         // producer
+var json = redis.BlockingDequeueItemFromList("queue:emails", TimeSpan.FromSeconds(5)); // worker
+```
+
+[Queues](/redis/queues) makes it reliable, adds delayed and priority jobs, and compares Streams, Redis MQ and
+Background Jobs.
+
+### Count unique visitors
+
+```csharp
+redis.AddToHyperLog($"visitors:{date}", visitorId);
+long uniques = redis.CountHyperLog($"visitors:{date}");
+```
+
+[Counters & Analytics](/redis/analytics) covers time buckets, bitmaps and exporting to a database.
+
+### Find what's nearby
+
+```csharp
+redis.AddGeoMember("stores", longitude, latitude, "store:42");
+var nearest = redis.FindGeoResultsInRadius("stores", lng, lat, 10, RedisGeoUnit.Kilometers,
+    count: 5, sortByNearest: true);
+```
+
+[Geospatial](/redis/geo) adds live tracking of moving objects and geofencing.
+
+### Run something on one server at a time
+
+```csharp
+using (redis.AcquireLock("lock:nightly-report", TimeSpan.FromMinutes(5)))
+{
+    GenerateNightlyReport();
+}
+```
+
+[Distributed Locking](/redis/distributed-locking) explains timeouts and lock lifetimes.
+
+### Show who's online
+
+```csharp
+redis.SetEntryInHash("presence:room:42", userId, "online");
+redis.HPExpire("presence:room:42", 30_000, new[] { userId }); // Redis 7.4+
+List<string> online = redis.GetHashKeys("presence:room:42");
+```
+
+[Hash Field Expiration](/redis/hash-field-expiration#presence-with-per-field-expiry) explains per-field lifetimes.
+
+### Notify every server
+
+```csharp
+redis.PublishMessage("cache:invalidate", "product:42");
+```
+
+[Redis Pub/Sub](/redis/pubsub) runs a managed, auto-reconnecting subscriber in the background.
+
+### Process an event log
+
+```csharp
+redis.AddStreamEntry("orders", new OrderPlaced { OrderId = 42 });
+```
+
+[Redis Streams](/redis/streams) covers consumer groups, acknowledgments and recovering stalled messages.
+
+## Production guidance
+
+- **Use one pooled manager.** Register a single `RedisManagerPool` as a singleton, borrow a client per operation
+  and dispose it straight away. See [Client Managers](/redis/client-managers).
+- **Never share a client between threads.** A client is a single connection; concurrent use corrupts its
+  responses. See [Troubleshooting](/redis/troubleshooting).
+- **Make multi-step updates atomic.** Use a [transaction](/redis/transactions) for a fixed set of writes, and a
+  [Lua script](/redis/lua) when a write depends on a value read in the same step.
+- **Expire what you create.** Caches, counters, rate limits and temporary results should all expire, so nothing
+  depends on a cleanup job to bound memory.
+- **Plan for failover.** Use [Redis Sentinel](/redis/sentinel) for high availability, and remember that writes
+  not yet replicated when a master fails can be lost.
+
+
+# Redis Caching Patterns
+Source: https://docs.servicestack.net/redis/caching-patterns
+
+Caching is the most common reason teams add Redis to an app, and the hard parts are not storing a value:
+they are keeping it fresh, stopping a popular key's expiry from flooding your database, and removing related
+entries together. This page covers the patterns that solve those problems, from a one-line cache-aside to a
+two-tier cache shared across app servers.
+
+<cache-pattern-map>
+</cache-pattern-map>
+
+All examples use a `RedisManagerPool` registered as a singleton, with `ICacheClient` resolved from it:
+
+```csharp
+services.AddSingleton<IRedisClientsManager>(c => 
+    new RedisManagerPool("localhost:6379"));
+services.AddSingleton<ICacheClient>(c => 
+    c.GetRequiredService<IRedisClientsManager>().GetCacheClient());
+```
+
+`ICacheClient` serializes POCOs as JSON, and the same calls work against the In-Memory, OrmLite and DynamoDB
+[caching providers](/caching). Drop down to `IRedisClient` when a pattern needs a Redis-specific command.
+
+## Cache-aside
+
+The default pattern: read from the cache, and on a miss, load from the source of truth and populate the cache
+for next time. `GetOrCreate` does this in one call:
+
+```csharp
+public class ProductServices(ICacheClient cache) : Service
+{
+    public object Any(GetProduct request) =>
+        cache.GetOrCreate($"product:{request.Id}", TimeSpan.FromMinutes(10),
+            () => Db.SingleById<Product>(request.Id));
+}
+```
+
+The async version takes a `Func<Task<T>>`:
+
+```csharp
+public async Task<object> Any(GetProduct request) =>
+    await CacheAsync.GetOrCreateAsync($"product:{request.Id}", TimeSpan.FromMinutes(10),
+        () => Db.SingleByIdAsync<Product>(request.Id));
+```
+
+Always give cached entries an expiry. It caps how long stale data can survive a missed invalidation, and it
+keeps memory bounded even when keys are never read again.
+
+::: tip
+`GetOrCreate` treats `default(T)` as a miss, so a `null` result is never cached and every request for a
+missing row reaches the database. If misses are common, cache a sentinel value, e.g. an empty DTO, with a
+short expiry.
+:::
+
+For whole Service responses, the declarative [[CacheResponse] attribute](/cacheresponse-attribute) caches the
+serialized output, including per-user and per-QueryString variations, without writing any caching code.
+
+## Add jitter to expirations
+
+Entries written at the same time with the same TTL also expire at the same time. After a deploy or cache flush,
+that can produce a wave of simultaneous misses. Spread expirations out with a small random offset:
+
+```csharp
+public static TimeSpan WithJitter(TimeSpan expireIn, double maxJitter = 0.1) =>
+    expireIn + TimeSpan.FromMilliseconds(
+        Random.Shared.NextDouble() * expireIn.TotalMilliseconds * maxJitter);
+
+cache.Set($"product:{id}", product, WithJitter(TimeSpan.FromMinutes(10))); // 10-11 minutes
+```
+
+## Stop cache stampedes
+
+When a hot key expires, every request that misses at the same moment recomputes the value, and an expensive
+query that normally runs once can run hundreds of times at once. The fix is to let only one caller rebuild it,
+using an atomic `SET NX` with an expiry as a short-lived lock:
+
+<stampede-comparison>
+</stampede-comparison>
+
+```csharp
+public static T GetOrCreateOnce<T>(this IRedisClient redis, string key, TimeSpan expireIn,
+    Func<T> createFn, TimeSpan? waitFor = null) where T : class
+{
+    var value = redis.Get<T>(key);
+    if (value != null) return value;
+
+    var lockKey = key + ":rebuilding";
+    var waitUntil = DateTime.UtcNow + (waitFor ?? TimeSpan.FromSeconds(5));
+    while (DateTime.UtcNow < waitUntil)
+    {
+        // Only the caller that creates the lock key rebuilds the value
+        if (redis.SetValueIfNotExists(lockKey, "1", TimeSpan.FromSeconds(30)))
+        {
+            try
+            {
+                value = createFn();
+                redis.Set(key, value, expireIn);
+                return value;
+            }
+            finally
+            {
+                redis.RemoveEntry(lockKey);
+            }
+        }
+
+        Thread.Sleep(50); // Everyone else waits for the rebuilt value
+        value = redis.Get<T>(key);
+        if (value != null) return value;
+    }
+    return createFn(); // The rebuild is taking too long, fall back to loading it ourselves
+}
+```
+
+With 20 concurrent callers hitting an expired key, `createFn` runs exactly once and every caller receives the
+rebuilt value:
+
+```csharp
+using var redis = redisManager.GetClient();
+var report = redis.GetOrCreateOnce("report:daily", TimeSpan.FromMinutes(5),
+    () => BuildDailyReport());
+```
+
+Choose a lock expiry comfortably longer than the slowest rebuild. The expiry is what recovers from a process
+that crashes while holding the lock; if it is shorter than the rebuild, a second caller can start rebuilding too.
+
+## Sliding expiration
+
+Session-like data should stay cached while it's in use and expire once it goes idle. On Redis 6.2+,
+`GetAndExpireValue` reads a value and resets its expiry in a single `GETEX` command:
+
+```csharp
+using var redis = redisManager.GetClient();
+string session = redis.GetAndExpireValue($"session:{sessionId}",
+    new RedisGetExOptions { ExpirySeconds = 20 * 60 }); // idle timeout: 20 minutes
+```
+
+Because it's one command, no other client can observe the value between the read and the expiry reset.
+Use `RedisGetExOptions.Persist = true` to remove the expiry instead. See
+[Atomic Key Commands](/redis/client#atomic-key-commands) for all options.
+
+## Invalidate related entries with tags
+
+Entries often need to be invalidated as a group: every cached product in a category, or every response that
+includes a customer's data. Record each key in a Redis Set for each tag it belongs to, in the same transaction
+that stores the value:
+
+```csharp
+public static void SetWithTags<T>(IRedisClient redis, string key, T value, TimeSpan expireIn,
+    params string[] tags)
+{
+    using var trans = redis.CreateTransaction();
+    trans.QueueCommand(r => r.Set(key, value, expireIn));
+    foreach (var tag in tags)
+    {
+        trans.QueueCommand(r => r.AddItemToSet(tag, key));
+        // Let the tag outlive its entries, then expire with them
+        trans.QueueCommand(r => r.ExpireEntryIn(tag, expireIn + TimeSpan.FromMinutes(1)));
+    }
+    trans.Commit();
+}
+
+SetWithTags(redis, "product:10", product10, TimeSpan.FromMinutes(10), "tag:category:tools");
+SetWithTags(redis, "product:11", product11, TimeSpan.FromMinutes(10), "tag:category:tools", "tag:brand:acme");
+```
+
+Invalidating a tag must read its members and delete them without another client adding a key in between.
+A small Lua script does both atomically on the server:
+
+```csharp
+const string InvalidateTagLua = """
+    local keys = redis.call('SMEMBERS', KEYS[1])
+    for i = 1, #keys, 500 do
+        redis.call('UNLINK', unpack(keys, i, math.min(i + 499, #keys)))
+    end
+    redis.call('UNLINK', KEYS[1])
+    return #keys
+    """;
+
+public static long InvalidateTag(IRedisClient redis, string tag) =>
+    redis.ExecLuaAsInt(InvalidateTagLua, new[] { tag }, Array.Empty<string>());
+
+InvalidateTag(redis, "tag:category:tools"); // removes product:10 and product:11
+```
+
+`UNLINK` reclaims memory in a background thread, so a tag with thousands of large entries doesn't block
+the server. The script deletes keys it reads from the Set rather than keys passed in `KEYS`, so it's suited to
+standalone Redis and Sentinel, not Redis Cluster.
+
+## Invalidate a namespace with generations
+
+When a whole class of entries goes stale at once, such as after a catalog import, you don't need to find and
+delete them. Include a generation number in each key, and increment it to switch every reader to new keys:
+
+```csharp
+public static string GenerationKey(IRedisClient redis, string ns, string key) =>
+    $"{ns}:v{redis.GetValue($"{ns}:gen") ?? "0"}:{key}";
+
+var key = GenerationKey(redis, "catalog", $"product:{id}"); // catalog:v0:product:1
+redis.Set(key, product, TimeSpan.FromMinutes(10));
+
+redis.IncrementValue("catalog:gen");                         // readers now use catalog:v1:...
+```
+
+Invalidation is a single `INCR`, regardless of how many entries exist. The orphaned entries are never read
+again and are removed by their expiry, so this pattern requires every entry to have one.
+
+## Delete keys by pattern
+
+To remove keys that share a prefix, `UnlinkByPattern` (v10.5) scans with cursor-based `SCAN` in batches and
+deletes each batch with `UNLINK`, without the server-blocking `KEYS` command:
+
+```csharp
+long removed = redis.UnlinkByPattern("product:*");
+
+// or with IRedisClientAsync
+removed = await redisAsync.UnlinkByPatternAsync("product:*", token: token);
+```
+
+A pattern scan visits every key in the database, so prefer tags or generations for invalidation on hot paths
+and keep pattern deletes for maintenance tasks. See
+[SCAN + UNLINK Pattern Cleanup](/redis/client#scan-unlink-pattern-cleanup) for its guarantees.
+
+## Two-tier cache with Pub/Sub invalidation
+
+Reading from Redis costs a network round trip. For small, very hot values, keep a short-lived copy in each app
+server's memory and use Redis Pub/Sub to tell every server to evict its copy when the value changes:
+
+<two-tier-cache>
+</two-tier-cache>
+
+```csharp
+public sealed class TwoTierCache : IDisposable
+{
+    const string Channel = "cache:invalidate";
+    readonly IRedisClientsManager redisManager;
+    readonly ICacheClient local;
+    readonly RedisPubSubServer subscriber;
+
+    public TwoTierCache(IRedisClientsManager redisManager, ICacheClient local)
+    {
+        this.redisManager = redisManager;
+        this.local = local;
+        // Every app server evicts its in-memory copy when any server invalidates a key
+        subscriber = new RedisPubSubServer(redisManager, Channel) {
+            OnMessage = (channel, key) => local.Remove(key),
+        };
+        subscriber.Start();
+    }
+
+    public T GetOrCreate<T>(string key, TimeSpan expireIn, Func<T> createFn) where T : class
+    {
+        var value = local.Get<T>(key);
+        if (value != null) return value;
+
+        using var redis = redisManager.GetClient();
+        value = redis.Get<T>(key);
+        if (value == null)
+        {
+            value = createFn();
+            redis.Set(key, value, expireIn);
+        }
+        // Keep the local copy short-lived so a missed message can only serve stale data briefly
+        local.Set(key, value, TimeSpan.FromSeconds(30));
+        return value;
+    }
+
+    public void Invalidate(string key)
+    {
+        using var redis = redisManager.GetClient();
+        redis.RemoveEntry(key);
+        redis.PublishMessage(Channel, key);
+    }
+
+    public void Dispose() => subscriber.Dispose();
+}
+```
+
+Register it as a singleton with a `MemoryCacheClient` for the local tier:
+
+```csharp
+services.AddSingleton(c => new TwoTierCache(
+    c.GetRequiredService<IRedisClientsManager>(), new MemoryCacheClient()));
+```
+
+Redis Pub/Sub is fire-and-forget: a server that is disconnected when the message is published never receives
+it. `RedisPubSubServer` reconnects automatically, and the short local expiry bounds how long a missed
+invalidation can serve stale data. Keep the local tier for data where that bound is acceptable.
+
+## Microsoft IDistributedCache and HybridCache
+
+Libraries written against ASP.NET Core's `IDistributedCache`, including `HybridCache` and output caching, can
+store their entries in Redis through ServiceStack.Redis. See [IDistributedCache](/redis/distributed-cache).
+
+## Production checklist
+
+- **Expire everything.** An expiry is the safety net for every missed invalidation.
+- **Configure an eviction policy.** Set `maxmemory` and `maxmemory-policy allkeys-lru` (or `allkeys-lfu`) on
+  servers used only for caching, so Redis evicts old entries instead of rejecting writes when full.
+- **Namespace your keys.** A consistent `{type}:{id}` scheme makes tags, generations and pattern cleanup possible.
+- **Treat the cache as optional.** Catch Redis errors on reads and fall back to the source of truth, so a cache
+  outage slows your app down instead of taking it down.
+- **Watch the hit rate.** `INFO stats` reports `keyspace_hits` and `keyspace_misses`; [Redis Stats](/redis/stats)
+  shows pool and command counters for the client.
+
+
+# Distributed Rate Limiting with Redis
+Source: https://docs.servicestack.net/redis/rate-limiting
+
+ASP.NET Core's [rate limiting middleware](/rate-limiting) keeps its counters in each process's memory, so
+behind a load balancer every app server enforces its own separate limit. Keeping the counters in Redis gives
+every server the same view, so a limit of 100 requests a minute means 100 in total, however many servers
+handle them.
+
+Each algorithm below runs as a Lua script, so the check and the update happen in one atomic step on the server.
+Two concurrent requests can't both read "99" and both be allowed, and a crash between commands can't leave a
+counter without an expiry.
+
+<rate-limit-algorithms>
+</rate-limit-algorithms>
+
+## Fixed window
+
+Count requests in the current window, and set the window's expiry when its first request arrives:
+
+```csharp
+public const string FixedWindowLua = """
+    local count = redis.call('INCR', KEYS[1])
+    if count == 1 then
+        redis.call('PEXPIRE', KEYS[1], ARGV[1])
+    end
+    return count
+    """;
+
+public static bool FixedWindow(IRedisClient redis, string key, int limit, TimeSpan window)
+{
+    var count = redis.ExecLuaAsInt(FixedWindowLua,
+        new[] { key }, new[] { ((long)window.TotalMilliseconds).ToString() });
+    return count <= limit;
+}
+
+if (!FixedWindow(redis, $"ratelimit:{userId}", limit: 100, window: TimeSpan.FromMinutes(1)))
+    throw new HttpError(429, "TooManyRequests", "Rate limit exceeded");
+```
+
+It's the cheapest algorithm, one integer per caller, and the easiest to explain to API consumers. Its
+weakness is the boundary: a caller can send 100 requests at the end of one window and 100 more at the start of
+the next, briefly doubling the limit.
+
+::: info Why not INCR then EXPIRE?
+Sending `IncrementValue` and `ExpireEntryIn` as two commands works until a process dies between them. The key
+is then left without an expiry and the caller stays blocked until someone deletes it. Running both inside the
+script makes them a single atomic operation.
+:::
+
+## Sliding window
+
+Record each request's timestamp in a Sorted Set, remove the ones older than the window, and allow the request
+only if fewer than the limit remain:
+
+```csharp
+public const string SlidingWindowLua = """
+    local t = redis.call('TIME')
+    local now = tonumber(t[1]) * 1000 + math.floor(tonumber(t[2]) / 1000)
+    local window = tonumber(ARGV[1])
+    redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now - window)
+    if redis.call('ZCARD', KEYS[1]) < tonumber(ARGV[2]) then
+        redis.call('ZADD', KEYS[1], now, ARGV[3])
+        redis.call('PEXPIRE', KEYS[1], window)
+        return 1
+    end
+    return 0
+    """;
+
+public static bool SlidingWindow(IRedisClient redis, string key, int limit, TimeSpan window) =>
+    redis.ExecLuaAsInt(SlidingWindowLua, new[] { key }, new[] {
+        ((long)window.TotalMilliseconds).ToString(),
+        limit.ToString(),
+        Guid.NewGuid().ToString("n"), // unique member, so requests in the same ms aren't merged
+    }) == 1;
+```
+
+The limit holds over every window-length period, with no boundary burst. The cost is memory: the set holds one
+entry per allowed request, so a limit of 10,000 an hour stores up to 10,000 entries per caller. Use it for low
+limits that must be exact, like login attempts or password resets.
+
+The script reads the time from Redis with `TIME`, so app servers with skewed clocks still agree on the window.
+
+## Token bucket
+
+Each caller has a bucket that refills at a steady rate up to a maximum capacity, and each request spends a
+token. It permits short bursts up to the capacity while holding the long-run average to the refill rate:
+
+```csharp
+public const string TokenBucketLua = """
+    local capacity = tonumber(ARGV[1])
+    local refillPerSec = tonumber(ARGV[2])
+    local cost = tonumber(ARGV[3])
+    local t = redis.call('TIME')
+    local now = tonumber(t[1]) + tonumber(t[2]) / 1000000
+
+    local bucket = redis.call('HMGET', KEYS[1], 'tokens', 'ts')
+    local tokens = tonumber(bucket[1]) or capacity
+    local ts = tonumber(bucket[2]) or now
+    tokens = math.min(capacity, tokens + (now - ts) * refillPerSec)
+
+    local allowed = 0
+    if tokens >= cost then
+        tokens = tokens - cost
+        allowed = 1
+    end
+    redis.call('HSET', KEYS[1], 'tokens', tostring(tokens), 'ts', tostring(now))
+    redis.call('EXPIRE', KEYS[1], math.ceil(capacity / refillPerSec) + 1)
+    return allowed
+    """;
+
+public static bool TokenBucket(IRedisClient redis, string key, int capacity,
+    double refillPerSecond, int cost = 1) =>
+    redis.ExecCachedLua(TokenBucketLua, sha1 => redis.ExecLuaShaAsInt(sha1, new[] { key }, new[] {
+        capacity.ToString(),
+        refillPerSecond.ToString(CultureInfo.InvariantCulture),
+        cost.ToString(),
+    })) == 1;
+```
+
+A bucket with `capacity: 10, refillPerSecond: 5` allows a burst of 10 requests, then 5 a second after that.
+The bucket is a two-field Hash, so memory stays constant regardless of the limit, and `cost` lets expensive
+operations spend more than one token. The bucket expires once it would have refilled completely, so idle callers
+use no memory.
+
+This example uses [`ExecCachedLua`](/redis/lua#execcachedlua), which runs the script by its SHA1 with
+`EVALSHA` and loads it automatically on first use or after a server restart, instead of sending the script
+body with every request.
+
+## Enforce limits on every API
+
+Register a global request filter to apply a limit to every ServiceStack API. This example limits each
+authenticated user, or each IP address for anonymous callers, to 100 requests a minute per API:
+
+```csharp
+public class ConfigureRateLimiting : IHostingStartup
+{
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureAppHost(appHost => {
+            appHost.GlobalRequestFiltersAsync.Add(async (req, res, requestDto) =>
+            {
+                var redisManager = req.TryResolve<IRedisClientsManagerAsync>();
+                await using var redis = await redisManager.GetClientAsync();
+
+                var session = await req.GetSessionAsync();
+                var caller = session.IsAuthenticated
+                    ? $"user:{session.UserAuthId}"
+                    : $"ip:{req.RemoteIp}";
+                var key = $"ratelimit:{requestDto.GetType().Name}:{caller}";
+
+                var count = await redis.ExecLuaAsIntAsync(RateLimits.FixedWindowLua,
+                    new[] { key }, new[] { "60000" });
+                if (count > 100)
+                {
+                    res.AddHeader("Retry-After", "60");
+                    throw new HttpError(429, "TooManyRequests", "Rate limit exceeded, try again later");
+                }
+            });
+        });
+}
+```
+
+Throwing an `HttpError` returns a structured `429 Too Many Requests` error response that ServiceStack's
+typed clients surface as a `WebServiceException` with `ErrorCode = "TooManyRequests"`.
+
+To apply different limits to different APIs, check for a custom attribute on the Request DTO, or use a
+[Request Filter Attribute](/filter-attributes) on the Services that need it.
+
+## Choosing an algorithm
+
+| | Fixed window | Sliding window | Token bucket |
+| --- | --- | --- | --- |
+| Memory per caller | 1 integer | 1 entry per request in the window | 2 hash fields |
+| Accuracy | Up to 2x the limit at a window boundary | Exact | Exact average, allows bursts up to capacity |
+| Commands in the script | 2 | 4 | 4 |
+| Good for | API quotas, high-volume limits | Logins, password resets, OTP | Public APIs, client SDKs, webhooks |
+
+## Production notes
+
+- **Key on the right identity.** Behind a proxy, `req.RemoteIp` is only the client's address when forwarded
+  headers are configured. Prefer an authenticated user or API key where available.
+- **Decide what happens when Redis is down.** Catching the exception and allowing the request ("fail open")
+  keeps your API available during an outage; rejecting it ("fail closed") is safer for login and payment endpoints.
+- **Return `Retry-After`.** Well-behaved clients wait instead of retrying immediately.
+- **Use one Redis for limits.** Under Sentinel failover, counters that hadn't replicated before the failover are
+  lost, which briefly resets some limits. That's acceptable for rate limiting, but not for billing quotas.
+
+
+# Leaderboards and Rankings with Sorted Sets
+Source: https://docs.servicestack.net/redis/leaderboards
+
+A Sorted Set keeps its members ordered by a numeric score, and Redis maintains that order on every write.
+Ranking, top-N, "your position" and score-range queries are all `O(log N)` lookups rather than a database
+`ORDER BY` over the whole table. That makes Sorted Sets the natural fit for leaderboards, trending lists,
+priority queues and anything else that's read in order.
+
+<sorted-set-leaderboard>
+</sorted-set-leaderboard>
+
+## Record and update scores
+
+`AddItemToSortedSet` sets a member's score, adding the member if it doesn't exist. `IncrementItemInSortedSet`
+adds to the current score atomically and returns the new total, so concurrent updates from different servers
+can't overwrite each other:
+
+```csharp
+const string Board = "leaderboard:global";
+
+using var redis = redisManager.GetClient();
+redis.AddItemToSortedSet(Board, "alice", 1200);
+redis.AddItemToSortedSet(Board, "bob",    950);
+redis.AddItemToSortedSet(Board, "carol", 1100);
+redis.AddItemToSortedSet(Board, "dave",   700);
+redis.AddItemToSortedSet(Board, "erin",  1300);
+
+double bobScore = redis.IncrementItemInSortedSet(Board, "bob", 200); // 1150
+```
+
+Use the player's ID as the member and keep the profile in its own key, e.g. a Hash or a POCO stored with
+the [typed client](/redis/typed-client). Sorted Set members are unique, so a player is never listed twice.
+
+## Top N
+
+`GetRangeWithScoresFromSortedSetDesc` returns members from highest to lowest score, with their scores, by
+0-based rank range:
+
+```csharp
+IDictionary<string, double> top3 = redis.GetRangeWithScoresFromSortedSetDesc(Board, 0, 2);
+// erin: 1300, alice: 1200, bob: 1150
+```
+
+The returned dictionary preserves rank order. Pages are just rank ranges: page `n` of size `20` is
+`GetRangeWithScoresFromSortedSetDesc(Board, n * 20, n * 20 + 19)`. Use `GetRangeFromSortedSetDesc` when you only
+need the members.
+
+## A player's rank and score
+
+```csharp
+long rank = redis.GetItemIndexInSortedSetDesc(Board, "carol"); // 3, i.e. 4th place
+double score = redis.GetItemScoreInSortedSet(Board, "carol");  // 1100
+```
+
+Ranks are 0-based. A member that isn't in the set returns a rank of `-1` and a score of `double.NaN`, so
+check for both before displaying them.
+
+## Players around me
+
+Most players are nowhere near the top, so show them their neighbours instead. Read their rank, then the range
+around it:
+
+```csharp
+public record RankedPlayer(long Rank, string Player, double Score);
+
+public static List<RankedPlayer> AroundPlayer(IRedisClient redis, string board, string player,
+    int neighbours = 2)
+{
+    var rank = redis.GetItemIndexInSortedSetDesc(board, player);
+    if (rank < 0) return new();
+    var from = (int)Math.Max(0, rank - neighbours);
+    var results = redis.GetRangeWithScoresFromSortedSetDesc(board, from, (int)rank + neighbours);
+    return results.Select((x, i) => new RankedPlayer(from + i + 1, x.Key, x.Value)).ToList();
+}
+
+AroundPlayer(redis, Board, "carol", neighbours: 1);
+// 3: bob 1150, 4: carol 1100, 5: dave 700
+```
+
+## Score ranges and percentiles
+
+Score queries answer questions like "how many players have at least 1,000 points" and "what share of players
+does carol beat":
+
+```csharp
+long above1000 = redis.GetSortedSetCount(Board, 1000, double.MaxValue);       // 4
+long total     = redis.GetSortedSetCount(Board);                              // 5
+double beats   = 100.0 * (total - rank - 1) / total;                       // carol: 20%
+
+List<string> gold = redis.GetRangeFromSortedSetByHighestScore(Board, 1200, double.MaxValue);
+```
+
+## Daily, weekly and all-time boards
+
+Keep a board per period and let old ones expire. Record each score in the current day's board as well as
+the all-time board, in one pipeline:
+
+```csharp
+public static void RecordScore(IRedisClient redis, string player, int points)
+{
+    var today = $"leaderboard:{DateTime.UtcNow:yyyy-MM-dd}";
+    using var pipeline = redis.CreatePipeline();
+    pipeline.QueueCommand(r => r.IncrementItemInSortedSet("leaderboard:global", player, points));
+    pipeline.QueueCommand(r => r.IncrementItemInSortedSet(today, player, points));
+    pipeline.QueueCommand(r => r.ExpireEntryIn(today, TimeSpan.FromDays(35)));
+    pipeline.Flush();
+}
+```
+
+Build a weekly board by summing the daily ones. `StoreUnionFromSortedSets` adds the scores of members that
+appear in several sets and stores the result as a new Sorted Set:
+
+```csharp
+var days = Enumerable.Range(0, 7)
+    .Select(i => $"leaderboard:{DateTime.UtcNow.AddDays(-i):yyyy-MM-dd}")
+    .ToArray();
+
+redis.StoreUnionFromSortedSets("leaderboard:week", days);
+redis.ExpireEntryIn("leaderboard:week", TimeSpan.FromMinutes(5));
+
+var weeklyTop10 = redis.GetRangeWithScoresFromSortedSetDesc("leaderboard:week", 0, 9);
+```
+
+The weekly board is a cache: recompute it on a schedule, or when it has expired, rather than on every request.
+Pass `"AGGREGATE", "MAX"` as `args` to `StoreUnionFromSortedSets(intoSetId, setIds, args)` to keep each player's
+best day instead of their total.
+
+## Removing players and trimming
+
+```csharp
+redis.RemoveItemFromSortedSet(Board, "dave");                 // remove one player
+redis.RemoveRangeFromSortedSet(Board, 0, -1001);              // keep only the top 1,000
+redis.RemoveRangeFromSortedSetByScore(Board, 0, 99);          // remove everyone under 100 points
+```
+
+`RemoveRangeFromSortedSet` removes by ascending rank, so `0..-1001` removes everything except the 1,000
+highest scores. Trimming bounds memory on boards that only ever display the top entries.
+
+## Typed leaderboards
+
+The typed client stores POCOs as members, serialized as JSON. It's convenient for small boards that should be
+read with their data in one call:
+
+```csharp
+var typed = redis.As<Player>();
+var board = typed.SortedSets["leaderboard:typed"];
+typed.AddItemToSortedSet(board, new Player { Id = 1, Name = "alice" }, 1200);
+List<Player> top = typed.GetRangeFromSortedSetDesc(board, 0, 9);
+```
+
+Because the whole serialized POCO is the member, changing any of its properties creates a different member.
+For boards whose profiles change, store IDs as members as shown above.
+
+## Async
+
+Every Sorted Set API has an async equivalent on `IRedisClientAsync`:
+
+```csharp
+await using var redis = await redisManager.GetClientAsync(token);
+double score = await redis.IncrementItemInSortedSetAsync(Board, "bob", 200, token);
+var top10 = await redis.GetRangeWithScoresFromSortedSetDescAsync(Board, 0, 9, token);
+long rank = await redis.GetItemIndexInSortedSetDescAsync(Board, "bob", token);
+```
+
+## Beyond games
+
+The same operations solve many other ordering problems:
+
+| Use-case | Member | Score |
+| --- | --- | --- |
+| Trending posts | Post ID | Votes, decayed by age |
+| Recently viewed | Product ID | Unix time of the view |
+| Delayed jobs | Job payload | Unix time it becomes due, see [Queues](/redis/queues#delayed-and-scheduled-jobs) |
+| Sliding-window rate limits | Request ID | Unix time of the request, see [Rate Limiting](/redis/rate-limiting#sliding-window) |
+| Autocomplete | Search term | Popularity, or `0` with lexical range queries, see [Lex Operations](/redis/client-usage#lex-operations) |
+| Geospatial | Location ID | A geohash, see [Geospatial](/redis/geo) |
+
+
+# Queues and Background Work with Redis
+Source: https://docs.servicestack.net/redis/queues
+
+Redis Lists push and pop from either end in constant time, and can block a consumer until an item arrives,
+which makes them a simple, fast work queue shared by every app server. This page builds up from a basic queue
+to reliable, delayed and prioritized queues, and explains when to use Redis Streams or a complete messaging
+solution instead.
+
+<queue-chooser>
+</queue-chooser>
+
+## A simple work queue
+
+Producers add to one end of a List with `EnqueueItemOnList` (`LPUSH`), and consumers take from the other end
+with `BlockingDequeueItemFromList` (`BRPOP`), which waits for an item instead of polling:
+
+```csharp
+const string Queue = "queue:emails";
+
+// Producer
+using var redis = redisManager.GetClient();
+redis.EnqueueItemOnList(Queue, new SendEmail { To = "alice@example.org" }.ToJson());
+```
+
+```csharp
+// Consumer: a dedicated, long-running worker
+using var redis = redisManager.GetClient();
+while (!token.IsCancellationRequested)
+{
+    var json = redis.BlockingDequeueItemFromList(Queue, TimeSpan.FromSeconds(5));
+    if (json == null) continue; // timed out, check for shutdown and wait again
+    await SendEmailAsync(json.FromJson<SendEmail>());
+}
+```
+
+Items are returned in the order they were added. The timeout lets the worker notice shutdown regularly; a
+`null` result means no item arrived in time.
+
+::: warning Dedicate a client to each blocking consumer
+A blocking call holds its client for the whole wait. Give each worker its own client for its lifetime rather
+than borrowing one per iteration, and make sure the client's `ReceiveTimeout` is longer than the blocking
+timeout, so the client doesn't time out a read that the server is still legitimately waiting on.
+:::
+
+This queue removes an item the moment it's taken. If the worker crashes before finishing, the item is lost.
+That's acceptable for work that's safe to drop, like cache warming; otherwise use a reliable queue.
+
+## A reliable queue
+
+`BlockingPopAndPushItemBetweenLists` (`BRPOPLPUSH`) takes the next item and atomically pushes it onto a second,
+per-worker "processing" List. The item is never only in memory: it's either waiting in the queue, or recorded
+as in progress by a named worker until that worker removes it:
+
+<reliable-queue-flow>
+</reliable-queue-flow>
+
+```csharp
+public class ReliableQueue(IRedisClient redis, string queue, string workerId)
+{
+    public string ProcessingList { get; } = $"{queue}:processing:{workerId}";
+
+    public void Enqueue(string job) => redis.EnqueueItemOnList(queue, job);
+
+    // Atomically moves the next job into this worker's processing list
+    public string Take(TimeSpan timeout) =>
+        redis.BlockingPopAndPushItemBetweenLists(queue, ProcessingList, timeout);
+
+    public void Complete(string job) => redis.RemoveItemFromList(ProcessingList, job, 1);
+
+    // On startup, return any jobs a previous run of this worker never completed
+    public int RecoverUnfinished()
+    {
+        var count = 0;
+        while (redis.PopAndPushItemBetweenLists(ProcessingList, queue) != null) count++;
+        return count;
+    }
+}
+```
+
+A worker recovers its own unfinished jobs when it starts, then processes jobs until it's stopped:
+
+```csharp
+using var redis = redisManager.GetClient();
+var worker = new ReliableQueue(redis, "queue:jobs", workerId: Environment.MachineName);
+worker.RecoverUnfinished();
+
+while (!token.IsCancellationRequested)
+{
+    var job = worker.Take(TimeSpan.FromSeconds(5));
+    if (job == null) continue;
+    await ProcessAsync(job);
+    worker.Complete(job);
+}
+```
+
+Use a stable worker ID, like the machine or pod name, so a restarted worker finds its own processing list.
+A job that's recovered may have been partly processed before the crash, so jobs must be safe to run more than
+once: use an ID in the payload to skip work that already completed.
+
+## Delayed and scheduled jobs
+
+A List is ordered by arrival, not by time. To run a job later, add it to a Sorted Set scored by the Unix time
+it becomes due, and move due jobs onto the ready queue with an atomic script:
+
+```csharp
+public class DelayedJobs(IRedisClient redis, string scheduledKey, string readyQueue)
+{
+    public void Schedule(string job, TimeSpan delay) =>
+        redis.AddItemToSortedSet(scheduledKey, job,
+            DateTimeOffset.UtcNow.Add(delay).ToUnixTimeMilliseconds());
+
+    const string PromoteLua = """
+        local t = redis.call('TIME')
+        local now = tonumber(t[1]) * 1000 + math.floor(tonumber(t[2]) / 1000)
+        local due = redis.call('ZRANGEBYSCORE', KEYS[1], '-inf', now, 'LIMIT', 0, tonumber(ARGV[1]))
+        for _, job in ipairs(due) do
+            redis.call('ZREM', KEYS[1], job)
+            redis.call('LPUSH', KEYS[2], job)
+        end
+        return #due
+        """;
+
+    public long PromoteDueJobs(int batchSize = 100) =>
+        redis.ExecLuaAsInt(PromoteLua, new[] { scheduledKey, readyQueue }, new[] { batchSize.ToString() });
+}
+```
+
+```csharp
+var scheduler = new DelayedJobs(redis, "jobs:scheduled", "queue:jobs");
+scheduler.Schedule(new SendReminder { OrderId = 42 }.ToJson(), TimeSpan.FromHours(24));
+
+// In a background loop, e.g. every second
+scheduler.PromoteDueJobs();
+```
+
+Because the script removes each job from the Sorted Set and pushes it onto the queue in one step, several
+servers can run the promoter at the same time without moving a job twice. The existing workers then process
+promoted jobs like any other.
+
+Sorted Set members are unique, so two identical payloads are stored once. Include a unique job ID in each payload
+unless you want that deduplication.
+
+## Priority queues
+
+`BlockingDequeueItemFromLists` waits on several Lists and always takes from the first non-empty one in the
+order given. Put higher-priority queues first:
+
+```csharp
+ItemRef next = redis.BlockingDequeueItemFromLists(
+    new[] { "queue:high", "queue:normal", "queue:low" }, TimeSpan.FromSeconds(5));
+
+if (next != null)
+    Console.WriteLine($"{next.Item} from {next.Id}"); // Id is the List it came from
+```
+
+Strict priority means low-priority jobs wait as long as there's higher-priority work. If they must still
+progress under load, give some workers a different queue order.
+
+## Fan-out and broadcast
+
+A List delivers each item to exactly one consumer. To deliver every message to every subscriber, use:
+
+- [Redis Pub/Sub](/redis/pubsub) for live notifications to connected subscribers, like cache invalidation.
+  Messages aren't stored, so a subscriber that's offline misses them.
+- [Redis Streams](/redis/streams) when each consumer group needs every message durably, can read from a past
+  position, and must recover messages a crashed consumer didn't acknowledge.
+
+## Streams consumer groups
+
+Streams give you, out of the box, much of what the reliable and delayed queue recipes build by hand: per-group
+delivery, explicit acknowledgment, a pending list per consumer, and claiming stale messages from crashed consumers:
+
+```csharp
+// Provision once, e.g. at deployment: creating an existing group fails with BUSYGROUP
+await redis.XGroupCreateAsync("orders", "workers", makeStream: true, token: token);
+
+var entries = await redis.ReadStreamGroupEntriesAsync<OrderEvent>("workers", "worker-1",
+    new[] { new RedisStreamPosition { Stream = "orders", Id = ">" } },
+    count: 100, blockMilliseconds: 1000, token: token);
+
+foreach (var entry in entries)
+{
+    if (!entry.HasValue) continue;
+    await ProcessOrder(entry.Value);
+    await redis.XAckAsync("orders", "workers", new[] { entry.Id }, token);
+}
+```
+
+See [Redis Streams](/redis/streams#consumer-groups-and-recovery) for recovery with `XAutoClaim`.
+
+## When to use a messaging solution
+
+The recipes on this page are building blocks. When you need retries with back-off, dead-letter queues,
+reply messages and monitoring, use one of ServiceStack's complete solutions instead:
+
+- **[Background Jobs](/jobs/)** runs commands and APIs in the background with retries, scheduling, recurring
+  jobs, and a dashboard in the Admin UI. Its state is stored in SQLite, so it works without Redis.
+- **[Redis MQ](/redis-mq)** executes ServiceStack Services from Redis-backed queues, with automatic retries,
+  dead-letter queues and responses published to reply queues.
+
+| | Lists | Streams | Redis MQ | Background Jobs |
+| --- | --- | --- | --- | --- |
+| Delivery | One consumer | Each consumer group | One consumer | One worker |
+| Survives a worker crash | With the reliable queue recipe | Pending entries + claim | Yes | Yes |
+| Retries & dead letters | Build it yourself | Build it yourself | Built in | Built in |
+| Scheduling | Sorted Set recipe | Build it yourself | No | Built in, including recurring |
+| Message history | No | Yes, until trimmed | No | Yes, in the database |
+
+
+# Counters and Real-time Analytics
+Source: https://docs.servicestack.net/redis/analytics
+
+Redis updates counters atomically in memory, so every app server can record page views, API calls and
+active users into the same keys, thousands of times a second, without locks or database writes. This page
+covers exact counters, time-bucketed statistics, and the probabilistic and bit-level structures that count
+millions of unique items in kilobytes.
+
+## Atomic counters
+
+`IncrementValue` and `IncrementValueBy` add to an integer and return the new value. Concurrent increments
+from different servers are never lost:
+
+```csharp
+long views = redis.IncrementValue($"views:post:{postId}");
+long credits = redis.IncrementValueBy($"credits:{userId}", -5);   // decrement with a negative count
+double total = redis.IncrementValueBy("revenue:today", 19.99);    // floating point
+```
+
+Keep several counters for one entity in a Hash, so they're read in one call and stored compactly:
+
+```csharp
+redis.IncrementValueInHash($"stats:post:{postId}", "views", 1);
+redis.IncrementValueInHash($"stats:post:{postId}", "likes", 1);
+
+Dictionary<string, string> stats = redis.GetAllEntriesFromHash($"stats:post:{postId}");
+// { views: "1", likes: "1" }
+```
+
+## Time-bucketed statistics
+
+Put the period in the key, e.g. one Hash per day with a field per page, and give each bucket an expiry so
+history is retained for a fixed time without cleanup jobs. A pipeline sends all the updates in one round trip:
+
+```csharp
+public static void TrackPageView(IRedisClient redis, string path, string visitorId, DateTime day)
+{
+    var date = day.ToString("yyyy-MM-dd");
+    using var pipeline = redis.CreatePipeline();
+    pipeline.QueueCommand(r => r.IncrementValueInHash($"pageviews:{date}", path, 1));
+    pipeline.QueueCommand(r => r.AddToHyperLog($"visitors:{date}", visitorId));
+    pipeline.QueueCommand(r => r.ExpireEntryIn($"pageviews:{date}", TimeSpan.FromDays(90)));
+    pipeline.QueueCommand(r => r.ExpireEntryIn($"visitors:{date}", TimeSpan.FromDays(90)));
+    pipeline.Flush();
+}
+
+TrackPageView(redis, "/pricing", visitorId, DateTime.UtcNow);
+
+var today = redis.GetAllEntriesFromHash($"pageviews:{DateTime.UtcNow:yyyy-MM-dd}");
+// { "/pricing": "3", "/docs": "12", ... }
+```
+
+Choose the bucket size from how the data is read: per-minute buckets for a live dashboard, per-day buckets for
+reports. Reading a range is one `GetAllEntriesFromHash` per bucket, which can itself be pipelined.
+
+## Unique visitors with HyperLogLog
+
+Counting unique items exactly means storing every item. A HyperLogLog estimates the count of unique items in
+a fixed ~12 KB, however many there are, with a standard error of 0.81%:
+
+```csharp
+redis.AddToHyperLog($"visitors:{date}", visitorId);   // PFADD
+long uniques = redis.CountHyperLog($"visitors:{date}"); // PFCOUNT
+```
+
+HyperLogLogs merge without double-counting, so unique visitors over a week are the union of the daily ones,
+not their sum:
+
+```csharp
+public static long UniqueVisitors(IRedisClient redis, DateTime from, DateTime to)
+{
+    var keys = new List<string>();
+    for (var d = from.Date; d <= to.Date; d = d.AddDays(1))
+        keys.Add($"visitors:{d:yyyy-MM-dd}");
+
+    var merged = $"visitors:{from:yyyy-MM-dd}..{to:yyyy-MM-dd}";
+    redis.MergeHyperLogs(merged, keys.ToArray());          // PFMERGE
+    redis.ExpireEntryIn(merged, TimeSpan.FromHours(1));
+    return redis.CountHyperLog(merged);
+}
+```
+
+A visitor seen on Monday and Tuesday is counted once. You can't list or remove the items in a HyperLogLog;
+it only answers "how many".
+
+## Daily active users with bitmaps
+
+When users have sequential integer IDs, a bitmap stores one bit per user: bit `userId` is set when that user
+was active. A million users take 128 KB per day, and the count is exact:
+
+```csharp
+var native = (IRedisNativeClient)redis;
+native.SetBit($"active:{date}", userId, 1);                        // SETBIT
+
+bool wasActive = native.GetBit($"active:{date}", userId) == 1;      // GETBIT
+long dau = long.Parse(redis.Custom("BITCOUNT", $"active:{date}").Text);
+```
+
+Combine days with `BITOP` through `Custom`, e.g. users active on every day of a week (`AND`) or on any day
+(`OR`), then `BITCOUNT` the result:
+
+```csharp
+redis.Custom("BITOP", "AND", "active:week-all",
+    "active:2026-11-09", "active:2026-11-10", "active:2026-11-11");
+long activeEveryDay = long.Parse(redis.Custom("BITCOUNT", "active:week-all").Text);
+```
+
+A bitmap is as large as its highest set bit, so it only suits dense integer IDs: setting bit 2,000,000,000
+allocates 256 MB. Use a HyperLogLog for string or sparse IDs.
+
+## Choosing a structure for unique counts
+
+We measured each structure with `MEMORY USAGE` after adding the same 1,000,000 unique IDs on Redis 8:
+
+<unique-count-memory>
+</unique-count-memory>
+
+| | Set | HyperLogLog | Bitmap |
+| --- | --- | --- | --- |
+| Memory for 1M IDs | 37.3 MB | 14 KB | 128 KB |
+| Count | Exact | ±0.81% (999,674 here) | Exact |
+| "Is X in it?" | Yes, `SetContainsItem` | No | Yes, `GetBit` |
+| List the members | Yes | No | Scan the bits |
+| IDs | Any string | Any string | Dense integers |
+| Combine | `SUNION`, `SINTER`, `SDIFF` | `PFMERGE` (union) | `BITOP AND/OR/XOR/NOT` |
+
+## Trending and top-N
+
+To rank items by activity, increment their score in a Sorted Set and read the highest scores. For example,
+the most-viewed pages today:
+
+```csharp
+redis.IncrementItemInSortedSet($"top-pages:{date}", path, 1);
+var top10 = redis.GetRangeWithScoresFromSortedSetDesc($"top-pages:{date}", 0, 9);
+```
+
+See [Leaderboards](/redis/leaderboards) for ranks, ranges and combining periods.
+
+## Exporting to a database
+
+Redis is ideal for collecting high-frequency counters, but long-term reporting belongs in a database. Run a
+periodic job that reads completed buckets and writes them with [OrmLite](/ormlite/):
+
+```csharp
+var date = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd");
+var views = redis.GetAllEntriesFromHash($"pageviews:{date}");
+var uniques = redis.CountHyperLog($"visitors:{date}");
+
+db.InsertAll(views.Select(x => new PageViewStat {
+    Date = date, Path = x.Key, Views = long.Parse(x.Value),
+}));
+db.Insert(new DailyStat { Date = date, UniqueVisitors = uniques });
+```
+
+Only export buckets for completed periods, so the export never misses late increments to the current one.
+[Background Jobs](/jobs/) can run the export as a recurring job.
+
+## Async
+
+Every API used on this page has an async equivalent on `IRedisClientAsync`:
+
+```csharp
+await using var redis = await redisManager.GetClientAsync(token);
+long views = await redis.IncrementValueAsync($"views:post:{postId}", token);
+await redis.IncrementValueInHashAsync($"stats:post:{postId}", "likes", 1, token);
+await redis.AddToHyperLogAsync($"visitors:{date}", new[] { visitorId }, token);
+long uniques = await redis.CountHyperLogAsync($"visitors:{date}", token);
+```
+
+
+# Geospatial Queries with Redis GEO
+Source: https://docs.servicestack.net/redis/geo
+
+Redis GEO commands store longitude/latitude points and answer "what's near here?" in milliseconds, which covers
+store locators, nearby drivers and couriers, "people near you" and geofencing without a spatial database.
+A GEO set is a Sorted Set whose scores are geohashes, so each member is a unique location ID.
+
+<geo-radius>
+</geo-radius>
+
+## Add locations
+
+`AddGeoMember` adds or moves one member, and `AddGeoMembers` adds several in one command. Arguments are
+**longitude first**, then latitude:
+
+```csharp
+using var redis = redisManager.GetClient();
+redis.AddGeoMembers("stores",
+    new RedisGeo(-122.4194, 37.7749, "store:sf-downtown"),
+    new RedisGeo(-122.2711, 37.8044, "store:oakland"),
+    new RedisGeo(-122.0322, 37.3230, "store:cupertino"),
+    new RedisGeo(-118.2437, 34.0522, "store:los-angeles"));
+```
+
+Store only the ID in the GEO set and keep each location's details, like name, address and opening hours, in its
+own key. Valid longitudes are -180 to 180, and latitudes -85.05 to 85.05.
+
+## Find what's nearby
+
+`FindGeoResultsInRadius` returns members within a radius of a point, with their distance and coordinates.
+Limit the count and sort by distance to get the nearest results:
+
+```csharp
+List<RedisGeoResult> nearby = redis.FindGeoResultsInRadius("stores",
+    longitude: -122.4089, latitude: 37.7837,
+    radius: 25, unit: RedisGeoUnit.Kilometers,
+    count: 5, sortByNearest: true);
+
+foreach (var store in nearby)
+    Console.WriteLine($"{store.Member}: {store.Distance:N1} km");
+// store:sf-downtown: 1.3 km
+// store:oakland: 12.3 km
+```
+
+`RedisGeoUnit` provides `Meters`, `Kilometers`, `Miles` and `Feet`. Use `FindGeoMembersInRadius` when you only need
+the member IDs:
+
+```csharp
+string[] ids = redis.FindGeoMembersInRadius("stores", -122.4089, 37.7837, 25, RedisGeoUnit.Kilometers);
+```
+
+Both also accept an existing member as the center, e.g. stores within 15 km of another store:
+
+```csharp
+string[] closeBy = redis.FindGeoMembersInRadius("stores", "store:sf-downtown", 15, RedisGeoUnit.Kilometers);
+// store:sf-downtown, store:oakland
+```
+
+## Distances and coordinates
+
+```csharp
+double km = redis.CalculateDistanceBetweenGeoMembers("stores",
+    "store:sf-downtown", "store:los-angeles", RedisGeoUnit.Kilometers);   // ~559
+
+List<RedisGeo> coords = redis.GetGeoCoordinates("stores", "store:oakland");
+string[] hashes = redis.GetGeohashes("stores", "store:oakland");          // e.g. for map tiles
+```
+
+Distances are calculated on a sphere, accurate to within 0.5%, which is ample for "nearest store" and
+"distance to driver" but not for surveying.
+
+## Track moving objects
+
+Updating a member's position is the same `AddGeoMember` call: a member is never duplicated, it moves. That
+makes tracking live positions, such as delivery drivers, a single command per location update:
+
+```csharp
+// Each driver's app reports its position every few seconds
+redis.AddGeoMember("drivers:available", lng, lat, $"driver:{driverId}");
+
+// Find the 3 closest available drivers to a pickup
+var closest = redis.FindGeoResultsInRadius("drivers:available", pickupLng, pickupLat,
+    5, RedisGeoUnit.Kilometers, count: 3, sortByNearest: true);
+
+// Remove a driver when they accept a job or go offline
+redis.RemoveItemFromSortedSet("drivers:available", $"driver:{driverId}");
+```
+
+GEO members don't expire individually. To drop drivers whose app stopped reporting, keep their last-seen time
+in a second Sorted Set and periodically remove stale members from both:
+
+```csharp
+var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+redis.AddItemToSortedSet("drivers:last-seen", $"driver:{driverId}", now); // on every update
+
+// Periodically: remove drivers not seen in the last 2 minutes
+var stale = redis.GetRangeFromSortedSetByLowestScore("drivers:last-seen", 0, now - 120);
+if (stale.Count > 0)
+{
+    redis.RemoveItemsFromSortedSet("drivers:available", stale);
+    redis.RemoveItemsFromSortedSet("drivers:last-seen", stale);
+}
+```
+
+## Geofencing
+
+To check whether a point is within range of a location, query a small radius around the point and look for the
+location's ID, or compare the distance directly:
+
+```csharp
+redis.AddGeoMember("geofence:warehouses", -122.39, 37.77, "warehouse:sf");
+redis.AddGeoMember("geofence:warehouses", deliveryLng, deliveryLat, "delivery:42");
+
+var meters = redis.CalculateDistanceBetweenGeoMembers("geofence:warehouses",
+    "warehouse:sf", "delivery:42", RedisGeoUnit.Meters);
+bool arrived = meters < 200;
+```
+
+## Async
+
+```csharp
+await using var redis = await redisManager.GetClientAsync(token);
+await redis.AddGeoMemberAsync("stores", -122.4194, 37.7749, "store:sf-downtown", token);
+var nearby = await redis.FindGeoResultsInRadiusAsync("stores", -122.4089, 37.7837,
+    25, RedisGeoUnit.Kilometers, count: 5, sortByNearest: true, token: token);
+```
+
+For a complete example app, see [Redis GEO](https://github.com/ServiceStackApps/redis-geo), which finds US
+cities near any point on an interactive map.
 
 
 # Redis Custom Commands
@@ -134278,6 +135778,544 @@ var redisPubSub = new RedisPubSubServer(clientsManager, "channel-1", "channel-2"
 
 Calling `Start()` after it's initialized will get it to start listening and processing any messages
 published to the subscribed channels.
+## Publishing messages
+
+Any client can publish to a channel; `PublishMessage` returns the number of subscribers that received it:
+
+```csharp
+using var redis = redisManager.GetClient();
+long receivers = redis.PublishMessage("notifications", "Deploy started");
+
+// Publish typed messages as JSON
+redis.PublishMessage("orders:created", new OrderCreated { OrderId = 42 }.ToJson());
+```
+
+Deserialize them in the handler with `msg.FromJson<OrderCreated>()`.
+
+## Subscribe to channel patterns
+
+`ChannelsMatching` subscribes to every channel matching a glob-style pattern, using `PSUBSCRIBE`. The handler
+receives the concrete channel name, so one subscriber can route several related channels:
+
+```csharp
+var pubSub = new RedisPubSubServer(redisManager) {
+    ChannelsMatching = new[] { "orders:*" },
+    OnMessage = (channel, msg) => {
+        switch (channel)
+        {
+            case "orders:created": OnCreated(msg.FromJson<OrderCreated>()); break;
+            case "orders:shipped": OnShipped(msg.FromJson<OrderShipped>()); break;
+        }
+    },
+}.Start();
+```
+
+## Run it for the lifetime of your App
+
+Start the subscriber when your App starts and dispose it on shutdown by wrapping it in a hosted service:
+
+```csharp
+public class NotificationsSubscriber(IRedisClientsManager redisManager, ILogger<NotificationsSubscriber> log)
+    : IHostedService, IDisposable
+{
+    RedisPubSubServer? pubSub;
+
+    public Task StartAsync(CancellationToken token)
+    {
+        pubSub = new RedisPubSubServer(redisManager, "notifications") {
+            OnMessage = (channel, msg) => log.LogInformation("{Channel}: {Message}", channel, msg),
+            OnError = ex => log.LogError(ex, "Redis Pub/Sub error"),
+        };
+        pubSub.Start();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken token)
+    {
+        pubSub?.Stop();
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => pubSub?.Dispose();
+}
+
+services.AddHostedService<NotificationsSubscriber>();
+```
+
+`OnMessage` runs on the subscriber's background thread, one message at a time. Keep handlers fast, and hand
+slow work to a queue or [Background Jobs](/jobs/) so later messages aren't delayed.
+
+## Use-cases
+
+- **Cache invalidation across servers.** Evict each server's in-memory copy of a changed value; see the
+  [two-tier cache recipe](/redis/caching-patterns#two-tier-cache-with-pubsub-invalidation).
+- **Configuration reloads.** Publish to a `config:reload` channel after changing settings, so every server
+  reloads them without a restart.
+- **Live updates to browsers.** [Redis Server Events](/redis-server-events) uses Pub/Sub to deliver
+  Server-Sent Events to browsers connected to any app server.
+- **Coordinating workers.** Tell background workers to pause, resume or shut down.
+
+## Delivery guarantees
+
+Pub/Sub delivers each message to the subscribers connected at the moment it's published, and stores nothing.
+A subscriber that's disconnected, restarting or failing over misses those messages, and `RedisPubSubServer`
+reconnects without replaying them. Design handlers so a missed message only means a short delay, e.g. a local
+cache entry that also expires, or use [Redis Streams](/redis/streams) when every message must be processed.
+
+
+# Redis Streams
+Source: https://docs.servicestack.net/redis/streams
+
+ServiceStack.Redis v10.5 adds sync and async Streams APIs with binary-safe field pairs, lossless
+string IDs, explicit consumer-group acknowledgments and pending-message recovery.
+
+:::youtube RhNCEMj1gQA
+Build a Redis Streams Work Queue in C# That Survives Worker Crashes
+:::
+
+## Native and Rich APIs
+
+The native byte-oriented commands are available on `RedisNativeClient` and `RedisClient`, and through extensions
+on existing `IRedisNativeClient` / `IRedisClient` references. Async counterparts accept `CancellationToken` on
+`IRedisNativeClientAsync` / `IRedisClientAsync`. Implementations opt in through the additive
+`IRedisStreamCommands` / `IRedisStreamCommandsAsync` contracts; existing interfaces gain no required members.
+Third-party providers without that capability receive `NotSupportedException` before a command is sent.
+
+| APIs | Purpose |
+| --- | --- |
+| `XAdd`, `XRange`, `XLen` | Append entries, read ranges (including `reverse: true`) and inspect length |
+| `XRead` | Read one or more streams from explicit positions, optionally blocking |
+| `XTrim`, `XDel` | Trim using MAXLEN or delete explicit IDs |
+| `XGroupCreate`, `XGroupDestroy` | Provision or remove a consumer group |
+| `XReadGroup`, `XAck` | Read new/pending messages and acknowledge explicitly |
+| `XPending`, `XPendingEntries` | Inspect pending totals, consumers, idle time and delivery counts |
+| `XClaim`, `XAutoClaim` | Transfer pending ownership or scan/reclaim with a continuation cursor |
+
+Core commands require Redis 5+; `XAutoClaim` requires Redis 6.2+. Tested on Redis
+6.2.24, Redis 8.10.1 and Valkey 8.1.11. Newer optional server flags are not automatically exposed. Unsupported
+commands, ACL denials and errors such as BUSYGROUP/NOGROUP propagate without Lua or multi-command emulation.
+
+```csharp
+using var manager = new RedisManagerPool("localhost:6379");
+using var redis = manager.GetClient(); // Writer lease
+
+string id = redis.XAdd("events", new[] {
+    new RedisStreamField {
+        Name = "message".ToUtf8Bytes(),
+        Value = "Order received".ToUtf8Bytes()
+    }
+});
+RedisStreamEntry[] entries = redis.XRange("events", count: 100);
+```
+
+Field names and values are raw `byte[]`; duplicate field names, empty values and arbitrary binary data are
+preserved. Stream IDs remain strings; do not convert them to floating-point values or DateTime. `XRange`
+accepts logical lower/upper bounds even when `reverse: true`. MAXLEN can be exact or approximate; approximate
+trimming does not promise a strict length cap.
+
+## Typed JSON Entries
+
+The typed facade stores one ServiceStack.Text JSON payload in a field named `json`. It does not change existing
+cache/entity storage or maintain typed entity index sets. Use application-owned payload versions when evolving
+schemas. Readers retain all raw fields, including fields they do not recognize.
+
+```csharp
+await using var redis = await ((IRedisClientsManagerAsync)manager).GetClientAsync(token);
+string id = await redis.AddStreamEntryAsync("orders", new OrderEvent { OrderId = 1 }, token:token);
+
+RedisTypedStreamEntry<OrderEvent>[] entries = await redis.ReadStreamEntriesAsync<OrderEvent>(
+    new[] { new RedisStreamPosition { Stream = "orders", Id = "0-0" } },
+    count: 100, token: token);
+
+public class OrderEvent {
+    public int OrderId { get; set; }
+}
+```
+
+`HasValue` distinguishes an explicit JSON `null` from an absent JSON field. Deleted pending payloads have
+`Fields == null`; an empty field value is different. Malformed JSON or duplicate `json` fields produce a
+parsing error, and are not acknowledged automatically. Raw commands remain available for other encodings.
+
+## Pipelines and Bulk Append
+
+`XAdd`, `XAck`, `XDel`, `XTrim` and `XLen`, including async counterparts, support existing pipelines. Results
+reach their string/integer callbacks when the pipeline is flushed. The typed `AddStreamEntry` helpers inherit
+the XADD support. Open an async connection before queueing, since queue delegates must only buffer commands:
+
+```csharp
+await redis.PingAsync(token);
+await using (var pipeline = redis.CreatePipeline()) {
+    pipeline.QueueCommand(r => r.AddStreamEntryAsync("orders", new OrderEvent { OrderId = 1 }),
+        id => Console.WriteLine($"Added {id}"));
+    pipeline.QueueCommand(r => r.XLenAsync("orders"),
+        length => Console.WriteLine($"Length: {length}"));
+    await pipeline.FlushAsync(token);
+}
+```
+
+Structured reads, group creation/destruction, pending/claim operations and blocking reads still require
+standalone calls. Streams transactions remain unsupported. `XAck` and `XDel` already accept multiple IDs in a
+single command. Pipelines batch independent operations; an acknowledgment should follow successful application
+processing rather than merely queueing a read and acknowledgment together.
+
+For bulk writes, `AddStreamEntries` and `AddStreamEntriesAsync` on `IRedisClient` / `IRedisClientAsync` accept
+either binary field arrays or typed values using the same `json` convention as `AddStreamEntry`:
+
+```csharp
+var events = Enumerable.Range(1, 1000).Select(i => new OrderEvent { OrderId = i });
+string[] ids = await redis.AddStreamEntriesAsync("orders", events,
+    batchSize: 100, maxLength: 10_000, token: token);
+```
+
+The binary overload accepts `IEnumerable<RedisStreamField[]>`. Both forms generate IDs with `XADD *`, return
+confirmed IDs in input order on success, and optionally apply exact/approximate MAXLEN to each append. Keep
+field buffers stable while the operation runs. `batchSize` defaults to 100 and must be positive; it caps XADD
+commands in each pipeline, not payload bytes or the size of the final ID array. Enumeration and serialization
+are incremental, and every field set in a batch is validated before that batch is sent. Empty input opens no
+connection. These helpers require a concrete ServiceStack RedisClient writer lease and reject nesting inside
+another pipeline or transaction. They open the connection before queueing and do not borrow extra clients.
+
+Bulk append is not atomic. A server error stops after the failed batch; other commands in that already-sent
+batch may succeed, and completed earlier batches remain. Transport failures or cancellation close uncertain
+connections and do not replay the batch. No partial ID array is returned on failure. Retrying generated-ID
+appends, or explicitly replaying a pipeline, can create duplicates; include an application event ID when you
+need deduplication. Caller cancellation is checked during enumeration, between batches and during async
+flush; use a cancellation deadline when bounding the entire operation. Async flushing also honors the client's
+SendTimeout for sending a batch and ReceiveTimeout separately for each queued reply; configured I/O timeout
+throws TimeoutException and closes the connection. Caller cancellation retains its original token.
+This is not an exactly-once API.
+
+## Consumer Groups and Recovery
+
+<consumer-group-flow>
+</consumer-group-flow>
+
+Provision groups explicitly, e.g. `XGroupCreate("orders", "workers", makeStream: true)` to start at `0-0`, or
+use `id: "$"` to start after current entries. Recreating a group produces BUSYGROUP rather than resetting its
+position. Consumer names identify logical workers, not a connection lifetime.
+
+```csharp
+// Use a dedicated, exclusively leased client for blocking reads.
+var entries = await redis.ReadStreamGroupEntriesAsync<OrderEvent>("workers", "worker-1",
+    new[] { new RedisStreamPosition { Stream = "orders", Id = ">" } },
+    count: 100, blockMilliseconds: 1000, token: token);
+
+foreach (var entry in entries) {
+    if (!entry.HasValue) continue; // Apply your own policy for missing/deleted/unknown payloads
+    await ProcessOrder(entry.Value);
+    await redis.XAckAsync("orders", "workers", new[] { entry.Id }, token);
+}
+```
+
+`>` selects new messages for a group; an explicit ID reads that consumer's pending history. Processing and
+acknowledgment are separate. If a worker stops after a side effect but before acknowledgment, its message can
+be delivered again. Handlers need application deduplication/idempotency; this API does not promise exactly-once
+processing. Native `XReadGroup` also exposes an explicit `noAck` option; typed group reads keep acknowledgment
+explicit by default.
+
+To recover stale pending messages, call `XAutoClaim("orders", "workers", "worker-2", minIdleMilliseconds: 60000,
+start: "0-0", count: 100)` and continue with `NextStartId` until it returns `0-0`. Claiming does not acknowledge.
+Use the returned entry IDs with `XAck` only after successful handling. `XPendingEntries` exposes idle times and
+delivery counts for application-owned retry/dead-letter policies.
+
+Redis 7+ reports deleted pending IDs in `RedisStreamAutoClaimResult.DeletedIds`. Redis 6.2 has an older reply
+shape and can return a nil claim entry without identifying its ID; this is represented by an entry with
+`Id == null` and `Fields == null`. No ID is invented and no extra mutation is sent to compensate.
+
+## Connection and Failure Semantics
+
+Use writer leases for consumer-group operations and dedicate a lease to each blocking reader. Clients remain
+stateful and exclusive; do not run parallel commands on the same borrowed client. Omitted `blockMilliseconds`
+is nonblocking; `0` blocks indefinitely. Configure receive timeouts to allow the requested blocking period, and
+use cancellation tokens for shutdown.
+
+Cancellation of a server-blocked async read closes uncertain protocol state before the client can be reused.
+The new Streams APIs surface caller cancellation as `OperationCanceledException`. Cancellation does not prove
+that a message was never delivered or that a mutation was undone. Existing transport retries still apply;
+application idempotency remains necessary for uncertain outcomes.
+
+The five primitive commands listed above support pipelines; other Streams methods reject batching before
+sending commands. Streams transactions remain unsupported; raw command APIs retain their existing behavior. Streams retention is not a durability guarantee: persistence and replication
+configuration still determine recovery after server failure. This feature adds no background consumer loop,
+automatic retry/acknowledgment, MQ adapter, Redis Cluster routing or change to existing Redis MQ/Pub/Sub keys.
+
+
+# Hash Field Expiration
+Source: https://docs.servicestack.net/redis/hash-field-expiration
+
+ServiceStack.Redis v10.5 adds native expiration for individual hash fields on Redis 7.4+ and compatible servers
+(Valkey 9+). Related values can stay in a hash while each field has its own lifetime. These APIs use server
+commands directly, with no Lua or alternate-key emulation.
+
+:::youtube bb5ThR6ZV9w
+Redis Caching in .NET: IDistributedCache, HybridCache and Atomic TTLs
+:::
+
+<field-expiry-comparison>
+</field-expiry-comparison>
+
+## Expire Hash Fields
+
+Borrow an exclusive writer lease for expiry changes and persistence operations:
+
+```csharp
+using var pool = new RedisManagerPool("localhost:6379");
+await using var redis = await ((IRedisClientsManagerAsync)pool).GetClientAsync(token);
+
+await redis.SetEntryInHashAsync("users:42", "presence", "online", token);
+long[] results = await redis.HPExpireAsync("users:42", 30_000,
+    new[] { "presence", "missing" }, RedisHashExpiryCondition.NX, token);
+// [1, -2]: expiry set for presence; missing field was not created
+
+long[] ttl = await redis.HPTtlAsync("users:42", new[] { "presence" }, token);
+long[] persisted = await redis.HPersistAsync("users:42", new[] { "presence" }, token);
+```
+
+| Command / async counterpart | Numeric units and purpose |
+| --- | --- |
+| `HExpire` / `HExpireAsync` | Relative seconds |
+| `HPExpire` / `HPExpireAsync` | Relative milliseconds |
+| `HExpireAt` / `HExpireAtAsync` | Absolute Unix seconds |
+| `HPExpireAt` / `HPExpireAtAsync` | Absolute Unix milliseconds |
+| `HTtl` / `HTtlAsync` | Remaining seconds per field |
+| `HPTtl` / `HPTtlAsync` | Remaining milliseconds per field |
+| `HExpireTime` / `HExpireTimeAsync` | Expiration as Unix seconds |
+| `HPExpireTime` / `HPExpireTimeAsync` | Expiration as Unix milliseconds |
+| `HPersist` / `HPersistAsync` | Remove independent field expiration |
+
+Native absolute arguments are Unix timestamps, not local dates. Convert DateTimeOffset values with
+ToUnixTimeSeconds/ToUnixTimeMilliseconds. Expiration arguments must be nonnegative: zero relative expiration
+or a past absolute deadline deletes an existing field when the condition permits. Server-specific numeric
+limits are still enforced by the server.
+
+## Conditions and Per-Field Results
+
+The four expiry setters accept one RedisHashExpiryCondition:
+
+- `None`: set/update expiration unconditionally.
+- `NX`: only when the field has no independent expiration.
+- `XX`: only when it already has an expiration.
+- `GT`: only when the new deadline is greater than its current deadline.
+- `LT`: only when the new deadline is less than its current deadline.
+
+For GT/LT, a field without expiration has an infinite lifetime. Conditions cannot be combined; invalid or
+combined enum values are rejected locally. Each field is evaluated independently.
+
+Every API returns a `long[]` in requested order, including duplicate field occurrences:
+
+| Operation | Result per field |
+| --- | --- |
+| Set expiration | `-2` missing hash/field; `0` condition rejected; `1` expiration set; `2` field deleted immediately |
+| TTL / expiration-time query | `-2` missing hash/field; `-1` no independent field expiration; otherwise the time in the command's units |
+| Remove expiration | `-2` missing hash/field; `-1` already has no expiration; `1` expiration removed |
+
+An expiring parent key still bounds the lifetime of every field. Setting/removing a field TTL does not reset
+the parent key's deadline. Redis can remove a hash when its last field disappears. Replacing a field with HSET
+clears that field's expiration; incrementing its numeric value retains it. HSET followed by an expiry command
+is two separate operations; this increment does not add atomic value-write-and-expire semantics. Existing typed POCO and private
+IDistributedCache hash formats are unchanged; use these APIs on application-owned hashes deliberately.
+
+## Use-cases
+
+### Presence with per-field expiry
+
+To show who's online in a room, store each member as a field and refresh its expiry on every heartbeat.
+Members whose client stops sending heartbeats disappear on their own, while the room's other members stay:
+
+```csharp
+public class Presence(IRedisClient redis)
+{
+    // Each member is its own field, with its own lifetime (Redis 7.4+ / Valkey 9+)
+    public void Heartbeat(string room, string userId, TimeSpan ttl)
+    {
+        redis.SetEntryInHash(room, userId, DateTime.UtcNow.ToString("O"));
+        redis.HPExpire(room, (long)ttl.TotalMilliseconds, new[] { userId });
+    }
+
+    public List<string> Online(string room) => redis.GetHashKeys(room);
+}
+
+var presence = new Presence(redis);
+presence.Heartbeat("presence:room:42", "alice", TimeSpan.FromSeconds(30));
+presence.Heartbeat("presence:room:42", "bob", TimeSpan.FromSeconds(30));
+List<string> online = presence.Online("presence:room:42"); // alice, bob - until a heartbeat is missed
+```
+
+`SetEntryInHash` replaces the field, which clears its previous expiry, so the expiry is always set again
+straight after it. Before Redis 7.4 this needed a Sorted Set of last-seen times and a cleanup job; see the
+[driver tracking example](/redis/geo#track-moving-objects) for that approach.
+
+### Temporary grants
+
+Absolute expiry fits access that ends at a known time, such as a trial feature or a support engineer's
+temporary access. Store grants for one user in one hash and each grant ends independently:
+
+```csharp
+var grants = $"grants:user:{userId}";
+redis.SetEntryInHash(grants, "export-reports", "trial");
+redis.HExpireAt(grants, DateTimeOffset.UtcNow.AddDays(14).ToUnixTimeSeconds(), new[] { "export-reports" });
+
+bool canExport = redis.HashContainsEntry(grants, "export-reports");
+long[] secondsLeft = redis.HTtl(grants, new[] { "export-reports" });
+```
+
+Use `RedisHashExpiryCondition.GT` when extending a grant, so a shorter extension can never cut an existing
+grant short:
+
+```csharp
+redis.HExpireAt(grants, newEnd.ToUnixTimeSeconds(), new[] { "export-reports" }, RedisHashExpiryCondition.GT);
+```
+
+## Binary Data and Compatibility
+
+String extensions are available on IRedisClient/IRedisClientAsync. Native overloads accept raw `byte[]` hash
+keys and `byte[][]` field names; IRedisNativeClient/Async extensions also accept a string hash key with binary
+field names. Arbitrary bytes, Unicode, empty names and empty values retain their existing storage format.
+Empty field lists and null keys/fields are rejected locally.
+
+RedisNativeClient/RedisClient implement optional IRedisHashExpiryCommands/IRedisHashExpiryCommandsAsync
+capabilities. Existing client interfaces gain no required members. Third-party implementations can opt in;
+otherwise the extensions throw NotSupportedException. No new package dependencies are introduced, and this
+command family is available across the client's supported target frameworks.
+
+These methods require standalone calls. Pipelines and transactions are rejected before sending hash-expiry
+commands; deferred integer-array callback support is outside this increment. Mutations require writers;
+TTL/time queries may use read-only leases with ordinary replica-staleness semantics.
+
+Unsupported-command, wrong-type and ACL errors propagate without fallback. Caller cancellation closes an
+interrupted reply and preserves the caller token. Malformed/truncated arrays close the connection and reset
+buffered commands before reuse; they are not replayed as a parser fallback. Ordinary transport retry behavior
+and uncertain-write outcomes still apply. HGETEX/HSETEX are not part of this increment.
+
+Behavior was validated on Redis 7.4.12, Redis 8.10.1 and Valkey 9.1.3. Redis 6.2.24 and Valkey 8.1.11 were
+tested for unsupported-command behavior without emulation. See the server references for individual command
+semantics: [Redis HEXPIRE](https://redis.io/docs/latest/commands/hexpire/),
+[HPTTL](https://redis.io/docs/latest/commands/hpttl/), [HPERSIST](https://redis.io/docs/latest/commands/hpersist/)
+and [Valkey HEXPIRE](https://valkey.io/commands/hexpire/).
+
+
+# Microsoft IDistributedCache
+Source: https://docs.servicestack.net/redis/distributed-cache
+
+**ServiceStack.Redis** includes Microsoft `IDistributedCache` integration for **.NET 10**. It uses existing
+Redis client managers, stores payloads as raw bytes and supports absolute and sliding expiration with atomic
+expiry refresh. No additional ServiceStack package is needed: the adapter and its Microsoft caching/DI package
+references are only included in the `net10.0` build, so the `net472`, `net6.0` and `net8.0` targets don't expose
+these APIs or take on these dependencies.
+
+:::youtube bb5ThR6ZV9w
+Redis Caching in .NET: IDistributedCache, HybridCache and Atomic TTLs
+:::
+
+## Registration
+
+```csharp
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceStack.Redis;
+
+builder.Services.AddServiceStackRedisCache("localhost:6379", options => {
+    options.KeyPrefix = "myapp:distributed-cache:v1:";
+});
+```
+
+This creates one lazy `RedisManagerPool`, owned and disposed by the cache registration. The cache is registered
+as a singleton. An existing `IDistributedCache` registration is preserved; repeated calls do not replace it.
+
+To share a manager already registered in DI:
+
+```csharp
+builder.Services.AddSingleton<IRedisClientsManager>(_ => new RedisManagerPool("localhost:6379"));
+builder.Services.AddServiceStackRedisCache(options => {
+    options.KeyPrefix = "myapp:distributed-cache:v1:";
+});
+```
+
+The existing manager keeps its existing owner. A manager created by a DI singleton factory is disposed by DI;
+an externally supplied instance remains externally owned. The cache adapter does not independently dispose
+shared managers.
+
+For dedicated manager configuration, the factory overload transfers ownership of a **new** manager to the cache:
+
+```csharp
+builder.Services.AddServiceStackRedisCache(_ => new RedisManagerPool("localhost:6379", new RedisPoolConfig {
+    MaxPoolSize = 10,
+    MaxLiveConnections = 20,
+    MaxWaitingClients = 100,
+    PoolTimeout = 2000
+}), options => options.KeyPrefix = "myapp:distributed-cache:v1:");
+```
+
+Options are copied at registration/construction. Direct construction is also supported with
+`new RedisDistributedCache(manager, options)`; direct instances leave the manager externally owned unless
+`ownsManager: true` is explicitly supplied. The manager must implement both `IRedisClientsManager` and
+`IRedisClientsManagerAsync`, and leased clients must provide the corresponding native client APIs.
+
+## Binary Data and Expiration
+
+Inject `IDistributedCache` and use its standard operations or Microsoft string extensions:
+
+```csharp
+await cache.SetStringAsync("status", "ready", new DistributedCacheEntryOptions {
+    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+    SlidingExpiration = TimeSpan.FromMinutes(2)
+}, token);
+
+string status = await cache.GetStringAsync("status", token);
+await cache.RefreshAsync("status", token);
+await cache.RemoveAsync("status", token);
+```
+
+<sliding-expiry-timeline>
+</sliding-expiry-timeline>
+
+- `Get` / `GetAsync` returns `null` for a miss and preserves stored zero-length arrays.
+- `Set` / `SetAsync` accepts raw `byte[]`; the adapter adds no JSON payload envelope.
+- Absolute expiration can use a `DateTimeOffset` or an interval relative to Set. If both absolute options are
+  supplied, the relative interval takes precedence. Past absolute deadlines are rejected before acquisition.
+- Get and explicit Refresh extend sliding expiry while respecting the stored absolute deadline. Refreshing a
+  missing or expired entry does not recreate it.
+- Set replaces all expiry metadata and clears an old TTL when the new entry has no expiration.
+- Expiration has millisecond precision, rounded up for positive sub-millisecond durations. Absolute deadlines
+  are computed from client UTC at Set; Redis TIME enforces the stored deadline during atomic operations.
+
+Set, Get/refresh and explicit Refresh execute as atomic Lua operations on one hash key. A concurrent refresh
+cannot apply old metadata to a replacement value. An entry whose absolute deadline passes while waiting for a
+lease is removed when Set reaches Redis. Even reads borrow **writer** leases because expiry refresh can mutate
+state. The adapter does not expose transaction/pipeline batching.
+
+Async calls pass cancellation tokens through pool acquisition and commands, including default async connection
+setup. Legacy/custom synchronous resolution retains its existing timeout behavior. Cancellation can leave an uncertain write outcome; it does not prove that
+a mutation was undone. Leases are returned on success, errors and cancellation.
+
+## Namespace and Server Requirements
+
+The default prefix is `ss:cache:v1:`. Configure a distinct, nonempty prefix per application/cache
+sharing a database. This prefix is independent of a manager's `NamespacePrefix`. Entries use a private versioned
+hash format containing raw data and expiry metadata. Use a fresh prefix when migrating data from another cache
+provider; existing ServiceStack cache/entity keys remain separate.
+
+Requires **Redis 5+** with `EVAL`, `EVALSHA`, `TIME`, `HGET`, `HEXISTS`, `HMGET`, `HMSET`, `PEXPIRE`, `PERSIST` and `DEL`
+permissions, plus normal connection/authentication commands. Script/ACL/server errors propagate without a
+non-atomic fallback. Scripts run by SHA1 with `EVALSHA`; if the server's script cache was flushed
+(`NOSCRIPT`), the adapter reruns the call with `EVAL`, which also reloads the script. Validation covered Redis 6.2.24, Redis 8.10.1 and Valkey 8.1.11 on .NET 10. The cache adapter
+is available only in the `net10.0` build of ServiceStack.Redis.
+
+## HybridCache
+
+Install Microsoft's `Microsoft.Extensions.Caching.Hybrid` package in the consuming application and register it
+alongside the adapter:
+
+```csharp
+builder.Services.AddServiceStackRedisCache("localhost:6379",
+    options => options.KeyPrefix = "myapp:hybrid:v1:");
+builder.Services.AddHybridCache();
+```
+
+HybridCache supplies serialization, its local cache and coordination within each instance; the adapter supplies
+the distributed byte storage. Separate HybridCache instances keep independent local caches. This registration
+adds no cross-process stampede coordination or local-cache invalidation backplane. Integration was verified
+with HybridCache 10.11.0 using independent service providers reading the same Redis L2 after publication.
 
 
 # Redis Sentinel
@@ -134965,6 +137003,81 @@ Use this API if you just need to access values as strings or you want to have co
 <client-api-map>
 </client-api-map>
 
+## Atomic Key Commands
+
+New in v10.5, the following extensions are available on clients returned by ServiceStack.Redis managers:
+
+| Command | String API | Native byte API | Server requirement |
+| --- | --- | --- | --- |
+| GETEX | `GetAndExpireValue` | `GetEx` | Redis 6.2+ |
+| GETDEL | `GetAndDeleteValue` | `GetDel` | Redis 6.2+ |
+| UNLINK | `Unlink` | `Unlink` | Redis 4.0+ |
+
+All three commands require a **writer connection**, including GETEX without an expiration option. Borrow a
+client with `GetClient()` rather than `GetReadOnlyClient()`:
+
+```csharp
+using var manager = new RedisManagerPool("localhost:6379");
+using var redis = manager.GetClient();
+
+redis.SetValue("status", "ready");
+string value = redis.GetAndExpireValue("status", new RedisGetExOptions {
+    ExpirySeconds = 60
+}); // Returns "ready" and sets its TTL in one atomic command
+
+string removed = redis.GetAndDeleteValue("status"); // Returns "ready" and deletes the key atomically
+long count = redis.Unlink("large:key", "another:key"); // Number of existing keys removed
+```
+
+`RedisGetExOptions` accepts at most one of:
+
+- `ExpirySeconds` or `ExpiryMilliseconds` — a positive relative expiration
+- `ExpiryAtSeconds` or `ExpiryAtMilliseconds` — a positive absolute Unix timestamp
+- `Persist = true` — remove the expiration
+
+Omit the options to preserve the existing TTL. A past absolute timestamp returns the current value and expires
+the key. Missing keys return `null`; stored empty values remain empty. GETEX and GETDEL report a server error
+for non-string values. UNLINK accepts any value type, removes keys immediately and reclaims their memory in
+the background. It does not scan for matching keys or change the behavior of existing `Remove` methods.
+
+The native `GetEx` and `GetDel` methods return raw `byte[]` values. The string APIs decode UTF-8 and do not
+apply POCO deserialization. Existing serialized payloads are unchanged. Async counterparts accept cancellation
+tokens; see [async key commands](/redis/async#atomic-key-commands).
+
+These APIs use additive `IRedisNativeKeyCommands` / `IRedisNativeKeyCommandsAsync` capabilities implemented by
+`RedisNativeClient` and `RedisClient`. Existing client interfaces gain no required members. A third-party
+provider must implement the optional capability to use the extensions; otherwise they throw
+`NotSupportedException`. Server support is separate: unsupported commands and ACL errors are propagated without
+a Lua or multi-command fallback. Pipelines and transactions use the existing command queuing APIs.
+
+## Hash Field Expiration
+
+Expire individual hash fields with `HExpire`/`HPExpire` or absolute Unix timestamps, inspect field TTL/deadlines,
+and remove expiration with `HPersist`. Sync/async APIs preserve per-field results and support NX/XX/GT/LT
+conditions. Requires Redis 7.4+ or compatible native support (Valkey 9+); standalone calls only.
+See [hash-field expiration](/redis/hash-field-expiration) for binary overloads, status codes and examples.
+
+## SCAN + UNLINK Pattern Cleanup
+
+New `UnlinkByPattern` and `UnlinkByPatternAsync` APIs scan matching keys and remove them in bounded UNLINK
+batches, with memory reclaimed in the background:
+
+```csharp
+long removed = await redis.UnlinkByPatternAsync("cache:reports:*",
+    batchSize: 512, scanCount: 1000, token: token);
+```
+
+Use an exclusively leased writer. `batchSize` is a hard key-count limit per UNLINK; `scanCount` is a SCAN hint,
+not a response-size guarantee. The result sums Redis-confirmed removals. Binary key names are preserved.
+Existing `RemoveByPattern` behavior is unchanged. Requires Redis 4.0+ and SCAN/UNLINK permission; errors propagate
+without a DEL fallback. Cancellation is checked between scans and batches and may leave partial cleanup.
+The scan is not an atomic snapshot; concurrent writes and duplicate observations can affect results. These
+multi-command helpers cannot run inside a pipeline or transaction.
+
+## Streams
+
+Sync/async Streams commands, typed JSON entries and explicit consumer-group recovery are available in v10.5. See the [Streams guide](/redis/streams) for usage, server requirements and blocking-connection semantics.
+
 ## API
 
 ```csharp
@@ -135489,6 +137602,12 @@ using (var trans = redis.CreateTransaction())
 //The value of "key" is incremented twice. The latest value of which is also stored in 'callbackResult'.
 
 ```
+
+::: info
+From v10.5, queued reads of empty strings and byte arrays return the empty value in transactions and pipelines,
+matching non-queued calls. Earlier versions returned `null`. Missing keys still return `null`. Set
+`RedisConfig.PipelineEmptyValuesAsNull = true` to restore the previous behavior.
+:::
 
 ## Other common examples
 The full-source code and other common examples can be found on the
