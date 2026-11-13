@@ -43,6 +43,16 @@ using var client = redisManager.GetClient();
 //...
 ```
 
+Standard `rediss://` TLS URIs are also supported, where the userinfo holds URL-encoded
+[ACL credentials](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/),
+the optional path is the database number and the port defaults to **6380**:
+
+```csharp
+var redisManager = new RedisManagerPool($"rediss://{Username.UrlEncode()}:{Password.UrlEncode()}@{Host}:6380/0");
+```
+
+See [Redis Connection Strings](/redis/client-managers#ipv6-and-opt-in-redis-uri-endpoints) for all supported options.
+
 If using `RedisSentinel` SSL needs to be specified on both host connection string and `HostFilter`, e.g: 
 
 ```csharp

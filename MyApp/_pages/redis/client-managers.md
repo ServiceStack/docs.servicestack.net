@@ -23,7 +23,15 @@ redis://localhost:6379
 password@localhost:6379
 clientid:password@localhost:6379
 redis://clientid:password@localhost:6380?ssl=true&db=1
+[::1]:6379
+rediss://redis.example
+rediss://user:p%40ss@redis.example:6380/2
 ```
+
+`rediss://` URIs connect over TLS and use standard Redis URI semantics, i.e. `user:password@` are
+[ACL credentials](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/) (URL-encoded)
+and the optional path is the database number. IPv6 addresses need to be wrapped in brackets.
+See [IPv6 and Redis URI Endpoints](#ipv6-and-opt-in-redis-uri-endpoints) for details.
 
 ::: info
 More examples can be seen in [ConfigTests.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/ConfigTests.cs)
@@ -88,6 +96,13 @@ When using [Redis ACLs](https://redis.io/docs/manual/security/acl/) the Username
 
 ```csharp
 var connString = $"redis://{Host}?ssl=true&username={Username}&password={Password.UrlEncode()}";
+var redisManager = new RedisManagerPool(connString);
+```
+
+Or as a standard `rediss://` TLS URI with the ACL credentials in the userinfo:
+
+```csharp
+var connString = $"rediss://{Username.UrlEncode()}:{Password.UrlEncode()}@{Host}";
 var redisManager = new RedisManagerPool(connString);
 ```
 
@@ -258,12 +273,25 @@ ServiceStack.Redis supports **SSL connections** making it suitable for accessing
 
 ![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
 
+The simplest way to connect over TLS is with a `rediss://` URI, which defaults to port **6380**:
+
+```csharp
+var redisManager = new RedisManagerPool("rediss://user:p%40ss@redis.example:6380");
+```
+
+This is equivalent to `redis://redis.example:6380?ssl=true&username=user&password=p%40ss`.
+TLS certificate and hostname validation are always enabled. With `rediss://` the credentials, database and SSL
+must be specified in the URI itself, so `ssl`, `db`, `username` and `password` QueryString options are rejected.
+
 #### Specify SSL Protocol
 
 Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
 
 ```csharp
 var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
+// or
+var connString = $"rediss://:{Password.UrlEncode()}@{Host}?sslprotocols=Tls12";
+
 var redisManager = new RedisManagerPool(connString);
 using var client = redisManager.GetClient();
 //...

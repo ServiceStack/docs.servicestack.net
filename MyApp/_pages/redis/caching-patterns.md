@@ -48,6 +48,10 @@ public async Task<object> Any(GetProduct request) =>
 Always give cached entries an expiry. It caps how long stale data can survive a missed invalidation, and it
 keeps memory bounded even when keys are never read again.
 
+The Redis `ICacheClient` writes a value and its expiry in one atomic command, including the `Set`, `Add` and
+`Replace` overloads that take an absolute `DateTime` expiry (using `SET PXAT` on Redis 6.2+, or an atomic Lua
+script on older servers), so a dropped connection can't leave a key cached without a TTL.
+
 ::: tip
 `GetOrCreate` treats `default(T)` as a miss, so a `null` result is never cached and every request for a
 missing row reaches the database. If misses are common, cache a sentinel value, e.g. an empty DTO, with a
