@@ -4,6 +4,14 @@ title: ServiceStack Security
 
 ServiceStack publishes product security information and version-specific software inventories for customers and suppliers assessing their use of ServiceStack. This section is the public reference for product security, vulnerability reporting, software inventories, assessment evidence and EU Cyber Resilience Act (CRA) readiness. Customers and suppliers can use **https://docs.servicestack.net/security/** as a single entry point.
 
+<div class="not-prose my-8 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-900">
+  <div>
+    <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Published Security Advisories</h3>
+    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Disclosed vulnerabilities, affected versions and fixes are published as GitHub Security Advisories.</p>
+  </div>
+  <a href="https://github.com/ServiceStack/ServiceStack/security/advisories" class="inline-flex shrink-0 items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 hover:no-underline">View Advisories &rarr;</a>
+</div>
+
 ## Supplier review evidence
 
 | Requested information | Public information and evidence |
