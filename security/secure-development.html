@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-11-13T09:09:10.4576644Z'>
+    <meta name='date' content='2026-11-13T12:30:05.2945283Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>Secure Development and Supply Chain</title>
@@ -366,6 +366,16 @@ ServiceStack Security                                    </span>
                                 </a>
                         <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
                                 <li class="relative">
+                                    <a href="/security/supplier-assurance" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Supplier Security Assurance
+                                    </a>
+                                </li>
+                                <li class="relative">
+                                    <a href="/security/information-security-policy" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
+                                        Information Security Policy
+                                    </a>
+                                </li>
+                                <li class="relative">
                                     <a href="/security/reporting" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
                                         Report a Vulnerability
                                     </a>
@@ -426,17 +436,64 @@ ServiceStack Security                                    </span>
                 <div class="not-prose"></div>
 
                 <div class="content"><p><a href="/security/">Security overview</a> · <a href="/security/sbom-vex">SBOM and VEX downloads</a> · <a href="/security/assessments">Security assessments</a></p>
-<p>This page summarizes publicly inspectable development and supply-chain evidence. It does not publish private operational records or assert independent certification of every development control.</p>
+<p>This page describes ServiceStack's documented software development lifecycle and publicly inspectable supply-chain evidence. It covers development, verification, release and maintenance of the libraries, with coverage determined by the identified project and workflow.</p>
+<p>Last reviewed: <strong>13 November 2026</strong>. See also the <a href="/security/information-security-policy">information security policy</a> and <a href="/security/supplier-assurance">supplier assurance directory</a>.</p>
+<h2 id="development-lifecycle">Development lifecycle<a class="header-anchor" href="javascript:;" onclick="location.hash='#development-lifecycle'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Documented practice and inspectable evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Change definition and design</td>
+<td>Source changes, pull requests and release notes identify behavior and compatibility changes. Security-change reports document reviewed trust boundaries and mitigations; they are not a complete, independently audited threat model for every package.</td>
+</tr>
+<tr>
+<td>Implementation and review</td>
+<td>Git history preserves changes and author attribution. Maintainers review contributions and larger changes through the repository process. Public source access does not establish that every commit received an independent second-person review.</td>
+</tr>
+<tr>
+<td>Verification</td>
+<td>Unit and integration tests exercise library behavior. The <a href="https://github.com/ServiceStack/ServiceStack/blob/main/.github/workflows/nuget-pack.yml">NuGet Pack workflow</a> builds and tests configured projects, including database and endpoint tests, before its package stage. Individual workflows identify the actual test selection and target framework.</td>
+</tr>
+<tr>
+<td>Packaging and publication</td>
+<td>A successful pack produces exact NuGet archives. Separate security generation records their identity, dependencies and hashes; NuGet Publish verifies matching evidence before publication. See the release process below.</td>
+</tr>
+<tr>
+<td>Maintenance</td>
+<td>Scheduled dependency checks, private reports and source review inform vulnerability investigation. Published advisories, security-change reports and release notes communicate findings, fixes and upgrade guidance within their stated scope.</td>
+</tr>
+</tbody>
+</table>
+<p>Security-sensitive review areas documented in the internal product audit include untrusted serialization, input limits, file and path access, SQL construction and resource management. Relevant regression tests and source changes provide evidence for specific cases. Test counts or a successful CI run alone do not establish coverage of every attack path.</p>
+<p>The published process is evidence of development practices, not certification against NIST SP 800-218 (SSDF) or ISA/IEC 62443-4-1. Formal product-wide risk assessments and additional CRA lifecycle commitments remain part of <a href="/security/cra">readiness work</a>.</p>
+<h2 id="open-source-and-verifiable-publishing">Open source and verifiable publishing<a class="header-anchor" href="javascript:;" onclick="location.hash='#open-source-and-verifiable-publishing'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>The complete source code for every ServiceStack NuGet package is public in the <a href="https://github.com/ServiceStack/ServiceStack">ServiceStack repository</a>, along with the full history of every commit and change. The build, test, packaging and publishing workflows are also public source in the same repository, so the process that produces each package can be inspected alongside the code it builds.</p>
+<p>Packages are built and published to NuGet.org by these public GitHub Actions workflows rather than from a developer machine:</p>
+<ul>
+<li><strong>Public build pipeline</strong> — the <a href="https://github.com/ServiceStack/ServiceStack/blob/main/.github/workflows/nuget-pack.yml">NuGet Pack workflow</a> builds and tests packages from a commit in the public repository, and the <a href="https://github.com/ServiceStack/ServiceStack/blob/main/.github/workflows/nuget-push.yml">NuGet Publish workflow</a> pushes those exact archives to NuGet.org.</li>
+<li><strong>NuGet Trusted Publishing</strong> — publishing authenticates with <a href="https://learn.microsoft.com/nuget/nuget-org/trusted-publishing">NuGet.org Trusted Publishing</a>, exchanging a GitHub Actions OIDC identity for a short-lived key bound to the ServiceStack repository and publish workflow. No long-lived NuGet API key is stored for publishing.</li>
+<li><strong>Source-linked packages</strong> — packages embed <a href="https://learn.microsoft.com/dotnet/standard/library-guidance/sourcelink">Source Link</a> metadata identifying the repository and exact source commit they were built from, so a shipped <code>.dll</code> can be traced back to the public commit.</li>
+<li><strong>Hash-matched release evidence</strong> — each <a href="/security/sbom-vex">release security bundle</a> records the SHA-256 of every published <code>.nupkg</code>, the pack and publish workflow runs that produced it, and its source commit.</li>
+</ul>
+<p>Together, these give customers an independent way to check a package: compare its hash with the release evidence, follow its source commit to the public history, and review the public workflow run that built and published it. A package whose hash is not in the published evidence for that release was not produced by this pipeline.</p>
 <h2 id="source-review-and-remediation">Source review and remediation<a class="header-anchor" href="javascript:;" onclick="location.hash='#source-review-and-remediation'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>ServiceStack source and security-change reports are available in the <a href="https://github.com/ServiceStack/ServiceStack">ServiceStack repository</a>. The <a href="/security/assessments">assessment evidence page</a> links the internal AI-assisted security and reliability review and package reports.</p>
 <p>Use source reports to understand the documented findings and changes. Match the source commit to the exact package being assessed before claiming a fix is present in a deployed release. Source availability, a review report and an automated test result answer different assurance questions.</p>
+<h2 id="dependency-selection">Dependency selection<a class="header-anchor" href="javascript:;" onclick="location.hash='#dependency-selection'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
+<p>ServiceStack keeps external dependencies limited and commonly uses Microsoft-maintained .NET components. Dependencies are identified from the actual package and its declared dependency groups, rather than assuming that every project reference ships to consumers. Publisher reputation does not establish vulnerability absence: Microsoft and other third-party components remain subject to advisory review.</p>
+<p>Downstream applications control their own restore results and runtime environment. Native engines, externally installed runtimes and content/template hosts need separate inventory and assessment where the managed package graph does not describe them completely.</p>
 <h2 id="release-and-dependency-evidence">Release and dependency evidence<a class="header-anchor" href="javascript:;" onclick="location.hash='#release-and-dependency-evidence'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The public <a href="https://github.com/ServiceStack/ServiceStack/tree/main/build/security">security tooling</a> maintains a configured package inventory and generates CycloneDX evidence from exact NuGet archives. Each release record identifies the original package hash, shipped frameworks, declared dependency ranges and a resolved consumer baseline.</p>
 <p>The independent <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/package-security.yml">Package Security Evidence workflow</a> processes outputs from successful package builds. A security run identifies its source pack run and commit. NuGet Publish verifies the matching package archives against this evidence before pushing them, then retains the evidence as <strong>ServiceStack Published Security</strong>. It attaches a security ZIP and checksum to the matching GitHub release, preparing a versioned draft with the assets if the release has not yet been created. The <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml">release security workflow</a> can reattach that retained evidence without downloading packages from NuGet again.</p>
 <p>New release bundles preserve the original pack evidence and include <code>publication.json</code> identifying the NuGet Publish run. Earlier bundles, such as 10.4.2, were generated from published NuGet archives and identify that source in their provenance. Preserve the manifest, source/publication records and archive checksum with the evidence you review; these sources need not have identical resolved consumer graphs.</p>
 <p>See <a href="/security/sbom-vex">download and verification instructions</a> for release assets, build artifacts and limitations.</p>
 <h2 id="dependency-advisory-monitoring">Dependency advisory monitoring<a class="header-anchor" href="javascript:;" onclick="location.hash='#dependency-advisory-monitoring'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
-<p>The <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/security-core.yml">scheduled security workflow</a> checks retained dependency graphs against current NuGet advisory data. A new advisory can make a historical graph fail a later scan without changing the original SBOM. Observations are retained for review; successful historical results are not a continuing all-clear.</p>
+<p>The <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/security-core.yml">scheduled security workflow</a> checks retained dependency graphs against current NuGet advisory data. A new advisory can make a historical graph fail a later scan without changing the original SBOM. Observations are retained for review; successful historical results are not a continuing all-clear. The daily scan job fails on matched advisories to provide a review signal. Package evidence generation and publication report advisory matches as warnings; those warnings are not an automatic exploitability decision or a blanket finding closure.</p>
 <p>The workflow covers managed package matches in its stated data source. First-party code, native engine versions, platform runtimes and an integrating application's own dependency resolutions need separate assessment. A Microsoft-maintained dependency is still subject to advisory review.</p>
 <h2 id="vulnerability-impact-and-fixes">Vulnerability impact and fixes<a class="header-anchor" href="javascript:;" onclick="location.hash='#vulnerability-impact-and-fixes'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>A dependency match is an investigation input. Product impact depends on the vulnerable behavior, application paths, platform and exact dependency versions. Reviewed VEX statements, when available, record a vulnerability-specific assessment; an empty VEX set does not mean no investigation is necessary.</p>
@@ -486,8 +543,23 @@ ServiceStack Security                                    </span>
                             </h5>
                             <ul class="text-slate-700 text-sm leading-6">
                                     <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#development-lifecycle'" data-id="development-lifecycle" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Development lifecycle
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#open-source-and-verifiable-publishing'" data-id="open-source-and-verifiable-publishing" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Open source and verifiable publishing
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
                                         <span v-hash="'#source-review-and-remediation'" data-id="source-review-and-remediation" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
                                             Source review and remediation
+                                        </span>
+                                    </li>
+                                    <li class="group text-gray-800 hover:text-gray-900">
+                                        <span v-hash="'#dependency-selection'" data-id="dependency-selection" class="cursor-pointer font-medium block text-sm transform transition-colors duration-200 py-2">
+                                            Dependency selection
                                         </span>
                                     </li>
                                     <li class="group text-gray-800 hover:text-gray-900">
