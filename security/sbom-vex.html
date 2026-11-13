@@ -6,7 +6,7 @@
     gtag('js', new Date()); gtag('config', 'UA-7722718-13');</script>
     
     <meta charset="utf-8"/>
-    <meta name='date' content='2026-11-13T08:46:27.3276029Z'>
+    <meta name='date' content='2026-11-13T09:09:10.4556469Z'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg" href="/img/logo.svg">
     <title>SBOM and VEX Downloads</title>
@@ -411,26 +411,6 @@ ServiceStack Security                                    </span>
                                     </a>
                                 </li>
                         </ul>
-                                <h2 class="font-display font-medium text-slate-900 dark:text-white whitespace-nowrap">
-                                    Public Resources
-                                </h2>
-                        <ul role="list" class="mb-6 mt-2 ml-3 space-y-2 border-l-2 border-slate-100 dark:border-slate-800 lg:mt-4 lg:space-y-4 lg:border-slate-200">
-                                <li class="relative">
-                                    <a href="/https://servicestack.net/security" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Disclosure Policy
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/https://github.com/ServiceStack/ServiceStack/security/advisories" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        Published Advisories
-                                    </a>
-                                </li>
-                                <li class="relative">
-                                    <a href="/" class="block w-full pl-3.5 before:pointer-events-none before:absolute before:-left-1 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full text-slate-500 before:hidden before:bg-slate-300 hover:text-slate-600 hover:before:block dark:text-slate-400 dark:before:bg-slate-700 dark:hover:text-slate-300">
-                                        All Documentation
-                                    </a>
-                                </li>
-                        </ul>
                 </nav>
             </div>
         </div>
@@ -462,7 +442,7 @@ ServiceStack Security                                    </span>
 <li><a href="https://github.com/ServiceStack/ServiceStack/actions/runs/39264297239">View the originating security workflow</a></li>
 </ul>
 <p>This bundle contains 49 package release records, all for 10.4.2. Its provenance identifies the exact published NuGet archives as the source and the dependency graph as a consumer baseline resolved at generation time.</p>
-<p>Security generation runs separately from package builds and release publication. A published package or release does not by itself establish that a security ZIP is available. If an asset is absent or its generation failed, there is no matching published bundle at that location yet. Check <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml">release-security workflow results</a>; do not substitute a different release's inventory.</p>
+<p>Security generation runs separately after NuGet Pack. NuGet Publish waits for matching evidence, verifies it against the packed archives, and retains it after publishing. A subsequent attachment job prepares the public ZIP and attaches it to the matching release, or creates a versioned draft with the assets ready. Release publication and manual reattachment reuse that evidence without waiting for NuGet indexing. A published package or release does not by itself establish that attachment has completed successfully. If an asset is absent or its generation failed, there is no matching published bundle at that location yet. Check <a href="https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml">release-security workflow results</a>; do not substitute a different release's inventory.</p>
 <h2 id="what-is-in-the-zip">What is in the ZIP?<a class="header-anchor" href="javascript:;" onclick="location.hash='#what-is-in-the-zip'" aria-label="Permalink">&ZeroWidthSpace;</a></h2>
 <p>The archive preserves the source-project folder layout. Start with the files at its root:</p>
 <table>
@@ -488,6 +468,10 @@ ServiceStack Security                                    </span>
 <tr>
 <td><code>source-run.json</code></td>
 <td>Source release/build, workflow and tooling provenance</td>
+</tr>
+<tr>
+<td><code>publication.json</code></td>
+<td>NuGet Publish run and its matching pack provenance, in bundles produced by the build-to-release flow</td>
 </tr>
 <tr>
 <td><code>SHA256SUMS</code></td>
@@ -555,7 +539,7 @@ sha256sum -c SHA256SUMS
 <li><strong>ServiceStack Security ZIP</strong> — a compressed bundle and checksum.</li>
 </ul>
 <p>Use <code>source-run.json</code> to match the security output to its originating pack run and commit, and the manifests to match the actual NuGet archives. GitHub Actions artifact downloads require GitHub sign-in and are retained for 90 days. Public release assets provide the direct download route for released evidence. SBOMs are distributed separately; they are not currently embedded inside the <code>.nupkg</code> downloaded from NuGet or MyGet.</p>
-<p>Release-asset regeneration can replace the named ZIP, update reviewed VEX and resolve dependency ranges again. Record the download date, checksum and provenance when retaining evidence for your own review.</p>
+<p>Reattaching a release ZIP reuses the retained publication evidence; it does not rerun dependency resolution or perform a new vulnerability assessment. Regenerating source evidence or adding reviewed VEX is a separate operation. Earlier release bundles may have been generated directly from NuGet, as their provenance states. Record the download date, checksum and provenance when retaining evidence for your own review. Actions retention still applies: if the original publication evidence has expired or is unavailable, reattachment fails explicitly rather than substituting another version or a fresh graph.</p>
 </div>
 
                 <div class="not-prose"></div>
