@@ -4,7 +4,7 @@ title: Security Assessments and Testing Evidence
 
 [Security Assurance](/security/) · [SBOM and VEX Downloads](/security/sbom-vex) · [CRA and CE Marking](/security/cra)
 
-This page identifies published assessment evidence and the limits of the conclusions it supports. Last reviewed: **12 November 2026**.
+This page identifies published assessment evidence and the limits of the conclusions it supports. Last reviewed: **13 November 2026**.
 
 ## Penetration-test report availability
 
@@ -26,6 +26,22 @@ The [ServiceStack v10.2 release materials](https://docs.servicestack.net/release
 
 These are living source reports. A source change is not by itself proof that a particular deployed release contains the fix. For version-specific review, identify the package version and source commit, and preserve a commit-pinned copy of the relevant report and verification evidence.
 
+## Assessment dates, scope and remediation status
+
+The internal source-review overview was published with **v10.2 on 13 August 2026**. This is the release documentation date, not a claimed start/end date for a penetration test. The linked security-change reports continue to evolve; use commit-pinned reports for a historical assessment. Current automated dependency observations carry their own scan dates and package scopes.
+
+No dated external penetration-test report is available in this public evidence set. An assessment of a deployed example application would cover that application's tested configuration and package versions, rather than every library API, consumer configuration or company system.
+
+A publishable assessment executive summary needs to identify:
+
+- the assessment dates, assessor and methodology, including automated, AI-assisted or human-led testing;
+- the tested application, source revision, package versions and environment;
+- authenticated roles, tenant boundaries, included attack surfaces and exclusions;
+- findings by severity, affected versions and remediation or mitigation status;
+- verification or retest dates and any unresolved high/critical findings or residual risks.
+
+This describes the evidence needed for a future summary; it is not a report of a completed test. Any high/critical-risk mitigation statement must be tied to actual findings, fixes and verification in that scope. Sensitive reproduction details can be omitted from a public summary without hiding unresolved risk.
+
 ## How to interpret the evidence
 
 | Evidence | What it supports | What it does not establish |
@@ -39,7 +55,7 @@ No blanket statement that all high or critical risks are mitigated is made by th
 
 ## Certifications and confidential material
 
-These pages do not provide an ISO 27001 certificate, SOC 2 report or other independent organizational certification. The published product evidence should not be represented as one.
+ServiceStack has not obtained independent organizational security or privacy certifications such as ISO 27001 or SOC 2. No independent organizational security-controls audit report is available in this public evidence set. The published product evidence should not be represented as either. See the [supplier assurance directory](/security/supplier-assurance) for the full evidence mapping.
 
 The public review reports, release evidence and security policy are the standard self-service assurance materials. Raw investigation records, sensitive exploitation details and internal infrastructure information are not included in public security bundles.
 

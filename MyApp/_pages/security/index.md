@@ -4,6 +4,8 @@ title: ServiceStack Security
 
 ServiceStack publishes product security information and version-specific software inventories for customers and suppliers assessing their use of ServiceStack. This section is the public reference for product security, vulnerability reporting, software inventories, assessment evidence and EU Cyber Resilience Act (CRA) readiness. Customers and suppliers can use **https://docs.servicestack.net/security/** as a single entry point.
 
+All source code for ServiceStack's NuGet packages is public, including the full history of every change. Packages are built and published to NuGet.org by public GitHub Actions workflows using NuGet Trusted Publishing, so each release can be traced to a public commit and the public run that built it. See [open source and verifiable publishing](/security/secure-development#open-source-and-verifiable-publishing).
+
 <div class="not-prose my-8 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700 dark:bg-slate-900">
   <div>
     <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Published Security Advisories</h3>
@@ -13,6 +15,8 @@ ServiceStack publishes product security information and version-specific softwar
 </div>
 
 ## Supplier review evidence
+
+The [supplier assurance directory](/security/supplier-assurance) maps common policy, certification, audit, development, regulatory and lifecycle questions to public evidence and current status. The [information security policy](/security/information-security-policy) provides our public policy summary.
 
 | Requested information | Public information and evidence |
 | --- | --- |
@@ -26,6 +30,8 @@ These pages and the published evidence are provided in English. Customers can re
 
 ## Explore security information
 
+- [Supplier security assurance](/security/supplier-assurance) — policy and evidence directory, certification status and regulatory applicability.
+- [Information security policy](/security/information-security-policy) — governance, access, information handling and security responsibilities.
 - [Vulnerability reporting and disclosure](/security/reporting) — private reporting channels, report contents and published advisories.
 - [SBOM and VEX downloads](/security/sbom-vex) — release bundles, integrity verification and vulnerability-impact statements.
 - [Security assessments](/security/assessments) — internal review evidence and penetration-test report availability.

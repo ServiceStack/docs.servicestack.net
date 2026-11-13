@@ -43,6 +43,8 @@ These dates are distinct: a future conformity date does not defer an already app
 
 ## Available readiness evidence
 
+For organization-level policy, certification status and separate NIS2/AI Act applicability statements, see [supplier security assurance](/security/supplier-assurance).
+
 | Area | Public evidence or current status |
 | --- | --- |
 | Package inventories and provenance | [Version-specific security bundles](/security/sbom-vex) |

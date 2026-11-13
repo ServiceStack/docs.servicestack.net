@@ -4,7 +4,9 @@ title: Security Updates and Support
 
 [Security overview](/security/) · [Vulnerability reporting](/security/reporting) · [CRA readiness](/security/cra)
 
-Use exact package versions and advisory-specific guidance when evaluating security updates. This page does not introduce a new LTS branch, fixed backport schedule or indefinite security-support commitment.
+Use exact package versions and advisory-specific guidance when evaluating security updates. Formal security-support schedules are still under assessment; the current update guidance and commitment boundaries are described below.
+
+Last reviewed: **13 November 2026**.
 
 ## Reporting older releases
 
@@ -27,6 +29,26 @@ A framework update does not automatically patch an externally installed .NET run
 Commercial subscription/support arrangements and product security-support periods are distinct. The existence or expiry of a subscription should not be used to infer a particular product's CRA support period, free-update entitlement or backport policy.
 
 Formal CRA product security-support periods and associated commitments remain under assessment, as stated on the [CRA and CE-marking page](/security/cra). No product-specific support schedule is established by this documentation. When published, such schedules must identify the covered products, versions, dates and upgrade paths.
+
+## Product support schedule status
+
+| Topic | Current public position |
+| --- | --- |
+| Product/version security-support start and end dates | No formal product-specific CRA schedule is published yet. |
+| LTS branches and backports | No general LTS or fixed backport commitment is established by these pages. Consult the affected product's advisory for an available fix. |
+| Security-fix access after commercial support expires | A separate CRA security-update access and entitlement policy remains under assessment. Commercial renewal terms alone do not establish this policy. |
+| VEX maintenance | Reviewed statements are scoped to the versions and frameworks they identify. No unconditional with-every-release or LTS refresh schedule is promised. |
+| End-of-life notice period | No general fixed notice period is established by this documentation. Product-specific dates and terms must be stated explicitly when adopted. |
+
+An adopted schedule needs to identify the product, versions and frameworks covered, security-support dates, the available patch or upgrade route, security-update access, notification channels and any applicable VEX maintenance. A runtime vendor's support dates are relevant inputs; they do not by themselves establish ServiceStack's product commitments.
+
+## End-of-life and residual-risk communication
+
+Use [published advisories](https://github.com/ServiceStack/ServiceStack/security/advisories), [release notes](/release-notes-history) and this support page to evaluate available update guidance. A formal product end-of-life notice, when issued, needs to identify the affected versions, end date, last supported release, replacement or migration path and known remaining risks or mitigations.
+
+For a particular deployment, assess whether the update requires configuration changes, a different target framework, a database/provider update or application changes. Temporary mitigations should retain their stated limitations and should not be treated as permanent substitutes for a required fix. Continued use of an affected or unsupported dependency can leave residual risk even when the ServiceStack package itself is unchanged.
+
+Report new suspected vulnerabilities through [private reporting](/security/reporting), including for older releases. An archived package, an accepted report or a retained inventory does not establish ongoing maintenance for that version.
 
 ## Evidence retention and end of life
 
