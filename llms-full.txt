@@ -1510,6 +1510,207 @@ rd /q /s bin obj
 ::include versioning-scheme.md::
 
 
+# SBOM and VEX Downloads
+Source: https://docs.servicestack.net/security/sbom-vex
+
+[Security Assurance](/security/) · [Security Assessments](/security/assessments) · [CRA and CE Marking](/security/cra)
+
+ServiceStack's security bundles provide machine-readable software inventories and supporting evidence for identified NuGet releases. Downloading these files does not require a ServiceStack subscription.
+
+## Download a release bundle
+
+Open the [ServiceStack GitHub releases](https://github.com/ServiceStack/ServiceStack/releases), select the release matching your packages, and expand **Assets**. When generation has completed successfully, the release includes:
+
+- `servicestack-security-<version>.zip`
+- `servicestack-security-<version>.zip.sha256`
+
+A release tag such as `v10.4` maps to NuGet version `10.4.0`. A patch tag such as `v10.4.2` maps to `10.4.2`.
+
+### Verified download: 10.4.2
+
+The following files were verified on **12 November 2026**:
+
+- [Download the 10.4.2 security ZIP](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip)
+- [Download its SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip.sha256)
+- [View the originating security workflow](https://github.com/ServiceStack/ServiceStack/actions/runs/39264297239)
+
+This bundle contains 49 package release records, all for 10.4.2. Its provenance identifies the exact published NuGet archives as the source and the dependency graph as a consumer baseline resolved at generation time.
+
+Security generation runs separately from package builds and release publication. A published package or release does not by itself establish that a security ZIP is available. If an asset is absent or its generation failed, there is no matching published bundle at that location yet. Check [release-security workflow results](https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml); do not substitute a different release's inventory.
+
+## What is in the ZIP?
+
+The archive preserves the source-project folder layout. Start with the files at its root:
+
+| File | Purpose |
+| --- | --- |
+| `README.md` | Scope and interpretation guidance |
+| `index.json` | Included package IDs, versions, NuGet archive hashes and framework coverage |
+| `packages.json` | Package-to-project mapping for the evidence set |
+| `source-run.json` | Source release/build, workflow and tooling provenance |
+| `SHA256SUMS` | Checksums for the enclosed evidence files |
+
+Each package has a `security/releases/<version>/` folder containing:
+
+| File or folder | Purpose |
+| --- | --- |
+| `sbom.cdx.json` | CycloneDX 1.6 JSON inventory combining the package's shipped target-framework graphs |
+| `manifest.json` | Original NuGet archive SHA-256, evidence hashes, framework coverage, generator details and limitations |
+| `resolution.json` | Declared dependency ranges and exact resolved dependency graphs |
+| `audit.json` | Managed NuGet advisory observation at generation time |
+| `vex/` | Dated reviewed vulnerability-impact statements, when available |
+| `scans/` | Subsequent advisory observations, if included in that evidence set |
+
+Framework-specific graph references distinguish dependency applicability within the combined SBOM. Repeated NuGet package identities across frameworks are intentional. Native payload hashes are inventoried where present; a hash alone does not establish the embedded engine version or its vulnerability status.
+
+## Verify integrity
+
+Download the ZIP and checksum into the same folder. On Linux:
+
+```sh
+sha256sum -c servicestack-security-10.4.2.zip.sha256
+unzip servicestack-security-10.4.2.zip -d servicestack-security-10.4.2
+cd servicestack-security-10.4.2
+sha256sum -c SHA256SUMS
+```
+
+On macOS, use `shasum -a 256 -c` in place of `sha256sum -c`. On Windows, compare `Get-FileHash <zip-path> -Algorithm SHA256` with the published checksum.
+
+The per-package manifest also identifies the original `.nupkg` hash, allowing you to compare the inventory with the package you obtained. Checksums detect content changes; they are not a digital signature or independent security attestation.
+
+## VEX information
+
+VEX describes an assessed vulnerability's impact on specified product versions and framework variants. ServiceStack renders dated CycloneDX VEX snapshots only when vulnerability-specific reviewed decisions are available. These can identify an affected, fixed, under-investigation or justified not-affected state.
+
+**The absence of VEX means no reviewed statements are included; it does not mean the product has no vulnerabilities.** The verified 10.4.2 public bundle contains no VEX snapshots. Do not infer a not-affected decision from an empty decisions list or a scanner returning no matches.
+
+Where a release contains several VEX snapshots, use the most recent applicable assessment and retain the earlier snapshots for history. Read the advisory, affected references, analysis, justification and remediation guidance together. A statement about one release or framework is not a statement about all ServiceStack products or all downstream configurations.
+
+There is no blanket commitment on this page to publish VEX with every release or to maintain an unspecified LTS branch. Applicability depends on the vulnerability assessment and the supported product/version concerned.
+
+## Advisory observations and downstream scope
+
+`audit.json` is a point-in-time observation from NuGet advisory data, not a continuously updated all-clear. The [scheduled security workflow](https://github.com/ServiceStack/ServiceStack/actions/workflows/security-core.yml) rescans retained release graphs against current advisory data and preserves observations, including findings. Historical graphs can gain new advisory matches without their original SBOM changing.
+
+Customers should scan their own application's resolved dependency graph and track .NET, operating-system, container and native-engine advisories separately. These package observations do not assess all first-party ServiceStack code or every deployment configuration.
+
+## Build and pre-release evidence
+
+For evidence associated with a particular package build, open its linked [Package Security Evidence workflow run](https://github.com/ServiceStack/ServiceStack/actions/workflows/package-security.yml). Its **Artifacts** section can include:
+
+- **ServiceStack Security** — the evidence tree;
+- **ServiceStack Security ZIP** — a compressed bundle and checksum.
+
+Use `source-run.json` to match the security output to its originating pack run and commit, and the manifests to match the actual NuGet archives. GitHub Actions artifact downloads require GitHub sign-in and are retained for 90 days. Public release assets provide the direct download route for released evidence. SBOMs are distributed separately; they are not currently embedded inside the `.nupkg` downloaded from NuGet or MyGet.
+
+Release-asset regeneration can replace the named ZIP, update reviewed VEX and resolve dependency ranges again. Record the download date, checksum and provenance when retaining evidence for your own review.
+
+
+# Security Assessments and Testing Evidence
+Source: https://docs.servicestack.net/security/assessments
+
+[Security Assurance](/security/) · [SBOM and VEX Downloads](/security/sbom-vex) · [CRA and CE Marking](/security/cra)
+
+This page identifies published assessment evidence and the limits of the conclusions it supports. Last reviewed: **12 November 2026**.
+
+## Penetration-test report availability
+
+No independent penetration-test report or independent penetration-test executive summary is currently published through this assurance documentation. The internal source review described below is available as supporting evidence, but is not a substitute for such a report.
+
+A proposed test, access to a testing tool, a dependency scan or the existence of CI security jobs does not establish that a penetration test has been completed. Customers requiring independent assessment evidence should record it as unavailable from the current public evidence set rather than treating the internal review as an external test.
+
+## Published internal security review
+
+The [ServiceStack v10.2 release materials](https://docs.servicestack.net/releases/v10_02) document an internal AI-assisted security and reliability review. Public reports describe findings and source changes across packages, including input handling, serialization, path boundaries, SQL construction and resource management.
+
+| Area | Public source report |
+| --- | --- |
+| ServiceStack.Common | [Common security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Common/SECURITY_CHANGES.md) |
+| ServiceStack.Interfaces | [Interfaces security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Interfaces/SECURITY_CHANGES.md) |
+| ServiceStack.Text | [Text security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/SECURITY_CHANGES.md) |
+| ServiceStack.OrmLite and database dialects | [OrmLite security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/SECURITY_CHANGES.md) |
+| Broader review scope | [v10.2 audit and hardening overview](https://docs.servicestack.net/releases/v10_02) |
+
+These are living source reports. A source change is not by itself proof that a particular deployed release contains the fix. For version-specific review, identify the package version and source commit, and preserve a commit-pinned copy of the relevant report and verification evidence.
+
+## How to interpret the evidence
+
+| Evidence | What it supports | What it does not establish |
+| --- | --- | --- |
+| Internal AI-assisted source review | Recorded source findings and remediation work in the documented scope | Independent penetration testing or exhaustive vulnerability coverage |
+| Automated tests and CI results | Behavior checked by the identified tests at a particular revision | Security of all untested paths or configurations |
+| SBOM and managed dependency observations | Package identity, dependency inventory and advisory matches in the stated data source | Runtime exploitation assessment, first-party code coverage or complete native-engine coverage |
+| Reviewed VEX, when published | A documented impact assessment for identified vulnerabilities and product variants | A general security certification or blanket all-clear |
+
+No blanket statement that all high or critical risks are mitigated is made by these pages. Such a conclusion requires an identified assessment scope, findings, remediation status and verification against the relevant release.
+
+## Certifications and confidential material
+
+These pages do not provide an ISO 27001 certificate, SOC 2 report or other independent organizational certification. The published product evidence should not be represented as one.
+
+The public review reports, release evidence and security policy are the standard self-service assurance materials. Raw investigation records, sensitive exploitation details and internal infrastructure information are not included in public security bundles.
+
+## Vulnerability disclosure
+
+Use the [ServiceStack security policy](https://servicestack.net/security) for private reporting and coordinated disclosure. Published assessments are historical evidence and do not replace monitoring current advisories and the actual dependencies resolved by your application.
+
+
+# EU Cyber Resilience Act and CE Marking
+Source: https://docs.servicestack.net/security/cra
+
+[Security Assurance](/security/) · [SBOM and VEX Downloads](/security/sbom-vex) · [Security Assessments](/security/assessments)
+
+This page states ServiceStack's current CRA readiness and CE-marking position for supplier assessments. Last reviewed: **12 November 2026**.
+
+## CE-marking position
+
+ServiceStack's planned approach is to apply CE marking to products where legally required under the EU Cyber Resilience Act, after completing the applicable conformity assessment and EU Declaration of Conformity, by the relevant statutory application date.
+
+**ServiceStack is not currently asserting CRA conformity or CRA CE marking for the packages covered by this assurance documentation.** Product applicability, classification, assessment route and security-support commitments remain under assessment. No signed CRA EU Declaration of Conformity is published here.
+
+This position is a readiness statement, not a certificate or declaration of conformity. It does not promise CE marking for components outside the regulation's scope or certify a customer's integrated application.
+
+## What must be completed
+
+The CRA places obligations on the product and its lifecycle. Depending on applicability, preparation includes:
+
+- defining the product boundary, intended use and applicable category;
+- recording cybersecurity risks and implementing applicable security requirements;
+- operating vulnerability intake, assessment, remediation, disclosure and reporting processes;
+- defining security-support coverage and providing the required user information;
+- assembling technical documentation and completing the applicable conformity assessment;
+- issuing the EU Declaration of Conformity and presenting the CE mark when conformity has been demonstrated.
+
+The [European Commission's manufacturer guidance](https://digital-strategy.ec.europa.eu/en/policies/cra-manufacturers) explains these stages. The [conformity-assessment guidance](https://digital-strategy.ec.europa.eu/en/policies/cra-conformity-assessment) explains why most products can use manufacturer self-assessment while certain important or critical categories require stricter procedures. This page does not assume every ServiceStack package has the same classification.
+
+## Software components and presentation
+
+Separately marketed software components can fall within scope. Being a library or being embedded in another supplier's product is not, by itself, an exemption. Free and open-source software has specific scope provisions; public source availability alone does not settle applicability.
+
+Under Article 30 of the CRA, software CE marking can be presented on the EU Declaration of Conformity or the website accompanying the software. A logo inside each DLL or NuGet package is not the required presentation mechanism. Any future declaration and mark must clearly identify the product it covers.
+
+See the [CRA legal text, including Articles 2–3, 28–32 and Annexes I–II](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847) for the governing requirements.
+
+## Application dates
+
+The CRA's main requirements generally apply from **11 December 2027**. Article 14 reporting obligations apply from **11 September 2026**. Transitional provisions affect products placed on the market earlier and products subsequently subject to substantial modification.
+
+These dates are distinct: a future conformity date does not defer an already applicable reporting obligation. See the [Commission CRA overview](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) and Articles 69 and 71 of the regulation.
+
+## Available readiness evidence
+
+| Area | Public evidence or current status |
+| --- | --- |
+| Package inventories and provenance | [Version-specific security bundles](/security/sbom-vex) |
+| Vulnerability-impact statements | [Reviewed VEX where available; absence explained](/security/sbom-vex#vex-information) |
+| Product review and assessment evidence | [Published security review and report availability](/security/assessments) |
+| Coordinated disclosure and private reporting | [ServiceStack security policy](https://servicestack.net/security) |
+| CRA declaration and CE marking | Not currently asserted or published for the covered packages |
+| Formal product security-support periods | Still under assessment; no new LTS or backport commitment is established by these pages |
+
+These materials support supplier due diligence. They do not, on their own, demonstrate completion of all CRA obligations. Customers integrating ServiceStack remain responsible for assessing their own product, resolved dependencies, deployment and applicable manufacturer obligations.
+
+
 # Create your first WebService
 Source: https://docs.servicestack.net/create-your-first-webservice
 
@@ -80864,6 +81065,16 @@ using var client = redisManager.GetClient();
 //...
 ```
 
+Standard `rediss://` TLS URIs are also supported, where the userinfo holds URL-encoded
+[ACL credentials](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/),
+the optional path is the database number and the port defaults to **6380**:
+
+```csharp
+var redisManager = new RedisManagerPool($"rediss://{Username.UrlEncode()}:{Password.UrlEncode()}@{Host}:6380/0");
+```
+
+See [Redis Connection Strings](/redis/client-managers#ipv6-and-opt-in-redis-uri-endpoints) for all supported options.
+
 If using `RedisSentinel` SSL needs to be specified on both host connection string and `HostFilter`, e.g: 
 
 ```csharp
@@ -132153,7 +132364,15 @@ redis://localhost:6379
 password@localhost:6379
 clientid:password@localhost:6379
 redis://clientid:password@localhost:6380?ssl=true&db=1
+[::1]:6379
+rediss://redis.example
+rediss://user:p%40ss@redis.example:6380/2
 ```
+
+`rediss://` URIs connect over TLS and use standard Redis URI semantics, i.e. `user:password@` are
+[ACL credentials](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/) (URL-encoded)
+and the optional path is the database number. IPv6 addresses need to be wrapped in brackets.
+See [IPv6 and Redis URI Endpoints](#ipv6-and-opt-in-redis-uri-endpoints) for details.
 
 ::: info
 More examples can be seen in [ConfigTests.cs](https://github.com/ServiceStack/ServiceStack.Redis/blob/master/tests/ServiceStack.Redis.Tests/ConfigTests.cs)
@@ -132218,6 +132437,13 @@ When using [Redis ACLs](https://redis.io/docs/manual/security/acl/) the Username
 
 ```csharp
 var connString = $"redis://{Host}?ssl=true&username={Username}&password={Password.UrlEncode()}";
+var redisManager = new RedisManagerPool(connString);
+```
+
+Or as a standard `rediss://` TLS URI with the ACL credentials in the userinfo:
+
+```csharp
+var connString = $"rediss://{Username.UrlEncode()}:{Password.UrlEncode()}@{Host}";
 var redisManager = new RedisManagerPool(connString);
 ```
 
@@ -132388,12 +132614,25 @@ ServiceStack.Redis supports **SSL connections** making it suitable for accessing
 
 ![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
 
+The simplest way to connect over TLS is with a `rediss://` URI, which defaults to port **6380**:
+
+```csharp
+var redisManager = new RedisManagerPool("rediss://user:p%40ss@redis.example:6380");
+```
+
+This is equivalent to `redis://redis.example:6380?ssl=true&username=user&password=p%40ss`.
+TLS certificate and hostname validation are always enabled. With `rediss://` the credentials, database and SSL
+must be specified in the URI itself, so `ssl`, `db`, `username` and `password` QueryString options are rejected.
+
 #### Specify SSL Protocol
 
 Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
 
 ```csharp
 var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
+// or
+var connString = $"rediss://:{Password.UrlEncode()}@{Host}?sslprotocols=Tls12";
+
 var redisManager = new RedisManagerPool(connString);
 using var client = redisManager.GetClient();
 //...
@@ -133161,6 +133400,10 @@ public async Task<object> Any(GetProduct request) =>
 
 Always give cached entries an expiry. It caps how long stale data can survive a missed invalidation, and it
 keeps memory bounded even when keys are never read again.
+
+The Redis `ICacheClient` writes a value and its expiry in one atomic command, including the `Set`, `Add` and
+`Replace` overloads that take an absolute `DateTime` expiry (using `SET PXAT` on Redis 6.2+, or an atomic Lua
+script on older servers), so a dropped connection can't leave a key cached without a TTL.
 
 ::: tip
 `GetOrCreate` treats `default(T)` as a miss, so a `null` result is never cached and every request for a
@@ -137505,6 +137748,380 @@ I hope this clearly illustrates differences between the two technologies. In pra
 It's always a good idea to expose yourself to new technologies so if you haven't already done so, I invite you to get started developing with Redis today to see the benefits for yourself. To get started all you need is an instance of
 [the redis-server](http://code.google.com/p/servicestack/wiki/RedisWindowsDownload) (no configuration required, just unzip and run) and the dependency-free
 [ServiceStack's C# Redis Client](https://github.com/ServiceStack/ServiceStack.Redis) and you're ready to go!
+
+
+# Vulnerability Reporting and Disclosure
+Source: https://docs.servicestack.net/security/reporting
+
+[Security overview](/security/) · [Security assessments](/security/assessments)
+
+Report suspected ServiceStack vulnerabilities privately so we can investigate, prepare fixes and coordinate disclosure. You do not need a paid subscription or a ServiceStack account to use GitHub private vulnerability reporting.
+
+## Submit a private report
+
+Use one of these channels:
+
+- [GitHub private vulnerability reporting](https://github.com/ServiceStack/ServiceStack/security/advisories/new) for ServiceStack libraries. A GitHub account is required.
+- The [ServiceStack security reporting portal](https://account.servicestack.net/security) as an alternative.
+
+Please use one channel per report. Do not disclose vulnerabilities in public GitHub issues, discussions or pull requests. General non-security bugs belong in [ServiceStack/Issues](https://github.com/ServiceStack/Issues).
+
+This documentation page provides instructions; it does not collect reports or attachments.
+
+## What to include
+
+- Affected package IDs and exact versions, or repository and source commit.
+- Relevant .NET runtime, operating system, database provider and configuration.
+- Reproduction steps and a minimal proof of concept where possible.
+- Expected and observed behavior, impact and required access or authentication.
+- Suggested mitigation, if known, and your preferred contact details.
+- Whether you would like researcher credit when the issue is disclosed.
+
+Remove real credentials, personal data and unrelated confidential information from reproductions. Test only systems you own or have permission to test; this reporting guidance does not authorize testing customer deployments or third-party services.
+
+## Handling and coordinated disclosure
+
+The [published security policy](https://servicestack.net/security) is the canonical reference for scope, reporting, response targets and coordinated disclosure. Its current repository copy is [SECURITY.md](https://github.com/ServiceStack/ServiceStack/blob/main/SECURITY.md).
+
+Reports are assessed to establish impact and affected versions, request further information where needed, and coordinate remediation and disclosure. Please keep exploit details private while investigation and remediation are coordinated. Response targets are not guarantees of a fixed resolution time.
+
+Reporting to ServiceStack and manufacturer reporting to authorities under the CRA are separate processes. Sending us a report does not discharge another manufacturer's own regulatory obligations. See [CRA readiness](/security/cra).
+
+## Published advisories and updates
+
+Consult [GitHub Security Advisories](https://github.com/ServiceStack/ServiceStack/security/advisories) for published ServiceStack advisories. Read the affected range, fixed versions, configuration assumptions and mitigation guidance before deciding whether your deployment is affected.
+
+For dependency inventory and reviewed impact statements, see [SBOM and VEX downloads](/security/sbom-vex). An absent advisory or VEX file is not a guarantee of absence of vulnerabilities.
+
+Reporting information is also discoverable through [security.txt](https://servicestack.net/.well-known/security.txt).
+
+
+# SBOM and VEX Downloads
+Source: https://docs.servicestack.net/security/sbom-vex
+
+[Security Assurance](/security/) · [Security Assessments](/security/assessments) · [CRA and CE Marking](/security/cra)
+
+ServiceStack's security bundles provide machine-readable software inventories and supporting evidence for identified NuGet releases. Downloading these files does not require a ServiceStack subscription.
+
+## Download a release bundle
+
+Open the [ServiceStack GitHub releases](https://github.com/ServiceStack/ServiceStack/releases), select the release matching your packages, and expand **Assets**. When generation has completed successfully, the release includes:
+
+- `servicestack-security-<version>.zip`
+- `servicestack-security-<version>.zip.sha256`
+
+A release tag such as `v10.4` maps to NuGet version `10.4.0`. A patch tag such as `v10.4.2` maps to `10.4.2`.
+
+### Verified download: 10.4.2
+
+The following files were verified on **12 November 2026**:
+
+- [Download the 10.4.2 security ZIP](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip)
+- [Download its SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip.sha256)
+- [View the originating security workflow](https://github.com/ServiceStack/ServiceStack/actions/runs/39264297239)
+
+This bundle contains 49 package release records, all for 10.4.2. Its provenance identifies the exact published NuGet archives as the source and the dependency graph as a consumer baseline resolved at generation time.
+
+Security generation runs separately from package builds and release publication. A published package or release does not by itself establish that a security ZIP is available. If an asset is absent or its generation failed, there is no matching published bundle at that location yet. Check [release-security workflow results](https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml); do not substitute a different release's inventory.
+
+## What is in the ZIP?
+
+The archive preserves the source-project folder layout. Start with the files at its root:
+
+| File | Purpose |
+| --- | --- |
+| `README.md` | Scope and interpretation guidance |
+| `index.json` | Included package IDs, versions, NuGet archive hashes and framework coverage |
+| `packages.json` | Package-to-project mapping for the evidence set |
+| `source-run.json` | Source release/build, workflow and tooling provenance |
+| `SHA256SUMS` | Checksums for the enclosed evidence files |
+
+Each package has a `security/releases/<version>/` folder containing:
+
+| File or folder | Purpose |
+| --- | --- |
+| `sbom.cdx.json` | CycloneDX 1.6 JSON inventory combining the package's shipped target-framework graphs |
+| `manifest.json` | Original NuGet archive SHA-256, evidence hashes, framework coverage, generator details and limitations |
+| `resolution.json` | Declared dependency ranges and exact resolved dependency graphs |
+| `audit.json` | Managed NuGet advisory observation at generation time |
+| `vex/` | Dated reviewed vulnerability-impact statements, when available |
+| `scans/` | Subsequent advisory observations, if included in that evidence set |
+
+Framework-specific graph references distinguish dependency applicability within the combined SBOM. Repeated NuGet package identities across frameworks are intentional. Native payload hashes are inventoried where present; a hash alone does not establish the embedded engine version or its vulnerability status.
+
+## Verify integrity
+
+Download the ZIP and checksum into the same folder. On Linux:
+
+```sh
+sha256sum -c servicestack-security-10.4.2.zip.sha256
+unzip servicestack-security-10.4.2.zip -d servicestack-security-10.4.2
+cd servicestack-security-10.4.2
+sha256sum -c SHA256SUMS
+```
+
+On macOS, use `shasum -a 256 -c` in place of `sha256sum -c`. On Windows, compare `Get-FileHash <zip-path> -Algorithm SHA256` with the published checksum.
+
+The per-package manifest also identifies the original `.nupkg` hash, allowing you to compare the inventory with the package you obtained. Checksums detect content changes; they are not a digital signature or independent security attestation.
+
+## VEX information
+
+VEX describes an assessed vulnerability's impact on specified product versions and framework variants. ServiceStack renders dated CycloneDX VEX snapshots only when vulnerability-specific reviewed decisions are available. These can identify an affected, fixed, under-investigation or justified not-affected state.
+
+**The absence of VEX means no reviewed statements are included; it does not mean the product has no vulnerabilities.** The verified 10.4.2 public bundle contains no VEX snapshots. Do not infer a not-affected decision from an empty decisions list or a scanner returning no matches.
+
+Where a release contains several VEX snapshots, use the most recent applicable assessment and retain the earlier snapshots for history. Read the advisory, affected references, analysis, justification and remediation guidance together. A statement about one release or framework is not a statement about all ServiceStack products or all downstream configurations.
+
+There is no blanket commitment on this page to publish VEX with every release or to maintain an unspecified LTS branch. Applicability depends on the vulnerability assessment and the supported product/version concerned.
+
+## Advisory observations and downstream scope
+
+`audit.json` is a point-in-time observation from NuGet advisory data, not a continuously updated all-clear. The [scheduled security workflow](https://github.com/ServiceStack/ServiceStack/actions/workflows/security-core.yml) rescans retained release graphs against current advisory data and preserves observations, including findings. Historical graphs can gain new advisory matches without their original SBOM changing.
+
+Customers should scan their own application's resolved dependency graph and track .NET, operating-system, container and native-engine advisories separately. These package observations do not assess all first-party ServiceStack code or every deployment configuration.
+
+## Build and pre-release evidence
+
+For evidence associated with a particular package build, open its linked [Package Security Evidence workflow run](https://github.com/ServiceStack/ServiceStack/actions/workflows/package-security.yml). Its **Artifacts** section can include:
+
+- **ServiceStack Security** — the evidence tree;
+- **ServiceStack Security ZIP** — a compressed bundle and checksum.
+
+Use `source-run.json` to match the security output to its originating pack run and commit, and the manifests to match the actual NuGet archives. GitHub Actions artifact downloads require GitHub sign-in and are retained for 90 days. Public release assets provide the direct download route for released evidence. SBOMs are distributed separately; they are not currently embedded inside the `.nupkg` downloaded from NuGet or MyGet.
+
+Release-asset regeneration can replace the named ZIP, update reviewed VEX and resolve dependency ranges again. Record the download date, checksum and provenance when retaining evidence for your own review.
+
+
+# Security Assessments and Testing Evidence
+Source: https://docs.servicestack.net/security/assessments
+
+[Security Assurance](/security/) · [SBOM and VEX Downloads](/security/sbom-vex) · [CRA and CE Marking](/security/cra)
+
+This page identifies published assessment evidence and the limits of the conclusions it supports. Last reviewed: **12 November 2026**.
+
+## Penetration-test report availability
+
+No independent penetration-test report or independent penetration-test executive summary is currently published through this assurance documentation. The internal source review described below is available as supporting evidence, but is not a substitute for such a report.
+
+A proposed test, access to a testing tool, a dependency scan or the existence of CI security jobs does not establish that a penetration test has been completed. Customers requiring independent assessment evidence should record it as unavailable from the current public evidence set rather than treating the internal review as an external test.
+
+## Published internal security review
+
+The [ServiceStack v10.2 release materials](https://docs.servicestack.net/releases/v10_02) document an internal AI-assisted security and reliability review. Public reports describe findings and source changes across packages, including input handling, serialization, path boundaries, SQL construction and resource management.
+
+| Area | Public source report |
+| --- | --- |
+| ServiceStack.Common | [Common security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Common/SECURITY_CHANGES.md) |
+| ServiceStack.Interfaces | [Interfaces security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack/src/ServiceStack.Interfaces/SECURITY_CHANGES.md) |
+| ServiceStack.Text | [Text security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.Text/SECURITY_CHANGES.md) |
+| ServiceStack.OrmLite and database dialects | [OrmLite security changes](https://github.com/ServiceStack/ServiceStack/blob/main/ServiceStack.OrmLite/SECURITY_CHANGES.md) |
+| Broader review scope | [v10.2 audit and hardening overview](https://docs.servicestack.net/releases/v10_02) |
+
+These are living source reports. A source change is not by itself proof that a particular deployed release contains the fix. For version-specific review, identify the package version and source commit, and preserve a commit-pinned copy of the relevant report and verification evidence.
+
+## How to interpret the evidence
+
+| Evidence | What it supports | What it does not establish |
+| --- | --- | --- |
+| Internal AI-assisted source review | Recorded source findings and remediation work in the documented scope | Independent penetration testing or exhaustive vulnerability coverage |
+| Automated tests and CI results | Behavior checked by the identified tests at a particular revision | Security of all untested paths or configurations |
+| SBOM and managed dependency observations | Package identity, dependency inventory and advisory matches in the stated data source | Runtime exploitation assessment, first-party code coverage or complete native-engine coverage |
+| Reviewed VEX, when published | A documented impact assessment for identified vulnerabilities and product variants | A general security certification or blanket all-clear |
+
+No blanket statement that all high or critical risks are mitigated is made by these pages. Such a conclusion requires an identified assessment scope, findings, remediation status and verification against the relevant release.
+
+## Certifications and confidential material
+
+These pages do not provide an ISO 27001 certificate, SOC 2 report or other independent organizational certification. The published product evidence should not be represented as one.
+
+The public review reports, release evidence and security policy are the standard self-service assurance materials. Raw investigation records, sensitive exploitation details and internal infrastructure information are not included in public security bundles.
+
+## Vulnerability disclosure
+
+Use the [ServiceStack security policy](https://servicestack.net/security) for private reporting and coordinated disclosure. Published assessments are historical evidence and do not replace monitoring current advisories and the actual dependencies resolved by your application.
+
+
+# Secure Development and Supply Chain
+Source: https://docs.servicestack.net/security/secure-development
+
+[Security overview](/security/) · [SBOM and VEX downloads](/security/sbom-vex) · [Security assessments](/security/assessments)
+
+This page summarizes publicly inspectable development and supply-chain evidence. It does not publish private operational records or assert independent certification of every development control.
+
+## Source review and remediation
+
+ServiceStack source and security-change reports are available in the [ServiceStack repository](https://github.com/ServiceStack/ServiceStack). The [assessment evidence page](/security/assessments) links the internal AI-assisted security and reliability review and package reports.
+
+Use source reports to understand the documented findings and changes. Match the source commit to the exact package being assessed before claiming a fix is present in a deployed release. Source availability, a review report and an automated test result answer different assurance questions.
+
+## Release and dependency evidence
+
+The public [security tooling](https://github.com/ServiceStack/ServiceStack/tree/main/build/security) maintains a configured package inventory and generates CycloneDX evidence from exact NuGet archives. Each release record identifies the original package hash, shipped frameworks, declared dependency ranges and a resolved consumer baseline.
+
+The independent [Package Security Evidence workflow](https://github.com/ServiceStack/ServiceStack/actions/workflows/package-security.yml) processes outputs from successful package builds. A security run identifies its source pack run and commit. The [release security workflow](https://github.com/ServiceStack/ServiceStack/actions/workflows/release-security.yml) generates public downloads from the exact published NuGet version.
+
+These paths have different provenance: regenerating a consumer baseline from a published package can resolve a dependency range differently from an earlier build. Preserve the manifest, provenance and archive checksum with the evidence you review.
+
+See [download and verification instructions](/security/sbom-vex) for release assets, build artifacts and limitations.
+
+## Dependency advisory monitoring
+
+The [scheduled security workflow](https://github.com/ServiceStack/ServiceStack/actions/workflows/security-core.yml) checks retained dependency graphs against current NuGet advisory data. A new advisory can make a historical graph fail a later scan without changing the original SBOM. Observations are retained for review; successful historical results are not a continuing all-clear.
+
+The workflow covers managed package matches in its stated data source. First-party code, native engine versions, platform runtimes and an integrating application's own dependency resolutions need separate assessment. A Microsoft-maintained dependency is still subject to advisory review.
+
+## Vulnerability impact and fixes
+
+A dependency match is an investigation input. Product impact depends on the vulnerable behavior, application paths, platform and exact dependency versions. Reviewed VEX statements, when available, record a vulnerability-specific assessment; an empty VEX set does not mean no investigation is necessary.
+
+Fixes in source or pre-release packages must be distinguished from confirmed stable availability. Consult published advisories and [security update guidance](/security/support), then verify the resolved packages in your own build.
+
+## Internal governance evidence
+
+The public source, workflows, review reports, security policy and release bundles are the standard self-service evidence set. These pages are not a published copy of every internal policy, a signed SDLC audit or an organizational security certification. See [assessment availability](/security/assessments) and [CRA readiness](/security/cra) for the current assurance boundaries.
+
+
+# Security Updates and Support
+Source: https://docs.servicestack.net/security/support
+
+[Security overview](/security/) · [Vulnerability reporting](/security/reporting) · [CRA readiness](/security/cra)
+
+Use exact package versions and advisory-specific guidance when evaluating security updates. This page does not introduce a new LTS branch, fixed backport schedule or indefinite security-support commitment.
+
+## Reporting older releases
+
+Please report suspected vulnerabilities in any version, including pre-release packages, and identify the version concerned. Acceptance of a report does not itself establish ongoing maintenance or backport availability for that release.
+
+The [security policy](https://github.com/ServiceStack/ServiceStack/blob/main/SECURITY.md) recommends using the latest stable release where possible and consulting each advisory for its required fixed version.
+
+## Selecting an update
+
+1. Check [published advisories](https://github.com/ServiceStack/ServiceStack/security/advisories) and the [release history](/release-notes-history) for the affected and fixed versions.
+2. Distinguish a source fix or pre-release build from a stable package available through NuGet.
+3. Restore your application and check its actual resolved dependency versions, including transitive packages.
+4. Test the update against your application and deploy the updated artifacts.
+5. Retain the corresponding inventory and assessment evidence for your deployment.
+
+A framework update does not automatically patch an externally installed .NET runtime, operating system, database server or native library. Track those components separately. A package version with no match in a particular scanner is not a guarantee that all of its behavior is secure.
+
+## Security support and commercial support
+
+Commercial subscription/support arrangements and product security-support periods are distinct. The existence or expiry of a subscription should not be used to infer a particular product's CRA support period, free-update entitlement or backport policy.
+
+Formal CRA product security-support periods and associated commitments remain under assessment, as stated on the [CRA and CE-marking page](/security/cra). No product-specific support schedule is established by this documentation. When published, such schedules must identify the covered products, versions, dates and upgrade paths.
+
+## Evidence retention and end of life
+
+Security inventories are versioned historical records. Keeping an older SBOM available does not mean that its release remains supported or that its original dependencies remain free of later advisories.
+
+GitHub Actions artifacts are retained for a limited period. Public release assets are the preferred download location for published evidence; customers should retain their reviewed ZIP, checksum, provenance and application inventory. See [artifact access and retention](/security/sbom-vex).
+
+Any future support-period or end-of-life announcement should be read with its explicit product scope and residual-risk guidance. Do not infer such a decision solely from the presence or absence of a download.
+
+
+# Application Security Guides
+Source: https://docs.servicestack.net/security/application-security
+
+[Security overview](/security/) · [Vulnerability reporting](/security/reporting)
+
+ServiceStack provides security features and integration points that must be configured for an application's own identity model, tenant boundaries and deployment. These guides complement the supplier assurance evidence; they do not certify a particular application as secure.
+
+## Authentication and sessions
+
+- [Authentication overview](/auth/) — available authentication models.
+- [ASP.NET Core Identity integration](/auth/identity-auth) — integrating Identity with ServiceStack.
+- [Sessions](/auth/sessions) — session behavior and lifecycle.
+- [JWT authentication](/auth/jwt-authprovider) — JWT provider configuration.
+- [API keys](/auth/apikeys) — API-key access and management.
+
+Choose and configure the identity model deliberately. Authentication establishes who the caller is; authorization and tenant membership still determine which operations and data they can access.
+
+## Authorization and tenant boundaries
+
+- [Authentication and authorization](/auth/authentication-and-authorization).
+- [Restricting services](/auth/restricting-services).
+- [OrmLite connection filters](/ormlite/connection-filters).
+
+For multi-tenant applications, validate membership server-side and scope reads, writes, files, exports and background work to the authorized tenant. A resource ID, client-selected organization or authenticated session is not by itself proof of access to a tenant's data. Test both allowed operations and cross-tenant denial in your actual application.
+
+## Input and browser boundaries
+
+- [Validation](/validation).
+- [Declarative validation](/declarative-validation).
+- [Antiforgery protection](/auth/anti-forgery).
+- [Cross-origin requests](/corsfeature).
+
+Apply appropriate request/body limits, validate inputs and configure browser-facing protections for the authentication mechanism used. CORS settings do not replace authorization. Cookies and browser-originated mutations require attention to CSRF and the application's origin policy.
+
+## Files and data exposure
+
+- [Managed file uploads](/locode/files-upload-filesystem).
+- [Request logging](/request-logger).
+- [Application logging](/logging).
+
+Protect uploaded files and downloads with resource authorization, storage boundaries and appropriate content/size controls. Keep credentials and unnecessary personal data out of logs, error responses, audit detail and support exports.
+
+## Security verification
+
+Use a representative test deployment with known package versions, synthetic data and appropriately scoped accounts. Assess unauthenticated behavior, role boundaries, tenant isolation and sensitive business operations. Keep the code revision, configuration, exclusions, results and remediation verification with your release evidence.
+
+Framework test results and an assessment of one application do not establish coverage of all possible ServiceStack deployments. See [assessment evidence and interpretation](/security/assessments).
+
+
+# EU Cyber Resilience Act and CE Marking
+Source: https://docs.servicestack.net/security/cra
+
+[Security Assurance](/security/) · [SBOM and VEX Downloads](/security/sbom-vex) · [Security Assessments](/security/assessments)
+
+This page states ServiceStack's current CRA readiness and CE-marking position for supplier assessments. Last reviewed: **12 November 2026**.
+
+## CE-marking position
+
+ServiceStack's planned approach is to apply CE marking to products where legally required under the EU Cyber Resilience Act, after completing the applicable conformity assessment and EU Declaration of Conformity, by the relevant statutory application date.
+
+**ServiceStack is not currently asserting CRA conformity or CRA CE marking for the packages covered by this assurance documentation.** Product applicability, classification, assessment route and security-support commitments remain under assessment. No signed CRA EU Declaration of Conformity is published here.
+
+This position is a readiness statement, not a certificate or declaration of conformity. It does not promise CE marking for components outside the regulation's scope or certify a customer's integrated application.
+
+## What must be completed
+
+The CRA places obligations on the product and its lifecycle. Depending on applicability, preparation includes:
+
+- defining the product boundary, intended use and applicable category;
+- recording cybersecurity risks and implementing applicable security requirements;
+- operating vulnerability intake, assessment, remediation, disclosure and reporting processes;
+- defining security-support coverage and providing the required user information;
+- assembling technical documentation and completing the applicable conformity assessment;
+- issuing the EU Declaration of Conformity and presenting the CE mark when conformity has been demonstrated.
+
+The [European Commission's manufacturer guidance](https://digital-strategy.ec.europa.eu/en/policies/cra-manufacturers) explains these stages. The [conformity-assessment guidance](https://digital-strategy.ec.europa.eu/en/policies/cra-conformity-assessment) explains why most products can use manufacturer self-assessment while certain important or critical categories require stricter procedures. This page does not assume every ServiceStack package has the same classification.
+
+## Software components and presentation
+
+Separately marketed software components can fall within scope. Being a library or being embedded in another supplier's product is not, by itself, an exemption. Free and open-source software has specific scope provisions; public source availability alone does not settle applicability.
+
+Under Article 30 of the CRA, software CE marking can be presented on the EU Declaration of Conformity or the website accompanying the software. A logo inside each DLL or NuGet package is not the required presentation mechanism. Any future declaration and mark must clearly identify the product it covers.
+
+See the [CRA legal text, including Articles 2–3, 28–32 and Annexes I–II](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847) for the governing requirements.
+
+## Application dates
+
+The CRA's main requirements generally apply from **11 December 2027**. Article 14 reporting obligations apply from **11 September 2026**. Transitional provisions affect products placed on the market earlier and products subsequently subject to substantial modification.
+
+These dates are distinct: a future conformity date does not defer an already applicable reporting obligation. See the [Commission CRA overview](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) and Articles 69 and 71 of the regulation.
+
+## Available readiness evidence
+
+| Area | Public evidence or current status |
+| --- | --- |
+| Package inventories and provenance | [Version-specific security bundles](/security/sbom-vex) |
+| Vulnerability-impact statements | [Reviewed VEX where available; absence explained](/security/sbom-vex#vex-information) |
+| Product review and assessment evidence | [Published security review and report availability](/security/assessments) |
+| Coordinated disclosure and private reporting | [ServiceStack security policy](https://servicestack.net/security) |
+| CRA declaration and CE marking | Not currently asserted or published for the covered packages |
+| Formal product security-support periods | Still under assessment; no new LTS or backport commitment is established by these pages |
+
+These materials support supplier due diligence. They do not, on their own, demonstrate completion of all CRA obligations. Customers integrating ServiceStack remain responsible for assessing their own product, resolved dependencies, deployment and applicable manufacturer obligations.
 
 
 # React Templates

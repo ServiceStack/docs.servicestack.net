@@ -31,9 +31,9 @@ const ConnectionAnatomy = {
     </section>`,
     setup() {
         const parts = [
-            { token:'redis://', name:'Scheme', text:'Optional. Included for readability when the rest of the URI is qualified.' },
+            { token:'redis:// or rediss://', name:'Scheme', text:'Optional with redis://. Use rediss:// for TLS, which also treats user:password@ as ACL credentials and /2 as the DB.' },
             { token:'clientid:password@', name:'Credentials', text:'A client alias and password. With Redis ACLs pass the username on the QueryString instead.' },
-            { token:'localhost:6380', name:'Host and port', text:'The only required part. Port defaults to 6379 when omitted.' },
+            { token:'localhost:6380', name:'Host and port', text:'The only required part. Port defaults to 6379 (6380 for rediss://). Wrap IPv6 addresses in brackets, e.g. [::1]:6379.' },
             { token:'?ssl=true', name:'SSL', text:'Connect over TLS - the primary use-case for Azure Redis Cache.' },
             { token:'?db=1', name:'Database', text:'The Redis DB this connection is switched to on connect.' },
             { token:'?connectTimeout=..', name:'Timeouts', text:'Connect, Send, Receive and IdleTimeOutSecs are all settable here.' },
@@ -43,6 +43,8 @@ const ConnectionAnatomy = {
             { value:'127.0.0.1:6379', note:'IP address and port' },
             { value:'password@localhost:6379', note:'with a password' },
             { value:'redis://clientid:password@localhost:6380?ssl=true&db=1', note:'fully qualified' },
+            { value:'[::1]:6379', note:'IPv6 address' },
+            { value:'rediss://user:p%40ss@redis.example:6380/2', note:'TLS URI with ACL user and DB' },
         ]
         return { parts, examples }
     }
@@ -84,7 +86,7 @@ const ManagerPicker = {
         const managers = [
             { name:'RedisManagerPool', featured:true,
               text:'The streamlined pool configured entirely from the connection string - no options on the manager itself and no separate readonly hosts.',
-              behavior:'Extra connections are created and disposed outside the pool, so a request never blocks waiting for a free client.',
+              behavior:'Extra connections are created and disposed outside the pool, so a request never blocks waiting for a free client - unless you cap them with MaxLiveConnections.',
               when:'The common case: a single Redis instance and a simpler configuration.' },
             { name:'PooledRedisClientManager', featured:false,
               text:'The configurable pool, which also accepts separate read/write (master) and readonly (replica) hosts.',
