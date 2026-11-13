@@ -1,0 +1,17 @@
+@page "/security/{Slug}"
+@model MyApp.Page
+@inject MarkdownPages Markdown
+@implements IRenderStatic<MyApp.Page>
+
+@functions {
+    public List<Page> GetStaticProps(RenderContext ctx) =>
+        ctx.Resolve<MarkdownPages>().GetVisiblePages("security")
+            .Where(page => page.Slug != "security/index")
+            .Map(page => new Page { Slug = page.Slug.RightPart('/') });
+}
+
+@await Html.PartialAsync("DocsPage", new Shared.DocsPage {
+    Brand = "ServiceStack Security",
+    Slug = Model.Slug,
+    Folder = "security",
+}.Init(this, Markdown))
