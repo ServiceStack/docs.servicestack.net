@@ -44,7 +44,7 @@ These pages and the published evidence are provided in English. Customers can re
 
 Identify the NuGet package ID, exact package version and target framework used by your application. If you receive DLLs through another vendor, also establish which package or private build produced them. An assembly filename alone does not identify a release or its resolved dependencies.
 
-For example, the following commonly embedded components are covered by the corresponding package entries in the published 10.4.2 bundle:
+For example, the following commonly embedded components are covered by the corresponding package entries in the published 10.5.0 and 10.4.2 bundles:
 
 | Component | NuGet package ID |
 | --- | --- |
@@ -60,10 +60,11 @@ An SBOM for one release is not evidence for a different release. NuGet dependenc
 
 ## Published evidence status
 
-Last checked: **12 November 2026**.
+Last checked: **14 November 2026**.
 
-- The [10.4.2 security bundle](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip) and its [SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip.sha256) are available. The bundle contains 49 package inventories and no reviewed VEX snapshots.
-- The [10.5 release](https://github.com/ServiceStack/ServiceStack/releases/tag/v10.5) does not yet have a security bundle attached as of this check. Check that release's Assets for subsequent availability; use neither the 10.4.2 bundle nor an example download URL as a substitute for missing 10.5 evidence.
+- The [10.5.0 security bundle](https://github.com/ServiceStack/ServiceStack/releases/download/v10.5/servicestack-security-10.5.0.zip) and its [SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.5/servicestack-security-10.5.0.zip.sha256) are attached to the [10.5 release](https://github.com/ServiceStack/ServiceStack/releases/tag/v10.5). The bundle contains 49 package inventories and no reviewed VEX snapshots.
+- The [10.4.2 security bundle](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip) and its [SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.4.2/servicestack-security-10.4.2.zip.sha256) remain available for 10.4.2. It also contains 49 package inventories and no reviewed VEX snapshots.
+- Use the bundle matching your exact package version; one release's bundle is not evidence for another.
 - [Assessment availability](/security/assessments) and [CRA/CE status](/security/cra) are stated separately. An inventory download is not a penetration-test report, certificate or declaration of conformity.
 
 ## Report a vulnerability privately

@@ -15,6 +15,16 @@ Open the [ServiceStack GitHub releases](https://github.com/ServiceStack/ServiceS
 
 A release tag such as `v10.4` maps to NuGet version `10.4.0`. A patch tag such as `v10.4.2` maps to `10.4.2`.
 
+### Verified download: 10.5.0
+
+The following files were verified on **14 November 2026**:
+
+- [Download the 10.5.0 security ZIP](https://github.com/ServiceStack/ServiceStack/releases/download/v10.5/servicestack-security-10.5.0.zip)
+- [Download its SHA-256 checksum](https://github.com/ServiceStack/ServiceStack/releases/download/v10.5/servicestack-security-10.5.0.zip.sha256)
+- [View the originating security workflow](https://github.com/ServiceStack/ServiceStack/actions/runs/43396620198)
+
+This bundle contains 49 package release records, all for 10.5.0. Its provenance identifies the exact published NuGet archives as the source and the dependency graph as a consumer baseline resolved at generation time.
+
 ### Verified download: 10.4.2
 
 The following files were verified on **12 November 2026**:
@@ -58,9 +68,9 @@ Framework-specific graph references distinguish dependency applicability within 
 Download the ZIP and checksum into the same folder. On Linux:
 
 ```sh
-sha256sum -c servicestack-security-10.4.2.zip.sha256
-unzip servicestack-security-10.4.2.zip -d servicestack-security-10.4.2
-cd servicestack-security-10.4.2
+sha256sum -c servicestack-security-10.5.0.zip.sha256
+unzip servicestack-security-10.5.0.zip -d servicestack-security-10.5.0
+cd servicestack-security-10.5.0
 sha256sum -c SHA256SUMS
 ```
 
@@ -72,7 +82,7 @@ The per-package manifest also identifies the original `.nupkg` hash, allowing yo
 
 VEX describes an assessed vulnerability's impact on specified product versions and framework variants. ServiceStack renders dated CycloneDX VEX snapshots only when vulnerability-specific reviewed decisions are available. These can identify an affected, fixed, under-investigation or justified not-affected state.
 
-**The absence of VEX means no reviewed statements are included; it does not mean the product has no vulnerabilities.** The verified 10.4.2 public bundle contains no VEX snapshots. Do not infer a not-affected decision from an empty decisions list or a scanner returning no matches.
+**The absence of VEX means no reviewed statements are included; it does not mean the product has no vulnerabilities.** The verified 10.5.0 and 10.4.2 public bundles contain no VEX snapshots. Do not infer a not-affected decision from an empty decisions list or a scanner returning no matches.
 
 Where a release contains several VEX snapshots, use the most recent applicable assessment and retain the earlier snapshots for history. Read the advisory, affected references, analysis, justification and remediation guidance together. A statement about one release or framework is not a statement about all ServiceStack products or all downstream configurations.
 
